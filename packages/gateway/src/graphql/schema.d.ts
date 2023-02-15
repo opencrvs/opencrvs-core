@@ -46,10 +46,13 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getRoles?: Array<GQLRole | null>
+  getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
+  fetchSystem?: GQLSystem
+  getFormDataset?: Array<GQLFormDataset>
+  informantSMSNotifications?: Array<GQLSMSNotification>
 }
 
 export interface GQLMutation {
@@ -83,13 +86,22 @@ export interface GQLMutation {
   resendSMSInvite?: string
   usernameSMSReminder?: string
   resetPasswordSMS?: string
+  updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
+  reactivateSystem?: GQLSystem
+  deactivateSystem?: GQLSystem
+  registerSystem?: GQLSystemSecret
+  refreshSystemSecret?: GQLSystemSecret
+  updatePermissions?: GQLSystem
+  deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
+  createFormDataset?: GQLFormDatasetResponse
+  toggleInformantSMSNotification?: Array<GQLSMSNotification>
 }
 
 export interface GQLDummy {
@@ -176,6 +188,8 @@ export interface GQLPerson {
   deceased?: GQLDeceased
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLBirthRegResultSet {
@@ -209,13 +223,13 @@ export interface GQLRegistrationCountResult {
 export interface GQLLocation {
   id: string
   _fhirID?: string
-  identifier?: Array<GQLIdentifier | null>
-  status?: string
-  name?: string
-  alias?: Array<string | null>
+  identifier?: Array<GQLIdentifier>
+  status: string
+  name: string
+  alias: Array<string>
   description?: string
-  partOf?: string
-  type?: GQLLocationType
+  partOf: string
+  type: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number
@@ -225,26 +239,26 @@ export interface GQLLocation {
 }
 
 export interface GQLUser {
-  id?: string
-  userMgntUserID?: string
-  practitionerId?: string
-  name?: Array<GQLHumanName | null>
+  id: string
+  userMgntUserID: string
+  practitionerId: string
+  name: Array<GQLHumanName>
   username?: string
-  mobile?: string
-  role?: string
-  type?: string
+  mobile: string
+  systemRole: GQLSystemRoleType
+  role: GQLRole
   email?: string
-  status?: string
+  status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation | null>
+  catchmentArea?: Array<GQLLocation>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
-  creationDate?: string
+  creationDate: string
   avatar?: GQLAvatar
   device?: string
-  searches?: Array<GQLBookmarkedSeachItem | null>
+  searches?: Array<GQLBookmarkedSeachItem>
 }
 
 export interface GQLSearchUserResult {
@@ -411,12 +425,11 @@ export interface GQLEventProgressResultSet {
   totalItems?: number
 }
 
-export interface GQLRole {
+export interface GQLSystemRole {
   id: string
-  title?: string
-  value?: string
-  types?: Array<string | null>
-  active?: boolean
+  value: GQLSystemRoleType
+  roles: Array<GQLRole>
+  active: boolean
 }
 
 export interface GQLComparisonInput {
@@ -450,6 +463,32 @@ export interface GQLFormDraft {
   history: Array<GQLDraftHistory>
   updatedAt: GQLDate
   createdAt: GQLDate
+}
+
+export interface GQLSystem {
+  _id: string
+  clientId: string
+  shaSecret: string
+  status: GQLSystemStatus
+  name: string
+  type: GQLSystemType
+  settings?: Array<GQLWebhookPermission>
+}
+
+export interface GQLFormDataset {
+  options?: Array<GQLFormDatasetOption>
+  fileName: string
+  createdAt: string
+  _id?: string
+}
+
+export interface GQLSMSNotification {
+  id?: string
+  name: string
+  message: string
+  enabled: boolean
+  updatedAt: string
+  createdAt: string
 }
 
 export interface GQLNotificationInput {
@@ -518,12 +557,12 @@ export interface GQLDeathRegistrationInput {
 
 export interface GQLUserInput {
   id?: string
-  name?: Array<GQLHumanNameInput | null>
+  name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile?: string
+  mobile: string
+  systemRole: GQLSystemRoleType
   role?: string
-  type?: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
@@ -544,6 +583,17 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
+}
+
+export interface GQLResponse {
+  msg: string
+}
+
+export interface GQLSystemRoleInput {
+  id: string
+  value?: string
+  active?: boolean
+  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLCertificateSVGInput {
@@ -569,7 +619,11 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegration | null>
+  INFORMANT_SIGNATURE?: boolean
+  INFORMANT_SIGNATURE_REQUIRED?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
+  ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackground
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -584,7 +638,11 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegrationInput | null>
+  INFORMANT_SIGNATURE?: boolean
+  INFORMANT_SIGNATURE_REQUIRED?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
+  ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
 
 export interface GQLFormDraftInput {
@@ -602,6 +660,22 @@ export interface GQLDeleteFormDraftInput {
   event: GQLEvent
 }
 
+export interface GQLSystemSecret {
+  system: GQLSystem
+  clientSecret: string
+}
+
+export interface GQLSystemInput {
+  name: string
+  type: GQLSystemType
+  settings?: GQLSystemSettings
+}
+
+export interface GQLUpdatePermissionsInput {
+  clientId: string
+  webhook: Array<GQLWebhookInput>
+}
+
 export interface GQLBookMarkedSearches {
   searchList?: Array<GQLBookmarkedSeachItem>
 }
@@ -615,6 +689,23 @@ export interface GQLBookmarkSearchInput {
 export interface GQLRemoveBookmarkedSeachInput {
   userId: string
   searchId: string
+}
+
+export interface GQLFormDatasetResponse {
+  status: string
+  msg: string
+  data?: GQLFormDataset
+}
+
+export interface GQLFormDatasetInput {
+  fileName: string
+  base64Data: string
+}
+
+export interface GQLSMSNotificationInput {
+  id: string
+  name: string
+  enabled: boolean
 }
 
 export type GQLMap = any
@@ -634,6 +725,7 @@ export interface GQLRegistration {
   assignment?: GQLAssignmentData
   contact?: string
   contactRelationship?: string
+  informantsSignature?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -650,6 +742,8 @@ export interface GQLRelatedPerson {
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
+  exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export const enum GQLBirthType {
@@ -695,6 +789,7 @@ export interface GQLHistory {
   requester?: string
   hasShowedVerifiedDocument?: boolean
   otherReason?: string
+  system?: GQLSystem
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -826,9 +921,31 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
+export const enum GQLSystemRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
+}
+
+export interface GQLRole {
+  _id: string
+  labels: Array<GQLRoleLabel>
+}
+
+export const enum GQLStatus {
+  active = 'active',
+  deactivated = 'deactivated',
+  pending = 'pending',
+  disabled = 'disabled'
+}
+
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: string
+  role: GQLSystemRoleType
   signature?: GQLSignature
 }
 
@@ -846,8 +963,8 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  type?: string
-  status?: string
+  role?: string
+  status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
   creationDate?: string
@@ -891,10 +1008,11 @@ export interface GQLTotalMetricsByTime {
 
 export interface GQLVSExport {
   event: string
-  year: number
+  startDate: GQLDate
+  endDate: GQLDate
   fileSize: string
   url: string
-  createdOn: string
+  createdOn: GQLDate
 }
 
 export type GQLUserAuditLogResultItem =
@@ -961,6 +1079,28 @@ export interface GQLDraftHistory {
   updatedAt: GQLDate
 }
 
+export const enum GQLSystemStatus {
+  active = 'active',
+  deactivated = 'deactivated'
+}
+
+export const enum GQLSystemType {
+  NATIONAL_ID = 'NATIONAL_ID',
+  HEALTH = 'HEALTH',
+  RECORD_SEARCH = 'RECORD_SEARCH',
+  WEBHOOK = 'WEBHOOK'
+}
+
+export interface GQLWebhookPermission {
+  event: string
+  permissions: Array<string>
+}
+
+export interface GQLFormDatasetOption {
+  value: string
+  label?: Array<GQLFormDatasetOptionLabel | null>
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -980,6 +1120,7 @@ export interface GQLPersonInput {
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLLocationInput {
@@ -1008,6 +1149,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  informantsSignature?: string
   informantType?: GQLInformantType
   otherInformantType?: string
   contact?: string
@@ -1029,6 +1171,8 @@ export interface GQLRelatedPersonInput {
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
+  exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLQuestionnaireQuestionInput {
@@ -1071,6 +1215,11 @@ export interface GQLSignatureInput {
   type?: string
 }
 
+export interface GQLRoleInput {
+  _id?: string
+  labels: Array<GQLLabelInput>
+}
+
 export interface GQLBirth {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1092,9 +1241,10 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
-export interface GQLIntegration {
-  name?: string
-  status?: string
+export interface GQLLoginBackground {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
 }
 
 export interface GQLBirthInput {
@@ -1118,9 +1268,10 @@ export interface GQLDeathInput {
   FEE?: GQLDeathFeeInput
 }
 
-export interface GQLIntegrationInput {
-  name?: string
-  status?: string
+export interface GQLLoginBackgroundInput {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
 }
 
 export interface GQLQuestionInput {
@@ -1138,6 +1289,18 @@ export interface GQLQuestionInput {
   enabled?: string
   custom?: boolean
   conditionals?: Array<GQLConditionalInput>
+  datasetId?: string
+  options?: Array<GQLCustomSelectOption>
+}
+
+export interface GQLSystemSettings {
+  dailyQuota?: number
+  webhook?: Array<GQLWebhookInput | null>
+}
+
+export interface GQLWebhookInput {
+  event: string
+  permissions: Array<string | null>
 }
 
 export const enum GQLInformantType {
@@ -1276,6 +1439,11 @@ export const enum GQLAttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
   INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
+}
+
+export interface GQLRoleLabel {
+  lang: string
+  label: string
 }
 
 export interface GQLAdvancedSeachParameters {
@@ -1436,6 +1604,11 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLFormDatasetOptionLabel {
+  lang: string
+  descriptor: GQLMesssageDescriptor
+}
+
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
@@ -1511,6 +1684,11 @@ export interface GQLCorrectionInput {
   note?: string
 }
 
+export interface GQLLabelInput {
+  lang: string
+  label: string
+}
+
 export interface GQLBirthFee {
   ON_TIME?: number
   LATE?: number
@@ -1520,6 +1698,11 @@ export interface GQLBirthFee {
 export interface GQLDeathFee {
   ON_TIME?: number
   DELAYED?: number
+}
+
+export const enum GQLImageFit {
+  FILL = 'FILL',
+  TILE = 'TILE'
 }
 
 export interface GQLBirthFeeInput {
@@ -1544,12 +1727,18 @@ export const enum GQLCustomFieldType {
   TEXTAREA = 'TEXTAREA',
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  PARAGRAPH = 'PARAGRAPH',
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 }
 
 export interface GQLConditionalInput {
   fieldId: string
   regexp: string
+}
+
+export interface GQLCustomSelectOption {
+  value: string
+  label: GQLMesssageDescriptorInput
 }
 
 export interface GQLPayment {
@@ -1583,6 +1772,12 @@ export interface GQLAuditLogItemBaseNameMap {
 export interface GQLAdditionalIdWithCompositionId {
   compositionId: string
   trackingId: string
+}
+
+export interface GQLMesssageDescriptor {
+  id: string
+  description?: string
+  defaultMessage: string
 }
 
 export interface GQLCommentInput {
@@ -1670,14 +1865,20 @@ export interface GQLResolver {
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
-  Role?: GQLRoleTypeResolver
+  SystemRole?: GQLSystemRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
+  System?: GQLSystemTypeResolver
+  FormDataset?: GQLFormDatasetTypeResolver
+  SMSNotification?: GQLSMSNotificationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
+  Response?: GQLResponseTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
+  SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
+  FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1692,6 +1893,7 @@ export interface GQLResolver {
   Deceased?: GQLDeceasedTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   Identifier?: GQLIdentifierTypeResolver
+  Role?: GQLRoleTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
   BookmarkedSeachItem?: GQLBookmarkedSeachItemTypeResolver
@@ -1712,17 +1914,20 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
+  WebhookPermission?: GQLWebhookPermissionTypeResolver
+  FormDatasetOption?: GQLFormDatasetOptionTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
-  Integration?: GQLIntegrationTypeResolver
+  LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  RoleLabel?: GQLRoleLabelTypeResolver
   AdvancedSeachParameters?: GQLAdvancedSeachParametersTypeResolver
   EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
   EventMetricsByLocation?: GQLEventMetricsByLocationTypeResolver
@@ -1734,6 +1939,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
@@ -1742,6 +1948,7 @@ export interface GQLResolver {
   }
 
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
+  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -1778,10 +1985,13 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getRoles?: QueryToGetRolesResolver<TParent>
+  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
+  fetchSystem?: QueryToFetchSystemResolver<TParent>
+  getFormDataset?: QueryToGetFormDatasetResolver<TParent>
+  informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2063,7 +2273,7 @@ export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -2331,18 +2541,18 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetRolesArgs {
+export interface QueryToGetSystemRolesArgs {
   title?: string
   value?: GQLComparisonInput
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: string
 }
-export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
+export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetRolesArgs,
+    args: QueryToGetSystemRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2372,6 +2582,29 @@ export interface QueryToGetActiveCertificatesSVGResolver<
 }
 
 export interface QueryToGetFormDraftResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QueryToFetchSystemArgs {
+  clientId: string
+}
+export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToFetchSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetFormDatasetResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QueryToInformantSMSNotificationsResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2406,13 +2639,22 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
   resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
+  updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
+  reactivateSystem?: MutationToReactivateSystemResolver<TParent>
+  deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
+  registerSystem?: MutationToRegisterSystemResolver<TParent>
+  refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
+  updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
+  deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
+  createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
+  toggleInformantSMSNotification?: MutationToToggleInformantSMSNotificationResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2877,6 +3119,18 @@ export interface MutationToResetPasswordSMSResolver<
   ): TResult
 }
 
+export interface MutationToUpdateRoleArgs {
+  systemRole?: GQLSystemRoleInput
+}
+export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToUpdateRoleArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToCreateOrUpdateCertificateSVGArgs {
   certificateSVG: GQLCertificateSVGInput
 }
@@ -2952,6 +3206,93 @@ export interface MutationToDeleteFormDraftResolver<
   ): TResult
 }
 
+export interface MutationToReactivateSystemArgs {
+  clientId: string
+}
+export interface MutationToReactivateSystemResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToReactivateSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeactivateSystemArgs {
+  clientId: string
+}
+export interface MutationToDeactivateSystemResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToDeactivateSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRegisterSystemArgs {
+  system?: GQLSystemInput
+}
+export interface MutationToRegisterSystemResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRegisterSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRefreshSystemSecretArgs {
+  clientId: string
+}
+export interface MutationToRefreshSystemSecretResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRefreshSystemSecretArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdatePermissionsArgs {
+  setting: GQLUpdatePermissionsInput
+}
+export interface MutationToUpdatePermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpdatePermissionsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeleteSystemArgs {
+  clientId: string
+}
+export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToDeleteSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToBookmarkAdvancedSearchArgs {
   bookmarkSearchInput: GQLBookmarkSearchInput
 }
@@ -2977,6 +3318,36 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateFormDatasetArgs {
+  formDataset: GQLFormDatasetInput
+}
+export interface MutationToCreateFormDatasetResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateFormDatasetArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToToggleInformantSMSNotificationArgs {
+  smsNotifications?: Array<GQLSMSNotificationInput>
+}
+export interface MutationToToggleInformantSMSNotificationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToToggleInformantSMSNotificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3381,6 +3752,8 @@ export interface GQLPersonTypeResolver<TParent = any> {
   deceased?: PersonToDeceasedResolver<TParent>
   nationality?: PersonToNationalityResolver<TParent>
   educationalAttainment?: PersonToEducationalAttainmentResolver<TParent>
+  ageOfIndividualInYears?: PersonToAgeOfIndividualInYearsResolver<TParent>
+  exactDateOfBirthUnknown?: PersonToExactDateOfBirthUnknownResolver<TParent>
 }
 
 export interface PersonToIdResolver<TParent = any, TResult = any> {
@@ -3459,6 +3832,20 @@ export interface PersonToNationalityResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToEducationalAttainmentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToAgeOfIndividualInYearsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToExactDateOfBirthUnknownResolver<
   TParent = any,
   TResult = any
 > {
@@ -3594,8 +3981,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
-  type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
@@ -3634,11 +4021,11 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToRoleResolver<TParent = any, TResult = any> {
+export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToTypeResolver<TParent = any, TResult = any> {
+export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4092,31 +4479,26 @@ export interface EventProgressResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  id?: RoleToIdResolver<TParent>
-  title?: RoleToTitleResolver<TParent>
-  value?: RoleToValueResolver<TParent>
-  types?: RoleToTypesResolver<TParent>
-  active?: RoleToActiveResolver<TParent>
+export interface GQLSystemRoleTypeResolver<TParent = any> {
+  id?: SystemRoleToIdResolver<TParent>
+  value?: SystemRoleToValueResolver<TParent>
+  roles?: SystemRoleToRolesResolver<TParent>
+  active?: SystemRoleToActiveResolver<TParent>
 }
 
-export interface RoleToIdResolver<TParent = any, TResult = any> {
+export interface SystemRoleToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTitleResolver<TParent = any, TResult = any> {
+export interface SystemRoleToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToValueResolver<TParent = any, TResult = any> {
+export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTypesResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RoleToActiveResolver<TParent = any, TResult = any> {
+export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4215,6 +4597,112 @@ export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLSystemTypeResolver<TParent = any> {
+  _id?: SystemTo_idResolver<TParent>
+  clientId?: SystemToClientIdResolver<TParent>
+  shaSecret?: SystemToShaSecretResolver<TParent>
+  status?: SystemToStatusResolver<TParent>
+  name?: SystemToNameResolver<TParent>
+  type?: SystemToTypeResolver<TParent>
+  settings?: SystemToSettingsResolver<TParent>
+}
+
+export interface SystemTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToClientIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToShaSecretResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToSettingsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLFormDatasetTypeResolver<TParent = any> {
+  options?: FormDatasetToOptionsResolver<TParent>
+  fileName?: FormDatasetToFileNameResolver<TParent>
+  createdAt?: FormDatasetToCreatedAtResolver<TParent>
+  _id?: FormDatasetTo_idResolver<TParent>
+}
+
+export interface FormDatasetToOptionsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSMSNotificationTypeResolver<TParent = any> {
+  id?: SMSNotificationToIdResolver<TParent>
+  name?: SMSNotificationToNameResolver<TParent>
+  message?: SMSNotificationToMessageResolver<TParent>
+  enabled?: SMSNotificationToEnabledResolver<TParent>
+  updatedAt?: SMSNotificationToUpdatedAtResolver<TParent>
+  createdAt?: SMSNotificationToCreatedAtResolver<TParent>
+}
+
+export interface SMSNotificationToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToEnabledResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -4271,6 +4759,14 @@ export interface AvatarToDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLResponseTypeResolver<TParent = any> {
+  msg?: ResponseToMsgResolver<TParent>
+}
+
+export interface ResponseToMsgResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
   BIRTH?: ApplicationConfigurationToBIRTHResolver<TParent>
@@ -4283,7 +4779,11 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
-  INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
+  INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
+  INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
+  DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
+  ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
+  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4363,7 +4863,51 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToINTEGRATIONSResolver<
+export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToADMIN_LEVELSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSystemSecretTypeResolver<TParent = any> {
+  system?: SystemSecretToSystemResolver<TParent>
+  clientSecret?: SystemSecretToClientSecretResolver<TParent>
+}
+
+export interface SystemSecretToSystemResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemSecretToClientSecretResolver<
   TParent = any,
   TResult = any
 > {
@@ -4375,6 +4919,33 @@ export interface GQLBookMarkedSearchesTypeResolver<TParent = any> {
 }
 
 export interface BookMarkedSearchesToSearchListResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLFormDatasetResponseTypeResolver<TParent = any> {
+  status?: FormDatasetResponseToStatusResolver<TParent>
+  msg?: FormDatasetResponseToMsgResolver<TParent>
+  data?: FormDatasetResponseToDataResolver<TParent>
+}
+
+export interface FormDatasetResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetResponseToMsgResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetResponseToDataResolver<
   TParent = any,
   TResult = any
 > {
@@ -4396,6 +4967,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   assignment?: RegistrationToAssignmentResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
+  informantsSignature?: RegistrationToInformantsSignatureResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -4482,6 +5054,13 @@ export interface RegistrationToContactRelationshipResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface RegistrationToInformantsSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface RegistrationToContactPhoneNumberResolver<
   TParent = any,
   TResult = any
@@ -4532,6 +5111,8 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
+  exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
+  ageOfIndividualInYears?: RelatedPersonToAgeOfIndividualInYearsResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
@@ -4570,6 +5151,20 @@ export interface RelatedPersonToIndividualResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface RelatedPersonToExactDateOfBirthUnknownResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToAgeOfIndividualInYearsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLQuestionnaireQuestionTypeResolver<TParent = any> {
   fieldId?: QuestionnaireQuestionToFieldIdResolver<TParent>
   value?: QuestionnaireQuestionToValueResolver<TParent>
@@ -4599,6 +5194,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   requester?: HistoryToRequesterResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
+  system?: HistoryToSystemResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
@@ -4645,6 +5241,10 @@ export interface HistoryToHasShowedVerifiedDocumentResolver<
 }
 
 export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToSystemResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4946,6 +5546,19 @@ export interface IdentifierToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLRoleTypeResolver<TParent = any> {
+  _id?: RoleTo_idResolver<TParent>
+  labels?: RoleToLabelsResolver<TParent>
+}
+
+export interface RoleTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToLabelsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLLocalRegistrarTypeResolver<TParent = any> {
   name?: LocalRegistrarToNameResolver<TParent>
   role?: LocalRegistrarToRoleResolver<TParent>
@@ -5010,7 +5623,7 @@ export interface BookmarkedSeachItemToParametersResolver<
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
-  type?: SearchFieldAgentResponseToTypeResolver<TParent>
+  role?: SearchFieldAgentResponseToRoleResolver<TParent>
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   avatar?: SearchFieldAgentResponseToAvatarResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
@@ -5035,7 +5648,7 @@ export interface SearchFieldAgentResponseToFullNameResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToTypeResolver<
+export interface SearchFieldAgentResponseToRoleResolver<
   TParent = any,
   TResult = any
 > {
@@ -5239,7 +5852,8 @@ export interface TotalMetricsByTimeToTotalResolver<
 
 export interface GQLVSExportTypeResolver<TParent = any> {
   event?: VSExportToEventResolver<TParent>
-  year?: VSExportToYearResolver<TParent>
+  startDate?: VSExportToStartDateResolver<TParent>
+  endDate?: VSExportToEndDateResolver<TParent>
   fileSize?: VSExportToFileSizeResolver<TParent>
   url?: VSExportToUrlResolver<TParent>
   createdOn?: VSExportToCreatedOnResolver<TParent>
@@ -5249,7 +5863,11 @@ export interface VSExportToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface VSExportToYearResolver<TParent = any, TResult = any> {
+export interface VSExportToStartDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToEndDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5371,6 +5989,44 @@ export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLWebhookPermissionTypeResolver<TParent = any> {
+  event?: WebhookPermissionToEventResolver<TParent>
+  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+}
+
+export interface WebhookPermissionToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLFormDatasetOptionTypeResolver<TParent = any> {
+  value?: FormDatasetOptionToValueResolver<TParent>
+  label?: FormDatasetOptionToLabelResolver<TParent>
+}
+
+export interface FormDatasetOptionToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionToLabelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLBirthTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
   LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
@@ -5440,16 +6096,30 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLIntegrationTypeResolver<TParent = any> {
-  name?: IntegrationToNameResolver<TParent>
-  status?: IntegrationToStatusResolver<TParent>
+export interface GQLLoginBackgroundTypeResolver<TParent = any> {
+  backgroundColor?: LoginBackgroundToBackgroundColorResolver<TParent>
+  backgroundImage?: LoginBackgroundToBackgroundImageResolver<TParent>
+  imageFit?: LoginBackgroundToImageFitResolver<TParent>
 }
 
-export interface IntegrationToNameResolver<TParent = any, TResult = any> {
+export interface LoginBackgroundToBackgroundColorResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
+export interface LoginBackgroundToBackgroundImageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LoginBackgroundToImageFitResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5608,6 +6278,19 @@ export interface InputOutputToValueStringResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRoleLabelTypeResolver<TParent = any> {
+  lang?: RoleLabelToLangResolver<TParent>
+  label?: RoleLabelToLabelResolver<TParent>
+}
+
+export interface RoleLabelToLangResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleLabelToLabelResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -6627,6 +7310,25 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetOptionLabelTypeResolver<TParent = any> {
+  lang?: FormDatasetOptionLabelToLangResolver<TParent>
+  descriptor?: FormDatasetOptionLabelToDescriptorResolver<TParent>
+}
+
+export interface FormDatasetOptionLabelToLangResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionLabelToDescriptorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLBirthFeeTypeResolver<TParent = any> {
   ON_TIME?: BirthFeeToON_TIMEResolver<TParent>
   LATE?: BirthFeeToLATEResolver<TParent>
@@ -6710,6 +7412,30 @@ export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
 }
 
 export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
+  id?: MesssageDescriptorToIdResolver<TParent>
+  description?: MesssageDescriptorToDescriptionResolver<TParent>
+  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+}
+
+export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDescriptionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {

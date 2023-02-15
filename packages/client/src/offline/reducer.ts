@@ -25,18 +25,18 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, System } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig
 } from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { find, merge } from 'lodash'
+import { find, isEmpty, merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -49,8 +49,8 @@ export enum LocationType {
 export interface ILocation {
   id: string
   name: string
+  status: string
   alias: string
-  address?: string
   physicalType: string
   jurisdictionType?: string
   type: string
@@ -61,7 +61,6 @@ export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  pilotLocations: { [key: string]: ILocation }
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
@@ -75,7 +74,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-
+  systems: System[]
   config: IApplicationConfig
   formConfig: IFormConfig
 }
@@ -84,7 +83,7 @@ export type IOfflineDataState = {
   offlineData: Partial<IOfflineData>
   offlineDataLoaded: boolean
   loadingError: boolean
-  userDetails?: IUserDetails
+  userDetails?: UserDetails
 }
 
 export const initialState: IOfflineDataState = {
@@ -128,6 +127,11 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     const errorMessage = find(question.errorMessage, {
       lang: language
     })
+    const optionMessages = question?.options?.map((option) => {
+      return find(option.label, {
+        lang: language
+      })
+    })
     if (labelMessage?.descriptor?.id) {
       const labelID: string = labelMessage.descriptor.id as string
       messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
@@ -152,6 +156,15 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     if (errorMessage?.descriptor?.id) {
       const errID = errorMessage.descriptor.id as string
       messages[errID] = errorMessage.descriptor.defaultMessage as string
+    }
+
+    if (!isEmpty(optionMessages)) {
+      optionMessages?.forEach((option) => {
+        if (option?.descriptor?.id) {
+          const errID = option.descriptor.id as string
+          messages[errID] = option.descriptor.defaultMessage as string
+        }
+      })
     }
   })
   return messages
@@ -209,11 +222,6 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
-  successActionCreator: actions.pilotLocationsLoaded,
-  failActionCreator: actions.pilotLocationsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -237,7 +245,6 @@ function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     FACILITIES_CMD,
     LOCATIONS_CMD,
-    PILOT_LOCATIONS_CMD,
     CONFIG_CMD,
     CONTENT_CMD
   ])
@@ -353,17 +360,35 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
+    case actions.UPDATE_OFFLINE_SYSTEMS: {
+      const newOfflineData = {
+        ...state.offlineData,
+        systems: action.payload.systems
+      }
+
+      return loop(
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
+    }
     case actions.UPDATE_OFFLINE_FORM_CONFIG: {
       const { formConfig } = state.offlineData
 
       if (!formConfig) return state
 
-      const { formDrafts, questionConfig = formConfig.questionConfig } =
-        action.payload
+      const {
+        formDrafts,
+        questionConfig = formConfig.questionConfig,
+        formDataset
+      } = action.payload
 
       const newFormConfig = {
         formDrafts,
-        questionConfig
+        questionConfig,
+        formDataset
       }
 
       return loop(
@@ -381,7 +406,7 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig } = action.payload
+      const { certificates, config, formConfig, systems } = action.payload
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
@@ -411,6 +436,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          systems,
           templates: {
             certificates: certificatesTemplates
           }
@@ -420,6 +446,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          systems,
 
           // Field agents do not get certificate templates from the config service.
           // Our loading logic depends on certificates being present and the app would load infinitely
@@ -541,29 +568,6 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(FACILITIES_CMD, RETRY_TIMEOUT)
-      )
-    }
-
-    /*
-     * Pilot Locations
-     */
-
-    case actions.PILOT_LOCATIONS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          pilotLocations: action.payload
-        }
-      }
-    }
-    case actions.PILOT_LOCATIONS_FAILED: {
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
       )
     }
 

@@ -11,13 +11,12 @@
  */
 import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
-import { SecureAccount } from '@client/views/SecureAccount/SecureAccountView'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS, IUserDetails } from '@client/utils/userUtils'
+import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import * as LogRocket from 'logrocket'
@@ -34,6 +33,7 @@ import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { CreatePin } from '@client/views/PIN/CreatePin'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -102,7 +102,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     } else {
       newState.pinExists = false
     }
-    const userDetails: IUserDetails = JSON.parse(
+    const userDetails: UserDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
     if (userDetails && userDetails.status && userDetails.status === 'pending') {
@@ -232,14 +232,13 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     if (!pinExists || passwordVerified) {
       return (
-        <SecureAccount
+        <CreatePin
           onComplete={() => {
             if (passwordVerified) {
               this.props.showPINUpdateSuccessToast()
             }
             this.markAsSecured()
           }}
-          collectPin={passwordVerified}
         />
       )
     }
@@ -252,6 +251,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       )
     }
     return (
+      // TODO: IdleTimer doesn't have children in it's type definition, due to React 18 starting to require it
+      // We would need to update IdleTimer to it's 5 version, which changed its API
+      // @ts-ignore
       <IdleTimer onIdle={this.onIdle} timeout={DESKTOP_TIME_OUT_MILLISECONDS}>
         {this.conditionalRenderUponSecuredState()}
       </IdleTimer>

@@ -14,7 +14,7 @@ import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Text } from './Text'
 import { Stack } from '../Stack'
-import { UserIcon } from '../icons/User.stories'
+import { User } from '../icons'
 import { Box } from '../Box'
 import styled from 'styled-components'
 
@@ -41,7 +41,7 @@ export const Heading = () => (
 
 export const HeadingWithIcon = () => (
   <Stack>
-    <UserIcon />
+    <User />
     <Text variant="h4" element="span">
       Profile page
     </Text>

@@ -111,7 +111,7 @@ export async function createFormDraftHandler(
       try {
         await Promise.all(
           modifiedQuestions.map(async (question) => {
-            await Question.updateOne({ fieldId: question.fieldId }, question)
+            await Question.replaceOne({ fieldId: question.fieldId }, question)
           })
         )
       } catch (err) {

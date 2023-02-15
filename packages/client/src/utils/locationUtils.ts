@@ -10,11 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
-import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
+import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
+import { UserDetails } from './userUtils'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -39,24 +40,22 @@ export function filterLocations(
   return filteredLocations
 }
 
-export function getLocation(userDetails: IUserDetails, locationKey: string) {
+export function getLocation(userDetails: UserDetails, locationKey: string) {
   if (!userDetails.catchmentArea) {
     throw Error('The user has no catchment area')
   }
-  const filteredArea: IGQLLocation[] = userDetails.catchmentArea.filter(
-    (area: IGQLLocation) => {
-      if (area.identifier) {
-        const relevantIdentifier: IIdentifier[] = area.identifier.filter(
-          (identifier: IIdentifier) => {
-            return identifier.value === locationKey
-          }
-        )
-        return relevantIdentifier[0] ? area : false
-      } else {
-        throw Error('The catchment area has no identifier')
-      }
+  const filteredArea = userDetails.catchmentArea.filter((area) => {
+    if (area.identifier) {
+      const relevantIdentifier: Identifier[] = area.identifier.filter(
+        (identifier: Identifier) => {
+          return identifier.value === locationKey
+        }
+      )
+      return relevantIdentifier[0] ? area : false
+    } else {
+      throw Error('The catchment area has no identifier')
     }
-  )
+  })
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
@@ -152,18 +151,6 @@ export function generateLocations(
   }
 
   return generateSearchableLocations(locationArray, locations, intl)
-}
-
-export function generatePilotLocations(
-  pilotLocations: { [key: string]: ILocation },
-  offlineLocations: { [key: string]: ILocation },
-  intl: IntlShape
-) {
-  return generateSearchableLocations(
-    Object.values(pilotLocations),
-    offlineLocations,
-    intl
-  )
 }
 
 export function getJurisidictionType(

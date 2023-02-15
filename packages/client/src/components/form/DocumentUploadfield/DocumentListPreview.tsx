@@ -11,48 +11,49 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { PaperClip, Delete } from '@opencrvs/components/lib/icons'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
+import { Link } from '@opencrvs/components/lib/Link/Link'
+import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { Button } from '@opencrvs/components/lib/Button/Button'
+
 const Wrapper = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
+  margin: 8px 0px;
+  max-width: 100%;
 `
-const PreviewLink = styled.div<{ disabled?: boolean }>`
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.primary};
+
+const Container = styled.div`
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  height: 40px;
+  padding: 0px 8px;
+`
+
+const SpinnerContainer = styled(Spinner)`
+  margin-right: 6px;
+`
+
+const DeleteContainer = styled(Button)`
+  min-width: 32px;
+`
+
+const Label = styled.div`
   display: flex;
-  cursor: pointer;
-  span {
-    margin-left: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  svg {
+    flex-shrink: 0;
   }
-
-  &:hover span {
-    text-decoration: underline;
-  }
-`
-
-const ProcessingSpinner = styled(Spinner)`
-  margin-left: auto;
-`
-
-const PreviewContainer = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  ${({ theme }) => theme.fonts.bold16};
-  font-style: normal;
-  text-decoration-line: underline;
-  padding: 5px 10px;
-  margin: 10px 0px;
-  display: flex;
-  flex-flow: row;
-`
-
-const IconContainer = styled.div`
-  margin-left: auto;
 `
 
 type IProps = {
@@ -89,67 +90,74 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
       <Wrapper id={`preview-list-${id}`}>
         {documents &&
           documents.map((document: IFileValue, key: number) => (
-            <PreviewContainer key={`preview_${key}`}>
-              <PreviewLink
-                id={`document_${(document.optionValues[1] as string).replace(
-                  /\s/g,
-                  ''
-                )}_link`}
-                key={key}
-                onClick={(_) => this.props.onSelect(document)}
-              >
-                <PaperClip />
-                <span>
-                  {(!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    this.props.inReviewSection &&
-                    this.props.dropdownOptions &&
-                    this.props.dropdownOptions[key]?.label) ||
-                    this.getFormattedLabelForDocType(
-                      document.optionValues[1] as string
-                    ) ||
-                    document.optionValues[1]}
-                </span>
-              </PreviewLink>
+            <Container key={`preview_${key}`}>
+              <Label>
+                <Icon color="currentColor" name="Paperclip" size="medium" />
+                <Link
+                  id={`document_${(document.optionValues[1] as string).replace(
+                    /\s/g,
+                    ''
+                  )}_link`}
+                  key={key}
+                  onClick={(_) => this.props.onSelect(document)}
+                >
+                  <span>
+                    {(!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                      this.props.inReviewSection &&
+                      this.props.dropdownOptions &&
+                      this.props.dropdownOptions[key]?.label) ||
+                      this.getFormattedLabelForDocType(
+                        document.optionValues[1] as string
+                      ) ||
+                      (document.optionValues[1] as string)}
+                  </span>
+                </Link>
+              </Label>
               {onDelete && (
-                <IconContainer>
-                  <TertiaryButton
-                    id="preview_delete"
-                    icon={() => <Delete color="red" />}
-                    onClick={() => onDelete(document)}
-                  />
-                </IconContainer>
+                <DeleteContainer
+                  id="preview_delete"
+                  type="icon"
+                  size="small"
+                  aria-label="Delete attachment"
+                  onClick={() => onDelete(document)}
+                >
+                  <Icon color="red" name="Trash2" size="small" />
+                </DeleteContainer>
               )}
-            </PreviewContainer>
+            </Container>
           ))}
         {processingDocuments &&
           processingDocuments.map(({ label }) => (
-            <PreviewContainer key={label}>
-              <PreviewLink disabled={true} key={label}>
-                <PaperClip stroke={theme.colors.disabled} />
-                <span>{this.getFormattedLabelForDocType(label) || label}</span>
-              </PreviewLink>
-              <IconContainer>
-                <ProcessingSpinner
-                  size={24}
-                  id={`document_${label}_processing`}
-                />
-              </IconContainer>
-            </PreviewContainer>
+            <Container key={label}>
+              <Label>
+                <Icon color="disabled" name="Paperclip" size="medium" />
+                <Link disabled={true} key={label}>
+                  <span>
+                    {this.getFormattedLabelForDocType(label) || label}
+                  </span>
+                </Link>
+              </Label>
+              <SpinnerContainer size={20} id={`document_${label}_processing`} />
+            </Container>
           ))}
         {attachment && attachment.data && label && (
-          <PreviewContainer>
-            <PreviewLink onClick={(_) => this.props.onSelect(attachment)}>
-              <PaperClip />
-              <span>{this.getFormattedLabelForDocType(label) || label}</span>
-            </PreviewLink>
-            <IconContainer>
-              <TertiaryButton
-                id="preview_delete"
-                icon={() => <Delete color="red" />}
-                onClick={() => onDelete && onDelete(attachment)}
-              />
-            </IconContainer>
-          </PreviewContainer>
+          <Container>
+            <Label>
+              <Icon color="grey600" name="Paperclip" size="medium" />
+              <Link onClick={(_) => this.props.onSelect(attachment)}>
+                <span>{this.getFormattedLabelForDocType(label) || label}</span>
+              </Link>
+            </Label>
+            <DeleteContainer
+              id="preview_delete"
+              type="icon"
+              size="small"
+              aria-label="Delete attachment"
+              onClick={() => onDelete && onDelete(attachment)}
+            >
+              <Icon color="red" name="Trash2" size="small" />
+            </DeleteContainer>
+          </Container>
         )}
       </Wrapper>
     )

@@ -39,7 +39,7 @@ interface IState {
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
-  width: 54px;
+  width: 54px !important;
   margin: 0 4px;
 
   &:first-of-type {
@@ -47,7 +47,7 @@ const DateSegment = styled(TextInput)`
   }
   &:last-of-type {
     margin-right: 0;
-    width: 80px;
+    width: 80px !important;
   }
 `
 
@@ -146,7 +146,6 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   render() {
     const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
       this.props
-
     return (
       <>
         <DateWrapper id={id}>
@@ -160,6 +159,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             id={`${id}-dd`}
             ref={this.dd}
             error={Boolean(meta && meta.error)}
+            isDisabled={props.disabled}
             touched={meta && meta.touched}
             focusInput={focusInput}
             type="number"
@@ -177,6 +177,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             id={`${id}-mm`}
             ref={this.mm}
             error={Boolean(meta && meta.error)}
+            isDisabled={props.disabled}
             touched={meta && meta.touched}
             focusInput={false}
             type="number"
@@ -195,6 +196,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             id={`${id}-yyyy`}
             ref={this.yyyy}
             error={Boolean(meta && meta.error)}
+            isDisabled={props.disabled}
             touched={meta && meta.touched}
             focusInput={false}
             type="number"

@@ -88,6 +88,7 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -96,9 +97,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
@@ -129,6 +129,7 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -137,9 +138,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 
@@ -172,6 +172,7 @@ describe('Verify handlers', () => {
       )
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -180,9 +181,8 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
-        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
 

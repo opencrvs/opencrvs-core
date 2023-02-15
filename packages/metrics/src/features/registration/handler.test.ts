@@ -1357,7 +1357,7 @@ describe('When an in-progress declaration is received', () => {
       payload
     })
     const inCompleteFieldPoints =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'in_complete_fields'
       )

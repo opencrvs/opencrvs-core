@@ -101,9 +101,9 @@ export function ListItemAction(props: IListItemActionProps) {
     <Container id={id}>
       <ListItemActionsContainer alignment={alignment} id="2ndContainer">
         {actions &&
-          actions.map((action: IAction) =>
+          actions.map((action: IAction, index) =>
             isActionComponent(action) ? (
-              <ActionButtonContainer>
+              <ActionButtonContainer key={`ActionButtonContainer-${index}`}>
                 <ActionButton>
                   {React.cloneElement(action.actionComponent, { id })}
                 </ActionButton>
@@ -112,13 +112,15 @@ export function ListItemAction(props: IListItemActionProps) {
               <ListItemSingleAction
                 type="primary"
                 isFullHeight={isFullHeight}
-                key={action.label as string}
+                key={`ListItemSingleAction-${action.label as string}`}
                 id={`${id}-${action.label as string}`}
                 size={'medium'}
                 onClick={action.handler}
                 disabled={action.disabled}
               >
-                {action.icon} {action.label}
+                <>
+                  {action.icon} {action.label}
+                </>
               </ListItemSingleAction>
             )
           )}

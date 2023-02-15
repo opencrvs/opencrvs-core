@@ -12,6 +12,8 @@
 import { gqlToDraftTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
+import { SystemRoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const dummyBirthRegistrationResponse = {
   _fhirIDMap: {
@@ -1224,8 +1226,8 @@ const mockOfflineData: Partial<IOfflineData> = {
       id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
-      address: '',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
     }
@@ -1236,6 +1238,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Abwe',
       alias: 'Abwe',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
@@ -1245,6 +1248,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Ibombo',
       alias: 'Ibombo',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
@@ -1254,29 +1258,31 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Central',
       alias: 'Central',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     }
   }
 }
-const mockUserDetails = {
-  language: 'en',
+const mockUserDetails: UserDetails = {
+  id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+  creationDate: '2022-03-25T12:30:34.597+00:00',
   localRegistrar: {
     name: [
       {
         use: 'en',
         firstNames: 'Kennedy',
-        familyName: 'Mweene',
-        __typename: 'HumanName'
+        familyName: 'Mweene'
+        // __typename: 'HumanName'
       }
     ],
-    role: 'LOCAL_REGISTRAR',
+    role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
-      type: 'image/png',
-      __typename: 'Signature'
-    },
-    __typename: 'LocalRegistrar'
+      type: 'image/png'
+      // __typename: 'Signature'
+    }
+    // __typename: 'LocalRegistrar'
   },
   userMgntUserID: '622f81b42cd537bf91daa10b',
   practitionerId: '9c8a1a9f-f1d1-47f1-8874-5da5f238effa',
@@ -1284,14 +1290,22 @@ const mockUserDetails = {
     {
       use: 'en',
       firstNames: 'Jonathan',
-      familyName: 'Campbell',
-      __typename: 'HumanName'
+      familyName: 'Campbell'
+      // __typename: 'HumanName'
     }
   ],
   mobile: '+260921111111',
-  role: 'NATIONAL_SYSTEM_ADMIN',
-  type: 'NATIONAL_SYSTEM_ADMIN',
-  status: 'active',
+  systemRole: SystemRoleType.NationalSystemAdmin,
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'NATIONAL_SYSTEM_ADMIN'
+      }
+    ]
+  },
+  status: Status.Active,
   primaryOffice: {
     id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
     name: 'Ibombo District Office',

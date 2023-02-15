@@ -66,7 +66,7 @@ const RowValue = ({
     return <LockedBox />
   }
 
-  if (typeof value === 'string') {
+  if (value && typeof value === 'string') {
     return (
       <Text variant="reg16" element="span">
         {value}

@@ -145,7 +145,7 @@ export const fieldToAddressTransformer =
     if (!address) {
       address = {
         type: addressType,
-        line: ['', '', '', '', '', '']
+        line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''] // lines must be available as empty strings for GraphQL to parse all options
       }
       sectionData.address.push(address)
     }
@@ -202,6 +202,7 @@ export const sectionFieldToBundleFieldTransformer =
     } else {
       transformedData[field.name] = draftData[sectionId][field.name]
     }
+
     return transformedData
   }
 

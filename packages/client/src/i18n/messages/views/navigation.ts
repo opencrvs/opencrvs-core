@@ -22,12 +22,18 @@ interface INavigationMessages
   print: MessageDescriptor
   application: MessageDescriptor
   performance: MessageDescriptor
+  organisation: MessageDescriptor
   team: MessageDescriptor
   vsexports: MessageDescriptor
   config: MessageDescriptor
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor
   form: MessageDescriptor
+  integration: MessageDescriptor
+  communications: MessageDescriptor
+  userroles: MessageDescriptor
+  informantnotification: MessageDescriptor
+  outbox: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -96,6 +102,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Reports label in navigation',
     id: 'navigation.reports'
   },
+  organisation: {
+    defaultMessage: 'Organisation',
+    description: 'Organisations label in navigation',
+    id: 'navigation.organisation'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
@@ -105,6 +116,26 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Declaration forms',
     description: 'Declaration forms label in navigation',
     id: 'navigation.declarationForms'
+  },
+  integration: {
+    defaultMessage: 'Integrations',
+    description: 'Integration forms label in navigation',
+    id: 'navigation.integration'
+  },
+  communications: {
+    defaultMessage: 'Communications',
+    description: 'Communications label in navigation',
+    id: 'navigation.communications'
+  },
+  userroles: {
+    defaultMessage: 'User roles',
+    description: 'User roles label in navigation',
+    id: 'navigation.userroles'
+  },
+  informantnotification: {
+    defaultMessage: 'Informant notifications',
+    description: 'Informant notifications label in navigation',
+    id: 'navigation.informantNotification'
   },
   outbox: {
     defaultMessage: 'Outbox',

@@ -29,7 +29,8 @@ export async function getTotalPayments(
       AND time <= $timeTo
       ${
         locationId
-          ? `AND ( locationLevel2 = $locationId
+          ? `AND ( locationLevel1 = $locationId
+      OR locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
       OR locationLevel5 = $locationId

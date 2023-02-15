@@ -15,19 +15,25 @@ import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
+import {
+  getFormattedDate,
+  getPageItems,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus } from '@client/utils/gateway'
+import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -65,18 +71,14 @@ const HealthSystemLogo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
 `
 
-const HealthSystemLocation = styled.p`
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-function HealthSystemUser() {
+function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
     <NameAvatar>
       <HealthSystemLogo>
         <Box />
       </HealthSystemLogo>
-      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+      <span>{name ?? intl.formatMessage(userMessages.healthSystem)}</span>
     </NameAvatar>
   )
 }
@@ -89,7 +91,7 @@ const GetNameWithAvatar = ({
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
-  avatar: IAvatar
+  avatar: Avatar
   language: string
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
@@ -103,6 +105,13 @@ const GetNameWithAvatar = ({
       <span>{userName}</span>
     </NameAvatar>
   )
+}
+
+function getSystemType(type: string | undefined) {
+  if (type === SystemType.RecordSearch) {
+    return integrationMessages.recordSearch
+  }
+  return integrationMessages.healthSystem
 }
 
 const getIndexByAction = (histories: any, index: number): number => {
@@ -134,7 +143,8 @@ export const GetHistory = ({
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
@@ -162,7 +172,7 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        role: userDetails.role
+        systemRole: userDetails.systemRole
       },
       office: userDetails.primaryOffice,
       comments: [],
@@ -208,13 +218,13 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {item.dhis2Notification && !item.user?.id ? (
-          <HealthSystemUser />
+        {isSystemInitiated(item) ? (
+          <HealthSystemUser name={item.system?.name} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
             nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as IAvatar}
+            avatar={item.user?.avatar as Avatar}
             language={window.config.LANGUAGES}
           />
         ) : (
@@ -226,33 +236,30 @@ export const GetHistory = ({
             <GetNameWithAvatar
               id={item?.user?.id as string}
               nameObject={item?.user?.name as (GQLHumanName | null)[]}
-              avatar={item.user?.avatar as IAvatar}
+              avatar={item.user?.avatar as Avatar}
               language={window.config.LANGUAGES}
             />
           </Link>
         )}
       </>
     ),
-    type: intl.formatMessage(
-      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
-        ? userMessages.healthSystem
-        : userMessages[item?.user?.role as string]
-    ),
-    location:
-      item.dhis2Notification && !item.user?.role ? (
-        <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
-        <Link
-          font="bold14"
-          onClick={() => {
-            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-          }}
-        >
-          {item.office?.name as string}
-        </Link>
-      )
+    role:
+      isSystemInitiated(item) || !item.user?.systemRole
+        ? intl.formatMessage(getSystemType(item.system?.type))
+        : item.user.role.labels.find((label) => label.lang === 'en')?.label,
+
+    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+      <>{item.office?.name}</>
+    ) : (
+      <Link
+        font="bold14"
+        onClick={() => {
+          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+        }}
+      >
+        {item.office?.name as string}
+      </Link>
+    )
   }))
 
   const columns = [
@@ -274,9 +281,9 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
-      key: 'type'
+      key: 'role'
     },
     {
       label: intl.formatMessage(constantsMessages.location),

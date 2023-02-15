@@ -303,7 +303,7 @@ export class InProgressComponent extends React.Component<
         ...item,
         notificationSent:
           item.notificationSent &&
-          formattedDuration(item.notificationSent as number),
+          formattedDuration(item.notificationSent as any),
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
       }

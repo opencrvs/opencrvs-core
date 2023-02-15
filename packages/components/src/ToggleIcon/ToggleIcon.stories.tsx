@@ -14,7 +14,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { ToggleIcon } from './ToggleIcon'
 
 export default {
-  title: 'Controls/ToggleIcon',
+  title: 'Controls/Toggle icon',
   component: ToggleIcon,
   parameters: {
     docs: {

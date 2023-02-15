@@ -73,7 +73,7 @@ export const deathEventLocationMutationTransformer =
           district: '',
           city: '',
           postalCode: '',
-          line: ['', '', '', '', '', '']
+          line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''] // lines must be available as empty strings for GraphQL to parse all options
         }
       } as fhir.Location
       if (transformedData.eventLocation && transformedData.eventLocation.type) {
@@ -168,5 +168,11 @@ export function setDeathRegistrationSectionTransformer(
       )
     }
   }
+
+  if (draftData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      draftData[sectionId].informantsSignature
+  }
+
   return transformedData
 }

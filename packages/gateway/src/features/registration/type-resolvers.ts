@@ -65,7 +65,7 @@ import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { getUser } from '@gateway/features/user/utils'
+import { getSystem, getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -157,6 +157,28 @@ export const typeResolvers: GQLResolver = {
       return (
         (reasonNotApplyingExtension &&
           reasonNotApplyingExtension.valueString) ||
+        null
+      )
+    },
+    ageOfIndividualInYears: (person) => {
+      const ageOfIndividualInYearsExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (ageOfIndividualInYearsExtension &&
+          ageOfIndividualInYearsExtension.valueString) ||
+        null
+      )
+    },
+    exactDateOfBirthUnknown: (person) => {
+      const exactDateOfBirthUnknownExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (exactDateOfBirthUnknownExtension &&
+          exactDateOfBirthUnknownExtension.valueString) ||
         null
       )
     },
@@ -405,6 +427,15 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+
+    informantsSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
@@ -832,7 +863,12 @@ export const typeResolvers: GQLResolver = {
           it.resource?.meta?.lastUpdated <= task.lastModified!
       )?.resource as fhir.PractitionerRole | undefined
 
-      const role = result?.code?.[0]?.coding?.[0]?.code
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+      })
+
+      const role = targetCode?.coding?.[0].code
+
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
@@ -846,8 +882,29 @@ export const typeResolvers: GQLResolver = {
       const userResponse: IUserModelData = await res.json()
       return {
         ...userResponse,
-        role: role ?? userResponse.role
+        role: {
+          ...userResponse.role,
+          labels: [
+            {
+              lang: 'en',
+              label:
+                role ??
+                userResponse.role.labels.find((label) => label.lang === 'en')
+                  ?.label
+            }
+          ]
+        }
       }
+    },
+    system: async (task: fhir.Task, _: any, authHeader) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
+      if (!systemIdentifier || !systemIdentifier.value) {
+        return null
+      }
+      return await getSystem({ systemId: systemIdentifier.value }, authHeader)
     },
     location: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(

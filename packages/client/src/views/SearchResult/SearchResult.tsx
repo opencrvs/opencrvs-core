@@ -50,7 +50,8 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -60,7 +61,6 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { Frame } from '@opencrvs/components/lib/Frame'
 
-import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -134,7 +134,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
@@ -346,9 +346,15 @@ export class SearchResultView extends React.Component<
                             ? convertToMSISDN(searchText)
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
-                        declarationLocationId: userDetails
-                          ? getUserLocation(userDetails).id
-                          : ''
+                        declarationLocationId:
+                          userDetails &&
+                          ![
+                            SystemRoleType.LocalRegistrar,
+                            SystemRoleType.NationalRegistrar,
+                            SystemRoleType.RegistrationAgent
+                          ].includes(userDetails.systemRole)
+                            ? getUserLocation(userDetails).id
+                            : ''
                       },
                       sort: SEARCH_RESULT_SORT
                     }
@@ -450,9 +456,15 @@ export class SearchResultView extends React.Component<
             query={SEARCH_EVENTS}
             variables={{
               advancedSearchParameters: {
-                declarationLocationId: userDetails
-                  ? getUserLocation(userDetails).id
-                  : '',
+                declarationLocationId:
+                  userDetails &&
+                  ![
+                    SystemRoleType.LocalRegistrar,
+                    SystemRoleType.NationalRegistrar,
+                    SystemRoleType.RegistrationAgent
+                  ].includes(userDetails.systemRole)
+                    ? getUserLocation(userDetails).id
+                    : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                 nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
                 registrationNumber:

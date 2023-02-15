@@ -15,15 +15,15 @@ import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
   IContentResponse,
-  IAssetResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
   ICertificateTemplateData
 } from '@client/utils/referenceApi'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User, System } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IFormConfig } from '@client/forms'
+import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -90,6 +90,11 @@ export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
 }
+export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
+export type UpdateOfflineSystemsAction = {
+  type: typeof UPDATE_OFFLINE_SYSTEMS
+  payload: { systems: System[] }
+}
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
 export type ApplicationConfigFailedAction = {
@@ -100,7 +105,7 @@ export type ApplicationConfigFailedAction = {
 export const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
   type: typeof GET_EXISTING_OFFLINE_DATA
-  payload: IUserDetails
+  payload: UserDetails
 }
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
 export type IGetOfflineDataSuccessAction = {
@@ -143,24 +148,10 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const pilotLocationsLoaded = (
-  payload: ILocationDataResponse
-): PilotLocationsLoadedAction => ({
-  type: PILOT_LOCATIONS_LOADED,
-  payload: payload
-})
-
-export const pilotLocationsFailed = (
-  error: Error
-): PilotLocationsFailedAction => ({
-  type: PILOT_LOCATIONS_FAILED,
-  payload: error
-})
-
 /*
  * Only called from tests atm
  */
-export const setOfflineData = (userDetails: IUserDetails): SetOfflineData => ({
+export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
   type: GET_EXISTING_OFFLINE_DATA,
   payload: userDetails
 })
@@ -216,6 +207,12 @@ export const updateOfflineConfigData = (payload: {
   type: UPDATE_OFFLINE_CONFIG,
   payload: payload
 })
+export const updateOfflineSystems = (payload: {
+  systems: System[]
+}): UpdateOfflineSystemsAction => ({
+  type: UPDATE_OFFLINE_SYSTEMS,
+  payload: payload
+})
 
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
@@ -228,6 +225,7 @@ export type UpdateOfflineFormConfigAction = {
   payload: {
     formDrafts: IFormDraft[]
     questionConfig?: IQuestionConfig[]
+    formDataset?: IFormDataSet[]
   }
 }
 
@@ -241,12 +239,14 @@ export type UpdateOfflineCertificateAction = {
 
 export const updateOfflineFormConfig = (
   formDrafts: IFormDraft[],
-  questionConfig?: IQuestionConfig[]
+  questionConfig?: IQuestionConfig[],
+  formDataset?: IFormDataSet[]
 ): UpdateOfflineFormConfigAction => ({
   type: UPDATE_OFFLINE_FORM_CONFIG,
   payload: {
     formDrafts,
-    questionConfig
+    questionConfig,
+    formDataset
   }
 })
 
@@ -266,13 +266,29 @@ export type OfflineFormConfigUpdatedAction = {
     formConfig: IFormConfig
   }
 }
-
 export const offlineFormConfigUpdated = (
   formConfig: IFormConfig
 ): OfflineFormConfigUpdatedAction => ({
   type: OFFLINE_FORM_CONFIG_UPDATED,
   payload: {
     formConfig
+  }
+})
+
+export const OFFLINE_FORM_CONFIG_ADD_FORM_DATASET =
+  'OFFLINE/FORM_CONFIG_ADD_FORM_DATASET'
+export type OfflineFormConfigAddFormDatasetAction = {
+  type: typeof OFFLINE_FORM_CONFIG_ADD_FORM_DATASET
+  payload: {
+    formDatasetItem: IFormDataSet
+  }
+}
+export const offlineFormConfigAddFormDataset = (
+  formDatasetItem: IFormDataSet
+): OfflineFormConfigAddFormDatasetAction => ({
+  type: OFFLINE_FORM_CONFIG_ADD_FORM_DATASET,
+  payload: {
+    formDatasetItem
   }
 })
 
@@ -292,9 +308,11 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | UpdateOfflineSystemsAction
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction
+  | OfflineFormConfigAddFormDatasetAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

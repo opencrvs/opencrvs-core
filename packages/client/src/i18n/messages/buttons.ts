@@ -23,6 +23,7 @@ interface IButtonsMessages
   configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
+  create: MessageDescriptor
   deactivate: MessageDescriptor
   delete: MessageDescriptor
   edit: MessageDescriptor
@@ -45,6 +46,8 @@ interface IButtonsMessages
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
+  saving: MessageDescriptor
+  refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
   closeDeclaration: MessageDescriptor
@@ -68,6 +71,8 @@ interface IButtonsMessages
   makeCorrection: MessageDescriptor
   publish: MessageDescriptor
   add: MessageDescriptor
+  copy: MessageDescriptor
+  copied: MessageDescriptor
   exactDateUnknown: MessageDescriptor
 }
 
@@ -122,6 +127,12 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Continue Button Text',
     id: 'buttons.continue'
   },
+
+  create: {
+    defaultMessage: 'Create',
+    description: 'Label for submit button of client integration creation form',
+    id: 'buttons.create'
+  },
   createUser: {
     defaultMessage: 'Create user',
     description: 'Label for submit button of user creation form',
@@ -163,7 +174,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgotPassword'
   },
   forgottenPIN: {
-    defaultMessage: 'Forgotten pin',
+    defaultMessage: 'Forgotten PIN',
     description: 'The label for forgotten pin button',
     id: 'buttons.forgottenPIN'
   },
@@ -237,10 +248,21 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Review button text',
     id: 'buttons.review'
   },
+
+  refresh: {
+    defaultMessage: 'Refresh',
+    description: 'Refresh button',
+    id: 'buttons.refresh'
+  },
   save: {
     defaultMessage: 'Save',
     description: 'Save Button Text',
     id: 'buttons.save'
+  },
+  saving: {
+    defaultMessage: 'Saving...',
+    description: 'Saving Button Text',
+    id: 'buttons.saving'
   },
   saveExitButton: {
     defaultMessage: 'Save & Exit',
@@ -356,6 +378,16 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.add',
     defaultMessage: 'Add',
     description: 'Add button text on form config'
+  },
+  copy: {
+    id: 'buttons.copy',
+    defaultMessage: 'Copy',
+    description: 'Copy button text'
+  },
+  copied: {
+    id: 'buttons.copied',
+    defaultMessage: 'Copied',
+    description: 'Copied button text'
   },
   exactDateUnknown: {
     id: 'buttons.exactDateUnknown',

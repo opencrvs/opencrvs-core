@@ -21,11 +21,11 @@ import {
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler,
-  getIntegrationConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
+  formDatasetSchema,
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/question/createQuestion/handler'
 import updateQuestionHandler, {
@@ -40,12 +40,23 @@ import {
   modifyDraftStatusHandler,
   requestSchema as modifyFormDraftReqSchema
 } from '@config/handlers/formDraft/updateFormDraft/handler'
-
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
+import createInformantSMSNotificationHandler, {
+  requestSchema as createInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
+import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
+import updateInformantSMSNotificationHandler, {
+  requestSchema as updateInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
+import getSystems from '@config/handlers/system/systemHandler'
+import {
+  createFormDatasetHandler,
+  getFormDatasetHandler
+} from '@config/handlers/formDataset/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -108,10 +119,10 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/integrationConfig',
-      handler: getIntegrationConfigHandler,
+      handler: getSystems,
       config: {
         tags: ['api'],
-        description: 'Retrieve Application integration configuration'
+        description: 'Retrieve Application integrations'
       }
     },
     {
@@ -315,6 +326,81 @@ export default function getRoutes() {
         description: 'Get question',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/getFormDataset',
+      handler: getFormDatasetHandler,
+      config: {
+        tags: ['api'],
+        description: 'fetch form dataset',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createFormDataset',
+      handler: createFormDatasetHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create form dataset',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: formDatasetSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/informantSMSNotification',
+      handler: createInformantSMSNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Creates informantSMSNotifications',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: createInformantSMSNotificationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/informantSMSNotification',
+      handler: getInformantSMSNotificationsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Get informantSMSNotifications',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/informantSMSNotification',
+      handler: updateInformantSMSNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update informantSMSNotification',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateInformantSMSNotificationReqSchema
         }
       }
     }

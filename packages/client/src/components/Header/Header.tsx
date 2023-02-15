@@ -46,10 +46,10 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ArrowBack,
   Plus,
   SearchDark,
   Activity,
@@ -81,7 +81,7 @@ import { HistoryNavigator } from './HistoryNavigator'
 import { Hamburger } from './Hamburger'
 
 type IStateProps = {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   language: string
 }
 
@@ -112,6 +112,11 @@ interface IProps extends RouteComponentProps {
   enableMenuSelection?: boolean
   changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
+  /** Sets default mobile right actions */
+  mobileRight?: {
+    icon: () => React.ReactNode
+    handler: () => void
+  }[]
 }
 
 type IFullProps = IntlShapeProps &
@@ -132,7 +137,8 @@ enum ACTIVE_MENU_ITEM {
   USERS,
   CERTIFICATE,
   APPLICATION,
-  FORM
+  FORM,
+  INTEGRATION
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -236,8 +242,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ]
         }
       } else if (
-        this.props.userDetails?.role &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role)
+        this.props.userDetails?.systemRole &&
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
       ) {
         return {
           mobileLeft: [
@@ -270,8 +276,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      this.props.userDetails?.role &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+      this.props.userDetails?.systemRole &&
+      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
     ) {
       return {
         mobileLeft: [
@@ -286,8 +292,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
             }
           ],
           mobileBody: this.renderSearchInput(this.props, true)
@@ -317,7 +323,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   isLandingPage = () => {
-    const role = this.props.userDetails && this.props.userDetails.role
+    const role = this.props.userDetails && this.props.userDetails.systemRole
     const location = this.props.history.location.pathname
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
@@ -393,7 +399,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        navigationList={navigationList}
+        navigationList={
+          FIELD_AGENT_ROLES.includes(
+            this.props.userDetails?.systemRole as string
+          )
+            ? undefined
+            : navigationList
+        }
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
@@ -403,8 +415,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToTeamView(props: IFullProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToTeamSearchAction()
       } else {
         return goToTeamUserListAction(
@@ -416,14 +428,19 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToPerformanceView(props: IFullProps) {
     const { userDetails, goToPerformanceHomeAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
           (locationId &&
-            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
+            goToPerformanceHomeAction(
+              undefined,
+              undefined,
+              Event.Birth,
+              locationId
+            )) ||
           goToPerformanceHomeAction()
         )
       }
@@ -447,6 +464,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.applicationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.FORM
           ? constantsMessages.formDeclarationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+          ? constantsMessages.integrationTitle
           : constantsMessages.declarationTitle
       )
 
@@ -458,8 +477,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         element: (
           <>
             {!(
-              this.props.userDetails?.role &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+              this.props.userDetails?.systemRole &&
+              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
             ) && (
               <HeaderCenter>
                 <StyledPrimaryButton
@@ -486,8 +505,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (
       activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+      (NATL_ADMIN_ROLES.includes(
+        this.props.userDetails?.systemRole as string
+      ) ||
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
     ) {
       rightMenu = [
         {
@@ -504,13 +525,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       theme
     )
 
+    const mobileHeaderActionPropsWithDefaults = {
+      mobileRight: this.props.mobileRight,
+      ...mobileHeaderActionProps
+    }
+
     return (
       <AppHeader
         id="register_app_header"
         desktopRightMenu={rightMenu}
         className={className}
         title={title}
-        {...mobileHeaderActionProps}
+        {...mobileHeaderActionPropsWithDefaults}
       />
     )
   }
@@ -530,6 +556,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.APPLICATION
       : window.location.href.includes('config/form')
       ? ACTIVE_MENU_ITEM.FORM
+      : window.location.href.includes('config/integration')
+      ? ACTIVE_MENU_ITEM.INTEGRATION
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)

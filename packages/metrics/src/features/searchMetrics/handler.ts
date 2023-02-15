@@ -43,7 +43,7 @@ export async function postAdvancedSearchByClient(
 ) {
   try {
     const clientId = getClientIdFromToken(request.headers.authorization)
-    const ipAddress = request.info.remoteAddress
+    const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
     const point: IPoints = {
       fields: { clientId },
       measurement: 'search_requests',

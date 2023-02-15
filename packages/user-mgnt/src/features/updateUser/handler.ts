@@ -20,11 +20,7 @@ import {
   postFhir
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, {
-  FIELD_AGENT_TYPES,
-  IUser,
-  IUserModel
-} from '@user-mgnt/model/user'
+import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
@@ -73,12 +69,12 @@ export default async function updateUser(
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
   let changingRole = false
-  if (existingUser.role !== user.role) {
+  if (existingUser.systemRole !== user.systemRole) {
     changingRole = true
-    existingUser.role = user.role
+    existingUser.systemRole = user.systemRole
     // Updating user sope
     const userScopes: string[] =
-      roleScopeMapping[existingUser.role || 'FIELD_AGENT']
+      roleScopeMapping[existingUser.systemRole || 'FIELD_AGENT']
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -87,28 +83,13 @@ export default async function updateUser(
     }
     existingUser.scope = userScopes
   }
-  existingUser.type = user.type
-
-  if (existingUser.role === 'FIELD_AGENT') {
-    if (
-      !existingUser.type ||
-      !Object.values(FIELD_AGENT_TYPES).includes(existingUser.type)
-    ) {
-      return h.response('Type not supported for this user').code(403)
-    }
-  } else {
-    if (existingUser.type) {
-      return h.response('Type not supported for this user').code(403)
-    }
-  }
+  existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
     if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
       existingUser.primaryOfficeId = user.primaryOfficeId
-      user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-        user.primaryOfficeId,
-        token
-      )
+      existingUser.catchmentAreaIds =
+        await getCatchmentAreaIdsByPrimaryOfficeId(user.primaryOfficeId, token)
     } else {
       throw new Error('Location can be changed only by National System Admin')
     }
@@ -122,7 +103,7 @@ export default async function updateUser(
       'Practitioner resource not updated correctly, practitioner ID not returned'
     )
   }
-  const practitionerRole = createFhirPractitionerRole(
+  const practitionerRole = await createFhirPractitionerRole(
     existingUser,
     existingUser.practitionerId,
     false

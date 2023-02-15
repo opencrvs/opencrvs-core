@@ -308,6 +308,7 @@ type Person {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -617,6 +618,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -631,6 +633,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -949,6 +952,7 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
@@ -1078,6 +1082,23 @@ input BirthInput {
 input CountryLogoInput {
   fileName: String
   file: String
+}
+
+enum ImageFit {
+  FILL
+  TILE
+}
+
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input CurrencyInput {

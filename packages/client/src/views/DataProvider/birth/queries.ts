@@ -46,6 +46,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           occupation
           nationality
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           address {
             type
             line
@@ -70,6 +72,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         dateOfMarriage
         educationalAttainment
         nationality
@@ -104,6 +108,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         dateOfMarriage
         educationalAttainment
         nationality
@@ -133,6 +139,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         duplicates
         attachments {
           data
@@ -199,10 +206,20 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           id
           name
         }
+        system {
+          name
+          type
+        }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -299,6 +316,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         identifier {
           id
           type
@@ -333,6 +352,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         identifier {
           id
           type
@@ -371,6 +392,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           nationality
           occupation
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           address {
             type
             line
@@ -388,6 +411,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment
@@ -448,10 +472,20 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           id
           name
         }
+        system {
+          name
+          type
+        }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName

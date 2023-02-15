@@ -13,7 +13,6 @@ import * as React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@client/styledComponents'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   RegisterForm,
   FullProps
@@ -54,10 +53,6 @@ type IProps = IReviewProps &
 export interface IReviewSectionDetails {
   [key: string]: any
 }
-
-const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
-`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};

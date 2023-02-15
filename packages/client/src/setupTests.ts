@@ -65,7 +65,8 @@ const config = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
   PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
-  ADDRESSES: 1
+  ADDRESSES: 1,
+  ADMIN_LEVELS: 2
 }
 
 vi.stubGlobal('config', config)
@@ -149,6 +150,7 @@ console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
 roleQueries.fetchRoles = vi.fn()
+
 userQueries.searchUsers = vi.fn()
 
 vi.doMock(
@@ -159,7 +161,6 @@ vi.doMock(
     referenceApi: {
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
       loadContent: () =>
         Promise.resolve({
           languages: mockOfflineData.languages

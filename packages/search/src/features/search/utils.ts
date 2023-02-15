@@ -106,7 +106,7 @@ export function advancedQueryBuilder(
   ) {
     must.push({
       match: {
-        dateOfRegistration: params.dateOfRegistration
+        dateOfDeclaration: params.dateOfRegistration
       }
     })
   }
@@ -148,7 +148,7 @@ export function advancedQueryBuilder(
   if (params.declarationJurisdictionId) {
     must.push({
       match: {
-        declarationJurisdictionId: {
+        declarationJurisdictionIds: {
           query: params.declarationJurisdictionId,
           boost: 2.0
         }
@@ -181,14 +181,12 @@ export function advancedQueryBuilder(
   ].filter((id) => Boolean(id))
 
   if (eventJurisdictionIds.length > 0) {
-    must.push({
-      bool: {
-        should: eventJurisdictionIds.map((locationId: string) => ({
-          match: {
-            eventJurisdictionIds: locationId
-          }
-        }))
-      }
+    eventJurisdictionIds.forEach((locationId) => {
+      must.push({
+        match: {
+          eventJurisdictionIds: locationId
+        }
+      })
     })
   }
 
@@ -206,7 +204,7 @@ export function advancedQueryBuilder(
     must.push({
       multi_match: {
         query: params.childLastName,
-        fields: 'childLastName',
+        fields: 'childFamilyName',
         fuzziness: 'AUTO'
       }
     })
@@ -300,7 +298,7 @@ export function advancedQueryBuilder(
 
     must.push({
       range: {
-        childDoB: {
+        deceasedDoB: {
           gte: params.deceasedDoBStart,
           lte: params.deceasedDoBEnd
         }
@@ -390,7 +388,7 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (!params.fatherDoBStart && params.fatherDoBEnd && params.fatherDoB) {
+  if (!params.fatherDoBStart && !params.fatherDoBEnd && params.fatherDoB) {
     must.push({
       match: {
         fatherDoB: params.fatherDoB
@@ -470,7 +468,7 @@ export function advancedQueryBuilder(
 
     must.push({
       range: {
-        childDoB: {
+        informantDoB: {
           gte: params.informantDoBStart,
           lte: params.informantDoBEnd
         }
@@ -511,28 +509,32 @@ export function advancedQueryBuilder(
   }
 
   if (params.nationalId) {
-    should.push(
-      {
-        match: {
-          motherIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          fatherIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          informantIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          deceasedIdentifier: params.nationalId
-        }
+    must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              motherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              fatherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              informantIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              deceasedIdentifier: params.nationalId
+            }
+          }
+        ]
       }
-    )
+    })
   }
 
   if (createdBy) {

@@ -9,14 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { useState, useRef, useEffect } from 'react'
 import {
   LinkButton,
   TertiaryButton,
-  PrimaryButton
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import SignatureCanvas from 'react-signature-canvas'
+import {
+  ImageUploader,
+  InputField,
+  ISelectOption as SelectComponentOptions,
+  TextArea,
+  ErrorText
+} from '@opencrvs/components/lib/'
+
 import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
@@ -66,7 +74,8 @@ import {
   SubmissionAction,
   ICheckboxFormField,
   CHECKBOX,
-  INestedInputFields
+  INestedInputFields,
+  DeathSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -90,7 +99,8 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  formMessageDescriptors
+  formMessageDescriptors,
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
@@ -122,6 +132,7 @@ import {
   injectIntl,
   IntlShape,
   MessageDescriptor,
+  useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
@@ -130,6 +141,11 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
+import {
+  ApplyButton,
+  CancelButton
+} from '@client/views/SysAdmin/Config/Application/Components'
+import { getBase64String } from '@client/utils/imageUtils'
 import {
   bytesToSize,
   isCorrection,
@@ -253,6 +269,203 @@ const DocumentListPreviewContainer = styled.div`
 const InputWrapper = styled.div`
   margin-top: 56px;
 `
+
+const CustomImageUpload = styled(ImageUploader)`
+  border: 0 !important;
+`
+const SignatureContainer = styled.div`
+  border: 2px solid ${({ theme }) => theme.colors.grey600};
+  border-radius: 4px;
+  width: 100%;
+`
+const SignatureInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
+const SignaturePreview = styled.img`
+  max-width: 50%;
+  display: block;
+`
+const ErrorMessage = styled.div`
+  margin-top: 16px;
+`
+
+function SignCanvas({
+  value,
+  onChange
+}: {
+  value?: string
+  onChange: (value: string) => void
+}) {
+  const [canvasWidth, setCanvasWidth] = useState(300)
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<SignatureCanvas>(null)
+
+  useEffect(() => {
+    function handleResize() {
+      if (canvasContainerRef.current) {
+        setCanvasWidth(canvasContainerRef.current.offsetWidth)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    handleResize()
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [canvasContainerRef])
+
+  useEffect(() => {
+    if (canvasRef.current && value) {
+      canvasRef.current.fromDataURL(value)
+    }
+  }, [value])
+
+  function emitValueToParent() {
+    const data = canvasRef.current?.toDataURL()
+    if (!data) {
+      return
+    }
+    onChange(data)
+  }
+
+  function clear() {
+    canvasRef.current?.clear()
+    onChange('')
+  }
+
+  return (
+    <SignatureInputContainer>
+      <SignatureContainer ref={canvasContainerRef}>
+        <SignatureCanvas
+          ref={canvasRef}
+          onEnd={() => {
+            emitValueToParent()
+          }}
+          penColor="black"
+          canvasProps={{
+            width: canvasWidth,
+            height: 200
+          }}
+        />
+      </SignatureContainer>
+      <TertiaryButton onClick={clear}>Clear</TertiaryButton>
+    </SignatureInputContainer>
+  )
+}
+
+type SignatureInputProps = {
+  id?: string
+  value?: string
+  onChange: (value: string) => void
+  disabled?: boolean
+}
+
+const SignatureDescription = styled.p`
+  margin-top: 0;
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
+function SignatureInput({
+  id,
+  value,
+  onChange,
+  disabled
+}: SignatureInputProps) {
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
+  const [signatureValue, setSignatureValue] = useState('')
+  const [signatureError, setSignatureError] = useState('')
+  const intl = useIntl()
+  const allowedSignatureFormat = ['image/png']
+
+  function apply() {
+    setSignatureDialogOpen(false)
+    onChange(signatureValue)
+  }
+
+  return (
+    <div>
+      <SignatureDescription>
+        {intl.formatMessage(messages.signatureDescription)}
+      </SignatureDescription>
+      <ErrorMessage id="signature-upload-error">
+        {signatureError && <ErrorText>{signatureError}</ErrorText>}
+      </ErrorMessage>
+      {!value && (
+        <>
+          <SecondaryButton
+            onClick={() => setSignatureDialogOpen(true)}
+            disabled={disabled}
+          >
+            {intl.formatMessage(messages.signatureOpenSignatureInput)}
+          </SecondaryButton>
+          <CustomImageUpload
+            id="signature-file-upload"
+            title="Upload"
+            handleFileChange={async (file) => {
+              if (!allowedSignatureFormat.includes(file.type)) {
+                setSignatureError(
+                  intl.formatMessage(formMessages.fileUploadError, {
+                    type: allowedSignatureFormat
+                      .map((signatureFormat) =>
+                        signatureFormat.split('/').pop()
+                      )
+                      .join(', ')
+                  })
+                )
+                return
+              }
+              onChange((await getBase64String(file)).toString())
+              setSignatureError('')
+            }}
+            disabled={disabled}
+          />
+        </>
+      )}
+      {value && <SignaturePreview alt="Informant's signature" src={value} />}
+      {value && (
+        <TertiaryButton onClick={() => onChange('')}>
+          {intl.formatMessage(messages.signatureDelete)}
+        </TertiaryButton>
+      )}
+
+      <ResponsiveModal
+        id={`${id}Modal`}
+        title={intl.formatMessage(messages.informantsSignature)}
+        autoHeight={true}
+        titleHeightAuto={true}
+        width={600}
+        show={signatureDialogOpen}
+        actions={[
+          <CancelButton
+            key="cancel"
+            id="modal_cancel"
+            onClick={() => setSignatureDialogOpen(false)}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </CancelButton>,
+          <ApplyButton
+            key="apply"
+            id="apply_change"
+            disabled={false}
+            onClick={apply}
+          >
+            {intl.formatMessage(buttonMessages.apply)}
+          </ApplyButton>
+        ]}
+        handleClose={() => setSignatureDialogOpen(false)}
+      >
+        <SignatureDescription>
+          {intl.formatMessage(messages.signatureInputDescription)}
+        </SignatureDescription>
+        <SignCanvas value={value} onChange={setSignatureValue} />
+      </ResponsiveModal>
+    </div>
+  )
+}
+
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: IFormSection,
@@ -402,9 +615,60 @@ const renderValue = (
   field: IFormField,
   intl: IntlShape,
   offlineCountryConfiguration: IOfflineData,
-  language: string
+  language: string,
+  isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
+  // Showing State & District Name instead of their ID
+  if (
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary',
+      'stateSecondary',
+      'districtSecondary',
+      'internationalStateSecondary',
+      'internationalDistrictSecondary'
+    ].includes(field.name) &&
+    isOriginalData
+  ) {
+    const sectionData = draftData[sectionId]
+
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+      if (field.name.includes('Secondary')) {
+        dynamicOption.dependency = [
+          'internationalStateSecondary',
+          'stateSecondary'
+        ].includes(field.name)
+          ? 'countrySecondary'
+          : 'stateSecondary'
+      } else {
+        dynamicOption.dependency = [
+          'internationalStatePrimary',
+          'statePrimary'
+        ].includes(field.name)
+          ? 'countryPrimary'
+          : 'statePrimary'
+      }
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    return value
+  }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -931,7 +1195,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean,
-    replaceEmpty?: boolean
+    replaceEmpty?: boolean,
+    isOriginalData?: boolean
   ) => {
     const { intl, offlineCountryConfiguration, language } = this.props
 
@@ -941,7 +1206,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       intl,
       offlineCountryConfiguration,
-      language
+      language,
+      isOriginalData
     )
 
     if (replaceEmpty && !value) {
@@ -951,50 +1217,53 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       get(sectionErrors[section.id][field.name], 'errors') ||
       this.getErrorForNestedField(section, field, sectionErrors)
 
-    return errorsOnField.length > 0
-      ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
-      : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
-      ? (
+    return errorsOnField.length > 0 ? (
+      this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+    ) : field.nestedFields && !Boolean(ignoreNestedFieldWrapping) ? (
+      (
+        (data[section.id] &&
+          data[section.id][field.name] &&
+          (data[section.id][field.name] as IFormSectionData).value &&
+          field.nestedFields[
+            (data[section.id][field.name] as IFormSectionData).value as string
+          ]) ||
+        []
+      ).reduce((groupedValues, nestedField) => {
+        const errorsOnNestedField =
+          sectionErrors[section.id][field.name].nestedFields[
+            nestedField.name
+          ] || []
+        // Value of the parentField resembles with IFormData as a nested form
+        const nestedValue =
           (data[section.id] &&
             data[section.id][field.name] &&
-            (data[section.id][field.name] as IFormSectionData).value &&
-            field.nestedFields[
-              (data[section.id][field.name] as IFormSectionData).value as string
-            ]) ||
-          []
-        ).reduce((groupedValues, nestedField) => {
-          const errorsOnNestedField =
-            sectionErrors[section.id][field.name].nestedFields[
-              nestedField.name
-            ] || []
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
-            (data[section.id] &&
-              data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineCountryConfiguration,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-              {errorsOnNestedField.length > 0
-                ? this.getFieldValueWithErrorMessage(
-                    section,
-                    field,
-                    errorsOnNestedField[0]
-                  )
-                : nestedValue}
-            </>
-          )
-        }, <>{value}</>)
-      : value
+            renderValue(
+              data[section.id][field.name] as IFormData,
+              'nestedFields',
+              nestedField,
+              intl,
+              offlineCountryConfiguration,
+              language,
+              isOriginalData
+            )) ||
+          ''
+        return (
+          <>
+            {groupedValues}
+            {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+            {errorsOnNestedField.length > 0
+              ? this.getFieldValueWithErrorMessage(
+                  section,
+                  field,
+                  errorsOnNestedField[0]
+                )
+              : nestedValue}
+          </>
+        )
+      }, <>{value}</>)
+    ) : (
+      <>{value}</>
+    )
   }
 
   getNestedFieldValueOrError = (
@@ -1112,7 +1381,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !index,
+              true
             )
           )
           .filter((value) => value)
@@ -1419,7 +1689,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+    const previewImageTransformed = { ...previewImage }
+    previewImageTransformed.data = isBase64FileString(
+      previewImageTransformed.data
+    )
+      ? previewImageTransformed.data
+      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
+
+    this.setState({ previewImage: previewImageTransformed as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1477,6 +1754,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
         (section.id === BirthSection.Father && !!data.father?.detailsExist))
+    )
+  }
+
+  isLastNameFirst = () => {
+    const { registerForm, draft: declaration } = this.props
+    const fields = registerForm[declaration.event].sections.find((section) =>
+      declaration.event === Event.Birth
+        ? section.id === BirthSection.Child
+        : section.id === DeathSection.Deceased
+    )?.groups[0]?.fields
+    if (!fields) return false
+    return (
+      fields.findIndex((field) => field.name === 'familyNameEng') <
+      fields.findIndex((field) => field.name === 'firstNamesEng')
     )
   }
 
@@ -1595,10 +1886,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
+    const isSignatureMissing = isCorrection(declaration)
+      ? false
+      : offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+        !declaration.data.registration?.informantsSignature
+
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0
+      ).length === 0 && !isSignatureMissing
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -1616,8 +1912,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
+    const signatureInputProps = {
+      id: 'informants_signature',
+      onChange: (value: string) => {
+        this.props.onChangeReviewForm &&
+          this.props.onChangeReviewForm(
+            { informantsSignature: value },
+            registrationSection,
+            declaration
+          )
+      },
+      value: declaration.data.registration?.informantsSignature as string
+    }
+
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
@@ -1712,6 +2025,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
+
+              {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
+                !isCorrection(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="informant_signature"
+                      touched={false}
+                      required={window.config.INFORMANT_SIGNATURE_REQUIRED}
+                      label={intl.formatMessage(messages.informantsSignature)}
+                    >
+                      <SignatureInput
+                        {...signatureInputProps}
+                        disabled={viewRecord}
+                      />
+                    </InputField>
+                  </InputWrapper>
+                )}
               {totalFileSizeExceeded && (
                 <Alert type="warning">
                   {intl.formatMessage(constantsMessages.totalFileSizeExceed, {

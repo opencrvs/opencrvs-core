@@ -45,7 +45,8 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   [CustomFieldType.Textarea]: messages.textAreaInput,
   /* TODO */
   [CustomFieldType.Subsection]: messages.supportingCopy,
-  [CustomFieldType.Paragraph]: messages.heading
+  [CustomFieldType.Paragraph]: messages.heading,
+  [CustomFieldType.SelectWithOptions]: messages.customSelect
 }
 
 type IRouteProps = {

@@ -11,9 +11,9 @@
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
-import { IUserDetails } from '@client/utils/userUtils'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -38,19 +38,19 @@ export function isOfflineDataLoaded(
   return isOfflineDataLoaded
 }
 
-export function isSystemAdmin(userDetails: IUserDetails | undefined) {
+export function isSystemAdmin(userDetails: UserDetails | undefined) {
   return (
     userDetails &&
-    userDetails.role &&
-    SYS_ADMIN_ROLES.includes(userDetails.role)
+    userDetails.systemRole &&
+    SYS_ADMIN_ROLES.includes(userDetails.systemRole)
   )
 }
 
-export function isNationalSystemAdmin(userDetails: IUserDetails | undefined) {
+export function isNationalSystemAdmin(userDetails: UserDetails | undefined) {
   return (
     userDetails &&
-    userDetails.role &&
-    NATL_ADMIN_ROLES.includes(userDetails.role)
+    userDetails.systemRole &&
+    NATL_ADMIN_ROLES.includes(userDetails.systemRole)
   )
 }
 
@@ -64,6 +64,24 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
     throw new Error('Offline data is not yet loaded. This should never happen')
   }
   return data
+}
+
+export const selectCountryBackground = (store: IStoreState) => {
+  const countryBackground = getKey(store, 'offlineData').config
+    ?.LOGIN_BACKGROUND
+  if (countryBackground?.backgroundImage) {
+    return {
+      backgroundImage: countryBackground.backgroundImage,
+      imageFit: countryBackground.imageFit
+    }
+  }
+  return {
+    backgroundColor: countryBackground?.backgroundColor ?? '36304E'
+  }
+}
+
+export const selectCountryLogo = (store: IStoreState) => {
+  return getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file
 }
 
 export const getOfflineLoadingError = (

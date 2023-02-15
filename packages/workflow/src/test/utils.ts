@@ -872,6 +872,65 @@ export const officeMock = JSON.stringify({
   }
 })
 
+export const informantSMSNotificationMock = [
+  {
+    _id: '63a30240ee4b270dc91f53d0',
+    name: 'birthInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d1',
+    name: 'birthDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d2',
+    name: 'birthRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d3',
+    name: 'birthRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d4',
+    name: 'deathInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d5',
+    name: 'deathDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d6',
+    name: 'deathRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d7',
+    name: 'deathRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  }
+]
+
 export const compositionMock = JSON.stringify({
   identifier: {
     system: 'urn:ietf:rfc:3986',
@@ -1932,6 +1991,6 @@ export const mosipSuccessMock = JSON.stringify({
     authToken: '257803821990055124230310596669133515'
   }
 })
-export const mosipConfigMock = JSON.stringify({
-  config: { INTEGRATIONS: [{ status: 'active', name: 'MOSIP' }] }
-})
+export const mosipConfigMock = JSON.stringify([
+  { status: 'active', name: 'MOSIP' }
+])

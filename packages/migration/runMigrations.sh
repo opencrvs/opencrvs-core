@@ -9,10 +9,26 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+HEARTH_CONFIG=./migrate-mongo-config-hearth.js
+OPENHIM_CONFIG=./migrate-mongo-config-openhim.js
+APP_CONFIG=./migrate-mongo-config-application-config.js
+USER_MGNT_CONFIG=./migrate-mongo-config-user-mgnt.js
+
+SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # hearth migrations
-yarn migrate-mongo up --file migrate-mongo-config-hearth.js
-yarn migrate-mongo status --file migrate-mongo-config-hearth.js
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
 #openhim migrations
-yarn migrate-mongo up --file migrate-mongo-config-openhim.js
-yarn migrate-mongo status --file migrate-mongo-config-openhim.js
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
+
+# Application Config migration
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
+
+# User mgnt migration
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
+

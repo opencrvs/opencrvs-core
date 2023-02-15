@@ -27,7 +27,6 @@ import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
-
 import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
 import {
   getActionFromTask,
@@ -165,6 +164,7 @@ export async function inProgressHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('IN_PROGRESS', request)
   try {
     const points = await generateInCompleteFieldPoints(
       request.payload as fhir.Bundle,

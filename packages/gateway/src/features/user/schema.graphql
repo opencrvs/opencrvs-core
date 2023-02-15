@@ -24,14 +24,32 @@ input SignatureInput {
   type: String
 }
 
+enum SystemRoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
+# Create user form does not ask email, username
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
+  mobile: String!
+  systemRole: SystemRoleType!
   role: String
-  type: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -46,7 +64,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: SystemRoleType!
   signature: Signature
 }
 
@@ -55,27 +73,34 @@ type Avatar {
   data: String!
 }
 
+# This should be replaced in #2277
+type System {
+  name: String!
+}
+
+# Fields type, underInvestigation, primaryOffice, catchmentArea and localRegistrar
+# are optional when a Local System Admin creates new user.
 type User {
-  id: ID
-  userMgntUserID: ID
-  practitionerId: String
-  name: [HumanName] # -> .name
+  id: ID!
+  userMgntUserID: ID!
+  practitionerId: String!
+  name: [HumanName!]! # -> .name
   username: String
-  mobile: String
-  role: String
-  type: String
+  mobile: String!
+  systemRole: SystemRoleType!
+  role: Role!
   email: String
-  status: String
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location]
+  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
-  creationDate: String
+  creationDate: String!
   avatar: Avatar
   device: String
-  searches: [BookmarkedSeachItem]
+  searches: [BookmarkedSeachItem!]
 }
 
 type SearchUserResult {
@@ -96,8 +121,8 @@ type SearchFieldAgentResult {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
-  status: String
+  role: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
@@ -127,7 +152,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int

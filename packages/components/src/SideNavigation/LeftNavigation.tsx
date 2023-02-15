@@ -25,11 +25,13 @@ export interface ILeftNavigationProps {
   applicationVersion: string
   buildVersion: string
 }
+
 const LeftNavigationContainer = styled.div<{
   navigationWidth?: number
 }>`
-  position: relative;
-  top: 0px;
+  top: 0;
+  display: flex;
+  flex-direction: column;
   width: ${({ navigationWidth }) =>
     navigationWidth ? navigationWidth : 249}px;
   height: 100vh;
@@ -80,20 +82,30 @@ const Version = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
   ${({ theme }) => theme.fonts.reg14};
   height: auto;
-  position: absolute;
-  bottom: 0px;
   padding: 16px;
+
   span:last-child {
     display: none;
   }
+
   :hover {
     span:first-child {
       display: none;
     }
+
     span:last-child {
       display: inline;
     }
   }
+`
+
+const Container = styled.div`
+  flex: 0 0 auto;
+`
+
+const MenuItem = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
 `
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
@@ -102,20 +114,26 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       navigationWidth={props.navigationWidth}
       className={props.className}
     >
-      <ApplicationNameContainer>
-        <ApplicationName>{props.applicationName}</ApplicationName>
-      </ApplicationNameContainer>
-      <UserInfo>
-        {props.avatar && props.avatar()}
-        <UserName>{props.name && props.name}</UserName>
-        <Role>{props.role && props.role}</Role>
-      </UserInfo>
-      {props.children && props.children}
-      <Version>
-        {props.warning}
-        <span>OpenCRVS {props.applicationVersion}</span>
-        <span>: {props.buildVersion}</span>
-      </Version>
+      <Container>
+        <ApplicationNameContainer>
+          <ApplicationName>{props.applicationName}</ApplicationName>
+        </ApplicationNameContainer>
+        <UserInfo>
+          <>
+            {props.avatar && props.avatar()}
+            <UserName>{props.name && props.name}</UserName>
+            <Role>{props.role && props.role}</Role>
+          </>
+        </UserInfo>
+      </Container>
+      <MenuItem>{props.children && props.children}</MenuItem>
+      <Container>
+        <Version>
+          {props.warning}
+          <span>OpenCRVS {props.applicationVersion}</span>
+          <span>: {props.buildVersion}</span>
+        </Version>
+      </Container>
     </LeftNavigationContainer>
   )
 }

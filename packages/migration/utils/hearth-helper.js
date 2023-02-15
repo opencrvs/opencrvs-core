@@ -20,10 +20,26 @@ export const COLLECTION_NAMES = {
   TASK: 'Task'
 }
 
-export async function getBirthEncounterCompositionCursor(db) {
-  return db.collection(COLLECTION_NAMES.COMPOSITION).find({
-    'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
-  })
+export async function getBirthEncounterCompositionCursor(
+  db,
+  limit = 50,
+  skip = 0
+) {
+  return db.collection(COLLECTION_NAMES.COMPOSITION).find(
+    {
+      'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
+    },
+    { limit, skip }
+  )
+}
+
+export async function getBirthEncounterCompositionCount(db) {
+  return db
+    .collection(COLLECTION_NAMES.COMPOSITION)
+    .find({
+      'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
+    })
+    .count()
 }
 
 export async function getCompositionCursor(db, limit = 50, skip = 0) {

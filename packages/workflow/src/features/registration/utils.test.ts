@@ -23,18 +23,30 @@ import {
   testFhirBundleWithIdsForDeath,
   officeMock,
   mosipDeceasedPatientMock,
-  mosipSuccessMock
+  mosipSuccessMock,
+  informantSMSNotificationMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
-
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
+  beforeEach(async () => {
+    fetch.resetMocks()
+    jest.mock('@workflow/features/registration/utils', () => {
+      const actual = jest.requireActual('./utils')
+      return {
+        ...actual,
+        getInformantSMSNotification: function () {
+          return informantSMSNotificationMock
+        }
+      }
+    })
+  })
+
   it('Generates proper birth tracking id successfully', async () => {
     const trackingId = generateBirthTrackingId()
-
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^B/)
@@ -79,6 +91,7 @@ describe('Verify utility functions', () => {
   })
   it('send Birth declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -109,12 +122,13 @@ describe('Verify utility functions', () => {
   })
   it('send Birth registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    sendEventNotification(
+    await sendEventNotification(
       testFhirBundle,
-      Events.BIRTH_MARK_REG,
+      Events.BIRTH_NEW_DEC,
       '01711111111',
       {
         Authorization: 'bearer acd '
@@ -156,6 +170,7 @@ describe('Verify utility functions', () => {
   })
   it('send Death declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -186,10 +201,11 @@ describe('Verify utility functions', () => {
   })
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
+    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    sendEventNotification(
+    await sendEventNotification(
       testFhirBundleWithIdsForDeath,
       Events.DEATH_MARK_REG,
       '01711111111',

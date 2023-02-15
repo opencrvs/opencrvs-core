@@ -9,35 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloQueryResult } from '@apollo/client'
 import { ValidationInitializer } from '@client/utils/validate'
-import { MessageDescriptor } from 'react-intl'
+import { IDynamicValues } from '@opencrvs/client/src/navigation'
+import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
   IRadioOption as RadioComponentOption,
   RadioSize
 } from '@opencrvs/components/lib/Radio'
-import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { IDynamicValues } from '@opencrvs/client/src/navigation'
+import { MessageDescriptor } from 'react-intl'
 
-import * as mutations from './mappings/mutation'
-import * as queries from './mappings/query'
-import * as graphQLQueries from './mappings/queries'
-import * as labels from './mappings/label'
-import * as types from './mappings/type'
-import * as responseTransformers from './mappings/response-transformers'
-import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { IUserDetails } from '@client/utils/userUtils'
-import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IQuestionConfig } from './questionConfig'
+import {
+  ICustomSelectOption,
+  IQuestionConfig
+} from '@client/forms/questionConfig'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { IOfflineData } from '@client/offline/reducer'
+import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
-import { LocationType } from '@client/utils/gateway'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import * as labels from './mappings/label'
+import * as mutations from './mappings/mutation'
+import * as graphQLQueries from './mappings/queries'
+import * as queries from './mappings/query'
+import * as responseTransformers from './mappings/response-transformers'
+import * as types from './mappings/type'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -91,9 +93,17 @@ export enum DownloadAction {
 
 export type Action = SubmissionAction | DownloadAction
 
+export interface IFormDataSet {
+  _id: string
+  fileName: string
+  options: ICustomSelectOption[]
+  resource?: string
+}
+
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]
   formDrafts: IFormDraft[]
+  formDataset?: IFormDataSet[]
 }
 
 export interface ISelectOption {
@@ -695,6 +705,7 @@ export interface IDynamicFormField
 }
 
 export interface IConditional {
+  description?: string
   action: string
   expression: string
 }
@@ -880,7 +891,7 @@ export type IFormSectionQueryMapFunction = (
   targetSectionId?: string, // used for template query mappings
   targetFieldName?: string, // used for template query mappings
   offlineData?: IOfflineData, // used for template offline mappings
-  userDetails?: IUserDetails // user for template user mappings
+  userDetails?: UserDetails // user for template user mappings
 ) => void
 
 export enum BirthSection {
