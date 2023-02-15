@@ -435,3 +435,6 @@ export function isSystemInitiated(history: History) {
     (history.dhis2Notification && !history.user?.id) || history.system
   )
 }
+export function isVerifiedAction(history: History) {
+  return history.action === RegAction.Verified
+}

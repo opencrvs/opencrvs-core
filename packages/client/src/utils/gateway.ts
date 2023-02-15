@@ -218,6 +218,7 @@ export type ApplicationConfiguration = {
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: Maybe<LoginBackground>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -236,6 +237,7 @@ export type ApplicationConfigurationInput = {
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -325,6 +327,11 @@ export type AuditLogItemBase = {
   practitionerId: Scalars['String']
   time: Scalars['String']
   userAgent: Scalars['String']
+}
+
+export enum AuthorizationStatus {
+  Anonymous = 'ANONYMOUS',
+  User = 'USER'
 }
 
 export type Avatar = {
@@ -922,6 +929,7 @@ export type History = {
   dhis2Notification?: Maybe<Scalars['Boolean']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
+  ipAddress?: Maybe<Scalars['String']>
   location?: Maybe<Location>
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
@@ -981,6 +989,11 @@ export type IdentityType = {
   id?: Maybe<Scalars['ID']>
   otherType?: Maybe<Scalars['String']>
   type?: Maybe<IdentityIdType>
+}
+
+export enum ImageFit {
+  Fill = 'FILL',
+  Tile = 'TILE'
 }
 
 export enum InformantType {
@@ -1085,6 +1098,19 @@ export type LocationWiseEstimationMetric = {
   within1Year: Scalars['Int']
   within5Years: Scalars['Int']
   withinTarget: Scalars['Int']
+}
+
+export type LoginBackground = {
+  __typename?: 'LoginBackground'
+  backgroundColor?: Maybe<Scalars['String']>
+  backgroundImage?: Maybe<Scalars['String']>
+  imageFit?: Maybe<ImageFit>
+}
+
+export type LoginBackgroundInput = {
+  backgroundColor?: InputMaybe<Scalars['String']>
+  backgroundImage?: InputMaybe<Scalars['String']>
+  imageFit?: InputMaybe<ImageFit>
 }
 
 export enum MannerOfDeath {
@@ -1533,6 +1559,7 @@ export type Query = {
   fetchEventRegistration?: Maybe<EventRegistration>
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
+  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1595,6 +1622,10 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QueryFetchRecordsDetailsByCompositionIdArgs = {
+  id: Scalars['String']
 }
 
 export type QueryFetchRegistrationArgs = {
@@ -1826,12 +1857,15 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export type RecordDetails = BirthRegistration | DeathRegistration
+
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
+  Verified = 'VERIFIED',
   Viewed = 'VIEWED'
 }
 
@@ -3355,6 +3389,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -3651,6 +3686,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       otherReason?: string | null
       statusReason?: {
@@ -4021,6 +4057,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -4297,6 +4334,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -5635,6 +5673,12 @@ export type UpdateApplicationConfigMutation = {
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     ADDRESSES?: number | null
     ADMIN_LEVELS?: number | null
+    LOGIN_BACKGROUND?: {
+      __typename?: 'LoginBackground'
+      backgroundColor?: string | null
+      backgroundImage?: string | null
+      imageFit?: ImageFit | null
+    } | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -6526,6 +6570,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
@@ -6808,6 +6853,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'

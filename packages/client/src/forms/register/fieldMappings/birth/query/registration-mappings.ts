@@ -18,7 +18,9 @@ import {
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
-import { VERIFY_DETAILS } from '@client/navigation/routes'
+import {
+  VIEW_VERIFY_CERTIFICATE
+} from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
@@ -341,9 +343,9 @@ export const QRCodeTransformerTransformer = async (
   transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
     await QRCode.toDataURL(
       `${window.location.protocol}//${window.location.host}${formatUrl(
-        VERIFY_DETAILS,
+        VIEW_VERIFY_CERTIFICATE,
         {
-          id: queryData.id
+          declarationId: queryData.id
         }
       )}`
     )

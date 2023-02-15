@@ -180,6 +180,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -422,6 +423,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }

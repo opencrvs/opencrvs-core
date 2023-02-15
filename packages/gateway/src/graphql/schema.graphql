@@ -30,6 +30,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -350,6 +352,15 @@ type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
 }
+
+union RecordDetails = BirthRegistration | DeathRegistration
+
+enum AuthorizationStatus {
+  ANONYMOUS
+  USER
+}
+
+directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
 
 type Location {
   id: ID!
@@ -891,6 +902,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -1431,6 +1443,7 @@ type Certificate {
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED

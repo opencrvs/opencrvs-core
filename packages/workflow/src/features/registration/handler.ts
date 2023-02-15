@@ -23,7 +23,8 @@ import {
   touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection,
-  validateDeceasedDetails
+  validateDeceasedDetails,
+  makeTaskAnonymous
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -444,6 +445,29 @@ export async function actionEventHandler(
         'Content-Type': 'application/fhir+json'
       }
     })
+  } catch (error) {
+    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
+    throw new Error(error)
+  }
+}
+export async function anonymousActionEventHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit,
+  event: Events
+) {
+  try {
+    const payload = request.payload as fhir.Bundle
+    const anonymousPayload = makeTaskAnonymous(payload)
+
+    const taskResource = anonymousPayload.entry?.[0].resource as fhir.Task
+    const res = await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskResource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    })
+    return res
   } catch (error) {
     logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)
