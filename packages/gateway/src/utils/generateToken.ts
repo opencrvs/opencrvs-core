@@ -18,13 +18,13 @@ import {
 import { sign } from 'jsonwebtoken'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
-export async function createToken(
+export function createToken(
   userId: string,
   scope: string[],
   audience: string[],
   issuer: string,
   temporary?: boolean
-): Promise<string> {
+): string {
   if (typeof userId === undefined) {
     throw new Error('Invalid userId found for token creation')
   }
@@ -39,8 +39,8 @@ export async function createToken(
   })
 }
 
-export const generateToken = async () =>
-  await createToken(
+export const generateToken = () =>
+  createToken(
     'ANONYMOUS_USER_FOR_VERI',
     ['register', 'performance', 'certify', 'demo', 'verify'],
     [

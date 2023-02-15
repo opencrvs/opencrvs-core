@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { configAnonymousUserLoaded } from '@client/offline/actions'
 import { referenceApi } from '@client/utils/referenceApi'
 import { IStoreState } from '@client/store'
@@ -19,21 +19,23 @@ const StyledSpinner = styled(Spinner)`
 
 const UnprotectedRouteWrapper = (props: {
   [x: string]: any
-  configAnonymousUserLoaded: any
+  offlineData: any
 }) => {
-  const { offlineData, configAnonymousUserLoaded, ...rest } = props
+  const { offlineData, ...rest } = props
+  const dispatch = useDispatch()
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const { config } = await referenceApi.loadConfigAnonymousUser()
         document.title = config?.APPLICATION_NAME as string
+
         // @ts-ignore
-        configAnonymousUserLoaded({ config })
+        dispatch(configAnonymousUserLoaded({ config }))
       } catch (e) {}
     }
     fetchData()
-  }, [configAnonymousUserLoaded])
+  }, [dispatch])
 
   if (!offlineData) {
     return (
@@ -51,11 +53,6 @@ const mapStateToProps = (store: IStoreState) => {
   }
 }
 
-const mapDispatchToProps = {
-  configAnonymousUserLoaded
-}
-
-export const UnprotectedRoute = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(UnprotectedRouteWrapper)
+export const UnprotectedRoute = connect(mapStateToProps)(
+  UnprotectedRouteWrapper
+)

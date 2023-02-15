@@ -59,9 +59,9 @@ import { generateToken } from '@gateway/utils/generateToken'
 export const resolvers: GQLResolver = {
   RecordDetails: {
     __resolveType(obj): any {
+      if (!obj?.type?.text) return 'BirthRegistration'
       if (obj.type.text == 'Birth Declaration') return 'BirthRegistration'
       if (obj.type.text == 'Death Declaration') return 'DeathRegistration'
-      return null
     }
   },
   Query: {
@@ -272,9 +272,9 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordsDetailsByCompositionId(_, { id }, context) {
+    async fetchRecordDetailsForVerification(_, { id }, context) {
       try {
-        const token = await generateToken()
+        const token = generateToken()
         context.Authorization = `Bearer ${token}`
         const authHeader = {
           Authorization: context.Authorization

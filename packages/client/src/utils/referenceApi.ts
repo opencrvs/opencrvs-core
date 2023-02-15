@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {IFormConfig} from '@client/forms'
-import {ILanguage} from '@client/i18n/reducer'
-import {ILocation} from '@client/offline/reducer'
-import {getToken} from '@client/utils/authUtils'
-import {Event, System} from '@client/utils/gateway'
-import {questionsTransformer} from '@client/forms/questionConfig'
+import { IFormConfig } from '@client/forms'
+import { ILanguage } from '@client/i18n/reducer'
+import { ILocation } from '@client/offline/reducer'
+import { getToken } from '@client/utils/authUtils'
+import { Event, System } from '@client/utils/gateway'
+import { questionsTransformer } from '@client/forms/questionConfig'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation

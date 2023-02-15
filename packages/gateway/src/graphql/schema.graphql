@@ -30,7 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
-  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails!
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
     @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
