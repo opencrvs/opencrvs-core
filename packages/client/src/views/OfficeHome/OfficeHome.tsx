@@ -138,7 +138,7 @@ class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState
 > {
-  pageSize = 2
+  pageSize = 10
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role

@@ -136,8 +136,6 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
 
-  console.log('aaaaaaaaaaaaaaa', initialWorkqueue, workqueueInitialState)
-
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
     return JSON.stringify(initialWorkqueue)
@@ -158,8 +156,6 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   const currentUserWorkqueue: IWorkqueue =
     (currentUserData && currentUserData.workqueue) ||
     workqueueInitialState.workqueue
-
-  console.log('bbbbbbbbbbb', currentUserWorkqueue)
 
   return JSON.stringify(currentUserWorkqueue)
 }

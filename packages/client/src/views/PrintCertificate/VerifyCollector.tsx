@@ -21,6 +21,7 @@ import {
   formatUrl,
   goBack,
   goToHomeTab,
+  goToIssueCertificatePayment,
   goToPrintCertificatePayment,
   goToReviewCertificate
 } from '@client/navigation'
@@ -42,6 +43,7 @@ import {
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { constantsMessages } from '@client/i18n/messages'
 
 interface IMatchParams {
   registrationId: string
@@ -60,6 +62,7 @@ interface IDispatchProps {
   writeDeclaration: typeof writeDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
+  goToIssueCertificatePayment: typeof goToIssueCertificatePayment
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
@@ -68,6 +71,7 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = () => {
+    const isIssueUrl = window.location.href.includes('issue')
     const event = this.props.declaration.event
     const eventDate = getEventDate(this.props.declaration.data, event)
     const registeredDate = getRegisteredDate(this.props.declaration.data)
@@ -95,10 +99,21 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         event
       )
     } else {
-      this.props.goToPrintCertificatePayment(
-        this.props.match.params.registrationId,
-        event
-      )
+      // this.props.goToPrintCertificatePayment(
+      //   this.props.match.params.registrationId,
+      //   event
+      // )
+      if (!isIssueUrl) {
+        this.props.goToPrintCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      } else {
+        this.props.goToIssueCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      }
     }
   }
 
@@ -161,7 +176,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   render() {
     const { collector } = this.props.match.params
     const { intl } = this.props
-    if (!this.props.declaration) {
+    const isIssueUrl = window.location.href.includes('issue')
+    const titleMessage = isIssueUrl
+      ? intl.formatMessage(constantsMessages.issueCertificate)
+      : intl.formatMessage(messages.certificateCollectionTitle)
+
+    if (!this.props.declaration && !isIssueUrl) {
       return (
         <Redirect
           to={formatUrl(REGISTRAR_HOME_TAB, {
@@ -171,11 +191,21 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         />
       )
     }
+    if (!this.props.declaration && isIssueUrl) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToIssue,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     return (
       <ActionPageLight
         goBack={this.props.goBack}
         hideBackground
-        title={intl.formatMessage(messages.certificateCollectionTitle)}
+        title={titleMessage}
         goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
         <IDVerifier
@@ -220,5 +250,6 @@ export const VerifyCollector = connect(mapStateToProps, {
   modifyDeclaration,
   writeDeclaration,
   goToReviewCertificate,
-  goToPrintCertificatePayment
+  goToPrintCertificatePayment,
+  goToIssueCertificatePayment
 })(injectIntl(VerifyCollectorComponent))

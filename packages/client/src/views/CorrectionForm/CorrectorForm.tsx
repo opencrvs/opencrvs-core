@@ -60,47 +60,46 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroupWithVisibleFields(
+export function getGroupWithVisibleFields(
   section: IFormSection,
   declaration: IDeclaration
 ) {
   const event = declaration.event
-  const group = section.groups[0]
-  const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
-  if (event === Event.Birth) {
-    const declarationData = declaration.data
+  const group = { ...section.groups[0] }
+  group.fields = group.fields.map((orgField, fieldIndex) => {
+    if (fieldIndex > 0) return orgField
+    const field = {
+      ...orgField
+    } as IRadioGroupWithNestedFieldsFormField
+    if (event === Event.Birth) {
+      const declarationData = declaration.data
 
-    const motherDataExists =
-      declarationData &&
-      declarationData.mother &&
-      declarationData.mother.detailsExist
+      const motherDataExists =
+        declarationData &&
+        declarationData.mother &&
+        declarationData.mother.detailsExist
 
-    const fatherDataExists =
-      declarationData &&
-      declarationData.father &&
-      declarationData.father.detailsExist
+      const fatherDataExists =
+        declarationData &&
+        declarationData.father &&
+        declarationData.father.detailsExist
 
-    if (!fatherDataExists) {
-      field.options = field.options.filter(
-        (option) => option.value !== 'FATHER'
-      )
+      if (!fatherDataExists) {
+        field.options = field.options.filter(
+          (option) => option.value !== 'FATHER'
+        )
+      }
+
+      if (!motherDataExists) {
+        field.options = field.options.filter(
+          (option) => option.value !== 'MOTHER'
+        )
+      }
     }
+    return field
+  })
 
-    if (!motherDataExists) {
-      field.options = field.options.filter(
-        (option) => option.value !== 'MOTHER'
-      )
-    }
-  }
-
-  return {
-    ...group,
-    fields: replaceInitialValues(
-      group.fields,
-      declaration.data[section.id] || {},
-      declaration.data
-    )
-  }
+  return group
 }
 
 function CorrectorFormComponent(props: IFullProps) {

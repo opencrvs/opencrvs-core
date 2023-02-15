@@ -365,6 +365,7 @@ export const NavigationView = (props: IFullProps) => {
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
+    readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
     outbox: storedDeclarations.filter((draft) =>
       (
         [
@@ -567,7 +568,7 @@ export const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.readyToIssue]
                       )}
-                      count={0}
+                      count={declarationCount.readyToIssue}
                       isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
                       onClick={() => {
                         props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)

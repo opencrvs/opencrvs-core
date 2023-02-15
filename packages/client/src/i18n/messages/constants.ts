@@ -158,6 +158,10 @@ interface IConstantsMessages
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
   regNumber: MessageDescriptor
+  issueCertificate: MessageDescriptor
+  issueToMother: MessageDescriptor
+  issueToFather: MessageDescriptor
+  issueToSomeoneElse: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -564,6 +568,26 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reg no.',
     description: 'Label for registered number',
     id: 'constants.registrationNumber'
+  },
+  issueCertificate: {
+    defaultMessage: 'Issue Certificate',
+    description: 'Label for issue certificate',
+    id: 'constants.issueCertificate'
+  },
+  issueToMother: {
+    defaultMessage: 'Issue to informant (Mother)',
+    description: 'Issuing to mother',
+    id: 'constants.issueToMother'
+  },
+  issueToFather: {
+    defaultMessage: 'Issue to informant (Father)',
+    description: 'Issuing to mother',
+    id: 'constants.issueToFather'
+  },
+  issueToSomeoneElse: {
+    defaultMessage: 'Issue to someone else',
+    description: 'Issuing to someone else',
+    id: 'constants.issueToSomeoneElse'
   },
   requestReason: {
     defaultMessage: 'Reason for request',

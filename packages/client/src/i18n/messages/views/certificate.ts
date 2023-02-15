@@ -50,6 +50,7 @@ interface ICertificateMessages
   preview: MessageDescriptor
   print: MessageDescriptor
   printCertificate: MessageDescriptor
+  issueCertificate: MessageDescriptor
   printReceipt: MessageDescriptor
   receiptIssuedAt: MessageDescriptor
   receiptIssuer: MessageDescriptor
@@ -281,6 +282,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Print',
     description: 'The title of review button in list expansion actions',
     id: 'print.certificate.form.name'
+  },
+  issueCertificate: {
+    defaultMessage: 'Issue Certificate',
+    description: 'The name of issue certificate',
+    id: 'print.certificate.issueCertificate'
   },
   printReceipt: {
     defaultMessage: 'Print receipt',

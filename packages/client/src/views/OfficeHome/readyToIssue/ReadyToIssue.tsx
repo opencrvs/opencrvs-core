@@ -12,7 +12,7 @@
 
 import {
   goToDeclarationRecordAudit,
-  goToPrintCertificate
+  goToIssueCertificate
 } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
 import { ITheme } from '@client/styledComponents'
@@ -31,7 +31,6 @@ import { withTheme } from 'styled-components'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
@@ -46,12 +45,10 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
-  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
-  IconWithNameEvent,
   NoNameContainer,
   NameContainer
 } from '@client/views/OfficeHome/components'
@@ -60,9 +57,9 @@ import { RegStatus } from '@client/utils/gateway'
 
 interface IBasePrintTabProps {
   theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
+  goToIssueCertificate: typeof goToIssueCertificate
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -180,7 +177,7 @@ class ReadyToPrintComponent extends React.Component<
     }
   }
 
-  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
+  transformCertifiedContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -203,11 +200,7 @@ class ReadyToPrintComponent extends React.Component<
           ) => {
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              this.props.clearCorrectionAndPrintChanges(reg.id)
-              this.props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLocaleLowerCase() || ''
-              )
+              this.props.goToIssueCertificate(reg.id)
             }
           }
         })
@@ -236,7 +229,7 @@ class ReadyToPrintComponent extends React.Component<
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+            this.props.goToDeclarationRecordAudit('issueTab', reg.id)
           }
         >
           {reg.name}
@@ -245,7 +238,7 @@ class ReadyToPrintComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+            this.props.goToDeclarationRecordAudit('issueTab', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -279,8 +272,6 @@ class ReadyToPrintComponent extends React.Component<
       }
     })
 
-    console.log('finalContent', finalContent)
-
     return finalContent
   }
 
@@ -307,10 +298,10 @@ class ReadyToPrintComponent extends React.Component<
         loading={this.props.loading}
         error={this.props.error}
         noResultText={intl.formatMessage(wqMessages.noRecordReadyToIssue)}
-        noContent={this.transformRegisteredContent(data).length <= 0}
+        noContent={this.transformCertifiedContent(data).length <= 0}
       >
         <Workqueue
-          content={this.transformRegisteredContent(data)}
+          content={this.transformCertifiedContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
@@ -328,7 +319,7 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const ReadyToIssue = connect(mapStateToProps, {
-  goToPrintCertificate,
+  goToIssueCertificate,
   goToDeclarationRecordAudit,
   clearCorrectionAndPrintChanges
 })(injectIntl(withTheme(ReadyToPrintComponent)))

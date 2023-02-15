@@ -66,6 +66,8 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import { IssueCollectorForm } from './views/IssueCertificate/IssueCollectorForm/IssueCollectorForm'
+import { IssuePayment } from './views/OfficeHome/readyToIssue/IssuePayment'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -291,6 +293,16 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={routes.ISSUE_COLLECTOR}
+                                            component={IssueCollectorForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.ISSUE_VERIFY_COLLECTOR}
+                                            component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.VERIFY_COLLECTOR}
                                             component={VerifyCollector}
                                           />
@@ -308,6 +320,12 @@ export class App extends React.Component<IAppProps> {
                                               routes.PRINT_CERTIFICATE_PAYMENT
                                             }
                                             component={Payment}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.ISSUE_CERTIFICATE_PAYMENT
+                                            }
+                                            component={IssuePayment}
                                           />
                                           <ProtectedRoute
                                             exact
