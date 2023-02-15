@@ -149,6 +149,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
               id="pin-input"
               ref={(elem: any) => (this.pinInput = elem)}
               onBlur={this.onBlur}
+              autoFocus={true}
             />
           </div>
           <div
