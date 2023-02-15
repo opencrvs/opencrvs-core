@@ -1559,7 +1559,7 @@ export type Query = {
   fetchEventRegistration?: Maybe<EventRegistration>
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
-  fetchRecordDetailsForVerification: RecordDetails
+  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
