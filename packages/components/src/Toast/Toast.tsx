@@ -38,7 +38,7 @@ const Container = styled.div<{
 }>`
   --color: ${({ $type, theme }) => `
     ${$type === 'success' ? theme.colors.positiveDark : ''}
-    ${($type === 'loading' || $type === 'info') ? theme.colors.primaryDark : ''}
+    ${$type === 'loading' || $type === 'info' ? theme.colors.primaryDark : ''}
     ${$type === 'error' ? theme.colors.negativeDark : ''}
     ${$type === 'warning' ? theme.colors.orangeDark : ''}
     ${$type === undefined ? theme.colors.positiveDark : ''}

@@ -18,9 +18,7 @@ import {
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
-import {
-  VIEW_VERIFY_CERTIFICATE
-} from '@client/navigation/routes'
+import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'

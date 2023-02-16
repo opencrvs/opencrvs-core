@@ -17,7 +17,8 @@ import {
   IContentResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData, IApplicationConfigAnonymous
+  ICertificateTemplateData,
+  IApplicationConfigAnonymous
 } from '@client/utils/referenceApi'
 import { User, System } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'

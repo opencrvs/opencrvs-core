@@ -12,7 +12,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react'
 import { Alert } from './Alert'
 import React, { useState } from 'react'
-import {Icon} from "../Icon";
+import { Icon } from '../Icon'
 
 const Template: ComponentStory<typeof Alert> = (args) => {
   return <Alert {...args} />
