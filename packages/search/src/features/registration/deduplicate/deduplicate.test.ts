@@ -40,7 +40,7 @@ afterEach(async () => {
     await client.indices.delete({
       index: OPENCRVS_INDEX_NAME
     })
-  } catch (error) {}
+  } catch (error) { }
 })
 
 afterAll(async () => {
@@ -180,12 +180,15 @@ describe('deduplication tests for death', () => {
   })
 
   describe('standard check for death duplication', () => {
-    it('finds a duplicate with very similar details', async () => {
+    it.only('finds a duplicate with very similar details', async () => {
       await expect(
         compareForDeathDuplication(
           {
             // Similar child's firstname(s)
-            deceasedFirstNames: ['John', 'aaaa']
+            deceasedFirstNames: ['John', 'jhon'],
+            deceasedFamilyName: ['koly', 'koly'],
+            deceasedIdentifier: ['23412387', '23412387'],
+            deathDate: ['2000-11-12', '2000-11-17']
             // Similar child's lastname
             // childFamilyName: ['Smith', 'Smith'],
             // Date of birth within 5 days

@@ -23,7 +23,7 @@ import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
-import { subYears, addYears, subMonths, addMonths } from 'date-fns'
+import { subYears, addYears, subMonths, addMonths, subDays, addDays } from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (
@@ -231,62 +231,52 @@ export const searchForDeathDuplicates = async (
       body: {
         query: {
           bool: {
-            should: [
+            must: [
+              body.deceasedFirstNames && {
+                match: {
+                  deceasedFirstNames: {
+                    query: body.deceasedFirstNames,
+                    fuzziness: FIRST_NAME_FUZZINESS
+                  }
+                }
+              },
+              body.deceasedFamilyName && {
+                match: {
+                  deceasedFamilyName: {
+                    query: body.deceasedFamilyName,
+                    fuzziness: FIRST_NAME_FUZZINESS
+                  }
+                }
+              },
+              body.deceasedIdentifier && {
+                match_phrase: {
+                  deceasedIdentifier: body.deceasedIdentifier
+                }
+              },
               {
                 bool: {
                   must: [
-                    {
-                      bool: {
-                        must: [
-                          body.deceasedFirstNames && {
-                            match: {
-                              deceasedFirstNames: {
-                                query: body.deceasedFirstNames,
-                                fuzziness: FIRST_NAME_FUZZINESS
-                              }
-                            }
-                          },
-                          body.deceasedIdentifier && {
-                            match_phrase: {
-                              deceasedIdentifier: body.deceasedIdentifier
-                            }
-                          },
-                          body.deathDate && {
-                            range: {
-                              deathDate: {
-                                gte: new Date(body.deathDate).getTime() - 5,
-                                lte: body.deathDate + 5
-                              }
-                            }
-                          },
-                          body.deceasedDoB && {
-                            bool: {
-                              should: [
-                                {
-                                  match: {
-                                    deceasedDoB: body.deceasedDoB
-                                  }
-                                },
-                                {
-                                  range: {
-                                    deceasedDoB: {
-                                      gte:
-                                        new Date(body.deceasedDoB).getTime() -
-                                        5,
-                                      lte: body.deceasedDoB + 5
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ].filter(Boolean)
+                    body.deathDate && {
+                      range: {
+                        deathDate: {
+                          gte: subDays(new Date(body.deathDate), 5).toISOString(),
+                          lte: addDays(new Date(body.deathDate), 5).toISOString()
+                        }
                       }
-                    }
+                    },
+                    body.deathDate && {
+                      distance_feature: {
+                        field: 'deathDate',
+                        pivot: '5d', // 9 months in days
+                        origin: new Date(body.deathDate).toISOString(),
+                        boost: 1
+                      }
+                    },
                   ].filter(Boolean)
                 }
               }
-            ]
+
+            ].filter(Boolean)
           }
         }
       }
