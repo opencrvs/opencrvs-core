@@ -463,7 +463,7 @@ export const NavigationView = (props: IFullProps) => {
                 <Icon color="currentColor" name="Plus" size="small" />
               )}
               id={''}
-              label="Adoption"
+              label="Adoption (Coming soon)"
               isSelected={''}
               onClick={''}
             />
@@ -686,7 +686,7 @@ export const NavigationView = (props: IFullProps) => {
         USER_SCOPE[userDetails.role].includes(GROUP_ID.performanceGroup) && (
           <NavigationGroup>
             <NavigationGroupTitle
-              label="PERFORMANCE"
+              label="ANALYTICS"
               onClick={() => setIsPerformanceExpanded(!isPerformanceExpanded)}
               expandableIcon={() =>
                 isPerformanceExpanded ? (
