@@ -14,9 +14,12 @@ import {
   StartedElasticsearchContainer
 } from 'testcontainers'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import {
+  IBirthCompositionBody,
+  IDeathCompositionBody
+} from '@search/elasticsearch/utils'
 import * as elasticsearch from '@elastic/elasticsearch'
-import { searchForDuplicates } from './service'
+import { searchForDeathDuplicates, searchForDuplicates } from './service'
 
 export const ELASTIC_SEARCH_HTTP_PORT = 9200
 
@@ -44,7 +47,7 @@ type ComparisonObject<T> = {
 }
 type Values<T> = T[keyof T]
 
-export async function compare(
+export async function compareForBirthDuplication(
   registrationComparison: ComparisonObject<IBirthCompositionBody>,
   client: elasticsearch.Client
 ) {
@@ -61,5 +64,25 @@ export async function compare(
 
   await indexComposition('123-123-123-123', existingComposition, client)
   const results = await searchForDuplicates(newComposition, client)
+  return results
+}
+
+export async function compareForDeathDuplication(
+  registrationComparison: ComparisonObject<IDeathCompositionBody>,
+  client: elasticsearch.Client
+) {
+  const existingComposition = Object.fromEntries(
+    Object.entries<Values<IDeathCompositionBody>[]>(registrationComparison).map(
+      ([key, values]) => [key, values[0]]
+    )
+  )
+  const newComposition = Object.fromEntries(
+    Object.entries<Values<IDeathCompositionBody>[]>(registrationComparison).map(
+      ([key, values]) => [key, values[1]]
+    )
+  )
+
+  await indexComposition('123-123-123-123', existingComposition, client)
+  const results = await searchForDeathDuplicates(newComposition, client)
   return results
 }

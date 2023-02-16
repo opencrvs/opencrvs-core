@@ -17,7 +17,8 @@ import {
   getStatusWiseRegistrationCountHandler,
   advancedRecordSearch,
   searchAssignment,
-  searchDuplicates
+  searchDuplicates,
+  searchForDeathDeDuplication
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -215,6 +216,23 @@ export const getRoutes = () => {
           ]
         },
         description: 'Handles searching from declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/duplications/death',
+      handler: searchForDeathDeDuplication,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        description: 'Handle searching from death declarations'
       }
     }
   ]

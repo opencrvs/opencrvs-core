@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { compare, startContainer, stopContainer } from './test-util'
+import {
+  compareForBirthDuplication,
+  compareForDeathDuplication,
+  startContainer,
+  stopContainer
+} from './test-util'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 import { StartedElasticsearchContainer } from 'testcontainers'
@@ -55,7 +60,7 @@ describe('deduplication tests', () => {
   describe('standard check', () => {
     it('finds a duplicate with very similar details', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             // Similar child's firstname(s)
             childFirstNames: ['John', 'Jonh'],
@@ -79,7 +84,7 @@ describe('deduplication tests', () => {
 
     it('finds no duplicate with different mother nid', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             childFirstNames: ['John', 'John'],
             childFamilyName: ['Smith', 'Smith'],
@@ -97,7 +102,7 @@ describe('deduplication tests', () => {
 
     it('finds no duplicates with very different details', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             childFirstNames: ['John', 'Mathew'],
             childFamilyName: ['Smith', 'Wilson'],
@@ -116,7 +121,7 @@ describe('deduplication tests', () => {
   describe('same mother two births within 9 months of each other', () => {
     it('finds a duplicate with same mother two births within 9 months', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             childFirstNames: ['John', 'Janet'],
             childFamilyName: ['Smith', 'Smith'],
@@ -133,7 +138,7 @@ describe('deduplication tests', () => {
 
     it('finds no duplicate with the same mother details if two births more than 9 months apart', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             childFirstNames: ['John', 'Janet'],
             childFamilyName: ['Smith', 'Smith'],
@@ -152,7 +157,7 @@ describe('deduplication tests', () => {
   describe('child age increase/decrease', () => {
     it('performs a duplicate check child increase and decrease. finds a duplicate for fraudulent records', async () => {
       await expect(
-        compare(
+        compareForBirthDuplication(
           {
             childFirstNames: ['John', 'John'],
             childFamilyName: ['Smith', 'Smith'],
@@ -161,6 +166,29 @@ describe('deduplication tests', () => {
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12'],
             motherIdentifier: ['23412387', '23412387']
+          },
+          client
+        )
+      ).resolves.toHaveLength(1)
+    })
+  })
+})
+
+describe('deduplication tests for death', () => {
+  it('death:checks elasticsearch is up', async () => {
+    await client.ping()
+  })
+
+  describe('standard check for death duplication', () => {
+    it('finds a duplicate with very similar details', async () => {
+      await expect(
+        compareForDeathDuplication(
+          {
+            // Similar child's firstname(s)
+            deceasedFirstNames: ['John', 'aaaa']
+            // Similar child's lastname
+            // childFamilyName: ['Smith', 'Smith'],
+            // Date of birth within 5 days
           },
           client
         )

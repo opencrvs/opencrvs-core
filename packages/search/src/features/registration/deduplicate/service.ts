@@ -16,7 +16,8 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   IBirthCompositionBody,
-  ICompositionBody
+  ICompositionBody,
+  IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
@@ -202,6 +203,86 @@ export const searchForDuplicates = async (
                       }
                     },
                     mothersDetailsMatch
+                  ].filter(Boolean)
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
+    return result.body.hits.hits
+  } catch (err) {
+    logger.error(`searchDuplicates error: ${err}`)
+    throw err
+  }
+}
+
+export const searchForDeathDuplicates = async (
+  body: IDeathCompositionBody,
+  client: elasticsearch.Client
+) => {
+  const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+
+  try {
+    const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
+      index: OPENCRVS_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      bool: {
+                        must: [
+                          body.deceasedFirstNames && {
+                            match: {
+                              deceasedFirstNames: {
+                                query: body.deceasedFirstNames,
+                                fuzziness: FIRST_NAME_FUZZINESS
+                              }
+                            }
+                          },
+                          body.deceasedIdentifier && {
+                            match_phrase: {
+                              deceasedIdentifier: body.deceasedIdentifier
+                            }
+                          },
+                          body.deathDate && {
+                            range: {
+                              deathDate: {
+                                gte: new Date(body.deathDate).getTime() - 5,
+                                lte: body.deathDate + 5
+                              }
+                            }
+                          },
+                          body.deceasedDoB && {
+                            bool: {
+                              should: [
+                                {
+                                  match: {
+                                    deceasedDoB: body.deceasedDoB
+                                  }
+                                },
+                                {
+                                  range: {
+                                    deceasedDoB: {
+                                      gte:
+                                        new Date(body.deceasedDoB).getTime() -
+                                        5,
+                                      lte: body.deceasedDoB + 5
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ].filter(Boolean)
+                      }
+                    }
                   ].filter(Boolean)
                 }
               }
