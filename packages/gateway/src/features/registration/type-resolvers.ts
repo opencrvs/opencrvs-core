@@ -100,24 +100,23 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Address: {
-    stateName: async (address, _, authHeader) => {
-      const location = await fetchFHIR(`/Location/${address.state}`, authHeader)
+    stateName: async (address, _, { dataSources }) => {
+      const location = await dataSources.locationsAPI.getLocation(address.state)
       return location.name
     },
-    districtName: async (address, _, authHeader) => {
-      const location = await fetchFHIR(
-        `/Location/${address.district}`,
-        authHeader
+    districtName: async (address, _, { dataSources }) => {
+      const location = await dataSources.locationsAPI.getLocation(
+        address.district
       )
       return location.name
     },
-    lineName: (address, _, authHeader) => {
+    lineName: (address, _, { dataSources }) => {
       return Promise.all(
         address.line.map(async (line: string) => {
           if (!validateUUID(line)) {
             return line
           }
-          const location = await fetchFHIR(`/Location/${line}`, authHeader)
+          const location = await dataSources.locationsAPI.getLocation(line)
           return location.name
         })
       )
@@ -836,7 +835,7 @@ export const typeResolvers: GQLResolver = {
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
-    user: async (task: fhir.Task, _: any, authHeader: any) => {
+    user: async (task: fhir.Task, _: any, { dataSources, ...authHeader }) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension as fhir.Extension[]
@@ -845,16 +844,16 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
-      const practitionerRoleBundle = await fetchFHIR(
-        `/PractitionerRole?practitioner=${practitionerId}`,
-        authHeader
-      )
+      const practitionerRoleBundle =
+        await dataSources.practitionerRoleAPI.getPractitionerRoleByPractitionerId(
+          practitionerId
+        )
+
       const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
       const practitionerRoleHistoryBundle: fhir.Bundle & {
         entry: fhir.PractitionerRole[]
-      } = await fetchFHIR(
-        `/PractitionerRole/${practitionerRoleId}/_history`,
-        authHeader
+      } = await dataSources.practitionerRoleAPI.getPractionerRoleHistory(
+        practitionerRoleId
       )
       const result = practitionerRoleHistoryBundle.entry.find(
         (it: fhir.BundleEntry) =>

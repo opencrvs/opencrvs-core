@@ -35,6 +35,7 @@
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
     "@types/uuid-validate": "^0.0.1",
+    "apollo-datasource-http": "^0.21.0",
     "apollo-server-hapi": "^3.5.0",
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",

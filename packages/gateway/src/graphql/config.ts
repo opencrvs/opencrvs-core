@@ -49,6 +49,8 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -105,6 +107,10 @@ export const getApolloConfig = (): Config => {
     typeDefs,
     resolvers,
     introspection: true,
+    dataSources: () => ({
+      locationsAPI: LocationsAPI.createNewInstance(),
+      practitionerRoleAPI: PractitionerRoleAPI.createNewInstance()
+    }),
     context: async ({ request, h }) => {
       try {
         const tokenPayload = getTokenPayload(
