@@ -39,6 +39,12 @@ import {
   DeathFeeOnTime,
   DeathRegistrationTarget
 } from '@client/views/SysAdmin/Config/Application/Tabs/DeathProperties'
+import {
+  MarriageDelayedFee,
+  MarriageDelayedRegistrationTarget,
+  MarriageFeeOnTime,
+  MarriageRegistrationTarget
+} from '@client/views/SysAdmin/Config/Application/Tabs/MarriageProperties'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
@@ -54,7 +60,8 @@ const ListGroupTitle = styled.div`
 export enum TabId {
   GENERAL = 'general',
   BIRTH = 'birth',
-  DEATH = 'death'
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 
 export enum GeneralActionId {
@@ -80,6 +87,13 @@ export enum DeathActionId {
   DEATH_REGISTRATION_DELAYED_TARGET = 'DEATH_REGISTRATION_DELAYED_TARGET',
   DEATH_ON_TIME_FEE = 'DEATH_ON_TIME_FEE',
   DEATH_DELAYED_FEE = 'DEATH_DELAYED_FEE'
+}
+
+export enum MarriageActionId {
+  MARRIAGE_REGISTRATION_TARGET = 'MARRIAGE_REGISTRATION_TARGET',
+  MARRIAGE_REGISTRATION_DELAYED_TARGET = 'MARRIAGE_REGISTRATION_DELAYED_TARGET',
+  MARRIAGE_ON_TIME_FEE = 'MARRIAGE_ON_TIME_FEE',
+  MARRIAGE_DELAYED_FEE = 'MARRIAGE_DELAYED_FEE'
 }
 
 interface ISection {
@@ -147,6 +161,29 @@ function DeathTabContent() {
   )
 }
 
+function MarriageTabContent() {
+  const intl = useIntl()
+
+  return (
+    <>
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <MarriageRegistrationTarget />
+        <MarriageDelayedRegistrationTarget />
+      </ListViewSimplified>
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationFeesGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <MarriageFeeOnTime />
+        <MarriageDelayedFee />
+      </ListViewSimplified>
+    </>
+  )
+}
+
 export function ApplicationConfig() {
   const intl = useIntl()
   const [activeTabId, setActiveTabId] = React.useState(TabId.GENERAL)
@@ -163,6 +200,10 @@ export function ApplicationConfig() {
     {
       id: TabId.DEATH,
       title: intl.formatMessage(messages.deathTabTitle)
+    },
+    {
+      id: TabId.MARRIAGE,
+      title: intl.formatMessage(messages.marriageTabTitle)
     }
   ]
 
@@ -185,6 +226,7 @@ export function ApplicationConfig() {
         {activeTabId === TabId.GENERAL && <GeneralTabContent />}
         {activeTabId === TabId.BIRTH && <BirthTabContent />}
         {activeTabId === TabId.DEATH && <DeathTabContent />}
+        {activeTabId === TabId.MARRIAGE && <MarriageTabContent />}
       </Content>
     </SysAdminContentWrapper>
   )

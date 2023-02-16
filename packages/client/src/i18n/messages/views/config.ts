@@ -62,12 +62,16 @@ interface IConfigMessages
   applicationBirthDelayedFeeChangeNotification: MessageDescriptor
   applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
   applicationDeathDelayedFeeChangeNotification: MessageDescriptor
+  applicationMarriageRegTargetChangeNotification: MessageDescriptor
+  applicationMarriageOnTimeFeeChangeNotification: MessageDescriptor
+  applicationMarriageDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   applicationConfigUpdatingMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
   deathLegallySpecifiedDialogTitle: MessageDescriptor
+  marriageLegallySpecifiedDialogTitle: MessageDescriptor
   onTimeFeeDialogTitle: MessageDescriptor
   lateFeeDialogTitle: MessageDescriptor
   delayedFeeDialogTitle: MessageDescriptor
@@ -90,6 +94,7 @@ interface IConfigMessages
   birthTabTitle: MessageDescriptor
   birthTabTitleExport: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  marriageTabTitle: MessageDescriptor
   imageTabTitle: MessageDescriptor
   colourTabTitle: MessageDescriptor
   colourTabText: MessageDescriptor
@@ -379,6 +384,24 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Death delayed fee updated',
     description: 'Message for application death delayed fee change notification'
   },
+  applicationMarriageOnTimeFeeChangeNotification: {
+    id: 'config.application.marriageOnTimeFeeChangeNotification',
+    defaultMessage: 'Marriage on time fee updated',
+    description:
+      'Message for application marriage on time fee change notification'
+  },
+  applicationMarriageRegTargetChangeNotification: {
+    id: 'config.application.marriageRegTargetChangeNotification',
+    defaultMessage: 'Marriage registration target days updated',
+    description:
+      'Message for application marriage registration target change notification'
+  },
+  applicationMarriageDelayedFeeChangeNotification: {
+    id: 'config.application.marriageDelayedFeeChangeNotification',
+    defaultMessage: 'Marriage delayed fee updated',
+    description:
+      'Message for application marriage delayed fee change notification'
+  },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
@@ -424,6 +447,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathLegallySpecifiedDialogTitle',
     defaultMessage: 'Legally specified time period for death registration',
     description: 'Legally specified dialog title for death'
+  },
+  marriageLegallySpecifiedDialogTitle: {
+    id: 'config.application.marriageLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for marriage registration',
+    description: 'Legally specified dialog title for marriage'
   },
   onTimeFeeDialogTitle: {
     id: 'config.application.onTimeFeeDialogTitle',
@@ -494,6 +522,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  marriageTabTitle: {
+    id: 'config.application.marriageTabTitle',
+    defaultMessage: 'Marriage',
+    description: 'The title for marriage tab'
   },
   imageTabTitle: {
     id: 'config.application.imageTabTitle',

@@ -732,6 +732,7 @@ type ApplicationConfiguration {
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   DEATH: Death
+  MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -751,6 +752,7 @@ input ApplicationConfigurationInput {
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   DEATH: DeathInput
+  MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -1338,6 +1340,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Marriage {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFee
+}
+
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1363,6 +1370,11 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input MarriageInput {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFeeInput
 }
 
 input LoginBackgroundInput {
@@ -1796,6 +1808,11 @@ type DeathFee {
   DELAYED: Float
 }
 
+type MarriageFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
 enum ImageFit {
   FILL
   TILE
@@ -1808,6 +1825,11 @@ input BirthFeeInput {
 }
 
 input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input MarriageFeeInput {
   ON_TIME: Float
   DELAYED: Float
 }

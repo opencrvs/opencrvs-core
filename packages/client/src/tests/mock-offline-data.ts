@@ -721,6 +721,13 @@ export const mockOfflineData = {
         DELAYED: 0
       }
     },
+    MARRIAGE: {
+      REGISTRATION_TARGET: 45,
+      FEE: {
+        ON_TIME: 0,
+        DELAYED: 0
+      }
+    },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
     FIELD_AGENT_AUDIT_LOCATIONS:

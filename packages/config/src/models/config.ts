@@ -26,6 +26,13 @@ interface IDeath {
     DELAYED: number
   }
 }
+interface IMarriage {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -48,6 +55,7 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: IDeath
+  MARRIAGE: IMarriage
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -77,6 +85,14 @@ const deathSchema = new Schema<IDeath>({
   FEE: {
     ON_TIME: Number,
     DELAYED: Number
+  }
+})
+
+const marriageSchema = new Schema<IMarriage>({
+  REGISTRATION_TARGET: { type: Number, default: 45 },
+  FEE: {
+    ON_TIME: { type: Number, default: 10 },
+    DELAYED: { type: Number, default: 45 }
   }
 })
 
@@ -114,6 +130,7 @@ const configSchema = new Schema({
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   CURRENCY: { type: currencySchema, required: false },
   DEATH: { type: deathSchema, required: false },
+  MARRIAGE: { type: marriageSchema, required: false },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,

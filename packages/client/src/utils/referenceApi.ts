@@ -70,6 +70,13 @@ export interface IApplicationConfig {
       DELAYED: number
     }
   }
+  MARRIAGE: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+  }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean

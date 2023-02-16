@@ -219,6 +219,7 @@ export type ApplicationConfiguration = {
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
+  MARRIAGE?: Maybe<Marriage>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -238,6 +239,7 @@ export type ApplicationConfigurationInput = {
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
+  MARRIAGE?: InputMaybe<MarriageInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -1127,6 +1129,28 @@ export enum MaritalStatusType {
   Separated = 'SEPARATED',
   Single = 'SINGLE',
   Widowed = 'WIDOWED'
+}
+
+export type Marriage = {
+  __typename?: 'Marriage'
+  FEE?: Maybe<MarriageFee>
+  REGISTRATION_TARGET?: Maybe<Scalars['Int']>
+}
+
+export type MarriageFee = {
+  __typename?: 'MarriageFee'
+  DELAYED?: Maybe<Scalars['Float']>
+  ON_TIME?: Maybe<Scalars['Float']>
+}
+
+export type MarriageFeeInput = {
+  DELAYED?: InputMaybe<Scalars['Float']>
+  ON_TIME?: InputMaybe<Scalars['Float']>
+}
+
+export type MarriageInput = {
+  FEE?: InputMaybe<MarriageFeeInput>
+  REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
 export type MedicalPractitioner = {
@@ -5754,6 +5778,15 @@ export type UpdateApplicationConfigMutation = {
       REGISTRATION_TARGET?: number | null
       FEE?: {
         __typename?: 'DeathFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+    MARRIAGE?: {
+      __typename?: 'Marriage'
+      REGISTRATION_TARGET?: number | null
+      FEE?: {
+        __typename?: 'MarriageFee'
         ON_TIME?: number | null
         DELAYED?: number | null
       } | null
