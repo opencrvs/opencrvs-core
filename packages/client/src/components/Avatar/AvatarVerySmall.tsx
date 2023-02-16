@@ -11,13 +11,13 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { IAvatar } from '@client/utils/userUtils'
+import { Avatar } from '@client/utils/gateway'
 import { AVATAR_API } from '@client/utils/constants'
 import { AvatarSmall } from '@opencrvs/components/lib/icons'
 
 interface IProps extends React.HTMLAttributes<HTMLImageElement> {
   name?: string
-  avatar?: IAvatar | undefined
+  avatar?: Avatar | undefined
 }
 
 const AvatarImage = styled.img`

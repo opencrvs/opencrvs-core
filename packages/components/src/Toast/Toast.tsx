@@ -11,15 +11,15 @@
  */
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Cross } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
 import { Link } from '../Link'
 import { colors } from '../colors'
 import { useToastVisibility } from './useToastVisibility'
+import { Icon } from '../Icon'
 
-const TOAST_DEFAULT_DURATION_MS = 8000
+const TOAST_DEFAULT_DURATION_MS = 32000
 
 type ToastType = 'success' | 'warning' | 'loading' | 'error' | 'info'
 
@@ -151,7 +151,7 @@ export function Toast({
           data-testid={props['data-testid'] && `${props['data-testid']}-close`}
           onClick={onClose}
         >
-          <Cross color="currentColor" />
+          <Icon color="currentColor" name="X" size="large" />
         </Close>
       )}
     </Container>

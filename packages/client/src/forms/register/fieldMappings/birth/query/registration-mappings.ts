@@ -25,7 +25,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   GQLRegStatus,
   GQLRegWorkflow
@@ -109,6 +108,11 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].status as GQLRegWorkflow[],
       sectionId
     )
+  }
+
+  if (queryData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      queryData[sectionId].informantsSignature
   }
 }
 
@@ -248,8 +252,7 @@ export const registrarNameUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -269,8 +272,7 @@ export const roleUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -282,8 +284,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }
@@ -316,8 +318,7 @@ export const registrarSignatureUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return

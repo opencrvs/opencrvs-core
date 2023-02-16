@@ -41,7 +41,7 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Roles, Scope } from '@client/utils/authUtils'
+import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,
@@ -50,7 +50,8 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -60,7 +61,6 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { Frame } from '@opencrvs/components/lib/Frame'
 
-import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -134,7 +134,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
@@ -349,10 +349,10 @@ export class SearchResultView extends React.Component<
                         declarationLocationId:
                           userDetails &&
                           ![
-                            Roles.LOCAL_REGISTRAR,
-                            Roles.NATIONAL_REGISTRAR,
-                            Roles.REGISTRATION_AGENT
-                          ].includes(userDetails.role as Roles)
+                            SystemRoleType.LocalRegistrar,
+                            SystemRoleType.NationalRegistrar,
+                            SystemRoleType.RegistrationAgent
+                          ].includes(userDetails.systemRole)
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -459,10 +459,10 @@ export class SearchResultView extends React.Component<
                 declarationLocationId:
                   userDetails &&
                   ![
-                    Roles.LOCAL_REGISTRAR,
-                    Roles.NATIONAL_REGISTRAR,
-                    Roles.REGISTRATION_AGENT
-                  ].includes(userDetails.role as Roles)
+                    SystemRoleType.LocalRegistrar,
+                    SystemRoleType.NationalRegistrar,
+                    SystemRoleType.RegistrationAgent
+                  ].includes(userDetails.systemRole)
                     ? getUserLocation(userDetails).id
                     : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',

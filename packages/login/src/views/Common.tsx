@@ -11,13 +11,10 @@
  */
 
 import styled from 'styled-components'
-import { Text } from '@opencrvs/components/lib/Text/Text'
 
 export const FormWrapper = styled.form`
   width: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 48px;
-  }
+  padding: 16px 0;
 `
 
 export const LogoContainer = styled.div`
@@ -37,13 +34,6 @@ export interface IProps {
   errorCode?: number
 }
 
-export const StyledH2 = styled(Text).attrs({
-  color: 'grey600',
-  variant: 'bold21',
-  element: 'h2'
-})`
-  text-align: center;
-`
 export const Container = styled.div`
   position: relative;
   height: auto;

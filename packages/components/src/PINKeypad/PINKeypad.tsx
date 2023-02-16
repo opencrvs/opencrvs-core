@@ -9,18 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { userMessages } from '@opencrvs/client/src/i18n/messages'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IProps {
   id?: string
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
   pin?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ref?: any
 }
 
 interface IState {
@@ -32,41 +28,49 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   outline: none;
+  margin-top: 32px;
+`
+const StyledInput = styled.input`
+  position: absolute;
+  opacity: 0;
 `
 
 const DotFilled = styled.span`
   height: 18px;
   width: 18px;
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
 `
 
 const DotUnfilled = styled.span`
   height: 18px;
   width: 18px;
-  border: 2px solid ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
+`
+const DotsContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
+  pinInput: React.RefObject<HTMLInputElement> = React.createRef()
 
-  pinInput = React.createRef<HTMLInputElement>()
+  componentDidMount() {
+    this.focusKeyInput()
+  }
+
+  focusKeyInput = () => {
+    this.pinInput?.current?.focus()
+  }
+  componentDidUpdate = () => this.focusKeyInput()
 
   keyPress = (key: number) => {
     const { pin } = this.state
@@ -117,39 +121,37 @@ export class PINKeypad extends React.Component<IProps, IState> {
     }
   }
 
+  onBlur = () => {
+    this.focusKeyInput()
+  }
+
   render() {
     const { pin } = this.state
     return (
-      <Container
-        id="pin-keypad-container"
-        tabIndex={0}
-        onKeyDown={this.keyDown}
-        {...this.props}
-      >
-        <div>
-          <div>
-            <input
-              hidden
-              type="number"
-              onKeyDown={this.keyDown}
-              id="pin-input"
-              ref={this.pinInput}
-            />
-          </div>
+      <Container id="pin-keypad-container" tabIndex={0} {...this.props}>
+        <DotsContainer>
+          <StyledInput
+            type="number"
+            onKeyDown={this.keyDown}
+            id="pin-input"
+            ref={this.pinInput}
+            onBlur={this.onBlur}
+            autoFocus
+          />
           <div
             onClick={() => {
               this.pinInput?.current?.focus()
             }}
           >
-            {new Array(pin.length).fill('').map((e, i) => (
+            {new Array(pin.length).fill('').map((_, i) => (
               <DotFilled key={`dot-filled-${i}`} />
             ))}
-            {new Array(4 - pin.length).fill('').map((e, i) => (
+            {new Array(4 - pin.length).fill('').map((_, i) => (
               <DotUnfilled key={`dot-unfilled-${i}`} />
             ))}
           </div>
           {this.props.forgotPinComponent}
-        </div>
+        </DotsContainer>
       </Container>
     )
   }

@@ -33,7 +33,7 @@ describe('User type resolvers', () => {
     mobile: '+8801711111111',
     email: 'test@test.org',
     identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
-    role: 'REGISTRATION_AGENT',
+    systemRole: 'REGISTRATION_AGENT',
     scope: ['certify'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -45,7 +45,14 @@ describe('User type resolvers', () => {
       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     ],
     creationDate: '1559054406433',
-    type: 'MAYOR',
+    role: {
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     device: ''
   }
   it('return id type', () => {

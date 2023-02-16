@@ -150,6 +150,7 @@ console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
 roleQueries.fetchRoles = vi.fn()
+
 userQueries.searchUsers = vi.fn()
 
 vi.doMock(
