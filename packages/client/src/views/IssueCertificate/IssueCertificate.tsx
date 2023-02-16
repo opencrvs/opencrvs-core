@@ -11,18 +11,23 @@
  */
 import React from 'react'
 import { AppBar, Frame } from '@opencrvs/components/lib'
-import { constantsMessages } from '@client/i18n/messages'
+import { Button } from '@opencrvs/components/lib/Button'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { useParams } from 'react-router'
 import { IPrintableDeclaration } from '@client/declarations'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { IStoreState } from '@client/store'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
+import { goBack } from '@client/navigation'
+import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
+import { Header } from '@client/components/Header/Header'
 
 export function IssueCertificate() {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const { pageId, registrationId } = useParams<{
     registrationId: string
     pageId: string
@@ -34,7 +39,21 @@ export function IssueCertificate() {
 
   return (
     <Frame
-      header={<AppBar desktopLeft={<HistoryNavigator />} />}
+      header={
+        <AppBar
+          title={intl.formatMessage(constantsMessages.issueCertificate)}
+          desktopLeft={<HistoryNavigator hideForward={true} />}
+          desktopRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
+        />
+      }
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
       )}
@@ -42,7 +61,7 @@ export function IssueCertificate() {
       {pageId === 'collector' ? (
         <IssueCollectorForm declaration={declaration} />
       ) : (
-        <></>
+        <IssueCollectorFormForOthers declaration={declaration} />
       )}
     </Frame>
   )

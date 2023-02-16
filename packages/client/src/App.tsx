@@ -66,8 +66,8 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
-import { IssueCertificate } from './views/IssueCertificate/IssueCertificate'
-import { IssuePayment } from './views/OfficeHome/readyToIssue/IssuePayment'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 
 interface IAppProps {
   client?: ApolloClient<{}>

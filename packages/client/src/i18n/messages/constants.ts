@@ -159,9 +159,11 @@ interface IConstantsMessages
   refresh: MessageDescriptor
   regNumber: MessageDescriptor
   issueCertificate: MessageDescriptor
+  collectorDetails: MessageDescriptor
   issueToMother: MessageDescriptor
   issueToFather: MessageDescriptor
   issueToSomeoneElse: MessageDescriptor
+  issueConfirmationMessage: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -574,6 +576,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for issue certificate',
     id: 'constants.issueCertificate'
   },
+  collectorDetails: {
+    defaultMessage: 'Collector Details',
+    description: 'Label for collector details',
+    id: 'constants.collectorDetails'
+  },
   issueToMother: {
     defaultMessage: 'Issue to informant (Mother)',
     description: 'Issuing to mother',
@@ -581,13 +588,19 @@ const messagesToDefine: IConstantsMessages = {
   },
   issueToFather: {
     defaultMessage: 'Issue to informant (Father)',
-    description: 'Issuing to mother',
+    description: 'Issuing to father',
     id: 'constants.issueToFather'
   },
   issueToSomeoneElse: {
     defaultMessage: 'Issue to someone else',
     description: 'Issuing to someone else',
     id: 'constants.issueToSomeoneElse'
+  },
+  issueConfirmationMessage: {
+    defaultMessage:
+      'Please confirm that the certificate has been issued to the informant or collector.',
+    description: 'Confirmation of issuance',
+    id: 'constants.issueConfirmationMessage'
   },
   requestReason: {
     defaultMessage: 'Reason for request',

@@ -138,7 +138,9 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             ...declaration.payload
           }
         })
-      } else if (submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION) {
+      } else if (
+        submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+      ) {
         await client.mutate({
           mutation,
           variables: {

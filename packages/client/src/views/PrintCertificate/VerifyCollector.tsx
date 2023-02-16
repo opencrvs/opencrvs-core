@@ -94,10 +94,17 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         offlineCountryConfiguration
       )
     ) {
-      this.props.goToReviewCertificate(
-        this.props.match.params.registrationId,
-        event
-      )
+      if (!isIssueUrl) {
+        this.props.goToReviewCertificate(
+          this.props.match.params.registrationId,
+          event
+        )
+      } else {
+        this.props.goToIssueCertificatePayment(
+          this.props.match.params.registrationId,
+          event
+        )
+      }
     } else {
       // this.props.goToPrintCertificatePayment(
       //   this.props.match.params.registrationId,

@@ -13,7 +13,7 @@ import React from 'react'
 import { Content, RadioSize } from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { IFormField, RADIO_GROUP } from '@client/forms'
+import { IFormField, IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   modifyDeclaration,
@@ -23,9 +23,14 @@ import {
 import { useDispatch } from 'react-redux'
 import { PrimaryButton } from '@client/../../components/lib/buttons'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
-import { goToIssueCertificate } from '@client/navigation'
+import {
+  goToIssueCertificate,
+  goToVerifyCollector,
+  goToVerifyIssueCollector
+} from '@client/navigation'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
-const fields: IFormField[] = [
+const fields: IRadioGroupFormField[] = [
   {
     name: 'type',
     type: RADIO_GROUP,
@@ -78,20 +83,36 @@ export function IssueCollectorForm({
     )
   }
 
+  const informantType = declaration.data.informant.relationship
+  const filterType =
+    informantType === 'MOTHER'
+      ? 'FATHER'
+      : informantType === 'FATHER'
+      ? 'MOTHER'
+      : null
+
+  const filteredData = fields.map((field) => {
+    const updatedOptions = field.options.filter(
+      (option) => option.value !== filterType
+    )
+    return { ...field, options: updatedOptions }
+  })
+
   function continueButtonHandler() {
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
+    const event = declaration.event
     if (!relationship) return
     if (relationship === 'OTHER') {
       dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
     } else {
-      //go to verify collector
+      dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
     }
   }
 
   return (
     <Content
-      title="Issue"
+      title={intl.formatMessage(constantsMessages.issueCertificate)}
       bottomActionButtons={[
         <PrimaryButton
           id="continue-button"
@@ -111,7 +132,16 @@ export function IssueCollectorForm({
           handleChange(values, declaration)
         }}
         setAllFieldsDirty={false}
-        fields={fields}
+        fields={replaceInitialValues(
+          filteredData,
+          (declaration &&
+            declaration.data.registration.certificates &&
+            declaration.data.registration.certificates[
+              declaration.data.registration.certificates.length - 1
+            ].collector) ||
+            {},
+          declaration && declaration.data
+        )}
         draftData={declaration.data}
       />
     </Content>

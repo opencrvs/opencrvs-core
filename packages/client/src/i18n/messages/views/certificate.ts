@@ -44,6 +44,7 @@ interface ICertificateMessages
   number: MessageDescriptor
   other: MessageDescriptor
   payment: MessageDescriptor
+  noPayment: MessageDescriptor
   paymentInstruction: MessageDescriptor
   paymentAmount: MessageDescriptor
   paymentMethod: MessageDescriptor
@@ -251,6 +252,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Collect payment',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
+  },
+  noPayment: {
+    defaultMessage: 'No payment required',
+    description: 'The title for no payment section',
+    id: 'print.certificate.noPayment'
   },
   paymentInstruction: {
     defaultMessage:

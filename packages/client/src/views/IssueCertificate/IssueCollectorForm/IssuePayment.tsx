@@ -50,6 +50,7 @@ import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { Event } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { Button } from '@client/../../components/src/Button'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -113,27 +114,27 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
 
     const certificate = (certificates && certificates[0]) || {}
 
-    // this.props.modifyDeclaration({
-    //   ...declaration,
-    //   data: {
-    //     ...declaration.data,
-    //     registration: {
-    //       ...declaration.data.registration,
-    //       certificates: [
-    //         {
-    //           ...certificate,
-    //           payments: {
-    //             type: 'MANUAL' as const,
-    //             total: Number(paymentAmount),
-    //             amount: Number(paymentAmount),
-    //             outcome: 'COMPLETED' as const,
-    //             date: Date.now()
-    //           }
-    //         }
-    //       ]
-    //     }
-    //   }
-    // })
+    this.props.modifyDeclaration({
+      ...declaration,
+      data: {
+        ...declaration.data,
+        registration: {
+          ...declaration.data.registration,
+          certificates: [
+            {
+              ...certificate,
+              payments: {
+                type: 'MANUAL' as const,
+                total: Number(paymentAmount),
+                amount: Number(paymentAmount),
+                outcome: 'COMPLETED' as const,
+                date: Date.now()
+              }
+            }
+          ]
+        }
+      }
+    })
 
     // this.props.goToReviewCertificate(
     //   this.props.registrationId,
@@ -180,6 +181,11 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
       offlineCountryConfig
     )
 
+    const titleMessage =
+      paymentAmount === 0
+        ? intl.formatMessage(messages.noPayment)
+        : intl.formatMessage(messages.payment)
+
     return (
       <>
         <ActionPageLight
@@ -188,7 +194,7 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)}
         >
-          <Content title={intl.formatMessage(messages.payment)}>
+          <Content title={titleMessage}>
             <Summary id="summary">
               <Summary.Row
                 id="service"
@@ -227,14 +233,17 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
               <TertiaryButton onClick={this.toggleModal} id="close-issue-modal">
                 {intl.formatMessage(buttonMessages.cancel)}
               </TertiaryButton>,
-              <PrimaryButton
+              <Button
                 onClick={() => alert('confirm')}
-                id="issue-certificate"
+                id="issue-certificate-confirmation"
+                type={'primary'}
               >
                 {intl.formatMessage(buttonMessages.confirm)}
-              </PrimaryButton>
+              </Button>
             ]}
-          ></ResponsiveModal>
+          >
+            {intl.formatMessage(constantsMessages.issueConfirmationMessage)}
+          </ResponsiveModal>
         </ActionPageLight>
       </>
     )

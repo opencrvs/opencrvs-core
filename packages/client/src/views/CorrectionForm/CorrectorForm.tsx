@@ -34,7 +34,6 @@ import {
   ReviewSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
