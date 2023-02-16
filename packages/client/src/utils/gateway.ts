@@ -330,8 +330,7 @@ export type AuditLogItemBase = {
 }
 
 export enum AuthorizationStatus {
-  Anonymous = 'ANONYMOUS',
-  User = 'USER'
+  Anonymous = 'ANONYMOUS'
 }
 
 export type Avatar = {
@@ -1634,7 +1633,7 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
   timeStart: Scalars['String']
 }
 
-export type QueryFetchRecordsDetailsByCompositionIdArgs = {
+export type QueryFetchRecordDetailsForVerificationArgs = {
   id: Scalars['String']
 }
 
@@ -6424,6 +6423,120 @@ export type SubmitActivateUserMutationVariables = Exact<{
 export type SubmitActivateUserMutation = {
   __typename?: 'Mutation'
   activateUser?: string | null
+}
+
+export type FetchRecordDetailsForVerificationQueryVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type FetchRecordDetailsForVerificationQuery = {
+  __typename?: 'Query'
+  fetchRecordDetailsForVerification?:
+    | {
+        __typename?: 'BirthRegistration'
+        id: string
+        createdAt?: any | null
+        child?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | {
+        __typename?: 'DeathRegistration'
+        id: string
+        createdAt?: any | null
+        deceased?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          deceased?: {
+            __typename?: 'Deceased'
+            deathDate?: string | null
+          } | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | null
 }
 
 export type FetchViewRecordByCompositionQueryVariables = Exact<{
