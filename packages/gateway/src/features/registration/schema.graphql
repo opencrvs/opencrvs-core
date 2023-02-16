@@ -529,12 +529,6 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
-enum Role {
-  ANONYMOUS
-}
-
-directive @auth(requires: Role!) on FIELD_DEFINITION
-
 union RecordDetails = BirthRegistration | DeathRegistration
 
 type Query {

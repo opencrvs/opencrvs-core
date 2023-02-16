@@ -358,7 +358,6 @@ union RecordDetails = BirthRegistration | DeathRegistration
 
 enum AuthorizationStatus {
   ANONYMOUS
-  USER
 }
 
 directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION

@@ -268,7 +268,6 @@ type Address { # -> Address (mostly the same property name except:)
 
 enum AuthorizationStatus {
   ANONYMOUS
-  USER
 }
 
 directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION

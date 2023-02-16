@@ -235,8 +235,7 @@ export interface GQLRecordDetailsNameMap {
 }
 
 export const enum GQLAuthorizationStatus {
-  ANONYMOUS = 'ANONYMOUS',
-  USER = 'USER'
+  ANONYMOUS = 'ANONYMOUS'
 }
 
 export interface GQLLocation {
