@@ -33,6 +33,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
 import { unionBy } from 'lodash'
 import { SECTION_CODE } from '@workflow/features/events/utils'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -119,15 +120,14 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
 }
 
 export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const eventType = getTaskEventType(taskResource)
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&
     taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
-          `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id` ||
-        identifier.system ===
-          `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`
+        `${OPENCRVS_SPECIFICATION_URL}id/${eventType.toLowerCase()}-tracking-id`
       )
     })
   if (!trackingIdentifier || !trackingIdentifier.value) {
@@ -297,6 +297,7 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
   return res.text()
 }
 
+//TODO: need to modifty for marriage event
 export async function getPhoneNo(
   taskResource: fhir.Task,
   eventType: EVENT_TYPE
@@ -320,6 +321,7 @@ export async function getPhoneNo(
   return phoneNumber
 }
 
+//TODO: need to modifty for marriage event
 export async function getEventInformantName(
   composition: fhir.Composition,
   eventType: EVENT_TYPE

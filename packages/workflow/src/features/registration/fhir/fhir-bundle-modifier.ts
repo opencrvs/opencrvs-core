@@ -54,7 +54,6 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { EVENT } from '@workflow/features/task/fhir/utils'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -244,12 +243,7 @@ export async function markEventAsRegistered(
   token: string
 ): Promise<fhir.Task> {
   /* Setting registration number here */
-  let identifierName
-  if (eventType === EVENT_TYPE.BIRTH) {
-    identifierName = 'birth-registration-number'
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    identifierName = 'death-registration-number'
-  }
+  const identifierName = `${eventType.toLowerCase()}-registration-number`
 
   if (taskResource && taskResource.identifier) {
     taskResource.identifier.push({
@@ -319,14 +313,9 @@ export async function touchBundle(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  let trackingId = ''
-  let trackingIdFhirName = ''
   const eventType = getEventType(fhirBundle)
-
-  if (eventType === EVENT[eventType]) {
-    trackingId = generateTrackingIdForEvents(eventType)
-    trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
-  }
+  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
 
   if (
     !fhirBundle ||

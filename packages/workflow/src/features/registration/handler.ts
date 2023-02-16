@@ -46,42 +46,20 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import {
-  EVENT_TYPE,
-  CHILD_SECTION_CODE,
-  DECEASED_SECTION_CODE,
-  BIRTH_REG_NUMBER_SYSTEM,
-  DEATH_REG_NUMBER_SYSTEM,
-  MARRIAGE_REG_NUMBER_SYSTEM,
-  BRIDE_SECTION_CODE,
-  GROOM_SECTION_CODE
-} from '@workflow/features/registration/fhir/constants'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
-import { Events } from '@workflow/features/events/utils'
+import {
+  Events,
+  MARK_REG,
+  REG_NUMBER_SYSTEM,
+  SECTION_CODE
+} from '@workflow/features/events/utils'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
-}
-
-const SECTION_CODE: Record<EVENT_TYPE, string[]> = {
-  [EVENT_TYPE.BIRTH]: [CHILD_SECTION_CODE],
-  [EVENT_TYPE.DEATH]: [DECEASED_SECTION_CODE],
-  [EVENT_TYPE.MARRIAGE]: [GROOM_SECTION_CODE, BRIDE_SECTION_CODE]
-}
-
-const REG_NUMBER_SYSTEM: Record<EVENT_TYPE, string> = {
-  [EVENT_TYPE.BIRTH]: BIRTH_REG_NUMBER_SYSTEM,
-  [EVENT_TYPE.DEATH]: DEATH_REG_NUMBER_SYSTEM,
-  [EVENT_TYPE.MARRIAGE]: MARRIAGE_REG_NUMBER_SYSTEM
-}
-
-const MARK_REG: Record<EVENT_TYPE, Events> = {
-  [EVENT_TYPE.BIRTH]: Events.BIRTH_MARK_REG,
-  [EVENT_TYPE.DEATH]: Events.DEATH_MARK_REG,
-  [EVENT_TYPE.MARRIAGE]: Events.MARRIAGE_MARK_REG
 }
 
 async function sendBundleToHearth(
@@ -129,7 +107,9 @@ function getSectionIndex(
   section.filter((obj: fhir.CompositionSection, i: number) => {
     if (
       obj.title &&
-      ['Birth encounter', 'Death encounter'].includes(obj.title)
+      ['Birth encounter', 'Death encounter', 'Marriage encounter'].includes(
+        obj.title
+      )
     ) {
       index = i
     }
@@ -451,7 +431,7 @@ export async function markEventAsCertifiedHandler(
     await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
-    logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
   }
 }

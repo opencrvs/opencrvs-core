@@ -71,7 +71,7 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateTrackingIdForEvents(eventType: Events): string {
+export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
   // using first letter of eventType for prefix
   // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
   return generateTrackingId(eventType[0])
