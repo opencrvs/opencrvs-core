@@ -104,12 +104,16 @@ export function ForgotPIN(props: IForgotPINProps) {
     dispatch(redirectToAuthentication())
   }, [dispatch])
   const language = useSelector(getLanguage)
-  const onForgetPassword = useCallback(() => {
-    logout()
-    window.location.assign(
-      window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-    )
-  }, [language, logout])
+  const onForgetPassword = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault()
+      logout()
+      window.location.assign(
+        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
+      )
+    },
+    [language, logout]
+  )
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
