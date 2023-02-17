@@ -23,6 +23,7 @@ import { changePhoneMutation } from '@client/views/Settings/mutations'
 import { queriesForUser } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
+import { NetworkStatus } from '@apollo/client'
 
 const graphqlMocks = [
   {
@@ -87,7 +88,9 @@ describe('Change phone modal tests', () => {
           getUserByMobile: {
             id: null
           }
-        }
+        },
+        loading: false,
+        networkStatus: NetworkStatus.ready
       })
     )
     component.find('input').simulate('change', {
@@ -109,7 +112,9 @@ describe('Change phone modal tests', () => {
           getUserByMobile: {
             id: null
           }
-        }
+        },
+        loading: false,
+        networkStatus: NetworkStatus.ready
       })
     )
     component
