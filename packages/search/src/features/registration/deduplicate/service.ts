@@ -23,7 +23,14 @@ import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
-import { subYears, addYears, subMonths, addMonths, subDays, addDays } from 'date-fns'
+import {
+  subYears,
+  addYears,
+  subMonths,
+  addMonths,
+  subDays,
+  addDays
+} from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (
@@ -49,7 +56,7 @@ const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
   )
 }
 
-export const searchForDuplicates = async (
+export const searchForBirthDuplicates = async (
   body: IBirthCompositionBody,
   client: elasticsearch.Client
 ) => {
@@ -259,23 +266,28 @@ export const searchForDeathDuplicates = async (
                     body.deathDate && {
                       range: {
                         deathDate: {
-                          gte: subDays(new Date(body.deathDate), 5).toISOString(),
-                          lte: addDays(new Date(body.deathDate), 5).toISOString()
+                          gte: subDays(
+                            new Date(body.deathDate),
+                            5
+                          ).toISOString(),
+                          lte: addDays(
+                            new Date(body.deathDate),
+                            5
+                          ).toISOString()
                         }
                       }
                     },
                     body.deathDate && {
                       distance_feature: {
                         field: 'deathDate',
-                        pivot: '5d', // 9 months in days
+                        pivot: '5d', // 5 days
                         origin: new Date(body.deathDate).toISOString(),
                         boost: 1
                       }
-                    },
+                    }
                   ].filter(Boolean)
                 }
               }
-
             ].filter(Boolean)
           }
         }

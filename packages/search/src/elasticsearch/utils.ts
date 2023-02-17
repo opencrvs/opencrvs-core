@@ -20,7 +20,7 @@ import {
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
 import fetch from 'node-fetch'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -177,7 +177,7 @@ export async function detectDuplicates(
   compositionId: string,
   body: IBirthCompositionBody
 ) {
-  const searchResponse = await searchForDuplicates(body, client)
+  const searchResponse = await searchForBirthDuplicates(body, client)
   const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
 }

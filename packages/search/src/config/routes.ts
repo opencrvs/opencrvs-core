@@ -17,7 +17,7 @@ import {
   getStatusWiseRegistrationCountHandler,
   advancedRecordSearch,
   searchAssignment,
-  searchDuplicates,
+  searchForBirthDeDuplication,
   searchForDeathDeDuplication
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
@@ -203,8 +203,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/search/duplicates',
-      handler: searchDuplicates,
+      path: '/search/duplicates/birth',
+      handler: searchForBirthDeDuplication,
       config: {
         tags: ['api'],
         auth: {
@@ -220,7 +220,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/search/duplications/death',
+      path: '/search/duplicates/death',
       handler: searchForDeathDeDuplication,
       config: {
         tags: ['api'],

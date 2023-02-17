@@ -28,7 +28,7 @@ import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
 import {
   searchForDeathDuplicates,
-  searchForDuplicates
+  searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
 
 type IAssignmentPayload = {
@@ -200,12 +200,12 @@ export async function advancedRecordSearch(
   }
 }
 
-export async function searchDuplicates(
+export async function searchForBirthDeDuplication(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const result = await searchForDuplicates(
+    const result = await searchForBirthDuplicates(
       request.payload as IBirthCompositionBody,
       client
     )

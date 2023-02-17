@@ -19,7 +19,7 @@ import {
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import * as elasticsearch from '@elastic/elasticsearch'
-import { searchForDeathDuplicates, searchForDuplicates } from './service'
+import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
 
 export const ELASTIC_SEARCH_HTTP_PORT = 9200
 
@@ -63,7 +63,7 @@ export async function compareForBirthDuplication(
   )
 
   await indexComposition('123-123-123-123', existingComposition, client)
-  const results = await searchForDuplicates(newComposition, client)
+  const results = await searchForBirthDuplicates(newComposition, client)
   return results
 }
 
