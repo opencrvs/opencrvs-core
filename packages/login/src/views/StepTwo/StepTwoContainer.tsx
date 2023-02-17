@@ -33,13 +33,7 @@ import {
 } from '@login/login/selectors'
 import { Toast } from '@opencrvs/components'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
-import {
-  Container,
-  FormWrapper,
-  LogoContainer,
-  StyledH2
-} from '@login/views/Common'
-import { Link } from '@opencrvs/components/lib/Link/Link'
+import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 
@@ -81,24 +75,36 @@ export function StepTwoContainer() {
     <Container id="login-step-two-box">
       <Box id="Box">
         <LogoContainer>
-          <CountryLogo src={logo} />
+          <CountryLogo size="small" src={logo} />
         </LogoContainer>
         {resentSMS ? (
           <React.Fragment>
-            <StyledH2>
+            <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
-            </StyledH2>
-            <p>
+            </Text>
+            <Text
+              variant="reg16"
+              align="center"
+              color="supportingCopy"
+              element="p"
+            >
               {intl.formatMessage(messages.resentSMS, {
                 number: mobileNumber
               })}
-            </p>
+            </Text>
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <StyledH2>{intl.formatMessage(messages.stepTwoTitle)}</StyledH2>
+            <Text element="h1" variant="h2" align="center">
+              {intl.formatMessage(messages.stepTwoTitle)}
+            </Text>
 
-            <Text variant="reg16" element="p">
+            <Text
+              variant="reg16"
+              align="center"
+              color="supportingCopy"
+              element="p"
+            >
               {intl.formatMessage(messages.stepTwoInstruction, {
                 number: mobileNumber
               })}
@@ -113,7 +119,7 @@ export function StepTwoContainer() {
         >
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
-              <Stack direction="column" alignItems="stretch" gap={16}>
+              <Stack direction="column" alignItems="stretch" gap={24}>
                 <Field name={field.name} field={field}>
                   {({ meta, input, ...otherProps }) => (
                     <InputField
@@ -136,21 +142,22 @@ export function StepTwoContainer() {
                   )}
                 </Field>
                 <Button
-                  size="medium"
+                  size="large"
                   type="primary"
                   id="login-mobile-submit"
-                  disabled={submitting}
+                  loading={submitting}
                 >
                   {intl.formatMessage(messages.verify)}
                 </Button>
 
-                <Link
+                <Button
+                  size="small"
+                  type="tertiary"
                   onClick={() => dispatch(actions.resendSMS())}
                   id="login-mobile-resend"
-                  type="button"
                 >
                   {intl.formatMessage(messages.resend)}
-                </Link>
+                </Button>
               </Stack>
             </FormWrapper>
           )}
