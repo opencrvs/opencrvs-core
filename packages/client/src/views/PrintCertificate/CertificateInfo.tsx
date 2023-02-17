@@ -44,6 +44,16 @@ const ValueContainer = styled.div<{ value: undefined | string }>`
     value ? theme.colors.grey600 : theme.colors.grey400};
   ${({ theme }) => theme.fonts.bold16}
 `
+function getTemplateFullName(
+  familyName: string,
+  firstNames: string,
+  middleNames?: string
+) {
+  return [
+    familyName,
+    [firstNames, middleNames].filter(Boolean).join(' ').trim()
+  ].join(', ')
+}
 
 export const CertificateInfo = ({ data }: { data: Record<string, string> }) => {
   const renderDataItem = (key: string, value: string) => {
@@ -64,22 +74,30 @@ export const CertificateInfo = ({ data }: { data: Record<string, string> }) => {
     LGA: data.registrationLGA,
     State: data.registrationState,
     BRN: data.registrationNumber,
-    'Full Name': `${data.childFamilyName}, ${data.childFirstName} ${data.childMiddleNames}`,
+    'Full Name': getTemplateFullName(
+      data.childFamilyName,
+      data.childFirstName,
+      data.childMiddleNames
+    ),
     Sex: data.informantGender,
     'Date of Birth': data.eventDate,
     'Place of Birth': `${data.placeOfBirthLocality}, ${data.placeOfBirthLGA}, ${data.placeOfBirthState}`
   }
 
   if (data.motherFamilyName || data.motherFirstName) {
-    renderedData[
-      'Full Name of Mother'
-    ] = `${data.motherFamilyName}, ${data.motherFirstName} ${data.motherMiddleNames}`
+    renderedData['Full Name of Mother'] = getTemplateFullName(
+      data.motherFamilyName,
+      data.motherFirstName,
+      data.motherMiddleNames
+    )
   }
 
   if (data.fatherFamilyName || data.fatherFirstName) {
-    renderedData[
-      'Full Name of Father'
-    ] = `${data.fatherFamilyName}, ${data.fatherFirstName} ${data.fatherMiddleNames}`
+    renderedData['Full Name of Father'] = getTemplateFullName(
+      data.fatherFamilyName,
+      data.fatherFirstName,
+      data.fatherMiddleNames
+    )
   }
 
   renderedData['Name of Registrar'] = data.registrarName
