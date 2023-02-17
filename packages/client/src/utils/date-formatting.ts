@@ -21,7 +21,7 @@ export const formatLongDate = (
   date: string,
   locale = 'en',
   formatString = 'dd MMMM yyyy'
-) => {
+): string => {
   window.__localeId__ = locale
   return format(new Date(date), formatString, {
     locale: locales[window.__localeId__]
