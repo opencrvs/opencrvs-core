@@ -117,7 +117,10 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
       setClient(client)
     }
 
-    init()
+    // skipping the persistent client in tests for now
+    if (import.meta.env.MODE !== 'test') {
+      init()
+    }
   }, [store])
 
   return {
