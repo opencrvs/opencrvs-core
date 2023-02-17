@@ -18,10 +18,10 @@ export default class PractitionerRoleAPI extends RESTDataSource {
   }
 
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
-    return this.get(`?practitioner=${practitionerId}`).then((res) => res.body)
+    return this.get(`?practitioner=${practitionerId}`)
   }
 
   async getPractionerRoleHistory(id: string) {
-    return this.get(`/${id}/_history`).then((res) => res.body)
+    return this.get(`/${id}/_history`)
   }
 }

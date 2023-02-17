@@ -101,10 +101,14 @@ export const typeResolvers: GQLResolver = {
   },
   Address: {
     stateName: async (address, _, { dataSources }) => {
-      return dataSources.locationsAPI.getLocationName(address.state)
+      const location = await dataSources.locationsAPI.getLocation(address.state)
+      return location.name
     },
     districtName: async (address, _, { dataSources }) => {
-      return dataSources.locationsAPI.getLocationName(address.district)
+      const location = await dataSources.locationsAPI.getLocation(
+        address.district
+      )
+      return location.name
     },
     lineName: (address, _, { dataSources }) => {
       return Promise.all(
@@ -112,7 +116,8 @@ export const typeResolvers: GQLResolver = {
           if (!validateUUID(line)) {
             return line
           }
-          return dataSources.locationsAPI.getLocationName(line)
+          const location = await dataSources.locationsAPI.getLocation(line)
+          return location.name
         })
       )
     }

@@ -17,6 +17,6 @@ export default class LocationsAPI extends RESTDataSource {
   }
 
   getLocation(id: string) {
-    return this.get(`/${id}`).then((res) => res.body)
+    return this.get(`/${id}`)
   }
 }
