@@ -51,6 +51,8 @@ import { certificateTypeResolvers } from '@gateway/features/certificate/type-res
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import { FHIR_URL } from '@gateway/constants'
+import { Pool } from 'undici'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -102,14 +104,16 @@ export const getApolloConfig = (): Config => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
   `
+  const baseURL = FHIR_URL.split('/fhir')[0]
+  const pool = new Pool(baseURL)
 
   return {
     typeDefs,
     resolvers,
     introspection: true,
     dataSources: () => ({
-      locationsAPI: LocationsAPI.createNewInstance(),
-      practitionerRoleAPI: PractitionerRoleAPI.createNewInstance()
+      locationsAPI: new LocationsAPI(baseURL, pool),
+      practitionerRoleAPI: new PractitionerRoleAPI(baseURL, pool)
     }),
     context: async ({ request, h }) => {
       try {

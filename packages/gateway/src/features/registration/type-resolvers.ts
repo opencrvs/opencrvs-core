@@ -101,14 +101,10 @@ export const typeResolvers: GQLResolver = {
   },
   Address: {
     stateName: async (address, _, { dataSources }) => {
-      const location = await dataSources.locationsAPI.getLocation(address.state)
-      return location.name
+      return dataSources.locationsAPI.getLocationName(address.state)
     },
     districtName: async (address, _, { dataSources }) => {
-      const location = await dataSources.locationsAPI.getLocation(
-        address.district
-      )
-      return location.name
+      return dataSources.locationsAPI.getLocationName(address.district)
     },
     lineName: (address, _, { dataSources }) => {
       return Promise.all(
@@ -116,8 +112,7 @@ export const typeResolvers: GQLResolver = {
           if (!validateUUID(line)) {
             return line
           }
-          const location = await dataSources.locationsAPI.getLocation(line)
-          return location.name
+          return dataSources.locationsAPI.getLocationName(line)
         })
       )
     }
@@ -597,7 +592,7 @@ export const typeResolvers: GQLResolver = {
     reason: (task: fhir.Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
-    location: async (task, _, authHeader) => {
+    location: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension
@@ -605,12 +600,11 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(
-        `/${taskLocation.valueReference.reference}`,
-        authHeader
+      return dataSources.locationsAPI.getLocation(
+        taskLocation.valueReference.reference?.split('/')[1]
       )
     },
-    office: async (task, _, authHeader) => {
+    office: async (task, _, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension
@@ -618,9 +612,8 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(
-        `/${taskLocation.valueReference.reference}`,
-        authHeader
+      return dataSources.locationsAPI.getLocation(
+        taskLocation.valueReference.reference?.split('/')[1]
       )
     },
     timeLogged: async (task, _, authHeader) => {
@@ -905,7 +898,7 @@ export const typeResolvers: GQLResolver = {
       }
       return await getSystem({ systemId: systemIdentifier.value }, authHeader)
     },
-    location: async (task: fhir.Task, _: any, authHeader: any) => {
+    location: async (task: fhir.Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
         task.extension as fhir.Extension[]
@@ -913,12 +906,11 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(
-        `/${taskLocation.valueReference.reference}`,
-        authHeader
+      return dataSources.locationsAPI.getLocation(
+        taskLocation.valueReference.reference?.split('/')[1]
       )
     },
-    office: async (task: fhir.Task, _: any, authHeader: any) => {
+    office: async (task: fhir.Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as fhir.Extension[]
@@ -926,9 +918,8 @@ export const typeResolvers: GQLResolver = {
       if (!taskLocation || !taskLocation.valueReference) {
         return null
       }
-      return await fetchFHIR(
-        `/${taskLocation.valueReference.reference}`,
-        authHeader
+      return dataSources.locationsAPI.getLocation(
+        taskLocation.valueReference.reference?.split('/')[1]
       )
     },
     comments: (task) => task.note || [],

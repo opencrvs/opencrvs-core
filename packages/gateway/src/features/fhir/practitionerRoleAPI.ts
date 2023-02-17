@@ -1,4 +1,3 @@
-import { FHIR_URL } from '@gateway/constants'
 import { HTTPDataSource } from 'apollo-datasource-http'
 import { Pool } from 'undici'
 
@@ -8,26 +7,19 @@ export default class PractitionerRoleAPI extends HTTPDataSource {
     super(baseURL, {
       pool
     })
-    this.count = 0
   }
 
-  getPractitionerRoleByPractitionerId(practitionerId: string) {
+  async getPractitionerRoleByPractitionerId(practitionerId: string) {
     const { dataSources, ...authHeader } = this.context
     return this.get(`/fhir/PractitionerRole?practitioner=${practitionerId}`, {
       headers: { 'Content-Type': 'application/fhir+json', ...authHeader }
-    })
+    }).then((res) => res.body)
   }
 
-  getPractionerRoleHistory(id: string) {
+  async getPractionerRoleHistory(id: string) {
     const { dataSources, ...authHeader } = this.context
     return this.get(`/fhir/PractitionerRole/${id}/_history`, {
       headers: { 'Content-Type': 'application/fhir+json', ...authHeader }
-    })
-  }
-
-  static createNewInstance() {
-    const baseURL = FHIR_URL.split('/fhir')[0]
-    const pool = new Pool(baseURL)
-    return new PractitionerRoleAPI(baseURL, pool)
+    }).then((res) => res.body)
   }
 }
