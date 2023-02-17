@@ -161,6 +161,10 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
     configs:
       - source: mongo-init.{{ts}}
         target: /docker-entrypoint-initdb.d/create-mongo-users.sh
