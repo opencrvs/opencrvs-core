@@ -1,16 +1,22 @@
-import { HTTPDataSource } from 'apollo-datasource-http'
-import { Pool } from 'undici'
-export default class LocationsAPI extends HTTPDataSource {
-  constructor(baseURL: string, pool: Pool) {
-    super(baseURL, {
-      pool
-    })
+import { FHIR_URL } from '@gateway/constants'
+import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
+
+export default class LocationsAPI extends RESTDataSource {
+  constructor() {
+    super()
+    this.baseURL = `${FHIR_URL}/Location`
+  }
+
+  protected willSendRequest(request: RequestOptions): void | Promise<void> {
+    const { dataSources, ...authHeader } = this.context
+    const headerKeys = Object.keys(authHeader)
+    for (const each of headerKeys) {
+      request.headers.set(each, authHeader[each])
+    }
+    request.headers.set('Content-Type', 'application/fhir+json')
   }
 
   getLocation(id: string) {
-    const { dataSources, ...authHeader } = this.context
-    return this.get(`/fhir/Location/${id}`, {
-      headers: { 'Content-Type': 'application/fhir+json', ...authHeader }
-    }).then((res) => res.body)
+    return this.get(`/${id}`).then((res) => res.body)
   }
 }
