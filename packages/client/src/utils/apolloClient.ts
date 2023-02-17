@@ -32,7 +32,7 @@ import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import * as localforage from 'localforage'
 import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
 
-export let client: any = { mutate: () => {}, query: () => {} }
+export let client: ApolloClient<NormalizedCacheObject>
 
 export const createClient = (
   store: Store<IStoreState, AnyAction>,
@@ -96,10 +96,11 @@ async function createPersistentClient(store: Store<IStoreState, AnyAction>) {
     persistor: newPersistor
   }
 }
+
 export function useApolloClient(store: Store<IStoreState, AnyAction>) {
   const [client, setClient] = React.useState<
     ApolloClient<NormalizedCacheObject>
-  >(new ApolloClient({ cache: new InMemoryCache() }))
+  >(createClient(store))
   const [persistor, setPersistor] =
     React.useState<CachePersistor<NormalizedCacheObject>>()
   const clearCache = React.useCallback(() => {
