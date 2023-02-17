@@ -14,12 +14,27 @@ import {
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
 import * as fetch from 'jest-fetch-mock'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+
+const mockGet = jest.fn()
+jest.mock('apollo-datasource-rest', () => {
+  class MockRESTDataSource {
+    get = mockGet
+  }
+  return {
+    RESTDataSource: MockRESTDataSource
+  }
+})
 
 beforeEach(() => {
   fetch.resetMocks()
 })
 
 describe('User type resolvers', () => {
+  afterEach(() => {
+    mockGet.mockReset()
+  })
+
   const mockResponse: IUserModelData = {
     _id: 'ba7022f0ff4822',
     name: [
@@ -116,8 +131,12 @@ describe('User type resolvers', () => {
       },
       id: '79776844-b606-40e9-8358-7d82147f702a'
     }
-    fetch.mockResponseOnce(JSON.stringify(mockOffice))
-    const res = await userTypeResolvers.User.primaryOffice(mockResponse)
+    mockGet.mockResolvedValueOnce(mockOffice)
+    const res = await userTypeResolvers.User.primaryOffice(
+      mockResponse,
+      undefined,
+      { dataSources: { locationsAPI: new LocationsAPI() } }
+    )
     expect(res).toEqual(mockOffice)
   })
   it('return catchmentArea type', async () => {
@@ -287,13 +306,19 @@ describe('User type resolvers', () => {
         id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
       }
     ]
-    fetch.mockResponses(
-      [JSON.stringify(mockLocations[0]), { status: 200 }],
-      [JSON.stringify(mockLocations[1]), { status: 200 }],
-      [JSON.stringify(mockLocations[2]), { status: 200 }],
-      [JSON.stringify(mockLocations[3]), { status: 200 }]
+    mockGet
+      .mockResolvedValueOnce(mockLocations[0])
+      .mockResolvedValueOnce(mockLocations[1])
+      .mockResolvedValueOnce(mockLocations[2])
+      .mockResolvedValueOnce(mockLocations[3])
+
+    const res = await userTypeResolvers.User.catchmentArea(
+      mockResponse,
+      undefined,
+      {
+        dataSources: { locationsAPI: new LocationsAPI() }
+      }
     )
-    const res = await userTypeResolvers.User.catchmentArea(mockResponse)
     expect(res).toEqual(mockLocations)
   })
 

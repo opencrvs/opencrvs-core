@@ -34,14 +34,28 @@ import {
 import { GQLRegAction } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 
 const fetch = fetchAny as any
+const mockGet = jest.fn()
+jest.mock('apollo-datasource-rest', () => {
+  class MockRESTDataSource {
+    get = mockGet
+  }
+  return {
+    RESTDataSource: MockRESTDataSource
+  }
+})
 
 beforeEach(() => {
   fetch.resetMocks()
 })
 
 describe('Registration type resolvers', () => {
+  afterEach(() => {
+    mockGet.mockReset()
+  })
   it('fetches and returns a mother patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
@@ -422,26 +436,26 @@ describe('Registration type resolvers', () => {
           }
         ]
       }
-
-      fetch.mockResponses(
-        [JSON.stringify(roleBundle), { status: 200 }],
-        [JSON.stringify(roleHistoryBundle), { status: 200 }],
-        [JSON.stringify(mockUser), { status: 200 }]
-      )
-      const user = await typeResolvers.History.user(
-        mockTaskDownloaded,
-        null,
-        {}
-      )
+      mockGet
+        .mockResolvedValueOnce(roleBundle)
+        .mockResolvedValueOnce(roleHistoryBundle)
+      fetch.mockResponses([JSON.stringify(mockUser), { status: 200 }])
+      const user = await typeResolvers.History.user(mockTaskDownloaded, null, {
+        dataSources: { practitionerRoleAPI: new PractitionerRoleAPI() }
+      })
       expect(user.role.labels).toEqual(mockUser.role.labels)
     })
 
     it('Should return location', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
       const location = await typeResolvers.History.location(
         mockTaskDownloaded,
         null,
-        {}
+        {
+          dataSources: {
+            locationsAPI: new LocationsAPI()
+          }
+        }
       )
       expect(location.id).toBe(mockLocation.id)
     })
@@ -1104,15 +1118,23 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns office of the task', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
 
-      const office = await typeResolvers.RegWorkflow.office(mockTask)
+      const office = await typeResolvers.RegWorkflow.office(
+        mockTask,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
       expect(office).toBeDefined()
       expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
     })
 
     it('returns null as office of the task', async () => {
-      const office = await typeResolvers.RegWorkflow.office(mockTaskForError)
+      const office = await typeResolvers.RegWorkflow.office(
+        mockTaskForError,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
       expect(office).toBeNull()
     })
 
@@ -1175,23 +1197,27 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns location of the task', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
 
-      const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
-      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Location/123', {
-        body: undefined,
-        headers: { 'Content-Type': 'application/fhir+json' },
-        method: 'GET'
-      })
+      const taskLocation = await typeResolvers.RegWorkflow.location(
+        mockTask,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
+      expect(mockGet).toBeCalledWith('/123')
 
       expect(taskLocation.resource.resourceType).toBe('Location')
     })
 
     it('returns null when there is no location ref in task extension', async () => {
-      const taskLocation = await typeResolvers.RegWorkflow.location({
-        resourceType: 'Task',
-        extension: []
-      })
+      const taskLocation = await typeResolvers.RegWorkflow.location(
+        {
+          resourceType: 'Task',
+          extension: []
+        },
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
 
       expect(taskLocation).toBeNull()
     })
