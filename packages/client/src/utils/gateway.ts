@@ -3222,6 +3222,7 @@ export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
   reason?: InputMaybe<Scalars['String']>
   comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
 export type MarkEventAsArchivedMutation = {
@@ -4377,6 +4378,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null

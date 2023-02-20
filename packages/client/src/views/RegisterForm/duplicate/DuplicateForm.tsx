@@ -71,10 +71,20 @@ export const DuplicateForm = (props: IProps) => {
     .join(', ')
 
   const getName = () => {
-    return [
-      data.child.firstNamesEng as string,
-      data.child.familyNameEng as string
-    ].join(' ')
+    switch (data.registration.type) {
+      case 'birth':
+        return [
+          data.child.firstNamesEng as string,
+          data.child.familyNameEng as string
+        ].join(' ')
+      case 'death':
+        return [
+          data.deceased.firstNamesEng as string,
+          data.deceased.familyNameEng as string
+        ].join(' ')
+      default:
+        return
+    }
   }
 
   const toggleModal = () => {
@@ -116,7 +126,6 @@ export const DuplicateForm = (props: IProps) => {
       {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
     </Button>
   )
-
   return (
     <>
       <SubPageContent
