@@ -24,8 +24,12 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   buttonMessages,
   constantsMessages,
