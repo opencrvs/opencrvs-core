@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  GQLAttachment,
-  GQLPerson,
-  GQLRelatedPerson
+  GQLRelatedPerson,
+  GQLIdentityIDType
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ICertificate,
@@ -49,26 +48,27 @@ export function transformCertificateData(
         name: [
           {
             use: 'en',
-            firstNames: certificateData.collector.firstName,
-            familyName: certificateData.collector.lastName
+            firstNames: certificateData.collector.firstName as string,
+            familyName: certificateData.collector.lastName as string
           }
         ],
         identifier: [
           {
-            id: certificateData.collector.iD,
-            type: certificateData.collector.iDType
+            id: certificateData.collector.iD as string,
+            type: certificateData.collector.iDType as GQLIdentityIDType
           }
         ]
-      } as GQLPerson
+      }
     }
     if (certificateData.collector.affidavitFile) {
       collector.affidavit = [
         {
+          id: '123',
           contentType: (certificateData.collector.affidavitFile as IFileValue)
             .type,
           data: (certificateData.collector.affidavitFile as IFileValue).data
         }
-      ] as GQLAttachment[]
+      ]
     }
     transformedData[sectionId].certificates[0].collector = collector
   }

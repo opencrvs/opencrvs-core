@@ -39,7 +39,7 @@ export const transformData = (
       let deathReg
       let names
       let dateOfEvent
-      const assignedReg = reg as GQLEventSearchSet
+      const assignedReg = reg
       if (assignedReg.registration && assignedReg.type === 'Birth') {
         birthReg = reg as GQLBirthEventSearchSet
         names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
