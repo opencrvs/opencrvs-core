@@ -12,7 +12,7 @@
 
 import { useEffect } from 'react'
 
-export const useTimeoout = (
+export const useTimeout = (
   callback: () => void,
   timeout = 0,
   trigger = false

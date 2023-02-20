@@ -43,7 +43,7 @@ import {
   RegistrationType,
   RegStatus
 } from '@client/utils/gateway'
-import { useTimeoout } from '@client/hooks/useTimeout'
+import { useTimeout } from '@client/hooks/useTimeout'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -270,7 +270,7 @@ export function VerifyCertificatePage() {
     BirthRegistration | DeathRegistration
   >()
 
-  useTimeoout(
+  useTimeout(
     () => {
       setCloseWindow(true)
     },
@@ -278,7 +278,7 @@ export function VerifyCertificatePage() {
     data
   )
 
-  useTimeoout(
+  useTimeout(
     () => {
       setCloseWindow(false)
       setTimeOut(true)
