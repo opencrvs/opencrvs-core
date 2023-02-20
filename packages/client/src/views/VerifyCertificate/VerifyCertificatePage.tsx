@@ -43,6 +43,7 @@ import {
   RegistrationType,
   RegStatus
 } from '@client/utils/gateway'
+import { useTimeout } from '@client/hooks/useTimeout'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -196,6 +197,57 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
   }
 `
 
+const LoadingState = () => {
+  const intl = useIntl()
+  return (
+    <CheckingContainer>
+      <Stack alignItems="center" direction="column">
+        <SpaceDiv />
+        <SpinnerContainer>
+          <StyledSpinner id="appSpinner" />
+        </SpinnerContainer>
+        <Text variant={'reg16'} element={'h4'}>
+          {intl.formatMessage(messageToDefine.loadingState)}
+        </Text>
+      </Stack>
+    </CheckingContainer>
+  )
+}
+
+const ErrorState = () => {
+  const intl = useIntl()
+  return (
+    <>
+      <Alert onActionClick={() => {}} type="error">
+        <Text variant={'bold16'} element={'span'} color={'redDark'}>
+          {intl.formatMessage(messageToDefine.errorAlertTitle)}
+        </Text>{' '}
+        <br />
+        <Text variant={'reg16'} element={'span'} color={'redDark'}>
+          {intl.formatMessage(messageToDefine.errorAlertMessage)}
+        </Text>
+      </Alert>
+    </>
+  )
+}
+
+const TimeOutState = () => {
+  const intl = useIntl()
+  return (
+    <>
+      <CheckingContainer>
+        <Stack alignItems="center" direction="column">
+          <SpaceDiv />
+          <Text variant={'reg16'} element={'h4'}>
+            {intl.formatMessage(messageToDefine.timeOutState)}
+          </Text>
+          <SpaceDiv />
+        </Stack>
+      </CheckingContainer>
+    </>
+  )
+}
+
 export function VerifyCertificatePage() {
   const intl = useIntl()
   const { declarationId } = useParams<{ declarationId: string }>()
@@ -218,16 +270,25 @@ export function VerifyCertificatePage() {
     BirthRegistration | DeathRegistration
   >()
 
+  useTimeout(
+    () => {
+      setCloseWindow(true)
+    },
+    60000,
+    data
+  )
+
+  useTimeout(
+    () => {
+      setCloseWindow(false)
+      setTimeOut(true)
+    },
+    600000,
+    data
+  )
+
   React.useEffect(() => {
     if (data) {
-      setTimeout(() => {
-        setCloseWindow(true)
-      }, 60000) // 60000 is correct value
-
-      setTimeout(() => {
-        setCloseWindow(false)
-        setTimeOut(true)
-      }, 600000) // 600000 is correct value
       setCurrentData(data.fetchRecordDetailsForVerification)
     }
   }, [data])
@@ -236,54 +297,6 @@ export function VerifyCertificatePage() {
     const blank = window.open('about:blank', '_self')
     // @ts-ignore
     blank.close()
-  }
-
-  const LoadingState = () => {
-    return (
-      <CheckingContainer>
-        <Stack alignItems="center" direction="column">
-          <SpaceDiv />
-          <SpinnerContainer>
-            <StyledSpinner id="appSpinner" />
-          </SpinnerContainer>
-          <Text variant={'reg16'} element={'h4'}>
-            {intl.formatMessage(messageToDefine.loadingState)}
-          </Text>
-        </Stack>
-      </CheckingContainer>
-    )
-  }
-
-  const ErrorState = () => {
-    return (
-      <>
-        <Alert onActionClick={() => {}} type="error">
-          <Text variant={'bold16'} element={'span'} color={'redDark'}>
-            {intl.formatMessage(messageToDefine.errorAlertTitle)}
-          </Text>{' '}
-          <br />
-          <Text variant={'reg16'} element={'span'} color={'redDark'}>
-            {intl.formatMessage(messageToDefine.errorAlertMessage)}
-          </Text>
-        </Alert>
-      </>
-    )
-  }
-
-  const TimeOutState = () => {
-    return (
-      <>
-        <CheckingContainer>
-          <Stack alignItems="center" direction="column">
-            <SpaceDiv />
-            <Text variant={'reg16'} element={'h4'}>
-              {intl.formatMessage(messageToDefine.timeOutState)}
-            </Text>
-            <SpaceDiv />
-          </Stack>
-        </CheckingContainer>
-      </>
-    )
   }
 
   const getRegisterNumber = (data: BirthRegistration | DeathRegistration) => {

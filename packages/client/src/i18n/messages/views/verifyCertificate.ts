@@ -68,7 +68,7 @@ const messagesToDefine: IVerifyCertificateMessages = {
   },
   successUrlValidation: {
     id: 'verifyCertificate.successUrl',
-    defaultMessage: 'URL Vérification',
+    defaultMessage: 'URL Verification',
     description: 'title for success alert for url validation'
   },
   fullName: {
