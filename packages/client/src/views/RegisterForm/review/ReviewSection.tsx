@@ -75,7 +75,8 @@ import {
   ICheckboxFormField,
   CHECKBOX,
   INestedInputFields,
-  DeathSection
+  DeathSection,
+  MarriageSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -156,6 +157,7 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -799,7 +801,8 @@ const getErrorsOnFieldsBySection = (
 
 const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
-  [Event.Death]: deathSectionMapping
+  [Event.Death]: deathSectionMapping,
+  [Event.Marriage]: marriageSectionMapping
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {

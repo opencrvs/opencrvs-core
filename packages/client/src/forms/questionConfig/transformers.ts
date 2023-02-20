@@ -83,6 +83,10 @@ export function questionsTransformer(
     death: populateRegisterFormsWithAddresses(
       registerForms[Event.Death],
       Event.Death
+    ),
+    marriage: populateRegisterFormsWithAddresses(
+      registerForms[Event.Marriage],
+      Event.Marriage
     )
   }
   return questionsPayload.map(

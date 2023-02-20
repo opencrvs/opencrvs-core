@@ -172,7 +172,8 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        systemRole: userDetails.systemRole
+        systemRole: userDetails.systemRole,
+        role: userDetails.role
       },
       office: userDetails.primaryOffice,
       comments: [],

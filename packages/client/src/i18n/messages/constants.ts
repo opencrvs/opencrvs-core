@@ -52,6 +52,7 @@ interface IConstantsMessages
   dateOfDeclaration: MessageDescriptor
   death: MessageDescriptor
   deaths: MessageDescriptor
+  marriage: MessageDescriptor
   declared: MessageDescriptor
   dob: MessageDescriptor
   dod: MessageDescriptor
@@ -378,6 +379,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Deaths',
     description: 'A label from the deaths event',
     id: 'constants.deaths'
+  },
+  marriage: {
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event',
+    id: 'constants.marriage'
   },
   declared: {
     defaultMessage: 'submitted',
@@ -1010,6 +1016,11 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.death',
     defaultMessage: 'Death',
     description: 'A label from the death event'
+  },
+  marriage: {
+    id: 'constants.marriage',
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event'
   },
   father: {
     id: 'form.field.label.informantRelation.father',

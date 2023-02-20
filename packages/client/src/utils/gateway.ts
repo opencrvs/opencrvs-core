@@ -770,7 +770,8 @@ export type Estimation = {
 
 export enum Event {
   Birth = 'birth',
-  Death = 'death'
+  Death = 'death',
+  Marriage = 'marriage'
 }
 
 export type EventMetrics = {

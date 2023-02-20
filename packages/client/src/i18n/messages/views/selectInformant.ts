@@ -74,6 +74,21 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for option father',
     id: 'form.field.label.informantRelation.father'
   },
+  groom: {
+    defaultMessage: 'Groom',
+    description: 'Label for option groom',
+    id: 'form.field.label.informantRelation.groom'
+  },
+  bride: {
+    defaultMessage: 'Bride',
+    description: 'Label for option bride',
+    id: 'form.field.label.informantRelation.bride'
+  },
+  groomAndBride: {
+    defaultMessage: 'Groom & Bride',
+    description: 'Label for option Groom & Bride',
+    id: 'form.field.label.informantRelation.groomAndBride'
+  },
   grandfather: {
     defaultMessage: 'Grandfather',
     description: 'Label for option Grandfather',
