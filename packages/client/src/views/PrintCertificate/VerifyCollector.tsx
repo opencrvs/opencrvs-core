@@ -43,7 +43,7 @@ import {
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { constantsMessages } from '@client/i18n/messages'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IMatchParams {
   registrationId: string
@@ -181,7 +181,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
-      ? intl.formatMessage(constantsMessages.issueCertificate)
+      ? intl.formatMessage(issueMessages.issueCertificate)
       : intl.formatMessage(messages.certificateCollectionTitle)
 
     if (!this.props.declaration && !isIssueUrl) {

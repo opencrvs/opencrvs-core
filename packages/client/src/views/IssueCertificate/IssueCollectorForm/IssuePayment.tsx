@@ -59,6 +59,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { Button } from '@client/../../components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -243,7 +244,7 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
     return (
       <>
         <ActionPageLight
-          title={intl.formatMessage(constantsMessages.issueCertificate)}
+          title={intl.formatMessage(issueMessages.issueCertificate)}
           goBack={goBack}
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)}
@@ -272,13 +273,13 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
             </Summary>
             <Action>
               <SuccessButton id="Continue" onClick={() => this.toggleModal()}>
-                {intl.formatMessage(constantsMessages.issueCertificate)}
+                {intl.formatMessage(issueMessages.issueCertificate)}
               </SuccessButton>
             </Action>
           </Content>
           <ResponsiveModal
             id="issue-certificate-confirm"
-            title={intl.formatMessage(constantsMessages.issueCertificate)}
+            title={intl.formatMessage(issueMessages.issueCertificate)}
             responsive={false}
             autoHeight={true}
             show={this.state.showConfirmationModal}
@@ -292,7 +293,7 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
                 id="issue-certificate-confirmation"
                 type={'primary'}
               >
-                {intl.formatMessage(buttonMessages.issue)}
+                {intl.formatMessage(buttonMessages.confirm)}
               </Button>
             ]}
           >

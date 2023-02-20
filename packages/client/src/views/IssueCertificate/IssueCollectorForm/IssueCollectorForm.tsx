@@ -29,13 +29,14 @@ import {
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { Event } from '@client/utils/gateway'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 const fields: IRadioGroupFormField[] = [
   {
     name: 'type',
     type: RADIO_GROUP,
     size: RadioSize.LARGE,
-    label: constantsMessages.issueCertificate,
+    label: issueMessages.issueCertificate,
     hideHeader: true,
     required: true,
     initialValue: '',
@@ -53,7 +54,7 @@ const commonFields: IRadioGroupFormField[] = [
     name: 'type',
     type: RADIO_GROUP,
     size: RadioSize.LARGE,
-    label: constantsMessages.issueCertificate,
+    label: issueMessages.issueCertificate,
     hideHeader: true,
     required: true,
     initialValue: '',

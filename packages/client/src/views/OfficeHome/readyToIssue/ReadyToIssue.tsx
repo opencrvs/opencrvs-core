@@ -24,12 +24,8 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
-import {
-  injectIntl,
-  useIntl,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   buttonMessages,
   constantsMessages,
@@ -56,6 +52,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useEffect, useState } from 'react'
 import { useTheme } from '@client/styledComponents'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IBasePrintTabProps {
   queryData: {
@@ -143,7 +140,7 @@ export const ReadyToIssue = ({
           sortFunction: onColumnClick
         },
         {
-          label: intl.formatMessage(constantsMessages.regNumber),
+          label: intl.formatMessage(issueMessages.regNumber),
           width: 18,
           key: COLUMNS.REGISTRATION_NO,
           isSorted: sortedCol === COLUMNS.REGISTRATION_NO,

@@ -157,14 +157,6 @@ interface IConstantsMessages
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
-  regNumber: MessageDescriptor
-  issueCertificate: MessageDescriptor
-  collectorDetails: MessageDescriptor
-  issueToMother: MessageDescriptor
-  issueToFather: MessageDescriptor
-  issueToSomeoneElse: MessageDescriptor
-  issueToInformant: MessageDescriptor
-  issueConfirmationMessage: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -566,47 +558,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Record',
     description: 'Label for header table header Record',
     id: 'constants.record'
-  },
-  regNumber: {
-    defaultMessage: 'Reg no.',
-    description: 'Label for registered number',
-    id: 'constants.registrationNumber'
-  },
-  issueCertificate: {
-    defaultMessage: 'Issue Certificate',
-    description: 'Label for issue certificate',
-    id: 'constants.issueCertificate'
-  },
-  collectorDetails: {
-    defaultMessage: 'Collector Details',
-    description: 'Label for collector details',
-    id: 'constants.collectorDetails'
-  },
-  issueToMother: {
-    defaultMessage: 'Issue to informant (Mother)',
-    description: 'Issuing to mother',
-    id: 'constants.issueToMother'
-  },
-  issueToFather: {
-    defaultMessage: 'Issue to informant (Father)',
-    description: 'Issuing to father',
-    id: 'constants.issueToFather'
-  },
-  issueToSomeoneElse: {
-    defaultMessage: 'Issue to someone else',
-    description: 'Issuing to someone else',
-    id: 'constants.issueToSomeoneElse'
-  },
-  issueToInformant: {
-    defaultMessage: 'Issue to informant',
-    description: 'Issuance of death to informant',
-    id: 'constants.issueToInformant'
-  },
-  issueConfirmationMessage: {
-    defaultMessage:
-      'Please confirm that the certificate has been issued to the informant or collector.',
-    description: 'Confirmation of issuance',
-    id: 'constants.issueConfirmationMessage'
   },
   requestReason: {
     defaultMessage: 'Reason for request',

@@ -12,7 +12,7 @@
 import React from 'react'
 import { AppBar, Frame, Icon } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { useParams } from 'react-router'
@@ -23,8 +23,7 @@ import { IStoreState } from '@client/store'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
 import { goBack } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
-import { Header } from '@client/components/Header/Header'
-import { IconButton } from '@client/../../components/lib/buttons'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 export function IssueCertificate() {
   const intl = useIntl()
@@ -42,7 +41,7 @@ export function IssueCertificate() {
     <Frame
       header={
         <AppBar
-          desktopTitle={intl.formatMessage(constantsMessages.issueCertificate)}
+          desktopTitle={intl.formatMessage(issueMessages.issueCertificate)}
           desktopLeft={<HistoryNavigator hideForward={true} />}
           desktopRight={
             <Button
