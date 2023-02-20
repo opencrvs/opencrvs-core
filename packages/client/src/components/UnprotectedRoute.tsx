@@ -31,7 +31,9 @@ const UnprotectedRouteWrapper = (props: RouteProps) => {
           document.title = config?.APPLICATION_NAME as string
           dispatch(configAnonymousUserLoaded({ anonymousConfig: config }))
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log('Error to load configuration')
+      }
     }
     fetchData()
   }, [dispatch])
