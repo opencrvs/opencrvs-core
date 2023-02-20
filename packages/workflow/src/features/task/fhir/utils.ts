@@ -15,7 +15,7 @@ import {
   EVENT_TYPE
 } from '@workflow/features/registration/fhir/constants'
 
-export const EVENT: Record<EVENT_TYPE, string> = {
+export const EVENT: Record<EVENT_TYPE, EVENT_TYPE> = {
   [EVENT_TYPE.BIRTH]: EVENT_TYPE.BIRTH,
   [EVENT_TYPE.DEATH]: EVENT_TYPE.DEATH,
   [EVENT_TYPE.MARRIAGE]: EVENT_TYPE.MARRIAGE

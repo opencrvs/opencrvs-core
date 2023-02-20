@@ -74,7 +74,7 @@ export enum FHIR_RESOURCE_TYPE {
 export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
   // using first letter of eventType for prefix
   // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
-  return generateTrackingId(eventType[0])
+  return generateTrackingId(eventType.charAt(0))
 }
 
 function generateTrackingId(prefix: string): string {
@@ -158,7 +158,7 @@ export async function sendEventNotification(
             trackingId: getTrackingId(fhirBundle),
             registrationNumber: getRegistrationNumber(
               getTaskResource(fhirBundle),
-              eventType
+              EVENT_TYPE[eventType]
             )
           }
         )
@@ -239,7 +239,7 @@ export async function sendEventNotification(
             trackingId: getTrackingId(fhirBundle),
             registrationNumber: getRegistrationNumber(
               getTaskResource(fhirBundle),
-              eventType
+              EVENT_TYPE[eventType]
             )
           }
         )
@@ -324,18 +324,16 @@ async function sendNotification(
 }
 
 const DETECT_EVENT: Record<string, EVENT_TYPE> = {
-  ['birth-declaration' || 'birth-notification']: EVENT_TYPE.BIRTH,
-  ['death-declaration' || 'death-notification']: EVENT_TYPE.DEATH,
-  ['marriage-declaration' || 'marriage-notification']: EVENT_TYPE.MARRIAGE
+  'birth-notification': EVENT_TYPE.BIRTH,
+  'birth-declaration': EVENT_TYPE.BIRTH,
+  'death-notification': EVENT_TYPE.DEATH,
+  'death-declaration': EVENT_TYPE.DEATH,
+  'marriage-notification': EVENT_TYPE.MARRIAGE,
+  'marriage-declaration': EVENT_TYPE.MARRIAGE
 }
 
 export function getCompositionEventType(compoition: fhir.Composition) {
-  const eventType =
-    compoition &&
-    compoition.type &&
-    compoition.type.coding &&
-    compoition.type.coding[0].code
-
+  const eventType = compoition?.type?.coding?.[0].code
   return eventType && DETECT_EVENT[eventType]
 }
 

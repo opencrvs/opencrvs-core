@@ -113,7 +113,20 @@ describe('Verify fhir bundle modifier functions', () => {
     it('Will push the composite resource identifier if it is missing on fhirDoc', () => {
       const fhirBundle = setTrackingId({
         ...testFhirBundle,
-        entry: [{ resource: {} }]
+        entry: [
+          {
+            resource: {
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'BIRTH'
+                  }
+                ]
+              }
+            }
+          }
+        ]
       })
 
       if (

@@ -609,7 +609,7 @@ export const testDeathFhirTaskBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'death-registration'
+              code: 'DEATH'
             }
           ]
         },

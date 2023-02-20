@@ -12,7 +12,7 @@
 import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  getBirthRegistrationNumber,
+  getRegistrationNumber,
   getEntryId,
   getInformantName,
   getCRVSOfficeName,
@@ -26,6 +26,7 @@ import {
   testFhirTaskBundle,
   officeMock
 } from '@workflow/test/utils'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any
@@ -156,7 +157,7 @@ describe('Verify getBirthRegistrationNumber', () => {
       status: '',
       intent: ''
     }
-    const brn = getBirthRegistrationNumber(taskResource)
+    const brn = getRegistrationNumber(taskResource, EVENT_TYPE.BIRTH)
 
     expect(brn).toBeDefined()
     expect(brn).toEqual('2019333436B5WGYJE8')
@@ -192,7 +193,7 @@ describe('Verify getBirthRegistrationNumber', () => {
     }
 
     expect(() =>
-      getBirthRegistrationNumber(testTask as fhir.Task)
+      getRegistrationNumber(testTask as fhir.Task, EVENT_TYPE.BIRTH)
     ).toThrowError("Didn't find any identifier for birth registration number")
   })
 })

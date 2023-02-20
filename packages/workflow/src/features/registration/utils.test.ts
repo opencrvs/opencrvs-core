@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
+  generateTrackingIdForEvents,
   convertStringToASCII,
   sendEventNotification,
   getMosipUINToken
@@ -26,8 +25,9 @@ import {
   mosipSuccessMock,
   informantSMSNotificationMock
 } from '@workflow/test/utils'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 import * as fetchAny from 'jest-fetch-mock'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 const fetch = fetchAny as any
 
@@ -46,14 +46,14 @@ describe('Verify utility functions', () => {
   })
 
   it('Generates proper birth tracking id successfully', async () => {
-    const trackingId = generateBirthTrackingId()
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.BIRTH)
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^B/)
   })
 
   it('Generates proper death tracking id successfully', async () => {
-    const trackingId = generateDeathTrackingId()
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.DEATH)
 
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
