@@ -20,13 +20,17 @@ import { vi } from 'vitest'
 storage.setItem = vi.fn()
 
 const pressPin = (component: ReactWrapper, keyCode: number) => {
-  component.find('#pin-input').simulate('keyDown', { keyCode })
+  component
+    .find('#pin-input')
+    .hostNodes()
+    .first()
+    .simulate('keyDown', { keyCode })
   component.update()
 }
 
 const pressBackspace = (component: ReactWrapper) => {
   const pinInput = component.find('#pin-input')
-  pinInput.simulate('keypress', { key: 'Backspace' })
+  pinInput.hostNodes().first().simulate('keypress', { key: 'Backspace' })
   component.update()
 }
 
@@ -87,7 +91,7 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    expect(c.find('h3#title-text').text()).toBe('Create a PIN')
+    expect(c.find('h1#title-text').text()).toBe('Create a PIN')
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -97,7 +101,7 @@ describe('Create PIN view', () => {
     pressPin(c, 54)
     c.update()
 
-    expect(c.find('h3#title-text').text()).toBe('Re-enter your new PIN')
+    expect(c.find('h1#title-text').text()).toBe('Re-enter your new PIN')
   })
 
   it('prevents the user from using 4 same digits as PIN', async () => {
