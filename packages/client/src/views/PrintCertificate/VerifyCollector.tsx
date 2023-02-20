@@ -106,10 +106,6 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         )
       }
     } else {
-      // this.props.goToPrintCertificatePayment(
-      //   this.props.match.params.registrationId,
-      //   event
-      // )
       if (!isIssueUrl) {
         this.props.goToPrintCertificatePayment(
           this.props.match.params.registrationId,

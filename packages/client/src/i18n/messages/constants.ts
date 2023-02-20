@@ -163,6 +163,7 @@ interface IConstantsMessages
   issueToMother: MessageDescriptor
   issueToFather: MessageDescriptor
   issueToSomeoneElse: MessageDescriptor
+  issueToInformant: MessageDescriptor
   issueConfirmationMessage: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
@@ -595,6 +596,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Issue to someone else',
     description: 'Issuing to someone else',
     id: 'constants.issueToSomeoneElse'
+  },
+  issueToInformant: {
+    defaultMessage: 'Issue to informant',
+    description: 'Issuance of death to informant',
+    id: 'constants.issueToInformant'
   },
   issueConfirmationMessage: {
     defaultMessage:

@@ -30,8 +30,7 @@ import {
   useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
-import { connect, useDispatch } from 'react-redux'
-import { withTheme } from 'styled-components'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   buttonMessages,
   constantsMessages,
@@ -59,13 +58,10 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useEffect, useState } from 'react'
+import { useTheme } from '@client/styledComponents'
+import { selectDeclaration } from '@client/declarations/selectors'
 
 interface IBasePrintTabProps {
-  theme: ITheme
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToIssueCertificate: typeof goToIssueCertificate
-  outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -76,332 +72,79 @@ interface IBasePrintTabProps {
   pageSize: number
 }
 
-interface IPrintTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-
-type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
-
-class ReadyToIssueComponent extends React.Component<
-  IPrintTabProps,
-  IPrintTabState
-> {
-  constructor(props: IPrintTabProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol: COLUMNS.REGISTERED,
-      sortOrder: SORT_ORDER.DESCENDING
-    }
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
-
-  onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
-  }
-
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-      return [
-        {
-          width: 30,
-          label: this.props.intl.formatMessage(constantsMessages.record),
-          key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 18,
-          key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 18,
-          key: COLUMNS.TRACKING_ID,
-          isSorted: this.state.sortedCol === COLUMNS.TRACKING_ID,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.regNumber),
-          width: 18,
-          key: COLUMNS.REGISTRATION_NO,
-          isSorted: this.state.sortedCol === COLUMNS.REGISTRATION_NO,
-          sortFunction: this.onColumnClick
-        },
-        {
-          width: 18,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ]
-    } else {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: COLUMNS.ICON_WITH_NAME_EVENT
-        },
-        {
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ]
-    }
-  }
-
-  transformCertifiedContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
-    if (!data || !data.results) {
-      return []
-    }
-
-    const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
-      const foundDeclaration = this.props.outboxDeclarations.find(
-        (declaration) => declaration.id === reg.id
-      )
-      const actions: IAction[] = []
-      const downloadStatus = foundDeclaration?.downloadStatus
-
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-        actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.issue),
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            e && e.stopPropagation()
-            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              this.props.goToIssueCertificate(reg.id)
-            }
-          }
-        })
-      }
-      actions.push({
-        actionComponent: (
-          <DownloadButton
-            downloadConfigs={{
-              event: reg.event,
-              compositionId: reg.id,
-              action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg.assignment
-            }}
-            key={`DownloadButton-${index}`}
-            status={downloadStatus}
-          />
-        )
-      })
-
-      const dateOfEvent =
-        reg.dateOfEvent &&
-        reg.dateOfEvent.length > 0 &&
-        new Date(reg.dateOfEvent)
-
-      const NameComponent = reg.name ? (
-        <NameContainer
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('issueTab', reg.id)
-          }
-        >
-          {reg.name}
-        </NameContainer>
-      ) : (
-        <NoNameContainer
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('issueTab', reg.id)
-          }
-        >
-          {intl.formatMessage(constantsMessages.noNameProvided)}
-        </NoNameContainer>
-      )
-
-      return {
-        ...reg,
-        name: reg.name && reg.name.toLowerCase(),
-        iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={NameComponent} />
-        ),
-        dateOfEvent,
-        trackingId: reg.trackingId,
-        registrationNumber: reg.registrationNumber,
-        actions
-      }
-    })
-
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
-
-    const finalContent = sortedItems.map((item) => {
-      return {
-        ...item,
-        dateOfEvent:
-          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
-      }
-    })
-
-    return finalContent
-  }
-
-  render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
-    const { data } = queryData
-    const totalPages = this.props.queryData.data.totalItems
-      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
-
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.readyToIssue)}
-        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={this.props.loading}
-        error={this.props.error}
-        noResultText={intl.formatMessage(wqMessages.noRecordReadyToIssue)}
-        noContent={this.transformCertifiedContent(data).length <= 0}
-      >
-        <Workqueue
-          content={this.transformCertifiedContent(data)}
-          columns={this.getColumns()}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
-        />
-      </WQContentWrapper>
-    )
-  }
-}
-
-function mapStateToProps(state: IStoreState) {
-  return {
-    outboxDeclarations: state.declarationsState.declarations
-  }
-}
-
-export const ReadyToIssue = connect(mapStateToProps, {
-  goToIssueCertificate,
-  goToDeclarationRecordAudit,
-  clearCorrectionAndPrintChanges
-})(injectIntl(withTheme(ReadyToIssueComponent)))
-
-// export const ReadyToIssue = ({
-//   queryData,
-//   paginationId,
-//   onPageChange,
-//   pageSize,
-//   theme,
-//   outboxDeclarations
-// }: IBasePrintTabProps) => {
-//   const [width, setWidth] = useState(window.innerWidth)
-//   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
-//   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-//   const dispatch = useDispatch()
-//   const intl = useIntl()
-//   const data = queryData.data
-//   const totalPages = data.totalItems ? Math.ceil(data.totalItems / pageSize) : 0
-//   const isShowPagination = data.totalItems && data.totalItems > pageSize
-
-//   useEffect(() => {
-//     window.addEventListener('resize', recordWindowWidth)
-
-//     return () => {
-//       window.removeEventListener('resize', recordWindowWidth)
+// class ReadyToIssueComponent extends React.Component<
+//   IPrintTabProps,
+//   IPrintTabState
+// > {
+//   constructor(props: IPrintTabProps) {
+//     super(props)
+//     this.state = {
+//       width: window.innerWidth,
+//       sortedCol: COLUMNS.REGISTERED,
+//       sortOrder: SORT_ORDER.DESCENDING
 //     }
-//   }, [])
-
-//   const recordWindowWidth = () => {
-//     setWidth(window.innerWidth)
 //   }
 
-//   const getExpandable = () => {
-//     return width > theme.grid.breakpoints.lg ? true : false
+//   componentDidMount() {
+//     window.addEventListener('resize', this.recordWindowWidth)
 //   }
 
-//   const onColumnClick = (columnName: string) => {
+//   componentWillUnmount() {
+//     window.removeEventListener('resize', this.recordWindowWidth)
+//   }
+
+//   recordWindowWidth = () => {
+//     this.setState({ width: window.innerWidth })
+//   }
+
+//   getExpandable = () => {
+//     return this.state.width > this.props.theme.grid.breakpoints.lg
+//       ? true
+//       : false
+//   }
+
+//   onColumnClick = (columnName: string) => {
 //     const { newSortedCol, newSortOrder } = changeSortedColumn(
 //       columnName,
-//       sortedCol,
-//       sortOrder
+//       this.state.sortedCol,
+//       this.state.sortOrder
 //     )
-//     setSortedCol(newSortedCol)
-//     setSortOrder(newSortOrder)
+//     this.setState({
+//       sortOrder: newSortOrder,
+//       sortedCol: newSortedCol
+//     })
 //   }
 
-//   const getColumns = () => {
-//     if (width > theme.grid.breakpoints.lg) {
+//   getColumns = () => {
+//     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
 //       return [
 //         {
 //           width: 30,
-//           label: intl.formatMessage(constantsMessages.record),
+//           label: this.props.intl.formatMessage(constantsMessages.record),
 //           key: COLUMNS.ICON_WITH_NAME,
-//           isSorted: sortedCol === COLUMNS.NAME,
-//           sortFunction: onColumnClick
+//           isSorted: this.state.sortedCol === COLUMNS.NAME,
+//           sortFunction: this.onColumnClick
 //         },
 //         {
-//           label: intl.formatMessage(constantsMessages.eventDate),
+//           label: this.props.intl.formatMessage(constantsMessages.eventDate),
 //           width: 18,
 //           key: COLUMNS.DATE_OF_EVENT,
-//           isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
-//           sortFunction: onColumnClick
+//           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+//           sortFunction: this.onColumnClick
 //         },
 //         {
-//           label: intl.formatMessage(constantsMessages.trackingId),
+//           label: this.props.intl.formatMessage(constantsMessages.trackingId),
 //           width: 18,
 //           key: COLUMNS.TRACKING_ID,
-//           isSorted: sortedCol === COLUMNS.TRACKING_ID,
-//           sortFunction: onColumnClick
+//           isSorted: this.state.sortedCol === COLUMNS.TRACKING_ID,
+//           sortFunction: this.onColumnClick
 //         },
 //         {
-//           label: intl.formatMessage(constantsMessages.regNumber),
+//           label: this.props.intl.formatMessage(constantsMessages.regNumber),
 //           width: 18,
 //           key: COLUMNS.REGISTRATION_NO,
-//           isSorted: sortedCol === COLUMNS.REGISTRATION_NO,
-//           sortFunction: onColumnClick
+//           isSorted: this.state.sortedCol === COLUMNS.REGISTRATION_NO,
+//           sortFunction: this.onColumnClick
 //         },
 //         {
 //           width: 18,
@@ -413,7 +156,7 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //     } else {
 //       return [
 //         {
-//           label: intl.formatMessage(constantsMessages.name),
+//           label: this.props.intl.formatMessage(constantsMessages.name),
 //           width: 70,
 //           key: COLUMNS.ICON_WITH_NAME_EVENT
 //         },
@@ -427,30 +170,30 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //     }
 //   }
 
-//   const transformCertifiedContent = (data: GQLEventSearchResultSet) => {
-//     const intl = useIntl()
+//   transformCertifiedContent = (data: GQLEventSearchResultSet) => {
+//     const { intl } = this.props
 //     if (!data || !data.results) {
 //       return []
 //     }
 
-//     const transformedData = transformData(data, intl)
+//     const transformedData = transformData(data, this.props.intl)
 //     const items = transformedData.map((reg, index) => {
-//       const foundDeclaration = outboxDeclarations.find(
+//       const foundDeclaration = this.props.outboxDeclarations.find(
 //         (declaration) => declaration.id === reg.id
 //       )
 //       const actions: IAction[] = []
 //       const downloadStatus = foundDeclaration?.downloadStatus
 
-//       if (width > theme.grid.breakpoints.lg) {
+//       if (this.state.width > this.props.theme.grid.breakpoints.lg) {
 //         actions.push({
-//           label: intl.formatMessage(buttonMessages.issue),
+//           label: this.props.intl.formatMessage(buttonMessages.issue),
 //           disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
 //           handler: (
 //             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
 //           ) => {
 //             e && e.stopPropagation()
 //             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-//               dispatch(goToIssueCertificate(reg.id))
+//               this.props.goToIssueCertificate(reg.id)
 //             }
 //           }
 //         })
@@ -479,7 +222,7 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //         <NameContainer
 //           id={`name_${index}`}
 //           onClick={() =>
-//             dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+//             this.props.goToDeclarationRecordAudit('issueTab', reg.id)
 //           }
 //         >
 //           {reg.name}
@@ -488,7 +231,7 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //         <NoNameContainer
 //           id={`name_${index}`}
 //           onClick={() =>
-//             dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+//             this.props.goToDeclarationRecordAudit('issueTab', reg.id)
 //           }
 //         >
 //           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -508,7 +251,11 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //       }
 //     })
 
-//     const sortedItems = getSortedItems(items, sortedCol, sortOrder)
+//     const sortedItems = getSortedItems(
+//       items,
+//       this.state.sortedCol,
+//       this.state.sortOrder
+//     )
 
 //     const finalContent = sortedItems.map((item) => {
 //       return {
@@ -521,38 +268,284 @@ export const ReadyToIssue = connect(mapStateToProps, {
 //     return finalContent
 //   }
 
-//   const handleResize = () => {
-//     setWidth(window.innerWidth)
+//   render() {
+//     const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
+//     const { data } = queryData
+//     const totalPages = this.props.queryData.data.totalItems
+//       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
+//       : 0
+//     const isShowPagination =
+//       this.props.queryData.data.totalItems &&
+//       this.props.queryData.data.totalItems > pageSize
+//         ? true
+//         : false
+
+//     return (
+//       <WQContentWrapper
+//         title={intl.formatMessage(navigationMessages.readyToIssue)}
+//         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
+//         isShowPagination={isShowPagination}
+//         paginationId={paginationId}
+//         totalPages={totalPages}
+//         onPageChange={onPageChange}
+//         loading={this.props.loading}
+//         error={this.props.error}
+//         noResultText={intl.formatMessage(wqMessages.noRecordReadyToIssue)}
+//         noContent={this.transformCertifiedContent(data).length <= 0}
+//       >
+//         <Workqueue
+//           content={this.transformCertifiedContent(data)}
+//           columns={this.getColumns()}
+//           loading={this.props.loading}
+//           sortOrder={this.state.sortOrder}
+//           hideLastBorder={!isShowPagination}
+//         />
+//       </WQContentWrapper>
+//     )
 //   }
-
-//   React.useEffect(() => {
-//     window.addEventListener('resize', handleResize)
-
-//     return () => {
-//       window.removeEventListener('resize', handleResize)
-//     }
-//   }, [])
-
-//   return (
-//     <WQContentWrapper
-//       title={intl.formatMessage(navigationMessages.readyToIssue)}
-//       isMobileSize={width < theme.grid.breakpoints.lg}
-//       // isShowPagination={isShowPagination}
-//       paginationId={paginationId}
-//       totalPages={totalPages}
-//       onPageChange={onPageChange}
-//       // loading={queryData.loading}
-//       // error={queryData.error}
-//       noResultText={intl.formatMessage(wqMessages.noRecordReadyToIssue)}
-//       noContent={transformCertifiedContent(data).length <= 0}
-//     >
-//       <Workqueue
-//         content={transformCertifiedContent(data)}
-//         columns={getColumns()}
-//         // loading={queryData.loading}
-//         sortOrder={sortOrder}
-//         hideLastBorder={!isShowPagination}
-//       />
-//     </WQContentWrapper>
-//   )
 // }
+
+// function mapStateToProps(state: IStoreState) {
+//   return {
+//     outboxDeclarations: state.declarationsState.declarations
+//   }
+// }
+
+// export const ReadyToIssue = connect(mapStateToProps, {
+//   goToIssueCertificate,
+//   goToDeclarationRecordAudit,
+//   clearCorrectionAndPrintChanges
+// })(injectIntl(withTheme(ReadyToIssueComponent)))
+
+export const ReadyToIssue = ({
+  queryData,
+  paginationId,
+  onPageChange,
+  pageSize
+}: IBasePrintTabProps) => {
+  const [width, setWidth] = useState(window.innerWidth)
+  const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const dispatch = useDispatch()
+  const intl = useIntl()
+  const data = queryData.data
+  const totalPages = data.totalItems ? Math.ceil(data.totalItems / pageSize) : 0
+  const isShowPagination = Boolean(
+    data.totalItems && data.totalItems > pageSize
+  )
+  const outboxDeclarations = useSelector(
+    (store: IStoreState) => store.declarationsState.declarations
+  )
+
+  useEffect(() => {
+    window.addEventListener('resize', recordWindowWidth)
+
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  }, [])
+
+  const theme = useTheme()
+
+  const recordWindowWidth = () => {
+    setWidth(window.innerWidth)
+  }
+
+  const getExpandable = () => {
+    return width > theme.grid.breakpoints.lg ? true : false
+  }
+
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedCol,
+      sortOrder
+    )
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
+  const getColumns = () => {
+    if (width > theme.grid.breakpoints.lg) {
+      return [
+        {
+          width: 30,
+          label: intl.formatMessage(constantsMessages.record),
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
+        },
+        {
+          label: intl.formatMessage(constantsMessages.eventDate),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
+        },
+        {
+          label: intl.formatMessage(constantsMessages.trackingId),
+          width: 18,
+          key: COLUMNS.TRACKING_ID,
+          isSorted: sortedCol === COLUMNS.TRACKING_ID,
+          sortFunction: onColumnClick
+        },
+        {
+          label: intl.formatMessage(constantsMessages.regNumber),
+          width: 18,
+          key: COLUMNS.REGISTRATION_NO,
+          isSorted: sortedCol === COLUMNS.REGISTRATION_NO,
+          sortFunction: onColumnClick
+        },
+        {
+          width: 18,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
+        }
+      ]
+    } else {
+      return [
+        {
+          label: intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
+        }
+      ]
+    }
+  }
+
+  const transformCertifiedContent = (data: GQLEventSearchResultSet) => {
+    const intl = useIntl()
+    if (!data || !data.results) {
+      return []
+    }
+
+    const transformedData = transformData(data, intl)
+    const items = transformedData.map((reg, index) => {
+      const foundDeclaration = outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
+      )
+      const actions: IAction[] = []
+      const downloadStatus = foundDeclaration?.downloadStatus
+
+      if (width > theme.grid.breakpoints.lg) {
+        actions.push({
+          label: intl.formatMessage(buttonMessages.issue),
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+              dispatch(goToIssueCertificate(reg.id))
+            }
+          }
+        })
+      }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
+
+      const dateOfEvent =
+        reg.dateOfEvent &&
+        reg.dateOfEvent.length > 0 &&
+        new Date(reg.dateOfEvent)
+
+      const NameComponent = reg.name ? (
+        <NameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+          }
+        >
+          {reg.name}
+        </NameContainer>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
+
+      return {
+        ...reg,
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={NameComponent} />
+        ),
+        dateOfEvent,
+        trackingId: reg.trackingId,
+        registrationNumber: reg.registrationNumber,
+        actions
+      }
+    })
+
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
+
+    const finalContent = sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
+      }
+    })
+
+    return finalContent
+  }
+
+  const handleResize = () => {
+    setWidth(window.innerWidth)
+  }
+
+  React.useEffect(() => {
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.readyToIssue)}
+      isMobileSize={width < theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      // loading={queryData.loading}
+      // error={queryData.error}
+      noResultText={intl.formatMessage(wqMessages.noRecordReadyToIssue)}
+      noContent={transformCertifiedContent(data).length <= 0}
+    >
+      <Workqueue
+        content={transformCertifiedContent(data)}
+        columns={getColumns()}
+        // loading={queryData.loading}
+        sortOrder={sortOrder}
+        hideLastBorder={!isShowPagination}
+      />
+    </WQContentWrapper>
+  )
+}

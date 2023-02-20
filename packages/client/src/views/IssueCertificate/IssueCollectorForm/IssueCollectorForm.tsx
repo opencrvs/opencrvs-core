@@ -13,7 +13,7 @@ import React from 'react'
 import { Content, RadioSize } from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { IFormField, IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
+import { IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   modifyDeclaration,
@@ -25,10 +25,10 @@ import { PrimaryButton } from '@client/../../components/lib/buttons'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
   goToIssueCertificate,
-  goToVerifyCollector,
   goToVerifyIssueCollector
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { Event } from '@client/utils/gateway'
 
 const fields: IRadioGroupFormField[] = [
   {
@@ -43,6 +43,23 @@ const fields: IRadioGroupFormField[] = [
     options: [
       { value: 'MOTHER', label: constantsMessages.issueToMother },
       { value: 'FATHER', label: constantsMessages.issueToFather },
+      { value: 'OTHER', label: constantsMessages.issueToSomeoneElse }
+    ]
+  }
+]
+
+const commonFields: IRadioGroupFormField[] = [
+  {
+    name: 'type',
+    type: RADIO_GROUP,
+    size: RadioSize.LARGE,
+    label: constantsMessages.issueCertificate,
+    hideHeader: true,
+    required: true,
+    initialValue: '',
+    validate: [],
+    options: [
+      { value: 'INFORMANT', label: constantsMessages.issueToInformant },
       { value: 'OTHER', label: constantsMessages.issueToSomeoneElse }
     ]
   }
@@ -83,28 +100,48 @@ export function IssueCollectorForm({
     )
   }
 
-  const informantType = declaration.data.informant.relationship
-  const filterType =
-    informantType === 'MOTHER'
-      ? 'FATHER'
-      : informantType === 'FATHER'
-      ? 'MOTHER'
-      : null
-
-  const filteredData = fields.map((field) => {
-    const updatedOptions = field.options.filter(
-      (option) => option.value !== filterType
-    )
-    return { ...field, options: updatedOptions }
-  })
+  const finalFields = (): IRadioGroupFormField[] => {
+    if (declaration.event === Event.Death) {
+      const filteredData = commonFields
+      return filteredData
+    } else {
+      const informantType = declaration.data.informant.relationship
+      const filterType =
+        informantType === 'MOTHER'
+          ? 'FATHER'
+          : informantType === 'FATHER'
+          ? 'MOTHER'
+          : null
+      if (filterType === null) {
+        const filteredData = commonFields.map((field) => {
+          const updatedOptions = field.options.filter(
+            (option) => option.value !== 'INFORMANT'
+          )
+          return { ...field, options: updatedOptions }
+        })
+        return filteredData
+      } else {
+        const filteredData = fields.map((field) => {
+          const updatedOptions = field.options.filter(
+            (option) => option.value !== filterType
+          )
+          return { ...field, options: updatedOptions }
+        })
+        return filteredData
+      }
+    }
+  }
 
   function continueButtonHandler() {
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
     const event = declaration.event
     if (!relationship) return
-    if (relationship === 'OTHER') {
-      dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
+    if (relationship === 'OTHER' || relationship === 'INFORMANT') {
+      if (relationship === 'OTHER')
+        dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
+      else
+        dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
     } else {
       dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
     }
@@ -133,7 +170,7 @@ export function IssueCollectorForm({
         }}
         setAllFieldsDirty={false}
         fields={replaceInitialValues(
-          filteredData,
+          finalFields(),
           (declaration &&
             declaration.data.registration.certificates &&
             declaration.data.registration.certificates[

@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
+import {
+  IPrintableDeclaration,
+  modifyDeclaration,
+  SUBMISSION_STATUS,
+  writeDeclaration
+} from '@client/declarations'
 import {
   formatUrl,
   goBack,
@@ -29,7 +34,8 @@ import {
   calculatePrice,
   getEventDate,
   getRegisteredDate,
-  getServiceMessage
+  getServiceMessage,
+  isFreeOfCost
 } from '@client/views/PrintCertificate/utils'
 import {
   ActionPageLight,
@@ -51,6 +57,8 @@ import { connect } from 'react-redux'
 import { Event } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Button } from '@client/../../components/src/Button'
+import { SubmissionAction } from '@client/forms'
+import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -93,12 +101,13 @@ interface IProps {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   userDetails: IUserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
-type IFullProps = IProps & IntlShapeProps
+type IFullProps = IProps & IntlShapeProps & ReturnType<typeof mapStatetoProps>
 
 class IssuePaymentComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
@@ -140,6 +149,51 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
     //   this.props.registrationId,
     //   this.props.event
     // )
+  }
+
+  readyToIssue = () => {
+    const { draft } = this.props
+    draft.submissionStatus = SUBMISSION_STATUS.READY_TO_ISSUE
+    draft.action = SubmissionAction.ISSUE_DECLARATION
+
+    const registeredDate = getRegisteredDate(draft.data)
+    const certificate = draft.data.registration.certificates[0]
+    const eventDate = getEventDate(draft.data, draft.event)
+
+    if (
+      isFreeOfCost(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+    ) {
+      certificate.payments = {
+        type: 'MANUAL' as const,
+        total: 0,
+        amount: 0,
+        outcome: 'COMPLETED' as const,
+        date: Date.now()
+      }
+    } else {
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+      certificate.payments = {
+        type: 'MANUAL' as const,
+        total: Number(paymentAmount),
+        amount: Number(paymentAmount),
+        outcome: 'COMPLETED' as const,
+        date: Date.now()
+      }
+    }
+
+    this.props.modifyDeclaration(draft)
+    this.props.writeDeclaration(draft)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
   }
 
   toggleModal = () => {
@@ -234,11 +288,11 @@ class IssuePaymentComponent extends React.Component<IFullProps, State> {
                 {intl.formatMessage(buttonMessages.cancel)}
               </TertiaryButton>,
               <Button
-                onClick={() => alert('confirm')}
+                onClick={() => this.readyToIssue()}
                 id="issue-certificate-confirmation"
                 type={'primary'}
               >
-                {intl.formatMessage(buttonMessages.confirm)}
+                {intl.formatMessage(buttonMessages.issue)}
               </Button>
             ]}
           >
@@ -269,9 +323,22 @@ function mapStatetoProps(
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
   ) as IPrintableDeclaration
+  const declarations = state.declarationsState
+    .declarations as IPrintableDeclaration[]
+
+  const draft = getDraft(declarations, registrationId, eventType)
 
   return {
     event,
+    draft: {
+      ...draft,
+      data: {
+        ...draft.data,
+        template: {
+          ...draft.data.template
+        }
+      }
+    },
     registrationId,
     language: state.i18n.language,
     declaration,
@@ -284,5 +351,6 @@ export const IssuePayment = connect(mapStatetoProps, {
   goBack: goBack,
   goToHomeTab,
   modifyDeclaration,
+  writeDeclaration,
   goToReviewCertificate: goToReviewCertificate
 })(injectIntl(IssuePaymentComponent))
