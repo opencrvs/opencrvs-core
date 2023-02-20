@@ -141,8 +141,6 @@ export const UserAudit = () => {
   const userRole =
     user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
 
-  console.log(user)
-
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
   }
