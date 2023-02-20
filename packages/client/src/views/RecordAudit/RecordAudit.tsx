@@ -34,7 +34,8 @@ import {
   goToPrintCertificate,
   goToUserProfile,
   goToTeamUserList,
-  goToViewRecordPage
+  goToViewRecordPage,
+  goToIssueCertificate
 } from '@client/navigation'
 import {
   injectIntl,
@@ -98,7 +99,8 @@ import {
   ShowDownloadButton,
   ShowReviewButton,
   ShowUpdateButton,
-  ShowPrintButton
+  ShowPrintButton,
+  ShowIssueButton
 } from './ActionButtons'
 import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
@@ -472,7 +474,7 @@ function RecordAuditBody({
 
   if (
     declaration.status === SUBMISSION_STATUS.REGISTERED ||
-    declaration.status === SUBMISSION_STATUS.CERTIFIED
+    declaration.status === SUBMISSION_STATUS.ISSUED
   ) {
     actions.push(
       ShowPrintButton({
@@ -492,6 +494,24 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
+  if (declaration.status === SUBMISSION_STATUS.CERTIFIED) {
+    actions.push(
+      ShowIssueButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToIssueCertificate
+      })
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
   if (!isDownloaded) {
     actions.push(
       ShowDownloadButton({

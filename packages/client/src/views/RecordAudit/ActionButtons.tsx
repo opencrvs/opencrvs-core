@@ -41,6 +41,7 @@ import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { Roles } from '@client/utils/authUtils'
+import { useDispatch } from 'react-redux'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -280,10 +281,9 @@ export const ShowIssueButton = ({
   declaration,
   intl,
   userDetails,
-  draft,
-  goToIssueCertificate,
-  clearCorrectionAndPrintChanges
+  draft
 }: CMethodParams) => {
+  const dispatch = useDispatch()
   const { id, type } = declaration || {}
   const role = userDetails ? userDetails.role : ''
   const showActionButton = role
@@ -295,7 +295,7 @@ export const ShowIssueButton = ({
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  const printButtonRoleStatusMap: { [key: string]: string[] } = {
+  const issueButtonRoleStatusMap: { [key: string]: string[] } = {
     REGISTRATION_AGENT: [
       SUBMISSION_STATUS.REGISTERED,
       SUBMISSION_STATUS.CERTIFIED
@@ -317,8 +317,8 @@ export const ShowIssueButton = ({
   if (
     role &&
     type &&
-    role in printButtonRoleStatusMap &&
-    printButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    role in issueButtonRoleStatusMap &&
+    issueButtonRoleStatusMap[role].includes(declaration?.status as string) &&
     showActionButton
   ) {
     if (!isDownloaded) {
@@ -326,10 +326,10 @@ export const ShowIssueButton = ({
         <PrimaryButton
           key={id}
           size={'medium'}
-          id={`print-${id}`}
+          id={`issue-${id}`}
           disabled={true}
         >
-          {intl.formatMessage(buttonMessages.print)}
+          {intl.formatMessage(buttonMessages.issue)}
         </PrimaryButton>
       )
     }
@@ -337,15 +337,13 @@ export const ShowIssueButton = ({
       <PrimaryButton
         key={id}
         size={'medium'}
-        id={`print-${id}`}
+        id={`issue-${id}`}
         onClick={() => {
-          clearCorrectionAndPrintChanges &&
-            clearCorrectionAndPrintChanges(declaration.id)
-          goToPrintCertificate &&
-            goToPrintCertificate(id, type.toLocaleLowerCase())
+          dispatch(clearCorrectionAndPrintChanges(id))
+          dispatch(goToIssueCertificate(id))
         }}
       >
-        {intl.formatMessage(buttonMessages.print)}
+        {intl.formatMessage(buttonMessages.issue)}
       </PrimaryButton>
     )
   }

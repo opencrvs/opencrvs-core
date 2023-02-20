@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { AppBar, Frame } from '@opencrvs/components/lib'
+import { AppBar, Frame, Icon } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
@@ -24,6 +24,7 @@ import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
 import { goBack } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { Header } from '@client/components/Header/Header'
+import { IconButton } from '@client/../../components/lib/buttons'
 
 export function IssueCertificate() {
   const intl = useIntl()
@@ -41,7 +42,7 @@ export function IssueCertificate() {
     <Frame
       header={
         <AppBar
-          title={intl.formatMessage(constantsMessages.issueCertificate)}
+          desktopTitle={intl.formatMessage(constantsMessages.issueCertificate)}
           desktopLeft={<HistoryNavigator hideForward={true} />}
           desktopRight={
             <Button
@@ -49,7 +50,7 @@ export function IssueCertificate() {
               type="tertiary"
               onClick={() => dispatch(goBack())}
             >
-              {intl.formatMessage(buttonMessages.exitButton)}
+              <Icon name={'X'} />
             </Button>
           }
         />
