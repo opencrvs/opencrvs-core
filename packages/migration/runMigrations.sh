@@ -32,3 +32,6 @@ yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
 
+# performance migration
+yarn migrate-mongo up --file migrate-mongo-config-performance.js
+yarn migrate-mongo status --file migrate-mongo-config-performance.js
