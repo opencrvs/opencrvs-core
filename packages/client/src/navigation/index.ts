@@ -55,7 +55,9 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS, PERFORMANCE_DASHBOARD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -176,6 +178,16 @@ export function goToCertificateConfig() {
 }
 export function goToVSExport() {
   return push(VS_EXPORTS)
+}
+
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS)
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS)
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD)
 }
 
 export function goToAdvancedSearch() {

@@ -34,7 +34,10 @@ import {
   goToFormConfigHome,
   goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport
+  goToVSExport,
+  goToPerformanceStatistics,
+  goToLeaderBoardsView,
+  goToDashboardView
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -65,6 +68,9 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
+import { Text } from '@opencrvs/components'
+import * as Icons from 'react-feather'
+import { ChartActivity } from '@opencrvs/components/lib/Icon/custom-icons'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -95,7 +101,11 @@ export const WORKQUEUE_TABS = {
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
-  menuGroup: 'menuGroup'
+  menuGroup: 'menuGroup',
+  leaderBoards: 'leaderBoards',
+  statistics: 'statistics',
+  performance: 'performance',
+  dashboard: 'dashboard'
 }
 
 interface IUSER_SCOPE {
@@ -116,8 +126,8 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
@@ -149,26 +159,41 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    GROUP_ID.performance,
+    GROUP_ID.leaderBoards,
+    GROUP_ID.statistics,
+    GROUP_ID.dashboard,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.performance,
+    GROUP_ID.performance,
+    GROUP_ID.leaderBoards,
+    GROUP_ID.statistics,
+    GROUP_ID.dashboard,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.performance,
+    GROUP_ID.performance,
+    GROUP_ID.leaderBoards,
+    GROUP_ID.statistics,
+    GROUP_ID.dashboard,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
-  PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
+  PERFORMANCE_MANAGEMENT: [
+    GROUP_ID.performance,
+    GROUP_ID.leaderBoards,
+    GROUP_ID.statistics,
+    GROUP_ID.dashboard,
+    GROUP_ID.menuGroup
+  ]
 }
 
 interface ICount {
@@ -210,6 +235,9 @@ interface IDispatchProps {
   goToTeamViewAction: typeof goToTeamView
   goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
+  goToLeaderBoardsView: typeof goToLeaderBoardsView
+  goToDashboardView: typeof goToDashboardView
+  goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
@@ -289,6 +317,9 @@ export const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
+    goToPerformanceStatistics,
+    goToDashboardView,
+    goToLeaderBoardsView,
     className
   } = props
   const tabId = deselectAllTabs
@@ -696,6 +727,77 @@ export const NavigationView = (props: IFullProps) => {
                   )}
               </NavigationGroup>
             )}
+          {userDetails?.role &&
+            USER_SCOPE[userDetails.role].includes(GROUP_ID.menuGroup) && (
+              <NavigationGroup>
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    GROUP_ID.performance
+                  ) && (
+                    <>
+                      <Text
+                        variant="bold14"
+                        style={{ marginLeft: 24 }}
+                        element="p"
+                        color="opacity24"
+                      >
+                        {' '}
+                        Analytics{' '}
+                      </Text>
+                      <NavigationItem
+                        icon={() => (
+                          <ChartActivity color={'primary'} size={24} />
+                        )}
+                        label={intl.formatMessage(
+                          navigationMessages[GROUP_ID.dashboard]
+                        )}
+                        onClick={goToDashboardView}
+                        id={`navigation_${GROUP_ID.dashboard}`}
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === GROUP_ID.dashboard
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Activity />}
+                        label={intl.formatMessage(
+                          navigationMessages[GROUP_ID.statistics]
+                        )}
+                        onClick={goToPerformanceStatistics}
+                        id={`navigation_${GROUP_ID.statistics}`}
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === GROUP_ID.statistics
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Icons.Award width={20} height={20} />}
+                        label={intl.formatMessage(
+                          navigationMessages[GROUP_ID.leaderBoards]
+                        )}
+                        onClick={goToLeaderBoardsView}
+                        id={`navigation_${GROUP_ID.leaderBoards}`}
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === GROUP_ID.leaderBoards
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Icons.BarChart2 width={20} height={20} />}
+                        label={intl.formatMessage(navigationMessages['report'])}
+                        onClick={() =>
+                          props.goToPerformanceViewAction(userDetails)
+                        }
+                        id={`navigation_${GROUP_ID.performance}_main`}
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === GROUP_ID.performance
+                        }
+                      />
+                    </>
+                  )}
+              </NavigationGroup>
+            )}
         </>
       )}
       <NavigationGroup>
@@ -802,7 +904,10 @@ export const Navigation = connect<
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue,
-  setAdvancedSearchParam
+  setAdvancedSearchParam,
+  goToPerformanceStatistics,
+  goToLeaderBoardsView,
+  goToDashboardView
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

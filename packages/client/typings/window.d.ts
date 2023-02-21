@@ -57,6 +57,9 @@ interface Window {
     SENTRY: string
     ADDRESSES: number
     ADMIN_LEVELS: number
+    REGISTRATIONS_DASHBOARD_URL: string
+    STATISTICS_DASHBOARD_URL: string
+    LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
 }

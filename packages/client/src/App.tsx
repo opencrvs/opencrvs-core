@@ -65,6 +65,9 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
+import { LeaderBoards } from '@client/views/Performance/LeaderBoards'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -423,6 +426,23 @@ export class App extends React.Component<IAppProps> {
                                               routes.PERFORMANCE_REGISTRATIONS_LIST
                                             }
                                             component={RegistrationList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.PERFORMANCE_STATISTICS}
+                                            component={PerformanceStatistics}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_LEADER_BOARDS
+                                            }
+                                            component={LeaderBoards}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.PERFORMANCE_DASHBOARD}
+                                            component={PerformanceDashboard}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
