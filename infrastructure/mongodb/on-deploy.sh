@@ -99,7 +99,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
   db.updateUser('hearth', {
-    pwd: '$HEARTH_MONGODB_PASSWORD'
+    pwd: '$HEARTH_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]
   })
 EOF
 fi
