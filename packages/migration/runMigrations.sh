@@ -13,6 +13,7 @@ HEARTH_CONFIG=./migrate-mongo-config-hearth.js
 OPENHIM_CONFIG=./migrate-mongo-config-openhim.js
 APP_CONFIG=./migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./migrate-mongo-config-user-mgnt.js
+PERFORMANCE_CONFIG=./migrate-mongo-config-performance.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -33,5 +34,5 @@ yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
 yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
 
 # performance migration
-yarn migrate-mongo up --file migrate-mongo-config-performance.js
-yarn migrate-mongo status --file migrate-mongo-config-performance.js
+yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
+yarn --cwd $SCRIPT_PATH migrate-mongo status --file $PERFORMANCE_CONFIG
