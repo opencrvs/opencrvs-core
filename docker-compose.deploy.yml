@@ -751,7 +751,8 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
       - DOMAIN={{hostname}}
-      - NATIONAL_ID_OPENID_CONNECT_URL=${NATIONAL_ID_OPENID_CONNECT_URL}
+      - NATIONAL_ID_OIDP_BASE_URL=${NATIONAL_ID_OIDP_BASE_URL}
+      - NATIONAL_ID_OIDP_CLIENT_ID=${NATIONAL_ID_OIDP_CLIENT_ID}
     deploy:
       labels:
         - 'traefik.enable=true'

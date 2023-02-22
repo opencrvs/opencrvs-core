@@ -24,8 +24,10 @@ export const registerSystem = gql`
         status
         type
         settings {
-          event
-          permissions
+          webhook {
+            event
+            permissions
+          }
         }
       }
     }
@@ -42,8 +44,10 @@ export const deactivateSystem = gql`
       status
       type
       settings {
-        event
-        permissions
+        webhook {
+          event
+          permissions
+        }
       }
     }
   }
@@ -58,8 +62,10 @@ export const activateSystem = gql`
       status
       type
       settings {
-        event
-        permissions
+        webhook {
+          event
+          permissions
+        }
       }
     }
   }
@@ -89,8 +95,10 @@ export const updateSystemPermissions = gql`
       status
       type
       settings {
-        event
-        permissions
+        webhook {
+          event
+          permissions
+        }
       }
     }
   }

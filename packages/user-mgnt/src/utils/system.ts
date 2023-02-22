@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  NATIONAL_ID_OPENID_CONNECT_CLIENT_ID,
-  NATIONAL_ID_OPENID_CONNECT_BASE_URL
+  NATIONAL_ID_OIDP_CLIENT_ID,
+  NATIONAL_ID_OIDP_BASE_URL
 } from '@user-mgnt/constants'
 import { ISystemModel } from '@user-mgnt/model/system'
 import { pick } from 'lodash'
@@ -29,15 +29,24 @@ type MongooseQueriedSystem = ISystemModel & { _id: Types.ObjectId }
 const pickSettings = (system: MongooseQueriedSystem) => {
   const openIdConnectUrl =
     system.type === 'NATIONAL_ID' &&
-    NATIONAL_ID_OPENID_CONNECT_CLIENT_ID &&
-    NATIONAL_ID_OPENID_CONNECT_BASE_URL
+    NATIONAL_ID_OIDP_CLIENT_ID &&
+    NATIONAL_ID_OIDP_BASE_URL
       ? {
-          openIdConnectAuthorizeUrl: NATIONAL_ID_OPENID_CONNECT_BASE_URL,
-          openIdConnectClientId: NATIONAL_ID_OPENID_CONNECT_CLIENT_ID
+          openIdProviderBaseUrl: NATIONAL_ID_OIDP_BASE_URL,
+          openIdProviderClientId: NATIONAL_ID_OIDP_CLIENT_ID
         }
       : {}
 
-  return { ...openIdConnectUrl }
+  const webhook = system.settings.webhook.map((ite) => ({
+    event: ite.event,
+    permissions: ite.permissions
+  }))
+
+  return {
+    ...openIdConnectUrl,
+    webhook,
+    dailyQuota: system.settings.dailyQuota
+  }
 }
 
 /** Returns a curated `System` with only the params we want to expose */

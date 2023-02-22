@@ -371,6 +371,13 @@ const webHookSchema = Joi.array().items(
   })
 )
 
+const settingsSchema = Joi.object({
+  dailyQuota: Joi.number(),
+  openIdConnectBaseUrl: Joi.string(),
+  openIdConnectClientId: Joi.string(),
+  webhook: webHookSchema
+})
+
 export const getSystemResponseSchema = Joi.object({
   name: Joi.string(),
   createdBy: Joi.string(),
@@ -381,10 +388,7 @@ export const getSystemResponseSchema = Joi.object({
   sha_secret: Joi.string(),
   practitionerId: Joi.string(),
   type: Joi.string(),
-  settings: Joi.object({
-    dailyQuota: Joi.number(),
-    webhook: Joi.any().optional()
-  })
+  settings: settingsSchema
 })
 
 export const clientIdSchema = Joi.object({
@@ -398,7 +402,7 @@ export const SystemSchema = Joi.object({
   type: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
-  settings: webHookSchema.optional()
+  settings: settingsSchema
 })
 
 export const resSystemSchema = Joi.object({

@@ -5338,6 +5338,12 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "NATIONAL_ID_VERIFICATION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "NUMBER",
             "description": null,
             "isDeprecated": false,
@@ -17811,6 +17817,53 @@
       },
       {
         "kind": "OBJECT",
+        "name": "Settings",
+        "description": null,
+        "fields": [
+          {
+            "name": "openIdConnectBaseUrl",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "openIdConnectClientId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "webhook",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "WebhookPermission",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "Signature",
         "description": null,
         "fields": [
@@ -18052,16 +18105,12 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "WebhookPermission",
-                  "ofType": null
-                }
+                "kind": "OBJECT",
+                "name": "Settings",
+                "ofType": null
               }
             },
             "isDeprecated": false,
