@@ -20,7 +20,13 @@ import { Activity } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-
+import styled from '@client/styledComponents'
+import IframeResizer from 'iframe-resizer-react'
+const StyledIFrame = styled(IframeResizer)`
+  width: 100%;
+  height: 100%;
+  border: none;
+`
 function dashboardComponent() {
   const dispatch = useDispatch()
   return (
@@ -55,9 +61,15 @@ function dashboardComponent() {
         skipToContentText="Skip to main content"
       >
         {window.config && window.config.REGISTRATIONS_DASHBOARD_URL ? (
-          <iframe src={window.config.REGISTRATIONS_DASHBOARD_URL}></iframe>
+          <StyledIFrame
+            src={window.config.REGISTRATIONS_DASHBOARD_URL}
+            allowFullScreen
+          />
         ) : (
-          <Content title="Dashboard" size="large"> No Content </Content>
+          <Content title="Dashboard" size="large">
+            {' '}
+            No Content{' '}
+          </Content>
         )}
       </Frame>
     </>

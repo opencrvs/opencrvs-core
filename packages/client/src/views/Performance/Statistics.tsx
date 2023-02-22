@@ -15,12 +15,18 @@ import { connect, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { injectIntl } from 'react-intl'
-import { AppBar, Content, Frame, Text } from '@opencrvs/components'
+import { AppBar, Content, Frame } from '@opencrvs/components'
 import { Activity } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-
+import styled from '@client/styledComponents'
+import IframeResizer from 'iframe-resizer-react'
+const StyledIFrame = styled(IframeResizer)`
+  width: 100%;
+  height: 100%;
+  border: none;
+`
 function performanceStatisticsComponent() {
   const dispatch = useDispatch()
   return (
@@ -55,9 +61,15 @@ function performanceStatisticsComponent() {
         skipToContentText="Skip to main content"
       >
         {window.config && window.config.STATISTICS_DASHBOARD_URL ? (
-          <iframe src={window.config.STATISTICS_DASHBOARD_URL}></iframe>
+          <StyledIFrame
+            src={window.config.STATISTICS_DASHBOARD_URL}
+            allowFullScreen
+          />
         ) : (
-          <Content title="Statistics" size="large"> No Content </Content>
+          <Content title="Statistics" size="large">
+            {' '}
+            No Content{' '}
+          </Content>
         )}
       </Frame>
     </>

@@ -109,8 +109,9 @@ export const WORKQUEUE_TABS = {
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
   menuGroup: 'menuGroup',
-  leaderBoards: 'leaderboards',
+  leaderboards: 'leaderboards',
   statistics: 'statistics',
+  report: 'report',
   dashboard: 'dashboard'
 }
 
@@ -135,7 +136,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
@@ -173,25 +173,25 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.performance,
-    GROUP_ID.leaderBoards,
+    GROUP_ID.report,
+    GROUP_ID.leaderboards,
     GROUP_ID.statistics,
     GROUP_ID.dashboard,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_SYSTEM_ADMIN: [
-    GROUP_ID.leaderBoards,
+    GROUP_ID.leaderboards,
     GROUP_ID.statistics,
     GROUP_ID.dashboard,
-    WORKQUEUE_TABS.performance,
+    GROUP_ID.report,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.performance,
-    GROUP_ID.leaderBoards,
+    GROUP_ID.report,
+    GROUP_ID.leaderboards,
     GROUP_ID.statistics,
     GROUP_ID.dashboard,
     WORKQUEUE_TABS.team,
@@ -204,8 +204,8 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [
-    WORKQUEUE_TABS.performance,
-    GROUP_ID.leaderBoards,
+    GROUP_ID.report,
+    GROUP_ID.leaderboards,
     GROUP_ID.statistics,
     GROUP_ID.dashboard,
     GROUP_ID.menuGroup
@@ -834,11 +834,11 @@ export const NavigationView = (props: IFullProps) => {
               </NavigationGroup>
             )}
           {userDetails?.role &&
-            USER_SCOPE[userDetails.role].includes(GROUP_ID.menuGroup) && (
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.menuGroup) && (
               <NavigationGroup>
                 {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.performance
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    GROUP_ID.report
                   ) && (
                     <>
                       <Text
@@ -879,13 +879,13 @@ export const NavigationView = (props: IFullProps) => {
                       <NavigationItem
                         icon={() => <Icons.Award width={20} height={20} />}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.leaderBoards]
+                          navigationMessages[GROUP_ID.leaderboards]
                         )}
                         onClick={goToLeaderBoardsView}
-                        id={`navigation_${GROUP_ID.leaderBoards}`}
+                        id={`navigation_${GROUP_ID.leaderboards}`}
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.leaderBoards
+                          activeMenuItem === GROUP_ID.leaderboards
                         }
                       />
                       <NavigationItem
@@ -894,7 +894,7 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
-                        id={`navigation_${WORKQUEUE_TABS.performance}_main`}
+                        id={`navigation_${GROUP_ID.report}_main`}
                         isSelected={
                           enableMenuSelection &&
                           activeMenuItem === WORKQUEUE_TABS.performance

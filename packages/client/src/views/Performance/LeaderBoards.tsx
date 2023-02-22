@@ -15,12 +15,18 @@ import { connect, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { injectIntl } from 'react-intl'
-import { AppBar, Content, Frame, Text } from '@opencrvs/components'
+import { AppBar, Content, Frame } from '@opencrvs/components'
 import * as Icons from 'react-feather'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { goBack } from '@client/navigation'
-
+import styled from '@client/styledComponents'
+import IframeResizer from 'iframe-resizer-react'
+const StyledIFrame = styled(IframeResizer)`
+  width: 100%;
+  height: 100%;
+  border: none;
+`
 function leaderBoardsComponent() {
   const dispatch = useDispatch()
   return (
@@ -57,7 +63,10 @@ function leaderBoardsComponent() {
         skipToContentText="Skip to main content"
       >
         {window.config && window.config.LEADERBOARDS_DASHBOARD_URL ? (
-          <iframe src={window.config.LEADERBOARDS_DASHBOARD_URL}></iframe>
+          <StyledIFrame
+            src={window.config.LEADERBOARDS_DASHBOARD_URL}
+            allowFullScreen
+          />
         ) : (
           <Content title="Leaderboards" size="large">
             {' '}
