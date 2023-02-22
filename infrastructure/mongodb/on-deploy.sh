@@ -147,6 +147,27 @@ else
 EOF
 fi
 
+PERFORMANCE_USER=$(echo $(checkIfUserExists "performance"))
+if [[ $PERFORMANCE_USER != "FOUND" ]]; then
+  echo "performance user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use performance
+  db.createUser({
+    user: 'performance',
+    pwd: '$PERFORMANCE_MONGODB_PASSWORD',
+    roles: [{ role: 'read', db: 'performance' }]
+  })
+EOF
+else
+  echo "performance user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use performance
+  db.updateUser('performance', {
+    pwd: '$PERFORMANCE_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
 METRICS_USER=$(echo $(checkIfUserExists "metrics"))
 if [[ $METRICS_USER != "FOUND" ]]; then
   echo "metrics user not found"
