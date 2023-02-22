@@ -25,9 +25,11 @@ import {
 } from '@client/components/ProtectedAccount'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { getUserName, IUserDetails } from '@client/utils/userUtils'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
+import {
+  SubmitActivateUserMutation,
+  SubmitActivateUserMutationVariables
+} from '@client/utils/gateway'
 import { Mutation } from '@apollo/client/react/components'
 import {
   userMessages,
@@ -39,10 +41,6 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SubmitActivateUserMutation,
-  SubmitActivateUserMutationVariables
-} from '@client/utils/gateway'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -78,7 +76,7 @@ interface IProps {
 export function UserSetupReview({ setupData, goToStep }: IProps) {
   const intl = useIntl()
   const [submitError, setSubmitError] = React.useState(false)
-  const userDetails = useSelector<IStoreState, IUserDetails | null>(
+  const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
   const englishName = getUserName(userDetails)
@@ -86,12 +84,16 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
 
   const typeRole =
     (userDetails &&
-      userDetails.role &&
-      (userDetails.type
+      userDetails.systemRole &&
+      (userDetails.role
         ? `${intl.formatMessage(
-            userMessages[userDetails.role as string]
-          )} / ${intl.formatMessage(userMessages[userDetails.type as string])}`
-        : `${intl.formatMessage(userMessages[userDetails.role as string])}`)) ||
+            userMessages[userDetails.systemRole as string]
+          )} / ${
+            userDetails.role.labels.find((label) => label.lang === 'en')?.label
+          }`
+        : `${intl.formatMessage(
+            userMessages[userDetails.systemRole as string]
+          )}`)) ||
     ''
 
   const primaryOffice =
@@ -143,7 +145,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       id: 'RoleType',
       label: `${intl.formatMessage(
         constantsMessages.labelRole
-      )} / ${intl.formatMessage(constantsMessages.type)}`,
+      )} / ${intl.formatMessage(constantsMessages.labelRole)}`,
       value: typeRole
     },
     ...answeredQuestions

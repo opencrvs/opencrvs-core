@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query } from '@client/utils/gateway'
+import { Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -39,7 +39,6 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import {
   GQLEventSearchResultSet,
@@ -64,7 +63,6 @@ import {
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { Roles } from '@client/utils/authUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import {
@@ -75,6 +73,7 @@ import {
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -379,7 +378,7 @@ interface IDownloadDeclarationSuccess {
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
-    userDetails?: IUserDetails
+    userDetails?: UserDetails
   }
 }
 
@@ -593,13 +592,13 @@ export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
 }
 
-async function getCurrentUserRole(): Promise<string> {
+async function getCurrentUserSystemRole(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).role || ''
+  return (JSON.parse(userDetails) as UserDetails).systemRole || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -608,7 +607,7 @@ export async function getCurrentUserID(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
+  return (JSON.parse(userDetails) as UserDetails).userMgntUserID || ''
 }
 
 export async function getUserData(userId: string) {
@@ -645,7 +644,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
-  const currentUserRole = await getCurrentUserRole()
+  const currentUserRole = await getCurrentUserSystemRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -666,7 +665,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   let currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
 
-  if (Roles.FIELD_AGENT.includes(currentUserRole) && currentUserData) {
+  if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
         const history = d.originalData?.history as unknown as IDynamicValues
@@ -988,7 +987,7 @@ function downloadDeclarationSuccess({
       form,
       client,
       offlineData: getOfflineData(store),
-      userDetails: getUserDetails(store) as IUserDetails
+      userDetails: getUserDetails(store) as UserDetails
     }
   }
 }
@@ -1342,7 +1341,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           userDetails?.practitionerId,
           10,
           Boolean(
-            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+            userDetails?.systemRole &&
+              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
           )
         )
 

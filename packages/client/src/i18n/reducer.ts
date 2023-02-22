@@ -18,6 +18,14 @@ import {
 } from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
+import {
+  IRoleMessagesLoadedAction,
+  IRoleLoadedAction,
+  rolesMessageAddData,
+  ROLES_LOADED
+} from '@client/user/userReducer'
+import { SystemRole } from '@client/utils/gateway'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IntlMessages {
   [key: string]: string
@@ -109,6 +117,32 @@ export const formatLocationLanguageState = (
   return languages
 }
 
+export const formatRoleLanguageState = (
+  systemRoles: SystemRole[],
+  languages: ILanguageState
+): ILanguageState => {
+  const transformedLanguages: ILanguageState = {
+    ...languages
+  }
+  systemRoles.forEach((systemRole) => {
+    systemRole.roles.forEach((role) => {
+      role.labels.forEach((label) => {
+        if (transformedLanguages[label.lang]) {
+          const generatedLabel = getUserRoleIntlKey(role._id)
+          transformedLanguages[label.lang] = {
+            ...transformedLanguages[label.lang],
+            messages: {
+              ...transformedLanguages[label.lang].messages,
+              [generatedLabel]: label.label
+            }
+          }
+        }
+      })
+    })
+  })
+  return transformedLanguages
+}
+
 const getNextMessages = (
   language: string,
   languages: ILanguageState
@@ -118,8 +152,13 @@ const getNextMessages = (
 
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: actions.Action | offlineActions.Action
-): IntlState | Loop<IntlState, actions.Action | offlineActions.Action> => {
+  action: actions.Action | offlineActions.Action | IRoleLoadedAction
+):
+  | IntlState
+  | Loop<
+      IntlState,
+      actions.Action | offlineActions.Action | IRoleMessagesLoadedAction
+    > => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)
@@ -136,11 +175,16 @@ export const intlReducer: LoopReducer<IntlState, any> = (
     case offlineActions.READY:
     case offlineActions.UPDATED:
       const languages = action.payload.languages
-
       const loadedLanguagesState: ILanguageState = languages.reduce(
         (indexedByLang, language) => ({
           ...indexedByLang,
-          [language.lang]: language
+          [language.lang]: {
+            ...language,
+            messages: {
+              ...state.languages[language.lang].messages,
+              ...language.messages
+            }
+          }
         }),
         {}
       )
@@ -165,6 +209,22 @@ export const intlReducer: LoopReducer<IntlState, any> = (
         messages: updatedMessages,
         languages: languagesWithFacilities
       }
+    case ROLES_LOADED:
+      const systemRoles = action.payload.systemRoles
+      const languageWithRoles = formatRoleLanguageState(
+        systemRoles,
+        state.languages
+      )
+      return loop(
+        {
+          ...state,
+          messages: getNextMessages(state.language, languageWithRoles),
+          languages: languageWithRoles
+        },
+
+        Cmd.action(rolesMessageAddData())
+      )
+
     default:
       return state
   }

@@ -12,12 +12,12 @@
 import * as React from 'react'
 import { Avatar as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
-import { IAvatar } from '@client/utils/userUtils'
+import { Avatar as AvatarType } from '@client/utils/gateway'
 import styled from '@client/styledComponents'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: IAvatar | undefined
+  avatar?: AvatarType | undefined | null
 }
 
 const AvatarImage = styled.img`

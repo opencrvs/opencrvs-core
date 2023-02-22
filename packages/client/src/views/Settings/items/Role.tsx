@@ -27,10 +27,10 @@ import { IStoreState } from '@client/store'
 
 export function Role() {
   const intl = useIntl()
-  const role = useSelector<IStoreState, string>((state) => {
-    const role = state.profile.userDetails?.role
-    return role && userMessages[role]
-      ? intl.formatMessage(userMessages[role])
+  const systemRole = useSelector<IStoreState, string>((state) => {
+    const systemRole = state.profile.userDetails?.systemRole
+    return systemRole && userMessages[systemRole]
+      ? intl.formatMessage(userMessages[systemRole])
       : ''
   })
   return (
@@ -40,7 +40,7 @@ export function Role() {
           {intl.formatMessage(constantsMessages.labelRole)}
         </LabelContainer>
       }
-      value={<ValueContainer>{role}</ValueContainer>}
+      value={<ValueContainer>{systemRole}</ValueContainer>}
       actions={
         <DynamicHeightLinkButton disabled>
           {intl.formatMessage(buttonMessages.change)}

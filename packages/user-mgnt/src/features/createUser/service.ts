@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import { IUser, IUserName } from '@user-mgnt/model/user'
+import { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
 import { logger } from '@user-mgnt/logger'
@@ -65,11 +65,11 @@ export const createFhirPractitioner = (
   }
 }
 
-export const createFhirPractitionerRole = (
+export const createFhirPractitionerRole = async (
   user: IUser,
   practitionerId: string,
   system: boolean
-): fhir.PractitionerRole => {
+): Promise<fhir.PractitionerRole> => {
   if (system) {
     return {
       resourceType: 'PractitionerRole',
@@ -99,6 +99,14 @@ export const createFhirPractitionerRole = (
       }))
     }
   } else {
+    const role = await UserRole.findOne({
+      _id: user.role
+    })
+    const titleCase = user.systemRole
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
+      .join(' ')
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -109,7 +117,7 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/roles`,
-              code: user.role
+              code: user.systemRole
             }
           ]
         },
@@ -117,7 +125,9 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: user.type
+              code: role?.labels
+                ? role.labels.find((lbl) => lbl.lang === 'en')?.label
+                : titleCase
             }
           ]
         }

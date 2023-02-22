@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -136,14 +136,14 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
-    type: String
+    role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [Role]
+  ): [SystemRole!]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
@@ -221,6 +221,7 @@ type Mutation {
   resendSMSInvite(userId: String!): String
   usernameSMSReminder(userId: String!): String
   resetPasswordSMS(userId: String!, applicationName: String!): String
+  updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -356,13 +357,13 @@ type RegistrationCountResult {
 type Location {
   id: ID!
   _fhirID: ID
-  identifier: [Identifier]
-  status: String
-  name: String
-  alias: [String]
+  identifier: [Identifier!]
+  status: String!
+  name: String!
+  alias: [String!]!
   description: String
-  partOf: String
-  type: LocationType
+  partOf: String!
+  type: LocationType!
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -378,20 +379,20 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: SystemRoleType!
+  role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location]
+  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String!
   avatar: Avatar
   device: String
-  searches: [BookmarkedSeachItem]
+  searches: [BookmarkedSeachItem!]
 }
 
 type SearchUserResult {
@@ -545,12 +546,11 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type Role {
+type SystemRole {
   id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
+  value: SystemRoleType!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -682,8 +682,8 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: SystemRoleType!
+  role: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -704,6 +704,17 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
+}
+
+type Response {
+  msg: String!
+}
+
+input SystemRoleInput {
+  id: ID!
+  value: String
+  active: Boolean
+  roles: [RoleInput!]
 }
 
 input CertificateSVGInput {
@@ -1031,7 +1042,7 @@ enum LocationType {
   OTHER
 }
 
-enum RoleType {
+enum SystemRoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
   LOCAL_REGISTRAR
@@ -1039,6 +1050,11 @@ enum RoleType {
   NATIONAL_SYSTEM_ADMIN
   PERFORMANCE_MANAGEMENT
   NATIONAL_REGISTRAR
+}
+
+type Role {
+  _id: ID!
+  labels: [RoleLabel!]!
 }
 
 enum Status {
@@ -1050,7 +1066,7 @@ enum Status {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: RoleType!
+  role: SystemRoleType!
   signature: Signature
 }
 
@@ -1068,7 +1084,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
+  role: String
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -1299,6 +1315,11 @@ input SignatureInput {
   type: String
 }
 
+input RoleInput {
+  _id: ID
+  labels: [LabelInput!]!
+}
+
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1518,6 +1539,11 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type RoleLabel {
+  lang: String!
+  label: String!
 }
 
 type AdvancedSeachParameters {
@@ -1755,6 +1781,11 @@ input CorrectionInput {
   reason: String
   otherReason: String
   note: String
+}
+
+input LabelInput {
+  lang: String!
+  label: String!
 }
 
 type BirthFee {
