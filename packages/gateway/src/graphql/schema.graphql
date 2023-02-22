@@ -167,6 +167,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -187,6 +188,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
@@ -1287,6 +1289,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 input MedicalPractitionerInput {

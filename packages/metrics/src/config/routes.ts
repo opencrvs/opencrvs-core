@@ -49,7 +49,8 @@ import {
   deathDeclarationArchivedHandler,
   birthDeclarationReinstatedHandler,
   deathDeclarationReinstatedHandler,
-  declarationUpdatedHandler
+  declarationUpdatedHandler,
+  markIssuedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -235,6 +236,24 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/mark-certified',
       handler: markCertifiedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Mark issued
+    {
+      method: 'POST',
+      path: '/events/birth/mark-issued',
+      handler: markIssuedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-issued',
+      handler: markIssuedHandler,
       config: {
         tags: ['api']
       }
