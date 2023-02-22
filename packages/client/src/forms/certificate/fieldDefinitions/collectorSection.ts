@@ -271,38 +271,6 @@ const otherCertCollector: IFormSectionGroup[] = [
   }
 ]
 
-export const issueGroupForBirthAppWithDetails: IFormSection = {
-  id: CertificateSection.Collector,
-  viewType: 'form',
-  name: certificateMessages.issueCertificate,
-  title: certificateMessages.issueCertificate,
-  groups: [
-    {
-      id: 'certCollector',
-      title: constantsMessages.issueCertificate,
-      error: certificateMessages.certificateCollectorError,
-      fields: [
-        {
-          name: 'type',
-          type: RADIO_GROUP,
-          size: RadioSize.LARGE,
-          label: constantsMessages.issueCertificate,
-          hideHeader: true,
-          required: true,
-          initialValue: '',
-          validate: [],
-          options: [
-            { value: 'MOTHER', label: constantsMessages.issueToMother },
-            { value: 'FATHER', label: constantsMessages.issueToFather },
-            { value: 'OTHER', label: constantsMessages.issueToSomeoneElse }
-          ]
-        }
-      ]
-    },
-    otherCertCollector[0]
-  ]
-}
-
 export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
   {
     id: 'certCollector',
