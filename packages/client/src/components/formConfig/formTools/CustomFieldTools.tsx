@@ -1078,7 +1078,7 @@ class CustomFieldToolsComp extends React.Component<
           }
         ]
       })
-      const res: { data: CreateFormDatasetMutation } = await client.mutate({
+      const res = await client.mutate<CreateFormDatasetMutation>({
         mutation: CREATE_FORM_DATA_SET,
         variables: { formDataset: { fileName, base64Data } }
       })

@@ -34,7 +34,7 @@ const StyledSelect = styled(ReactSelect)<{
   withLightTheme: boolean
 }>`
   .react-select__container {
-    border-radius: 2px;
+    border-radius: 4px;
     ${({ theme }) => theme.fonts.reg14};
   }
 

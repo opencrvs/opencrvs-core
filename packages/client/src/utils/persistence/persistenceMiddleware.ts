@@ -28,6 +28,7 @@ import { client } from '@client/utils/apolloClient'
 import { READY } from '@client/offline/actions'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { QueryOptions } from '@apollo/client'
 
 const isUserOfNationalScope = (userDetails: UserDetails) =>
   [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
@@ -36,7 +37,10 @@ const isUserOfNationalScope = (userDetails: UserDetails) =>
 const isFieldAgent = (userDetails: UserDetails) =>
   FIELD_AGENT_ROLES.includes(userDetails.systemRole)
 
-function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
+function getQueriesToPrefetch(
+  locationId: string,
+  officeSelected: boolean
+): QueryOptions[] {
   const defaultTimeStart = new Date(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   )

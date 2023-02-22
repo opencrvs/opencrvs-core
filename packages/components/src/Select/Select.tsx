@@ -47,7 +47,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   ${({ theme }) => theme.fonts.reg16};
   .react-select__control {
     background: ${({ theme }) => theme.colors.white};
-    border-radius: 2px;
+    border-radius: 4px;
     height: 40px;
     box-shadow: none;
     ${({ theme }) => theme.fonts.reg16};
