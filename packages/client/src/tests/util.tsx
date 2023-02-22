@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -1259,9 +1260,12 @@ export const currentUserDeclarations = {
   ]
 }
 
-export const userDetails = {
+export const userDetails: UserDetails = {
   userMgntUserID: '123',
-  language: 'en',
+  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+  status: 'active' as Status,
+  creationDate: '1487076708000',
+  practitionerId: '12345',
   name: [
     {
       use: 'en',
@@ -1270,7 +1274,7 @@ export const userDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: 'FIELD_AGENT',
+  systemRole: SystemRoleType.FieldAgent,
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
@@ -1358,7 +1362,7 @@ export const userDetails = {
     }
   ],
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR',
+    role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -2206,7 +2210,7 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: RoleType.FieldAgent,
+          systemRole: SystemRoleType.FieldAgent,
           role: {
             _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             labels: [
@@ -2241,7 +2245,8 @@ export function loginAsFieldAgent(store: AppStore) {
           primaryOffice: {
             id: '0d8474da-0361-4d32-979e-af91f012340a',
             name: 'Kaliganj Union Sub Center',
-            status: 'active'
+            status: 'active',
+            alias: ['বানিয়াজান']
           },
           localRegistrar: {
             name: [
@@ -2251,7 +2256,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: RoleType.LocalRegistrar,
+            role: SystemRoleType.LocalRegistrar,
             signature: undefined
           }
         }
@@ -2298,166 +2303,213 @@ export const mockRoles = {
   data: {
     getSystemRoles: [
       {
+        id: '63c7ebee48dc29888b5b020d',
         value: 'FIELD_AGENT',
         roles: [
           {
+            _id: '63ef9466f708ea080777c279',
             labels: [
               {
                 lang: 'en',
-                label: 'Healthcare Worker'
+                label: 'Health Worker',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Professionnel de Santé'
+                label: 'Professionnel de Santé',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           },
           {
+            _id: '63ef9466f708ea080777c27a',
             labels: [
               {
                 lang: 'en',
-                label: 'Police Officer'
+                label: 'Police Worker',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Agent de Police'
+                label: 'Agent de Police',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           },
           {
+            _id: '63ef9466f708ea080777c27b',
             labels: [
               {
                 lang: 'en',
-                label: 'Social Worker'
+                label: 'Social Worker',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Travailleur Social'
+                label: 'Travailleur Social',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           },
           {
+            _id: '63ef9466f708ea080777c27c',
             labels: [
               {
                 lang: 'en',
-                label: 'Local Leader'
+                label: 'Local Leader',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Leader Local'
+                label: 'Leader Local',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b020e',
         value: 'REGISTRATION_AGENT',
         roles: [
           {
+            _id: '63ef9466f708ea080777c27d',
             labels: [
               {
                 lang: 'en',
-                label: 'Registration Agent'
+                label: 'Registration Agent',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: "Agent d'enregistrement"
+                label: "Agent d'enregistrement",
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b020f',
         value: 'LOCAL_REGISTRAR',
         roles: [
           {
+            _id: '63ef9466f708ea080777c27e',
             labels: [
               {
                 lang: 'en',
-                label: 'Local Registrar'
+                label: 'Local Registrar',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Registraire local'
+                label: 'Registraire local',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b0210',
         value: 'LOCAL_SYSTEM_ADMIN',
         roles: [
           {
+            _id: '63ef9466f708ea080777c27f',
             labels: [
               {
                 lang: 'en',
-                label: 'Local System_admin'
+                label: 'Local System Admin',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Administrateur système local'
+                label: 'Administrateur système local',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b0211',
         value: 'NATIONAL_SYSTEM_ADMIN',
         roles: [
           {
+            _id: '63ef9466f708ea080777c280',
             labels: [
               {
                 lang: 'en',
-                label: 'National System_admin'
+                label: 'National System Admin',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Administrateur système national'
+                label: 'Administrateur système national',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b0212',
         value: 'PERFORMANCE_MANAGEMENT',
         roles: [
           {
+            _id: '63ef9466f708ea080777c281',
             labels: [
               {
                 lang: 'en',
-                label: 'Performance Management'
+                label: 'Performance Manager',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Gestion des performances'
+                label: 'Gestion des performances',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       },
       {
+        id: '63c7ebee48dc29888b5b0213',
         value: 'NATIONAL_REGISTRAR',
         roles: [
           {
+            _id: '63ef9466f708ea080777c282',
             labels: [
               {
                 lang: 'en',
-                label: 'National Registrar'
+                label: 'National Registrar',
+                __typename: 'RoleLabel'
               },
               {
                 lang: 'fr',
-                label: 'Registraire national'
+                label: 'Registraire national',
+                __typename: 'RoleLabel'
               }
-            ]
+            ],
+            __typename: 'Role'
           }
         ],
-        active: true
+        __typename: 'SystemRole'
       }
     ]
   }

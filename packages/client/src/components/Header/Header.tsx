@@ -46,10 +46,10 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ArrowBack,
   Plus,
   SearchDark,
   Activity,
@@ -79,10 +79,9 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { Hamburger } from './Hamburger'
-import { Event } from '@client/utils/gateway'
 
 type IStateProps = {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   language: string
 }
 

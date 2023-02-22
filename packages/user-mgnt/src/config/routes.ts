@@ -652,7 +652,7 @@ export const getRoutes = () => {
     },
 
     {
-      method: 'GET',
+      method: 'POST',
       path: '/countUsersByLocation',
       handler: countUsersByLocationHandler,
       config: {
@@ -668,8 +668,9 @@ export const getRoutes = () => {
           ]
         },
         validate: {
-          query: Joi.object({
-            role: Joi.string().required()
+          payload: Joi.object({
+            role: Joi.string().required(),
+            locationId: Joi.string()
           })
         }
       }
