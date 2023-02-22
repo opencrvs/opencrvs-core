@@ -17,7 +17,7 @@ import {
 import {
   CERTIFIED_STATUS,
   createStatusHistory,
-  detectDuplicates,
+  detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -166,7 +166,7 @@ async function detectAndUpdateDeathDuplicates(
   composition: fhir.Composition,
   body: IDeathCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionId, body)
+  const duplicates = await detectDeathDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }

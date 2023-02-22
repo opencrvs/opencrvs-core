@@ -29,7 +29,7 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
@@ -112,7 +112,7 @@ describe('Verify handlers', () => {
 
     it('should return status code 500 when composition has no ID', async () => {
       ;(indexComposition as jest.Mock).mockReturnValue({})
-      ;(searchForDuplicates as jest.Mock).mockReturnValue(
+      ;(searchForBirthDuplicates as jest.Mock).mockReturnValue(
         mockSearchResponse.body.hits.hits
       )
       ;(updateComposition as jest.Mock).mockReturnValue({})

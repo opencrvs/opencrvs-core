@@ -16,7 +16,7 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectDuplicates,
+  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -410,7 +410,7 @@ async function detectAndUpdateBirthDuplicates(
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionId, body)
+  const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }

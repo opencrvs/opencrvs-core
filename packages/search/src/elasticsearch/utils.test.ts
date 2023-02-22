@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  detectDuplicates,
+  detectBirthDuplicates,
   createStatusHistory,
   IBirthCompositionBody
 } from '@search/elasticsearch/utils'
@@ -24,7 +24,7 @@ import {
   mockTaskBirthCorrectionBundle
 } from '@search/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch = fetchAny as any
 
@@ -33,10 +33,10 @@ jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', () => {
   it('should return an array of duplicate identifiers for a composition', async () => {
-    ;(searchForDuplicates as jest.Mock).mockReturnValue(
+    ;(searchForBirthDuplicates as jest.Mock).mockReturnValue(
       mockSearchResponse.body.hits.hits
     )
-    const duplicates = await detectDuplicates(
+    const duplicates = await detectBirthDuplicates(
       'c79e8d62-335e-458d-9fcc-45ec5836c404',
       mockCompositionBody
     )

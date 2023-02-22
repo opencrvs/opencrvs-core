@@ -17,7 +17,7 @@ import {
 import { mockCompositionBody } from '@search/test/utils'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import { client } from '@search/elasticsearch/client'
 
 describe('elasticsearch db helper', () => {
@@ -64,7 +64,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      searchForDuplicates(mockCompositionBody, client)
+      searchForBirthDuplicates(mockCompositionBody, client)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&

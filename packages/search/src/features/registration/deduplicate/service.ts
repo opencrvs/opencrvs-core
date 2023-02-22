@@ -220,7 +220,7 @@ export const searchForBirthDuplicates = async (
     })
     return result.body.hits.hits
   } catch (err) {
-    logger.error(`searchDuplicates error: ${err}`)
+    logger.error(`searchBirthDuplicates error: ${err}`)
     throw err
   }
 }
@@ -231,6 +231,7 @@ export const searchForDeathDuplicates = async (
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
+  console.log(body)
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
@@ -295,7 +296,7 @@ export const searchForDeathDuplicates = async (
     })
     return result.body.hits.hits
   } catch (err) {
-    logger.error(`searchDuplicates error: ${err}`)
+    logger.error(`searchDeathDuplicates error: ${err}`)
     throw err
   }
 }
