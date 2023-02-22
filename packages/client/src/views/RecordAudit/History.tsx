@@ -246,7 +246,8 @@ export const GetHistory = ({
     role:
       isSystemInitiated(item) || !item.user?.systemRole
         ? intl.formatMessage(getSystemType(item.system?.type))
-        : item.user.role.labels.find((label) => label.lang === 'en')?.label,
+        : item.user.role.labels.find((label) => label.lang === intl.locale)
+            ?.label,
 
     location: isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
