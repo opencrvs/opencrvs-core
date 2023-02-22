@@ -19,7 +19,8 @@ import {
   IFormField,
   SELECT_WITH_OPTIONS,
   ISelectOption,
-  IFormDataSet
+  IFormDataSet,
+  NATIONAL_ID_VERIFICATION
 } from '@client/forms'
 import {
   getIdentifiersFromFieldId,
@@ -616,6 +617,10 @@ class CustomFieldToolsComp extends React.Component<
       case SELECT_WITH_OPTIONS:
         return intl.formatMessage(
           customFieldFormMessages.customSelectFieldHeading
+        )
+      case NATIONAL_ID_VERIFICATION:
+        return intl.formatMessage(
+          customFieldFormMessages.customNationalIdVerificationFieldHeading
         )
       default:
         return intl.formatMessage(

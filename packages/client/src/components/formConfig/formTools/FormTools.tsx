@@ -14,7 +14,6 @@ import { Event, CustomFieldType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -26,6 +25,8 @@ import { useParams } from 'react-router'
 import { addCustomField } from '@client/forms/configuration/formConfig/actions'
 import { flushSync } from 'react-dom'
 import { CenteredToggle } from './components'
+import { useIsNationalIdVerificationEnabled } from '@client/utils/nationalIdUtils'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -43,10 +44,20 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   [CustomFieldType.Tel]: messages.phoneNumberInput,
   [CustomFieldType.Number]: messages.numberInput,
   [CustomFieldType.Textarea]: messages.textAreaInput,
-  /* TODO */
   [CustomFieldType.Subsection]: messages.supportingCopy,
   [CustomFieldType.Paragraph]: messages.heading,
-  [CustomFieldType.SelectWithOptions]: messages.customSelect
+  [CustomFieldType.SelectWithOptions]: messages.customSelect,
+  [CustomFieldType.NationalIdVerification]: messages.nationalIdVerification
+}
+
+const useDisabledFieldTypes = (): Partial<Record<CustomFieldType, boolean>> => {
+  const isNationalIdVerificationEnabled = useIsNationalIdVerificationEnabled()
+
+  return {
+    [CustomFieldType.NationalIdVerification]: !isNationalIdVerificationEnabled,
+    [CustomFieldType.Paragraph]: true,
+    [CustomFieldType.Subsection]: true
+  }
 }
 
 type IRouteProps = {
@@ -68,6 +79,7 @@ export const FormTools = ({
   const intl = useIntl()
   const dispatch = useDispatch()
   const { event, section } = useParams<IRouteProps>()
+  const disabledFieldTypes = useDisabledFieldTypes()
 
   const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
 
@@ -98,18 +110,13 @@ export const FormTools = ({
             key={fieldType}
             label={<Label>{intl.formatMessage(MESSAGE_MAP[fieldType])}</Label>}
             actions={
-              <LinkButton
+              <Link
                 id={`add-${fieldType}-btn`}
                 onClick={() => handleAddCustomField(fieldType)}
-                size="small"
-                /* TODO */
-                disabled={
-                  fieldType === CustomFieldType.Paragraph ||
-                  fieldType === CustomFieldType.Subsection
-                }
+                disabled={disabledFieldTypes[fieldType]}
               >
                 {intl.formatMessage(buttonMessages.add)}
-              </LinkButton>
+              </Link>
             }
           />
         ))}

@@ -69,6 +69,7 @@ export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
+export const NATIONAL_ID_VERIFICATION = 'NATIONAL_ID_VERIFICATION'
 
 export enum Sort {
   ASC = 'asc',
@@ -659,6 +660,10 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
+export interface INationalIdVerification extends IFormFieldBase {
+  type: typeof NATIONAL_ID_VERIFICATION
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -688,6 +693,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
+  | INationalIdVerification
 
 export interface IPreviewGroup {
   id: string
@@ -1196,6 +1202,11 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   networkErrorText: string
 }
 
+export interface Ii18nNationalIdVerificationFormField
+  extends Ii18nFormFieldBase {
+  type: typeof NATIONAL_ID_VERIFICATION
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1222,6 +1233,7 @@ export type Ii18nFormField =
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
+  | Ii18nNationalIdVerificationFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1282,7 +1294,8 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
-    DYNAMIC_LIST: messages.dynamicList
+    DYNAMIC_LIST: messages.dynamicList,
+    NATIONAL_ID_VERIFICATION: messages.nationalIdVerification
   }
 
   return labelDict[type]

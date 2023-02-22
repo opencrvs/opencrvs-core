@@ -612,6 +612,7 @@ export type CurrencyInput = {
 }
 
 export enum CustomFieldType {
+  NationalIdVerification = 'NATIONAL_ID_VERIFICATION',
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
   SelectWithOptions = 'SELECT_WITH_OPTIONS',
@@ -2083,6 +2084,13 @@ export type SecurityQuestionAnswer = {
   questionKey?: InputMaybe<Scalars['String']>
 }
 
+export type Settings = {
+  __typename?: 'Settings'
+  openIdConnectBaseUrl?: Maybe<Scalars['String']>
+  openIdConnectClientId?: Maybe<Scalars['String']>
+  webhook?: Maybe<WebhookPermission>
+}
+
 export type Signature = {
   __typename?: 'Signature'
   data?: Maybe<Scalars['String']>
@@ -2117,7 +2125,7 @@ export type System = {
   _id: Scalars['ID']
   clientId: Scalars['ID']
   name: Scalars['String']
-  settings?: Maybe<Array<WebhookPermission>>
+  settings: Settings
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
@@ -5895,11 +5903,14 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
-      settings?: Array<{
-        __typename?: 'WebhookPermission'
-        event: string
-        permissions: Array<string>
-      }> | null
+      settings: {
+        __typename?: 'Settings'
+        webhook?: {
+          __typename?: 'WebhookPermission'
+          event: string
+          permissions: Array<string>
+        } | null
+      }
     }
   } | null
 }
@@ -5918,11 +5929,14 @@ export type DeactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings: {
+      __typename?: 'Settings'
+      webhook?: {
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      } | null
+    }
   } | null
 }
 
@@ -5940,11 +5954,14 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings: {
+      __typename?: 'Settings'
+      webhook?: {
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      } | null
+    }
   } | null
 }
 
@@ -5983,11 +6000,14 @@ export type UpdatePermissionsMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings: {
+      __typename?: 'Settings'
+      webhook?: {
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      } | null
+    }
   } | null
 }
 
