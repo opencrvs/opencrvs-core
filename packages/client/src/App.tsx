@@ -68,6 +68,7 @@ import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -443,6 +444,13 @@ export function App(props: IAppProps) {
                                           ]}
                                           path={routes.ORGANISATIONS_INDEX}
                                           component={AdministrativeLevels}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.OIDP_VERIFICATION_CALLBACK
+                                          }
+                                          component={OIDPVerificationCallback}
                                         />
                                       </Switch>
                                     </TransitionWrapper>

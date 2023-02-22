@@ -99,3 +99,5 @@ export const USER_PROFILE = '/userProfile/:userId'
 
 export const VIEW_RECORD = '/:declarationId/viewRecord'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
+
+export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'
