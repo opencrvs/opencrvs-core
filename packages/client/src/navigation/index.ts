@@ -58,7 +58,10 @@ import {
   PERFORMANCE_REGISTRATIONS_LIST,
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION
+  INFORMANT_NOTIFICATION,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS,
+  PERFORMANCE_DASHBOARD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -188,6 +191,16 @@ export function goToInformantNotification() {
 
 export function goToVSExport() {
   return push(VS_EXPORTS)
+}
+
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS)
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS)
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD)
 }
 
 export function goToAdvancedSearch() {

@@ -507,6 +507,11 @@ export interface GQLCreatedIds {
   registrationNumber?: string
 }
 
+export const enum GQLAuthorizationStatus {
+  ANONYMOUS = 'ANONYMOUS',
+  USER = 'USER'
+}
+
 export interface GQLBirthRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
