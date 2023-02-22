@@ -25,6 +25,7 @@ import {
 import {
   testFhirBundle,
   testDeathFhirBundle,
+  testMarriageFhirBundle,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
   districtMock,
@@ -96,6 +97,34 @@ describe('Verify fhir bundle modifier functions', () => {
           if (task && task.identifier && task.identifier[0]) {
             expect(task.identifier[0]).toEqual({
               system: `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`,
+              value: composition.identifier.value
+            })
+          }
+        }
+      }
+    })
+
+    it('Successfully modified the provided fhirBundle with marriage trackingid', () => {
+      const fhirBundle = setTrackingId(testMarriageFhirBundle)
+      if (
+        fhirBundle &&
+        fhirBundle.entry &&
+        fhirBundle.entry[0] &&
+        fhirBundle.entry[0].resource &&
+        fhirBundle.entry[1].resource
+      ) {
+        const composition = fhirBundle.entry[0].resource as fhir.Composition
+        const task = fhirBundle.entry[1].resource as fhir.Task
+        if (
+          composition &&
+          composition.identifier &&
+          composition.identifier.value
+        ) {
+          expect(composition.identifier.value).toMatch(/^M/)
+          expect(composition.identifier.value.length).toBe(7)
+          if (task && task.identifier && task.identifier[0]) {
+            expect(task.identifier[1]).toEqual({
+              system: `${OPENCRVS_SPECIFICATION_URL}id/marriage-tracking-id`,
               value: composition.identifier.value
             })
           }

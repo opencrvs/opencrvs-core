@@ -23,6 +23,8 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   testFhirBundle,
+  testDeathFhirBundle,
+  testMarriageFhirBundle,
   testFhirTaskBundle,
   officeMock
 } from '@workflow/test/utils'
@@ -125,10 +127,30 @@ describe('Verify getCRVSOfficeName', () => {
 })
 
 describe('Verify getTrackingId', () => {
-  it('Returned tracking id properly', () => {
+  it('Returned tracking id properly for birth', () => {
     const trackingid = getTrackingId(setTrackingId(testFhirBundle))
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
+  })
+
+  it('Returned tracking id properly for death', () => {
+    const trackingid = getTrackingId(setTrackingId(testDeathFhirBundle))
+    if (trackingid) {
+      expect(trackingid).toMatch(/^D/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
+  })
+
+  it('Returned tracking id properly for marriage', () => {
+    const trackingid = getTrackingId(setTrackingId(testMarriageFhirBundle))
+    if (trackingid) {
+      expect(trackingid).toMatch(/^M/)
       expect(trackingid.length).toBe(7)
     } else {
       throw new Error('Failed')
@@ -145,7 +167,7 @@ describe('Verify getTrackingId', () => {
   })
 })
 
-describe('Verify getBirthRegistrationNumber', () => {
+describe('Verify getRegistrationNumber', () => {
   it('Returned birth registration number properly', async () => {
     const taskResource: fhir.Task = {
       identifier: [
@@ -161,6 +183,40 @@ describe('Verify getBirthRegistrationNumber', () => {
 
     expect(brn).toBeDefined()
     expect(brn).toEqual('2019333436B5WGYJE8')
+  })
+
+  it('Returned death registration number properly', async () => {
+    const taskResource: fhir.Task = {
+      identifier: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`,
+          value: '2019333436DE5WGRT8'
+        }
+      ],
+      status: '',
+      intent: ''
+    }
+    const drn = getRegistrationNumber(taskResource, EVENT_TYPE.DEATH)
+
+    expect(drn).toBeDefined()
+    expect(drn).toEqual('2019333436DE5WGRT8')
+  })
+
+  it('Returned marriage registration number properly', async () => {
+    const taskResource: fhir.Task = {
+      identifier: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}id/marriage-registration-number`,
+          value: '2019333436MA5WGRT8'
+        }
+      ],
+      status: '',
+      intent: ''
+    }
+    const mrn = getRegistrationNumber(taskResource, EVENT_TYPE.MARRIAGE)
+
+    expect(mrn).toBeDefined()
+    expect(mrn).toEqual('2019333436MA5WGRT8')
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {

@@ -60,6 +60,14 @@ describe('Verify utility functions', () => {
     expect(trackingId).toMatch(/^D/)
   })
 
+  it('Generates proper marriage tracking id successfully', async () => {
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.MARRIAGE)
+
+    expect(trackingId).toBeDefined()
+    expect(trackingId.length).toBe(7)
+    expect(trackingId).toMatch(/^M/)
+  })
+
   it('Converts string to corresponding ascii successfully', async () => {
     const ascii = convertStringToASCII('B5WGYJE')
 
