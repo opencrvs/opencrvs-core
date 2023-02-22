@@ -24,7 +24,7 @@ input SignatureInput {
   type: String
 }
 
-enum RoleType {
+enum SystemRoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
   LOCAL_REGISTRAR
@@ -48,7 +48,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  systemRole: RoleType!
+  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String
@@ -64,7 +64,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: RoleType!
+  role: SystemRoleType!
   signature: Signature
 }
 
@@ -87,20 +87,20 @@ type User {
   name: [HumanName!]! # -> .name
   username: String
   mobile: String!
-  systemRole: RoleType!
+  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location]
+  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String!
   avatar: Avatar
   device: String
-  searches: [BookmarkedSeachItem]
+  searches: [BookmarkedSeachItem!]
 }
 
 type SearchUserResult {

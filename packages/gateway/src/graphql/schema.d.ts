@@ -223,13 +223,13 @@ export interface GQLRegistrationCountResult {
 export interface GQLLocation {
   id: string
   _fhirID?: string
-  identifier?: Array<GQLIdentifier | null>
-  status?: string
-  name?: string
-  alias?: Array<string | null>
+  identifier?: Array<GQLIdentifier>
+  status: string
+  name: string
+  alias: Array<string>
   description?: string
-  partOf?: string
-  type?: GQLLocationType
+  partOf: string
+  type: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number
@@ -245,20 +245,20 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile: string
-  systemRole: GQLRoleType
+  systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation | null>
+  catchmentArea?: Array<GQLLocation>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate: string
   avatar?: GQLAvatar
   device?: string
-  searches?: Array<GQLBookmarkedSeachItem | null>
+  searches?: Array<GQLBookmarkedSeachItem>
 }
 
 export interface GQLSearchUserResult {
@@ -427,7 +427,7 @@ export interface GQLEventProgressResultSet {
 
 export interface GQLSystemRole {
   id: string
-  value: string
+  value: GQLSystemRoleType
   roles: Array<GQLRole>
   active: boolean
 }
@@ -561,7 +561,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile: string
-  systemRole: GQLRoleType
+  systemRole: GQLSystemRoleType
   role?: string
   email?: string
   primaryOffice?: string
@@ -921,7 +921,7 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
-export const enum GQLRoleType {
+export const enum GQLSystemRoleType {
   FIELD_AGENT = 'FIELD_AGENT',
   REGISTRATION_AGENT = 'REGISTRATION_AGENT',
   LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
@@ -945,7 +945,7 @@ export const enum GQLStatus {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: GQLRoleType
+  role: GQLSystemRoleType
   signature?: GQLSignature
 }
 

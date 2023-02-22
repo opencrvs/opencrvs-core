@@ -64,7 +64,7 @@ import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   ListViewSimplified,
   ListViewItemSimplified,
@@ -90,7 +90,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }
 
 interface ISectionData {
@@ -108,10 +108,6 @@ const Container = styled.div`
   }
 `
 
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 16px;
-`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;

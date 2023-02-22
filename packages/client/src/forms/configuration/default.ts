@@ -1183,7 +1183,6 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageOfIndividualInYears',
                 type: 'NUMBER',
                 label: formMessageDescriptors.ageOfInformant,
-                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -1533,7 +1532,6 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageOfIndividualInYears',
                 type: 'NUMBER',
                 label: formMessageDescriptors.ageOfMother,
-                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -1544,6 +1542,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'maxLength',
                     parameters: [3]
+                  },
+                  {
+                    operation: 'isValidParentsBirthDate',
+                    parameters: [5, true]
                   }
                 ],
                 conditionals: [
@@ -2083,7 +2085,6 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageOfIndividualInYears',
                 type: 'NUMBER',
                 label: formMessageDescriptors.ageOfFather,
-                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -2094,6 +2095,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'maxLength',
                     parameters: [3]
+                  },
+                  {
+                    operation: 'isValidParentsBirthDate',
+                    parameters: [10, true]
                   }
                 ],
                 conditionals: [
@@ -3333,7 +3338,6 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageOfIndividualInYears',
                 type: 'NUMBER',
                 label: formMessageDescriptors.ageOfDeceased,
-                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -4005,7 +4009,6 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageOfIndividualInYears',
                 type: 'NUMBER',
                 label: formMessageDescriptors.ageOfInformant,
-                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [

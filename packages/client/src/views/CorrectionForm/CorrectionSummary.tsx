@@ -81,10 +81,11 @@ import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IGQLLocation } from '@client/utils/userUtils'
+import { Location } from '@client/utils/gateway'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -94,7 +95,7 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
-  userPrimaryOffice?: IGQLLocation
+  userPrimaryOffice?: UserDetails['primaryOffice']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string

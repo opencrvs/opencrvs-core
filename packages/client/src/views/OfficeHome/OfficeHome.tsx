@@ -31,7 +31,7 @@ import {
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -289,7 +289,7 @@ class OfficeHomeView extends React.Component<
             to={{
               pathname: PERFORMANCE_HOME,
               search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as IUserDetails
+                this.props.userDetails as UserDetails
               )}`
             }}
           />

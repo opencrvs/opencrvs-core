@@ -161,15 +161,15 @@ const UserRoles = () => {
                   <ListViewItemSimplified
                     key={systemRole.id}
                     label={
-                      <Label id={`${systemRole?.value}_label`}>
+                      <Label id={`${systemRole.value}_label`}>
                         {getUserSystemRole(
-                          { systemRole: systemRole?.value },
+                          { systemRole: systemRole.value },
                           intl
                         )}
                       </Label>
                     }
                     value={
-                      <Value id={`${systemRole?.value}_value`}>
+                      <Value id={`${systemRole.value}_value`}>
                         <Stack direction="column" alignItems="stretch" gap={2}>
                           {systemRole.roles.map((role) => (
                             <span>{getUserRole(language, role)}</span>

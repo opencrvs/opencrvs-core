@@ -37,7 +37,9 @@ const StyledPage = styled.div<{
 }>`
   height: 100vh;
   width: 100%;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   ${({ background: { backgroundImage, imageFit, backgroundColor } }) =>
     backgroundImage
@@ -63,8 +65,7 @@ const StyledPage = styled.div<{
 export const Container = styled.div`
   margin: auto;
   height: auto;
-  padding-top: 104px;
-  width: min(363px, 90%);
+  width: min(380px, 90%);
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
     padding-top: 70px;
   }

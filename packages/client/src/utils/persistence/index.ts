@@ -9,19 +9,5 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from 'styled-components'
-
-const Logo = styled.img<{ size: ISize }>`
-  max-height: ${({ size }) => (size === 'small' ? 104 : 128)}px;
-  max-width: 100%;
-`
-
-type ISize = 'small' | 'medium'
-
-export function CountryLogo({
-  size = 'medium',
-  ...props
-}: React.ImgHTMLAttributes<HTMLImageElement> & { size?: ISize }) {
-  return <Logo alt="country-logo" size={size} {...props} />
-}
+export * from './persistenceMapper'
+export * from './persistLink'
