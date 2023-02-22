@@ -30,7 +30,7 @@ import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/adva
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 interface IRemoveBookmarkModalProps {
   showRemoveBookmarkModal: boolean

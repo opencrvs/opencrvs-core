@@ -15,7 +15,7 @@ import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'
-import { isNavigatorOnline } from '@client/utils'
+import { useOnlineStatus } from '@client/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -113,20 +113,6 @@ export function withOnlineStatus<T>(
     const isOnline = useOnlineStatus()
     return <WrappedComponent isOnline={isOnline} {...props} />
   }
-}
-
-export function useOnlineStatus() {
-  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
-  const ONLINE_CHECK_INTERVAL = 500
-  React.useEffect(() => {
-    const intervalID = setInterval(
-      () => setOnline(isNavigatorOnline()),
-      ONLINE_CHECK_INTERVAL
-    )
-
-    return () => clearInterval(intervalID)
-  }, [])
-  return isOnline
 }
 
 export type IOnlineStatusProps = {

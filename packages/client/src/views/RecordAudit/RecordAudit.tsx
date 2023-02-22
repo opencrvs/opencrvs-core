@@ -119,7 +119,7 @@ import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
 
