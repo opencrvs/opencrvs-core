@@ -168,5 +168,11 @@ export function setDeathRegistrationSectionTransformer(
       )
     }
   }
+
+  if (draftData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      draftData[sectionId].informantsSignature
+  }
+
   return transformedData
 }

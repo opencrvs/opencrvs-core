@@ -61,7 +61,7 @@ export async function waitFor(condition: () => boolean) {
 }
 
 export async function waitForElement<
-  C extends React.ComponentClass<any> | React.StatelessComponent<any>
+  C extends React.ComponentClass<any> | React.FunctionComponent<any>
 >(
   rootComponent: ReactWrapper,
   selector: C

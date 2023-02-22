@@ -46,7 +46,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'REGISTRATION_AGENT'
+      systemRole: 'REGISTRATION_AGENT'
     }
   }
 }
@@ -63,7 +63,7 @@ const nameObjNatlSysAdmin = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'NATIONAL_SYSTEM_ADMIN'
+      systemRole: 'NATIONAL_SYSTEM_ADMIN'
     }
   }
 }

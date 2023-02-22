@@ -28,7 +28,7 @@ function leaderBoardsComponent() {
       <Frame
         header={
           <AppBar
-            desktopTitle="Leader Boards"
+            desktopTitle="Leaderboards"
             desktopLeft={<Icons.Award width={20} height={20} />}
             desktopRight={
               <Button
@@ -51,7 +51,7 @@ function leaderBoardsComponent() {
                 <Icon name="X" color="primary" />{' '}
               </Button>
             }
-            mobileTitle="Leader Boards"
+            mobileTitle="Leaderboards"
           />
         }
         skipToContentText="Skip to main content"
@@ -59,7 +59,10 @@ function leaderBoardsComponent() {
         {window.config && window.config.LEADERBOARDS_DASHBOARD_URL ? (
           <iframe src={window.config.LEADERBOARDS_DASHBOARD_URL}></iframe>
         ) : (
-          <Content title="LeaderBoard" size="large"> No Content </Content>
+          <Content title="Leaderboards" size="large">
+            {' '}
+            No Content{' '}
+          </Content>
         )}
       </Frame>
     </>

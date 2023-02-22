@@ -31,7 +31,7 @@ import {
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -138,7 +138,7 @@ class OfficeHomeView extends React.Component<
   pageSize = 10
   showPaginated = false
   interval: any = undefined
-  role = this.props.userDetails && this.props.userDetails.role
+  role = this.props.userDetails && this.props.userDetails.systemRole
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
       ? true
@@ -289,7 +289,7 @@ class OfficeHomeView extends React.Component<
             to={{
               pathname: PERFORMANCE_HOME,
               search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as IUserDetails
+                this.props.userDetails as UserDetails
               )}`
             }}
           />

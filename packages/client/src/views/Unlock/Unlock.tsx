@@ -9,69 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
+import styled from 'styled-components'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { messages } from '@client/i18n/messages/views/pin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { IUserDetails, getUserName } from '@client/utils/userUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
-import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
-import { Logout } from '@opencrvs/components/lib/icons'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
-export const PageWrapper = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  width: 100%;
-`
+import { BackgroundWrapper } from '@client/views/common/Common'
 
-export const LogoutHeader = styled.a`
-  width: 100%;
-  color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  justify-content: flex-end;
-  span {
-    margin-right: 10px;
-  }
-`
-const Container = styled.div`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-`
-const Name = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-`
-const ForgottenPinLink = styled(Button)`
-  ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.white};
-  text-transform: none;
-`
 interface IState {
   pin: string
   resetKey: number
 }
+
 type ErrorState = {
   attempt: number
   errorMessage: string
@@ -79,7 +48,7 @@ type ErrorState = {
 type IFullState = IState & ErrorState
 
 type Props = {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 type IFullProps = Props &
@@ -88,12 +57,29 @@ type IFullProps = Props &
     onForgetPin: () => void
   }
 
+const LogoutButton = styled(Button)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+`
+
+const Content = styled(Stack)`
+  padding: 16px 0;
+`
+
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
-class UnlockView extends React.Component<IFullProps, IFullState> {
-  pinKeyRef: any
+export const EnterPinLabel = () => {
+  const intl = useIntl()
+  return (
+    <Text element="h1" variant="h2" align="center">
+      {intl.formatMessage(userMessages.enterPinLabel)}
+    </Text>
+  )
+}
 
+class UnlockView extends React.Component<IFullProps, IFullState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -106,31 +92,18 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   componentDidMount() {
     this.screenLockTimer()
-    document.addEventListener('mouseup', this.handleClick, false)
-    this.focusKeypad()
-  }
-
-  showName() {
-    const { userDetails } = this.props
-    const nameObj =
-      (userDetails &&
-        userDetails.name &&
-        (userDetails.name.find(
-          // @ts-ignore
-          (storedName: GQLHumanName) => storedName.use === 'en'
-        ) as GQLHumanName)) ||
-      null
-    const fullName =
-      (nameObj &&
-        `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`) ||
-      ''
-    return <Name>{fullName}</Name>
   }
 
   showErrorMessage() {
     return (
       this.state.errorMessage && (
-        <ErrorMessage id="errorMsg">{this.state.errorMessage}</ErrorMessage>
+        <Toast
+          type="error"
+          id="errorMsg"
+          onClose={() => this.setState({ errorMessage: '' })}
+        >
+          {this.state.errorMessage}
+        </Toast>
       )
     )
   }
@@ -218,56 +191,42 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.props.redirectToAuthentication()
   }
 
-  componentDidUpdate = () => this.focusKeypad()
-
-  componentWillUnmount() {
-    document.removeEventListener('mouseup', this.handleClick, false)
-  }
-
-  handleClick = (e: Event) => {
-    this.focusKeypad()
-  }
-
-  focusKeypad = () => {
-    const node =
-      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
-    if (node) {
-      node.focus()
-    }
-  }
-
   render() {
     const { userDetails } = this.props
     return (
-      <PageWrapper id="unlockPage">
-        <LogoutHeader onClick={this.logout} id="logout">
-          <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
-          <Logout />
-        </LogoutHeader>
-        <Container onClick={this.focusKeypad}>
-          <AvatarLarge
-            name={getUserName(userDetails)}
-            avatar={userDetails?.avatar}
-          />
-          {this.showName()}
+      <BackgroundWrapper id="unlockPage">
+        <Box id="Box">
+          <LogoutButton type="icon" onClick={this.logout} id="logout">
+            <Icon name="LogOut" />
+          </LogoutButton>
 
-          {this.showErrorMessage()}
-          <PINKeypad
-            forgotPinComponent={
-              <ForgottenPinLink
+          <Content direction="column" gap={0} justifyContent="flex-start">
+            <AvatarLarge
+              name={getUserName(userDetails)}
+              avatar={userDetails?.avatar}
+            />
+            <EnterPinLabel />
+            <Stack direction="column" gap={16} justifyContent="flex-start">
+              <PINKeypad
+                onComplete={this.onPinProvided}
+                pin={this.state.pin}
+                key={this.state.resetKey}
+              />
+
+              <Button
+                size="small"
+                type="tertiary"
                 id="forgotten_pin"
                 onClick={this.props.onForgetPin}
               >
                 {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-              </ForgottenPinLink>
-            }
-            ref={(elem: any) => (this.pinKeyRef = elem)}
-            onComplete={this.onPinProvided}
-            pin={this.state.pin}
-            key={this.state.resetKey}
-          />
-        </Container>
-      </PageWrapper>
+              </Button>
+            </Stack>
+          </Content>
+
+          {this.showErrorMessage()}
+        </Box>
+      </BackgroundWrapper>
     )
   }
 }

@@ -357,7 +357,7 @@ function RegistrationListComponent(props: IProps) {
           width: 20
         },
         {
-          key: 'role',
+          key: 'systemRole',
           label: intl.formatMessage(messages.typeColumnHeader),
           width: 20
         },
@@ -434,7 +434,9 @@ function RegistrationListComponent(props: IProps) {
               {result.registrarPractitioner.primaryOffice.name}
             </Link>
           ),
-          role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
+          systemRole: getFieldAgentTypeLabel(
+            result.registrarPractitioner.systemRole
+          ),
           total: String(result.total),
           delayed: showWithTooltip(
             result.total,

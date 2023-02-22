@@ -339,8 +339,8 @@ export const DeclarationsStartedReport = connect<
     const userDetails = getUserDetails(state)
     if (
       userDetails &&
-      userDetails.role &&
-      !SYS_ADMIN_ROLES.includes(userDetails.role)
+      userDetails.systemRole &&
+      !SYS_ADMIN_ROLES.includes(userDetails.systemRole)
     ) {
       const jurisdictionLocation =
         getJurisdictionLocationIdFromUserDetails(userDetails)

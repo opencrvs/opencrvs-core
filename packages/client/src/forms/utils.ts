@@ -563,6 +563,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
+
   // eslint-disable-next-line no-unused-vars
   const mothersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
@@ -734,7 +735,7 @@ export const conditionals: IConditionals = {
   },
   isRegistrarRoleSelected: {
     action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
+    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
   },
   isOfficePreSelected: {
     action: 'hide',

@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -136,19 +136,20 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
-    type: String
+    role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [Role]
+  ): [SystemRole!]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
+  informantSMSNotifications: [SMSNotification!]
 }
 
 type Mutation {
@@ -218,6 +219,7 @@ type Mutation {
   resendSMSInvite(userId: String!): String
   usernameSMSReminder(userId: String!): String
   resetPasswordSMS(userId: String!, applicationName: String!): String
+  updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -240,6 +242,9 @@ type Mutation {
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
   createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
+  toggleInformantSMSNotification(
+    smsNotifications: [SMSNotificationInput!]
+  ): [SMSNotification!]
 }
 
 type Dummy {
@@ -326,6 +331,8 @@ type Person {
   deceased: Deceased
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type BirthRegResultSet {
@@ -348,13 +355,13 @@ type RegistrationCountResult {
 type Location {
   id: ID!
   _fhirID: ID
-  identifier: [Identifier]
-  status: String
-  name: String
-  alias: [String]
+  identifier: [Identifier!]
+  status: String!
+  name: String!
+  alias: [String!]!
   description: String
-  partOf: String
-  type: LocationType
+  partOf: String!
+  type: LocationType!
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -364,26 +371,26 @@ type Location {
 }
 
 type User {
-  id: ID
-  userMgntUserID: ID
-  practitionerId: String
-  name: [HumanName]
+  id: ID!
+  userMgntUserID: ID!
+  practitionerId: String!
+  name: [HumanName!]!
   username: String
-  mobile: String
-  role: String
-  type: String
+  mobile: String!
+  systemRole: SystemRoleType!
+  role: Role!
   email: String
-  status: String
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location]
+  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
-  creationDate: String
+  creationDate: String!
   avatar: Avatar
   device: String
-  searches: [BookmarkedSeachItem]
+  searches: [BookmarkedSeachItem!]
 }
 
 type SearchUserResult {
@@ -537,12 +544,11 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type Role {
+type SystemRole {
   id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
+  value: SystemRoleType!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -593,6 +599,15 @@ type FormDataset {
   fileName: String!
   createdAt: String!
   _id: String
+}
+
+type SMSNotification {
+  id: String
+  name: String!
+  message: String!
+  enabled: Boolean!
+  updatedAt: String!
+  createdAt: String!
 }
 
 input NotificationInput {
@@ -661,12 +676,12 @@ input DeathRegistrationInput {
 
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
+  mobile: String!
+  systemRole: SystemRoleType!
   role: String
-  type: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -687,6 +702,17 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
+}
+
+type Response {
+  msg: String!
+}
+
+input SystemRoleInput {
+  id: ID!
+  value: String
+  active: Boolean
+  roles: [RoleInput!]
 }
 
 input CertificateSVGInput {
@@ -712,7 +738,11 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -727,7 +757,11 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -787,6 +821,12 @@ input FormDatasetInput {
   base64Data: String!
 }
 
+input SMSNotificationInput {
+  id: String!
+  name: String!
+  enabled: Boolean!
+}
+
 scalar Map
 
 type Registration {
@@ -804,6 +844,7 @@ type Registration {
   assignment: AssignmentData
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -820,6 +861,8 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 enum BirthType {
@@ -997,9 +1040,31 @@ enum LocationType {
   OTHER
 }
 
+enum SystemRoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+type Role {
+  _id: ID!
+  labels: [RoleLabel!]!
+}
+
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: SystemRoleType!
   signature: Signature
 }
 
@@ -1017,8 +1082,8 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
-  status: String
+  role: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
@@ -1152,6 +1217,7 @@ input PersonInput {
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
 }
 
 input LocationInput {
@@ -1180,6 +1246,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
@@ -1201,6 +1268,8 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput!]
   individual: PersonInput
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 input QuestionnaireQuestionInput {
@@ -1243,6 +1312,11 @@ input SignatureInput {
   type: String
 }
 
+input RoleInput {
+  _id: ID
+  labels: [LabelInput!]!
+}
+
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1264,6 +1338,12 @@ type Death {
   FEE: DeathFee
 }
 
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1283,6 +1363,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input QuestionInput {
@@ -1450,6 +1536,11 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type RoleLabel {
+  lang: String!
+  label: String!
 }
 
 type AdvancedSeachParameters {
@@ -1689,6 +1780,11 @@ input CorrectionInput {
   note: String
 }
 
+input LabelInput {
+  lang: String!
+  label: String!
+}
+
 type BirthFee {
   ON_TIME: Float
   LATE: Float
@@ -1698,6 +1794,11 @@ type BirthFee {
 type DeathFee {
   ON_TIME: Float
   DELAYED: Float
+}
+
+enum ImageFit {
+  FILL
+  TILE
 }
 
 input BirthFeeInput {
