@@ -924,6 +924,31 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'webhooks'
+
+  dashboards:
+    volumes:
+      - /data/metabase:/data/metabase
+    networks:
+      - overlay_net
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.metabase.rule=Host(`metabase.{{hostname}}`)'
+        - 'traefik.http.services.metabase.loadbalancer.server.port=3000'
+        - 'traefik.http.routers.metabase.tls=true'
+        - 'traefik.http.routers.metabase.tls.certresolver=certResolver'
+        - 'traefik.http.routers.metabase.entrypoints=web,websecure'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.http.middlewares.metabase.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.http.middlewares.metabase.headers.customresponseheaders.Cache-control=no-store'
+        - 'traefik.http.middlewares.metabase.headers.customresponseheaders.X-Robots-Tag=none'
+        - 'traefik.http.middlewares.metabase.headers.stsseconds=31536000'
+        - 'traefik.http.middlewares.metabase.headers.stsincludesubdomains=true'
+        - 'traefik.http.middlewares.metabase.headers.stspreload=true'
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data1 == true
 secrets:
   jwt-public-key.{{ts}}:
     external: true

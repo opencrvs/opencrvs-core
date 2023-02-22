@@ -17,6 +17,13 @@ services:
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
 
+  dashboards:
+    image: opencrvs/ocrvs-dashboards:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/dashboards/Dockerfile
+    restart: unless-stopped
+
   components:
     image: opencrvs/ocrvs-components:${VERSION:-latest}
     build:
