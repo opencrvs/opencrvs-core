@@ -1,0 +1,13 @@
+{
+  "name": "@opencrvs/dashboards",
+  "version": "1.3.0-beta",
+  "description": "OpenCRVS performance dashboards",
+  "main": "index.js",
+  "scripts": {
+    "start": "./run-dev.sh",
+    "db:shell": "./open-shell.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Riku Rouvila",
+  "license": "MPL-2.0"
+}
