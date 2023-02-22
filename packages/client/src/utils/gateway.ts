@@ -2084,13 +2084,6 @@ export type SecurityQuestionAnswer = {
   questionKey?: InputMaybe<Scalars['String']>
 }
 
-export type Settings = {
-  __typename?: 'Settings'
-  openIdConnectBaseUrl?: Maybe<Scalars['String']>
-  openIdConnectClientId?: Maybe<Scalars['String']>
-  webhook?: Maybe<WebhookPermission>
-}
-
 export type Signature = {
   __typename?: 'Signature'
   data?: Maybe<Scalars['String']>
@@ -2125,7 +2118,7 @@ export type System = {
   _id: Scalars['ID']
   clientId: Scalars['ID']
   name: Scalars['String']
-  settings: Settings
+  settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
@@ -2133,7 +2126,7 @@ export type System = {
 
 export type SystemInput = {
   name: Scalars['String']
-  settings?: InputMaybe<SystemSettings>
+  settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
 }
 
@@ -2169,6 +2162,14 @@ export type SystemSecret = {
 }
 
 export type SystemSettings = {
+  __typename?: 'SystemSettings'
+  dailyQuota?: Maybe<Scalars['Int']>
+  openIdProviderBaseUrl?: Maybe<Scalars['String']>
+  openIdProviderClientId?: Maybe<Scalars['String']>
+  webhook?: Maybe<Array<WebhookPermission>>
+}
+
+export type SystemSettingsInput = {
   dailyQuota?: InputMaybe<Scalars['Int']>
   webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
@@ -5903,14 +5904,14 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
-      settings: {
-        __typename?: 'Settings'
-        webhook?: {
+      settings?: {
+        __typename?: 'SystemSettings'
+        webhook?: Array<{
           __typename?: 'WebhookPermission'
           event: string
           permissions: Array<string>
-        } | null
-      }
+        }> | null
+      } | null
     }
   } | null
 }
@@ -5929,14 +5930,14 @@ export type DeactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings: {
-      __typename?: 'Settings'
-      webhook?: {
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
         __typename?: 'WebhookPermission'
         event: string
         permissions: Array<string>
-      } | null
-    }
+      }> | null
+    } | null
   } | null
 }
 
@@ -5954,14 +5955,14 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings: {
-      __typename?: 'Settings'
-      webhook?: {
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
         __typename?: 'WebhookPermission'
         event: string
         permissions: Array<string>
-      } | null
-    }
+      }> | null
+    } | null
   } | null
 }
 
@@ -6000,14 +6001,14 @@ export type UpdatePermissionsMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings: {
-      __typename?: 'Settings'
-      webhook?: {
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
         __typename?: 'WebhookPermission'
         event: string
         permissions: Array<string>
-      } | null
-    }
+      }> | null
+    } | null
   } | null
 }
 

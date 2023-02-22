@@ -29,6 +29,13 @@ enum SystemType {
   WEBHOOK
 }
 
+type SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookPermission!]
+  openIdProviderClientId: String
+  openIdProviderBaseUrl: String
+}
+
 type System {
   _id: ID!
   clientId: ID!
@@ -36,7 +43,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  settings: [WebhookPermission!]
+  settings: SystemSettings
 }
 
 type SystemSecret {
@@ -54,14 +61,14 @@ input WebhookInput {
   permissions: [String]!
 }
 
-input SystemSettings {
+input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
 }
 input SystemInput {
   name: String!
   type: SystemType!
-  settings: SystemSettings
+  settings: SystemSettingsInput
 }
 
 input UpdatePermissionsInput {

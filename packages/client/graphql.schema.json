@@ -17817,53 +17817,6 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Settings",
-        "description": null,
-        "fields": [
-          {
-            "name": "openIdConnectBaseUrl",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "openIdConnectClientId",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "webhook",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "WebhookPermission",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
         "name": "Signature",
         "description": null,
         "fields": [
@@ -18105,13 +18058,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Settings",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "SystemSettings",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -18197,7 +18146,7 @@
             "description": null,
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "SystemSettings",
+              "name": "SystemSettingsInput",
               "ofType": null
             },
             "defaultValue": null,
@@ -18476,8 +18425,75 @@
         "possibleTypes": null
       },
       {
-        "kind": "INPUT_OBJECT",
+        "kind": "OBJECT",
         "name": "SystemSettings",
+        "description": null,
+        "fields": [
+          {
+            "name": "dailyQuota",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "openIdProviderBaseUrl",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "openIdProviderClientId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "webhook",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "WebhookPermission",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "SystemSettingsInput",
         "description": null,
         "fields": null,
         "inputFields": [

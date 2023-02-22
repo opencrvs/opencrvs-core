@@ -43,6 +43,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  NATIONAL_ID_VERIFICATION
 }
 
 input CustomSelectOption {

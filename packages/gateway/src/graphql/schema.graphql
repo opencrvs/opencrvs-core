@@ -591,7 +591,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  settings: [WebhookPermission!]
+  settings: SystemSettings
 }
 
 type FormDataset {
@@ -787,7 +787,7 @@ type SystemSecret {
 input SystemInput {
   name: String!
   type: SystemType!
-  settings: SystemSettings
+  settings: SystemSettingsInput
 }
 
 input UpdatePermissionsInput {
@@ -1188,9 +1188,11 @@ enum SystemType {
   WEBHOOK
 }
 
-type WebhookPermission {
-  event: String!
-  permissions: [String!]!
+type SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookPermission!]
+  openIdProviderClientId: String
+  openIdProviderBaseUrl: String
 }
 
 type FormDatasetOption {
@@ -1390,7 +1392,7 @@ input QuestionInput {
   options: [CustomSelectOption!]
 }
 
-input SystemSettings {
+input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
 }
@@ -1700,6 +1702,11 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
 type FormDatasetOptionLabel {
   lang: String!
   descriptor: MesssageDescriptor!
@@ -1825,6 +1832,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  NATIONAL_ID_VERIFICATION
 }
 
 input ConditionalInput {

@@ -472,7 +472,7 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
-  settings?: Array<GQLWebhookPermission>
+  settings?: GQLSystemSettings
 }
 
 export interface GQLFormDataset {
@@ -668,7 +668,7 @@ export interface GQLSystemSecret {
 export interface GQLSystemInput {
   name: string
   type: GQLSystemType
-  settings?: GQLSystemSettings
+  settings?: GQLSystemSettingsInput
 }
 
 export interface GQLUpdatePermissionsInput {
@@ -1091,9 +1091,11 @@ export const enum GQLSystemType {
   WEBHOOK = 'WEBHOOK'
 }
 
-export interface GQLWebhookPermission {
-  event: string
-  permissions: Array<string>
+export interface GQLSystemSettings {
+  dailyQuota?: number
+  webhook?: Array<GQLWebhookPermission>
+  openIdProviderClientId?: string
+  openIdProviderBaseUrl?: string
 }
 
 export interface GQLFormDatasetOption {
@@ -1293,7 +1295,7 @@ export interface GQLQuestionInput {
   options?: Array<GQLCustomSelectOption>
 }
 
-export interface GQLSystemSettings {
+export interface GQLSystemSettingsInput {
   dailyQuota?: number
   webhook?: Array<GQLWebhookInput | null>
 }
@@ -1604,6 +1606,11 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLWebhookPermission {
+  event: string
+  permissions: Array<string>
+}
+
 export interface GQLFormDatasetOptionLabel {
   lang: string
   descriptor: GQLMesssageDescriptor
@@ -1728,7 +1735,8 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  NATIONAL_ID_VERIFICATION = 'NATIONAL_ID_VERIFICATION'
 }
 
 export interface GQLConditionalInput {
@@ -1914,7 +1922,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
-  WebhookPermission?: GQLWebhookPermissionTypeResolver
+  SystemSettings?: GQLSystemSettingsTypeResolver
   FormDatasetOption?: GQLFormDatasetOptionTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
@@ -1939,6 +1947,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  WebhookPermission?: GQLWebhookPermissionTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
@@ -5989,19 +5998,32 @@ export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLWebhookPermissionTypeResolver<TParent = any> {
-  event?: WebhookPermissionToEventResolver<TParent>
-  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+export interface GQLSystemSettingsTypeResolver<TParent = any> {
+  dailyQuota?: SystemSettingsToDailyQuotaResolver<TParent>
+  webhook?: SystemSettingsToWebhookResolver<TParent>
+  openIdProviderClientId?: SystemSettingsToOpenIdProviderClientIdResolver<TParent>
+  openIdProviderBaseUrl?: SystemSettingsToOpenIdProviderBaseUrlResolver<TParent>
 }
 
-export interface WebhookPermissionToEventResolver<
+export interface SystemSettingsToDailyQuotaResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface WebhookPermissionToPermissionsResolver<
+export interface SystemSettingsToWebhookResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderClientIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderBaseUrlResolver<
   TParent = any,
   TResult = any
 > {
@@ -7304,6 +7326,25 @@ export interface EventProgressDataToTimeInWaitingForBRISResolver<
 }
 
 export interface EventProgressDataToTimeInReadyToPrintResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLWebhookPermissionTypeResolver<TParent = any> {
+  event?: WebhookPermissionToEventResolver<TParent>
+  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+}
+
+export interface WebhookPermissionToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface WebhookPermissionToPermissionsResolver<
   TParent = any,
   TResult = any
 > {
