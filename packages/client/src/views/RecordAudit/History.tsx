@@ -252,13 +252,10 @@ export const GetHistory = ({
         )}
       </>
     ),
-    role: isVerifiedAction(item) ? (
-      <div />
-    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
-      intl.formatMessage(getSystemType(item.system?.type))
-    ) : (
-      item.user.role.labels.find((label) => label.lang === 'en')?.label
-    ),
+    role:
+      isSystemInitiated(item) || !item.user?.systemRole
+        ? intl.formatMessage(getSystemType(item.system?.type))
+        : getUserRole(currentLanguage, item.user.role),
 
     location: isVerifiedAction(item) ? (
       <div />
