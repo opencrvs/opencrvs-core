@@ -403,6 +403,11 @@ export const gqlToDraftTransformer = (
   if (queryData.history) {
     transformedData.history = queryData.history
   }
+
+  if (queryData.user?.role) {
+    transformedData.user.role = queryData.user.role._id
+  }
+
   return transformedData
 }
 
