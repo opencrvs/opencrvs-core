@@ -13,8 +13,6 @@ ENV OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=/environment-configuration.sql
 # Install envsubst
 RUN apk update && apk add gettext
 
-RUN /initialize-database.sh
-
 ENTRYPOINT ["/bin/sh", "/run.sh"]
 
 

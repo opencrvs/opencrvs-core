@@ -930,10 +930,10 @@ services:
       # Note that only mongo1 is used here on purpose for all environments
       # https://discourse.metabase.com/t/solved-add-mongodb-replicaset-database/7404/2
       - OPENCRVS_METABASE_DB_HOST=mongo1
-      - OPENCRVS_METABASE_DB_USER="performance"
+      - OPENCRVS_METABASE_DB_USER=performance
       - OPENCRVS_METABASE_DB_PASS=${PERFORMANCE_MONGODB_PASSWORD}
-      - OPENCRVS_METABASE_DB_AUTH_DB="admin"
-      - OPENCRVS_METABASE_SITE_NAME="OpenCRVS Dashboards"
+      - OPENCRVS_METABASE_DB_AUTH_DB=admin
+      - OPENCRVS_METABASE_SITE_NAME=OpenCRVS Dashboards
       - OPENCRVS_METABASE_SITE_URL=http://metabase.{{hostname}}
     deploy:
       labels:

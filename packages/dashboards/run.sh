@@ -46,8 +46,17 @@ if [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
 fi
 
 export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
-export MB_DB_FILE=/data/metabase/metabase
+export MB_DB_FILE=/data/metabase/metabase.mv.db
 
+source /initialize-database.sh
 source /update-database.sh
+
 echo "Starting metabase..."
+
+metabase_db_path=${MB_DB_FILE:-'/data/metabase/metabase.mv.db'}
+metabase_db_path="${metabase_db_path}"
+metabase_db_path_for_metabase=${metabase_db_path%.mv.db}
+
+MB_DB_FILE=${metabase_db_path_for_metabase} \
+MB_DB_TYPE=h2 \
 ./app/run_metabase.sh
