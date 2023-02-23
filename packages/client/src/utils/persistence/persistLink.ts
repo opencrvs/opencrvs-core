@@ -43,15 +43,16 @@ const attachPersists = (paths: any[], object: any) => {
     ) {
       const path = toQueryPath(this.path)
 
-      this.update({
-        __persist: Boolean(
-          queryPaths.find(
-            (queryPath) =>
-              queryPath.indexOf(path) === 0 || path.indexOf(queryPath) === 0
-          )
-        ),
-        ...this.node
-      })
+      const shouldAddPersistFlag = queryPaths.find(
+        (queryPath) =>
+          queryPath.indexOf(path) === 0 || path.indexOf(queryPath) === 0
+      )
+      if (shouldAddPersistFlag) {
+        this.update({
+          __persist: true,
+          ...this.node
+        })
+      }
     }
   })
 }
