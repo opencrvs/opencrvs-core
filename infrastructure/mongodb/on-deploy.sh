@@ -91,7 +91,7 @@ if [[ $HEARTH_USER != "FOUND" ]]; then
   db.createUser({
     user: 'hearth',
     pwd: '$HEARTH_MONGODB_PASSWORD',
-    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'hearth-dev' }]
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]
   })
 EOF
 else
