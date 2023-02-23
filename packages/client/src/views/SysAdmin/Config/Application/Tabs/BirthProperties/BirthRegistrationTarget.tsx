@@ -85,7 +85,9 @@ export function BirthRegistrationTarget() {
               ON_TIME: offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME,
               LATE: offlineCountryConfiguration.config.BIRTH.FEE.LATE,
               DELAYED: offlineCountryConfiguration.config.BIRTH.FEE.DELAYED
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.BIRTH.PRINT_IN_ADVANCE
           }
         },
         dispatch,
