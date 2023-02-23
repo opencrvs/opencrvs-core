@@ -15,7 +15,7 @@ import { connect, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { injectIntl } from 'react-intl'
-import { AppBar, Content, Frame } from '@opencrvs/components'
+import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
 import { Activity } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -73,14 +73,15 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
             allowFullScreen
           />
         ) : (
+          <div id={`${title.toLowerCase()}_noContent`}>
           <Content
             title={title}
-            size="large"
-            id={`${title.toLowerCase()}_noContent`}
+            size={ContentSize.LARGE}
           >
             {' '}
             No Content{' '}
           </Content>
+          </div>
         )}
       </Frame>
     </>
