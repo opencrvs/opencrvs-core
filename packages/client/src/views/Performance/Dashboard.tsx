@@ -27,15 +27,21 @@ const StyledIFrame = styled(IframeResizer)`
   height: 100%;
   border: none;
 `
-function dashboardComponent() {
+interface IdashboardView {
+  title: string
+  url: string
+  icon?: JSX.Element
+}
+
+export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const dispatch = useDispatch()
   return (
     <>
       <Frame
         header={
           <AppBar
-            desktopTitle="Dashboard"
-            desktopLeft={<Activity />}
+            desktopTitle={title}
+            desktopLeft={icon}
             desktopRight={
               <Button
                 type="icon"
@@ -45,7 +51,7 @@ function dashboardComponent() {
                 <Icon name="X" color="primary" />
               </Button>
             }
-            mobileLeft={<Activity />}
+            mobileLeft={icon}
             mobileRight={
               <Button
                 type="icon"
@@ -55,16 +61,13 @@ function dashboardComponent() {
                 <Icon name="X" color="primary" />
               </Button>
             }
-            mobileTitle="Statistics"
+            mobileTitle={title}
           />
         }
         skipToContentText="Skip to main content"
       >
-        {window.config && window.config.REGISTRATIONS_DASHBOARD_URL ? (
-          <StyledIFrame
-            src={window.config.REGISTRATIONS_DASHBOARD_URL}
-            allowFullScreen
-          />
+        {window.config && url ? (
+          <StyledIFrame src={url} allowFullScreen />
         ) : (
           <Content title="Dashboard" size="large">
             {' '}
@@ -75,6 +78,15 @@ function dashboardComponent() {
     </>
   )
 }
+
+const dashboardComponent = () => (
+  <DashboardEmbedView
+    title={'Dashboard'}
+    url={window.config.REGISTRATIONS_DASHBOARD_URL}
+    icon={<Activity />}
+  />
+)
+
 export const PerformanceDashboard = connect((state: IStoreState) =>
   getOfflineData(state)
 )(injectIntl(dashboardComponent))
