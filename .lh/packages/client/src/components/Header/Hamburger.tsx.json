@@ -1,0 +1,18 @@
+{
+    "sourceFile": "packages/client/src/components/Header/Hamburger.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1677231225840,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1677231225840,
+            "name": "Commit-0",
+            "content": "/*\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at https://mozilla.org/MPL/2.0/.\n *\n * OpenCRVS is also distributed under the terms of the Civil Registration\n * & Healthcare Disclaimer located at http://opencrvs.org/license.\n *\n * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS\n * graphic logo are (registered/a) trademark(s) of Plan International.\n */\nimport React, { useState } from 'react'\nimport { useIntl } from 'react-intl'\nimport { useSelector } from 'react-redux'\nimport { getUserDetails } from '@client/profile/profileSelectors'\nimport { getLanguage } from '@client/i18n/selectors'\nimport { getIndividualNameObj } from '@client/utils/userUtils'\nimport { Avatar } from '@client/components/Avatar'\nimport { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'\nimport { FixedNavigation } from '@client/components/interface/Navigation'\nimport { Button } from '@opencrvs/components/lib/Button'\nimport { Icon } from '@opencrvs/components/lib/Icon'\nimport { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'\nimport { Role } from '@client/utils/gateway'\n\nexport function Hamburger() {\n  const [showMenu, setShowMenu] = useState(false)\n  const userDetails = useSelector(getUserDetails)\n  const language = useSelector(getLanguage)\n  const toggleMenu = () => {\n    setShowMenu((prevState) => !prevState)\n  }\n  let name = ''\n  if (userDetails && userDetails.name) {\n    const nameObj = getIndividualNameObj(userDetails.name, language)\n    name = nameObj\n      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`\n      : ''\n  }\n\n  // let's remove this type assertion after #4458 merges in\n  const role =\n    (userDetails?.role && getUserRole(language, userDetails.role as Role)) ?? ''\n\n  const avatar = <Avatar name={name} avatar={userDetails?.avatar} />\n\n  const userInfo = { name, role, avatar }\n\n  return (\n    <>\n      <Button type=\"icon\" onClick={toggleMenu}>\n        <Icon name=\"List\"></Icon>\n      </Button>\n      <ExpandingMenu\n        showMenu={showMenu}\n        menuCollapse={() => toggleMenu()}\n        navigation={() => (\n          <FixedNavigation\n            navigationWidth={320}\n            menuCollapse={() => toggleMenu()}\n            userInfo={userInfo}\n          />\n        )}\n      />\n    </>\n  )\n}\n"
+        }
+    ]
+}
