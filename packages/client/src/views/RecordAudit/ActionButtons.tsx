@@ -42,6 +42,7 @@ import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { Roles } from '@client/utils/authUtils'
 import { useDispatch } from 'react-redux'
+import { Button } from '@client/../../components/src/Button'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -323,14 +324,15 @@ export const ShowIssueButton = ({
   ) {
     if (!isDownloaded) {
       return (
-        <PrimaryButton
+        <Button
           key={id}
           size={'medium'}
           id={`issue-${id}`}
           disabled={true}
+          type={'primary'}
         >
           {intl.formatMessage(buttonMessages.issue)}
-        </PrimaryButton>
+        </Button>
       )
     }
     return (

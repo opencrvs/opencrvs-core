@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { Content, RadioSize } from '@opencrvs/components/lib'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form'
@@ -42,9 +42,9 @@ const fields: IRadioGroupFormField[] = [
     initialValue: '',
     validate: [],
     options: [
-      { value: 'MOTHER', label: constantsMessages.issueToMother },
-      { value: 'FATHER', label: constantsMessages.issueToFather },
-      { value: 'OTHER', label: constantsMessages.issueToSomeoneElse }
+      { value: 'MOTHER', label: issueMessages.issueToMother },
+      { value: 'FATHER', label: issueMessages.issueToFather },
+      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
     ]
   }
 ]
@@ -60,8 +60,8 @@ const commonFields: IRadioGroupFormField[] = [
     initialValue: '',
     validate: [],
     options: [
-      { value: 'INFORMANT', label: constantsMessages.issueToInformant },
-      { value: 'OTHER', label: constantsMessages.issueToSomeoneElse }
+      { value: 'INFORMANT', label: issueMessages.issueToInformant },
+      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
     ]
   }
 ]
@@ -138,11 +138,8 @@ export function IssueCollectorForm({
       declaration.data.registration.certificates[0].collector?.type
     const event = declaration.event
     if (!relationship) return
-    if (relationship === 'OTHER' || relationship === 'INFORMANT') {
-      if (relationship === 'OTHER')
-        dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
-      else
-        dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
+    if (relationship === 'OTHER') {
+      dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
     } else {
       dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
     }
@@ -150,7 +147,7 @@ export function IssueCollectorForm({
 
   return (
     <Content
-      title={intl.formatMessage(constantsMessages.issueCertificate)}
+      title={intl.formatMessage(issueMessages.issueCertificate)}
       bottomActionButtons={[
         <PrimaryButton
           id="continue-button"

@@ -184,7 +184,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       ? intl.formatMessage(issueMessages.issueCertificate)
       : intl.formatMessage(messages.certificateCollectionTitle)
 
-    if (!this.props.declaration && !isIssueUrl) {
+    if (!this.props.declaration) {
       return (
         <Redirect
           to={formatUrl(REGISTRAR_HOME_TAB, {

@@ -43,6 +43,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 type IProps = {
   declaration: IDeclaration
@@ -98,7 +99,14 @@ export function getGroupWithVisibleFields(
     return field
   })
 
-  return group
+  return {
+    ...group,
+    fields: replaceInitialValues(
+      group.fields,
+      declaration.data[section.id] || {},
+      declaration.data
+    )
+  }
 }
 
 function CorrectorFormComponent(props: IFullProps) {

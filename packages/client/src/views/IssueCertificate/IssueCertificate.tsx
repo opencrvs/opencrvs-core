@@ -41,6 +41,17 @@ export function IssueCertificate() {
     <Frame
       header={
         <AppBar
+          mobileLeft={<HistoryNavigator hideForward={true} />}
+          mobileTitle={intl.formatMessage(issueMessages.issueCertificate)}
+          mobileRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              <Icon name={'X'} />
+            </Button>
+          }
           desktopTitle={intl.formatMessage(issueMessages.issueCertificate)}
           desktopLeft={<HistoryNavigator hideForward={true} />}
           desktopRight={

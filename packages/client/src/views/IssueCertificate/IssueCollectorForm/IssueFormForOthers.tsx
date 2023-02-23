@@ -44,6 +44,7 @@ import {
   goToVerifyIssueCollector
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 const fields: IFormField[] = [
   {
@@ -187,7 +188,7 @@ export const IssueCollectorFormForOthers = ({
 
   return (
     <Content
-      title={intl.formatMessage(constantsMessages.collectorDetails)}
+      title={intl.formatMessage(issueMessages.collectorDetails)}
       bottomActionButtons={[
         <PrimaryButton
           id="continue-button"

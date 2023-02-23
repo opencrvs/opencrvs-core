@@ -39,6 +39,7 @@ interface IButtonsMessages
   no: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
+  issue: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
   rejectDeclaration: MessageDescriptor
@@ -212,6 +213,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Print',
     description: 'Print button text',
     id: 'buttons.print'
+  },
+  issue: {
+    id: 'buttons.issue',
+    defaultMessage: 'Issue',
+    description: 'Button for issuing'
   },
   reinstate: {
     defaultMessage: 'Reinstate',

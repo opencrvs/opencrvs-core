@@ -30,14 +30,10 @@ import {
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
 import { conditionals } from '@client/forms/utils'
-import {
-  constantsMessages,
-  formMessages,
-  userMessages
-} from '@client/i18n/messages'
+import { formMessages, userMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
-import { RadioSize } from '@opencrvs/components/lib/Radio/'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export interface INameField {
   firstNamesField: string
@@ -163,114 +159,6 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
     ]
   }
 
-const otherCertCollector: IFormSectionGroup[] = [
-  {
-    id: 'otherCertCollector',
-    conditionals: [conditionals.certCollectorOther],
-    title: certificateMessages.otherCollectorFormTitle,
-    error: certificateMessages.certificateOtherCollectorInfoError,
-    fields: [
-      {
-        name: 'iDType',
-        type: SELECT_WITH_OPTIONS,
-        label: formMessages.typeOfId,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ],
-        placeholder: formMessages.select,
-        options: identityOptions
-      },
-      {
-        name: 'iDTypeOther',
-        type: TEXT,
-        label: formMessages.iDTypeOtherLabel,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ],
-        conditionals: [conditionals.iDType]
-      },
-      {
-        name: 'iD',
-        type: FIELD_WITH_DYNAMIC_DEFINITIONS,
-        dynamicDefinitions: {
-          label: {
-            dependency: 'iDType',
-            labelMapper: identityNameMapper
-          },
-          helperText: {
-            dependency: 'iDType',
-            helperTextMapper: identityHelperTextMapper
-          },
-          type: {
-            kind: 'dynamic',
-            dependency: 'iDType',
-            typeMapper: identityTypeMapper
-          },
-          validate: [
-            {
-              validator: validIDNumber,
-              dependencies: ['iDType']
-            }
-          ]
-        },
-        label: formMessages.iD,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ],
-        conditionals: [conditionals.iDAvailable]
-      },
-      {
-        name: 'firstName',
-        type: TEXT,
-        label: formMessages.firstName,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ]
-      },
-      {
-        name: 'lastName',
-        type: TEXT,
-        label: formMessages.lastName,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ]
-      },
-      {
-        name: 'relationship',
-        type: TEXT,
-        label: formMessages.informantsRelationWithChild,
-        required: true,
-        initialValue: '',
-        validate: [
-          fieldValidationDescriptorToValidationFunction({
-            operation: 'requiredBasic'
-          })
-        ]
-      }
-    ]
-  }
-]
-
 export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
   {
     id: 'certCollector',
@@ -331,7 +219,111 @@ export const collectBirthCertificateFormSection: IFormSection = {
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
   groups: [
-    otherCertCollector[0],
+    {
+      id: 'otherCertCollector',
+      conditionals: [conditionals.certCollectorOther],
+      title: certificateMessages.otherCollectorFormTitle,
+      error: certificateMessages.certificateOtherCollectorInfoError,
+      fields: [
+        {
+          name: 'iDType',
+          type: SELECT_WITH_OPTIONS,
+          label: formMessages.typeOfId,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          placeholder: formMessages.select,
+          options: identityOptions
+        },
+        {
+          name: 'iDTypeOther',
+          type: TEXT,
+          label: formMessages.iDTypeOtherLabel,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDType]
+        },
+        {
+          name: 'iD',
+          type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+          dynamicDefinitions: {
+            label: {
+              dependency: 'iDType',
+              labelMapper: identityNameMapper
+            },
+            helperText: {
+              dependency: 'iDType',
+              helperTextMapper: identityHelperTextMapper
+            },
+            type: {
+              kind: 'dynamic',
+              dependency: 'iDType',
+              typeMapper: identityTypeMapper
+            },
+            validate: [
+              {
+                validator: validIDNumber,
+                dependencies: ['iDType']
+              }
+            ]
+          },
+          label: formMessages.iD,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDAvailable]
+        },
+        {
+          name: 'firstName',
+          type: TEXT,
+          label: formMessages.firstName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'lastName',
+          type: TEXT,
+          label: formMessages.lastName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'relationship',
+          type: TEXT,
+          label: formMessages.informantsRelationWithChild,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        }
+      ]
+    },
     {
       id: 'affidavit',
       conditionals: [conditionals.certCollectorOther],
