@@ -14,15 +14,16 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { IRoleSearchPayload } from '@gateway/features/role/type-resolvers'
 import { transformMongoComparisonObject } from '@gateway/features/role/utils'
+import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getRoles(
+    async getSystemRoles(
       _,
       {
         title = null,
         value = null,
-        type = null,
+        role = null,
         active = null,
         sortBy = null,
         sortOrder = null
@@ -39,8 +40,8 @@ export const resolvers: GQLResolver = {
           value: transformMongoComparisonObject(value)
         }
       }
-      if (type) {
-        payload = { ...payload, type }
+      if (role) {
+        payload = { ...payload, role }
       }
       if (sortBy) {
         payload = { ...payload, sortBy }
@@ -51,7 +52,7 @@ export const resolvers: GQLResolver = {
       if (active !== null) {
         payload = { ...payload, active }
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}getRoles`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}getSystemRoles`, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
@@ -60,6 +61,30 @@ export const resolvers: GQLResolver = {
         }
       })
       return await res.json()
+    }
+  },
+  Mutation: {
+    async updateRole(_, { systemRole }, authHeader) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        return Promise.reject(
+          new Error(' Update Role is only allowed for natlsysadmin')
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}updateRole`, {
+        method: 'POST',
+        body: JSON.stringify(systemRole),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return new Error(
+          `Something went wrong on user management service. Couldn't update system role`
+        )
+      }
+      return res.json()
     }
   }
 }

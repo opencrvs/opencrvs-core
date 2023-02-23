@@ -101,10 +101,6 @@ export const ReadyToIssue = ({
     setWidth(window.innerWidth)
   }
 
-  const getExpandable = () => {
-    return width > theme.grid.breakpoints.lg ? true : false
-  }
-
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,

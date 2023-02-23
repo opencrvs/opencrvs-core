@@ -14,6 +14,7 @@ import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 import enGB from 'date-fns/locale/en-GB'
 import bn from 'date-fns/locale/bn'
 import fr from 'date-fns/locale/fr'
+import subYears from 'date-fns/subYears'
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 
@@ -34,6 +35,10 @@ export const formattedDuration = (fromDate: Date | number) => {
     addSuffix: true,
     roundingMethod: 'floor'
   })
+}
+
+export const convertAgeToDate = (age: string): string => {
+  return format(subYears(new Date(), Number(age)), 'yyyy-MM-dd')
 }
 
 export default function formatDate(date: Date | number, formatStr = 'PP') {

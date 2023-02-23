@@ -20,6 +20,7 @@ import {
   mockOfflineDataDispatch,
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
+  mockRoles,
   mockUserGraphqlOperation
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -27,17 +28,21 @@ import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { roleQueries } from '@client/forms/user/query/queries'
+import { Mock, describe, expect } from 'vitest'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
+      ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser

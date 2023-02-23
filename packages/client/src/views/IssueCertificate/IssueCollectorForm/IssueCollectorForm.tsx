@@ -105,30 +105,6 @@ export function IssueCollectorForm({
     if (declaration.event === Event.Death) {
       return commonFields
     }
-    // const informantType = declaration.data.informant.relationship
-    // const filterType =
-    //   informantType === 'MOTHER'
-    //     ? 'FATHER'
-    //     : informantType === 'FATHER'
-    //     ? 'MOTHER'
-    //     : null
-    // if (filterType === null) {
-    //   const filteredData = commonFields.map((field) => {
-    //     const updatedOptions = field.options.filter(
-    //       (option) => option.value !== 'INFORMANT'
-    //     )
-    //     return { ...field, options: updatedOptions }
-    //   })
-    //   return filteredData
-    // } else {
-    //   const filteredData = fields.map((field) => {
-    //     const updatedOptions = field.options.filter(
-    //       (option) => option.value !== filterType
-    //     )
-    //     return { ...field, options: updatedOptions }
-    //   })
-    //   return filteredData
-    // }
     const declarationData = declaration.data
     const filteredData = [{ ...fields[0] }]
 

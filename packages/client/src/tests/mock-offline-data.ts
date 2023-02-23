@@ -156,7 +156,7 @@ export const mockConditionals = {
   },
   isRegistrarRoleSelected: {
     action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
+    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
   },
   isOfficePreSelected: {
     action: 'hide',
@@ -711,7 +711,8 @@ export const mockOfflineData = {
         ON_TIME: 0,
         LATE: 15,
         DELAYED: 20
-      }
+      },
+      PRINT_IN_ADVANCE: true
     },
     AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
     DEATH: {
@@ -719,7 +720,8 @@ export const mockOfflineData = {
       FEE: {
         ON_TIME: 0,
         DELAYED: 0
-      }
+      },
+      PRINT_IN_ADVANCE: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',

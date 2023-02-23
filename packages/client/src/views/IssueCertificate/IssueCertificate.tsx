@@ -21,9 +21,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { IStoreState } from '@client/store'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
-import { goBack } from '@client/navigation'
+import { goBack, goToHomeTab } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 export function IssueCertificate() {
   const intl = useIntl()
@@ -47,7 +48,7 @@ export function IssueCertificate() {
             <Button
               size="large"
               type="tertiary"
-              onClick={() => dispatch(goBack())}
+              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
               <Icon name={'X'} />
             </Button>
@@ -58,7 +59,7 @@ export function IssueCertificate() {
             <Button
               size="large"
               type="tertiary"
-              onClick={() => dispatch(goBack())}
+              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
               <Icon name={'X'} />
             </Button>

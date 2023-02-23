@@ -12,13 +12,13 @@
 import * as Hapi from '@hapi/hapi'
 import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
 
-const ROLE = 'role'
+type Payload = {
+  role: string
+  locationId?: string
+}
 
-export async function countUsersByLocationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const role = request.query[ROLE]
+export async function countUsersByLocationHandler(request: Hapi.Request) {
+  const { locationId, role } = request.payload as Payload
 
-  return countUsersByLocation({ role })
+  return countUsersByLocation(role, locationId)
 }
