@@ -5338,12 +5338,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "NATIONAL_ID_VERIFICATION",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "NUMBER",
             "description": null,
             "isDeprecated": false,

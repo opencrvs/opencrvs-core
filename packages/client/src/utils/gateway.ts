@@ -612,7 +612,6 @@ export type CurrencyInput = {
 }
 
 export enum CustomFieldType {
-  NationalIdVerification = 'NATIONAL_ID_VERIFICATION',
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
   SelectWithOptions = 'SELECT_WITH_OPTIONS',
