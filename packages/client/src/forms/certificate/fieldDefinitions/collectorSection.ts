@@ -87,6 +87,18 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
         },
         birthDateField: 'fatherBirthDate',
         nationalityField: 'nationality'
+      },
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
       }
     },
     death: {

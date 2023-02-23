@@ -103,34 +103,60 @@ export function IssueCollectorForm({
 
   const finalFields = (): IRadioGroupFormField[] => {
     if (declaration.event === Event.Death) {
-      const filteredData = commonFields
-      return filteredData
-    } else {
-      const informantType = declaration.data.informant.relationship
-      const filterType =
-        informantType === 'MOTHER'
-          ? 'FATHER'
-          : informantType === 'FATHER'
-          ? 'MOTHER'
-          : null
-      if (filterType === null) {
-        const filteredData = commonFields.map((field) => {
-          const updatedOptions = field.options.filter(
-            (option) => option.value !== 'INFORMANT'
-          )
-          return { ...field, options: updatedOptions }
-        })
-        return filteredData
-      } else {
-        const filteredData = fields.map((field) => {
-          const updatedOptions = field.options.filter(
-            (option) => option.value !== filterType
-          )
-          return { ...field, options: updatedOptions }
-        })
-        return filteredData
-      }
+      return commonFields
     }
+    // const informantType = declaration.data.informant.relationship
+    // const filterType =
+    //   informantType === 'MOTHER'
+    //     ? 'FATHER'
+    //     : informantType === 'FATHER'
+    //     ? 'MOTHER'
+    //     : null
+    // if (filterType === null) {
+    //   const filteredData = commonFields.map((field) => {
+    //     const updatedOptions = field.options.filter(
+    //       (option) => option.value !== 'INFORMANT'
+    //     )
+    //     return { ...field, options: updatedOptions }
+    //   })
+    //   return filteredData
+    // } else {
+    //   const filteredData = fields.map((field) => {
+    //     const updatedOptions = field.options.filter(
+    //       (option) => option.value !== filterType
+    //     )
+    //     return { ...field, options: updatedOptions }
+    //   })
+    //   return filteredData
+    // }
+    const declarationData = declaration.data
+    const filteredData = [{ ...fields[0] }]
+
+    const motherDataExists =
+      declarationData &&
+      declarationData.mother &&
+      declarationData.mother.detailsExist
+
+    const fatherDataExists =
+      declarationData &&
+      declarationData.father &&
+      declarationData.father.detailsExist
+
+    if (!fatherDataExists && !motherDataExists) return commonFields
+
+    if (!fatherDataExists) {
+      filteredData[0].options = filteredData[0].options.filter(
+        (option) => option.value !== 'FATHER'
+      )
+    }
+
+    if (!motherDataExists) {
+      filteredData[0].options = filteredData[0].options.filter(
+        (option) => option.value !== 'MOTHER'
+      )
+    }
+
+    return filteredData
   }
 
   function continueButtonHandler() {

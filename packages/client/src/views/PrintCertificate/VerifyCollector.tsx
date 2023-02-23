@@ -209,7 +209,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         goBack={this.props.goBack}
         hideBackground
         title={titleMessage}
-        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        goHome={() =>
+          isIssueUrl
+            ? this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+            : this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+        }
       >
         <IDVerifier
           id="idVerifier"
