@@ -873,7 +873,7 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
-                        id="navigation_report_main"
+                        id="navigation_report"
                         isSelected={
                           enableMenuSelection &&
                           activeMenuItem === WORKQUEUE_TABS.performance
