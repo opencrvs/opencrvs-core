@@ -10,21 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React, { Fragment } from 'react'
-import { Frame } from '@opencrvs/components/lib/Frame'
 import { Header } from '@client/components/Header/Header'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { constantsMessages } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
 import { useIntl } from 'react-intl'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
+  Frame,
   Content,
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
   BreadCrumb,
   Divider,
-  Icon
+  Icon,
+  Button,
+  Pagination
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,7 +37,6 @@ import {
   goToPerformanceHome,
   goToTeamUserList
 } from '@client/navigation'
-import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
