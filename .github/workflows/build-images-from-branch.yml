@@ -52,7 +52,7 @@ jobs:
       - name: Upload image
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
-          image: 'opencrvs-build:latest'
+          image: 'opencrvs-build:${{ steps.set-version.outputs.version }}'
 
     outputs:
       services: ${{ steps.get-services.outputs.services }}
@@ -82,7 +82,7 @@ jobs:
       - name: Download image
         uses: ishworkh/docker-image-artifact-download@v1
         with:
-          image: 'opencrvs-build:latest'
+          image: 'opencrvs-build:${{ needs.base.outputs.version }}'
 
       - name: Build ${{ matrix.service }}
         run: |
