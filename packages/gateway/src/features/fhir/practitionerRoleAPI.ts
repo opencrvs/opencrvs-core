@@ -20,10 +20,10 @@ export default class PractitionerRoleAPI extends RESTDataSource {
   }
 
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { dataSources, ...authHeader } = this.context
-    const headerKeys = Object.keys(authHeader)
+    const { headers } = this.context
+    const headerKeys = Object.keys(headers)
     for (const each of headerKeys) {
-      request.headers.set(each, authHeader[each])
+      request.headers.set(each, headers[each])
     }
     request.headers.set('Content-Type', 'application/fhir+json')
   }

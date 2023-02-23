@@ -1142,13 +1142,29 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockUser))
 
       // @ts-ignore
-      const comments = await typeResolvers.RegWorkflow.comments(mockTask)
+      const comments = await typeResolvers.RegWorkflow.comments(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const comment = await typeResolvers.Comment.comment(mockTask.note[0])
+      const comment = await typeResolvers.Comment.comment(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const user = await typeResolvers.Comment.user(mockTask.note[0])
+      const user = await typeResolvers.Comment.user(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const time = await typeResolvers.Comment.createdAt(mockTask.note[0])
+      const time = await typeResolvers.Comment.createdAt(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
 
       expect(comments).toBeDefined()
 
@@ -1167,7 +1183,11 @@ describe('Registration type resolvers', () => {
 
     it('returns timeLogged of the task', async () => {
       fetch.mockResponseOnce(JSON.stringify({ timeSpentEditing: 0 }))
-      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(mockTask)
+      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
 
       expect(timeLogged).toBe(0)
     })
@@ -1354,7 +1374,9 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
 
       const relatedPerson = await typeResolvers.Certificate.collector(
-        mockCertificate
+        mockCertificate,
+        undefined,
+        { headers: undefined }
       )
       expect(relatedPerson).toBeDefined()
       expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')

@@ -77,10 +77,12 @@ describe('Test apollo server config', () => {
       h: {}
     })
     expect(context).toStrictEqual({
-      Authorization: `Bearer ${token}`,
-      'x-correlation-id': '1',
-      'x-real-ip': '1.1.1.1',
-      'x-real-user-agent': 'OpenCRVS'
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'x-correlation-id': '1',
+        'x-real-ip': '1.1.1.1',
+        'x-real-user-agent': 'OpenCRVS'
+      }
     })
   })
   it('throws authentication error when the token holder does not exist', async () => {

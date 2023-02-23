@@ -249,7 +249,7 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.coding[0].display
       )
     },
-    individual: async (relatedPerson, _, authHeader) => {
+    individual: async (relatedPerson, _, { headers: authHeader }) => {
       if (
         !relatedPerson ||
         !relatedPerson.patient ||
@@ -621,7 +621,7 @@ export const typeResolvers: GQLResolver = {
         taskLocation.valueReference.reference?.split('/')[1]
       )
     },
-    timeLogged: async (task, _, authHeader) => {
+    timeLogged: async (task, _, { headers: authHeader }) => {
       const compositionId =
         (task.focus.reference && task.focus.reference.split('/')[1]) || ''
       const timeLoggedResponse = (await getTimeLoggedFromMetrics(
@@ -633,7 +633,7 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Comment: {
-    user: async (comment, _, authHeader) => {
+    user: async (comment, _, { headers: authHeader }) => {
       if (!comment.authorString) {
         return null
       }
@@ -694,7 +694,11 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Certificate: {
-    async collector(docRef: fhir.DocumentReference, _, authHeader) {
+    async collector(
+      docRef: fhir.DocumentReference,
+      _,
+      { headers: authHeader }
+    ) {
       const relatedPersonRef =
         docRef.extension &&
         docRef.extension.find(
@@ -715,7 +719,7 @@ export const typeResolvers: GQLResolver = {
     async hasShowedVerifiedDocument(
       docRef: fhir.DocumentReference,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const hasShowedDocument = findExtension(
         HAS_SHOWED_VERIFIED_DOCUMENT,
@@ -833,7 +837,11 @@ export const typeResolvers: GQLResolver = {
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
-    user: async (task: fhir.Task, _: any, { dataSources, ...authHeader }) => {
+    user: async (
+      task: fhir.Task,
+      _: any,
+      { dataSources, headers: authHeader }
+    ) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension as fhir.Extension[]
@@ -893,7 +901,7 @@ export const typeResolvers: GQLResolver = {
         }
       }
     },
-    system: async (task: fhir.Task, _: any, authHeader) => {
+    system: async (task: fhir.Task, _: any, { headers: authHeader }) => {
       const systemIdentifier = task.identifier?.find(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
@@ -930,7 +938,7 @@ export const typeResolvers: GQLResolver = {
     comments: (task) => task.note || [],
     input: (task) => task.input || [],
     output: (task) => task.output || [],
-    certificates: async (task, _, authHeader) => {
+    certificates: async (task, _, { headers: authHeader }) => {
       if (
         getActionFromTask(task) ||
         getStatusFromTask(task) !== GQLRegStatus.CERTIFIED

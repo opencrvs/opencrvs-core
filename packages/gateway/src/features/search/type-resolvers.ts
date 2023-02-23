@@ -242,7 +242,11 @@ export const searchTypeResolvers: GQLResolver = {
       }
       return startedAt
     },
-    startedBy: async (searchData: ISearchEventDataTemplate, _, authHeader) => {
+    startedBy: async (
+      searchData: ISearchEventDataTemplate,
+      _,
+      { headers: authHeader }
+    ) => {
       return await getUser(
         { practitionerId: searchData._source && searchData._source.createdBy },
         authHeader
@@ -261,7 +265,7 @@ export const searchTypeResolvers: GQLResolver = {
     progressReport: async (
       searchData: ISearchEventDataTemplate,
       _,
-      authHeader
+      { headers: authHeader }
     ) => {
       return await getEventDurationsFromMetrics(authHeader, searchData._id)
     }

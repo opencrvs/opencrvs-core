@@ -301,11 +301,15 @@ describe('Registration type resolvers', () => {
         })
       )
       // @ts-ignore
-      const person = await typeResolvers.RelatedPerson.individual({
-        patient: {
-          reference: 'Patient/123' // reference to deceased
-        }
-      })
+      const person = await typeResolvers.RelatedPerson.individual(
+        {
+          patient: {
+            reference: 'Patient/123' // reference to deceased
+          }
+        },
+        undefined,
+        { headers: undefined }
+      )
       // console.log(response.mockPatient.na)
       expect(person.name[0].family[0]).toEqual('Matinyana')
       expect(mock).toHaveBeenCalledTimes(1)

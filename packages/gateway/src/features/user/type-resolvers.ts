@@ -180,7 +180,11 @@ export const userTypeResolvers: GQLResolver = {
         })
       )
     },
-    async localRegistrar(userModel: IUserModelData, _, authHeader) {
+    async localRegistrar(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader }
+    ) {
       const scope = userModel.scope
 
       if (!scope) {
@@ -223,7 +227,7 @@ export const userTypeResolvers: GQLResolver = {
         }
       }
     },
-    async signature(userModel: IUserModelData, _, authHeader) {
+    async signature(userModel: IUserModelData, _, { headers: authHeader }) {
       const practitioner: fhir.Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader

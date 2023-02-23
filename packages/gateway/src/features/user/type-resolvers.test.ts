@@ -385,7 +385,11 @@ describe('User type resolvers', () => {
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
-    const response = await userTypeResolvers.User.localRegistrar(mockResponse)
+    const response = await userTypeResolvers.User.localRegistrar(
+      mockResponse,
+      undefined,
+      { headers: undefined }
+    )
 
     expect(response).toEqual({
       role: 'LOCAL_REGISTRAR',
@@ -424,7 +428,11 @@ describe('User type resolvers', () => {
     const userResponse = mockResponse
     userResponse.scope.push('register')
 
-    const response = await userTypeResolvers.User.localRegistrar(userResponse)
+    const response = await userTypeResolvers.User.localRegistrar(
+      userResponse,
+      undefined,
+      { headers: undefined }
+    )
 
     expect(response).toEqual({
       role: 'REGISTRATION_AGENT',
