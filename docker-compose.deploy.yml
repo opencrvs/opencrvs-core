@@ -932,7 +932,7 @@ services:
       - OPENCRVS_METABASE_DB_HOST=mongo1
       - OPENCRVS_METABASE_DB_USER=performance
       - OPENCRVS_METABASE_DB_PASS=${PERFORMANCE_MONGODB_PASSWORD}
-      - OPENCRVS_METABASE_DB_AUTH_DB=admin
+      - OPENCRVS_METABASE_DB_AUTH_DB=performance
       - OPENCRVS_METABASE_SITE_NAME=OpenCRVS Dashboards
       - OPENCRVS_METABASE_SITE_URL=http://metabase.{{hostname}}
     deploy:

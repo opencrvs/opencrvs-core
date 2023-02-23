@@ -53,8 +53,8 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import { validateFunc } from '@gateway/../../commons/build/dist'
 import { AUTH_URL, CHECK_INVALID_TOKEN } from '@gateway/constants'
+import { validateFunc } from '@opencrvs/commons'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
