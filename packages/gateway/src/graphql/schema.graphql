@@ -30,6 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -357,6 +358,22 @@ interface EventRegistration {
 type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
+}
+
+type MarriageRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person
+  groom: Person
+  witnessOne: RelatedPerson
+  witnessTwo: RelatedPerson
+  eventLocation: Location
+  marriageType: MarriageType
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
 type Location {
@@ -693,22 +710,6 @@ input MarriageRegistrationInput {
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
-}
-
-type MarriageRegistration implements EventRegistration {
-  id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  bride: Person
-  groom: Person
-  witnessOne: RelatedPerson
-  witnessTwo: RelatedPerson
-  eventLocation: Location
-  marriageType: MarriageType
-  questionnaire: [QuestionnaireQuestion]
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
 }
 
 input UserInput {
@@ -1058,6 +1059,11 @@ type StatusWiseRegistrationCount {
   count: Int!
 }
 
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
+}
+
 type Identifier {
   system: String
   value: String
@@ -1332,11 +1338,6 @@ input MedicalPractitionerInput {
   name: String
   qualification: String
   lastVisitDate: Date
-}
-
-enum MarriageType {
-  POLYGAMY
-  MONOGAMY
 }
 
 input HumanNameInput {

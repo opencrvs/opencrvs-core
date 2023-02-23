@@ -122,6 +122,19 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async fetchMarriageRegistration(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare')
+      ) {
+        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
     async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
