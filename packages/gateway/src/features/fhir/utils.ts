@@ -1148,7 +1148,7 @@ export const postAdvancedSearch = (
     })
 }
 
-type DuplicateSearchBody = {
+type BirthDuplicateSearchBody = {
   childFirstNames?: string
   childFamilyName?: string
   childDoB?: string
@@ -1156,11 +1156,41 @@ type DuplicateSearchBody = {
   motherFamilyName?: string
   motherDoB?: string
 }
-export const findDuplicates = (
+
+export const findBirthDuplicates = (
   authHeader: IAuthHeader,
-  criteria: DuplicateSearchBody
+  criteria: BirthDuplicateSearchBody
 ) => {
-  return fetch(`${SEARCH_URL}search/duplicates`, {
+  return fetch(`${SEARCH_URL}search/duplicates/birth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type DeathDuplicateSearchBody = {
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedIdentifier?: string
+  deceasedDoB?: string
+  deathDate?: string
+}
+export const findDeathDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: DeathDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/death`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

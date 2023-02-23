@@ -167,6 +167,10 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.DEATH_NEW_DEC
+              }
+
               return Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 

@@ -17,6 +17,7 @@ import {
 import {
   CERTIFIED_STATUS,
   createStatusHistory,
+  detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -41,6 +42,8 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
+import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -153,6 +156,25 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
+  if (body.type !== 'IN_PROGRESS' && body.type !== 'WAITING_VALIDATION') {
+    await detectAndUpdateDeathDuplicates(compositionId, composition, body)
+  }
+}
+
+async function detectAndUpdateDeathDuplicates(
+  compositionId: string,
+  composition: fhir.Composition,
+  body: IDeathCompositionBody
+) {
+  const duplicates = await detectDeathDuplicates(compositionId, body)
+  if (!duplicates.length) {
+    return
+  }
+  logger.info(
+    `Search/service:death: ${duplicates.length} duplicate composition(s) found`
+  )
+
+  return await updateCompositionWithDuplicates(composition, duplicates)
 }
 
 async function createIndexBody(

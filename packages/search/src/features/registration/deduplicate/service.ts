@@ -16,13 +16,21 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   IBirthCompositionBody,
-  ICompositionBody
+  ICompositionBody,
+  IDeathCompositionBody
 } from '@search/elasticsearch/utils'
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
-import { subYears, addYears, subMonths, addMonths } from 'date-fns'
+import {
+  subYears,
+  addYears,
+  subMonths,
+  addMonths,
+  subDays,
+  addDays
+} from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (
@@ -48,7 +56,7 @@ const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
   )
 }
 
-export const searchForDuplicates = async (
+export const searchForBirthDuplicates = async (
   body: IBirthCompositionBody,
   client: elasticsearch.Client
 ) => {
@@ -212,7 +220,83 @@ export const searchForDuplicates = async (
     })
     return result.body.hits.hits
   } catch (err) {
-    logger.error(`searchDuplicates error: ${err}`)
+    logger.error(`searchBirthDuplicates error: ${err}`)
+    throw err
+  }
+}
+
+export const searchForDeathDuplicates = async (
+  body: IDeathCompositionBody,
+  client: elasticsearch.Client
+) => {
+  const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+
+  console.log(body)
+  try {
+    const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
+      index: OPENCRVS_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: {
+          bool: {
+            must: [
+              body.deceasedFirstNames && {
+                match: {
+                  deceasedFirstNames: {
+                    query: body.deceasedFirstNames,
+                    fuzziness: FIRST_NAME_FUZZINESS
+                  }
+                }
+              },
+              body.deceasedFamilyName && {
+                match: {
+                  deceasedFamilyName: {
+                    query: body.deceasedFamilyName,
+                    fuzziness: FIRST_NAME_FUZZINESS
+                  }
+                }
+              },
+              body.deceasedIdentifier && {
+                match_phrase: {
+                  deceasedIdentifier: body.deceasedIdentifier
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    body.deathDate && {
+                      range: {
+                        deathDate: {
+                          gte: subDays(
+                            new Date(body.deathDate),
+                            5
+                          ).toISOString(),
+                          lte: addDays(
+                            new Date(body.deathDate),
+                            5
+                          ).toISOString()
+                        }
+                      }
+                    },
+                    body.deathDate && {
+                      distance_feature: {
+                        field: 'deathDate',
+                        pivot: '5d', // 5 days
+                        origin: new Date(body.deathDate).toISOString(),
+                        boost: 1
+                      }
+                    }
+                  ].filter(Boolean)
+                }
+              }
+            ].filter(Boolean)
+          }
+        }
+      }
+    })
+    return result.body.hits.hits
+  } catch (err) {
+    logger.error(`searchDeathDuplicates error: ${err}`)
     throw err
   }
 }

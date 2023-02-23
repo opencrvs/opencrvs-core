@@ -862,7 +862,7 @@ export const DuplicateFormTabs = (props: IProps) => {
                 ),
                 rightValue: (
                   <Text variant="reg16" element="span" color="grey600">
-                    {item2.value}
+                    {item2?.value}
                   </Text>
                 )
               }

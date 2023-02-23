@@ -29,7 +29,7 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
@@ -47,11 +47,15 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedsearchForDuplicates = searchForDuplicates as jest.Mocked<any>
+      const mockedsearchForDuplicates =
+        searchForBirthDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
+
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
+
       mockedIndexComposition.mockReturnValue({})
+
       mockedsearchForDuplicates.mockReturnValue(
         mockSearchResponse.body.hits.hits
       )
@@ -94,7 +98,8 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchComposition = searchForDuplicates as jest.Mocked<any>
+      const mockedSearchComposition =
+        searchForBirthDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>

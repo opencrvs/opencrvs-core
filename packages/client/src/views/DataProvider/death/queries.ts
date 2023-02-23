@@ -380,6 +380,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactRelationship
         contactPhoneNumber
         informantsSignature
+        duplicates {
+          compositionId
+          trackingId
+        }
         status {
           comments {
             comment

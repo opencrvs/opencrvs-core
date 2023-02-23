@@ -37,7 +37,8 @@ draft.data = {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }
   },
   registration: {
-    commentsOrNotes: ''
+    commentsOrNotes: '',
+    type: 'birth'
   }
 }
 //@ts-ignore

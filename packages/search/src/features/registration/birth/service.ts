@@ -16,7 +16,7 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectDuplicates,
+  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -165,7 +165,7 @@ async function indexAndSearchComposition(
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
   if (body.type !== 'IN_PROGRESS' && body.type !== 'WAITING_VALIDATION') {
-    await detectAndUpdateDuplicates(compositionId, composition, body)
+    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }
 
@@ -405,23 +405,23 @@ async function createDeclarationIndex(
   body.updatedBy = regLastUser
 }
 
-async function detectAndUpdateDuplicates(
+async function detectAndUpdateBirthDuplicates(
   compositionId: string,
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionId, body)
+  const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }
   logger.info(
-    `Search/service: ${duplicates.length} duplicate composition(s) found`
+    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
 
   return await updateCompositionWithDuplicates(composition, duplicates)
 }
 
-async function updateCompositionWithDuplicates(
+export async function updateCompositionWithDuplicates(
   composition: fhir.Composition,
   duplicates: string[]
 ) {

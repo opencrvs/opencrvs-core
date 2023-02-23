@@ -20,7 +20,10 @@ import {
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
 import fetch from 'node-fetch'
-import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
+import {
+  searchForBirthDuplicates,
+  searchForDeathDuplicates
+} from '@search/features/registration/deduplicate/service'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -173,12 +176,21 @@ export interface IUserModelData {
   name: fhir.HumanName[]
 }
 
-export async function detectDuplicates(
+export async function detectBirthDuplicates(
   compositionId: string,
   body: IBirthCompositionBody
 ) {
-  const searchResponse = await searchForDuplicates(body, client)
-  const duplicates = findDuplicateIds(compositionId, searchResponse)
+  const searchResponse = await searchForBirthDuplicates(body, client)
+  const duplicates = findBirthDuplicateIds(compositionId, searchResponse)
+  return duplicates
+}
+
+export async function detectDeathDuplicates(
+  compositionId: string,
+  body: IDeathCompositionBody
+) {
+  const searchResponse = await searchForDeathDuplicates(body, client)
+  const duplicates = findDeathDuplicateIds(compositionId, searchResponse)
   return duplicates
 }
 
@@ -270,9 +282,21 @@ function isNotification(body: ICompositionBody): boolean {
   )
 }
 
-function findDuplicateIds(
+function findBirthDuplicateIds(
   compositionIdentifier: string,
   results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
+) {
+  return results
+    .filter(
+      (hit) =>
+        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
+    )
+    .map((hit) => hit._id)
+}
+
+function findDeathDuplicateIds(
+  compositionIdentifier: string,
+  results: ISearchResponse<IDeathCompositionBody>['hits']['hits']
 ) {
   return results
     .filter(
