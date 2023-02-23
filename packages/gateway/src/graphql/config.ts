@@ -51,6 +51,7 @@ import { certificateTypeResolvers } from '@gateway/features/certificate/type-res
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import { IAuthHeader } from '@gateway/common-types'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -59,6 +60,14 @@ interface IStringIndexSignatureInterface {
 }
 
 type StringIndexed<T> = T & IStringIndexSignatureInterface
+
+export interface Context {
+  dataSources: {
+    locationsAPI: LocationsAPI
+    practitionerRoleAPI: PractitionerRoleAPI
+  }
+  headers: IAuthHeader
+}
 
 const resolvers: StringIndexed<IResolvers> = merge(
   notificationRootResolvers as IResolvers,

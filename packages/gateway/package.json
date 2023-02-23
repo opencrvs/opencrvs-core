@@ -13,7 +13,7 @@
     "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",
     "build:clean": "rm -rf build",
     "gen:schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\" > src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.graphql",
-    "gen:types": "graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && yarn prettier --write src/graphql/schema.d.ts",
+    "gen:types": "graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts --importStatements 'import {Context} from \"./config\"' --contextType Context && yarn prettier --write src/graphql/schema.d.ts",
     "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
