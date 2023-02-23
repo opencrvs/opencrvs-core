@@ -18,7 +18,8 @@ import {
   ListContainer,
   calculateTotal,
   ReportContainer,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  PerformanceListSubHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -52,9 +53,18 @@ export function ApplicationSourcesReport(
       <ReportContainer>
         <ListViewItemSimplified
           label={
-            <PerformanceListHeader>
-              {intl.formatMessage(messages.performanceApplicationSourcesHeader)}
-            </PerformanceListHeader>
+            <div>
+              <PerformanceListHeader>
+                {intl.formatMessage(
+                  messages.performanceApplicationSourcesHeader
+                )}
+              </PerformanceListHeader>
+              <PerformanceListSubHeader>
+                {intl.formatMessage(
+                  messages.performanceApplicationSourcesSubHeader
+                )}
+              </PerformanceListSubHeader>
+            </div>
           }
         />
         <ListViewItemSimplified

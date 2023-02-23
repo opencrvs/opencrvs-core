@@ -9,15 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLLocation,
-  GQLUser,
-  GQLHumanName,
-  GQLIdentifier,
-  GQLSignature,
-  GQLBookmarkedSeachItem
-} from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
+import { FetchUserQuery, HumanName } from '@client/utils/gateway'
 import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
@@ -25,131 +18,9 @@ import { IStoreState } from '@client/store'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
-export interface IIdentifier {
-  system: string
-  value: string
-}
-export interface IGQLLocation {
-  id: string
-  identifier?: IIdentifier[]
-  name?: string
-  alias?: (string | null)[]
-  status?: string
-}
+export type UserDetails = NonNullable<FetchUserQuery['getUser']>
 
-export interface IAvatar {
-  type: string
-  data: string
-}
-
-export interface IUserDetails {
-  userMgntUserID?: string
-  practitionerId?: string
-  mobile?: string
-  role?: string
-  type?: string
-  status?: string
-  name?: Array<GQLHumanName | null>
-  catchmentArea?: IGQLLocation[]
-  primaryOffice?: IGQLLocation
-  localRegistrar?: {
-    name: Array<GQLHumanName | null>
-    role?: string
-    signature?: GQLSignature
-  }
-  avatar?: IAvatar
-  searches?: GQLBookmarkedSeachItem[]
-}
-
-export function getUserDetails(user: GQLUser): IUserDetails {
-  const {
-    catchmentArea,
-    primaryOffice,
-    name,
-    mobile,
-    role,
-    type,
-    status,
-    userMgntUserID,
-    practitionerId,
-    localRegistrar,
-    avatar,
-    searches
-  } = user
-  const userDetails: IUserDetails = {}
-  if (localRegistrar) {
-    userDetails.localRegistrar = localRegistrar
-  }
-  if (userMgntUserID) {
-    userDetails.userMgntUserID = userMgntUserID
-  }
-  if (practitionerId) {
-    userDetails.practitionerId = practitionerId
-  }
-  if (name) {
-    userDetails.name = name
-  }
-  if (mobile) {
-    userDetails.mobile = mobile
-  }
-  if (role) {
-    userDetails.role = role
-  }
-  if (type) {
-    userDetails.type = type
-  }
-  if (status) {
-    userDetails.status = status
-  }
-  if (primaryOffice) {
-    userDetails.primaryOffice = {
-      id: primaryOffice.id,
-      name: primaryOffice.name,
-      alias: primaryOffice.alias,
-      status: primaryOffice.status
-    }
-  }
-
-  if (catchmentArea) {
-    const areaWithLocations: GQLLocation[] = catchmentArea as GQLLocation[]
-    const potentialCatchmentAreas = areaWithLocations.map(
-      (cArea: GQLLocation) => {
-        if (cArea.identifier) {
-          const identifiers: GQLIdentifier[] =
-            cArea.identifier as GQLIdentifier[]
-          return {
-            id: cArea.id,
-            name: cArea.name,
-            alias: cArea.alias,
-            status: cArea.status,
-            identifier: identifiers.map((identifier: GQLIdentifier) => {
-              return {
-                system: identifier.system,
-                value: identifier.value
-              }
-            })
-          }
-        }
-        return {}
-      }
-    ) as IGQLLocation[]
-    if (potentialCatchmentAreas !== undefined) {
-      userDetails.catchmentArea = potentialCatchmentAreas
-    }
-  }
-
-  if (avatar) {
-    userDetails.avatar = avatar
-  }
-
-  if (searches) {
-    userDetails.searches = searches as GQLBookmarkedSeachItem[]
-  }
-
-  return userDetails
-}
-
-export function getUserLocation(userDetails: IUserDetails) {
+export function getUserLocation(userDetails: UserDetails) {
   if (!userDetails.primaryOffice) {
     throw Error('The user has no primary office')
   }
@@ -157,7 +28,7 @@ export function getUserLocation(userDetails: IUserDetails) {
   return userDetails.primaryOffice
 }
 
-export async function storeUserDetails(userDetails: IUserDetails) {
+export async function storeUserDetails(userDetails: UserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
 export async function removeUserDetails() {
@@ -165,23 +36,21 @@ export async function removeUserDetails() {
 }
 
 export function getIndividualNameObj(
-  individualNameArr: Array<GQLHumanName | null>,
+  individualNameArr: Array<HumanName | null>,
   language: string
 ) {
   return (
-    individualNameArr.find((name: GQLHumanName | null) => {
+    individualNameArr.find((name: HumanName | null) => {
       return name && name.use === language ? true : false
     }) || individualNameArr[0]
   )
 }
 
-export function getUserName(userDetails: IUserDetails | null) {
+export function getUserName(userDetails: UserDetails | null) {
   return (
     (userDetails &&
       userDetails.name &&
-      createNamesMap(
-        userDetails.name.filter((name): name is GQLHumanName => !!name)
-      )[LANG_EN]) ||
+      createNamesMap(userDetails.name)[LANG_EN]) ||
     ''
   )
 }
