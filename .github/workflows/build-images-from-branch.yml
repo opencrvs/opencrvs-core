@@ -49,6 +49,11 @@ jobs:
         id: base-image
         run: |
           yarn build:image
+
+      - name: Tag image with version
+        run: |
+          docker image tag opencrvs-build:latest opencrvs-build:${{ needs.base.outputs.version }}
+
       - name: Upload image
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
@@ -83,6 +88,10 @@ jobs:
         uses: ishworkh/docker-image-artifact-download@v1
         with:
           image: 'opencrvs-build:${{ needs.base.outputs.version }}'
+
+      - name: Rename image to latest
+        run: |
+          docker image tag opencrvs-build:${{ needs.base.outputs.version }} opencrvs-build:latest
 
       - name: Build ${{ matrix.service }}
         run: |
