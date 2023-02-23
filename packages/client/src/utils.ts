@@ -12,7 +12,6 @@
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
-import { useState, useEffect } from 'react'
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -35,29 +34,4 @@ export async function validateApplicationVersion() {
 }
 export function isNavigatorOnline() {
   return navigator.onLine
-}
-
-export function useOnlineStatus() {
-  const [value, setValue] = useState(true)
-
-  useEffect(() => {
-    if (window.navigator.onLine !== value) {
-      setValue(window.navigator.onLine)
-      return
-    }
-
-    function handleOnlineStatus() {
-      setValue(window.navigator.onLine)
-    }
-
-    window.addEventListener('online', handleOnlineStatus)
-    window.addEventListener('offline', handleOnlineStatus)
-
-    return () => {
-      window.removeEventListener('online', handleOnlineStatus)
-      window.removeEventListener('offline', handleOnlineStatus)
-    }
-  }, [value, setValue])
-
-  return value === true
 }

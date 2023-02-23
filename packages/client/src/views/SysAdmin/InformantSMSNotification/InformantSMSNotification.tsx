@@ -24,8 +24,10 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { useOnlineStatus } from '@client/utils'
+import {
+  LoadingIndicator,
+  useOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
