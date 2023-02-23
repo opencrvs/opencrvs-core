@@ -297,7 +297,7 @@ export const UserAudit = () => {
           title={user.name}
           icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
           topActionButtons={
-            userDetails.systemRole === SystemRoleType.LocalSystemAdmin &&
+            userDetails?.systemRole === SystemRoleType.LocalSystemAdmin &&
             userDetails?.primaryOffice?.id !== user?.primaryOffice?.id
               ? [<Status status={user.status || 'pending'} />]
               : [
