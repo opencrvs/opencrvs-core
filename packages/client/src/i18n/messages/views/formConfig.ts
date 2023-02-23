@@ -83,7 +83,6 @@ interface IFormConfigMessages
   warning: MessageDescriptor
   link: MessageDescriptor
   fetchButton: MessageDescriptor
-  nationalIdVerification: MessageDescriptor
   tel: MessageDescriptor
   selectWithOption: MessageDescriptor
   selectWithDynamicOption: MessageDescriptor
@@ -452,11 +451,6 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.fetchButton',
     defaultMessage: 'Fetch Button',
     description: 'Success notification label for number of addresses settings'
-  },
-  nationalIdVerification: {
-    id: 'config.form.settings.nationalIdVerification',
-    defaultMessage: 'National ID Verification',
-    description: 'National ID verification label'
   },
   tel: {
     id: 'config.form.settings.tel',

@@ -81,8 +81,7 @@ import {
   Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
-  IDateRangePickerValue,
-  NATIONAL_ID_VERIFICATION
+  IDateRangePickerValue
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -125,7 +124,6 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { NationalIdVerificationButtonField } from './NationalIdVerificationButton'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -255,9 +253,6 @@ function GeneratedInputField({
         />
       </InputField>
     )
-  }
-  if (fieldDefinition.type === NATIONAL_ID_VERIFICATION) {
-    return <NationalIdVerificationButtonField {...inputFieldProps} />
   }
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
     return (

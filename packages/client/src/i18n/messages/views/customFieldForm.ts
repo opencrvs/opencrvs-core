@@ -77,12 +77,6 @@ const messagesToDefine: ICustomFieldFormMessages = {
     defaultMessage: 'Custom select',
     description: 'Heading of Custom FieldForm'
   },
-  customNationalIdVerificationFieldHeading: {
-    id: 'custom.field.nationalIdVerification.heading',
-    defaultMessage: 'National ID verification',
-    description:
-      'Heading of national id verification form configuration side panel'
-  },
   hideFieldLabel: {
     id: 'custom.field.form.hideField',
     defaultMessage: 'Hide field',
