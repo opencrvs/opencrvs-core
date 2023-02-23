@@ -52,7 +52,7 @@ jobs:
 
       - name: Tag image with version
         run: |
-          docker image tag opencrvs-build:latest opencrvs-build:${{ needs.base.outputs.version }}
+          docker image tag opencrvs-build:latest opencrvs-build:${{ steps.set-version.outputs.version }}
 
       - name: Upload image
         uses: ishworkh/docker-image-artifact-upload@v1
