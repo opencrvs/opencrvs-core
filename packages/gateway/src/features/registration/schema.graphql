@@ -98,6 +98,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -143,6 +144,11 @@ enum CauseOfDeathMethodType {
   LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 input PaymentInput {
@@ -346,6 +352,36 @@ type DeathRegistration implements EventRegistration { # -> Composition
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
+  createdAt: Date # -> .date($first)
+  updatedAt: Date # -> .date
+  history: [History]
+}
+
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  marriageType: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
+  createdAt: Date
+  updatedAt: Date
+}
+
+type MarriageRegistration implements EventRegistration { # -> Composition
+  id: ID! # long uuid
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person # -> .section(code='bride-details').entry.reference
+  groom: Person # -> .section(code='groom-details').entry.reference
+  witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
+  witnessTwo: RelatedPerson # -> .section(code='witnessTwo-details').entry.reference
+  eventLocation: Location
+  marriageType: MarriageType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
   history: [History]
@@ -596,4 +632,12 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
+  #MARRIAGE
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
 }

@@ -50,7 +50,18 @@ import {
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   DEATH_CORRECTION_ENCOUNTER_CODE,
   DEATH_DESCRIPTION_CODE,
-  CAUSE_OF_DEATH_ESTABLISHED_CODE
+  CAUSE_OF_DEATH_ESTABLISHED_CODE,
+  MARRIAGE_ENCOUNTER_CODE,
+  MARRIAGE_TYPE_CODE,
+  BRIDE_CODE,
+  BRIDE_TITLE,
+  GROOM_CODE,
+  GROOM_TITLE,
+  WITNESS_ONE_CODE,
+  WITNESS_ONE_TITLE,
+  WITNESS_TWO_CODE,
+  WITNESS_TWO_TITLE,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -89,7 +100,8 @@ import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
@@ -818,7 +830,9 @@ function createQuestionnaireBuilder() {
       const questionnaire = selectOrCreateQuestionnaireResource(
         context.event === EVENT_TYPE.BIRTH
           ? BIRTH_ENCOUNTER_CODE
-          : DEATH_ENCOUNTER_CODE,
+          : context.event === EVENT_TYPE.DEATH
+          ? DEATH_ENCOUNTER_CODE
+          : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -826,7 +840,11 @@ function createQuestionnaireBuilder() {
     },
     value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const questionnaire = selectOrCreateQuestionnaireResource(
-        BIRTH_ENCOUNTER_CODE,
+        context.event === EVENT_TYPE.BIRTH
+          ? BIRTH_ENCOUNTER_CODE
+          : context.event === EVENT_TYPE.DEATH
+          ? DEATH_ENCOUNTER_CODE
+          : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -1044,6 +1062,18 @@ export const builders: IFieldBuilders = {
           OBSERVATION_CATEGORY_PROCEDURE_DESC,
           BIRTH_TYPE_CODE,
           'Birth plurality of Pregnancy',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      marriageType: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          MARRIAGE_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          MARRIAGE_TYPE_CODE,
+          'Types of marriage partnerships',
           fhirBundle,
           context
         )
@@ -2058,6 +2088,278 @@ export const builders: IFieldBuilders = {
       relatedPersonResource.relationship.text = fieldValue
     }
   },
+  bride: {
+    _fhirID: (fhirBundle, fieldValue) => {
+      const bride = selectOrCreatePersonResource(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        fhirBundle
+      )
+      bride.id = fieldValue as string
+    },
+    identifier: createIDBuilder(BRIDE_CODE, BRIDE_TITLE),
+    name: createNameBuilder(BRIDE_CODE, BRIDE_TITLE),
+    telecom: createTelecomBuilder(BRIDE_CODE, BRIDE_TITLE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const bride = selectOrCreatePersonResource(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        fhirBundle
+      )
+      bride.birthDate = fieldValue as string
+    },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+    },
+    address: createAddressBuilder(BRIDE_CODE, BRIDE_TITLE),
+    photo: createPhotoBuilder(BRIDE_CODE, BRIDE_TITLE),
+    nationality: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        fhirBundle
+      )
+      return createNationalityBuilder(person, fieldValue)
+    }
+  },
+  groom: {
+    _fhirID: (fhirBundle, fieldValue) => {
+      const groom = selectOrCreatePersonResource(
+        GROOM_CODE,
+        GROOM_TITLE,
+        fhirBundle
+      )
+      groom.id = fieldValue as string
+    },
+    identifier: createIDBuilder(GROOM_CODE, GROOM_TITLE),
+    name: createNameBuilder(GROOM_CODE, BRIDE_TITLE),
+    telecom: createTelecomBuilder(GROOM_CODE, GROOM_TITLE),
+    birthDate: (fhirBundle, fieldValue, context) => {
+      const groom = selectOrCreatePersonResource(
+        GROOM_CODE,
+        GROOM_TITLE,
+        fhirBundle
+      )
+      groom.birthDate = fieldValue as string
+    },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        GROOM_CODE,
+        GROOM_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+    },
+    address: createAddressBuilder(GROOM_CODE, GROOM_TITLE),
+    photo: createPhotoBuilder(GROOM_CODE, GROOM_TITLE),
+    nationality: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        GROOM_CODE,
+        GROOM_TITLE,
+        fhirBundle
+      )
+      return createNationalityBuilder(person, fieldValue)
+    }
+  },
+  witnessOne: {
+    _fhirID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_ONE_CODE,
+        WITNESS_ONE_TITLE,
+        fhirBundle
+      )
+      relatedPersonResource.id = fieldValue
+    },
+    name: {
+      use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
+      },
+      firstNames: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          fieldValue.split(' '),
+          'given',
+          context
+        )
+      },
+      familyName: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [fieldValue],
+          'family',
+          context
+        )
+      }
+    },
+    relationship: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_ONE_CODE,
+        WITNESS_ONE_TITLE,
+        fhirBundle
+      )
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
+      }
+    },
+    otherRelationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_ONE_CODE,
+        WITNESS_ONE_TITLE,
+        fhirBundle
+      )
+      if (!relatedPersonResource.relationship) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ]
+        }
+      }
+      relatedPersonResource.relationship.text = fieldValue
+    }
+  },
+  witnessTwo: {
+    _fhirID: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_TWO_CODE,
+        WITNESS_TWO_TITLE,
+        fhirBundle
+      )
+      relatedPersonResource.id = fieldValue
+    },
+    name: {
+      use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
+      },
+      firstNames: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          fieldValue.split(' '),
+          'given',
+          context
+        )
+      },
+      familyName: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        setObjectPropInResourceArray(
+          person,
+          'name',
+          [fieldValue],
+          'family',
+          context
+        )
+      }
+    },
+    relationship: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_TWO_CODE,
+        WITNESS_TWO_TITLE,
+        fhirBundle
+      )
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
+      }
+    },
+    otherRelationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        WITNESS_TWO_CODE,
+        WITNESS_TWO_TITLE,
+        fhirBundle
+      )
+      if (!relatedPersonResource.relationship) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'OTHER'
+            }
+          ]
+        }
+      }
+      relatedPersonResource.relationship.text = fieldValue
+    }
+  },
   registration: {
     _fhirID: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
@@ -2071,7 +2373,6 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
     },
-
     informantsSignature: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2080,7 +2381,6 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantsSignature(taskResource, fieldValue)
     },
-
     contactRelationship: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2184,8 +2484,10 @@ export const builders: IFieldBuilders = {
       let trackingId
       if (context.event === EVENT_TYPE.BIRTH) {
         trackingId = 'birth-tracking-id'
-      } else {
+      } else if (context.event === EVENT_TYPE.DEATH) {
         trackingId = 'death-tracking-id'
+      } else if (context.event === EVENT_TYPE.MARRIAGE) {
+        trackingId = 'marriage-tracking-id'
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
     },
@@ -2205,8 +2507,10 @@ export const builders: IFieldBuilders = {
       let regNumber
       if (context.event === EVENT_TYPE.BIRTH) {
         regNumber = 'birth-registration-number'
-      } else {
+      } else if (context.event === EVENT_TYPE.DEATH) {
         regNumber = 'death-registration-number'
+      } else if (context.event === EVENT_TYPE.MARRIAGE) {
+        regNumber = 'marriage-registration-number'
       }
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
@@ -2445,7 +2749,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH,
+            context.event,
             true
           )
           paymentResource.outcome = {
@@ -2540,7 +2844,9 @@ export const builders: IFieldBuilders = {
           const location = selectOrCreateLocationRefResource(
             context.event === EVENT_TYPE.BIRTH
               ? BIRTH_CORRECTION_ENCOUNTER_CODE
-              : DEATH_CORRECTION_ENCOUNTER_CODE,
+              : context.event === EVENT_TYPE.DEATH
+              ? DEATH_CORRECTION_ENCOUNTER_CODE
+              : MARRIAGE_CORRECTION_ENCOUNTER_CODE,
             fhirBundle,
             context
           )
@@ -3171,7 +3477,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           if (!paymentResource.identifier) {
             paymentResource.identifier = []
@@ -3189,7 +3495,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -3213,7 +3519,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           paymentResource.total = fieldValue as fhir.Money
         },
@@ -3225,7 +3531,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -3249,7 +3555,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           paymentResource.outcome = {
             coding: [{ code: fieldValue }]
@@ -3263,7 +3569,7 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -3288,7 +3594,7 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          EVENT_TYPE.BIRTH
+          context.event
         )
 
         if (isBase64FileString(fieldValue)) {
@@ -3332,13 +3638,20 @@ export const builders: IFieldBuilders = {
           fhirBundle,
           context
         )
-      } else {
+      } else if (context.event === EVENT_TYPE.DEATH) {
         location = selectOrCreateLocationRefResource(
           DEATH_ENCOUNTER_CODE,
           fhirBundle,
           context
         )
+      } else {
+        location = selectOrCreateLocationRefResource(
+          MARRIAGE_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
       }
+
       location.type = {
         coding: [
           {
@@ -3354,7 +3667,11 @@ export const builders: IFieldBuilders = {
       context: any
     ) => {
       const location = selectOrCreateLocationRefResource(
-        BIRTH_ENCOUNTER_CODE,
+        context.event === EVENT_TYPE.BIRTH
+          ? BIRTH_ENCOUNTER_CODE
+          : context.event === EVENT_TYPE.DEATH
+          ? DEATH_ENCOUNTER_CODE
+          : MARRIAGE_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -3414,7 +3731,6 @@ export const builders: IFieldBuilders = {
       encounterParticipant.period.start = fieldValue
     }
   },
-
   maleDependentsOfDeceased: (
     fhirBundle: ITemplatedBundle,
     fieldValue: string,
@@ -3458,6 +3774,25 @@ export const builders: IFieldBuilders = {
       OBSERVATION_CATEGORY_PROCEDURE_DESC,
       BIRTH_TYPE_CODE,
       'Birth plurality of Pregnancy',
+      fhirBundle,
+      context
+    )
+    if (!observation.valueQuantity) {
+      observation.valueQuantity = {}
+    }
+    observation.valueQuantity.value = fieldValue
+  },
+  marriageType: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: number,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      MARRIAGE_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      MARRIAGE_TYPE_CODE,
+      'Types of marriage partnerships',
       fhirBundle,
       context
     )
@@ -3684,7 +4019,10 @@ export const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(
-  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  reg:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {

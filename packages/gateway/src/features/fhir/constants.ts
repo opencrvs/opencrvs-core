@@ -19,7 +19,8 @@ export const FHIR_OBSERVATION_CATEGORY_URL =
   'http://hl7.org/fhir/observation-category'
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
 
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`

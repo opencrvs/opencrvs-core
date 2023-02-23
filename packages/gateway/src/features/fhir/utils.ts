@@ -35,7 +35,9 @@ import {
   DEATH_CORRECTION_ENCOUNTER_CODE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
   CORRECTION_CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -70,6 +72,7 @@ import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
@@ -153,6 +156,10 @@ export function selectOrCreateEncounterResource(
     sectionCode = isCorrection
       ? DEATH_CORRECTION_ENCOUNTER_CODE
       : DEATH_ENCOUNTER_CODE
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    sectionCode = isCorrection
+      ? MARRIAGE_CORRECTION_ENCOUNTER_CODE
+      : MARRIAGE_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -899,7 +906,10 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
   return extension?.valueString
 }
 export async function setCertificateCollector(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
