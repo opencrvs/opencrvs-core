@@ -20,9 +20,10 @@ import { AppStore } from '@client/store'
 import { vi } from 'vitest'
 import React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
+import { DashboardEmbedView } from './Dashboard'
+import { Activity } from '@opencrvs/components/lib/icons'
 
-describe('LeaderBoards component', () => {
+describe('Leaderboards component', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
 
@@ -31,16 +32,19 @@ describe('LeaderBoards component', () => {
     ;({ store } = await createTestStore())
   })
   beforeEach(async () => {
-    const { history } = createRouterProps('/performance/leaderboards', {
+    const { history } = createRouterProps('/performance/dashboard', {
       isNavigatedInsideApp: false
     })
 
-    component = await createTestComponent(<PerformanceDashboard />, {
-      history,
-      store
-    })
+    component = await createTestComponent(
+      <DashboardEmbedView title="Dashboard" icon={<Activity />} />,
+      {
+        history,
+        store
+      }
+    )
   })
-  it('renders without crashing', async () => {
-    await waitForElement(component, '#leader-boards')
+  it('renders no content component without crashing', async () => {
+    await waitForElement(component, '#dashboard_noContent')
   })
 })

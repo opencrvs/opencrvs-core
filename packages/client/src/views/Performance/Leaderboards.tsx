@@ -15,17 +15,17 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { injectIntl } from 'react-intl'
-import { Activity } from '@opencrvs/components/lib/icons'
+import * as Icons from 'react-feather'
 import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
 
-const performanceStatisticsComponent = () => (
+const leaderboardsComponent = () => (
   <DashboardEmbedView
-    title={'Statistics'}
-    url={window.config.STATISTICS_DASHBOARD_URL}
-    icon={<Activity />}
+    title={'Leaderboards'}
+    url={window.config.LEADERBOARDS_DASHBOARD_URL}
+    icon={<Icons.Award width={20} height={20} />}
   />
 )
 
-export const PerformanceStatistics = connect((state: IStoreState) =>
+export const Leaderboards = connect((state: IStoreState) =>
   getOfflineData(state)
-)(injectIntl(performanceStatisticsComponent))
+)(injectIntl(leaderboardsComponent))

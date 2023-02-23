@@ -20,16 +20,28 @@ import { Activity } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import styled from '@client/styledComponents'
+import IframeResizer from 'iframe-resizer-react'
+const StyledIFrame = styled(IframeResizer)`
+  width: 100%;
+  height: 100%;
+  border: none;
+`
+interface IdashboardView {
+  title: string
+  url?: string
+  icon?: JSX.Element
+}
 
-function dashboardComponent() {
+export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const dispatch = useDispatch()
   return (
     <>
       <Frame
         header={
           <AppBar
-            desktopTitle="Dashboard"
-            desktopLeft={<Activity />}
+            desktopTitle={title}
+            desktopLeft={icon}
             desktopRight={
               <Button
                 type="icon"
@@ -39,7 +51,7 @@ function dashboardComponent() {
                 <Icon name="X" color="primary" />
               </Button>
             }
-            mobileLeft={<Activity />}
+            mobileLeft={icon}
             mobileRight={
               <Button
                 type="icon"
@@ -49,20 +61,40 @@ function dashboardComponent() {
                 <Icon name="X" color="primary" />
               </Button>
             }
-            mobileTitle="Statistics"
+            mobileTitle={title}
           />
         }
         skipToContentText="Skip to main content"
       >
-        {window.config && window.config.REGISTRATIONS_DASHBOARD_URL ? (
-          <iframe src={window.config.REGISTRATIONS_DASHBOARD_URL}></iframe>
+        {window.config && url ? (
+          <StyledIFrame
+            id={`${title.toLowerCase()}_main`}
+            src={url}
+            allowFullScreen
+          />
         ) : (
-          <Content title="Dashboard" size="large"> No Content </Content>
+          <Content
+            title={title}
+            size="large"
+            id={`${title.toLowerCase()}_noContent`}
+          >
+            {' '}
+            No Content{' '}
+          </Content>
         )}
       </Frame>
     </>
   )
 }
+
+const dashboardComponent = () => (
+  <DashboardEmbedView
+    title={'Dashboard'}
+    url={window.config.REGISTRATIONS_DASHBOARD_URL}
+    icon={<Activity />}
+  />
+)
+
 export const PerformanceDashboard = connect((state: IStoreState) =>
   getOfflineData(state)
 )(injectIntl(dashboardComponent))

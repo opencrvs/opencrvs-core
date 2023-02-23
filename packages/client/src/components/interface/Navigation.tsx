@@ -69,10 +69,10 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
-import { UserDetails } from '@client/utils/userUtils'
 import { Text } from '@opencrvs/components'
 import * as Icons from 'react-feather'
 import { ChartActivity } from '@opencrvs/components/lib/Icon/custom-icons'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -107,11 +107,8 @@ export const WORKQUEUE_TABS = {
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
-  menuGroup: 'menuGroup',
-  leaderBoards: 'leaderBoards',
-  statistics: 'statistics',
-  performance: 'performance',
-  dashboard: 'dashboard'
+  analytics: 'analytics',
+  menuGroup: 'menuGroup'
 }
 
 interface IUSER_SCOPE {
@@ -135,7 +132,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
@@ -173,26 +169,16 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
-    GROUP_ID.performance,
-    GROUP_ID.leaderBoards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
     GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
   LOCAL_SYSTEM_ADMIN: [
-    GROUP_ID.performance,
-    GROUP_ID.leaderBoards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
-    GROUP_ID.performance,
-    GROUP_ID.leaderBoards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.organisation,
@@ -200,15 +186,10 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
     WORKQUEUE_TABS.informantNotification,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
-  PERFORMANCE_MANAGEMENT: [
-    GROUP_ID.performance,
-    GROUP_ID.leaderBoards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
-    GROUP_ID.menuGroup
-  ]
+  PERFORMANCE_MANAGEMENT: [GROUP_ID.menuGroup, GROUP_ID.analytics]
 }
 
 interface ICount {
@@ -336,10 +317,10 @@ export const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
-    goToInformantNotification,
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
+    goToInformantNotification,
     className
   } = props
   const tabId = deselectAllTabs
@@ -833,11 +814,11 @@ export const NavigationView = (props: IFullProps) => {
               </NavigationGroup>
             )}
           {userDetails?.role &&
-            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.menuGroup) && (
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.analytics) && (
               <NavigationGroup>
-                {userDetails?.systemRole &&
+                {userDetails?.role &&
                   USER_SCOPE[userDetails.systemRole].includes(
-                    GROUP_ID.performance
+                    GROUP_ID.analytics
                   ) && (
                     <>
                       <Text
@@ -854,37 +835,35 @@ export const NavigationView = (props: IFullProps) => {
                           <ChartActivity color={'primary'} size={24} />
                         )}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.dashboard]
+                          navigationMessages['dashboard']
                         )}
                         onClick={goToDashboardView}
-                        id={`navigation_${GROUP_ID.dashboard}`}
+                        id="navigation_dashboard"
                         isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.dashboard
+                          enableMenuSelection && activeMenuItem === 'dashboard'
                         }
                       />
                       <NavigationItem
                         icon={() => <Activity />}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.statistics]
+                          navigationMessages['statistics']
                         )}
                         onClick={goToPerformanceStatistics}
-                        id={`navigation_${GROUP_ID.statistics}`}
+                        id="navigation_statistics"
                         isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.statistics
+                          enableMenuSelection && activeMenuItem === 'statistics'
                         }
                       />
                       <NavigationItem
                         icon={() => <Icons.Award width={20} height={20} />}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.leaderBoards]
+                          navigationMessages['leaderboards']
                         )}
                         onClick={goToLeaderBoardsView}
-                        id={`navigation_${GROUP_ID.leaderBoards}`}
+                        id="navigation_leaderboards"
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.leaderBoards
+                          activeMenuItem === 'leaderboards'
                         }
                       />
                       <NavigationItem
@@ -893,10 +872,10 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
-                        id={`navigation_${GROUP_ID.performance}_main`}
+                        id="navigation_report_main"
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.performance
+                          activeMenuItem === WORKQUEUE_TABS.performance
                         }
                       />
                     </>
@@ -1017,10 +996,10 @@ export const Navigation = connect<
   goToSettings,
   updateRegistrarWorkqueue,
   setAdvancedSearchParam,
-  goToInformantNotification,
   goToPerformanceStatistics,
   goToLeaderBoardsView,
-  goToDashboardView
+  goToDashboardView,
+  goToInformantNotification
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

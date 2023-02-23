@@ -147,10 +147,10 @@ const messagesToDefine: INavigationMessages = {
     description: 'Statistics Dashboard Section',
     id: 'navigation.performanceStatistics'
   },
-  leaderBoards: {
-    defaultMessage: 'LeaderBoards',
-    description: 'Leader Board Dashboard Section',
-    id: 'navigation.leaderBoard'
+  leaderboards: {
+    defaultMessage: 'Leaderboards',
+    description: 'Leaderboards Dashboard Section',
+    id: 'navigation.leaderboards'
   },
   dashboard: {
     defaultMessage: 'Dashboard',
