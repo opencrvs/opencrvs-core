@@ -29,7 +29,7 @@ const StyledIFrame = styled(IframeResizer)`
 `
 interface IdashboardView {
   title: string
-  url: string
+  url?: string
   icon?: JSX.Element
 }
 
@@ -67,9 +67,17 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
         skipToContentText="Skip to main content"
       >
         {window.config && url ? (
-          <StyledIFrame src={url} allowFullScreen />
+          <StyledIFrame
+            id={`${title.toLowerCase()}_main`}
+            src={url}
+            allowFullScreen
+          />
         ) : (
-          <Content title="Dashboard" size="large">
+          <Content
+            title={title}
+            size="large"
+            id={`${title.toLowerCase()}_noContent`}
+          >
             {' '}
             No Content{' '}
           </Content>

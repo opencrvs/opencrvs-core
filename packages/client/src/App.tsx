@@ -69,13 +69,12 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { PerformanceStatistics } from '@client/views/Performance/Statistics'
-import { LeaderBoards } from '@client/views/Performance/LeaderBoards'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
 import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
-
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -449,7 +448,7 @@ export function App(props: IAppProps) {
                                           path={
                                             routes.PERFORMANCE_LEADER_BOARDS
                                           }
-                                          component={LeaderBoards}
+                                          component={Leaderboards}
                                         />
                                         <ProtectedRoute
                                           exact

@@ -108,11 +108,8 @@ export const WORKQUEUE_TABS = {
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
-  menuGroup: 'menuGroup',
-  leaderboards: 'leaderboards',
-  statistics: 'statistics',
-  report: 'report',
-  dashboard: 'dashboard'
+  analytics: 'analytics',
+  menuGroup: 'menuGroup'
 }
 
 interface IUSER_SCOPE {
@@ -173,27 +170,16 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
-    GROUP_ID.report,
-    GROUP_ID.leaderboards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
     GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
   LOCAL_SYSTEM_ADMIN: [
-    GROUP_ID.leaderboards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
-    GROUP_ID.report,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
-    GROUP_ID.report,
-    GROUP_ID.leaderboards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.organisation,
@@ -201,15 +187,10 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
     WORKQUEUE_TABS.informantNotification,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
-  PERFORMANCE_MANAGEMENT: [
-    GROUP_ID.report,
-    GROUP_ID.leaderboards,
-    GROUP_ID.statistics,
-    GROUP_ID.dashboard,
-    GROUP_ID.menuGroup
-  ]
+  PERFORMANCE_MANAGEMENT: [GROUP_ID.menuGroup, GROUP_ID.analytics]
 }
 
 interface ICount {
@@ -834,11 +815,11 @@ export const NavigationView = (props: IFullProps) => {
               </NavigationGroup>
             )}
           {userDetails?.role &&
-            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.menuGroup) && (
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.analytics) && (
               <NavigationGroup>
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.systemRole].includes(
-                    GROUP_ID.report
+                    GROUP_ID.analytics
                   ) && (
                     <>
                       <Text
@@ -855,37 +836,35 @@ export const NavigationView = (props: IFullProps) => {
                           <ChartActivity color={'primary'} size={24} />
                         )}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.dashboard]
+                          navigationMessages['dashboard']
                         )}
                         onClick={goToDashboardView}
-                        id={`navigation_${GROUP_ID.dashboard}`}
+                        id="navigation_dashboard"
                         isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.dashboard
+                          enableMenuSelection && activeMenuItem === 'dashboard'
                         }
                       />
                       <NavigationItem
                         icon={() => <Activity />}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.statistics]
+                          navigationMessages['statistics']
                         )}
                         onClick={goToPerformanceStatistics}
-                        id={`navigation_${GROUP_ID.statistics}`}
+                        id="navigation_statistics"
                         isSelected={
-                          enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.statistics
+                          enableMenuSelection && activeMenuItem === 'statistics'
                         }
                       />
                       <NavigationItem
                         icon={() => <Icons.Award width={20} height={20} />}
                         label={intl.formatMessage(
-                          navigationMessages[GROUP_ID.leaderboards]
+                          navigationMessages['leaderboards']
                         )}
                         onClick={goToLeaderBoardsView}
-                        id={`navigation_${GROUP_ID.leaderboards}`}
+                        id="navigation_leaderboards"
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === GROUP_ID.leaderboards
+                          activeMenuItem === 'leaderboards'
                         }
                       />
                       <NavigationItem
@@ -894,7 +873,7 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
-                        id={`navigation_${GROUP_ID.report}_main`}
+                        id="navigation_report_main"
                         isSelected={
                           enableMenuSelection &&
                           activeMenuItem === WORKQUEUE_TABS.performance

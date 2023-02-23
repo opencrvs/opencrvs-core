@@ -18,7 +18,7 @@ import { injectIntl } from 'react-intl'
 import * as Icons from 'react-feather'
 import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
 
-const leaderBoardsComponent = () => (
+const leaderboardsComponent = () => (
   <DashboardEmbedView
     title={'Leaderboards'}
     url={window.config.LEADERBOARDS_DASHBOARD_URL}
@@ -26,6 +26,6 @@ const leaderBoardsComponent = () => (
   />
 )
 
-export const LeaderBoards = connect((state: IStoreState) =>
+export const Leaderboards = connect((state: IStoreState) =>
   getOfflineData(state)
-)(injectIntl(leaderBoardsComponent))
+)(injectIntl(leaderboardsComponent))
