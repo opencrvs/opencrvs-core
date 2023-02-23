@@ -340,7 +340,7 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async attachments(task: fhir.Task, _, authHeader) {
+    async attachments(task: fhir.Task, _, { headers: authHeader }) {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
@@ -365,7 +365,7 @@ export const typeResolvers: GQLResolver = {
         return await fetchFHIR(`/${docRefReference}`, authHeader)
       })
     },
-    async informantType(task: fhir.Task, _, authHeader) {
+    async informantType(task: fhir.Task, _, { headers: authHeader }) {
       if (!task.focus) {
         return null
       }
@@ -392,7 +392,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async otherInformantType(task: fhir.Task, _, authHeader) {
+    async otherInformantType(task: fhir.Task, _, { headers: authHeader }) {
       if (!task.focus) {
         return null
       }
@@ -482,7 +482,7 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    status: async (task: fhir.Task, _, authHeader) => {
+    status: async (task: fhir.Task, _, { headers: authHeader }) => {
       // fetch full task history
       const taskBundle: fhir.Bundle = await fetchFHIR(
         `/Task/${task.id}/_history`,
@@ -508,7 +508,7 @@ export const typeResolvers: GQLResolver = {
       )
       return (taskCode && taskCode.code) || null
     },
-    duplicates: async (task, _, authHeader) => {
+    duplicates: async (task, _, { headers: authHeader }) => {
       if (!task.focus) {
         throw new Error(
           'Task resource does not have a focus property necessary to lookup the composition'
@@ -534,9 +534,9 @@ export const typeResolvers: GQLResolver = {
         })
       )
     },
-    certificates: async (task, _, authHeader) =>
+    certificates: async (task, _, { headers: authHeader }) =>
       await getCertificatesFromTask(task, _, authHeader),
-    assignment: async (task, _, authHeader) => {
+    assignment: async (task, _, { headers: authHeader }) => {
       const assignmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
@@ -574,7 +574,7 @@ export const typeResolvers: GQLResolver = {
     type: (task: fhir.Task) => {
       return getStatusFromTask(task)
     },
-    user: async (task, _, authHeader) => {
+    user: async (task, _, { headers: authHeader }) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
@@ -606,7 +606,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1]
+        taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
     office: async (task, _, { dataSources }) => {
@@ -618,7 +618,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1]
+        taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
     timeLogged: async (task, _, { headers: authHeader }) => {
@@ -754,7 +754,7 @@ export const typeResolvers: GQLResolver = {
     address: (location) => location.address
   },
   MedicalPractitioner: {
-    name: async (encounterParticipant, _, authHeader) => {
+    name: async (encounterParticipant, _, { headers: authHeader }) => {
       if (
         !encounterParticipant ||
         !encounterParticipant.individual ||
@@ -774,7 +774,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    qualification: async (encounterParticipant, _, authHeader) => {
+    qualification: async (encounterParticipant, _, { headers: authHeader }) => {
       if (
         !encounterParticipant ||
         !encounterParticipant.individual ||
@@ -797,7 +797,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    lastVisitDate: async (encounterParticipant, _, authHeader) => {
+    lastVisitDate: async (encounterParticipant, _, { headers: authHeader }) => {
       return (
         (encounterParticipant &&
           encounterParticipant.period &&
@@ -920,7 +920,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1]
+        taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
     office: async (task: fhir.Task, _: any, { dataSources }) => {
@@ -932,7 +932,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return dataSources.locationsAPI.getLocation(
-        taskLocation.valueReference.reference?.split('/')[1]
+        taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
     comments: (task) => task.note || [],
@@ -947,7 +947,7 @@ export const typeResolvers: GQLResolver = {
       }
       return await getCertificatesFromTask(task, _, authHeader)
     },
-    signature: async (task: fhir.Task, _: any, authHeader: any) => {
+    signature: async (task: fhir.Task, _: any, { headers: authHeader }) => {
       const action = getActionFromTask(task)
       if (action || getStatusFromTask(task) !== GQLRegStatus.REGISTERED) {
         return null
@@ -977,7 +977,11 @@ export const typeResolvers: GQLResolver = {
   },
 
   DeathRegistration: {
-    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+    async _fhirIDMap(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1046,7 +1050,11 @@ export const typeResolvers: GQLResolver = {
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
-    async mother(composition: ITemplatedComposition, _, authHeader) {
+    async mother(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1056,7 +1064,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async father(composition: ITemplatedComposition, _, authHeader) {
+    async father(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1066,7 +1078,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async spouse(composition: ITemplatedComposition, _, authHeader) {
+    async spouse(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(SPOUSE_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1076,7 +1092,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async deceased(composition: ITemplatedComposition, _, authHeader) {
+    async deceased(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(DECEASED_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1086,7 +1106,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async informant(composition: ITemplatedComposition, _, authHeader) {
+    async informant(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1096,7 +1120,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )) as fhir.RelatedPerson
     },
-    async registration(composition: ITemplatedComposition, _, authHeader) {
+    async registration(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${composition.id}`,
         authHeader
@@ -1108,7 +1136,11 @@ export const typeResolvers: GQLResolver = {
       return taskBundle.entry[0].resource
     },
 
-    async eventLocation(composition: ITemplatedComposition, _, authHeader) {
+    async eventLocation(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
         composition
@@ -1130,7 +1162,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async deathDescription(composition: ITemplatedComposition, _, authHeader) {
+    async deathDescription(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
         composition
@@ -1150,7 +1186,11 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async mannerOfDeath(composition: ITemplatedComposition, _, authHeader) {
+    async mannerOfDeath(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
         composition
@@ -1176,7 +1216,7 @@ export const typeResolvers: GQLResolver = {
     async causeOfDeathEstablished(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1203,7 +1243,7 @@ export const typeResolvers: GQLResolver = {
     async causeOfDeathMethod(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1227,7 +1267,11 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async causeOfDeath(composition: ITemplatedComposition, _, authHeader) {
+    async causeOfDeath(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
         composition
@@ -1254,7 +1298,7 @@ export const typeResolvers: GQLResolver = {
     async maleDependentsOfDeceased(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1277,7 +1321,7 @@ export const typeResolvers: GQLResolver = {
     async femaleDependentsOfDeceased(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1298,7 +1342,11 @@ export const typeResolvers: GQLResolver = {
         ? observations.entry[0].resource.valueString
         : null
     },
-    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+    async questionnaire(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
         composition
@@ -1343,7 +1391,7 @@ export const typeResolvers: GQLResolver = {
     async medicalPractitioner(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -1363,7 +1411,11 @@ export const typeResolvers: GQLResolver = {
       }
       return encounterParticipant
     },
-    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
+    async history(
+      composition: ITemplatedComposition,
+      _: any,
+      { headers: authHeader }
+    ) {
       const task = await fetchFHIR(
         `/Task/?focus=Composition/${composition.id}`,
         authHeader
@@ -1391,7 +1443,11 @@ export const typeResolvers: GQLResolver = {
     }
   },
   BirthRegistration: {
-    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+    async _fhirIDMap(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1460,7 +1516,11 @@ export const typeResolvers: GQLResolver = {
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
-    async mother(composition: ITemplatedComposition, _, authHeader) {
+    async mother(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(MOTHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1470,7 +1530,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async father(composition: ITemplatedComposition, _, authHeader) {
+    async father(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(FATHER_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1480,7 +1544,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async child(composition: ITemplatedComposition, _, authHeader) {
+    async child(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(CHILD_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1490,7 +1558,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async informant(composition: ITemplatedComposition, _, authHeader) {
+    async informant(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -1500,7 +1572,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )) as fhir.RelatedPerson
     },
-    async registration(composition: ITemplatedComposition, _, authHeader) {
+    async registration(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${composition.id}`,
         authHeader
@@ -1511,7 +1587,11 @@ export const typeResolvers: GQLResolver = {
       }
       return taskBundle.entry[0].resource
     },
-    async weightAtBirth(composition: ITemplatedComposition, _, authHeader) {
+    async weightAtBirth(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1534,7 +1614,11 @@ export const typeResolvers: GQLResolver = {
       )
     },
 
-    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+    async questionnaire(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1576,7 +1660,11 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async birthType(composition: ITemplatedComposition, _, authHeader) {
+    async birthType(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1596,7 +1684,11 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async eventLocation(composition: ITemplatedComposition, _, authHeader) {
+    async eventLocation(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1618,7 +1710,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async attendantAtBirth(composition: ITemplatedComposition, _, authHeader) {
+    async attendantAtBirth(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1641,7 +1737,7 @@ export const typeResolvers: GQLResolver = {
     async birthRegistrationType(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1665,7 +1761,7 @@ export const typeResolvers: GQLResolver = {
     async childrenBornAliveToMother(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1689,7 +1785,7 @@ export const typeResolvers: GQLResolver = {
     async foetalDeathsToMother(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1713,7 +1809,7 @@ export const typeResolvers: GQLResolver = {
     async lastPreviousLiveBirth(
       composition: ITemplatedComposition,
       _,
-      authHeader
+      { headers: authHeader }
     ) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1734,7 +1830,11 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
+    async history(
+      composition: ITemplatedComposition,
+      _: any,
+      { headers: authHeader }
+    ) {
       const task = await fetchFHIR(
         `/Task/?focus=Composition/${composition.id}`,
         authHeader
