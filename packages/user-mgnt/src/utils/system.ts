@@ -11,7 +11,9 @@
  */
 import {
   NATIONAL_ID_OIDP_CLIENT_ID,
-  NATIONAL_ID_OIDP_BASE_URL
+  NATIONAL_ID_OIDP_BASE_URL,
+  NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS,
+  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS
 } from '@user-mgnt/constants'
 import { ISystemModel } from '@user-mgnt/model/system'
 import { pick } from 'lodash'
@@ -27,13 +29,20 @@ export const types = {
 type MongooseQueriedSystem = ISystemModel & { _id: Types.ObjectId }
 
 const pickSettings = (system: MongooseQueriedSystem) => {
+  const openIdProviderClaims = convertClaimsToUserInfoClaims({
+    openIdProviderEssentialClaims: NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS,
+    openIdProviderVoluntaryClaims: NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS
+  })
+
   const openIdConnectUrl =
     system.type === 'NATIONAL_ID' &&
     NATIONAL_ID_OIDP_CLIENT_ID &&
-    NATIONAL_ID_OIDP_BASE_URL
+    NATIONAL_ID_OIDP_BASE_URL &&
+    (NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS || NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS)
       ? {
           openIdProviderBaseUrl: NATIONAL_ID_OIDP_BASE_URL,
-          openIdProviderClientId: NATIONAL_ID_OIDP_CLIENT_ID
+          openIdProviderClientId: NATIONAL_ID_OIDP_CLIENT_ID,
+          openIdProviderClaims
         }
       : {}
 
@@ -61,4 +70,27 @@ export const pickSystem = (system: MongooseQueriedSystem) => {
     clientId: system.client_id,
     settings: pickSettings(system)
   }
+}
+
+const convertClaimsToUserInfoClaims = ({
+  openIdProviderEssentialClaims,
+  openIdProviderVoluntaryClaims
+}: {
+  openIdProviderEssentialClaims: string | null
+  openIdProviderVoluntaryClaims: string | null
+}) => {
+  const userinfo: Record<string, { essential: boolean }> = {}
+
+  for (const claim of (openIdProviderVoluntaryClaims ?? '').split(',')) {
+    userinfo[claim] = { essential: false }
+  }
+
+  for (const claim of (openIdProviderEssentialClaims ?? '').split(',')) {
+    userinfo[claim] = { essential: true }
+  }
+
+  return JSON.stringify({
+    userinfo,
+    id_token: {}
+  })
 }

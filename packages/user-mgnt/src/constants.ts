@@ -33,3 +33,9 @@ export const NATIONAL_ID_OIDP_BASE_URL =
 
 export const NATIONAL_ID_OIDP_CLIENT_ID =
   process.env.NATIONAL_ID_OIDP_CLIENT_ID || null
+
+export const NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS =
+  process.env.NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS || null // e.g. given_name,family_name
+
+export const NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS =
+  process.env.NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS || null
