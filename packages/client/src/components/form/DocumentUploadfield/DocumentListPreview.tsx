@@ -121,7 +121,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                   aria-label="Delete attachment"
                   onClick={() => onDelete(document)}
                 >
-                  <Icon color="red" name="TrashSimple" size="small" />
+                  <Icon color="red" name="Trash2" size="small" />
                 </DeleteContainer>
               )}
             </Container>
@@ -155,7 +155,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
               aria-label="Delete attachment"
               onClick={() => onDelete && onDelete(attachment)}
             >
-              <Icon color="red" name="TrashSimple" size="small" />
+              <Icon color="red" name="Trash2" size="small" />
             </DeleteContainer>
           </Container>
         )}

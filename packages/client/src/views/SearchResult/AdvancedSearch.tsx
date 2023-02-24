@@ -279,7 +279,7 @@ const BirthSection = () => {
       </Accordion>
 
       <StyledPrimaryButton
-        icon={() => <Icon name={'MagnifyingGlass'} />}
+        icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
         key="search"
@@ -439,7 +439,7 @@ const DeathSection = () => {
       </Accordion>
 
       <StyledPrimaryButton
-        icon={() => <Icon name={'MagnifyingGlass'} />}
+        icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
         key="search"
