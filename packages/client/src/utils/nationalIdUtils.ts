@@ -18,7 +18,7 @@ export function useIsNationalIdVerificationEnabled() {
   return offlineData.systems.some(
     (integration) =>
       integration.type === 'NATIONAL_ID' &&
-      integration?.settings.openIdProviderBaseUrl &&
+      integration?.settings?.openIdProviderBaseUrl &&
       integration?.settings.openIdProviderClientId
   )
 }

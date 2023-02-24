@@ -188,10 +188,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.settings!, Event.Birth)
+            populatePermissions(system.settings!.webhook!, Event.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.settings!, Event.Death)
+            populatePermissions(system.settings!.webhook!, Event.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
