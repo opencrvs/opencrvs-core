@@ -1193,6 +1193,7 @@ type SystemSettings {
   webhook: [WebhookPermission!]
   openIdProviderClientId: String
   openIdProviderBaseUrl: String
+  openIdProviderClaims: String
 }
 
 type FormDatasetOption {

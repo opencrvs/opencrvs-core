@@ -2165,6 +2165,7 @@ export type SystemSettings = {
   __typename?: 'SystemSettings'
   dailyQuota?: Maybe<Scalars['Int']>
   openIdProviderBaseUrl?: Maybe<Scalars['String']>
+  openIdProviderClaims?: Maybe<Scalars['String']>
   openIdProviderClientId?: Maybe<Scalars['String']>
   webhook?: Maybe<Array<WebhookPermission>>
 }

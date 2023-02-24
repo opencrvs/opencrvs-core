@@ -1096,6 +1096,7 @@ export interface GQLSystemSettings {
   webhook?: Array<GQLWebhookPermission>
   openIdProviderClientId?: string
   openIdProviderBaseUrl?: string
+  openIdProviderClaims?: string
 }
 
 export interface GQLFormDatasetOption {
@@ -6003,6 +6004,7 @@ export interface GQLSystemSettingsTypeResolver<TParent = any> {
   webhook?: SystemSettingsToWebhookResolver<TParent>
   openIdProviderClientId?: SystemSettingsToOpenIdProviderClientIdResolver<TParent>
   openIdProviderBaseUrl?: SystemSettingsToOpenIdProviderBaseUrlResolver<TParent>
+  openIdProviderClaims?: SystemSettingsToOpenIdProviderClaimsResolver<TParent>
 }
 
 export interface SystemSettingsToDailyQuotaResolver<
@@ -6024,6 +6026,13 @@ export interface SystemSettingsToOpenIdProviderClientIdResolver<
 }
 
 export interface SystemSettingsToOpenIdProviderBaseUrlResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderClaimsResolver<
   TParent = any,
   TResult = any
 > {
