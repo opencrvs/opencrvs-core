@@ -160,7 +160,7 @@ export function ForgotPIN(props: IForgotPINProps) {
             <Icon name="ArrowLeft" />
           </Button>
           <Button type="icon" onClick={logout} id="logout">
-            <Icon name="SignOut" />
+            <Icon name="LogOut" />
           </Button>
         </Stack>
         <Stack direction="column">
