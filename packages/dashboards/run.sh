@@ -55,7 +55,7 @@ echo "Starting metabase..."
 
 metabase_db_path=${MB_DB_FILE:-'/data/metabase/metabase.mv.db'}
 metabase_db_path="${metabase_db_path}"
-metabase_db_path_for_metabase=${metabase_db_path%.mv.db}
+metabase_db_path_for_metabase=${metabase_db_path%\/metabase.mv.db}
 
 MB_DB_FILE=${metabase_db_path_for_metabase} \
 MB_DB_TYPE=h2 \

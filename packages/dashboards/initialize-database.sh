@@ -26,14 +26,11 @@ init_sql_file=${MB_DB_INIT_SQL_FILE}
 
 
 if [ -f "$init_sql_file" ]; then
-  if [ -f "$metabase_db_path" ]; then
-  echo "Database path $metabase_db_path exists, removing it"
-  rm $metabase_db_path
+  if [ ! -f "$metabase_db_path" ]; then
+    echo "Creating database $metabase_db_path from $init_sql_file"
+    java -cp "$metabase_jar" org.h2.tools.RunScript -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$init_sql_file"
+    echo "Database created"
   fi
-
-  echo "Creating database $metabase_db_path from $init_sql_file"
-  java -cp "$metabase_jar" org.h2.tools.RunScript -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$init_sql_file"
-  echo "Database created"
 else
   echo "MB_DB_INIT_SQL_FILE $init_sql_file not found, SKIP"
 fi
