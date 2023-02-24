@@ -36,20 +36,19 @@ export function Icon({
   fill = 'none',
   ...rest
 }: IconProps) {
-  const IconComponent = icons[name]
-
+  const IconComponent = icons['' + name]
   return (
     <IconComponent
-      size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
-      fill={
-        fill === 'none'
-          ? 'none'
-          : fill === 'currentColor'
-          ? 'currentColor'
-          : colors[fill]
-      }
+      size={IconSize[size]}
+      weight={'bold'}
       {...rest}
     />
   )
 }
+
+// ChevronRight = CaretRight
+// ChevronDown = CaretDown
+// Search = MagnifyingGlass
+// MessageCircle = ChatCircle
+// LogOut = SignOut
