@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { FHIR_URL } from '@gateway/constants'
+// eslint-disable-next-line import/no-relative-parent-imports
+import { FHIR_URL } from '../../constants'
 import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
 export default class LocationsAPI extends RESTDataSource {

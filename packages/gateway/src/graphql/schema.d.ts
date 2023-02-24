@@ -1,4 +1,4 @@
-import { Context } from './config'
+import { Context } from './context'
 /* tslint:disable */
 /* eslint-disable */
 import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
