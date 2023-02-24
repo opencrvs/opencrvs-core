@@ -28,7 +28,7 @@ export const resolvers: GQLResolver = {
         sortBy = null,
         sortOrder = null
       },
-      authHeader
+      { headers: authHeader }
     ) {
       let payload: IRoleSearchPayload = {}
       if (title) {
@@ -64,7 +64,7 @@ export const resolvers: GQLResolver = {
     }
   },
   Mutation: {
-    async updateRole(_, { systemRole }, authHeader) {
+    async updateRole(_, { systemRole }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return Promise.reject(
           new Error(' Update Role is only allowed for natlsysadmin')
