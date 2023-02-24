@@ -9,6 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as React from 'react'
 
-export * from './custom-icons'
-export * from 'phosphor-react'
+export function Search(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#4C68C1"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="ph-caret-down"
+      {...props}
+    >
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
+}
