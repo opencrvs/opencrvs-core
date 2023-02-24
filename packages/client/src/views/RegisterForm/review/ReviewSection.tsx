@@ -1875,7 +1875,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const isDuplicate = Boolean(declaration.duplicates)
+    const isDuplicate = Boolean(declaration.duplicates?.length)
     const formSections =
       (viewRecord || isDuplicate) && !isCorrection(declaration)
         ? this.getViewableSection(registerForm[event]).map((section) => {
@@ -2077,11 +2077,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <>
                     {!isCorrection(declaration) ? (
                       <>
-                        <DuplicateWarning
-                          duplicateIds={declaration.duplicates?.map(
-                            (duplicate) => duplicate.compositionId
-                          )}
-                        />
+                        {isDuplicate && (
+                          <DuplicateWarning
+                            duplicateIds={declaration.duplicates?.map(
+                              (duplicate) => duplicate.compositionId
+                            )}
+                          />
+                        )}
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}

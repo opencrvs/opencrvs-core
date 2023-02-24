@@ -231,7 +231,6 @@ export const searchForDeathDuplicates = async (
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
-  console.log(body)
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
