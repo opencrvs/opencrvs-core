@@ -46,6 +46,10 @@ export type IFormConfigState =
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
+      marriage: {
+        formDraft: IFormDraft
+        configFields: ISectionFieldMap
+      }
       formDataset: IFormDataSet[]
     }
 
@@ -71,6 +75,11 @@ function getReadyState(formConfig: IFormConfig) {
     Event.Death
   )
 
+  const defaultMarriageForm = populateRegisterFormsWithAddresses(
+    registerForms[Event.Marriage],
+    Event.Marriage
+  )
+
   return {
     state: 'READY' as const,
     birth: {
@@ -91,6 +100,17 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
+        questionConfig,
+        formDataset
+      )
+    },
+    marriage: {
+      formDraft:
+        getEventDraft(formDrafts, Event.Marriage) ||
+        DEFAULT_FORM_DRAFT[Event.Marriage],
+      configFields: generateConfigFields(
+        Event.Marriage,
+        defaultMarriageForm,
         questionConfig,
         formDataset
       )

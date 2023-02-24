@@ -212,6 +212,8 @@ export function getEventDate(data: IFormData, event: Event) {
       return data.child.childBirthDate as string
     case Event.Death:
       return data.deathEvent.deathDate as string
+    case Event.Marriage:
+      return data.marriageEvent.marriageDate as string
   }
 }
 
@@ -252,9 +254,10 @@ export function getRegistrarSignatureHandlebarName(
   offlineCountryConfig: IOfflineData,
   event: Event
 ) {
-  const svgCode = offlineCountryConfig.templates.certificates![event].definition
+  const svgCode =
+    offlineCountryConfig.templates.certificates![event]?.definition
   const html = document.createElement('html')
-  html.innerHTML = svgCode
+  html.innerHTML = String(svgCode)
   const certificateImages = html.querySelectorAll('image')
   const signatureImage = Array.from(certificateImages).find(
     (image) => image.getAttribute('data-content') === 'signature'

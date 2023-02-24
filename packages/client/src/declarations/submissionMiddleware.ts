@@ -33,6 +33,7 @@ import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
+import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutations'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -98,7 +99,9 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     const mutation =
       event === Event.Birth
         ? getBirthMutation(submissionAction)
-        : getDeathMutation(submissionAction)
+        : event === Event.Death
+        ? getDeathMutation(submissionAction)
+        : getMarriageMutation(submissionAction)
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         await client.mutate({

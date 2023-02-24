@@ -69,6 +69,7 @@ export interface IOfflineData {
     certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
+      marriage?: ISVGTemplate
     }
   }
   assets: {

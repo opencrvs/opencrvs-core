@@ -149,6 +149,13 @@ export function App(props: IAppProps) {
                                         />
                                         <ProtectedRoute
                                           exact
+                                          path={
+                                            routes.SELECT_MARRIAGE_INFORMANT
+                                          }
+                                          component={DeclarationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
                                           path={routes.DRAFT_BIRTH_PARENT_FORM}
                                           component={DeclarationForm}
                                         />
@@ -178,8 +185,25 @@ export function App(props: IAppProps) {
                                         />
                                         <ProtectedRoute
                                           exact
+                                          path={routes.DRAFT_MARRIAGE_FORM}
+                                          component={DeclarationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
                                           path={
                                             routes.DRAFT_DEATH_FORM_PAGE_GROUP
+                                          }
+                                          component={DeclarationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.DRAFT_MARRIAGE_FORM_PAGE}
+                                          component={DeclarationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP
                                           }
                                           component={DeclarationForm}
                                         />

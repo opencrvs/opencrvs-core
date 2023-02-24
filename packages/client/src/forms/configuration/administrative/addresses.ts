@@ -13,6 +13,7 @@
 import {
   BirthSection,
   DeathSection,
+  MarriageSection,
   FLEX_DIRECTION,
   SerializedFormField,
   ISerializedForm,
@@ -37,7 +38,8 @@ export enum AddressCases {
 
 export enum EventLocationAddressCases {
   PLACE_OF_BIRTH = 'placeOfBirth',
-  PLACE_OF_DEATH = 'placeOfDeath'
+  PLACE_OF_DEATH = 'placeOfDeath',
+  PLACE_OF_MARRIAGE = 'placeOfMarriage'
 }
 
 export enum AddressCopyConfigCases {
@@ -231,6 +233,52 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         conditionalCase: secondaryAddressesDisabled
       }
     ]
+  },
+  {
+    precedingFieldId: 'marriage.groom.groom-view-group.marriedLastNameEng',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      }
+    ]
+  },
+  {
+    precedingFieldId: 'marriage.bride.bride-view-group.marriedLastNameEng',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      }
+    ]
   }
 ]
 
@@ -322,6 +370,19 @@ export function getPreviewGroups(
             id: 'form.field.label.placeOfDeath'
           },
           fieldToRedirect: 'placeOfDeath'
+        }
+      ]
+    case EventLocationAddressCases.PLACE_OF_MARRIAGE:
+      return [
+        {
+          id: 'placeOfMarriage',
+          label: {
+            defaultMessage: 'Place of marriage',
+            description:
+              'Label for form field: Place of occurrence of marriage',
+            id: 'form.field.label.placeOfMarriage'
+          },
+          fieldToRedirect: 'placeOfMarriage'
         }
       ]
     case AddressCases.PRIMARY_ADDRESS:

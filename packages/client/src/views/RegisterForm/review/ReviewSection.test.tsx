@@ -23,7 +23,8 @@ import {
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
@@ -455,6 +456,17 @@ describe('when in device of large viewport', () => {
               ]
             }
           ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: MarriageSection.Groom,
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
+              viewType: 'form' as ViewType,
+              groups: []
+            }
+          ]
         }
       })
 
@@ -556,6 +568,17 @@ describe('when in device of large viewport', () => {
               id: DeathSection.Deceased,
               name: formMessages.deceasedTitle,
               title: formMessages.deceasedTitle,
+              viewType: 'form' as ViewType,
+              groups: []
+            }
+          ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: MarriageSection.Groom,
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
               groups: []
             }
@@ -668,6 +691,17 @@ describe('when in device of small viewport', () => {
             id: DeathSection.Deceased,
             name: formMessages.deceasedTitle,
             title: formMessages.deceasedTitle,
+            viewType: 'form' as ViewType,
+            groups: []
+          }
+        ]
+      },
+      marriage: {
+        sections: [
+          {
+            id: MarriageSection.Groom,
+            name: formMessages.groomName,
+            title: formMessages.groomTitle,
             viewType: 'form' as ViewType,
             groups: []
           }
