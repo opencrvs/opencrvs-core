@@ -949,7 +949,12 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      await fetchAllDuplicateDeclarations(data.data as Query)
+      const userDetails = getUserDetails(getState())
+      if (
+        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
+      ) {
+        await fetchAllDuplicateDeclarations(data.data as Query)
+      }
       await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
