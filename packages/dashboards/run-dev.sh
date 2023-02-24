@@ -73,4 +73,5 @@ if [ -n "$save_sql_file" ]; then
   echo "Saving database $metabase_db_path to $save_sql_file"
   java -cp "$metabase_jar" org.h2.tools.Script -url jdbc:h2:"$metabase_db_path_for_metabase" -script "$save_sql_file"
   echo "Done"
+  exit 0
 fi
