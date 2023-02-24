@@ -122,8 +122,8 @@ jobs:
         run: echo "CORE_VERSION=${{ inputs.core-image-tag }}" >> $GITHUB_ENV
 
       # Checkout core at the commit hash associated in order for yarn deploy to pickup any deploy Docker Compose changes
-      # - name: Checkout correct Core branch
-      #   run: git checkout ${{ env.CORE_VERSION }}
+      - name: Checkout correct Core branch
+        run: git checkout ${{ env.CORE_VERSION }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
