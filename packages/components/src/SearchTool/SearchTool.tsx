@@ -325,7 +325,7 @@ export class SearchTool extends React.Component<IProps, IState> {
             id="searchIconButton"
             onClick={this.search}
           >
-            <Icon color="currentColor" name="MagnifyingGlass" size="large" />
+            <Icon color="currentColor" name="Search" size="large" />
           </Button>
           <SearchTextInput
             id="searchText"

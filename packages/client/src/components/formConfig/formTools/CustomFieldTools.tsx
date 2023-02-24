@@ -948,7 +948,7 @@ class CustomFieldToolsComp extends React.Component<
       <>
         <Text variant="bold16" element="p">
           <CustomSelectHeading>
-            <Icon color="currentColor" name="TextT" size="large" />
+            <Icon color="currentColor" name="Type" size="large" />
             {intl.formatMessage(customFieldFormMessages.copyHeading)}
           </CustomSelectHeading>
         </Text>

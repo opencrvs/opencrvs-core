@@ -11,4 +11,4 @@
  */
 
 export * from './custom-icons'
-export * from 'phosphor-react'
+export * from 'react-feather'
