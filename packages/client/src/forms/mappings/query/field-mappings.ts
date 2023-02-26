@@ -18,6 +18,7 @@ import {
   GQLLocationType,
   GQLAddressType
 } from '@opencrvs/gateway/src/graphql/schema'
+import { BirthRegistration, Address } from '@client/utils/gateway'
 import {
   IAttachment,
   IFormData,
@@ -56,14 +57,14 @@ interface IIgnoreAddressFields {
 export const nameToFieldTransformer =
   (
     language: string,
-    transformedFieldName?: string,
-    fromSectionId?: string,
+    transformedFieldName?: keyof GQLHumanName,
+    fromSectionId?: keyof BirthRegistration,
     nestedField?: string //nestedField is necessary for GQL data informant->individual
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     const selectSectionId = fromSectionId ? fromSectionId : sectionId
@@ -88,14 +89,17 @@ export const nameToFieldTransformer =
         )
     }
 
-    const nameKey = transformedFieldName ? transformedFieldName : field.name
+    const nameKey = transformedFieldName
+      ? transformedFieldName
+      : (field.name as keyof GQLHumanName)
     if (!selectedName || !selectedName[nameKey]) {
       return transformedData
     }
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] = selectedName[nameKey]
+    if (selectedName[nameKey])
+      transformedData[sectionId][field.name] = selectedName[nameKey]
     return transformedData
   }
 
@@ -103,8 +107,8 @@ export const fieldValueTransformer =
   (transformedFieldName: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     if (queryData[sectionId] && queryData[sectionId][transformedFieldName]) {
@@ -115,16 +119,16 @@ export const fieldValueTransformer =
   }
 
 export const bundleFieldToSectionFieldTransformer =
-  (transformedFieldName?: string) =>
+  (transformedFieldName?: keyof BirthRegistration) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     const selectedFieldName = transformedFieldName
       ? transformedFieldName
-      : field.name
+      : (field.name as keyof BirthRegistration)
     if (
       queryData[selectedFieldName] !== null &&
       queryData[selectedFieldName] !== undefined &&
@@ -137,8 +141,8 @@ export const bundleFieldToSectionFieldTransformer =
 
 export function arrayToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) {
   if (
@@ -155,8 +159,8 @@ export const identifierToFieldTransformer =
   (identifierField: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     if (
@@ -176,8 +180,8 @@ export const identifierWithTypeToFieldTransformer =
   (identifierType: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     let identifier
@@ -194,8 +198,8 @@ export const identityToFieldTransformer =
   (identifierField: string, identityType: string, nestedField = '') =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     //nestedField is necessary for GQL data informant->individual
@@ -234,23 +238,20 @@ export const identityToFieldTransformer =
     }
     return transformedData
   }
-interface IAddress {
-  [key: string]: any
-}
 
 export const addressToFieldTransformer =
   (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
-    const address: IAddress | undefined =
+    const address =
       queryData[sectionId] &&
       queryData[sectionId].address &&
-      (queryData[sectionId].address as GQLAddress[]).find(
-        (addr) => addr.type === addressType
+      queryData[sectionId].address.find(
+        (addr: Address) => addr.type === addressType
       )
 
     if (!address) {
@@ -269,27 +270,27 @@ export const addressToFieldTransformer =
 export const sameAddressFieldTransformer =
   (
     fromAddressType: string,
-    fromSection: string,
+    fromSection: keyof BirthRegistration,
     toAddressType: string,
-    toSection: string
+    toSection: keyof BirthRegistration
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: BirthRegistration,
     sectionId: string,
     field: IFormField
   ) => {
     const fromAddress =
       queryData[fromSection] &&
       queryData[fromSection].address &&
-      (queryData[fromSection].address as [GQLAddress]).find(
-        (addr) => addr.type === fromAddressType
+      queryData[fromSection].address.find(
+        (addr: Address) => addr.type === fromAddressType
       )
     const toAddress =
       queryData[toSection] &&
       queryData[toSection].address &&
-      (queryData[toSection].address as [GQLAddress]).find(
-        (addr) => addr.type === toAddressType
+      queryData[toSection].address.find(
+        (addr: Address) => addr.type === toAddressType
       )
     if (!fromAddress || !toAddress) {
       transformedData[sectionId][field.name] = false
@@ -318,11 +319,11 @@ export const sameAddressFieldTransformer =
   }
 
 export const sectionFieldExchangeTransformer =
-  (fromSectionId: string, fromSectionField?: string) =>
+  (fromSectionId: keyof BirthRegistration, fromSectionField?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     if (
@@ -340,17 +341,15 @@ export const sectionFieldExchangeTransformer =
 
 export function commentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) {
+  // Check this one
   const comment =
     queryData[sectionId].status &&
-    (queryData[sectionId].status as GQLRegWorkflow[])[0].comments &&
-    (
-      (queryData[sectionId].status as GQLRegWorkflow[])[0]
-        .comments as GQLComment[]
-    )[0].comment
+    queryData[sectionId].status[0].comments &&
+    queryData[sectionId].status[0].comments[0].comment
   if (comment) {
     transformedData[sectionId][field.name] = comment
   }
@@ -359,10 +358,10 @@ export function commentToFieldTransformer(
 
 export function attachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField,
-  alternateSectionId?: string,
+  alternateSectionId?: keyof BirthRegistration,
   subjectMapper?: any,
   typeMapper?: any,
   fieldNameMapping?: any
@@ -403,26 +402,32 @@ export function attachmentToFieldTransformer(
 export const eventLocationQueryTransformer =
   (
     lineNumber = 0,
-    transformedFieldName?: string,
+    transformedFieldName?: keyof Address,
     ignoreAddressFields?: IIgnoreAddressFields
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: BirthRegistration,
     sectionId: string,
     field: IFormField
   ) => {
     if (!queryData.eventLocation || !queryData.eventLocation.address) {
       return transformedData
     }
-    const eventLocation = queryData.eventLocation as fhir.Location
-    const address = eventLocation.address as IAddress
-    const line = address.line as string[]
-    const country = address.country
+    const eventLocation = queryData.eventLocation
+    const address = eventLocation.address
+    const line = address?.line
+    const country = address?.country
     const fieldValue =
-      address[transformedFieldName ? transformedFieldName : field.name]
+      address &&
+      address[
+        transformedFieldName
+          ? transformedFieldName
+          : (field.name as keyof Address)
+      ]
     if (lineNumber > 0) {
-      transformedData[sectionId][field.name] = line[lineNumber - 1]
+      transformedData[sectionId][field.name] =
+        (line && line[lineNumber - 1]) || []
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
@@ -449,7 +454,7 @@ export const eventLocationTypeQueryTransformer =
   () =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: BirthRegistration,
     sectionId: string,
     field: IFormField
   ) => {
@@ -469,7 +474,7 @@ export const eventLocationIDQueryTransformer =
   () =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: BirthRegistration,
     sectionId: string,
     field: IFormField
   ) => {
@@ -490,8 +495,8 @@ export const locationIDToFieldTransformer =
   (transformedName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     const fieldName = transformedName || field.name
@@ -507,7 +512,7 @@ export const eventLocationNameQueryOfflineTransformer =
   (resourceKey: string, transformedFieldName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: BirthRegistration,
     sectionId: string,
     field: IFormField,
     _?: IFormField,
@@ -563,8 +568,8 @@ export const nestedValueToFieldTransformer =
   (nestedFieldName: string, transformMethod?: IFormFieldQueryMapFunction) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField
   ) => {
     if (!queryData[sectionId] || !queryData[sectionId][nestedFieldName]) {
@@ -591,8 +596,8 @@ export const nestedValueToFieldTransformer =
 
 export const booleanTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) => {
   // graphql boolean ignored unless forced like this
@@ -802,15 +807,15 @@ const transformAddressTemplateArray = (
 
 export const addressOfflineTransformer =
   (
-    transformedFieldName: string,
+    transformedFieldName: keyof BirthRegistration,
     addressType: GQLAddressType,
     addressLocationLevel: keyof typeof LocationLevel,
     targetFieldName?: string
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -821,9 +826,9 @@ export const addressOfflineTransformer =
     ) {
       return
     }
-    const addressFromQuery = (
-      queryData[transformedFieldName]?.address as GQLAddress[]
-    )?.find((address) => address.type === addressType)
+    const addressFromQuery = queryData[transformedFieldName]?.address?.find(
+      (address: GQLAddress) => address.type === addressType
+    )
     const nameKey = targetFieldName || field.name
     if (addressFromQuery) {
       transformAddressTemplateArray(
@@ -844,8 +849,8 @@ export const individualAddressTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -881,8 +886,8 @@ export const addressLineTemplateTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -913,8 +918,8 @@ export const eventLocationAddressLineTemplateTransformer =
   (lineNumber: number, transformedFieldName: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -930,7 +935,10 @@ export const eventLocationAddressLineTemplateTransformer =
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
     transformedData[sectionId][transformedFieldName] =
-      queryData.eventLocation?.address.line[index] || ''
+      (queryData.eventLocation?.address &&
+        queryData.eventLocation.address.line &&
+        queryData.eventLocation.address.line[index]) ||
+      ''
   }
 
 export const eventLocationAddressOfflineTransformer =
@@ -940,8 +948,8 @@ export const eventLocationAddressOfflineTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: BirthRegistration,
+    sectionId: keyof BirthRegistration,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -956,7 +964,7 @@ export const eventLocationAddressOfflineTransformer =
       return
     }
 
-    const addressFromQuery = queryData.eventLocation?.address
+    const addressFromQuery = queryData.eventLocation?.address as GQLAddress
     const nameKey = transformedFieldName || field.name
 
     if (addressFromQuery) {
@@ -973,10 +981,11 @@ export const eventLocationAddressOfflineTransformer =
 
 export const selectTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) => {
+  const fieldName = field.name as keyof BirthRegistration
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
@@ -986,13 +995,13 @@ export const selectTransformer = (
         queryData[sectionId][field.name],
         (field as ISelectFormFieldWithOptions).options
       )?.label as IFormSectionData) || ''
-  } else if (queryData[field.name]) {
+  } else if (queryData[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
     transformedData[sectionId][field.name] =
       (getSelectedOption(
-        queryData[field.name],
+        queryData[fieldName],
         (field as ISelectFormFieldWithOptions).options
       )?.label as IFormSectionData) || ''
   }
@@ -1000,8 +1009,8 @@ export const selectTransformer = (
 
 export const nationalityTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) => {
   if (queryData[sectionId]?.[field.name]) {
@@ -1026,20 +1035,21 @@ export const nationalityTransformer = (
 
 export const plainInputTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: BirthRegistration,
+  sectionId: keyof BirthRegistration,
   field: IFormField
 ) => {
-  if (queryData[sectionId]?.[field.name]) {
+  const fieldName = field.name as keyof BirthRegistration
+  if (queryData[sectionId]?.[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] =
+    transformedData[sectionId][fieldName] =
       queryData[sectionId][field.name] || ''
-  } else if (queryData[field.name]) {
+  } else if (queryData[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] = queryData[field.name] || ''
+    transformedData[sectionId][field.name] = queryData[fieldName] || ''
   }
 }
