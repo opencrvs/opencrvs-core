@@ -32,7 +32,7 @@ const StyledInput = styled.input<ITextInputProps>`
     inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
