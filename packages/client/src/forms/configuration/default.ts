@@ -878,6 +878,33 @@ export const registerForms: IDefaultRegisterForms = {
                 inputFieldWidth: '78px'
               },
               {
+                name: 'rankOfBirth',
+                type: 'NUMBER',
+                label: {
+                  defaultMessage: 'Rank of birth',
+                  description: 'Label for form field: rankOfBirth',
+                  id: 'form.field.label.rankOfBirth'
+                },
+                customisable: false,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'greaterThanZero'
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [30]
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'rankOfBirth',
+                    operation: 'plainInputTransformer'
+                  }
+                }
+              },
+              {
                 name: 'placeOfBirthTitle',
                 type: 'SUBSECTION',
                 label: formMessageDescriptors.placeOfBirthPreview,
