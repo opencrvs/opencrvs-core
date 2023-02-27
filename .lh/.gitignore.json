@@ -1,0 +1,18 @@
+{
+    "sourceFile": ".gitignore",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1677502853001,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1677502853001,
+            "name": "Commit-0",
+            "content": "# See http://help.github.com/ignore-files/ for more about ignoring files.\n\n# dependencies\nnode_modules\nopencrvs-farajaland\nopencrvs-farajaland\npackage-lock.json\n\n# testing\ncoverage\n\n# production\nbuild\n\n# misc\n.DS_Store\n.env*\n*.log\n.secrets/*\n# But, keep the .gitignore so the folder is created\n!.secrets/.gitignore\n.idea\n.vscode\n.idea/*\n.vim\ndata\ngrafana\n\n.vscode/launch.json\n.history\ndeploy_key\n"
+        }
+    ]
+}
