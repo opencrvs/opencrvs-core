@@ -28,8 +28,7 @@ export default {
     docs: {
       description: {
         component: `
-\`<VerificationButton />\` is used for fetching authenticated NID data from mosip IDP.
-It also shows if it has  successfully authenticated NID data from MOSIP.`
+\`<VerificationButton />\` is used for authentication flow. It can show a button, a spinner or a verified state.`
       }
     }
   }

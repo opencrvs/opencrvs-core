@@ -17,7 +17,7 @@ import { Spinner } from '../Spinner'
 import { Text } from '../Text'
 
 interface IVerificationButtonProps {
-  status: 'unverified' | 'loading' | 'verified'
+  status?: 'unverified' | 'loading' | 'verified'
   onClick: () => void
   labelForVerifiedState: string
   labelForUnverifiedState: string
@@ -41,17 +41,23 @@ const StyledDiv = styled.div`
   }
 `
 
-export const VerificationButton = (props: IVerificationButtonProps) => {
+export const VerificationButton = ({
+  status = 'unverified',
+  onClick,
+  labelForUnverifiedState,
+  labelForLoadingState,
+  labelForVerifiedState
+}: IVerificationButtonProps) => {
   return (
     <>
-      {props.status === 'unverified' && (
-        <Button size="medium" type="secondary" onClick={props.onClick}>
+      {status === 'unverified' && (
+        <Button size="medium" type="secondary" onClick={onClick}>
           <Icon name="CircleWavyCheck" />
-          {props.labelForUnverifiedState}
+          {labelForUnverifiedState}
         </Button>
       )}
 
-      {props.status === 'loading' && (
+      {status === 'loading' && (
         <StyledDiv>
           <Spinner
             id="nid-verification-loading"
@@ -59,16 +65,16 @@ export const VerificationButton = (props: IVerificationButtonProps) => {
             baseColor="currentColor"
           />
           <Text variant="bold16" element="p" color="primary">
-            {props.labelForLoadingState}...
+            {labelForLoadingState}...
           </Text>
         </StyledDiv>
       )}
 
-      {props.status === 'verified' && (
+      {status === 'verified' && (
         <StyledDiv>
           <Icon name="CircleWavyCheck" fill="green" color="green" />
           <Text variant="bold16" element="p" color="green">
-            {props.labelForVerifiedState}
+            {labelForVerifiedState}
           </Text>
         </StyledDiv>
       )}
