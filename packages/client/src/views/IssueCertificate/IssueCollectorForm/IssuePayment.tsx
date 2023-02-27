@@ -24,7 +24,6 @@ import {
   goToReviewCertificate
 } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
