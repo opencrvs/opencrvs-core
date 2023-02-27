@@ -676,7 +676,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            role: Joi.string().required(),
+            systemRole: Joi.string().required(),
             locationId: Joi.string()
           })
         }
