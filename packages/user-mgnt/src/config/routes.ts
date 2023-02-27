@@ -410,7 +410,14 @@ export const getRoutes = () => {
       handler: getSystemRoles,
       config: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: searchRoleSchema
