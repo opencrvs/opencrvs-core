@@ -246,6 +246,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           reg.declarationStatus === RegStatus.Validated
         const declarationIsInProgress =
           reg.declarationStatus === RegStatus.InProgress
+        const declarationIsIssued = reg.declarationStatus === RegStatus.Issued
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -255,7 +256,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
-            (declarationIsRegistered || declarationIsCertified) &&
+            (declarationIsRegistered ||
+              declarationIsCertified ||
+              declarationIsIssued) &&
             userHasCertifyScope()
           ) {
             actions.push({
@@ -290,6 +293,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
+          } else if (declarationIsIssued) {
           }
         }
         actions.push({
