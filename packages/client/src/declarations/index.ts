@@ -993,7 +993,7 @@ async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   }
 
   const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
-    ViewRecordQueries.fetchDeclarationForViewing(id as string)
+    ViewRecordQueries.fetchDuplicateDeclarations(id as string)
   )
 
   return Promise.all(fetchAllDuplicates)
