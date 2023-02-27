@@ -87,6 +87,7 @@ const workqueue: IWorkqueue = {
     rejectTab: {},
     approvalTab: {},
     printTab: {},
+    issueTab: {},
     externalValidationTab: {}
   },
   initialSyncDone: true

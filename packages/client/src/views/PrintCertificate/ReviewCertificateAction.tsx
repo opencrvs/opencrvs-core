@@ -320,7 +320,7 @@ const getEvent = (eventType: string | undefined) => {
   }
 }
 
-const getDraft = (
+export const getDraft = (
   drafts: IPrintableDeclaration[],
   registrationId: string,
   eventType: string

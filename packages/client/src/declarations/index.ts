@@ -155,7 +155,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_CERTIFY,
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  SUBMISSION_STATUS.REQUESTING_CORRECTION
+  SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.READY_TO_ISSUE,
+  SUBMISSION_STATUS.ISSUING
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -1766,6 +1768,10 @@ export function filterProcessingDeclarationsFromQuery(
     ),
     externalValidationTab: filterProcessingDeclarations(
       queryData.externalValidationTab,
+      processingDeclarationIds
+    ),
+    issueTab: filterProcessingDeclarations(
+      queryData.issueTab,
       processingDeclarationIds
     )
   }
