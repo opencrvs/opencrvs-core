@@ -15,6 +15,7 @@ import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
+import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 import { Query } from '@client/components/Query'
 import { WatchQueryFetchPolicy } from '@apollo/client'
 
@@ -29,7 +30,8 @@ type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const QueryMapper = {
   [Event.Birth]: getBirthQueryMappings,
-  [Event.Death]: getDeathQueryMappings
+  [Event.Death]: getDeathQueryMappings,
+  [Event.Marriage]: getMarriageQueryMappings
 }
 export const getQueryMapping = (event: Event, action: Action) => {
   return QueryMapper[event] && QueryMapper[event](action)

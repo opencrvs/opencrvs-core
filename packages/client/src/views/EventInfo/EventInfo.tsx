@@ -84,6 +84,11 @@ function EventInfoComponet(props: IFullProps) {
         props.storeDeclaration(declaration)
         props.goToDeathInformant(declaration.id)
         break
+      case Event.Marriage:
+        declaration = createDeclaration(Event.Marriage)
+        props.storeDeclaration(declaration)
+        props.goToDeathInformant(declaration.id)
+        break
       default:
         throw new Error(`Unknown eventType ${eventType}`)
     }
