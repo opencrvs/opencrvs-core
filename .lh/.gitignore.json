@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1677502853001,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1677502899565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,8 +20,9 @@\n # But, keep the .gitignore so the folder is created\n !.secrets/.gitignore\n .idea\n .vscode\n+.lh\n .idea/*\n .vim\n data\n grafana\n"
                 }
             ],
             "date": 1677502853001,

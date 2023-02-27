@@ -21,6 +21,7 @@ build
 !.secrets/.gitignore
 .idea
 .vscode
+.lh
 .idea/*
 .vim
 data
