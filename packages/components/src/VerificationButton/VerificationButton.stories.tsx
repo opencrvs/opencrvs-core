@@ -22,7 +22,7 @@ interface IVerificationButtonProps {
 }
 
 export default {
-  title: 'Controls/Verification Button',
+  title: 'Controls/Verification button',
   component: VerificationButton,
   parameters: {
     docs: {
