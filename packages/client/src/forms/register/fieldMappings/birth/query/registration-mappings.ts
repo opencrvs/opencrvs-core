@@ -29,6 +29,7 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
+import { allCountries } from '@client/utils/countryUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -177,6 +178,17 @@ const convertToLocal = (
    */
   const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+
+  const data = allCountries.find(
+    (countryData) => countryData.iso2 === countryCode.slice(0, 2)
+  )
+
+  if (data) {
+    return (
+      mobileWithCountryCode &&
+      mobileWithCountryCode.replace(data.dialCode, String(data.priority))
+    )
+  }
 
   return (
     mobileWithCountryCode &&

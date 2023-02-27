@@ -71,6 +71,7 @@ import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
+import { allCountries } from '@client/utils/countryUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -654,8 +655,13 @@ export const convertToMSISDN = (phone: string) => {
       ? 'ZMB'
       : window.config.COUNTRY.toUpperCase()
 
-  const countryCallingCode =
-    callingCountries[countryCode].countryCallingCodes[0]
+  const data = allCountries.find(
+    (countryData) => countryData.iso2 === countryCode.slice(0, 2)
+  )
+
+  const countryCallingCode = data
+    ? data.dialCode
+    : callingCountries[countryCode].countryCallingCodes[0]
 
   if (
     phone.startsWith(countryCallingCode) ||
