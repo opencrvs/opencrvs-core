@@ -20,7 +20,7 @@ import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import format from '@client/utils/date-formatting'
-import { REGISTERED, CERTIFIED } from '@client/utils/constants'
+import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -83,12 +83,13 @@ export const GetDeclarationInfo = ({
     type: getCaptitalizedWord(declaration?.type),
     trackingId: declaration?.trackingId
   }
+  console.log(info.status)
 
   /* TODO: This component needs refactor on how the data is being shown */
   if (info.type === 'Birth') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
       if (declaration?.brnDrn) {
         info.brn = declaration.brnDrn
@@ -106,7 +107,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Death') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
       if (declaration?.brnDrn) {
         info.drn = declaration.brnDrn
