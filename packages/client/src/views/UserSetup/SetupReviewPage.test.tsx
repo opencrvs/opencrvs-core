@@ -32,7 +32,7 @@ describe('SetupReviewPage page tests', () => {
             labels: [
               {
                 lang: 'en',
-                label: 'CHA'
+                label: 'ENTREPENEUR'
               }
             ]
           }
@@ -73,7 +73,7 @@ describe('SetupReviewPage page tests', () => {
       { store, history }
     )
     const role = testComponent.find('#RoleType_value').hostNodes().text()
-    expect(role).toEqual('Field Agent / ENTREPENEUR')
+    expect(role).toEqual('ENTREPENEUR')
   })
   it('clicks question to change', async () => {
     const testComponent = await createTestComponent(
