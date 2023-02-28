@@ -2692,15 +2692,6 @@
     "@whatwg-node/fetch" "^0.4.0"
     tslib "^2.4.0"
 
-"@graphql-tools/graphql-file-loader@^6.0.9":
-  version "6.2.7"
-  resolved "https://registry.npmjs.org/@graphql-tools/graphql-file-loader/-/graphql-file-loader-6.2.7.tgz"
-  integrity sha512-5k2SNz0W87tDcymhEMZMkd6/vs6QawDyjQXWtqkuLTBF3vxjxPD1I4dwHoxgWPIjjANhXybvulD7E+St/7s9TQ==
-  dependencies:
-    "@graphql-tools/import" "^6.2.6"
-    "@graphql-tools/utils" "^7.0.0"
-    tslib "~2.1.0"
-
 "@graphql-tools/graphql-file-loader@^7.0.5", "@graphql-tools/graphql-file-loader@^7.3.7":
   version "7.5.5"
   resolved "https://registry.npmjs.org/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.5.tgz"
@@ -2723,7 +2714,7 @@
     "@graphql-tools/utils" "8.12.0"
     tslib "^2.4.0"
 
-"@graphql-tools/import@6.7.6", "@graphql-tools/import@^6.2.6":
+"@graphql-tools/import@6.7.6":
   version "6.7.6"
   resolved "https://registry.npmjs.org/@graphql-tools/import/-/import-6.7.6.tgz"
   integrity sha512-WtUyiO2qCaK/H4u81zAw/NbBvCOzwKl4N+Vl+FqrFCzYobscwL6x6roePyoXM1O3+JJIIn3CETv4kg4kwxaBVw==
@@ -2946,7 +2937,7 @@
     camel-case "4.1.1"
     tslib "~2.0.1"
 
-"@graphql-tools/utils@^7.0.0", "@graphql-tools/utils@^7.5.0":
+"@graphql-tools/utils@^7.5.0":
   version "7.10.0"
   resolved "https://registry.npmjs.org/@graphql-tools/utils/-/utils-7.10.0.tgz"
   integrity sha512-d334r6bo9mxdSqZW6zWboEnnOOFRrAPVQJ7LkU8/6grglrbcu6WhwCLzHb90E94JI3TD3ricC3YGbUqIi9Xg0w==
@@ -23546,11 +23537,6 @@ tslib@~2.0.1:
   version "2.0.3"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.0.3.tgz"
   integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
-
-tslib@~2.1.0:
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/tslib/-/tslib-2.1.0.tgz"
-  integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
 
 tslib@~2.2.0:
   version "2.2.0"

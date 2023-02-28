@@ -11,21 +11,18 @@
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { injectIntl } from 'react-intl'
-import * as Icons from 'react-feather'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
+import { useIntl } from 'react-intl'
+import { dashboardMessages } from '@client/i18n/messages/views/dashboard'
 
-const leaderboardsComponent = () => (
-  <DashboardEmbedView
-    title={'Leaderboards'}
-    url={window.config.LEADERBOARDS_DASHBOARD_URL}
-    icon={<Icons.Award width={20} height={20} />}
-  />
-)
-
-export const Leaderboards = connect((state: IStoreState) =>
-  getOfflineData(state)
-)(injectIntl(leaderboardsComponent))
+export const Leaderboards = () => {
+  const intl = useIntl()
+  return (
+    <DashboardEmbedView
+      title={intl.formatMessage(dashboardMessages.leaderboardTitle)}
+      url={window.config.LEADERBOARDS_DASHBOARD_URL}
+      icon={<Icon name="Award" size="medium" />}
+    />
+  )
+}

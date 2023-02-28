@@ -142,6 +142,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Label for navigation item outbox',
     id: 'navigation.outbox'
   },
+  analytic: {
+    defaultMessage: 'Analytics',
+    description: 'Analytic Group',
+    id: 'navigation.analytic'
+  },
   statistics: {
     defaultMessage: 'Statistics',
     description: 'Statistics Dashboard Section',

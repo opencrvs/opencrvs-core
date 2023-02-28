@@ -11,21 +11,18 @@
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { injectIntl } from 'react-intl'
-import { Activity } from '@opencrvs/components/lib/icons'
+import { useIntl } from 'react-intl'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
+import { dashboardMessages } from '@client/i18n/messages/views/dashboard'
 
-const performanceStatisticsComponent = () => (
-  <DashboardEmbedView
-    title={'Statistics'}
-    url={window.config.STATISTICS_DASHBOARD_URL}
-    icon={<Activity />}
-  />
-)
-
-export const PerformanceStatistics = connect((state: IStoreState) =>
-  getOfflineData(state)
-)(injectIntl(performanceStatisticsComponent))
+export const PerformanceStatistics = () => {
+  const intl = useIntl()
+  return (
+    <DashboardEmbedView
+      title={intl.formatMessage(dashboardMessages.statisticTitle)}
+      url={window.config.STATISTICS_DASHBOARD_URL}
+      icon={<Icon name="Activity" size="medium" />}
+    />
+  )
+}

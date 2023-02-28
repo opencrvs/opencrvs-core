@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,17 +12,15 @@
  */
 
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { injectIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
 import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
-import { Activity } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from '@client/styledComponents'
 import IframeResizer from 'iframe-resizer-react'
+import { dashboardMessages } from '@client/i18n/messages/views/dashboard'
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -34,6 +33,7 @@ interface IdashboardView {
 }
 
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
+  const intl = useIntl()
   const dispatch = useDispatch()
   return (
     <>
@@ -74,13 +74,9 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
           />
         ) : (
           <div id={`${title.toLowerCase()}_noContent`}>
-          <Content
-            title={title}
-            size={ContentSize.LARGE}
-          >
-            {' '}
-            No Content{' '}
-          </Content>
+            <Content title={title} size={ContentSize.LARGE}>
+              {intl.formatMessage(dashboardMessages.noContent)}
+            </Content>
           </div>
         )}
       </Frame>
@@ -88,14 +84,13 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   )
 }
 
-const dashboardComponent = () => (
-  <DashboardEmbedView
-    title={'Dashboard'}
-    url={window.config.REGISTRATIONS_DASHBOARD_URL}
-    icon={<Activity />}
-  />
-)
-
-export const PerformanceDashboard = connect((state: IStoreState) =>
-  getOfflineData(state)
-)(injectIntl(dashboardComponent))
+export const PerformanceDashboard = () => {
+  const intl = useIntl()
+  return (
+    <DashboardEmbedView
+      title={intl.formatMessage(dashboardMessages.dashboardTitle)}
+      url={window.config.REGISTRATIONS_DASHBOARD_URL}
+      icon={<Icon name="Activity" size="medium" />}
+    />
+  )
+}

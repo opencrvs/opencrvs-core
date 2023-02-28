@@ -44,7 +44,6 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
@@ -70,7 +69,6 @@ import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { Text } from '@opencrvs/components'
-import * as Icons from 'react-feather'
 import { ChartActivity } from '@opencrvs/components/lib/Icon/custom-icons'
 import { UserDetails } from '@client/utils/userUtils'
 
@@ -449,7 +447,7 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <PaperPlane />}
+              icon={() => <Icon name="Send" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.outbox}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.outbox]
@@ -580,7 +578,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <PaperPlane />}
+                      icon={() => <Icon name="Send" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]
@@ -603,7 +601,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
-                      icon={() => <Activity />}
+                      icon={() => <Icon name="Activity" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.performance}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.performance]
@@ -658,7 +656,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
-                      icon={() => <Users />}
+                      icon={() => <Icon name="Users" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.team}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.team]
@@ -827,13 +825,10 @@ export const NavigationView = (props: IFullProps) => {
                         element="p"
                         color="opacity24"
                       >
-                        {' '}
-                        Analytics{' '}
+                        {intl.formatMessage(navigationMessages['analytic'])}
                       </Text>
                       <NavigationItem
-                        icon={() => (
-                          <ChartActivity color={'primary'} size={24} />
-                        )}
+                        icon={() => <Icon name="ChartActivity" size="medium" />}
                         label={intl.formatMessage(
                           navigationMessages['dashboard']
                         )}
@@ -844,7 +839,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       <NavigationItem
-                        icon={() => <Activity />}
+                        icon={() => <Icon name="Activity" size="medium" />}
                         label={intl.formatMessage(
                           navigationMessages['statistics']
                         )}
@@ -855,7 +850,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       <NavigationItem
-                        icon={() => <Icons.Award width={20} height={20} />}
+                        icon={() => <Icon name="Award" size="medium" />}
                         label={intl.formatMessage(
                           navigationMessages['leaderboards']
                         )}
@@ -867,7 +862,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       <NavigationItem
-                        icon={() => <Icons.BarChart2 width={20} height={20} />}
+                        icon={() => <Icon name="BarChart2" size="medium" />}
                         label={intl.formatMessage(navigationMessages['report'])}
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
