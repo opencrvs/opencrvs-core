@@ -208,10 +208,11 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'blue',
+  CERTIFIED: 'teal',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
-  SUBMITTING: 'orange'
+  SUBMITTING: 'orange',
+  ISSUED: 'blue'
 }
 
 const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
