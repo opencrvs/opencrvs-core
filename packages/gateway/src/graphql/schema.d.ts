@@ -613,6 +613,7 @@ export interface GQLApplicationConfiguration {
   COUNTRY_LOGO?: GQLCountryLogo
   CURRENCY?: GQLCurrency
   DEATH?: GQLDeath
+  MARRIAGE?: GQLMarriage
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -632,6 +633,7 @@ export interface GQLApplicationConfigurationInput {
   COUNTRY_LOGO?: GQLCountryLogoInput
   CURRENCY?: GQLCurrencyInput
   DEATH?: GQLDeathInput
+  MARRIAGE?: GQLMarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -963,7 +965,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  role?: string
+  role?: GQLRole
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
@@ -1241,6 +1243,11 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
+export interface GQLMarriage {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLMarriageFee
+}
+
 export interface GQLLoginBackground {
   backgroundColor?: string
   backgroundImage?: string
@@ -1266,6 +1273,11 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+}
+
+export interface GQLMarriageInput {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLMarriageFeeInput
 }
 
 export interface GQLLoginBackgroundInput {
@@ -1700,6 +1712,11 @@ export interface GQLDeathFee {
   DELAYED?: number
 }
 
+export interface GQLMarriageFee {
+  ON_TIME?: number
+  DELAYED?: number
+}
+
 export const enum GQLImageFit {
   FILL = 'FILL',
   TILE = 'TILE'
@@ -1712,6 +1729,11 @@ export interface GQLBirthFeeInput {
 }
 
 export interface GQLDeathFeeInput {
+  ON_TIME?: number
+  DELAYED?: number
+}
+
+export interface GQLMarriageFeeInput {
   ON_TIME?: number
   DELAYED?: number
 }
@@ -1920,6 +1942,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  Marriage?: GQLMarriageTypeResolver
   LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -1942,6 +1965,7 @@ export interface GQLResolver {
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
+  MarriageFee?: GQLMarriageFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
@@ -4773,6 +4797,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
+  MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
@@ -4815,6 +4840,13 @@ export interface ApplicationConfigurationToCURRENCYResolver<
 }
 
 export interface ApplicationConfigurationToDEATHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToMARRIAGEResolver<
   TParent = any,
   TResult = any
 > {
@@ -6096,6 +6128,22 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLMarriageTypeResolver<TParent = any> {
+  REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
+  FEE?: MarriageToFEEResolver<TParent>
+}
+
+export interface MarriageToREGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLLoginBackgroundTypeResolver<TParent = any> {
   backgroundColor?: LoginBackgroundToBackgroundColorResolver<TParent>
   backgroundImage?: LoginBackgroundToBackgroundImageResolver<TParent>
@@ -7357,6 +7405,19 @@ export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMarriageFeeTypeResolver<TParent = any> {
+  ON_TIME?: MarriageFeeToON_TIMEResolver<TParent>
+  DELAYED?: MarriageFeeToDELAYEDResolver<TParent>
+}
+
+export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

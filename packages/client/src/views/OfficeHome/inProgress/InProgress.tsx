@@ -36,6 +36,7 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { ITheme, withTheme } from '@client/styledComponents'
@@ -333,6 +334,8 @@ export class InProgressComponent extends React.Component<
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (draft.event && draft.event.toString() === 'death') {
         pageRoute = DRAFT_DEATH_FORM_PAGE
+      } else if (draft.event && draft.event.toString() === 'marriage') {
+        pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
       const name = getDraftInformantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn

@@ -32,7 +32,9 @@ import {
   IRejectedPoints,
   ICorrectionPoint,
   IUserAuditTags,
-  IUserAuditFields
+  IUserAuditFields,
+  IMarriageRegistrationFields,
+  IMarriageRegistrationTags
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -624,6 +626,74 @@ export async function generateRejectedPoints(
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
   }
+}
+
+export async function generateMarriageRegPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader,
+  regStatus: string
+): Promise<IRejectedPoints> {
+  const person: fhir.Patient = getSectionBySectionCode(payload, 'bride-details')
+
+  if (!person) {
+    throw new Error('No bride found!')
+  }
+
+  const marriageExtension = person.extension?.find(
+    (extension) =>
+      extension.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`
+  )
+
+  if (!marriageExtension) {
+    throw new Error('No marriage extension is found')
+  }
+
+  const composition = getComposition(payload)
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  const practitionerRole = await fetchDeclarationsBeginnerRole(
+    payload,
+    authHeader
+  )
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
+
+  const fields: IMarriageRegistrationFields = {
+    compositionId: composition.id,
+    daysAfterEvent: marriageExtension && Number(marriageExtension.valueString)
+  }
+  const compositionDate = new Date(composition.date)
+  const tags: IMarriageRegistrationTags = {
+    regStatus: regStatus,
+    eventLocationType: await getEncounterLocationType(payload, authHeader),
+    gender: person.gender,
+    registrarPractitionerId,
+    practitionerRole,
+    dateLabel: !Number.isNaN(compositionDate.getTime())
+      ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
+      : undefined,
+    timeLabel:
+      (marriageExtension.valueString &&
+        (await getTimeLabel(
+          Number(marriageExtension?.valueString),
+          EVENT_TYPE.MARRIAGE,
+          authHeader.Authorization
+        ))) ||
+      undefined,
+    officeLocation: getRegLastOffice(payload),
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  const point = {
+    measurement: 'marriage_registration',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(composition.date)
+  }
+
+  return point
 }
 
 export const generateAuditPoint = (

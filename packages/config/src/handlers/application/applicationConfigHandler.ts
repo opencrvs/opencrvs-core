@@ -143,6 +143,13 @@ export const updateApplicationConfig = Joi.object({
       DELAYED: Joi.number()
     }
   }),
+  MARRIAGE: Joi.object().keys({
+    REGISTRATION_TARGET: Joi.number(),
+    FEE: {
+      ON_TIME: Joi.number(),
+      DELAYED: Joi.number()
+    }
+  }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
   HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),

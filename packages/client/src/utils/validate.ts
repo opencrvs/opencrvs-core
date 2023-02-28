@@ -346,8 +346,7 @@ export const checkBirthDate =
   }
 
 export const checkMarriageDate =
-  (birthDate: string): Validation =>
-  (value: IFormFieldValue) => {
+  (): Validation => (value: IFormFieldValue, drafts) => {
     const cast = value as string
     if (!isAValidDateFormat(cast)) {
       return {
@@ -362,16 +361,53 @@ export const checkMarriageDate =
         message: messages.dateFormat
       }
     }
+    const groomDOB =
+      drafts && drafts.groom && String(drafts.groom.groomBirthDate)
+    const brideDOB =
+      drafts && drafts.bride && String(drafts.bride.brideBirthDate)
 
-    if (!birthDate || !isAValidDateFormat(birthDate)) {
+    if (!groomDOB || !brideDOB) {
       return undefined
+    } else {
+      return mDate > new Date(groomDOB) && mDate > new Date(brideDOB)
+        ? undefined
+        : {
+            message: messages.domLaterThanDob
+          }
+    }
+  }
+
+export const isValidDateOfBirthForMarriage =
+  (sectionName: string, minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const isExactDateOfBirthUnknown =
+      drafts &&
+      drafts[sectionName] &&
+      drafts[sectionName].exactDateOfBirthUnknown
+    const cast = isExactDateOfBirthUnknown
+      ? convertAgeToDate(value as string)
+      : (value as string)
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
+      }
+    } else if (!isDateNotInFuture(cast)) {
+      return { message: messages.isValidBirthDate }
     }
 
-    return mDate > new Date(birthDate)
-      ? undefined
-      : {
-          message: messages.domLaterThanDob
-        }
+    if (
+      !minAgeGapExist(
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
+        String(value),
+        minAge
+      )
+    ) {
+      return {
+        message: messages.illegalMarriageAge
+      }
+    } else {
+      return undefined
+    }
   }
 
 export const dateGreaterThan =

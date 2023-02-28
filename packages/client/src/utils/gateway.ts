@@ -219,6 +219,7 @@ export type ApplicationConfiguration = {
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
+  MARRIAGE?: Maybe<Marriage>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -238,6 +239,7 @@ export type ApplicationConfigurationInput = {
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
+  MARRIAGE?: InputMaybe<MarriageInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -770,7 +772,8 @@ export type Estimation = {
 
 export enum Event {
   Birth = 'birth',
-  Death = 'death'
+  Death = 'death',
+  Marriage = 'marriage'
 }
 
 export type EventMetrics = {
@@ -1127,6 +1130,28 @@ export enum MaritalStatusType {
   Separated = 'SEPARATED',
   Single = 'SINGLE',
   Widowed = 'WIDOWED'
+}
+
+export type Marriage = {
+  __typename?: 'Marriage'
+  FEE?: Maybe<MarriageFee>
+  REGISTRATION_TARGET?: Maybe<Scalars['Int']>
+}
+
+export type MarriageFee = {
+  __typename?: 'MarriageFee'
+  DELAYED?: Maybe<Scalars['Float']>
+  ON_TIME?: Maybe<Scalars['Float']>
+}
+
+export type MarriageFeeInput = {
+  DELAYED?: InputMaybe<Scalars['Float']>
+  ON_TIME?: InputMaybe<Scalars['Float']>
+}
+
+export type MarriageInput = {
+  FEE?: InputMaybe<MarriageFeeInput>
+  REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
 export type MedicalPractitioner = {
@@ -2059,7 +2084,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  role?: Maybe<Scalars['String']>
+  role?: Maybe<Role>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
@@ -5758,6 +5783,15 @@ export type UpdateApplicationConfigMutation = {
         DELAYED?: number | null
       } | null
     } | null
+    MARRIAGE?: {
+      __typename?: 'Marriage'
+      REGISTRATION_TARGET?: number | null
+      FEE?: {
+        __typename?: 'MarriageFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
   } | null
 }
 
@@ -6333,7 +6367,6 @@ export type SearchFieldAgentsQuery = {
       __typename?: 'SearchFieldAgentResponse'
       practitionerId?: string | null
       fullName?: string | null
-      role?: string | null
       status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
@@ -6341,6 +6374,10 @@ export type SearchFieldAgentsQuery = {
       totalNumberOfInProgressAppStarted?: number | null
       totalNumberOfRejectedDeclarations?: number | null
       averageTimeForDeclaredDeclarations?: number | null
+      role?: {
+        __typename?: 'Role'
+        labels: Array<{ __typename?: 'RoleLabel'; label: string; lang: string }>
+      } | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
