@@ -966,7 +966,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  role?: string
+  role?: GQLRole
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string

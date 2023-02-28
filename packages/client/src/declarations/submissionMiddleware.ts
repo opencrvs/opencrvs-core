@@ -40,6 +40,8 @@ import {
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
+// eslint-disable-next-line no-restricted-imports
+import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -191,6 +193,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.FAILED
         })
+        captureException(error)
         return
       }
       if (
