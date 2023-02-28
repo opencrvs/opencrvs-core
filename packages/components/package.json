@@ -37,7 +37,7 @@
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "build:clean": "rm -rf lib",
     "storybook": "start-storybook -p 6060",
-    "build-storybook": "build-storybook -o build",
+    "build-storybook": "node --max_old_space_size=6144 $(yarn bin)/build-storybook -o build",
     "recreate-src-index-ts": "bash recreate-src-index-ts.sh"
   },
   "lint-staged": {
