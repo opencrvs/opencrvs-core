@@ -949,7 +949,12 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      await fetchAllDuplicateDeclarations(data.data as Query)
+      const userDetails = getUserDetails(getState())
+      if (
+        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
+      ) {
+        await fetchAllDuplicateDeclarations(data.data as Query)
+      }
       await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
@@ -988,7 +993,7 @@ async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   }
 
   const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
-    ViewRecordQueries.fetchDeclarationForViewing(id as string)
+    ViewRecordQueries.fetchDuplicateDeclarations(id as string)
   )
 
   return Promise.all(fetchAllDuplicates)

@@ -137,7 +137,7 @@ function mapStatetoProps(
     event: getEvent(match.params.event),
     registerForm: form,
     pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
-    duplicate: Boolean(declaration?.duplicates)
+    duplicate: Boolean(declaration?.duplicates?.length)
   }
 }
 

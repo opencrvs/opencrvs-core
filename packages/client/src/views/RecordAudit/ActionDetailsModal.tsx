@@ -505,6 +505,7 @@ export const ActionDetailsModalListTable = ({
 
       {/* Show Duplicate pill for Archived declarations */}
       {actionDetailsData.reason === 'duplicate' &&
+        !actionDetailsData.action &&
         actionDetailsData.regStatus === RegStatus.Archived && (
           <p>
             <Pill

@@ -156,7 +156,11 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (body.type !== 'IN_PROGRESS' && body.type !== 'WAITING_VALIDATION') {
+  if (
+    body.type !== 'IN_PROGRESS' &&
+    body.type !== 'WAITING_VALIDATION' &&
+    body.type !== 'VALIDATED'
+  ) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }

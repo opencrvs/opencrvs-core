@@ -895,7 +895,7 @@ export const DuplicateFormTabs = (props: IProps) => {
               duplicateMessages.duplicateComparePageTitle,
               {
                 actualTrackingId: (
-                  <Text variant="bold21" element="span" color="negative">
+                  <Text variant="bold18" element="span" color="negative">
                     {actualTrackingId}
                   </Text>
                 ),
@@ -909,7 +909,7 @@ export const DuplicateFormTabs = (props: IProps) => {
               {comparisonDelcarationData.map((sections, index) => {
                 return (
                   <div key={`comparison-div-${index}`}>
-                    <Text variant="bold21" element="span" color="grey600">
+                    <Text variant="bold18" element="span" color="grey600">
                       {sections.title}
                     </Text>
                     <ComparisonListView

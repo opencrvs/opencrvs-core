@@ -95,7 +95,8 @@ async function removeDuplicatesFromCompositionAndElastic(
     declaration.isNotDuplicate &&
     [
       SubmissionAction.REGISTER_DECLARATION,
-      SubmissionAction.REJECT_DECLARATION
+      SubmissionAction.REJECT_DECLARATION,
+      SubmissionAction.APPROVE_DECLARATION
     ].includes(submissionAction)
   ) {
     await client.mutate({
