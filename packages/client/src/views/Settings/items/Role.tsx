@@ -22,16 +22,14 @@ import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { Role as GatewayRole } from '@client/utils/gateway'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function Role() {
   const intl = useIntl()
   const language = useSelector(getLanguage)
   const systemRole = useSelector<IStoreState, string>((state) => {
-    return (
-      getUserRole(language, state.profile.userDetails?.role as GatewayRole) ??
-      ''
-    )
+    const userDetails = getUserDetails(state)
+    return (userDetails && getUserRole(language, userDetails.role)) ?? ''
   })
   return (
     <ListViewItemSimplified

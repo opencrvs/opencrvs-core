@@ -71,7 +71,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const language = useSelector(getLanguage)
-  const typeRole = userDetails && getUserRole(language, userDetails?.role)
+  const role = userDetails && getUserRole(language, userDetails.role)
   const primaryOffice =
     (userDetails &&
       userDetails.primaryOffice &&
@@ -118,9 +118,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       value: primaryOffice
     },
     {
-      id: 'RoleType',
+      id: 'Role',
       label: `${intl.formatMessage(constantsMessages.labelRole)}`,
-      value: typeRole
+      value: role
     },
     ...answeredQuestions
   ]
