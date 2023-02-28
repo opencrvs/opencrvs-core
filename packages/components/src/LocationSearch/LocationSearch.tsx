@@ -43,7 +43,7 @@ const Wrapper = styled.div`
 const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   ${({ theme }) => theme.fonts.reg18};
   padding-left: 36px;
   border: 2px solid
@@ -276,7 +276,13 @@ export class LocationSearch extends React.Component<IProps, IState> {
               autoComplete="off"
               onFocus={this.onFocus}
               onBlur={this.onBlurHandler}
-              onClick={() => document.addEventListener('click', this.handler)}
+              onClick={() =>
+                //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+                setTimeout(
+                  () => document.addEventListener('click', this.handler),
+                  0
+                )
+              }
               value={this.state.selectedText || ''}
               onChange={this.onChangeHandler}
               error={this.props.error}

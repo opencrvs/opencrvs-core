@@ -22,8 +22,16 @@ const applicationConfigMutation = gql`
       NID_NUMBER_PATTERN
       PHONE_NUMBER_PATTERN
       HIDE_EVENT_REGISTER_INFORMATION
+      DATE_OF_BIRTH_UNKNOWN
+      INFORMANT_SIGNATURE
+      INFORMANT_SIGNATURE_REQUIRED
       ADDRESSES
       ADMIN_LEVELS
+      LOGIN_BACKGROUND {
+        backgroundColor
+        backgroundImage
+        imageFit
+      }
       COUNTRY_LOGO {
         fileName
         file

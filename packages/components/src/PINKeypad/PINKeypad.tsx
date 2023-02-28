@@ -9,17 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { Backspace } from '../icons/Backspace'
 
 interface IProps {
   id?: string
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
   pin?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ref?: any
 }
 
 interface IState {
@@ -31,62 +28,49 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   outline: none;
+  margin-top: 32px;
+`
+const StyledInput = styled.input`
+  position: absolute;
+  opacity: 0;
 `
 
 const DotFilled = styled.span`
   height: 18px;
   width: 18px;
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
 `
 
 const DotUnfilled = styled.span`
   height: 18px;
   width: 18px;
-  border: 2px solid ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
 `
-
-const NumberContainer = styled.div`
-  display: grid;
-  grid-template-columns: auto auto auto;
-
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const Key = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h1};
-  padding: 24px 48px;
-  text-align: center;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 20px 40px;
-    ${({ theme }) => theme.fonts.h1};
-  }
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.h2};
-  }
+const DotsContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
+  pinInput: React.RefObject<HTMLInputElement> = React.createRef()
+
+  componentDidMount() {
+    this.focusKeyInput()
+  }
+
+  focusKeyInput = () => {
+    this.pinInput?.current?.focus()
+  }
+  componentDidUpdate = () => this.focusKeyInput()
 
   keyPress = (key: number) => {
     const { pin } = this.state
@@ -137,117 +121,37 @@ export class PINKeypad extends React.Component<IProps, IState> {
     }
   }
 
+  onBlur = () => {
+    this.focusKeyInput()
+  }
+
   render() {
     const { pin } = this.state
     return (
-      <Container
-        id="pin-keypad-container"
-        tabIndex={0}
-        onKeyDown={this.keyDown}
-        {...this.props}
-      >
-        <div>
-          <div>
-            {new Array(pin.length).fill('').map((e, i) => (
+      <Container id="pin-keypad-container" tabIndex={0} {...this.props}>
+        <DotsContainer>
+          <StyledInput
+            type="number"
+            onKeyDown={this.keyDown}
+            id="pin-input"
+            ref={this.pinInput}
+            onBlur={this.onBlur}
+            autoFocus
+          />
+          <div
+            onClick={() => {
+              this.pinInput?.current?.focus()
+            }}
+          >
+            {new Array(pin.length).fill('').map((_, i) => (
               <DotFilled key={`dot-filled-${i}`} />
             ))}
-            {new Array(4 - pin.length).fill('').map((e, i) => (
+            {new Array(4 - pin.length).fill('').map((_, i) => (
               <DotUnfilled key={`dot-unfilled-${i}`} />
             ))}
           </div>
           {this.props.forgotPinComponent}
-        </div>
-        <NumberContainer>
-          <Key
-            id="keypad-1"
-            onClick={() => {
-              this.keyPress(1)
-            }}
-          >
-            1
-          </Key>
-          <Key
-            id="keypad-2"
-            onClick={() => {
-              this.keyPress(2)
-            }}
-          >
-            2
-          </Key>
-          <Key
-            id="keypad-3"
-            onClick={() => {
-              this.keyPress(3)
-            }}
-          >
-            3
-          </Key>
-          <Key
-            id="keypad-4"
-            onClick={() => {
-              this.keyPress(4)
-            }}
-          >
-            4
-          </Key>
-          <Key
-            id="keypad-5"
-            onClick={() => {
-              this.keyPress(5)
-            }}
-          >
-            5
-          </Key>
-          <Key
-            id="keypad-6"
-            onClick={() => {
-              this.keyPress(6)
-            }}
-          >
-            6
-          </Key>
-          <Key
-            id="keypad-7"
-            onClick={() => {
-              this.keyPress(7)
-            }}
-          >
-            7
-          </Key>
-          <Key
-            id="keypad-8"
-            onClick={() => {
-              this.keyPress(8)
-            }}
-          >
-            8
-          </Key>
-          <Key
-            id="keypad-9"
-            onClick={() => {
-              this.keyPress(9)
-            }}
-          >
-            9
-          </Key>
-          <Key id="keypad-blank">&nbsp;</Key>
-          <Key
-            id="keypad-0"
-            onClick={() => {
-              this.keyPress(0)
-            }}
-          >
-            0
-          </Key>
-          <Key
-            id="keypad-backspace"
-            onClick={() => {
-              this.keyPress(-1)
-            }}
-          >
-            <Backspace />
-          </Key>
-        </NumberContainer>
+        </DotsContainer>
       </Container>
     )
   }

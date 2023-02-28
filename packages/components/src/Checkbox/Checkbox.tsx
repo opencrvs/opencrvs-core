@@ -25,7 +25,8 @@ const Wrapper = styled.li`
 const Label = styled.label`
   position: relative;
   cursor: pointer;
-  padding-left: 15px;
+  padding-left: 20px;
+  margin-left: -5px; /* This is to increase hitbox on the label, to allow clicking the borders of the checkbox */
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -38,8 +39,8 @@ const Check = styled.span<{ size?: string }>`
     size === 'large'
       ? `height: 40px;
     width: 40px;`
-      : ` height: 20px;
-    width: 20px;`}
+      : ` height: 24px;
+    width: 24px;`}
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
@@ -52,8 +53,8 @@ const Check = styled.span<{ size?: string }>`
       size === 'large'
         ? `height: 36px;
     width: 36px;`
-        : ` height: 16px;
-    width: 17px;`}
+        : ` height: 20px;
+    width: 20px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -89,32 +90,29 @@ const Input = styled.input`
 
   &:active ~ ${Check} {
     &::after {
-      border-radius: 4px;
       border: 4px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
     }
   }
 
   &:focus ~ ${Check} {
     &::after {
       box-sizing: content-box;
-      border-radius: 4px;
       border: 4px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
     }
   }
   &:hover ~ ${Check} {
-    &::after {
-      box-sizing: content-box;
-      border: 4px solid ${({ theme }) => theme.colors.grey600};
-      box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
-      border-radius: 6px;
-    }
+    box-shadow: ${({ theme }) => theme.colors.grey300} 0 0 0 8px;
   }
 `
 type Size = 'large' | 'small'
 
-interface ICheckbox extends React.OptionHTMLAttributes<{}> {
+export interface CheckboxProps extends React.OptionHTMLAttributes<{}> {
   name: string
   label: string
   value: string
@@ -123,7 +121,7 @@ interface ICheckbox extends React.OptionHTMLAttributes<{}> {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export class Checkbox extends React.Component<ICheckbox> {
+export class Checkbox extends React.Component<CheckboxProps> {
   render() {
     const {
       name,

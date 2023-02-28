@@ -54,7 +54,7 @@ import {
   History,
   HumanName
 } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
   id: string
@@ -407,7 +407,7 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: IUserDetails | null
+  loggedInUser: UserDetails | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {
@@ -417,8 +417,8 @@ export function getStatusLabel(
   if (
     regStatus === RegStatus.Declared &&
     performedBy?.id === loggedInUser?.userMgntUserID &&
-    loggedInUser?.role &&
-    FIELD_AGENT_ROLES.includes(loggedInUser.role)
+    loggedInUser?.systemRole &&
+    FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }

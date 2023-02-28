@@ -19,8 +19,10 @@ import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
+import { SystemRoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
-const users = [
+const users: UserDetails[] = [
   {
     id: '5d08e102542c7a19fc55b790',
     name: [
@@ -31,7 +33,7 @@ const users = [
       }
     ],
     username: 'r.tagore',
-    role: 'REGISTRATION_AGENT',
+    systemRole: SystemRoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -40,10 +42,43 @@ const users = [
           familyName: 'Huq'
         }
       ],
-      role: 'LOCAL_REGISTRAR'
+      role: SystemRoleType.LocalRegistrar,
+      signature: undefined
     },
-    type: 'ENTREPENEUR',
-    status: 'active'
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'ENTREPENEUR'
+        }
+      ]
+    },
+    status: Status.Active,
+    creationDate: '2022-10-03T10:42:46.920Z',
+    userMgntUserID: '5eba726866458970cf2e23c2',
+    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    mobile: '+8801711111111',
+    catchmentArea: [
+      {
+        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+        name: 'Baniajan',
+        alias: ['বানিয়াজান'],
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+            value: 'division=9&district=30&upazila=233&union=4194'
+          }
+        ]
+      }
+    ],
+    primaryOffice: {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Kaliganj Union Sub Center',
+      status: 'active',
+      alias: ['Central']
+    }
   },
   {
     id: '5d08e102542c7a19fc55b793',
@@ -55,9 +90,17 @@ const users = [
       }
     ],
     username: 'np.huq',
-    role: 'STATE_REGISTRAR',
-    type: 'MAYOR',
-    status: 'deactivated',
+    systemRole: SystemRoleType.LocalRegistrar,
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
+    status: Status.Deactivated,
     localRegistrar: {
       name: [
         {
@@ -66,7 +109,32 @@ const users = [
           familyName: 'Islam'
         }
       ],
-      role: 'LOCAL_REGISTRAR'
+      role: SystemRoleType.LocalRegistrar,
+      signature: undefined
+    },
+    creationDate: '2022-10-03T10:42:46.920Z',
+    userMgntUserID: '5eba726866458970cf2e23c2',
+    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    mobile: '+8801711111111',
+    catchmentArea: [
+      {
+        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+        name: 'Baniajan',
+        alias: ['বানিয়াজান'],
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+            value: 'division=9&district=30&upazila=233&union=4194'
+          }
+        ]
+      }
+    ],
+    primaryOffice: {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Kaliganj Union Sub Center',
+      status: 'active',
+      alias: ['Central']
     }
   }
 ]
@@ -207,10 +275,10 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+        waitFor(
+          () =>
+            store.getState().notification.userAuditSuccessToast.visible === true
+        )
       })
     })
   })
@@ -239,9 +307,10 @@ describe('user audit action modal tests', () => {
 
       it('clicking confirm action dispatches error notification action', async () => {
         component.find('#deactivate-action').hostNodes().simulate('click')
-        await flushPromises()
-        expect(store.getState().notification.submitFormErrorToast).toBe(
-          'userFormFail'
+        waitFor(
+          () =>
+            store.getState().notification.submitFormErrorToast ===
+            'userFormFail'
         )
       })
     })

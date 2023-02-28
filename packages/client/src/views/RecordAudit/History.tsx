@@ -24,16 +24,19 @@ import {
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus, SystemType } from '@client/utils/gateway'
+import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { useSelector } from 'react-redux'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -91,7 +94,7 @@ const GetNameWithAvatar = ({
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
-  avatar: IAvatar
+  avatar: Avatar
   language: string
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
@@ -143,10 +146,13 @@ export const GetHistory = ({
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+  const currentLanguage = useSelector(getLanguage)
+
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
   if (
@@ -171,6 +177,7 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
+        systemRole: userDetails.systemRole,
         role: userDetails.role
       },
       office: userDetails.primaryOffice,
@@ -223,7 +230,7 @@ export const GetHistory = ({
           <GetNameWithAvatar
             id={item?.user?.id as string}
             nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as IAvatar}
+            avatar={item.user?.avatar as Avatar}
             language={window.config.LANGUAGES}
           />
         ) : (
@@ -235,18 +242,18 @@ export const GetHistory = ({
             <GetNameWithAvatar
               id={item?.user?.id as string}
               nameObject={item?.user?.name as (GQLHumanName | null)[]}
-              avatar={item.user?.avatar as IAvatar}
+              avatar={item.user?.avatar as Avatar}
               language={window.config.LANGUAGES}
             />
           </Link>
         )}
       </>
     ),
-    type: intl.formatMessage(
-      isSystemInitiated(item) || !item.user?.role
-        ? getSystemType(item.system?.type)
-        : userMessages[item.user.role]
-    ),
+    role:
+      isSystemInitiated(item) || !item.user?.systemRole
+        ? intl.formatMessage(getSystemType(item.system?.type))
+        : getUserRole(currentLanguage, item.user.role),
+
     location: isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
@@ -280,9 +287,9 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
-      key: 'type'
+      key: 'role'
     },
     {
       label: intl.formatMessage(constantsMessages.location),

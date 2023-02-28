@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Document, model, Schema } from 'mongoose'
+import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
 export enum AUDIT_REASON {
@@ -32,13 +32,6 @@ export interface IUserName {
   use: string
   family: string
   given: string[]
-}
-
-export enum FIELD_AGENT_TYPES {
-  HEALTHCARE_WORKER = 'HEALTHCARE_WORKER',
-  POLICE_OFFICER = 'POLICE_OFFICER',
-  SOCIAL_WORKER = 'SOCIAL_WORKER',
-  LOCAL_LEADER = 'LOCAL_LEADER'
 }
 
 interface IIdentifier {
@@ -130,13 +123,13 @@ export interface IAvatar {
 export interface IUser {
   name: IUserName[]
   username: string
-  identifiers?: IIdentifier[]
-  email?: string
+  identifiers: IIdentifier[]
+  email: string
   mobile: string
   passwordHash: string
   salt: string
-  role?: string
-  type?: FIELD_AGENT_TYPES
+  systemRole: string
+  role: Types.ObjectId
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -145,7 +138,7 @@ export interface IUser {
   localRegistrar?: ILocalRegistrar
   status: string
   device?: string
-  securityQuestionAnswers?: ISecurityQuestionAnswer[]
+  securityQuestionAnswers: ISecurityQuestionAnswer[]
   creationDate: number
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar
@@ -306,8 +299,8 @@ const userSchema = new Schema({
   mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
-  role: String,
-  type: String,
+  systemRole: { type: String, required: true },
+  role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
@@ -330,4 +323,31 @@ const userSchema = new Schema({
   searches: [SearchesSchema]
 })
 
+export interface IUserRole {
+  labels: Label[]
+}
+
+type Label = {
+  lang: string
+  label: string
+}
+
+export interface IUserRoleModel extends IUserRole, Document {}
+
+const LabelSchema = new Schema(
+  {
+    lang: String,
+    label: String
+  },
+  { _id: false }
+)
+
+const UserRoleSchema = new Schema(
+  {
+    labels: [LabelSchema]
+  },
+  { timestamps: true }
+)
+
+export const UserRole = model<IUserRoleModel>('UserRole', UserRoleSchema)
 export default model<IUserModel>('User', userSchema)

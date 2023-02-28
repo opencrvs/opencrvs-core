@@ -59,7 +59,15 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'DISTRICT_REGISTRAR'
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'DISTRICT_REGISTRAR'
+          }
+        ]
+      }
     }
   }
 }

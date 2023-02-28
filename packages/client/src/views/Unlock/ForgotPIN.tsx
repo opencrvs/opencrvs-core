@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React, {
-  useCallback,
-  FocusEventHandler,
   ChangeEvent,
+  FocusEventHandler,
+  useCallback,
   useState
 } from 'react'
 import styled from '@client/styledComponents'
@@ -20,92 +20,37 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { Logout, BackArrow } from '@opencrvs/components/lib/icons'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import {
-  Button,
-  PrimaryButton,
-  CircleButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { InputField, THEME_MODE } from '@opencrvs/components/lib/InputField'
-import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
-import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
+  buttonMessages,
   constantsMessages,
-  userMessages,
   errorMessages,
-  buttonMessages
+  userMessages
 } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
-import {
-  PageWrapper as UnlockPageWrapper,
-  LogoutHeader as LogoutContainer
-} from '@client/views/Unlock/Unlock'
 import { getLanguage } from '@client/i18n/selectors'
+import { Box, Link, Stack, Toast } from '@opencrvs/components'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { BackgroundWrapper } from '@client/views/common/Common'
 
 interface IForgotPINProps {
   goBack: () => void
   onVerifyPassword: () => void
 }
 
-const PageWrapper = styled(UnlockPageWrapper)`
-  justify-content: flex-start;
-`
-
-const BackButton = styled(CircleButton)`
-  float: left;
-  color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  position: absolute;
-  top: 30px;
-  left: 20px;
-
-  svg {
-    path {
-      stroke: ${({ theme }) => theme.colors.white};
-    }
-  }
-`
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 300px;
-  position: relative;
-  margin-top: 104px;
-  margin-left: auto;
-  margin-right: auto;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-top: 80px;
-  }
-`
-
-const Name = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-`
 const StyledForm = styled.form`
   width: 100%;
 `
-const ActionWrapper = styled.div`
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-`
-const ForgotPasswordLink = styled(Button)`
-  ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.white};
-  text-transform: none;
-  margin-top: 24px;
-`
-const SpinnerContainer = styled.div`
-  margin-top: 48px;
+
+const VerifyButton = styled(Button)`
+  width: 100%;
 `
 type MetaProps = { touched: boolean; error: string }
 type InputProps = {
@@ -131,7 +76,6 @@ const Password = injectIntl(
         label={intl.formatMessage(constantsMessages.labelPassword)}
         ignoreMediaQuery
         hideAsterisk
-        mode={THEME_MODE.DARK}
       >
         <PasswordInput
           id={id}
@@ -160,25 +104,16 @@ export function ForgotPIN(props: IForgotPINProps) {
     dispatch(redirectToAuthentication())
   }, [dispatch])
   const language = useSelector(getLanguage)
-  const onForgetPassword = useCallback(() => {
-    logout()
-    window.location.assign(
-      window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-    )
-  }, [language, logout])
-
-  function showName() {
-    const nameObj =
-      (userDetails &&
-        userDetails.name &&
-        (userDetails.name.find(
-          // @ts-ignore
-          (storedName: GQLHumanName) => storedName.use === 'en'
-        ) as GQLHumanName)) ||
-      {}
-    const fullName = `${nameObj.firstNames ?? ''} ${nameObj.familyName ?? ''}`
-    return <Name>{fullName}</Name>
-  }
+  const onForgetPassword = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault()
+      logout()
+      window.location.assign(
+        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
+      )
+    },
+    [language, logout]
+  )
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -218,56 +153,58 @@ export function ForgotPIN(props: IForgotPINProps) {
   }, [])
 
   return (
-    <PageWrapper id="forgot_pin_page">
-      <BackButton id="action_back" onClick={props.goBack}>
-        <BackArrow />
-      </BackButton>
-      <LogoutContainer onClick={logout} id="logout">
-        <span>{intl.formatMessage(buttonMessages.logout)}</span>
-        <Logout />
-      </LogoutContainer>
-      <Container>
-        <AvatarLarge
-          name={getUserName(userDetails)}
-          avatar={userDetails?.avatar}
-        />
-        {showName()}
-        {verifyingPassword ? (
-          <SpinnerContainer>
-            <Spinner
-              id="verifying_password_spinner"
-              baseColor={getTheme().colors.white}
+    <BackgroundWrapper id="forgotPinPage">
+      <Box id="Box">
+        <Stack direction="row" justifyContent="space-between">
+          <Button type="icon" id="action_back" onClick={props.goBack}>
+            <Icon name="ArrowLeft" />
+          </Button>
+          <Button type="icon" onClick={logout} id="logout">
+            <Icon name="LogOut" />
+          </Button>
+        </Stack>
+        <Stack direction="column">
+          <AvatarLarge
+            name={getUserName(userDetails)}
+            avatar={userDetails?.avatar}
+          />
+        </Stack>
+
+        <StyledForm id="password_verification_form" onSubmit={onSubmit}>
+          <Stack
+            direction="column"
+            gap={18}
+            alignItems="stretch"
+            className="button-group"
+          >
+            <Password
+              id="password"
+              meta={{ touched, error }}
+              input={{
+                onChange,
+                onBlur,
+                value: password
+              }}
             />
-          </SpinnerContainer>
-        ) : (
-          <>
-            {error && <ErrorMessage id="form_error">{error}</ErrorMessage>}
-            <StyledForm id="password_verification_form" onSubmit={onSubmit}>
-              <Password
-                id="password"
-                meta={{ touched, error }}
-                input={{
-                  onChange,
-                  onBlur,
-                  value: password
-                }}
-              />
-              <ActionWrapper>
-                <PrimaryButton id="form_submit">
-                  {intl.formatMessage(buttonMessages.verify)}
-                </PrimaryButton>
-                <ForgotPasswordLink
-                  type="button"
-                  id="forgot_password"
-                  onClick={onForgetPassword}
-                >
-                  {intl.formatMessage(buttonMessages.forgotPassword)}
-                </ForgotPasswordLink>
-              </ActionWrapper>
-            </StyledForm>
-          </>
+            <VerifyButton
+              loading={verifyingPassword}
+              type="primary"
+              id="form_submit"
+            >
+              {intl.formatMessage(buttonMessages.verify)}
+            </VerifyButton>
+            <Link id="forgot_password" onClick={onForgetPassword}>
+              {intl.formatMessage(buttonMessages.forgotPassword)}
+            </Link>
+          </Stack>
+        </StyledForm>
+
+        {error && (
+          <Toast type="error" id="form_error" onClose={() => setError('')}>
+            {error}
+          </Toast>
         )}
-      </Container>
-    </PageWrapper>
+      </Box>
+    </BackgroundWrapper>
   )
 }

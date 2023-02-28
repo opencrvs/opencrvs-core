@@ -33,7 +33,6 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -67,12 +66,18 @@ import {
   IStatusMapping,
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
-import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
+import {
+  goToWorkflowStatus,
+  goToCompletenessRates,
+  goToPerformanceHome
+} from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import startOfMonth from 'date-fns/startOfMonth'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;
@@ -174,10 +179,19 @@ const Text = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
+  timeStart: Date
+  timeEnd: Date
+  event: Event
+  selectedLocation: ISearchLocation
   currency: ICurrency
 }
 
 interface ISearchParams {
+  /* TODO the event type should be changed because Event is birth/death.
+  WorkflowStatus.tsx, StatusWiseDeclarationCountView requires BIRTH/DEATH.
+  GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
+  Due to that we had to use toUpperCase where it is required.
+  */
   event: Event
   locationId: string
   timeStart: string
@@ -189,15 +203,6 @@ interface IMetricsQueryResult {
 }
 
 interface State {
-  selectedLocation: ISearchLocation
-  /* TODO the event type should be changed because Event is birth/death.
-  WorkflowStatus.tsx, StatusWiseDeclarationCountView requires BIRTH/DEATH.
-  GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
-  Due to that we had to use toUpperCase where it is required.
-  */
-  event: Event
-  timeStart: Date
-  timeEnd: Date
   toggleStatus: boolean
   officeSelected: boolean
   isAccessibleOffice: boolean
@@ -210,12 +215,13 @@ type IOnlineStatusProps = {
 interface IDispatchProps {
   goToWorkflowStatus: typeof goToWorkflowStatus
   goToCompletenessRates: typeof goToCompletenessRates
+  goToPerformanceHome: typeof goToPerformanceHome
 }
 
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
@@ -233,31 +239,8 @@ interface ICorrectionsQueryResult {
 
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
-    const {
-      location: { search },
-      locations,
-      offices
-    } = props
-    const { timeStart, timeEnd, locationId, event } = parse(
-      search
-    ) as unknown as ISearchParams
-
-    const selectedLocation = !locationId
-      ? getAdditionalLocations(props.intl)[0]
-      : selectLocation(
-          locationId,
-          generateLocations({ ...locations, ...offices }, props.intl).concat(
-            getAdditionalLocations(props.intl)
-          )
-        )
-
+    const { selectedLocation } = props
     return {
-      selectedLocation,
-      timeStart:
-        (timeStart && new Date(timeStart)) ||
-        subMonths(new Date(Date.now()), 11),
-      timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
-      event: event || Event.Birth,
       toggleStatus: false,
       officeSelected: this.isOfficeSelected(selectedLocation),
       isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
@@ -271,12 +254,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.state = this.transformPropsToState(props)
   }
 
-  componentDidUpdate(_: Props, prevState: State) {
-    if (this.state.selectedLocation !== prevState.selectedLocation) {
+  componentDidUpdate(previousProps: Props) {
+    if (previousProps.selectedLocation.id !== this.props.selectedLocation.id) {
       this.setState({
-        officeSelected: this.isOfficeSelected(this.state.selectedLocation),
+        officeSelected: this.isOfficeSelected(this.props.selectedLocation),
         isAccessibleOffice: this.isAccessibleOfficeSelected(
-          this.state.selectedLocation
+          this.props.selectedLocation
         )
       })
     }
@@ -289,7 +272,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   onClickDetails = (time: CompletenessRateTime) => {
-    const { event, selectedLocation, timeStart, timeEnd } = this.state
+    const { event, timeStart, timeEnd, selectedLocation } = this.props
     this.props.goToCompletenessRates(
       event,
       selectedLocation && !isCountry(selectedLocation)
@@ -302,7 +285,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
-    const { id: locationId } = selectedLocation || {}
+    const { id: locationId } = selectedLocation
 
     return (
       <>
@@ -320,15 +303,28 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 this.props.intl
               ).concat(getAdditionalLocations(intl))
             )
-            this.setState({ selectedLocation: newLocation })
+            this.props.goToPerformanceHome(
+              this.props.timeStart,
+              this.props.timeEnd,
+              this.props.event,
+              newLocation.id
+            )
           }}
         />
         <PerformanceSelect
-          onChange={(option) => this.setState({ event: option.value as Event })}
+          onChange={(option) => {
+            const { timeStart, timeEnd } = this.props
+            this.props.goToPerformanceHome(
+              timeStart,
+              timeEnd,
+              option.value as Event,
+              locationId
+            )
+          }}
           id="eventSelect"
           withLightTheme={true}
           defaultWidth={110}
-          value={this.state.event}
+          value={this.props.event}
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
@@ -341,13 +337,15 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           ]}
         />
         <DateRangePicker
-          startDate={this.state.timeStart}
-          endDate={this.state.timeEnd}
+          startDate={this.props.timeStart}
+          endDate={this.props.timeEnd}
           onDatesChange={({ startDate, endDate }) => {
-            this.setState({
-              timeStart: startDate,
-              timeEnd: endDate
-            })
+            this.props.goToPerformanceHome(
+              startDate,
+              endDate,
+              this.props.event,
+              locationId
+            )
           }}
         />
       </>
@@ -355,7 +353,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   onClickStatusDetails = (status?: keyof IStatusMapping) => {
-    const { selectedLocation, event, timeStart, timeEnd } = this.state
+    const { event, timeStart, timeEnd, selectedLocation } = this.props
     const { id: locationId } = selectedLocation
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
@@ -374,12 +372,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       selectedLocation &&
       this.isOfficeSelected(selectedLocation) &&
       this.props.userDetails &&
-      this.props.userDetails.role
+      this.props.userDetails.systemRole
     ) {
-      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+      if (this.props.userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
         return true
       } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        REGISTRAR_ROLES.includes(this.props.userDetails?.systemRole) &&
         this.props.userDetails.primaryOffice?.id === selectedLocation.id
       ) {
         return true
@@ -390,14 +388,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, isOnline } = this.props
-    const {
-      timeStart,
-      timeEnd,
-      event,
-      toggleStatus,
-      officeSelected,
-      isAccessibleOffice
-    } = this.state
+    const { toggleStatus, officeSelected } = this.state
+    const { timeStart, timeEnd, event, selectedLocation } = this.props
+
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString(),
@@ -415,19 +408,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              filterContent={this.getFilter(intl, this.state.selectedLocation)}
+              filterContent={this.getFilter(intl, selectedLocation)}
             >
               {isOnline ? (
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -469,17 +461,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
-                            locationId={this.state.selectedLocation.id}
+                            locationId={selectedLocation.id}
                           />
                           <CertificationRatesReport
                             totalRegistrations={calculateTotal(
                               data?.getTotalMetrics.results || []
                             )}
-                            {...(this.state.selectedLocation &&
-                            !isCountry(this.state.selectedLocation)
+                            {...(selectedLocation &&
+                            !isCountry(selectedLocation)
                               ? {
                                   ...queryVariablesWithoutLocationId,
-                                  locationId: this.state.selectedLocation.id
+                                  locationId: selectedLocation.id
                                 }
                               : queryVariablesWithoutLocationId)}
                           />
@@ -487,9 +479,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             data={data!.getTotalMetrics}
                             isAccessibleOffice={this.state.isAccessibleOffice}
                             locationId={
-                              isCountry(this.state.selectedLocation)
+                              isCountry(selectedLocation)
                                 ? undefined
-                                : this.state.selectedLocation.id
+                                : selectedLocation.id
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
@@ -499,14 +491,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     query={CORRECTION_TOTALS}
                     variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -533,14 +524,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -579,12 +569,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             query={PERFORMANCE_STATS}
             variables={{
               locationId:
-                this.state.selectedLocation &&
-                !isCountry(this.state.selectedLocation)
-                  ? this.state.selectedLocation.id
+                selectedLocation && !isCountry(selectedLocation)
+                  ? selectedLocation.id
                   : undefined,
               populationYear: timeEnd.getFullYear(),
-              event: this.state.event,
+              event,
               status: [
                 'IN_PROGRESS',
                 'DECLARED',
@@ -595,7 +584,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="no-cache"
+            fetchPolicy="cache-first"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -617,7 +606,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <>
                           {isOnline && (
                             <StatusWiseDeclarationCountView
-                              selectedEvent={this.state.event}
+                              selectedEvent={this.props.event}
                               isAccessibleOffice={this.state.isAccessibleOffice}
                               statusMapping={StatusMapping}
                               data={data.fetchRegistrationCountByStatus}
@@ -676,7 +665,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView
-                          selectedEvent={this.state.event}
+                          selectedEvent={this.props.event}
                           isAccessibleOffice={this.state.isAccessibleOffice}
                           statusMapping={StatusMapping}
                           data={data.fetchRegistrationCountByStatus}
@@ -695,17 +684,52 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 }
 
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(
+  state: IStoreState,
+  props: RouteComponentProps & WrappedComponentProps
+) {
   const offlineCountryConfiguration = getOfflineData(state)
+
+  const locations = offlineCountryConfiguration.locations
+  const offices = offlineCountryConfiguration.offices
+  const {
+    location: { search }
+  } = props
+  const { timeStart, timeEnd, locationId, event } = parse(
+    search
+  ) as unknown as ISearchParams
+
+  const selectedLocation = !locationId
+    ? getAdditionalLocations(props.intl)[0]
+    : selectLocation(
+        locationId,
+        generateLocations({ ...locations, ...offices }, props.intl).concat(
+          getAdditionalLocations(props.intl)
+        )
+      )
+
   return {
-    locations: offlineCountryConfiguration.locations,
+    locations,
+    timeStart:
+      (timeStart && new Date(timeStart)) ||
+      new Date(
+        startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+      ),
+    timeEnd:
+      (timeEnd && new Date(timeEnd)) ||
+      new Date(new Date(Date.now()).setHours(23, 59, 59)),
+    event: event || Event.Birth,
+    selectedLocation,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),
     currency: offlineCountryConfiguration.config.CURRENCY
   }
 }
 
-export const PerformanceHome = connect(mapStateToProps, {
-  goToWorkflowStatus,
-  goToCompletenessRates
-})(withTheme(injectIntl(withOnlineStatus(PerformanceHomeComponent))))
+export const PerformanceHome = injectIntl(
+  connect(mapStateToProps, {
+    goToWorkflowStatus,
+    goToCompletenessRates,
+    goToPerformanceHome
+  })(withTheme(withOnlineStatus(PerformanceHomeComponent)))
+)

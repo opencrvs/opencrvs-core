@@ -26,8 +26,14 @@ export async function getTimeLoggedByStatus(
   const timeLoggedData: ITimeLoggedData[] = await query(
     `SELECT timeSpentEditing
           FROM declaration_time_logged
-        WHERE compositionId = '${compositionId}'
-        AND currentStatus = '${status}'`
+        WHERE compositionId = $compositionId
+        AND currentStatus = $status`,
+    {
+      placeholders: {
+        compositionId,
+        status
+      }
+    }
   )
   return timeLoggedData && timeLoggedData.length > 0
     ? timeLoggedData[0]
@@ -41,7 +47,12 @@ export async function getTimeLogged(
   const timeLoggedData: ITimeLoggedData[] = await query(
     `SELECT currentStatus as status, timeSpentEditing
           FROM declaration_time_logged
-        WHERE compositionId = '${compositionId}'`
+        WHERE compositionId = $compositionId`,
+    {
+      placeholders: {
+        compositionId
+      }
+    }
   )
   return timeLoggedData && timeLoggedData.length > 0 ? timeLoggedData : []
 }
@@ -53,19 +64,30 @@ export async function getTimeLoggedForPractitioner(
   locationId: string,
   count?: number
 ): Promise<ITimeLoggedData[]> {
-  const timeLoggedData: ITimeLoggedData[] =
-    await query(`SELECT currentStatus as status, trackingId, 
-                                              eventType, timeSpentEditing, time
-                                            FROM declaration_time_logged
-                                            WHERE time > '${timeFrom}' AND time <= '${timeTo}'
-                                            AND practitionerId = '${practitionerId}'
-                                            AND ( locationLevel1 = '${locationId}'
-                                                  OR locationLevel2 = '${locationId}' 
-                                                  OR locationLevel3 = '${locationId}' 
-                                                  OR locationLevel4 = '${locationId}' 
-                                                  OR locationLevel5 = '${locationId}')
-                                            ORDER BY time DESC
-                                            ${count ? 'LIMIT ' + count : ''}`)
+  const countLimit = count ? 'LIMIT ' + count : ''
+  const timeLoggedData: ITimeLoggedData[] = await query(
+    `SELECT currentStatus as status, trackingId, 
+          eventType, timeSpentEditing, time
+          FROM declaration_time_logged
+            WHERE time > $timeFrom AND time <= $timeTo
+            AND practitionerId = $practitionerId
+            AND ( locationLevel1 = $locationId 
+            OR locationLevel2 = $locationId 
+            OR locationLevel3 = $locationId 
+            OR locationLevel4 = $locationId 
+            OR locationLevel5 = $locationId)
+              ORDER BY time DESC
+              $countLimit`,
+    {
+      placeholders: {
+        timeFrom,
+        timeTo,
+        practitionerId,
+        locationId,
+        countLimit
+      }
+    }
+  )
 
   return timeLoggedData && timeLoggedData.length > 0 ? timeLoggedData : []
 }

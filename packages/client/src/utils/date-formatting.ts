@@ -14,6 +14,8 @@ import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 import enGB from 'date-fns/locale/en-GB'
 import bn from 'date-fns/locale/bn'
 import fr from 'date-fns/locale/fr'
+import subYears from 'date-fns/subYears'
+import isValid from 'date-fns/isValid'
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 
@@ -22,6 +24,21 @@ export const formatLongDate = (
   locale = 'en',
   formatString = 'dd MMMM yyyy'
 ) => {
+  const [yyyy, mm, dd] = date.split('-')
+  if (
+    !dd ||
+    !mm ||
+    !yyyy ||
+    dd.length === 0 ||
+    mm.length === 0 ||
+    yyyy.length < 4
+  ) {
+    return ''
+  }
+
+  if (!isValid(new Date(date))) {
+    return ''
+  }
   window.__localeId__ = locale
   return format(new Date(date), formatString, {
     locale: locales[window.__localeId__]
@@ -29,6 +46,9 @@ export const formatLongDate = (
 }
 
 export const formattedDuration = (fromDate: Date | number) => {
+  if (!isValid(fromDate)) {
+    return ''
+  }
   return formatDistanceToNowStrict(fromDate, {
     locale: locales[window.__localeId__],
     addSuffix: true,
@@ -36,7 +56,14 @@ export const formattedDuration = (fromDate: Date | number) => {
   })
 }
 
+export const convertAgeToDate = (age: string): string => {
+  return format(subYears(new Date(), Number(age)), 'yyyy-MM-dd')
+}
+
 export default function formatDate(date: Date | number, formatStr = 'PP') {
+  if (!isValid(date)) {
+    return ''
+  }
   return format(date, formatStr, {
     locale: locales[window.__localeId__]
   })
