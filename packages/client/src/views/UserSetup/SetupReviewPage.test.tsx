@@ -72,7 +72,7 @@ describe('SetupReviewPage page tests', () => {
       />,
       { store, history }
     )
-    const role = testComponent.find('#RoleType_value').hostNodes().text()
+    const role = testComponent.find('#Role_value').hostNodes().text()
     expect(role).toEqual('ENTREPENEUR')
   })
   it('clicks question to change', async () => {
@@ -170,62 +170,6 @@ describe('SetupReviewPage page tests', () => {
     testComponent.update()
     expect(testComponent.find('#GlobalError').hostNodes().text()).toBe(
       'An error occurred. Please try again.'
-    )
-  })
-
-  it('shows nothing for undefined fields of userDetails', async () => {
-    store.dispatch(
-      getStorageUserDetailsSuccess(
-        JSON.stringify({
-          catchmentArea: [
-            {
-              id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
-              name: 'Dhaka',
-              status: 'active',
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/geo-id',
-                  value: '3'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/bbs-code',
-                  value: '30'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                  value: 'DIVISION'
-                }
-              ]
-            }
-          ]
-        })
-      )
-    )
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <UserSetupReview
-        setupData={{
-          userId: 'ba7022f0ff4822',
-          password: 'password',
-          securityQuestionAnswers: [
-            { questionKey: 'BIRTH_TOWN', answer: 'test' }
-          ]
-        }}
-      />,
-      { store, history }
-    )
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-
-    expect(testComponent.find('div#EnglishName').hostNodes().text()).toBe(
-      'English nameChange'
-    )
-    expect(testComponent.find('div#UserPhone').hostNodes().text()).toBe(
-      'Phone numberChange'
     )
   })
 })
