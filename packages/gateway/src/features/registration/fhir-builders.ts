@@ -146,7 +146,7 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
         person,
         'name',
         [fieldValue],
-        'suffix',
+        'family',
         context
       )
     },
@@ -164,7 +164,7 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
         person,
         'name',
         [fieldValue],
-        'family',
+        'suffix',
         context
       )
     }
