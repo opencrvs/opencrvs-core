@@ -10,16 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  RegStatus,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
-
-export const EVENT: Record<EVENT_TYPE, EVENT_TYPE> = {
-  [EVENT_TYPE.BIRTH]: EVENT_TYPE.BIRTH,
-  [EVENT_TYPE.DEATH]: EVENT_TYPE.DEATH,
-  [EVENT_TYPE.MARRIAGE]: EVENT_TYPE.MARRIAGE
-}
+import { RegStatus } from '@workflow/features/registration/fhir/constants'
 
 export function isRejectedTask(taskResource: fhir.Task) {
   return getTaskBusinessStatus(taskResource) === RegStatus.REJECTED
@@ -47,7 +38,7 @@ export function taskHasInput(taskResource: fhir.Task) {
 
 export function getTaskEventType(task: fhir.Task) {
   const eventType = task?.code?.coding?.[0].code
-  return eventType && EVENT[eventType]
+  return eventType
 }
 
 export function filterTaskExtensions(

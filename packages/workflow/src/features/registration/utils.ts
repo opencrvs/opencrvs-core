@@ -341,9 +341,11 @@ export function getEventType(fhirBundle: fhir.Bundle) {
   if (fhirBundle.entry && fhirBundle.entry[0] && fhirBundle.entry[0].resource) {
     const firstEntry = fhirBundle.entry[0].resource
     if (firstEntry.resourceType === 'Composition') {
-      return getCompositionEventType(firstEntry as fhir.Composition)
+      return getCompositionEventType(
+        firstEntry as fhir.Composition
+      ) as EVENT_TYPE
     } else {
-      return getTaskEventType(firstEntry as fhir.Task)
+      return getTaskEventType(firstEntry as fhir.Task) as EVENT_TYPE
     }
   }
   throw new Error('Invalid FHIR bundle found')
