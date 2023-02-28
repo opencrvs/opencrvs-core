@@ -655,23 +655,20 @@ export const convertToMSISDN = (phone: string) => {
       ? 'ZMB'
       : window.config.COUNTRY.toUpperCase()
 
-  const data = allCountries.find(
-    (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-  )
-
-  const countryCallingCode = data
-    ? data.dialCode
-    : callingCountries[countryCode].countryCallingCodes[0]
+  const data =
+    allCountries.find(
+      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
+    ) || allCountries[allCountries.length - 3]
 
   if (
-    phone.startsWith(countryCallingCode) ||
-    `+${phone}`.startsWith(countryCallingCode)
+    phone.startsWith(data.dialCode) ||
+    `+${phone}`.startsWith(data.dialCode)
   ) {
     return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
-    ? `${countryCallingCode}${phone.substring(1)}`
-    : `${countryCallingCode}${phone}`
+    ? `${data.dialCode}${phone.substring(1)}`
+    : `${data.dialCode}${phone}`
 }
 
 export const isRadioGroupWithNestedField = (

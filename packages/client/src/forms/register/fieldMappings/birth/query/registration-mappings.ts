@@ -168,34 +168,21 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (
-  mobileWithCountryCode: string,
-  country: string,
-  codeReplacement?: string
-) => {
+const convertToLocal = (mobileWithCountryCode: string, country: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
-  const data = allCountries.find(
-    (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-  )
-
-  if (data) {
-    return (
-      mobileWithCountryCode &&
-      mobileWithCountryCode.replace(data.dialCode, String(data.priority))
-    )
-  }
+  const data =
+    allCountries.find(
+      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
+    ) || allCountries[allCountries.length - 3]
 
   return (
     mobileWithCountryCode &&
-    mobileWithCountryCode.replace(
-      callingCountries[countryCode].countryCallingCodes[0],
-      codeReplacement ? codeReplacement : '0'
-    )
+    mobileWithCountryCode.replace(data.dialCode, data.priority)
   )
 }
 
@@ -209,11 +196,7 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
-    const localPhone = convertToLocal(
-      msisdnPhone,
-      window.config.COUNTRY,
-      codeReplacement
-    )
+    const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
     transformedData[sectionId][field.name] = localPhone
     return transformedData
   }

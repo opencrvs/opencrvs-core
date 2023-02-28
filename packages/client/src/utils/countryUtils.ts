@@ -9,7 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const countries: any = [
+
+interface ICountryData {
+  name: string
+  iso2: string
+  dialCode: string
+  priority: string
+  areaCodes: number | string | string[] | null
+}
+
+const countries = [
   ['Afghanistan (‫افغانستان‬‎)', 'af', '93'],
   ['Albania (Shqipëri)', 'al', '355'],
   ['Algeria (‫الجزائر‬‎)', 'dz', '213'],
@@ -312,23 +321,12 @@ const countries: any = [
 ]
 
 // loop over all the countries above, restructuring the data to be objects with named keys
-for (let i = 0; i < countries.length; i++) {
-  const c = countries[i]
-  countries[i] = {
-    name: c[0],
-    iso2: c[1],
-    dialCode: c[2],
-    priority: c[3] || 0,
-    areaCodes: c[4] || null
+export const allCountries: ICountryData[] = countries.map((country) => {
+  return {
+    name: country[0] as string,
+    iso2: country[1] as string,
+    dialCode: country[2] as string,
+    priority: String(country[3] || 0),
+    areaCodes: country[4] || null
   }
-}
-
-interface ICountryData {
-  name: string
-  iso2: string
-  dialCode: string
-  priority: number
-  areaCodes: string[]
-}
-
-export const allCountries: ICountryData[] = countries
+})
