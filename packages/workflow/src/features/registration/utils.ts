@@ -21,8 +21,7 @@ import {
   getInformantName,
   getTrackingId,
   getCRVSOfficeName,
-  getBirthRegistrationNumber,
-  getDeathRegistrationNumber,
+  getRegistrationNumber,
   concatenateName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -30,9 +29,10 @@ import {
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
+  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
@@ -71,12 +71,10 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateBirthTrackingId(): string {
-  return generateTrackingId('B')
-}
-
-export function generateDeathTrackingId(): string {
-  return generateTrackingId('D')
+export function generateTrackingIdForEvents(eventType: EVENT_TYPE): string {
+  // using first letter of eventType for prefix
+  // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
+  return generateTrackingId(eventType.charAt(0))
 }
 
 function generateTrackingId(prefix: string): string {
@@ -89,6 +87,7 @@ export function convertStringToASCII(str: string): string {
     .reduce((acc, v) => acc.concat(v))
 }
 
+// TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getInformantName() )
 export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
   event: Events,
@@ -98,6 +97,9 @@ export async function sendEventNotification(
   const informantSMSNotifications = (await getInformantSMSNotification(
     authHeader.Authorization
   )) as IInformantSMSNotification[] | []
+
+  const eventType = getEventType(fhirBundle)
+
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       if (
@@ -154,8 +156,9 @@ export async function sendEventNotification(
           {
             name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
-            registrationNumber: getBirthRegistrationNumber(
-              getTaskResource(fhirBundle)
+            registrationNumber: getRegistrationNumber(
+              getTaskResource(fhirBundle),
+              EVENT_TYPE[eventType]
             )
           }
         )
@@ -234,8 +237,9 @@ export async function sendEventNotification(
           {
             name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
-            registrationNumber: getDeathRegistrationNumber(
-              getTaskResource(fhirBundle)
+            registrationNumber: getRegistrationNumber(
+              getTaskResource(fhirBundle),
+              EVENT_TYPE[eventType]
             )
           }
         )
@@ -319,27 +323,29 @@ async function sendNotification(
   }
 }
 
-export function getCompositionEventType(compoition: fhir.Composition) {
-  const eventType =
-    compoition &&
-    compoition.type &&
-    compoition.type.coding &&
-    compoition.type.coding[0].code
+const DETECT_EVENT: Record<string, EVENT_TYPE> = {
+  'birth-notification': EVENT_TYPE.BIRTH,
+  'birth-declaration': EVENT_TYPE.BIRTH,
+  'death-notification': EVENT_TYPE.DEATH,
+  'death-declaration': EVENT_TYPE.DEATH,
+  'marriage-notification': EVENT_TYPE.MARRIAGE,
+  'marriage-declaration': EVENT_TYPE.MARRIAGE
+}
 
-  if (eventType === 'death-declaration' || eventType === 'death-notification') {
-    return EVENT_TYPE.DEATH
-  } else {
-    return EVENT_TYPE.BIRTH
-  }
+export function getCompositionEventType(compoition: fhir.Composition) {
+  const eventType = compoition?.type?.coding?.[0].code
+  return eventType && DETECT_EVENT[eventType]
 }
 
 export function getEventType(fhirBundle: fhir.Bundle) {
   if (fhirBundle.entry && fhirBundle.entry[0] && fhirBundle.entry[0].resource) {
     const firstEntry = fhirBundle.entry[0].resource
     if (firstEntry.resourceType === 'Composition') {
-      return getCompositionEventType(firstEntry as fhir.Composition)
+      return getCompositionEventType(
+        firstEntry as fhir.Composition
+      ) as EVENT_TYPE
     } else {
-      return getTaskEventType(firstEntry as fhir.Task)
+      return getTaskEventType(firstEntry as fhir.Task) as EVENT_TYPE
     }
   }
   throw new Error('Invalid FHIR bundle found')
@@ -356,7 +362,8 @@ export function hasCorrectionEncounterSection(
     if (section.code?.coding?.[0]?.code) {
       return [
         BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
+        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+        MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
       ].includes(section.code.coding[0].code)
     }
     return false
@@ -407,8 +414,10 @@ export function isEventNonNotifiable(event: Events) {
     [
       Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
   )
 }

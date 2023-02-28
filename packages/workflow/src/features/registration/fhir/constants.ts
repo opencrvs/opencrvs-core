@@ -20,6 +20,11 @@ export const DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE =
   'death-correction-encounters'
 export const BIRTH_REG_NUMBER_SYSTEM = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REG_NUMBER_SYSTEM = 'DEATH_REGISTRATION_NUMBER'
+export const GROOM_SECTION_CODE = 'groom-details'
+export const BRIDE_SECTION_CODE = 'bride-details'
+export const MARRIAGE_REG_NUMBER_SYSTEM = 'MARRIAGE_REGISTRATION_NUMBER'
+export const MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE =
+  'marriage-correction-encounters'
 export enum RegStatus {
   ARCHIVED = 'ARCHIVED',
   IN_PROGRESS = 'IN_PROGRESS',
@@ -35,5 +40,6 @@ export enum RegStatus {
 export const DOWNLOADED = 'DOWNLOADED'
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
