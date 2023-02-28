@@ -200,6 +200,10 @@ type Mutation {
     details: MarriageRegistrationInput!
   ): MarriageRegistration!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -1128,7 +1132,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  role: String
+  role: Role
   status: Status
   avatar: Avatar
   primaryOfficeId: String

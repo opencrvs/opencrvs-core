@@ -410,7 +410,14 @@ export const getRoutes = () => {
       handler: getSystemRoles,
       config: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: searchRoleSchema
@@ -669,7 +676,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            role: Joi.string().required(),
+            systemRole: Joi.string().required(),
             locationId: Joi.string()
           })
         }

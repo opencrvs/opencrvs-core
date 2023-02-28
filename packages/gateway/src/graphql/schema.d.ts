@@ -82,6 +82,7 @@ export interface GQLMutation {
   markMarriageAsValidated?: string
   markMarriageAsRegistered: GQLMarriageRegistration
   markMarriageAsCertified: string
+  requestMarriageRegistrationCorrection: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -1008,7 +1009,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  role?: string
+  role?: GQLRole
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
@@ -2736,6 +2737,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsValidated?: MutationToMarkMarriageAsValidatedResolver<TParent>
   markMarriageAsRegistered?: MutationToMarkMarriageAsRegisteredResolver<TParent>
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
+  requestMarriageRegistrationCorrection?: MutationToRequestMarriageRegistrationCorrectionResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3148,6 +3150,22 @@ export interface MutationToMarkMarriageAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkMarriageAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToRequestMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestMarriageRegistrationCorrectionArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
