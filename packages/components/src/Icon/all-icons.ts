@@ -38,5 +38,6 @@ export {
   TextT,
   Database,
   CheckSquare,
-  X
+  X,
+  Activity
 } from 'phosphor-react'
