@@ -20,7 +20,10 @@ const StyledInputDescriptor = styled.p`
   display: inline-block;
 `
 
-export class InputDescriptor extends React.Component<{}, {}> {
+export class InputDescriptor extends React.Component<
+  { children?: React.ReactNode },
+  {}
+> {
   render() {
     return <StyledInputDescriptor>{this.props.children}</StyledInputDescriptor>
   }

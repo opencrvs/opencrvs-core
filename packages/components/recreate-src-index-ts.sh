@@ -27,7 +27,7 @@ EOM
 
 # Loop through directories starting with capitalized A-Z and append them to index.ts
 for directory in [A-Z]*/; do
-  echo "export * from './${directory::-1}'"
+  echo "export * from './${directory%\/}'"
 done >> index.ts
 
 # Append file footer to to index.ts

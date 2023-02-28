@@ -21,7 +21,7 @@ import { useParams } from 'react-router'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
-import { Event } from '@client/utils/gateway'
+import { Event, FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
 import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -137,18 +137,22 @@ export const ViewRecord = () => {
   const offlineData = useSelector(getOfflineData)
   const { declarationId } = useParams<{ declarationId: string }>()
 
-  const { loading, error, data } = useQuery(FETCH_VIEW_RECORD_BY_COMPOSITION, {
-    variables: { id: declarationId },
-    fetchPolicy: 'network-only'
-  })
+  const { loading, error, data } = useQuery<FetchViewRecordByCompositionQuery>(
+    FETCH_VIEW_RECORD_BY_COMPOSITION,
+    {
+      variables: { id: declarationId },
+      fetchPolicy: 'network-only'
+    }
+  )
 
   if (loading) return <LoadingState />
 
   if (error) return <GenericErrorToast />
 
   const eventData = data?.fetchRegistrationForViewing
-  const eventType =
-    data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+  const eventType = ((data?.fetchRegistrationForViewing?.registration?.type &&
+    data.fetchRegistrationForViewing.registration.type.toLowerCase()) ||
+    '') as Event
 
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],

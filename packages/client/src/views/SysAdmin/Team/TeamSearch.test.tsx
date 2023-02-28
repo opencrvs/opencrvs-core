@@ -16,14 +16,20 @@ import {
   createTestApp,
   createTestComponent,
   createTestStore,
-  flushPromises
+  flushPromises,
+  mockUserResponse,
+  registerScopeToken
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
-import { vi } from 'vitest'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { checkAuth } from '@client/profile/profileActions'
+import { Mock, vi } from 'vitest'
+import { merge } from 'lodash'
+import { queries } from '@client/profile/queries'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -89,6 +95,51 @@ describe('Team search test', () => {
   describe('Team search with location in props', () => {
     let app: ReactWrapper
     let history: History
+    const getItem = window.localStorage.getItem as Mock
+    const mockFetchUserDetails = vi.fn()
+    const nameObj = {
+      data: {
+        getUser: {
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              __typename: 'HumanName'
+            },
+            {
+              use: 'bn',
+              firstNames: '',
+              familyName: '',
+              __typename: 'HumanName'
+            }
+          ],
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'DISTRICT_REGISTRAR'
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    // storage.getItem = vi.fn()
+    // storage.setItem = vi.fn()
+
+    beforeAll(async () => {
+      merge(mockUserResponse, nameObj)
+      mockFetchUserDetails.mockReturnValue(mockUserResponse)
+      queries.fetchUserDetails = mockFetchUserDetails
+    })
+
+    beforeAll(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      await store.dispatch(checkAuth())
+    })
 
     beforeEach(async () => {
       const testApp = await createTestApp()
@@ -102,10 +153,10 @@ describe('Team search test', () => {
           displayLabel: 'Alokbali Union Parishad'
         }
       })
-      app.update()
     })
 
-    it('loads the location in the search input box', () => {
+    it('loads the location in the search input box', async () => {
+      await waitForElement(app, '#locationSearchInput')
       expect(
         app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')

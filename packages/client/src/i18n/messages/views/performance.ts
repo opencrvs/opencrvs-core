@@ -51,8 +51,14 @@ const messagesToDefine = {
   },
   performanceApplicationSourcesHeader: {
     id: 'performance.reports.header.applicationSources',
-    defaultMessage: 'Sources of applications',
-    description: 'Header for sources of applications'
+    defaultMessage: 'Sources of registrations',
+    description: 'Header for sources of registrations'
+  },
+  performanceApplicationSourcesSubHeader: {
+    id: 'performance.reports.subHeader.applicationSources',
+    defaultMessage:
+      'The number and percentage of declarations started by each system role that has been registered',
+    description: 'Subheader for sources of registrations'
   },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
@@ -256,6 +262,11 @@ const messagesToDefine = {
     id: 'performance.fieldAgents.columnHeader.type',
     defaultMessage: 'Type',
     description: 'Column header for type in field agent list'
+  },
+  roleColumnHeader: {
+    id: 'performance.fieldAgents.columnHeader.role',
+    defaultMessage: 'Role',
+    description: 'Column header for role in field agent list'
   },
   officeColumnHeader: {
     id: 'performance.fieldAgents.columnHeader.office',

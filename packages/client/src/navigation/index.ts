@@ -55,7 +55,10 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  USER_ROLES_CONFIG,
+  ORGANISATIONS_INDEX,
+  INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -64,7 +67,6 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -80,6 +82,7 @@ import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -174,6 +177,15 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+
+export function goToUserRolesConfig() {
+  return push(USER_ROLES_CONFIG)
+}
+
+export function goToInformantNotification() {
+  return push(INFORMANT_NOTIFICATION)
+}
+
 export function goToVSExport() {
   return push(VS_EXPORTS)
 }
@@ -223,14 +235,18 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 }
 
 export function goToPerformanceHome(
-  timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
-  timeEnd: Date = new Date(Date.now()),
+  timeStart: Date = new Date(
+    startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+  ),
+  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59)),
+  event?: Event,
   locationId?: string
 ) {
   return push({
     pathname: PERFORMANCE_HOME,
     search: stringify({
       locationId,
+      event,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
     })
@@ -244,6 +260,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToOrganizationList(locationId?: string | undefined | null) {
+  return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
 export function goToSystemList() {
@@ -616,8 +636,8 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
-  const role = userDetails?.role
+export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
+  const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
@@ -635,20 +655,25 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   )
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
+export function goToPerformanceView(userDetails: UserDetails) {
   return goToPerformanceHome(
+    undefined,
     undefined,
     undefined,
     getDefaultPerformanceLocationId(userDetails)
   )
 }
 
-export function goToTeamView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
+export function goToTeamView(userDetails: UserDetails) {
+  if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
+}
+
+export function goToOrganisationView(userDetails: UserDetails) {
+  return goToOrganizationList()
 }
 
 export type INavigationState = undefined
