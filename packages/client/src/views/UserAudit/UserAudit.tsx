@@ -45,7 +45,8 @@ import {
   GetUserQuery,
   GetUserQueryVariables,
   HumanName,
-  User
+  User,
+  SystemRoleType
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -295,15 +296,23 @@ export const UserAudit = () => {
         <Content
           title={user.name}
           icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
-          topActionButtons={[
-            <Status status={user.status || 'pending'} />,
-            <ToggleMenu
-              id={`sub-page-header-munu-button`}
-              toggleButton={<VerticalThreeDots />}
-              menuItems={getMenuItems(user.id as string, user.status as string)}
-              hide={(scope && !scope.includes('sysadmin')) || false}
-            />
-          ]}
+          topActionButtons={
+            userDetails?.systemRole === SystemRoleType.LocalSystemAdmin &&
+            userDetails?.primaryOffice?.id !== user?.primaryOffice?.id
+              ? [<Status status={user.status || 'pending'} />]
+              : [
+                  <Status status={user.status || 'pending'} />,
+                  <ToggleMenu
+                    id={`sub-page-header-munu-button`}
+                    toggleButton={<VerticalThreeDots />}
+                    menuItems={getMenuItems(
+                      user.id as string,
+                      user.status as string
+                    )}
+                    hide={(scope && !scope.includes('sysadmin')) || false}
+                  />
+                ]
+          }
           size={ContentSize.LARGE}
         >
           <>
