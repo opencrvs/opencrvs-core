@@ -51,7 +51,7 @@ import { certificateTypeResolvers } from '@gateway/features/certificate/type-res
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
-import { IAuthHeader } from '@gateway/common-types'
+import { Context } from '@gateway/graphql/context'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -60,14 +60,6 @@ interface IStringIndexSignatureInterface {
 }
 
 type StringIndexed<T> = T & IStringIndexSignatureInterface
-
-export interface Context {
-  dataSources: {
-    locationsAPI: LocationsAPI
-    practitionerRoleAPI: PractitionerRoleAPI
-  }
-  headers: IAuthHeader
-}
 
 const resolvers: StringIndexed<IResolvers> = merge(
   notificationRootResolvers as IResolvers,
@@ -116,11 +108,11 @@ export const getApolloConfig = (): Config => {
     typeDefs,
     resolvers,
     introspection: true,
-    dataSources: () => ({
+    dataSources: (): Context['dataSources'] => ({
       locationsAPI: new LocationsAPI(),
       practitionerRoleAPI: new PractitionerRoleAPI()
     }),
-    context: async ({ request, h }) => {
+    context: async ({ request, h }): Promise<Pick<Context, 'headers'>> => {
       try {
         const tokenPayload = getTokenPayload(
           request.headers.authorization.split(' ')[1]
