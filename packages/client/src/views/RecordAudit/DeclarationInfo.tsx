@@ -83,7 +83,6 @@ export const GetDeclarationInfo = ({
     type: getCaptitalizedWord(declaration?.type),
     trackingId: declaration?.trackingId
   }
-  console.log(info.status)
 
   /* TODO: This component needs refactor on how the data is being shown */
   if (info.type === 'Birth') {

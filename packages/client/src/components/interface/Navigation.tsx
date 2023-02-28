@@ -579,7 +579,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.readyToIssue
                   ) && (
                     <NavigationItem
-                      icon={() => <DeclarationIconSmall />}
+                      icon={() => <DeclarationIconSmall color={'teal'} />}
                       id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.readyToIssue]
