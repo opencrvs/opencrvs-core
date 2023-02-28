@@ -120,7 +120,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
 }
 
 export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
-  const eventType = getTaskEventType(taskResource)
+  const eventType = getTaskEventType(taskResource) as EVENT_TYPE
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&

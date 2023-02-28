@@ -298,7 +298,7 @@ export async function markEventAsRegisteredCallbackHandler(
   const composition: fhir.Composition = await getFromFhir(
     `/${task.focus.reference}`
   )
-  const event = getTaskEventType(task)
+  const event = getTaskEventType(task) as EVENT_TYPE
 
   try {
     await markEventAsRegistered(
