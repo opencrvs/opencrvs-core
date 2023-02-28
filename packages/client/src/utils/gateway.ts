@@ -2084,7 +2084,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  role?: Maybe<Scalars['String']>
+  role?: Maybe<Role>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
@@ -6367,7 +6367,6 @@ export type SearchFieldAgentsQuery = {
       __typename?: 'SearchFieldAgentResponse'
       practitionerId?: string | null
       fullName?: string | null
-      role?: string | null
       status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
@@ -6375,6 +6374,10 @@ export type SearchFieldAgentsQuery = {
       totalNumberOfInProgressAppStarted?: number | null
       totalNumberOfRejectedDeclarations?: number | null
       averageTimeForDeclaredDeclarations?: number | null
+      role?: {
+        __typename?: 'Role'
+        labels: Array<{ __typename?: 'RoleLabel'; label: string; lang: string }>
+      } | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null

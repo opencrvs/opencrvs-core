@@ -16,7 +16,6 @@ import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import {
   ProtectedAccoutStep,
@@ -41,6 +40,9 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { ErrorText } from '@opencrvs/components/lib/'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -52,19 +54,6 @@ const ConfirmButton = styled(PrimaryButton)`
   }
 `
 
-const LoaderOverlay = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`
 interface IProps {
   setupData: IProtectedAccountSetupData
   goToStep: (
@@ -81,21 +70,8 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   )
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
-
-  const typeRole =
-    (userDetails &&
-      userDetails.systemRole &&
-      (userDetails.role
-        ? `${intl.formatMessage(
-            userMessages[userDetails.systemRole as string]
-          )} / ${
-            userDetails.role.labels.find((label) => label.lang === 'en')?.label
-          }`
-        : `${intl.formatMessage(
-            userMessages[userDetails.systemRole as string]
-          )}`)) ||
-    ''
-
+  const language = useSelector(getLanguage)
+  const role = userDetails && getUserRole(language, userDetails.role)
   const primaryOffice =
     (userDetails &&
       userDetails.primaryOffice &&
@@ -142,11 +118,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       value: primaryOffice
     },
     {
-      id: 'RoleType',
-      label: `${intl.formatMessage(
-        constantsMessages.labelRole
-      )} / ${intl.formatMessage(constantsMessages.labelRole)}`,
-      value: typeRole
+      id: 'Role',
+      label: `${intl.formatMessage(constantsMessages.labelRole)}`,
+      value: role
     },
     ...answeredQuestions
   ]
@@ -200,9 +174,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
               >
                 <GlobalError id="GlobalError">
                   {submitError && (
-                    <WarningMessage>
+                    <ErrorText>
                       {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                    </WarningMessage>
+                    </ErrorText>
                   )}
                 </GlobalError>
                 <div id="UserSetupData">
