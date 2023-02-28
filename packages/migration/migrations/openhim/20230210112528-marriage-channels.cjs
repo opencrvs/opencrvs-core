@@ -12,39 +12,26 @@ graphic logo are (registered/a) trademark(s) of Plan International.
 const {
   upsertChannel,
   removeChannel,
-  newChannelTemplate
+  newChannelTemplate,
+  commonRoutes
 } = require('../../utils/openhim-helpers.cjs')
 
 const marriageNewDeclarationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> New Marriage Declaration',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> New Marriage Declaration',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'New Marriage Declaration',
@@ -55,32 +42,18 @@ const marriageInProgressDeclarationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> New Marriage InProgress',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> New Marriage InProgress',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'New Marriage InProgress',
@@ -91,32 +64,18 @@ const marriageRequestForRegistrarValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Request for Registrar Validation',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Request for Registrar Validation',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Request for Registrar Validation',
@@ -127,32 +86,18 @@ const marriageWaitingExternalResourceValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Waiting External Resource Validation',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Waiting External Resource Validation',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Waiting External Resource Validation',
@@ -163,32 +108,18 @@ const registrarMarriageRegistrationWaitingExternalResourceValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Registrar Marriage Registration Waiting External Resource Validation',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Registrar Marriage Registration Waiting External Resource Validation',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Registrar Marriage Registration Waiting External Resource Validation',
@@ -200,46 +131,25 @@ const marriageRegistrationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Registration',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Registration',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Webhooks -> Marriage Registration',
-      secured: false,
       host: 'metrics',
       port: 2525,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Registration',
@@ -250,32 +160,18 @@ const marriageValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Validation',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Validation',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Validation',
@@ -286,32 +182,18 @@ const marriageCertificationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Certification',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Certification',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Certification',
@@ -322,32 +204,18 @@ const marriageRejectionChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Rejection',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Rejection',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Rejection',
@@ -358,32 +226,18 @@ const marriageArchiveChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Archive',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Archive',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Archive',
@@ -394,32 +248,18 @@ const marriageReinstateChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Reinstate',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Reinstate',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Archive',
@@ -430,32 +270,18 @@ const marriageRequestCorrectionChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Search -> Marriage Request Correction',
-      secured: false,
       host: 'search',
       port: 9090,
-      path: '',
-      pathTransform: '',
-      primary: true,
-      username: '',
-      password: ''
+      primary: true
     },
     {
-      type: 'http',
-      status: 'enabled',
-      forwardAuthHeader: true,
+      ...commonRoutes,
       name: 'Metrics -> Marriage Request Correction',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: ''
+      primary: false
     }
   ],
   name: 'Marriage Request Correction',

@@ -94,7 +94,7 @@ function getEventToScopeMap(event: Events) {
       return [USER_SCOPE.VALIDATE, USER_SCOPE.REGISTER]
 
     default:
-      return false
+      return []
   }
 }
 
@@ -106,9 +106,7 @@ export function isUserAuthorized(
     return false
   }
 
-  return scopes.some(
-    (scope) =>
-      getEventToScopeMap(event) &&
-      (getEventToScopeMap(event) as string[]).includes(scope)
+  return scopes.some((scope) =>
+    (getEventToScopeMap(event) as string[]).includes(scope)
   )
 }

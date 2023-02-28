@@ -583,8 +583,7 @@ export async function updatePatientIdentifierWithRN(
   identifierType: string,
   registrationNumber: string
 ): Promise<fhir.Patient[]> {
-  const patients: fhir.Patient[] = []
-  await Promise.all(
+  return await Promise.all(
     sectionCodes.map(async (sectionCode) => {
       const section = getSectionEntryBySectionCode(composition, sectionCode)
       const patient = await getFromFhir(`/${section.reference}`)
@@ -606,10 +605,9 @@ export async function updatePatientIdentifierWithRN(
           value: registrationNumber
         })
       }
-      patients.push(patient)
+      return patient
     })
   )
-  return patients
 }
 
 interface Integration {
