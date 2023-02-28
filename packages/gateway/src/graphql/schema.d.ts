@@ -586,7 +586,7 @@ export interface GQLMarriageRegistrationInput {
   witnessOne?: GQLRelatedPersonInput
   witnessTwo?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
-  marriageType?: GQLMarriageType
+  typeOfMarriage?: GQLMarriageType
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -870,6 +870,7 @@ export interface GQLHumanName {
   use?: string
   firstNames?: string
   familyName?: string
+  marriedLastName?: string
 }
 
 export interface GQLContactPoint {
@@ -1085,16 +1086,19 @@ export interface GQLEventSearchSet {
 export type GQLPossibleEventSearchSetTypeNames =
   | 'BirthEventSearchSet'
   | 'DeathEventSearchSet'
+  | 'MarriageEventSearchSet'
 
 export interface GQLEventSearchSetNameMap {
   EventSearchSet: GQLEventSearchSet
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
+  MarriageEventSearchSet: GQLMarriageEventSearchSet
 }
 
 export const enum GQLEvent {
   birth = 'birth',
-  death = 'death'
+  death = 'death',
+  marriage = 'marriage'
 }
 
 export interface GQLEventProgressSet {
@@ -1246,6 +1250,7 @@ export interface GQLHumanNameInput {
   use?: string
   firstNames?: string
   familyName?: string
+  marriedLastName?: string
 }
 
 export interface GQLUserIdentifierInput {
@@ -1374,6 +1379,8 @@ export const enum GQLInformantType {
   DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
   GRANDSON = 'GRANDSON',
   GRANDDAUGHTER = 'GRANDDAUGHTER',
+  BRIDE = 'BRIDE',
+  GROOM = 'GROOM',
   OTHER = 'OTHER'
 }
 
@@ -1646,6 +1653,16 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   type?: string
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLDate
+  registration?: GQLRegistrationSearchSet
+  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+}
+
+export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
+  id: string
+  type?: string
+  brideName?: Array<GQLHumanName | null>
+  groomName?: Array<GQLHumanName | null>
+  dateOfMarriage?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
@@ -2005,6 +2022,7 @@ export interface GQLResolver {
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
+  MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
@@ -5601,6 +5619,7 @@ export interface GQLHumanNameTypeResolver<TParent = any> {
   use?: HumanNameToUseResolver<TParent>
   firstNames?: HumanNameToFirstNamesResolver<TParent>
   familyName?: HumanNameToFamilyNameResolver<TParent>
+  marriedLastName?: HumanNameToMarriedLastNameResolver<TParent>
 }
 
 export interface HumanNameToUseResolver<TParent = any, TResult = any> {
@@ -5612,6 +5631,13 @@ export interface HumanNameToFirstNamesResolver<TParent = any, TResult = any> {
 }
 
 export interface HumanNameToFamilyNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HumanNameToMarriedLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -6162,7 +6188,10 @@ export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
-    | Promise<'BirthEventSearchSet' | 'DeathEventSearchSet'>
+    | 'MarriageEventSearchSet'
+    | Promise<
+        'BirthEventSearchSet' | 'DeathEventSearchSet' | 'MarriageEventSearchSet'
+      >
 }
 export interface GQLEventProgressSetTypeResolver<TParent = any> {
   id?: EventProgressSetToIdResolver<TParent>
@@ -7538,6 +7567,65 @@ export interface DeathEventSearchSetToRegistrationResolver<
 }
 
 export interface DeathEventSearchSetToOperationHistoriesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMarriageEventSearchSetTypeResolver<TParent = any> {
+  id?: MarriageEventSearchSetToIdResolver<TParent>
+  type?: MarriageEventSearchSetToTypeResolver<TParent>
+  brideName?: MarriageEventSearchSetToBrideNameResolver<TParent>
+  groomName?: MarriageEventSearchSetToGroomNameResolver<TParent>
+  dateOfMarriage?: MarriageEventSearchSetToDateOfMarriageResolver<TParent>
+  registration?: MarriageEventSearchSetToRegistrationResolver<TParent>
+  operationHistories?: MarriageEventSearchSetToOperationHistoriesResolver<TParent>
+}
+
+export interface MarriageEventSearchSetToIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToBrideNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToGroomNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToDateOfMarriageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageEventSearchSetToOperationHistoriesResolver<
   TParent = any,
   TResult = any
 > {

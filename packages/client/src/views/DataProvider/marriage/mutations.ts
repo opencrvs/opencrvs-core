@@ -13,7 +13,7 @@ import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
 
 export const SUBMIT_MARRIAGE_DECLARATION = gql`
-  mutation createMarriageRegistration($details: BirthRegistrationInput!) {
+  mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
     createMarriageRegistration(details: $details) {
       trackingId
       compositionId
@@ -23,7 +23,7 @@ export const SUBMIT_MARRIAGE_DECLARATION = gql`
 export const APPROVE_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsValidated(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsValidated(id: $id, details: $details)
   }
@@ -31,7 +31,7 @@ export const APPROVE_MARRIAGE_DECLARATION = gql`
 export const REGISTER_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsRegistered(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsRegistered(id: $id, details: $details) {
       id
@@ -90,7 +90,7 @@ export const ARCHIVE_MARRIAGE_DECLARATION = gql`
 export const COLLECT_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsCertified(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsCertified(id: $id, details: $details)
   }

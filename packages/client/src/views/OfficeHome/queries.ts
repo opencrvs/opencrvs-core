@@ -65,6 +65,19 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         use
       }
     }
+    ... on MarriageEventSearchSet {
+      dateOfMarriage
+      brideName {
+        firstNames
+        familyName
+        use
+      }
+      groomName {
+        firstNames
+        familyName
+        use
+      }
+    }
   }
 `
 

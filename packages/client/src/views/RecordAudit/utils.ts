@@ -29,7 +29,8 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLHumanName,
-  GQLAssignmentData
+  GQLAssignmentData,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -269,6 +270,12 @@ export const isDeathDeclaration = (
   return (declaration && declaration.type === 'Death') || false
 }
 
+export const isMarriageDeclaration = (
+  declaration: GQLEventSearchSet | null
+): declaration is GQLMarriageEventSearchSet => {
+  return (declaration && declaration.type === 'Marriage') || false
+}
+
 export const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = EMPTY_STRING
   let declarationName
@@ -348,6 +355,15 @@ export const getWQDeclarationData = (
     workqueueDeclaration.deceasedName
   ) {
     name = getName(workqueueDeclaration.deceasedName, language)
+  } else if (
+    isMarriageDeclaration(workqueueDeclaration) &&
+    workqueueDeclaration.brideName &&
+    workqueueDeclaration.groomName
+  ) {
+    name = `${getName(workqueueDeclaration.groomName, language)} & ${getName(
+      workqueueDeclaration.brideName,
+      language
+    )}`
   }
   return {
     id: workqueueDeclaration?.id,

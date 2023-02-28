@@ -61,6 +61,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -365,7 +367,7 @@ input MarriageRegistrationInput {
   witnessOne: RelatedPersonInput
   witnessTwo: RelatedPersonInput
   eventLocation: LocationInput
-  marriageType: MarriageType
+  typeOfMarriage: MarriageType
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date

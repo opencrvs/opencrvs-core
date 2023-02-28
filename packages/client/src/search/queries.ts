@@ -76,6 +76,19 @@ export const SEARCH_EVENTS = gql`
             use
           }
         }
+        ... on MarriageEventSearchSet {
+          dateOfMarriage
+          brideName {
+            firstNames
+            familyName
+            use
+          }
+          groomName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
   }

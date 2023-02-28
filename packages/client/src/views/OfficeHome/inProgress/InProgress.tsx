@@ -20,7 +20,8 @@ import {
   GQLHumanName,
   GQLEventSearchResultSet,
   GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
+  GQLDeathEventSearchSet,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   IDeclaration,
@@ -195,12 +196,25 @@ export class InProgressComponent extends React.Component<
         name = namesMap[locale] || namesMap[LANG_EN]
         const date = (reg as GQLBirthEventSearchSet).dateOfBirth
         eventDate = date && date
-      } else {
+      } else if (reg.registration && reg.type === 'Death') {
         const deathReg = reg as GQLDeathEventSearchSet
         const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
         const namesMap = createNamesMap(names)
         name = namesMap[locale] || namesMap[LANG_EN]
         const date = (reg as GQLDeathEventSearchSet).dateOfDeath
+        eventDate = date && date
+      } else if (reg.registration && reg.type === 'Marriage') {
+        const marriageReg = reg as GQLMarriageEventSearchSet
+        const groomNames =
+          marriageReg && (marriageReg.groomName as GQLHumanName[])
+        const groomNamesMap = createNamesMap(groomNames)
+        const brideNames =
+          marriageReg && (marriageReg.groomName as GQLHumanName[])
+        const brideNamesMap = createNamesMap(brideNames)
+        const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
+        const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
+        name = `${groomName} & ${brideName}`
+        const date = (reg as GQLMarriageEventSearchSet).dateOfMarriage
         eventDate = date && date
       }
       const dateOfEvent =

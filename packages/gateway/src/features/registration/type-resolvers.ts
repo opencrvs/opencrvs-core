@@ -94,6 +94,12 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return Array.isArray(name.family) ? name.family.join(' ') : name.family
+    },
+    marriedLastName(name) {
+      if (!name.suffix) {
+        return null
+      }
+      return Array.isArray(name.suffix) ? name.suffix.join(' ') : name.suffix
     }
   },
   IdentityType: {

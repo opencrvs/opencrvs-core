@@ -146,6 +146,24 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
         person,
         'name',
         [fieldValue],
+        'suffix',
+        context
+      )
+    },
+    marriedLastName: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'name',
+        [fieldValue],
         'family',
         context
       )
@@ -2129,6 +2147,14 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreateInformantResource(fhirBundle)
+      return createDateOfMarriageBuilder(person, fieldValue)
     }
   },
   groom: {
@@ -2172,6 +2198,14 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createNationalityBuilder(person, fieldValue)
+    },
+    dateOfMarriage: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreateInformantResource(fhirBundle)
+      return createDateOfMarriageBuilder(person, fieldValue)
     }
   },
   witnessOne: {
@@ -2187,38 +2221,54 @@ export const builders: IFieldBuilders = {
       )
       relatedPersonResource.id = fieldValue
     },
-    name: {
-      use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+    individual: {
+      _fhirID: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
+        person.id = fieldValue as string
       },
-      firstNames: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'name',
-          fieldValue.split(' '),
-          'given',
-          context
-        )
-      },
-      familyName: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'name',
-          [fieldValue],
-          'family',
-          context
-        )
+      name: {
+        use: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue,
+            'use',
+            context
+          )
+        },
+        firstNames: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue.split(' '),
+            'given',
+            context
+          )
+        },
+        familyName: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            [fieldValue],
+            'family',
+            context
+          )
+        }
       }
     },
     relationship: async (
@@ -2280,38 +2330,54 @@ export const builders: IFieldBuilders = {
       )
       relatedPersonResource.id = fieldValue
     },
-    name: {
-      use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+    individual: {
+      _fhirID: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(person, 'name', fieldValue, 'use', context)
+        person.id = fieldValue as string
       },
-      firstNames: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'name',
-          fieldValue.split(' '),
-          'given',
-          context
-        )
-      },
-      familyName: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        setObjectPropInResourceArray(
-          person,
-          'name',
-          [fieldValue],
-          'family',
-          context
-        )
+      name: {
+        use: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue,
+            'use',
+            context
+          )
+        },
+        firstNames: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            fieldValue.split(' '),
+            'given',
+            context
+          )
+        },
+        familyName: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'name',
+            [fieldValue],
+            'family',
+            context
+          )
+        }
       }
     },
     relationship: async (
@@ -3782,7 +3848,7 @@ export const builders: IFieldBuilders = {
     }
     observation.valueQuantity.value = fieldValue
   },
-  marriageType: (
+  typeOfMarriage: (
     fhirBundle: ITemplatedBundle,
     fieldValue: number,
     context: any

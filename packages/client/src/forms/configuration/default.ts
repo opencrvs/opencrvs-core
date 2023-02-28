@@ -5196,49 +5196,23 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   template: {
-                    operation: 'dateFormatTransformer',
+                    operation: 'marriageDateFormatTransformation',
                     fieldName: 'eventDate',
-                    parameters: ['marriageDate', 'en', 'do MMMM yyyy']
+                    parameters: ['en', 'do MMMM yyyy', ['bride', 'groom']]
                   },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['marriageDate']
+                    operation: 'fieldToMarriageDateTransformation',
+                    parameters: [
+                      ['bride', 'groom'],
+                      {
+                        operation: 'longDateTransformer',
+                        parameters: []
+                      }
+                    ]
                   },
                   query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['marriageDate']
-                  }
-                }
-              },
-              {
-                name: 'placeOfMarriage',
-                customisable: false,
-                type: 'SELECT_WITH_OPTIONS',
-                previewGroup: 'placeOfMarriage',
-                ignoreFieldLabelOnErrorMessage: true,
-                label: formMessageDescriptors.placeOfMarriage,
-                required: true,
-                initialValue: '',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'MARRIAGE_USUAL_RESIDENCE',
-                    label: formMessageDescriptors.placeOfDeathSameAsPrimary
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.otherInstitution
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'marriageEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationTypeQueryTransformer',
-                    parameters: []
+                    operation: 'marriageDateToFieldTransformation',
+                    parameters: [['bride', 'groom']]
                   }
                 }
               },
@@ -5315,18 +5289,31 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  template: {
-                    fieldName: 'witnessOneFirstNamesEng',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'firstNames']
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      'name'
+                    ]
                   },
                   query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
+                      }
+                    ]
+                  },
+                  template: {
+                    fieldName: 'witnessOneFirstName',
                     operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -5344,23 +5331,36 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  template: {
-                    fieldName: 'witnessOneFamilyNameEng',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'familyName']
+                      },
+                      'name'
+                    ]
                   },
                   query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
+                      }
+                    ]
+                  },
+                  template: {
+                    fieldName: 'witnessOneFamilyName',
                     operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               },
               {
-                name: 'witnessOneRelationship',
+                name: 'relationship',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.relationshipToSpouses,
@@ -5390,7 +5390,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ]
               },
               {
-                name: 'witnessOneOtherRelationship',
+                name: 'otherRelationship',
                 type: 'TEXT',
                 label: formMessageDescriptors.other,
                 maxLength: 32,
@@ -5456,18 +5456,31 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  template: {
-                    fieldName: 'witnessTwoFirstNamesEng',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'firstNames']
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      'name'
+                    ]
                   },
                   query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
+                      }
+                    ]
+                  },
+                  template: {
+                    fieldName: 'witnessTwoFirstName',
                     operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -5485,23 +5498,36 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  template: {
-                    fieldName: 'witnessTwoFamilyNameEng',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'familyName']
+                      },
+                      'name'
+                    ]
                   },
                   query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
+                      }
+                    ]
+                  },
+                  template: {
+                    fieldName: 'witnessTwoFamilyName',
                     operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               },
               {
-                name: 'witnessTwoRelationship',
+                name: 'relationship',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.relationshipToSpouses,
@@ -5509,12 +5535,6 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
-                mapping: {
-                  template: {
-                    fieldName: 'witnessTwoRelationship',
-                    operation: 'selectTransformer'
-                  }
-                },
                 options: [
                   {
                     value: 'headOfGroomFamily',
@@ -5531,7 +5551,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ]
               },
               {
-                name: 'witnessTwoOtherRelationship',
+                name: 'otherRelationship',
                 type: 'TEXT',
                 label: formMessageDescriptors.other,
                 maxLength: 32,
