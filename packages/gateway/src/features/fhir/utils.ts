@@ -63,7 +63,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARRIAGE_REG_NO
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -588,6 +589,38 @@ export function selectOrCreateInformantResource(
   const relatedPersonResource = selectOrCreateInformantSection(
     INFORMANT_CODE,
     INFORMANT_TITLE,
+    fhirBundle
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      (entry) => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related informant person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
+}
+
+export function selectOrCreateWitnessResource(
+  fhirBundle: ITemplatedBundle,
+  code: string,
+  title: string
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateInformantSection(
+    code,
+    title,
     fhirBundle
   )
   const patientRef =
@@ -1292,7 +1325,10 @@ export async function getRegistrationIds(
     registrationNumber = BIRTH_REG_NO
   } else if (eventType === EVENT_TYPE.DEATH) {
     registrationNumber = DEATH_REG_NO
+  } else if (eventType === EVENT_TYPE.MARRIAGE) {
+    registrationNumber = MARRIAGE_REG_NO
   }
+
   let path
   if (isTask) {
     path = `/Task/${compositionId}`

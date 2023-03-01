@@ -87,7 +87,8 @@ import {
   setQuestionnaireItem,
   uploadBase64ToMinio,
   isBase64FileString,
-  postAssignmentSearch
+  postAssignmentSearch,
+  selectOrCreateWitnessResource
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -2153,7 +2154,11 @@ export const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreateInformantResource(fhirBundle)
+      const person = selectOrCreatePersonResource(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        fhirBundle
+      )
       return createDateOfMarriageBuilder(person, fieldValue)
     }
   },
@@ -2167,7 +2172,7 @@ export const builders: IFieldBuilders = {
       groom.id = fieldValue as string
     },
     identifier: createIDBuilder(GROOM_CODE, GROOM_TITLE),
-    name: createNameBuilder(GROOM_CODE, BRIDE_TITLE),
+    name: createNameBuilder(GROOM_CODE, GROOM_TITLE),
     telecom: createTelecomBuilder(GROOM_CODE, GROOM_TITLE),
     birthDate: (fhirBundle, fieldValue, context) => {
       const groom = selectOrCreatePersonResource(
@@ -2204,7 +2209,11 @@ export const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const person = selectOrCreateInformantResource(fhirBundle)
+      const person = selectOrCreatePersonResource(
+        GROOM_CODE,
+        GROOM_TITLE,
+        fhirBundle
+      )
       return createDateOfMarriageBuilder(person, fieldValue)
     }
   },
@@ -2223,7 +2232,11 @@ export const builders: IFieldBuilders = {
     },
     individual: {
       _fhirID: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_ONE_CODE,
+          WITNESS_ONE_TITLE
+        )
         person.id = fieldValue as string
       },
       name: {
@@ -2232,7 +2245,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_ONE_CODE,
+            WITNESS_ONE_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',
@@ -2246,7 +2263,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_ONE_CODE,
+            WITNESS_ONE_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',
@@ -2260,7 +2281,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_ONE_CODE,
+            WITNESS_ONE_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',
@@ -2332,7 +2357,11 @@ export const builders: IFieldBuilders = {
     },
     individual: {
       _fhirID: (fhirBundle, fieldValue, context) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
+        const person = selectOrCreateWitnessResource(
+          fhirBundle,
+          WITNESS_TWO_CODE,
+          WITNESS_TWO_TITLE
+        )
         person.id = fieldValue as string
       },
       name: {
@@ -2341,7 +2370,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_TWO_CODE,
+            WITNESS_TWO_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',
@@ -2355,7 +2388,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_TWO_CODE,
+            WITNESS_TWO_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',
@@ -2369,7 +2406,11 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          const person = selectOrCreateInformantResource(fhirBundle)
+          const person = selectOrCreateWitnessResource(
+            fhirBundle,
+            WITNESS_TWO_CODE,
+            WITNESS_TWO_TITLE
+          )
           setObjectPropInResourceArray(
             person,
             'name',

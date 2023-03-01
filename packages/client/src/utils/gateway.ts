@@ -969,6 +969,7 @@ export enum IdentityIdType {
   DeathRegistrationNumber = 'DEATH_REGISTRATION_NUMBER',
   DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
+  MarriageRegistrationNumber = 'MARRIAGE_REGISTRATION_NUMBER',
   MosipUintoken = 'MOSIP_UINTOKEN',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
@@ -1295,6 +1296,7 @@ export type Mutation = {
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
+  requestMarriageRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
   resetPasswordSMS?: Maybe<Scalars['String']>
   toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
@@ -1491,6 +1493,11 @@ export type MutationRequestBirthRegistrationCorrectionArgs = {
 
 export type MutationRequestDeathRegistrationCorrectionArgs = {
   details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationRequestMarriageRegistrationCorrectionArgs = {
+  details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
@@ -2081,7 +2088,8 @@ export type RegistrationSearchSet = {
 
 export enum RegistrationType {
   Birth = 'BIRTH',
-  Death = 'DEATH'
+  Death = 'DEATH',
+  Marriage = 'MARRIAGE'
 }
 
 export type Reinstated = {
@@ -2474,6 +2482,16 @@ export type RequestDeathRegistrationCorrectionMutationVariables = Exact<{
 export type RequestDeathRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   requestDeathRegistrationCorrection: string
+}
+
+export type RequestMarriageRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type RequestMarriageRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  requestMarriageRegistrationCorrection: string
 }
 
 export type FetchPersonQueryVariables = Exact<{
@@ -4887,7 +4905,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -5170,7 +5187,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -7029,6 +7045,26 @@ export type FetchDeclarationShortInfoQuery = {
     | {
         __typename?: 'MarriageRegistration'
         id: string
+        bride?: {
+          __typename?: 'Person'
+          id?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        groom?: {
+          __typename?: 'Person'
+          id?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
         registration?: {
           __typename?: 'Registration'
           id?: string | null

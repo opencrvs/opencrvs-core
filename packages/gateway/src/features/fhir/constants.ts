@@ -35,3 +35,4 @@ export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regV
 
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'
+export const MARRIAGE_REG_NO = 'marriage-registration-number'

@@ -332,28 +332,30 @@ export async function markEventAsRegisteredCallbackHandler(
       bundle.entry?.push({ resource: patient })
     }
     await sendBundleToHearth(bundle)
-
-    const phoneNo = await getPhoneNo(task, event)
-    const informantName = await getEventInformantName(composition, event)
-    /* sending notification to the contact */
-    if (phoneNo && informantName) {
-      logger.info(
-        'markEventAsRegisteredCallbackHandler sending event notification'
-      )
-      sendRegisteredNotification(
-        phoneNo,
-        informantName,
-        trackingId,
-        registrationNumber,
-        event,
-        {
-          Authorization: request.headers.authorization
-        }
-      )
-    } else {
-      logger.info(
-        'markEventAsRegisteredCallbackHandler could not send event notification'
-      )
+    //TODO: We have to configure sms and identify informant for marriage event
+    if (event !== EVENT_TYPE.MARRIAGE) {
+      const phoneNo = await getPhoneNo(task, event)
+      const informantName = await getEventInformantName(composition, event)
+      /* sending notification to the contact */
+      if (phoneNo && informantName) {
+        logger.info(
+          'markEventAsRegisteredCallbackHandler sending event notification'
+        )
+        sendRegisteredNotification(
+          phoneNo,
+          informantName,
+          trackingId,
+          registrationNumber,
+          event,
+          {
+            Authorization: request.headers.authorization
+          }
+        )
+      } else {
+        logger.info(
+          'markEventAsRegisteredCallbackHandler could not send event notification'
+        )
+      }
     }
     // Most nations will desire the opportunity to pilot OpenCRVS alongised a legacy system, or an external data store / validation process
     // In the absence of an external process, we must wait at least a second before we continue, because Elasticsearch must

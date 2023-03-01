@@ -36,4 +36,3 @@ export const REQUEST_MARRIAGE_REG_CORRECTION = gql`
     requestMarriageRegistrationCorrection(id: $id, details: $details)
   }
 `
-

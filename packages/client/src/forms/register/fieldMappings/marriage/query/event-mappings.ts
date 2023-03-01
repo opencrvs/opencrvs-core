@@ -24,11 +24,10 @@ export const marriageDateToFieldTransformation =
       alternativeSectionIds && alternativeSectionIds.length > 0
         ? alternativeSectionIds
         : sectionId
-
     if (Array.isArray(fromSectionIds)) {
       fromSectionIds.forEach((id) => {
         transformedData[sectionId][field.name] = queryData.id
-          ? queryData[id].marriageDate
+          ? queryData[id]?.dateOfMarriage || queryData[id]?.dateOfMarriage
           : ''
       })
 
@@ -60,7 +59,8 @@ export const marriageDateFormatTransformation =
     if (Array.isArray(fromSectionIds)) {
       fromSectionIds.forEach((id) => {
         queryValue =
-          queryData[id].groom?.marriageDate || queryData[id].bride?.marriageDate
+          queryData[id]?.groom?.marriageDate ||
+          queryData[id]?.bride?.marriageDate
       })
     } else {
       if (!queryData[fromSectionIds]) {

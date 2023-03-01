@@ -57,7 +57,7 @@ export const transformData = (
         groomNames =
           (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
         brideNames =
-          (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
+          (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
 
         dateOfEvent = marriageReg && marriageReg.dateOfMarriage
       }

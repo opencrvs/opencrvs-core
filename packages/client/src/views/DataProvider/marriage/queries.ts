@@ -155,7 +155,6 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
       marriageType
       eventLocation {
         id
-        type
         address {
           line
           district
@@ -406,7 +405,6 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
       marriageType
       eventLocation {
         id
-        type
         address {
           line
           district

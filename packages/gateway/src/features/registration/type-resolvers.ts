@@ -299,8 +299,10 @@ export const typeResolvers: GQLResolver = {
         task.code.coding[0].code
       if (trackingId === 'BIRTH') {
         trackingId = 'birth-tracking-id'
-      } else {
+      } else if (trackingId === 'DEATH') {
         trackingId = 'death-tracking-id'
+      } else if (trackingId === 'MARRIAGE') {
+        trackingId = 'marriage-tracking-id'
       }
       const foundIdentifier =
         task.identifier &&
@@ -321,8 +323,10 @@ export const typeResolvers: GQLResolver = {
         task.code.coding[0].code
       if (regNoType === 'BIRTH') {
         regNoType = 'birth-registration-number'
-      } else {
+      } else if (regNoType === 'DEATH') {
         regNoType = 'death-registration-number'
+      } else if (regNoType === 'MARRIAGE') {
+        regNoType = 'marriage-registration-number'
       }
       const foundIdentifier =
         task.identifier &&
@@ -441,7 +445,6 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
-
     informantsSignature: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
@@ -449,7 +452,6 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
-
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
@@ -1854,30 +1856,31 @@ export const typeResolvers: GQLResolver = {
       )
     },
     async witnessOne(composition: ITemplatedComposition, _, authHeader) {
-      const patientSection = findCompositionSection(
+      const relatedPersonSection = findCompositionSection(
         WITNESS_ONE_CODE,
         composition
       )
-      if (!patientSection || !patientSection.entry) {
+      if (!relatedPersonSection || !relatedPersonSection.entry) {
         return null
       }
       return (await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
+        `/${relatedPersonSection.entry[0].reference}`,
         authHeader
       )) as fhir.RelatedPerson
     },
     async witnessTwo(composition: ITemplatedComposition, _, authHeader) {
-      const patientSection = findCompositionSection(
+      const relatedPersonSection = findCompositionSection(
         WITNESS_TWO_CODE,
         composition
       )
-      if (!patientSection || !patientSection.entry) {
+      if (!relatedPersonSection || !relatedPersonSection.entry) {
         return null
       }
-      return (await fetchFHIR(
-        `/${patientSection.entry[0].reference}`,
+      const relatedPerson = (await fetchFHIR(
+        `/${relatedPersonSection.entry[0].reference}`,
         authHeader
       )) as fhir.RelatedPerson
+      return relatedPerson
     },
     async registration(composition: ITemplatedComposition, _, authHeader) {
       const taskBundle = await fetchFHIR(

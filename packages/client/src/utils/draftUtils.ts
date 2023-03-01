@@ -92,6 +92,12 @@ export const getDraftInformantFullName = (
       return getInformantFullName(draft.data.child, language, lastNameFirst)
     case Event.Death:
       return getInformantFullName(draft.data.deceased, language, lastNameFirst)
+    case Event.Marriage:
+      return `${getInformantFullName(
+        draft.data.groom,
+        language,
+        lastNameFirst
+      )} & ${getInformantFullName(draft.data.bride, language, lastNameFirst)}`
   }
 }
 

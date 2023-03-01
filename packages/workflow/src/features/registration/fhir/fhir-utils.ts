@@ -332,7 +332,7 @@ export async function getEventInformantName(
       composition,
       CHILD_SECTION_CODE
     )
-  } else {
+  } else if (eventType === EVENT_TYPE.DEATH) {
     informantSection = getSectionEntryBySectionCode(
       composition,
       DECEASED_SECTION_CODE

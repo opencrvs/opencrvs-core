@@ -121,6 +121,7 @@ enum AttachmentSubject {
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 enum MannerOfDeath {
