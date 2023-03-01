@@ -25,6 +25,7 @@ import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)
@@ -66,7 +67,28 @@ describe('ConfigHome page when already has uploaded certificate template', async
   await loginAsFieldAgent(store)
   let testComponent: ReactWrapper
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
+
   beforeEach(async () => {
+    vi.resetAllMocks()
+    configApplicationMutations.mutateApplicationConfig = vi.fn(
+      () =>
+        new Promise((resolve) =>
+          resolve({
+            data: {
+              updateApplicationConfig: {
+                BIRTH: {
+                  PRINT_IN_ADVANCE: true
+                },
+                DEATH: {
+                  PRINT_IN_ADVANCE: true
+                }
+              }
+            }
+          })
+        )
+    )
+    const { store, history } = createStore()
+
     testComponent = await createTestComponent(
       <CertificatesConfig></CertificatesConfig>,
       { store, history }
@@ -78,33 +100,59 @@ describe('ConfigHome page when already has uploaded certificate template', async
     spy.mockReset()
   })
 
-  it('shows default birth certificate template text', () => {
-    expect(
-      testComponent.find('#birth_value').hostNodes().first().text()
-    ).toContain('Default birth certificate template')
-  })
+  describe('certificate page test', () => {
+    it('should show birth, and death tab button', async () => {
+      expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Births')
+      expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Deaths')
+    })
 
-  it('shows default death certificate template text', () => {
-    expect(
-      testComponent.find('#death_value').hostNodes().first().text()
-    ).toContain('Default death certificate template')
-  })
+    it('shows default birth certificate template text', () => {
+      expect(
+        testComponent.find('#birth_value').hostNodes().first().text()
+      ).toContain('farajaland-birth-certificate-v3.svg')
+    })
 
-  it('shows sub menu link when VerticalThreeDots is clicked', async () => {
-    await waitForElement(
-      testComponent,
-      '#template-birth-action-menuToggleButton'
-    )
-    testComponent
-      .find('#template-birth-action-menuToggleButton')
-      .hostNodes()
-      .first()
-      .simulate('click')
+    it('shows sub menu link when VerticalThreeDots is clicked', async () => {
+      await waitForElement(
+        testComponent,
+        '#template-birth-action-menuToggleButton'
+      )
+      testComponent
+        .find('#template-birth-action-menuToggleButton')
+        .hostNodes()
+        .first()
+        .simulate('click')
 
-    testComponent.update()
-    expect(
-      testComponent.find('#template-birth-action-menuItem0').hostNodes()
-    ).toHaveLength(1)
+      testComponent.update()
+      expect(
+        testComponent.find('#template-birth-action-menuItem0').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('should toggle allow printing for birth', async () => {
+      testComponent
+        .find('#allow-printing-toggle')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+
+      testComponent.update()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+
+      await waitForElement(testComponent, '#allow-printing-notification')
+
+      expect(
+        testComponent
+          .find('#allow-printing-notification')
+          .hostNodes()
+          .first()
+          .text()
+      ).toBe('Allow printing in advance of issuance updated')
+    })
   })
 
   describe('Testing sub menu item on config page', () => {
