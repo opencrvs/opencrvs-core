@@ -265,10 +265,3 @@ type Address { # -> Address (mostly the same property name except:)
   from: Date # -> .period.start
   to: Date # -> .period.end
 }
-
-enum AuthorizationStatus {
-  ANONYMOUS
-  USER
-}
-
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION

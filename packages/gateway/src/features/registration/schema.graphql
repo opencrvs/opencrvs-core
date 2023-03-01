@@ -558,7 +558,6 @@ type Query {
 type Mutation {
   # BIRTH
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
-    @auth(requires: USER)
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(

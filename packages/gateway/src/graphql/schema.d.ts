@@ -107,43 +107,43 @@ export interface GQLMutation {
 }
 
 export interface GQLDummy {
-  dummy: string;
+  dummy: string
 }
 
 export interface GQLNotification {
-  id: string;
-  child?: GQLPerson;
-  mother?: GQLPerson;
-  father?: GQLPerson;
-  informant?: GQLPerson;
-  location?: GQLLocation;
-  createdAt?: GQLDate;
-  updatedAt?: GQLDate;
+  id: string
+  child?: GQLPerson
+  mother?: GQLPerson
+  father?: GQLPerson
+  informant?: GQLPerson
+  location?: GQLLocation
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
 }
 
-export type GQLDate = any;
+export type GQLDate = any
 
 export interface GQLBirthRegistration extends GQLEventRegistration {
-  id: string;
-  _fhirIDMap?: GQLMap;
-  registration?: GQLRegistration;
-  child?: GQLPerson;
-  mother?: GQLPerson;
-  father?: GQLPerson;
-  informant?: GQLRelatedPerson;
-  eventLocation?: GQLLocation;
-  birthType?: GQLBirthType;
-  questionnaire?: Array<GQLQuestionnaireQuestion | null>;
-  weightAtBirth?: number;
-  attendantAtBirth?: GQLAttendantType;
-  otherAttendantAtBirth?: string;
-  birthRegistrationType?: GQLBirthRegType;
-  childrenBornAliveToMother?: number;
-  foetalDeathsToMother?: number;
-  lastPreviousLiveBirth?: GQLDate;
-  createdAt?: GQLDate;
-  updatedAt?: GQLDate;
-  history?: Array<GQLHistory | null>;
+  id: string
+  _fhirIDMap?: GQLMap
+  registration?: GQLRegistration
+  child?: GQLPerson
+  mother?: GQLPerson
+  father?: GQLPerson
+  informant?: GQLRelatedPerson
+  eventLocation?: GQLLocation
+  birthType?: GQLBirthType
+  questionnaire?: Array<GQLQuestionnaireQuestion | null>
+  weightAtBirth?: number
+  attendantAtBirth?: GQLAttendantType
+  otherAttendantAtBirth?: string
+  birthRegistrationType?: GQLBirthRegType
+  childrenBornAliveToMother?: number
+  foetalDeathsToMother?: number
+  lastPreviousLiveBirth?: GQLDate
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
+  history?: Array<GQLHistory | null>
 }
 
 export interface GQLDeathRegistration extends GQLEventRegistration {

@@ -156,7 +156,6 @@ type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
-    @auth(requires: USER)
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
@@ -628,13 +627,6 @@ type CreatedIds {
   trackingId: String
   registrationNumber: String
 }
-
-enum AuthorizationStatus {
-  ANONYMOUS
-  USER
-}
-
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
 
 input BirthRegistrationInput {
   _fhirIDMap: Map
