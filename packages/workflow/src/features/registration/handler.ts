@@ -205,7 +205,7 @@ export async function createRegistrationHandler(
     }
 
     /* sending notification to the contact */
-    const msisdn = getSharedContactMsisdn(payload)
+    const msisdn = await getSharedContactMsisdn(payload)
     if (!msisdn) {
       logger.info('createRegistrationHandler could not send event notification')
       return resBundle

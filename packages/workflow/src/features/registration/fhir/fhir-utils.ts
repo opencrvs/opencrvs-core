@@ -33,11 +33,11 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
 import { unionBy } from 'lodash'
 
-export function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
+export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export function concatenateName(fhirNames: fhir.HumanName[]) {
@@ -313,7 +313,10 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
   return res.text()
 }
 
-export function getPhoneNo(taskResource: fhir.Task, eventType: EVENT_TYPE) {
+export async function getPhoneNo(
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
     const phoneExtension =

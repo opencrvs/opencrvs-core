@@ -52,7 +52,7 @@ export default async function updateTaskHandler(
         }] body: ${await res.text()}`
       )
     }
-    const msisdn = getSharedContactMsisdn(payload)
+    const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
       logger.info(`updateTaskHandler(${event}) sending event notification`)
