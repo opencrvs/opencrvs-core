@@ -74,6 +74,8 @@ import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
 interface IAppProps {
@@ -484,6 +486,22 @@ export function App(props: IAppProps) {
                                           exact
                                           path={routes.PERFORMANCE_DASHBOARD}
                                           component={PerformanceDashboard}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.ISSUE_COLLECTOR}
+                                          component={IssueCertificate}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.ISSUE_VERIFY_COLLECTOR}
+                                          component={VerifyCollector}
+                                        />
+                                        <ProtectedRoute
+                                          path={
+                                            routes.ISSUE_CERTIFICATE_PAYMENT
+                                          }
+                                          component={IssuePayment}
                                         />
                                       </Switch>
                                     </TransitionWrapper>

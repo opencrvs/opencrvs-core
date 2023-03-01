@@ -100,7 +100,8 @@ export const WORKQUEUE_TABS = {
   declarationForms: 'form',
   logout: 'logout',
   communications: 'communications',
-  informantNotification: 'informantnotification'
+  informantNotification: 'informantnotification',
+  readyToIssue: 'readyToIssue'
 } as const
 
 const GROUP_ID = {
@@ -119,6 +120,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -131,6 +133,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -143,6 +146,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -155,6 +159,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -167,6 +172,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup,
     GROUP_ID.analytics
@@ -174,6 +180,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
@@ -199,6 +206,7 @@ interface ICount {
   sentForApproval?: number
   externalValidation?: number
   readyToPrint?: number
+  readyToIssue?: number
 }
 
 interface IUserInfo {
@@ -382,6 +390,7 @@ export const NavigationView = (props: IFullProps) => {
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
+    readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
     outbox: storedDeclarations.filter((draft) =>
       (
         [
@@ -573,6 +582,26 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
+
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    WORKQUEUE_TABS.readyToIssue
+                  ) && (
+                    <NavigationItem
+                      icon={() => <DeclarationIconSmall color={'teal'} />}
+                      id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.readyToIssue]
+                      )}
+                      count={declarationCount.readyToIssue}
+                      isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
+                      onClick={() => {
+                        props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+                        menuCollapse && menuCollapse()
+                      }}
+                    />
+                  )}
+
                 {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.outbox
@@ -767,7 +796,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="MessageCircle" size="small" />}
+                        icon={() => <Icon name="ChatCircle" size="small" />}
                         id={`navigation_${WORKQUEUE_TABS.communications}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.communications]
