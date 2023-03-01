@@ -32,6 +32,7 @@ import { messages } from '@client/i18n/messages/views/search'
 import {
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
+  goToIssueCertificate as goToIssueCertificateAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
@@ -138,6 +139,7 @@ interface IBaseSearchResultProps {
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToIssueCertificate: typeof goToIssueCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
@@ -276,6 +278,7 @@ export class SearchResultView extends React.Component<
         const declarationIsRejected = reg.declarationStatus === 'REJECTED'
         const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
         const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+        const declarationIsIssued = reg.declarationStatus === 'ISSUED'
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -285,7 +288,7 @@ export class SearchResultView extends React.Component<
         const { searchText, searchType } = match.params
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           if (
-            (declarationIsRegistered || declarationIsCertified) &&
+            (declarationIsRegistered || declarationIsIssued) &&
             this.userHasCertifyScope()
           ) {
             actions.push({
@@ -295,6 +298,17 @@ export class SearchResultView extends React.Component<
               ) => {
                 e && e.stopPropagation()
                 this.props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (declarationIsCertified && this.userHasCertifyScope()) {
+            actions.push({
+              label: this.props.intl.formatMessage(buttonMessages.issue),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                this.props.goToIssueCertificate(reg.id)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -546,6 +560,7 @@ export const SearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToPrintCertificate: goToPrintCertificateAction,
+    goToIssueCertificate: goToIssueCertificateAction,
     goToDeclarationRecordAudit
   }
 )(injectIntl(withTheme(SearchResultView)))
