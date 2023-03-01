@@ -39,5 +39,8 @@ export {
   Database,
   CheckSquare,
   X,
-  Activity
+  Activity,
+  ChartLine,
+  ChartBar,
+  PaperPlaneTilt
 } from 'phosphor-react'

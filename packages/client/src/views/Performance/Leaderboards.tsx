@@ -22,7 +22,7 @@ export const Leaderboards = () => {
     <DashboardEmbedView
       title={intl.formatMessage(messages.leaderboardTitle)}
       url={window.config.LEADERBOARDS_DASHBOARD_URL}
-      icon={<Icon name="Award" size="medium" />}
+      icon={<Icon name="Medal" size="medium" />}
     />
   )
 }

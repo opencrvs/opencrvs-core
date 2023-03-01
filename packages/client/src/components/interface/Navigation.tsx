@@ -456,7 +456,7 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <Icon name="Send" size="medium" />}
+              icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.outbox}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.outbox]
@@ -607,7 +607,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <Icon name="Send" size="medium" />}
+                      icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]
@@ -857,7 +857,7 @@ export const NavigationView = (props: IFullProps) => {
                         {intl.formatMessage(navigationMessages['analytic'])}
                       </Text>
                       <NavigationItem
-                        icon={() => <Icon name="ChartActivity" size="medium" />}
+                        icon={() => <Icon name="ChartLine" size="medium" />}
                         label={intl.formatMessage(
                           navigationMessages['dashboard']
                         )}
@@ -879,7 +879,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       <NavigationItem
-                        icon={() => <Icon name="Award" size="medium" />}
+                        icon={() => <Icon name="Medal" size="medium" />}
                         label={intl.formatMessage(
                           navigationMessages['leaderboards']
                         )}
@@ -891,7 +891,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       <NavigationItem
-                        icon={() => <Icon name="BarChart2" size="medium" />}
+                        icon={() => <Icon name="ChartBar" size="medium" />}
                         label={intl.formatMessage(navigationMessages['report'])}
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
