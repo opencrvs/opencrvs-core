@@ -14,18 +14,18 @@ import {
   updateComposition,
   searchComposition,
   searchByCompositionId
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
+import { client } from '@search/opensearch/client'
 import { logger } from '@search/logger'
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import { IBirthCompositionBody } from '@search/opensearch/utils'
 
-describe('elasticsearch db helper', () => {
+describe('search db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>
 
-  describe('elasticsearch db helper', () => {
+  describe('search db helper', () => {
     beforeAll(() => {
       logger.error = jest.fn()
     })

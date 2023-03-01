@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
+import { client, ISearchResponse } from '@search/opensearch/client'
+import { buildQuery, ICompositionBody } from '@search/opensearch/utils'
 import { logger } from '@search/logger'
 
 export const indexComposition = async (

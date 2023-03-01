@@ -17,9 +17,9 @@ sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/infrastructure/openhim-console-config
 # Set hostname in compose file
 sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/docker-compose.deploy.yml
 
-# Setup an encryption key for Kibana
-KIBANA_ENCRYPTION_KEY=`uuidgen`
-sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /opt/opencrvs/infrastructure/monitoring/kibana/kibana.yml
+# Setup an encryption key for opensearch-dashboards
+OPENSEARCH_DASHBOARDS_ENCRYPTION_KEY=`uuidgen`
+sed -i "s/{{OPENSEARCH_DASHBOARDS_ENCRYPTION_KEY}}/$OPENSEARCH_DASHBOARDS_ENCRYPTION_KEY/g" /opt/opencrvs/infrastructure/monitoring/opensearch-dashboards/opensearch_dashboards.yml
 sed -i -e "s%{{SMTP_HOST}}%$SMTP_HOST%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml
 sed -i -e "s%{{SMTP_PORT}}%$SMTP_PORT%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml
 sed -i -e "s%{{ALERT_EMAIL}}%$ALERT_EMAIL%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml

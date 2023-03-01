@@ -254,7 +254,7 @@ describe('Search root resolvers', () => {
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
-    it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
+    it('returns total item as 0 and an empty array in-case of invalid result found from search', async () => {
       fetch.mockResponse(
         JSON.stringify({
           body: { hits: null }

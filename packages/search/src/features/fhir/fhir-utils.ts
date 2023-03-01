@@ -13,7 +13,7 @@ import { HEARTH_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
   IDeathCompositionBody
-} from '@search/elasticsearch/utils'
+} from '@search/opensearch/utils'
 import { logger } from '@search/logger'
 import fetch from 'node-fetch'
 

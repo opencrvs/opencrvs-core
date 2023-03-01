@@ -54,7 +54,7 @@ services:
     networks:
       - overlay_net
   metricbeat:
-    image: docker.elastic.co/beats/metricbeat:7.17.0
+    image: docker.elastic.co/beats/metricbeat:7.12.1
 
     user: root
     volumes:
@@ -63,15 +63,15 @@ services:
       - /:/hostfs:ro
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - ELASTICSEARCH_HOST=elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-      - KIBANA_HOST=kibana:5601
-      - KIBANA_USERNAME=${KIBANA_USERNAME}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_HOST=opensearch:9200
+      - ELASTICSEARCH_USERNAME=opensearch
+      - ELASTICSEARCH_PASSWORD=${OPENSEARCH_SUPERUSER_PASSWORD}
+      - KIBANA_HOST=opensearch-dashboards:5601
+      - KIBANA_USERNAME=${OPENSEARCH_DASHBOARDS_USERNAME}
+      - KIBANA_PASSWORD=${OPENSEARCH_DASHBOARDS_PASSWORD}
       - BEATS_USERNAME=beats_system
-      - BEATS_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
-    command: [ '--strict.perms=false', '-system.hostfs=/hostfs' ]
+      - BEATS_PASSWORD=${ROTATING_METRICBEAT_PASSWORD}
+    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
     deploy:
@@ -90,16 +90,16 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metricbeat'
-  setup-kibana-config:
+  setup-opensearch-dashboards-config:
     image: curlimages/curl:7.83.1
     entrypoint:
       [
         'curl',
         '-u',
-        'elastic:${ELASTICSEARCH_SUPERUSER_PASSWORD}',
+        'opensearch:${OPENSEARCH_SUPERUSER_PASSWORD}',
         '-X',
         'POST',
-        'http://kibana:5601/api/saved_objects/_import?overwrite=true',
+        'http://opensearch-dashboards:5601/api/saved_objects/_import?overwrite=true',
         '-H',
         'kbn-xsrf: true',
         '--form',
@@ -107,9 +107,9 @@ services:
       ]
     restart: on-failure
     depends_on:
-      - kibana
+      - opensearch
     volumes:
-      - '/opt/opencrvs/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
+      - '/opt/opencrvs/infrastructure/monitoring/opensearch-dashboards/config.ndjson:/config.ndjson'
     networks:
       - overlay_net
     deploy:
@@ -123,18 +123,18 @@ services:
       driver: gelf
       options:
         gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'setup-kibana-config'
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
+        tag: 'setup-opensearch-dashboards-config'
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.6.0
     restart: always
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.kibana.rule=Host(`kibana.{{hostname}}`)'
-        - 'traefik.http.services.kibana.loadbalancer.server.port=5601'
-        - 'traefik.http.routers.kibana.tls=true'
-        - 'traefik.http.routers.kibana.tls.certresolver=certResolver'
-        - 'traefik.http.routers.kibana.entrypoints=web,websecure'
+        - 'traefik.http.routers.opensearch-dashboards.rule=Host(`opensearch-dashboards.{{hostname}}`)'
+        - 'traefik.http.services.opensearch-dashboards.loadbalancer.server.port=5601'
+        - 'traefik.http.routers.opensearch-dashboards.tls=true'
+        - 'traefik.http.routers.opensearch-dashboards.tls.certresolver=certResolver'
+        - 'traefik.http.routers.opensearch-dashboards.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
         - 'traefik.http.middlewares.traefik.headers.stsseconds=31536000'
         - 'traefik.http.middlewares.traefik.headers.stsincludesubdomains=true'
@@ -142,18 +142,17 @@ services:
     networks:
       - overlay_net
     environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - OPENSEARCH_SUPERUSER_PASSWORD=${OPENSEARCH_SUPERUSER_PASSWORD}
     configs:
-      - source: kibana.{{ts}}
-        target: /usr/share/kibana/config/kibana.yml
+      - source: opensearch_dashboards.{{ts}}
+        target: /usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
     depends_on:
-      - elasticsearch
+      - opensearch
     logging:
       driver: gelf
       options:
         gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'kibana'
+        tag: 'opensearch-dashboards'
   # Configure mongo nodes as a replica set
   mongo1:
     command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
@@ -237,11 +236,11 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'redis'
-  # Configure elasticsearch
-  elasticsearch:
+  # Configure opensearch
+  opensearch:
     volumes:
-      - '/data/elasticsearch:/usr/share/elasticsearch/data'
-      - '/data/backups/elasticsearch:/data/backups/elasticsearch'
+      - '/data/opensearch:/usr/share/opensearch/data'
+      - '/data/backups/opensearch:/data/backups/opensearch'
     deploy:
       replicas: 1
       labels:
@@ -250,8 +249,8 @@ services:
         constraints:
           - node.labels.data1 == true
     environment:
-      - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-      - path.repo=/data/backups/elasticsearch
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_SUPERUSER_PASSWORD}
+      - path.repo=/data/backups/opensearch
       - cluster.name=docker-cluster
       - network.host=0.0.0.0
       - discovery.zen.minimum_master_nodes=1
@@ -266,9 +265,7 @@ services:
       driver: gelf
       options:
         gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'elasticsearch'
-
-  # Configure elasticsearch
+        tag: 'opensearch'
   minio:
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
@@ -301,23 +298,23 @@ services:
     networks:
       - overlay_net
 
-  setup-elasticsearch-users:
+  setup-opensearch-users:
     image: ubuntu:bionic
-    entrypoint: [ 'bash', '/usr/app/setup.sh' ]
+    entrypoint: ['bash', '/usr/app/setup.sh']
     restart: on-failure
     depends_on:
-      - elasticsearch
+      - opensearch
     environment:
-      - ELASTICSEARCH_HOST=elasticsearch
-      - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-      - METRICBEAT_ELASTIC_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
-      - APM_ELASTIC_PASSWORD=${ROTATING_APM_ELASTIC_PASSWORD}
-      - SEARCH_ELASTIC_USERNAME=search-user
-      - SEARCH_ELASTIC_PASSWORD=${ROTATING_SEARCH_ELASTIC_PASSWORD}
-      - KIBANA_USERNAME=${KIBANA_USERNAME}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_SUPERUSER_PASSWORD}
+      - METRICBEAT_ELASTIC_PASSWORD=${ROTATING_METRICBEAT_PASSWORD}
+      - APM_ELASTIC_PASSWORD=${ROTATING_APM_OPENSEARCH_PASSWORD}
+      - SEARCH_OPENSEARCH_USERNAME=search-user
+      - SEARCH_OPENSEARCH_PASSWORD=${ROTATING_OPENSEARCH_PASSWORD}
+      - OPENSEARCH_DASHBOARDS_USERNAME=${OPENSEARCH_DASHBOARDS_USERNAME}
+      - OPENSEARCH_DASHBOARDS_PASSWORD=${OPENSEARCH_DASHBOARDS_PASSWORD}
     volumes:
-      - '/opt/opencrvs/infrastructure/elasticsearch:/usr/app'
+      - '/opt/opencrvs/infrastructure/opensearch:/usr/app'
     networks:
       - overlay_net
     deploy:
@@ -331,7 +328,7 @@ services:
       driver: gelf
       options:
         gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'setup-elasticsearch-users'
+        tag: 'setup-opensearch-users'
   elastalert:
     image: jertel/elastalert2:2.3.0
     restart: unless-stopped
@@ -357,7 +354,7 @@ services:
     image: logstash:7.17.0
     command: logstash -f /etc/logstash/logstash.conf --verbose
     depends_on:
-      - elasticsearch
+      - opensearch
     ports:
       - '12201:12201'
       - '12201:12201/udp'
@@ -367,10 +364,7 @@ services:
       - source: logstash.{{ts}}
         target: /usr/share/logstash/config/logstash.yml
     environment:
-      - ELASTICSEARCH_SUPERUSER_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - OPENSEARCH_SUPERUSER_PASSWORD=${OPENSEARCH_SUPERUSER_PASSWORD}
     networks:
       - overlay_net
     restart: always
@@ -381,10 +375,10 @@ services:
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
-      - elasticsearch
-      - kibana
-    cap_add: [ 'CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID' ]
-    cap_drop: [ 'ALL' ]
+      - opensearch
+      - opensearch-dashboards
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
+    cap_drop: ['ALL']
     restart: always
     ports:
       - 8200:8200
@@ -401,13 +395,13 @@ services:
         '-c',
         'apm-server.yml',
         '-E',
-        'output.elasticsearch.username=elastic',
+        'output.elasticsearch.username=opensearch',
         '-E',
-        'output.elasticsearch.password=${ELASTICSEARCH_SUPERUSER_PASSWORD}',
+        'output.elasticsearch.password=${OPENSEARCH_SUPERUSER_PASSWORD}',
         '-E',
-        'kibana.username=${KIBANA_USERNAME}',
+        'kibana.username=${OPENSEARCH_DASHBOARDS_USERNAME}',
         '-E',
-        'kibana.password=${KIBANA_PASSWORD}'
+        'kibana.password=${OPENSEARCH_DASHBOARDS_PASSWORD}'
       ]
     configs:
       - source: apm.{{ts}}
@@ -674,7 +668,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
+      - OPENSEARCH_HOST=search-user:${ROTATING_OPENSEARCH_PASSWORD}@opensearch:9200
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
@@ -780,7 +774,7 @@ services:
       - APPLICATION_CONFIG_MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
-      - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
+      - OPENSEARCH_HOST=search-user:${ROTATING_OPENSEARCH_PASSWORD}@opensearch:9200
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
       - MINIO_HOST=minio
@@ -942,8 +936,8 @@ configs:
     file: ./infrastructure/mongodb/on-deploy.sh
   metricbeat-rollover-policy.{{ts}}:
     file: ./infrastructure/monitoring/beats/rollover-policy.json
-  kibana.{{ts}}:
-    file: ./infrastructure/monitoring/kibana/kibana.yml
+  opensearch_dashboards.{{ts}}:
+    file: ./infrastructure/monitoring/opensearch-dashboards/opensearch_dashboards.yml
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
   logstash.{{ts}}:

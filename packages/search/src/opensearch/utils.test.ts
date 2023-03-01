@@ -14,7 +14,7 @@ import {
   buildQuery,
   createStatusHistory,
   IBirthCompositionBody
-} from '@search/elasticsearch/utils'
+} from '@search/opensearch/utils'
 import {
   mockSearchResponse,
   mockCompositionBody,
@@ -24,14 +24,14 @@ import {
   mockFacilityResponse,
   mockTaskBirthCorrectionBundle
 } from '@search/test/utils'
-import { searchComposition } from '@search/elasticsearch/dbhelper'
+import { searchComposition } from '@search/opensearch/dbhelper'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
 
-jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/opensearch/dbhelper.ts')
 
-describe('elastic search utils', () => {
+describe('search utils', () => {
   it('should return an array of duplicate identifiers for a composition', async () => {
     ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
     const duplicates = await detectDuplicates(

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { ES_HOST } from '@search/constants'
+import * as opensearch from '@opensearch-project/opensearch'
+import { OPENSEARCH_HOST } from '@search/constants'
 
 interface IShardsResponse {
   total: number
@@ -51,6 +51,6 @@ export interface ISearchResponse<T> {
   aggregations?: any
 }
 
-export const client = new elasticsearch.Client({
-  node: `http://${ES_HOST}`
+export const client = new opensearch.Client({
+  node: `http://${OPENSEARCH_HOST}`
 })

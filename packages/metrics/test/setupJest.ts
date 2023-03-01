@@ -824,7 +824,7 @@ beforeEach(() => {
           querystring: '',
           headers: {
             'User-Agent':
-              'elasticsearch-js/6.8.5 (darwin 18.7.0-x64; Node.js v13.5.0)',
+              'opensearch-project/opensearch/2.2.0 (darwin 18.7.0-x64; Node.js v13.5.0)',
             'Content-Type': 'application/json',
             'Content-Length': '63'
           },
@@ -833,7 +833,7 @@ beforeEach(() => {
         options: { ignore: [404], warnings: null },
         id: 269
       },
-      name: 'elasticsearch-js',
+      name: 'opensearch-project/opensearch',
       connection: {
         url: 'http://localhost:9200/',
         id: 'http://localhost:9200/',

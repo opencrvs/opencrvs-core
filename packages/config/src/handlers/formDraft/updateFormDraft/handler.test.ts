@@ -204,7 +204,7 @@ describe('modifyDraftStatusHandler test', () => {
     expect(res.statusCode).toBe(400)
   })
 
-  it('should delete all elastic and influx and fhir data', async () => {
+  it('should delete all search and influx and fhir data', async () => {
     const birthMockForDeletedOperation = {
       ...birthUpdatedMockFormDraft,
       status: 'IN_PREVIEW'

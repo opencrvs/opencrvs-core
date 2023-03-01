@@ -25,14 +25,14 @@ function err {
   echo "[x] $1" >&2
 }
 
-# Poll the 'elasticsearch' service until it responds with HTTP code 200.
-function wait_for_elasticsearch {
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+# Poll the 'opensearch' service until it responds with HTTP code 200.
+function wait_for_opensearch {
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
-  local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}' "http://${elasticsearch_host}:9200/" )
+  local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}' "http://${opensearch_host}:9200/" )
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1
@@ -56,18 +56,18 @@ function wait_for_elasticsearch {
   return $result
 }
 
-# Verify that the given Elasticsearch user exists.
+# Verify that the given Opensearch user exists.
 function check_user_exists {
   local username=$1
 
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
   local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-    "http://${elasticsearch_host}:9200/_security/user/${username}"
+    "http://${opensearch_host}:9200/_security/user/${username}"
     )
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1
@@ -91,32 +91,32 @@ function check_user_exists {
   return $result
 }
 
-# Set password of a given Elasticsearch user.
+# Set password of a given Opensearch user.
 function update_user {
   local username=$1
   local password=$2
   local role=${3:-}
 
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
   if [[ -n "${role:-}" ]]; then
     local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-      "http://${elasticsearch_host}:9200/_security/user/${username}"
+      "http://${opensearch_host}:9200/_security/user/${username}"
       '-X' 'PUT'
       '-H' 'Content-Type: application/json'
       '-d' "{\"password\" : \"${password}\",\"roles\":[\"${role}\"]}}"
     )
   else
     local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-      "http://${elasticsearch_host}:9200/_security/user/${username}/_password"
+      "http://${opensearch_host}:9200/_security/user/${username}/_password"
       '-X' 'POST'
       '-H' 'Content-Type: application/json'
       '-d' "{\"password\" : \"${password}\"}"
     )
   fi
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1
@@ -134,23 +134,23 @@ function update_user {
   return $result
 }
 
-# Create the given Elasticsearch user.
+# Create the given Opensearch user.
 function create_user {
   local username=$1
   local password=$2
   local role=$3
 
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
   local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-    "http://${elasticsearch_host}:9200/_security/user/${username}"
+    "http://${opensearch_host}:9200/_security/user/${username}"
     '-X' 'POST'
     '-H' 'Content-Type: application/json'
     '-d' "{\"password\":\"${password}\",\"roles\":[\"${role}\"]}"
     )
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1
@@ -168,22 +168,22 @@ function create_user {
   return $result
 }
 
-# Ensure that the given Elasticsearch role is up-to-date, create it if required.
+# Ensure that the given Opensearch role is up-to-date, create it if required.
 function ensure_role {
   local name=$1
   local body=$2
 
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
   local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-    "http://${elasticsearch_host}:9200/_security/role/${name}"
+    "http://${opensearch_host}:9200/_security/role/${name}"
     '-X' 'PUT'
     '-H' 'Content-Type: application/json'
     '-d' "$body"
     )
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1
@@ -204,17 +204,17 @@ function ensure_role {
 function ensure_settings {
   local body=$1
 
-  local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+  local opensearch_host="${OPENSEARCH_HOST:-opensearch}"
 
   local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-    "http://${elasticsearch_host}:9200/_settings"
+    "http://${opensearch_host}:9200/_settings"
     '-X' 'PUT'
     '-H' 'Content-Type: application/json'
     '-d' "$body"
     )
 
-  if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-    args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+  if [[ -n "${OPENSEARCH_PASSWORD:-}" ]]; then
+    args+=( '-u' "opensearch:${OPENSEARCH_PASSWORD}" )
   fi
 
   local -i result=1

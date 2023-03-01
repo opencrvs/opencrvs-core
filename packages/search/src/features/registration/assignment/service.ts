@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { updateComposition } from '@search/elasticsearch/dbhelper'
+import { updateComposition } from '@search/opensearch/dbhelper'
 import {
   getUser,
   IAssignment,
   ICompositionBody,
   IUserModelData,
   NAME_EN
-} from '@search/elasticsearch/utils'
+} from '@search/opensearch/utils'
 import { findName, findTaskExtension } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { getTokenPayload, ITokenPayload } from '@search/utils/authUtils'

@@ -17,7 +17,7 @@ import {
   mockSearchResult,
   mockAggregationSearchResult
 } from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
+import { client } from '@search/opensearch/client'
 // import * as fetchMock from 'jest-fetch-mock'
 
 // const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock

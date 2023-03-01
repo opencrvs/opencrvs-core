@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
-import { client } from '@search/elasticsearch/client'
+import { client } from '@search/opensearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function deleteOCRVSIndexHandler(

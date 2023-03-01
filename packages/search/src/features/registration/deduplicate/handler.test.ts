@@ -12,13 +12,13 @@
 import {
   updateComposition,
   searchByCompositionId
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import { createServer } from '@search/server'
 import { mockCompositionResponse, mockSearchResponse } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
-jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/opensearch/dbhelper.ts')
 
 describe('Verify handlers', () => {
   let server: any

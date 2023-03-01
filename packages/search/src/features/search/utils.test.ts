@@ -11,7 +11,7 @@
  */
 import { advancedQueryBuilder } from '@search/features/search/utils'
 
-describe('elasticsearch db helper', () => {
+describe('search db helper', () => {
   it('should create a query that searches child and mother name fields and event location', () => {
     const newQuery = advancedQueryBuilder(
       {

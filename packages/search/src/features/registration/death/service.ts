@@ -13,7 +13,7 @@ import {
   indexComposition,
   searchByCompositionId,
   updateComposition
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import {
   CERTIFIED_STATUS,
   createStatusHistory,
@@ -27,7 +27,7 @@ import {
   REGISTERED_STATUS,
   REJECTED_STATUS,
   VALIDATED_STATUS
-} from '@search/elasticsearch/utils'
+} from '@search/opensearch/utils'
 import {
   findEntry,
   findName,

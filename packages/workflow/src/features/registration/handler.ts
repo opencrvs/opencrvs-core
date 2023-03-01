@@ -347,7 +347,7 @@ export async function markEventAsRegisteredCallbackHandler(
       )
     }
     // Most nations will desire the opportunity to pilot OpenCRVS alongised a legacy system, or an external data store / validation process
-    // In the absence of an external process, we must wait at least a second before we continue, because Elasticsearch must
+    // In the absence of an external process, we must wait at least a second before we continue, because Opensearch must
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {

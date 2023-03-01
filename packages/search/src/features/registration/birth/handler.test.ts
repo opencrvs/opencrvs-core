@@ -15,7 +15,7 @@ import {
   indexComposition,
   searchComposition,
   updateComposition
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import { createServer } from '@search/server'
 import {
   mockBirthFhirBundleWithoutCompositionId,
@@ -33,7 +33,7 @@ import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
-jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/opensearch/dbhelper.ts')
 
 describe('Verify handlers', () => {
   let server: any

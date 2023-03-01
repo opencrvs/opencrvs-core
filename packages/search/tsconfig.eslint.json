@@ -3,7 +3,7 @@
   "include": [
     "src/**/*.ts",
     "typings",
-    "__mocks__/elasticsearch.ts",
+    "__mocks__/opensearch.ts",
     "src/**/*.test.ts"
   ],
   "exclude": [
@@ -11,6 +11,6 @@
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
+    "src/setupTests.ts"
   ]
 }

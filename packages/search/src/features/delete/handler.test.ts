@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
-import { client } from '@search/elasticsearch/client'
+import { client } from '@search/opensearch/client'
 let server: any
 
 // @ts-ignore
@@ -37,7 +37,7 @@ describe('Delete Handler', () => {
 
     const res = await server.server.inject({
       method: 'DELETE',
-      url: '/elasticIndex',
+      url: '/searchIndex',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
@@ -61,7 +61,7 @@ describe('Delete Handler', () => {
 
     const res = await server.server.inject({
       method: 'DELETE',
-      url: '/elasticIndex',
+      url: '/searchIndex',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`

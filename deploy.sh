@@ -97,18 +97,18 @@ if [ -z "$ALERT_EMAIL" ] ; then
     print_usage_and_exit
 fi
 
-if [ -z "$KIBANA_USERNAME" ] ; then
-    echo 'Error: Missing environment variable KIBANA_USERNAME.'
+if [ -z "$OPENSEARCH_DASHBOARDS_USERNAME" ] ; then
+    echo 'Error: Missing environment variable OPENSEARCH_DASHBOARDS_USERNAME.'
     print_usage_and_exit
 fi
 
-if [ -z "$KIBANA_PASSWORD" ] ; then
-    echo 'Error: Missing environment variable KIBANA_PASSWORD.'
+if [ -z "$OPENSEARCH_DASHBOARDS_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable OPENSEARCH_DASHBOARDS_PASSWORD.'
     print_usage_and_exit
 fi
 
-if [ -z "$ELASTICSEARCH_SUPERUSER_PASSWORD" ] ; then
-    echo 'Error: Missing environment variable ELASTICSEARCH_SUPERUSER_PASSWORD.'
+if [ -z "$OPENSEARCH_SUPERUSER_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable OPENSEARCH_SUPERUSER_PASSWORD.'
     print_usage_and_exit
 fi
 
@@ -187,20 +187,20 @@ OPENHIM_MONGODB_PASSWORD=`generate_password`
 WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 
 #
-# Elasticsearch credentials
+# Opensearch credentials
 #
 # Notice that all of these passwords change on each deployment.
 
 # Application password for OpenCRVS Search
-ROTATING_SEARCH_ELASTIC_PASSWORD=`generate_password`
-# If new applications require access to ElasticSearch, new passwords should be generated here.
-# Remember to add the user to infrastructure/elasticsearch/setup-users.sh so it is created when you deploy.
+ROTATING_OPENSEARCH_PASSWORD=`generate_password`
+# If new applications require access to Opensearch, new passwords should be generated here.
+# Remember to add the user to infrastructure/opensearch/setup-users.sh so it is created when you deploy.
 
-# Used by Metricsbeat when writing data to ElasticSearch
-ROTATING_METRICBEAT_ELASTIC_PASSWORD=`generate_password`
+# Used by Metricsbeat when writing data to Opensearch
+ROTATING_METRICBEAT_PASSWORD=`generate_password`
 
-# Used by APM for writing data to ElasticSearch
-ROTATING_APM_ELASTIC_PASSWORD=`generate_password`
+# Used by APM for writing data to Opensearch
+ROTATING_APM_OPENSEARCH_PASSWORD=`generate_password`
 
 echo
 echo "Deploying VERSION $VERSION to $SSH_HOST..."
@@ -326,12 +326,12 @@ docker_stack_deploy() {
   MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
   DOCKERHUB_ACCOUNT=$DOCKERHUB_ACCOUNT
   DOCKERHUB_REPO=$DOCKERHUB_REPO
-  ELASTICSEARCH_SUPERUSER_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD
-  ROTATING_METRICBEAT_ELASTIC_PASSWORD=$ROTATING_METRICBEAT_ELASTIC_PASSWORD
-  ROTATING_APM_ELASTIC_PASSWORD=$ROTATING_APM_ELASTIC_PASSWORD
-  ROTATING_SEARCH_ELASTIC_PASSWORD=$ROTATING_SEARCH_ELASTIC_PASSWORD
-  KIBANA_USERNAME=$KIBANA_USERNAME
-  KIBANA_PASSWORD=$KIBANA_PASSWORD
+  OPENSEARCH_SUPERUSER_PASSWORD=$OPENSEARCH_SUPERUSER_PASSWORD
+  ROTATING_METRICBEAT_PASSWORD=$ROTATING_METRICBEAT_PASSWORD
+  ROTATING_APM_OPENSEARCH_PASSWORD=$ROTATING_APM_OPENSEARCH_PASSWORD
+  ROTATING_OPENSEARCH_PASSWORD=$ROTATING_OPENSEARCH_PASSWORD
+  OPENSEARCH_DASHBOARDS_USERNAME=$OPENSEARCH_DASHBOARDS_USERNAME
+  OPENSEARCH_DASHBOARDS_PASSWORD=$OPENSEARCH_DASHBOARDS_PASSWORD
   TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK=$TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK
   TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY=$TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY
   TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD=$TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD"
@@ -410,8 +410,8 @@ if [ $1 == "--clear-data=yes" ] ; then
     echo "Clearing all existing data..."
     echo
     ssh $SSH_USER@$SSH_HOST "
-        ELASTICSEARCH_ADMIN_USER=elastic \
-        ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD \
+        OPENSEARCH_ADMIN_USER=opensearch \
+        OPENSEARCH_ADMIN_PASSWORD=$OPENSEARCH_SUPERUSER_PASSWORD \
         MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER \
         MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD \
         /opt/opencrvs/infrastructure/clear-all-data.sh $REPLICAS $ENV"

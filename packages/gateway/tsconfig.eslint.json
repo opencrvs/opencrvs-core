@@ -3,14 +3,9 @@
   "include": [
     "src/**/*.ts",
     "typings",
-    "__mocks__/elasticsearch.ts",
+    "__mocks__/opensearch.ts",
     "src/**/*.test.ts",
-    "test/setupJest.ts",
+    "test/setupJest.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests"
-  ]
+  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

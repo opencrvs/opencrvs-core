@@ -1094,7 +1094,7 @@ export const mockDeathFhirBundle = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         gender: 'male',
@@ -1246,7 +1246,7 @@ export const mockDeathFhirBundle = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         telecom: [
@@ -1550,7 +1550,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         gender: 'male',
@@ -1645,7 +1645,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         telecom: [
@@ -3236,7 +3236,7 @@ export const mockMinimalDeathFhirBundle = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         gender: 'male',
@@ -3331,7 +3331,7 @@ export const mockMinimalDeathFhirBundle = {
           },
           {
             use: 'en',
-            family: ['elastic']
+            family: ['search']
           }
         ],
         telecom: [

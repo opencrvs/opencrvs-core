@@ -13,7 +13,7 @@
     "**/coverage",
     "packages/client/public/robots.txt",
     "packages/login/public/robots.txt",
-    "infrastructure/monitoring/kibana/config.ndjson",
+    "infrastructure/monitoring/opensearch-dashboards/config.ndjson",
     "infrastructure/monitoring/logstash/*.conf",
     ".env*",
     ".vs",

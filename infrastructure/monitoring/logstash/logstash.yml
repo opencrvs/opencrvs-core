@@ -10,7 +10,7 @@
 
 xpack.monitoring:
   enabled: true
-  elasticsearch:
-    hosts: ['elasticsearch:9200']
-    username: ${ELASTICSEARCH_USERNAME}
-    password: ${ELASTICSEARCH_PASSWORD}
+  opensearch:
+    hosts: ['opensearch:9200']
+    username: opensearch
+    password: ${OPENSEARCH_SUPERUSER_PASSWORD}

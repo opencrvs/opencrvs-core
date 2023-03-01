@@ -15,7 +15,7 @@ import * as Joi from 'joi'
 import FormDraft, { validEvent } from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
 import {
-  clearHearthElasticInfluxData,
+  clearHearthSearchInfluxData,
   clearQuestionConfigs
 } from '@config/services/formDraftService'
 
@@ -30,7 +30,7 @@ export async function deleteFormDraftHandler(
   const { event } = request.payload as IDeleteFormDraftPayload
 
   try {
-    await clearHearthElasticInfluxData(request)
+    await clearHearthSearchInfluxData(request)
     await Promise.all([
       clearQuestionConfigs(event),
       FormDraft.findOneAndRemove({ event })

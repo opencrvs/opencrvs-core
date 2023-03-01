@@ -17,8 +17,8 @@ print_usage_and_exit () {
     echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
     echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
     echo ""
-    echo "If your Elasticsearch is password protected, an admin user's credentials can be given as environment variables:"
-    echo "ELASTICSEARCH_ADMIN_USER=your_user ELASTICSEARCH_ADMIN_PASSWORD=your_pass"
+    echo "If your Opensearch is password protected, an admin user's credentials can be given as environment variables:"
+    echo "OPENSEARCH_ADMIN_USER=your_user OPENSEARCH_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -64,11 +64,11 @@ mongo_credentials() {
   fi
 }
 
-elasticsearch_host() {
-  if [ ! -z ${ELASTICSEARCH_ADMIN_USER+x} ] || [ ! -z ${ELASTICSEARCH_ADMIN_PASSWORD+x} ]; then
-    echo "$ELASTICSEARCH_ADMIN_USER:$ELASTICSEARCH_ADMIN_PASSWORD@elasticsearch:9200";
+opensearch_host() {
+  if [ ! -z ${OPENSEARCH_ADMIN_USER+x} ] || [ ! -z ${OPENSEARCH_ADMIN_PASSWORD+x} ]; then
+    echo "$OPENSEARCH_ADMIN_USER:$OPENSEARCH_ADMIN_PASSWORD@opensearch:9200";
   else
-    echo "elasticsearch:9200";
+    echo "opensearch:9200";
   fi
 }
 
@@ -89,9 +89,9 @@ drop_database application-config
 
 drop_database metrics
 
-# Delete all data from elasticsearch
+# Delete all data from Opensearch
 #-----------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/ocrvs" -v
+docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(opensearch_host)/ocrvs" -v
 
 # Delete all data from metrics
 #-----------------------------

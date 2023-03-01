@@ -189,14 +189,14 @@ export const getRoutes = () => {
     },
     {
       method: 'DELETE',
-      path: '/elasticIndex',
+      path: '/searchIndex',
       handler: deleteOCRVSIndexHandler,
       config: {
         tags: ['api'],
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
-        description: 'Delete ocrvs index from elasticsearch'
+        description: 'Delete ocrvs index from opensearch'
       }
     }
   ]

@@ -19,7 +19,7 @@ import FormDraft, {
   IFormDraft
 } from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
-import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
+import { clearHearthSearchInfluxData } from '@config/services/formDraftService'
 
 const STATUS_TRANSITION: Record<DraftStatus, DraftStatus[]> = {
   [DraftStatus.DRAFT]: [DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED],
@@ -89,7 +89,7 @@ export async function modifyDraftStatusHandler(
   }
 
   try {
-    await clearHearthElasticInfluxData(request)
+    await clearHearthSearchInfluxData(request)
     draft.status = newStatus
     draft.updatedAt = Date.now()
     await FormDraft.updateOne({ _id: draft._id }, draft)

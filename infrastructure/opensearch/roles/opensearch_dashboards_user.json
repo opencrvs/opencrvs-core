@@ -19,7 +19,7 @@
   "run_as": [],
   "applications": [
     {
-      "application": "kibana-.kibana",
+      "application": "opensearch-dashboards-.opensearch-dashboards",
       "privileges": ["all"],
       "resources": ["*"]
     }

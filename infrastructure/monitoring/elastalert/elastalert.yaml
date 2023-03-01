@@ -15,7 +15,7 @@ run_every:
 buffer_time:
   minutes: 15
 
-es_host: elasticsearch
+OPENSEARCH_HOST: opensearch
 es_port: 9200
 
 writeback_index: elastalert_status

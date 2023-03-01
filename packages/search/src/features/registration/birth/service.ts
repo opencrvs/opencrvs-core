@@ -13,7 +13,7 @@ import {
   indexComposition,
   searchByCompositionId,
   updateComposition
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import {
   createStatusHistory,
   detectDuplicates,
@@ -28,7 +28,7 @@ import {
   VALIDATED_STATUS,
   REGISTERED_STATUS,
   CERTIFIED_STATUS
-} from '@search/elasticsearch/utils'
+} from '@search/opensearch/utils'
 import {
   addDuplicatesToComposition,
   findEntry,

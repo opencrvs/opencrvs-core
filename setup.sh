@@ -129,7 +129,7 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     echo -e "Your Ubuntu version: $ubuntuVersion is \033[32msupported!\033[0m :)"
     echo
 
-    echo -e "\033[32m:::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::\033[0m"
+    echo -e "\033[32m:::::::: Setting memory requirements for file watch limit and OpenSearch ::::::::\033[0m"
     echo
 
     if grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ; then
@@ -340,8 +340,8 @@ echo -e "\033[32m::::::::::::: Please enter your sudo password when prompted :::
 echo
 if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
-mkdir -p data/elasticsearch
-chmod 775 data/elasticsearch
+mkdir -p data/opensearch
+chmod 775 data/opensearch
 
 mkdir -p data/mongo
 chmod 775 data/mongo
@@ -352,7 +352,7 @@ chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading Mongo DB, OpenSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway

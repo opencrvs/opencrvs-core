@@ -13,15 +13,15 @@ import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import {
   searchByCompositionId,
   searchComposition
-} from '@search/elasticsearch/dbhelper'
+} from '@search/opensearch/dbhelper'
 import {
   findName,
   findNameLocale,
   findTaskExtension,
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { ISearchResponse } from '@search/opensearch/client'
+import { ApiResponse } from '@opensearch-project/opensearch'
 import fetch from 'node-fetch'
 
 export const enum EVENT {

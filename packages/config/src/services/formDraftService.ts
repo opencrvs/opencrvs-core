@@ -33,7 +33,7 @@ export enum HearthCollectionsName {
   Task = 'Task'
 }
 
-export async function clearHearthElasticInfluxData(request: Hapi.Request) {
+export async function clearHearthSearchInfluxData(request: Hapi.Request) {
   const token = request.headers.authorization.replace('Bearer ', '')
   const formDraft = request.payload as IModifyFormDraftPayload
   const taskBundle = await fetchFHIR(`/${HearthCollectionsName.Task}`, {
@@ -55,10 +55,10 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
       `Could not delete draft for ${formDraft.event} event. Other task found without configuration extension`
     )
   }
-  //deleting all elastic and influx data
+  //deleting all search and influx data
   try {
     Promise.all([
-      await fetch(`${SEARCH_URL}elasticIndex`, {
+      await fetch(`${SEARCH_URL}searchIndex`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
       })
     ])
   } catch (err) {
-    throw Error(`Failed to delete elastic, influx data. ${err}`)
+    throw Error(`Failed to delete search, influx data. ${err}`)
   }
 
   Promise.all(

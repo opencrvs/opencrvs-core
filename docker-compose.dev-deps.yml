@@ -21,17 +21,17 @@ services:
     ports:
       - '6379:6379'
 
-  elasticsearch:
+  opensearch:
     ports:
       - '9200:9200'
       - '9300:9300'
     volumes:
-      - './data/elasticsearch:/usr/share/elasticsearch/data'
-      - './data/backups/elasticsearch:/data/backups/elasticsearch'
+      - './data/opensearch:/usr/share/opensearch/data'
+      - './data/backups/opensearch:/data/backups/opensearch'
     environment:
       - 'discovery.type=single-node'
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
-      - path.repo=/data/backups/elasticsearch
+      - path.repo=/data/backups/opensearch
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
 

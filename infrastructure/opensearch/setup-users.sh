@@ -22,10 +22,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/setup-helpers.sh"
 
 declare -A users_passwords
 users_passwords=(
-  [$SEARCH_ELASTIC_USERNAME]="${SEARCH_ELASTIC_PASSWORD:-}"
+  [$SEARCH_OPENSEARCH_USERNAME]="${SEARCH_OPENSEARCH_PASSWORD:-}"
   [beats_system]="${METRICBEAT_ELASTIC_PASSWORD:-}"
   [apm_system]="${APM_ELASTIC_PASSWORD:-}"
-  [$KIBANA_USERNAME]="${KIBANA_PASSWORD:-}"
+  [$OPENSEARCH_DASHBOARDS_USERNAME]="${OPENSEARCH_DASHBOARDS_PASSWORD:-}"
 )
 
 # -------------------------------------
@@ -33,8 +33,8 @@ users_passwords=(
 # If you are adding a new user, remember to assign a role. You can use search_user as a template.
 declare -A users_roles
 users_roles=(
-  [$SEARCH_ELASTIC_USERNAME]='search_user'
-  [$KIBANA_USERNAME]='kibana_admin_user'
+  [$SEARCH_OPENSEARCH_USERNAME]='search_user'
+  [$OPENSEARCH_DASHBOARDS_USERNAME]='opensearch_dashboards_admin_user'
 )
 
 # --------------------------------------------------------
@@ -43,7 +43,7 @@ users_roles=(
 declare -A roles_files
 roles_files=(
   [search_user]='search_user.json'
-  [kibana_admin_user]='kibana_user.json'
+  [opensearch_dashboards_admin_user]='opensearch_dashboards_user.json'
 )
 
 # --------------------------------------------------------
@@ -51,9 +51,9 @@ roles_files=(
 
 echo "-------- $(date) --------"
 
-log 'Waiting for availability of Elasticsearch'
-wait_for_elasticsearch
-sublog 'Elasticsearch is running'
+log 'Waiting for availability of Opensearch'
+wait_for_opensearch
+sublog 'Opensearch is running'
 
 for role in "${!roles_files[@]}"; do
   log "Role '$role'"

@@ -13,8 +13,8 @@
 import {
   searchByCompositionId,
   updateComposition
-} from '@search/elasticsearch/dbhelper'
-import { ICompositionBody } from '@search/elasticsearch/utils'
+} from '@search/opensearch/dbhelper'
+import { ICompositionBody } from '@search/opensearch/utils'
 import { get } from 'lodash'
 
 export const removeDuplicate = async (bundle: fhir.Bundle) => {

@@ -14,9 +14,9 @@ import { logger } from '@search/logger'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
-import { client } from '@search/elasticsearch/client'
-import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
-import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
+import { client } from '@search/opensearch/client'
+import { ICompositionBody, EVENT } from '@search/opensearch/utils'
+import { searchByCompositionId } from '@search/opensearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
@@ -66,7 +66,7 @@ export async function getAllDocumentsHandler(
     const count: number = allDocumentsCountCheck.body.hits.total.value
     if (count > 5000) {
       return internal(
-        'Elastic contains over 5000 results.  It is risky to return all without pagination.'
+        'Search contains over 5000 results.  It is risky to return all without pagination.'
       )
     }
     // If total count is less than 5000, then proceed.

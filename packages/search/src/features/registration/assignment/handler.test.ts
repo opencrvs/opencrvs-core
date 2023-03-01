@@ -21,7 +21,7 @@ import * as jwt from 'jsonwebtoken'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
-jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/opensearch/dbhelper.ts')
 
 let server: any
 

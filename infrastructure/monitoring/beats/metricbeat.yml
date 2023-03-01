@@ -82,8 +82,8 @@ setup.dashboards:
 #============================== Kibana =========================================
 setup.kibana:
   host: '${KIBANA_HOST}'
-  username: ${KIBANA_USERNAME}
-  password: ${KIBANA_PASSWORD}
+  username: ${OPENSEARCH_DASHBOARDS_USERNAME}
+  password: ${OPENSEARCH_DASHBOARDS_PASSWORD}
 
 #============================== Xpack Monitoring ===============================
 xpack.monitoring:

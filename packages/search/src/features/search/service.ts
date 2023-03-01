@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { client, ISearchResponse } from '@search/opensearch/client'
+import { ApiResponse } from '@opensearch-project/opensearch'
 import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@search/logger'

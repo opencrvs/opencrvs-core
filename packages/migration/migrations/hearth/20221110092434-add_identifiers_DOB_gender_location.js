@@ -20,7 +20,7 @@ import {
 import {
   updateComposition,
   updateFieldNameByCompositionId
-} from '../../utils/elasticsearch-helper.js'
+} from '../../utils/opensearch-helper.js'
 
 export const up = async (db, client) => {
   const session = client.startSession()
@@ -29,7 +29,7 @@ export const up = async (db, client) => {
   let processedDocCount = 0
   try {
     await session.withTransaction(async () => {
-      //rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on elasticSearch
+      //rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on OpenSearch
       await updateFieldNameByCompositionId(
         'declarationJurisdictionIds',
         'declarationLocationHirarchyIds'
@@ -44,7 +44,7 @@ export const up = async (db, client) => {
         const count = await compositionCursor.count()
         // eslint-disable-next-line no-console
         console.log(
-          `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${
+          `Migration - OpenSearch :: Processing ${processedDocCount + 1} - ${
             processedDocCount + count
           } of ${totalCompositionCount} compositions...`
         )
@@ -60,14 +60,12 @@ export const up = async (db, client) => {
           100
         ).toFixed(2)
         // eslint-disable-next-line no-console
-        console.log(
-          `Migration - ElasticSearch :: Processing done ${percentage}%`
-        )
+        console.log(`Migration - OpenSearch :: Processing done ${percentage}%`)
       }
     })
   } finally {
     // eslint-disable-next-line no-console
-    console.log(`Migration - ElasticSearch :: Process completed successfully.`)
+    console.log(`Migration - OpenSearch :: Process completed successfully.`)
     await session.endSession()
   }
 }

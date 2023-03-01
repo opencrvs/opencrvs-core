@@ -17,7 +17,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/setup-helpers.sh"
 
 echo "-------- $(date) --------"
 
-log 'Waiting for availability of Elasticsearch'
-wait_for_elasticsearch
+log 'Waiting for availability of Opensearch'
+wait_for_opensearch
 
 ensure_settings "{\"index\":{\"number_of_replicas\":0}}"

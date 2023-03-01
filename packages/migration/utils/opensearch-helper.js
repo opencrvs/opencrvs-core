@@ -10,20 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as elasticsearch from '@elastic/elasticsearch'
+import * as opensearch from '@opensearch-project/opensearch'
+const OPENSEARCH_HOST = process.env.OPENSEARCH_HOST || 'localhost:9200'
+const OPENSEARCH_INDEX_NAME = 'ocrvs'
 
-const ES_HOST = process.env.ES_HOST || 'localhost:9200'
-const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
-
-export const client = new elasticsearch.Client({
-  node: `http://${ES_HOST}`
+export const client = new opensearch.Client({
+  node: `http://${OPENSEARCH_HOST}`
 })
 
 export const updateComposition = async (id, body) => {
   let response
   try {
     response = await client.update({
-      index: ELASTICSEARCH_INDEX_NAME,
+      index: OPENSEARCH_INDEX_NAME,
       type: 'compositions',
       id,
       body: {
@@ -43,7 +42,7 @@ export const updateFieldNameByCompositionId = async (
 ) => {
   try {
     const response = await client.updateByQuery({
-      index: ELASTICSEARCH_INDEX_NAME,
+      index: OPENSEARCH_INDEX_NAME,
       type: 'compositions',
       body: {
         query: {

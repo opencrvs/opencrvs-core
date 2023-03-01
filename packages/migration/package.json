@@ -20,7 +20,7 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.0",
+    "@opensearch-project/opensearch": "2.2.0",
     "file-type": "^16.5.3",
     "influx": "^5.0.7",
     "lodash": "^4.17.21",

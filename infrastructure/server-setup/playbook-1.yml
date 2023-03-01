@@ -26,14 +26,14 @@
         that:
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
-          - elasticsearch_superuser_password is defined
+          - OPENSEARCH_SUPERUSER_PASSWORD is defined
           - country_config_path is defined
 
     - name: Setting global variables accessed by country configuration playbook
       ansible.builtin.set_fact:
         mongodb_admin_password={{ mongodb_admin_password }}
         mongodb_admin_username={{ mongodb_admin_username }}
-        elasticsearch_superuser_password={{elasticsearch_superuser_password}}
+        OPENSEARCH_SUPERUSER_PASSWORD={{OPENSEARCH_SUPERUSER_PASSWORD}}
         disk_encryption_key={{ disk_encryption_key }}
 
     - name: 'Add docker repository key'
@@ -194,33 +194,33 @@
         path: /data/traefik
         state: directory
 
-    - name: Check elasticsearch data directory
+    - name: Check opensearch data directory
       stat:
-        path: /data/elasticsearch
-      register: elasticsearch_data
+        path: /data/opensearch
+      register: opensearch_data
 
-    - name: 'Create elasticsearch data directory'
+    - name: 'Create opensearch data directory'
       file:
-        path: /data/elasticsearch
+        path: /data/opensearch
         state: directory
         group: 1000
         owner: 1000
         mode: g+rwx
-      when: not elasticsearch_data.stat.exists
+      when: not opensearch_data.stat.exists
 
-    - name: Check elasticsearch data backup directory
+    - name: Check opensearch data backup directory
       stat:
-        path: /data/backups/elasticsearch
-      register: elasticsearch_data_backup
+        path: /data/backups/opensearch
+      register: opensearch_data_backup
 
-    - name: 'Create elasticsearch backup directory'
+    - name: 'Create opensearch backup directory'
       file:
-        path: /data/backups/elasticsearch
+        path: /data/backups/opensearch
         state: directory
         group: 1000
         owner: 1000
         mode: ugo+rwx
-      when: not elasticsearch_data_backup.stat.exists
+      when: not opensearch_data_backup.stat.exists
 
     - name: Check influxdb data directory
       stat:
@@ -374,7 +374,7 @@
       shell: docker swarm join-token -q worker
       register: worker_token
 
-    - name: 'Set higher max map count for elastic search'
+    - name: 'Set higher max map count for opensearch'
       sysctl:
         name: vm.max_map_count
         value: 262144
