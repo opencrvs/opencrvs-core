@@ -35,6 +35,8 @@ import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
+// eslint-disable-next-line no-restricted-imports
+import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -178,6 +180,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.FAILED
         })
+        captureException(error)
         return
       }
       if (

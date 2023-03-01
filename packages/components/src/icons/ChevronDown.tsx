@@ -9,15 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
+import * as React from 'react'
 
-type Payload = {
-  systemRole: string
-  locationId?: string
-}
-
-export async function countUsersByLocationHandler(request: Hapi.Request) {
-  const { locationId, systemRole } = request.payload as Payload
-  return countUsersByLocation(systemRole, locationId)
+export function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#4C68C1"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="ph-caret-down"
+      {...props}
+    >
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  )
 }
