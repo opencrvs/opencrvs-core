@@ -3683,7 +3683,7 @@ export const builders: IFieldBuilders = {
   }
 }
 
-export function buildFHIRBundle(
+export async function buildFHIRBundle(
   reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
@@ -3701,11 +3701,16 @@ export function buildFHIRBundle(
   if (authHeader) {
     context.authHeader = authHeader
   }
-  transformObj(reg as Record<string, unknown>, fhirBundle, builders, context)
+  await transformObj(
+    reg as Record<string, unknown>,
+    fhirBundle,
+    builders,
+    context
+  )
   return fhirBundle
 }
 
-export function updateFHIRTaskBundle(
+export async function updateFHIRTaskBundle(
   taskEntry: ITaskBundleEntry,
   status: string,
   reason?: string,

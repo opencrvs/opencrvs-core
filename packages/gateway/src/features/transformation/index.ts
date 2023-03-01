@@ -42,7 +42,7 @@ async function transformField(
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      transformObj(
+      await transformObj(
         sourceVal,
         targetObj,
         fieldBuilderForVal,
@@ -62,7 +62,7 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    fieldBuilderForVal(targetObj, sourceVal, context)
+    await fieldBuilderForVal(targetObj, sourceVal, context)
     return targetObj
   }
 
@@ -75,7 +75,7 @@ async function transformField(
   )
 }
 
-export default function transformObj(
+export default async function transformObj(
   sourceObj: Record<string, unknown>,
   targetObj: Record<string, unknown>,
   fieldBuilders: IFieldBuilders,
@@ -97,7 +97,7 @@ export default function transformObj(
             [currentPropName]: index
           } */
 
-          transformField(
+          await transformField(
             arrayVal,
             targetObj,
             fieldBuilders[currentPropName],
@@ -109,7 +109,7 @@ export default function transformObj(
         continue
       }
 
-      transformField(
+      await transformField(
         sourceObj[currentPropName],
         targetObj,
         fieldBuilders[currentPropName],

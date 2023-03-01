@@ -289,7 +289,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
+        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -377,7 +377,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
+      const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.REJECTED,
         reason,
@@ -399,7 +399,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = updateFHIRTaskBundle(
+      const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.ARCHIVED
       )
@@ -432,7 +432,7 @@ export const resolvers: GQLResolver = {
         { url: REINSTATED_EXTENSION_URL }
       ]
 
-      const newTaskBundle = updateFHIRTaskBundle(taskEntry, prevRegStatus)
+      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
 
@@ -540,7 +540,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = buildFHIRBundle(details, event, authHeader)
+  const doc = await buildFHIRBundle(details, event, authHeader)
   const draftId =
     details && details.registration && details.registration.draftId
 
@@ -609,7 +609,7 @@ async function markEventAsValidated(
       entry: taskEntry
     }
   } else {
-    doc = buildFHIRBundle(details, event, authHeader)
+    doc = await buildFHIRBundle(details, event, authHeader)
   }
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
@@ -621,8 +621,7 @@ async function markEventAsRegistered(
   event: EVENT_TYPE,
   details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
-  const doc = buildFHIRBundle(details, event, authHeader)
-
+  const doc = await buildFHIRBundle(details, event, authHeader)
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
@@ -637,7 +636,7 @@ async function markEventAsCertified(
   event: EVENT_TYPE
 ) {
   await setCertificateCollector(details, authHeader)
-  const doc = buildFHIRBundle(details, event, authHeader)
+  const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id

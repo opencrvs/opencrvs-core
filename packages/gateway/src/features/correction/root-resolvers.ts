@@ -82,7 +82,7 @@ async function requestEventRegistrationCorrection(
   reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   eventType: EVENT_TYPE
 ) {
-  const fhirBundle = buildFHIRBundle(reg, eventType, authHeader)
+  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
   const res = await fetchFHIR(
     '',
     authHeader,
