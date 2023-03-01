@@ -758,7 +758,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="MessageCircle" size="small" />}
+                        icon={() => <Icon name="ChatCircle" size="small" />}
                         id={`navigation_${WORKQUEUE_TABS.communications}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.communications]
