@@ -11,14 +11,11 @@
  */
 import {
   GQLAddress,
-  GQLAttachment,
-  GQLComment,
   GQLHumanName,
-  GQLRegWorkflow,
   GQLLocationType,
   GQLAddressType
 } from '@opencrvs/gateway/src/graphql/schema'
-import { BirthRegistration, Address } from '@client/utils/gateway'
+import { BirthRegistration, Address, Attachment } from '@client/utils/gateway'
 import {
   IAttachment,
   IFormData,
@@ -368,30 +365,29 @@ export function attachmentToFieldTransformer(
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
+  const registaration: Attachment[] = queryData[selectedSectionId].attachments
 
   if (queryData[selectedSectionId].attachments) {
-    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
-      (attachment) => {
-        const subject = attachment.subject as string
-        let type = attachment.type
-        if (typeMapper) {
-          // @ts-ignore
-          type =
-            Object.keys(typeMapper).find(
-              (key) => typeMapper[key] === attachment.type
-            ) || attachment.type
-        }
-        if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-          attachments.push({
-            data: attachment.data,
-            type: attachment.contentType,
-            optionValues: [subject, type],
-            title: subject,
-            description: type
-          } as IAttachment)
-        }
+    registaration.forEach((attachment) => {
+      const subject = attachment.subject as string
+      let type = attachment.type
+      if (typeMapper) {
+        // @ts-ignore
+        type =
+          Object.keys(typeMapper).find(
+            (key) => typeMapper[key] === attachment.type
+          ) || attachment.type
       }
-    )
+      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+        attachments.push({
+          data: attachment.data,
+          type: attachment.contentType,
+          optionValues: [subject, type],
+          title: subject,
+          description: type
+        } as IAttachment)
+      }
+    })
   }
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
@@ -771,7 +767,7 @@ const isLocationFacilityOrCRVSOffice = (
 
 const transformAddressTemplateArray = (
   transformedData: IFormData,
-  addressFromQuery: GQLAddress,
+  addressFromQuery: Address,
   addressLocationLevel: keyof typeof LocationLevel,
   sectionId: string,
   nameKey: string,
@@ -964,7 +960,7 @@ export const eventLocationAddressOfflineTransformer =
       return
     }
 
-    const addressFromQuery = queryData.eventLocation?.address as GQLAddress
+    const addressFromQuery = queryData.eventLocation?.address
     const nameKey = transformedFieldName || field.name
 
     if (addressFromQuery) {

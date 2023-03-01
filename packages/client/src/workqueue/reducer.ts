@@ -173,9 +173,7 @@ function mergeWorkQueueData(
     ) {
       return
     }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
+    destinationWorkQueue.data[workQueueId].results?.forEach((declaration) => {
       if (declaration == null) {
         return
       }
