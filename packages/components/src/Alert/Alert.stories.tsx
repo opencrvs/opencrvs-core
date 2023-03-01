@@ -63,7 +63,7 @@ CustomIcon.args = {
   type: 'success',
   children: "Hello, I'm an alert to show a custom icon",
   onClose: undefined,
-  customIcon: <Icon name={'Users'} />
+  customIcon: <Icon name={'Medal'} />
 }
 
 export const Dismissable = () => {
