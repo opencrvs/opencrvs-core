@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export function ChevronLeft(props: React.SVGProps<SVGSVGElement>) {
+export function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width={24}
@@ -22,10 +22,10 @@ export function ChevronLeft(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="ph-caret-left"
+      className="ph-caret-down"
       {...props}
     >
-      <path d="M15 18l-6-6 6-6" />
+      <path d="M9 18l6-6-6-6" />
     </svg>
   )
 }
