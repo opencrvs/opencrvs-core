@@ -20,7 +20,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from '@client/styledComponents'
 import IframeResizer from 'iframe-resizer-react'
-import { dashboardMessages } from '@client/i18n/messages/views/dashboard'
+import { messages } from '@client/i18n/messages/views/dashboard'
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -75,7 +75,7 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
         ) : (
           <div id={`${title.toLowerCase()}_noContent`}>
             <Content title={title} size={ContentSize.LARGE}>
-              {intl.formatMessage(dashboardMessages.noContent)}
+              {intl.formatMessage(messages.noContent)}
             </Content>
           </div>
         )}
@@ -88,7 +88,7 @@ export const PerformanceDashboard = () => {
   const intl = useIntl()
   return (
     <DashboardEmbedView
-      title={intl.formatMessage(dashboardMessages.dashboardTitle)}
+      title={intl.formatMessage(messages.dashboardTitle)}
       url={window.config.REGISTRATIONS_DASHBOARD_URL}
       icon={<Icon name="Activity" size="medium" />}
     />

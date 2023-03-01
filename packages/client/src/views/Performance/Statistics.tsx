@@ -14,13 +14,13 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
-import { dashboardMessages } from '@client/i18n/messages/views/dashboard'
+import { messages } from '@client/i18n/messages/views/dashboard'
 
 export const PerformanceStatistics = () => {
   const intl = useIntl()
   return (
     <DashboardEmbedView
-      title={intl.formatMessage(dashboardMessages.statisticTitle)}
+      title={intl.formatMessage(messages.statisticTitle)}
       url={window.config.STATISTICS_DASHBOARD_URL}
       icon={<Icon name="Activity" size="medium" />}
     />
