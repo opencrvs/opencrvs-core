@@ -35,6 +35,33 @@ const messagesToDefine = {
     description: 'Label for informants signature input',
     id: 'review.inputs.informantsSignature'
   },
+  brideSignature: {
+    defaultMessage: 'Signature of Bride',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.brideSignature'
+  },
+  groomSignature: {
+    defaultMessage: 'Signature of Groom',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.groomSignature'
+  },
+  witnessOneSignature: {
+    defaultMessage: 'Signature of Witness 1',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.witnessOneSignature'
+  },
+  witnessTwoSignature: {
+    defaultMessage: 'Signature of Witness 2',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.witnessTwoSignature'
+  },
+
+  terms: {
+    defaultMessage:
+      'We, the undersigned declare under penalty of perjury under the laws of Farajaland that the forgoing information is true and correct to the best of our knowledge and belief. We further declare that no legal objections to the marriage is known and hereby apply for a certificate of marriage',
+    description: 'Label for signature terms',
+    id: 'review.inputs.terms'
+  },
   signatureDescription: {
     defaultMessage:
       'I, the undersigned, hereby declare that the particulars in this form are true and correct to the best of my knowledge.',
