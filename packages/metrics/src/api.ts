@@ -215,7 +215,7 @@ export async function countRegistrarsByLocation(
       ...authHeader
     },
     body: JSON.stringify({
-      role: 'LOCAL_REGISTRAR',
+      systemRole: 'LOCAL_REGISTRAR',
       locationId
     })
   })

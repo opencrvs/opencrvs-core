@@ -263,6 +263,11 @@ const messagesToDefine = {
     defaultMessage: 'Type',
     description: 'Column header for type in field agent list'
   },
+  roleColumnHeader: {
+    id: 'performance.fieldAgents.columnHeader.role',
+    defaultMessage: 'Role',
+    description: 'Column header for role in field agent list'
+  },
   officeColumnHeader: {
     id: 'performance.fieldAgents.columnHeader.office',
     defaultMessage: 'Office',
