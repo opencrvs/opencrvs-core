@@ -13,21 +13,21 @@ const {
   upsertChannel,
   removeChannel,
   newChannelTemplate,
-  commonRoutes
+  routeTemplate
 } = require('../../utils/openhim-helpers.cjs')
 
 const marriageNewDeclarationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> New Marriage Declaration',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> New Marriage Declaration',
       host: 'metrics',
       port: 1050,
@@ -42,14 +42,14 @@ const marriageInProgressDeclarationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> New Marriage InProgress',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> New Marriage InProgress',
       host: 'metrics',
       port: 1050,
@@ -64,14 +64,14 @@ const marriageRequestForRegistrarValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Request for Registrar Validation',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Request for Registrar Validation',
       host: 'metrics',
       port: 1050,
@@ -86,14 +86,14 @@ const marriageWaitingExternalResourceValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Waiting External Resource Validation',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Waiting External Resource Validation',
       host: 'metrics',
       port: 1050,
@@ -108,14 +108,14 @@ const registrarMarriageRegistrationWaitingExternalResourceValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Registrar Marriage Registration Waiting External Resource Validation',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Registrar Marriage Registration Waiting External Resource Validation',
       host: 'metrics',
       port: 1050,
@@ -131,23 +131,23 @@ const marriageRegistrationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Registration',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Registration',
       host: 'metrics',
       port: 1050,
       primary: false
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Webhooks -> Marriage Registration',
-      host: 'metrics',
+      host: 'webhooks',
       port: 2525,
       primary: false
     }
@@ -160,14 +160,14 @@ const marriageValidationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Validation',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Validation',
       host: 'metrics',
       port: 1050,
@@ -182,14 +182,14 @@ const marriageCertificationChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Certification',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Certification',
       host: 'metrics',
       port: 1050,
@@ -204,14 +204,14 @@ const marriageRejectionChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Rejection',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Rejection',
       host: 'metrics',
       port: 1050,
@@ -226,14 +226,14 @@ const marriageArchiveChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Archive',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Archive',
       host: 'metrics',
       port: 1050,
@@ -248,14 +248,14 @@ const marriageReinstateChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Reinstate',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Reinstate',
       host: 'metrics',
       port: 1050,
@@ -270,14 +270,14 @@ const marriageRequestCorrectionChannel = {
   ...newChannelTemplate,
   routes: [
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Search -> Marriage Request Correction',
       host: 'search',
       port: 9090,
       primary: true
     },
     {
-      ...commonRoutes,
+      ...routeTemplate,
       name: 'Metrics -> Marriage Request Correction',
       host: 'metrics',
       port: 1050,
