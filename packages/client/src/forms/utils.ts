@@ -656,10 +656,11 @@ export const convertToMSISDN = (phone: string) => {
       ? 'ZMB'
       : window.config.COUNTRY.toUpperCase()
 
+  const defaultCountryZambia = allCountries[allCountries.length - 3]
   const data =
     allCountries.find(
       (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-    ) || allCountries[allCountries.length - 3]
+    ) || defaultCountryZambia
 
   if (
     phone.startsWith(data.dialCode) ||

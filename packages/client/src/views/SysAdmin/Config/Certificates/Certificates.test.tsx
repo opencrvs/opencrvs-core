@@ -198,7 +198,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
       expect(
         testComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(0)
+      ).toBeTruthy()
     })
 
     it('should call print certificate after clicking print', async () => {

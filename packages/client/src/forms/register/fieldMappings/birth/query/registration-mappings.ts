@@ -25,7 +25,6 @@ import {
   GQLRegStatus,
   GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
-import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { allCountries } from '@client/utils/countryUtils'
@@ -179,10 +178,11 @@ const convertToLocal = (mobileWithCountryCode: string, country: string) => {
   const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
+  const defaultCountryZambia = allCountries[allCountries.length - 3]
   const data =
     allCountries.find(
       (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-    ) || allCountries[allCountries.length - 3]
+    ) || defaultCountryZambia
 
   return (
     mobileWithCountryCode &&

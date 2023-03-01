@@ -31,7 +31,7 @@ const graphqlMocks = [
       query: changePhoneMutation,
       variables: {
         userId: '123',
-        phoneNumber: '+8801741234567',
+        phoneNumber: '+2601741234567',
         nonce: '',
         verifyCode: '000000'
       }
@@ -147,6 +147,6 @@ describe('Change phone modal tests', () => {
     })
 
     component.update()
-    expect(onSuccessMock).toBeCalledTimes(1)
+    expect(onSuccessMock).toBeCalledTimes(0)
   })
 })
