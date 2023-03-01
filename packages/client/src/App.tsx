@@ -43,7 +43,11 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ApolloClient, ApolloProvider } from '@apollo/client'
+import {
+  ApolloClient,
+  ApolloProvider,
+  NormalizedCacheObject
+} from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
@@ -69,10 +73,12 @@ import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeL
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { UnprotectedRoute } from '@client/components/UnprotectedRoute'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
 interface IAppProps {
-  client?: ApolloClient<{}>
+  client?: ApolloClient<NormalizedCacheObject>
   store: AppStore
   history: History
 }
@@ -478,6 +484,24 @@ export function App(props: IAppProps) {
                                               ]}
                                               path={routes.ORGANISATIONS_INDEX}
                                               component={AdministrativeLevels}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.ISSUE_COLLECTOR}
+                                              component={IssueCertificate}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.ISSUE_VERIFY_COLLECTOR
+                                              }
+                                              component={VerifyCollector}
+                                            />
+                                            <ProtectedRoute
+                                              path={
+                                                routes.ISSUE_CERTIFICATE_PAYMENT
+                                              }
+                                              component={IssuePayment}
                                             />
                                           </Switch>
                                         </TransitionWrapper>

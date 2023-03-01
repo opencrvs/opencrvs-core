@@ -12,11 +12,7 @@
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { useIntl } from 'react-intl'
-import {
-  constantsMessages,
-  buttonMessages,
-  userMessages
-} from '@client/i18n/messages'
+import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import {
   LabelContainer,
   ValueContainer,
@@ -24,14 +20,16 @@ import {
 } from '@client/views/Settings/items/components'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { getLanguage } from '@client/i18n/selectors'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function Role() {
   const intl = useIntl()
+  const language = useSelector(getLanguage)
   const systemRole = useSelector<IStoreState, string>((state) => {
-    const systemRole = state.profile.userDetails?.systemRole
-    return systemRole && userMessages[systemRole]
-      ? intl.formatMessage(userMessages[systemRole])
-      : ''
+    const userDetails = getUserDetails(state)
+    return (userDetails && getUserRole(language, userDetails.role)) ?? ''
   })
   return (
     <ListViewItemSimplified

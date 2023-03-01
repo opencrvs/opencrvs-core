@@ -17720,8 +17720,8 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "OBJECT",
+              "name": "Role",
               "ofType": null
             },
             "isDeprecated": false,

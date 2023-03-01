@@ -50,14 +50,16 @@ beforeEach(async () => {
                   ON_TIME: 5,
                   LATE: 10,
                   DELAYED: 15
-                }
+                },
+                PRINT_IN_ADVANCE: true
               },
               DEATH: {
                 REGISTRATION_TARGET: 10,
                 FEE: {
                   ON_TIME: 10,
                   DELAYED: 15
-                }
+                },
+                PRINT_IN_ADVANCE: true
               }
             }
           }

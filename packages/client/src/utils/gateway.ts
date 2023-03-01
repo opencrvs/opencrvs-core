@@ -1887,7 +1887,8 @@ export enum RegStatus {
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
   Validated = 'VALIDATED',
-  WaitingValidation = 'WAITING_VALIDATION'
+  WaitingValidation = 'WAITING_VALIDATION',
+  Issued = 'ISSUED'
 }
 
 export type RegWorkflow = {
@@ -2072,7 +2073,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  role?: Maybe<Scalars['String']>
+  role?: Maybe<Role>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
@@ -4604,6 +4605,7 @@ export type RegistrationHomeQueryVariables = Exact<{
   approvalSkip?: InputMaybe<Scalars['Int']>
   externalValidationSkip?: InputMaybe<Scalars['Int']>
   printSkip?: InputMaybe<Scalars['Int']>
+  issueSkip?: InputMaybe<Scalars['Int']>
 }>
 
 export type RegistrationHomeQuery = {
@@ -5251,6 +5253,113 @@ export type RegistrationHomeQuery = {
     > | null
   } | null
   printTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  issueTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
     results?: Array<
@@ -6350,7 +6459,6 @@ export type SearchFieldAgentsQuery = {
       __typename?: 'SearchFieldAgentResponse'
       practitionerId?: string | null
       fullName?: string | null
-      role?: string | null
       status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
@@ -6358,6 +6466,10 @@ export type SearchFieldAgentsQuery = {
       totalNumberOfInProgressAppStarted?: number | null
       totalNumberOfRejectedDeclarations?: number | null
       averageTimeForDeclaredDeclarations?: number | null
+      role?: {
+        __typename?: 'Role'
+        labels: Array<{ __typename?: 'RoleLabel'; label: string; lang: string }>
+      } | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null

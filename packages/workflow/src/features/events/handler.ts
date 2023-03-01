@@ -24,10 +24,12 @@ import {
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
-  anonymousActionEventHandler
+  anonymousActionEventHandler,
+  markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
+  hasCertificateDataInDocRef,
   hasCorrectionEncounterSection,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -63,6 +65,7 @@ export enum Events {
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
+  BIRTH_MARK_ISSUE = '/events/birth/mark-issued',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
@@ -75,6 +78,7 @@ export enum Events {
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
+  DEATH_MARK_ISSUE = '/events/death/mark-issued',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
@@ -118,6 +122,8 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.BIRTH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.BIRTH_MARK_ISSUE
               } else {
                 return Events.BIRTH_MARK_CERT
               }
@@ -150,6 +156,8 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.DEATH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.DEATH_MARK_ISSUE
               } else {
                 return Events.DEATH_MARK_CERT
               }
@@ -400,6 +408,22 @@ export async function fhirWorkflowEventHandler(
       response = await markEventAsCertifiedHandler(request, h)
       await triggerEvent(
         Events.DEATH_MARK_CERT,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.BIRTH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.DEATH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_MARK_ISSUE,
         request.payload,
         request.headers
       )

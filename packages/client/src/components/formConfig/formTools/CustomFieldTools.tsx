@@ -948,7 +948,7 @@ class CustomFieldToolsComp extends React.Component<
       <>
         <Text variant="bold16" element="p">
           <CustomSelectHeading>
-            <Icon color="currentColor" name="Type" size="large" />
+            <Icon color="currentColor" name="TextT" size="large" />
             {intl.formatMessage(customFieldFormMessages.copyHeading)}
           </CustomSelectHeading>
         </Text>
@@ -1078,7 +1078,7 @@ class CustomFieldToolsComp extends React.Component<
           }
         ]
       })
-      const res: { data: CreateFormDatasetMutation } = await client.mutate({
+      const res = await client.mutate<CreateFormDatasetMutation>({
         mutation: CREATE_FORM_DATA_SET,
         variables: { formDataset: { fileName, base64Data } }
       })
