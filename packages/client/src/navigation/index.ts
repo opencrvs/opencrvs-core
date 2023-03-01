@@ -58,7 +58,10 @@ import {
   PERFORMANCE_REGISTRATIONS_LIST,
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION
+  INFORMANT_NOTIFICATION,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
+  ISSUE_CERTIFICATE_PAYMENT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -334,6 +337,32 @@ export function goToPrintCertificate(
   )
 }
 
+export function goToIssueCertificate(
+  registrationId: string,
+  pageId = 'collector'
+) {
+  return push(
+    formatUrl(ISSUE_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      pageId: pageId
+    })
+  )
+}
+
+export function goToVerifyIssueCollector(
+  registrationId: string,
+  event: string,
+  collector: string
+) {
+  return push(
+    formatUrl(ISSUE_VERIFY_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString(),
+      collector: collector.toLowerCase().toString()
+    })
+  )
+}
+
 export function goToViewRecordPage(declarationId: string) {
   return push(
     formatUrl(VIEW_RECORD, {
@@ -393,6 +422,18 @@ export function goToPrintCertificatePayment(
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+      registrationId: registrationId.toString(),
+      eventType: event
+    })
+  )
+}
+
+export function goToIssueCertificatePayment(
+  registrationId: string,
+  event: Event
+) {
+  return push(
+    formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
       registrationId: registrationId.toString(),
       eventType: event
     })
