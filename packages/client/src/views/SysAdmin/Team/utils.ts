@@ -78,6 +78,7 @@ const AuditDescriptionMapping: {
   REGISTERED: messages.registeredAuditAction,
   REJECTED: messages.rejectedAuditAction,
   CERTIFIED: messages.certifiedAuditAction,
+  ISSUED: messages.issuedAuditAction,
   ASSIGNED: messages.assignedAuditAction,
   UNASSIGNED: messages.unAssignedAuditAction,
   CORRECTED: messages.correctedAuditAction,
