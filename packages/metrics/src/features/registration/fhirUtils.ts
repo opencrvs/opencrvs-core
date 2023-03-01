@@ -254,7 +254,8 @@ export function getTrackingId(task: Task) {
   const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
-      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
+      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id` ||
+      identifier.system === `http://opencrvs.org/specs/id/marriage-tracking-id`
     )
   })
   if (!trackingIdentifier || !trackingIdentifier.value) {

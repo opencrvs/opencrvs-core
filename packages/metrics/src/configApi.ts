@@ -27,6 +27,13 @@ interface IDeath {
     DELAYED: number
   }
 }
+interface IMarriage {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+}
 export interface ICountryLogo {
   fileName: string
   file: string
@@ -47,6 +54,7 @@ export interface IApplicationConfig {
   CURRENCY: ICurrency
   COUNTRY_LOGO: ICountryLogo
   DEATH: IDeath
+  MARRIAGE: IMarriage
   HEALTH_FACILITY_FILTER: string
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
