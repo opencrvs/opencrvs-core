@@ -19,6 +19,8 @@ interface INotificationsMessages
   updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
   statusArchiving: MessageDescriptor
+  statusCertifying: MessageDescriptor
+  statusIssuing: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusReinstating: MessageDescriptor
@@ -29,6 +31,8 @@ interface INotificationsMessages
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
   statusWaitingToSubmit: MessageDescriptor
+  statusWaitingToCertify: MessageDescriptor
+  statusWaitingToIssue: MessageDescriptor
   userAuditSuccess: MessageDescriptor
   userFormFail: MessageDescriptor
   userFormSuccess: MessageDescriptor
@@ -79,6 +83,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for declaration status Certifying',
     id: 'regHome.outbox.statusCertifying'
   },
+  statusIssuing: {
+    defaultMessage: 'Issuing...',
+    description: 'Label for declaration status Issuing',
+    id: 'regHome.outbox.statusIssuing'
+  },
   statusRegistering: {
     defaultMessage: 'Registering...',
     description: 'Label for declaration status Registering',
@@ -123,6 +132,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to certify',
     description: 'Label for declaration status waiting for certify',
     id: 'regHome.outbox.statusWaitingToCertify'
+  },
+  statusWaitingToIssue: {
+    defaultMessage: 'Waiting to issue',
+    description: 'Label for declaration status waiting for certify',
+    id: 'regHome.outbox.statusWaitingToIssue'
   },
   statusWaitingToValidate: {
     defaultMessage: 'Waiting to send for approval',

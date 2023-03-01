@@ -16,7 +16,9 @@ import {
   deleteDeclaration,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration
+  writeDeclaration,
+  ICertificate,
+  Payment
 } from '@client/declarations'
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -58,7 +60,10 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
   [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
-  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
+    SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.ISSUING,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
@@ -120,14 +125,34 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     }
     const declaration = action.payload
     const { event, action: submissionAction } = declaration
+    let payments: Payment | undefined
     updateDeclaration(dispatch, {
       ...declaration,
       submissionStatus: STATUS_CHANGE_MAP[submissionAction]
     })
+    //If SubmissionAction is certify and issue declaration then remove payment for certify first
+    if (submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION) {
+      const certificate = (
+        declaration.data.registration.certificates as ICertificate[]
+      )?.[0]
+      if (certificate) {
+        payments = certificate.payments
+        delete certificate.payments
+      }
+    }
+
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration
     )
+
+    //then add payment while issue declaration
+    if (payments) {
+      ;(
+        declaration.data.registration.certificates as ICertificate[]
+      )[0].payments = payments
+    }
+
     const mutation =
       event === Event.Birth
         ? getBirthMutation(submissionAction)
@@ -175,6 +200,28 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             ...declaration.payload
           }
         })
+      } else if (
+        submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+      ) {
+        await client.mutate({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: gqlDetails
+          }
+        })
+        //delete data from certificates to identify event in workflow for markEventAsIssued
+        if (declaration.data.registration.certificates) {
+          delete (
+            declaration.data.registration.certificates as ICertificate[]
+          )?.[0].data
+        }
+        updateDeclaration(dispatch, {
+          ...declaration,
+          action: SubmissionAction.ISSUE_DECLARATION,
+          submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
+        })
+        return
       } else {
         removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
         await client.mutate({

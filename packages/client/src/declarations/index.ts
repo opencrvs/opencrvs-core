@@ -120,6 +120,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_REINSTATE = 'READY_TO_REINSTATE',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
+  READY_TO_ISSUE = 'READY_TO_ISSUE',
+  ISSUING = 'ISSUING',
+  ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
@@ -152,7 +155,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_CERTIFY,
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  SUBMISSION_STATUS.REQUESTING_CORRECTION
+  SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.READY_TO_ISSUE,
+  SUBMISSION_STATUS.ISSUING
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -284,7 +289,7 @@ type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 
-type Payment = {
+export type Payment = {
   paymentId?: string
   type: PaymentType
   total: number
@@ -1813,6 +1818,10 @@ export function filterProcessingDeclarationsFromQuery(
     ),
     externalValidationTab: filterProcessingDeclarations(
       queryData.externalValidationTab,
+      processingDeclarationIds
+    ),
+    issueTab: filterProcessingDeclarations(
+      queryData.issueTab,
       processingDeclarationIds
     )
   }

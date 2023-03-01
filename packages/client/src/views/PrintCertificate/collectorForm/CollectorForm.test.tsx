@@ -432,7 +432,7 @@ describe('Certificate collector test for a birth registration without father det
         component.find('#submit_confirm').hostNodes().simulate('click')
 
         expect(history.location.pathname).toBe(
-          '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 

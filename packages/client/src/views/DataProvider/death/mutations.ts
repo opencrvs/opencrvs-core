@@ -98,6 +98,12 @@ export const COLLECT_DEATH_CERTIFICATE = gql`
   }
 `
 
+export const ISSUE_DEATH_CERTIFICATE = gql`
+  mutation markDeathAsIssued($id: ID!, $details: DeathRegistrationInput!) {
+    markDeathAsIssued(id: $id, details: $details)
+  }
+`
+
 export function getDeathMutation(action: SubmissionAction) {
   switch (action) {
     case SubmissionAction.SUBMIT_FOR_REVIEW:
@@ -110,8 +116,11 @@ export function getDeathMutation(action: SubmissionAction) {
       return REJECT_DEATH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_DEATH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_DEATH_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_DEATH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_DEATH_REG_CORRECTION
   }
