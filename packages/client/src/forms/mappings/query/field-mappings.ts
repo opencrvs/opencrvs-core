@@ -365,10 +365,12 @@ export function attachmentToFieldTransformer(
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
-  const registaration: Attachment[] = queryData[selectedSectionId].attachments
 
   if (queryData[selectedSectionId].attachments) {
-    registaration.forEach((attachment) => {
+    const registrationAttachments: Attachment[] =
+      queryData[selectedSectionId].attachments
+
+    registrationAttachments.forEach((attachment) => {
       const subject = attachment.subject as string
       let type = attachment.type
       if (typeMapper) {
