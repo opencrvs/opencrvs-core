@@ -43,11 +43,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import {
-  ApolloClient,
-  ApolloProvider,
-  NormalizedCacheObject
-} from '@apollo/client'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
@@ -72,6 +68,7 @@ import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
