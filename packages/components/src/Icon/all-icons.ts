@@ -13,6 +13,7 @@
 export * from './custom-icons'
 export {
   GitBranch,
+  Archive,
   List,
   Target,
   Medal,
@@ -24,6 +25,7 @@ export {
   Share,
   ListBullets,
   Compass,
+  NotePencil,
   ChatCircle,
   Star,
   MagnifyingGlass,
@@ -38,6 +40,7 @@ export {
   TextT,
   Database,
   CheckSquare,
+  WarningCircle,
   X,
   Activity
 } from 'phosphor-react'

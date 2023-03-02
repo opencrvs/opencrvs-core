@@ -109,7 +109,7 @@ export const DuplicateForm = (props: IProps) => {
       }}
       type="positive"
     >
-      <Icon name="Edit" />
+      <Icon name="NotePencil" />
       {intl.formatMessage(duplicateMessages.notDuplicateButton)}
     </Button>
   )

@@ -607,7 +607,7 @@ export const DuplicateFormTabs = (props: IProps) => {
     id: props.declaration.id,
     title: (props.declaration.data.registration.trackingId as string) || '',
     disabled: false,
-    icon: <Icon name={'AlertCircle'} color={'red'} size={'medium'} />,
+    icon: <Icon name="WarningCircle" color="red" size="medium" />,
     color: 'red'
   })
 
