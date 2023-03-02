@@ -69,7 +69,6 @@ import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { Text } from '@opencrvs/components'
-import { ChartActivity } from '@opencrvs/components/lib/Icon/custom-icons'
 import { UserDetails } from '@client/utils/userUtils'
 
 const SCREEN_LOCK = 'screenLock'
@@ -915,7 +914,7 @@ export const NavigationView = (props: IFullProps) => {
             return (
               <NavigationItem
                 icon={() => (
-                  <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+                  <Icon name={'Star'} color={'yellow'} fill={'yellow'} />
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}

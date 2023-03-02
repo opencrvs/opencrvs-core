@@ -19,6 +19,7 @@ export {
   CreditCard,
   Phone,
   User,
+  Users,
   ArrowLeft,
   ArrowRight,
   Share,
