@@ -83,7 +83,10 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ISSUE,
+  [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
+    SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
 } as const
 
@@ -1932,6 +1935,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
@@ -1945,6 +1949,7 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }

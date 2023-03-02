@@ -23,10 +23,13 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  actionEventHandler
+  actionEventHandler,
+  anonymousActionEventHandler,
+  markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
+  hasCertificateDataInDocRef,
   hasCorrectionEncounterSection,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -46,7 +49,8 @@ import {
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -61,6 +65,7 @@ export enum Events {
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
+  BIRTH_MARK_ISSUE = '/events/birth/mark-issued',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
@@ -73,6 +78,7 @@ export enum Events {
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
+  DEATH_MARK_ISSUE = '/events/death/mark-issued',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
@@ -82,6 +88,7 @@ export enum Events {
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
+  VERIFIED_EVENT = '/events/verified',
   UNKNOWN = 'unknown',
   VIEWED = '/events/viewed'
 }
@@ -115,6 +122,8 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.BIRTH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.BIRTH_MARK_ISSUE
               } else {
                 return Events.BIRTH_MARK_CERT
               }
@@ -147,6 +156,8 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.DEATH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.DEATH_MARK_ISSUE
               } else {
                 return Events.DEATH_MARK_CERT
               }
@@ -189,6 +200,7 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
     const taskResource = getTaskResource(fhirBundle)
+
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
     }
@@ -200,6 +212,10 @@ function detectEvent(request: Hapi.Request): Events {
     }
     if (hasExtension(taskResource, VIEWED_EXTENSION_URL)) {
       return Events.VIEWED
+    }
+
+    if (hasExtension(taskResource, VERIFIED_EXTENSION_URL)) {
+      return Events.VERIFIED_EVENT
     }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
@@ -237,6 +253,7 @@ export async function fhirWorkflowEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const event = detectEvent(request)
+
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary
@@ -395,6 +412,22 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
+    case Events.BIRTH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.DEATH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
       await triggerEvent(
@@ -428,6 +461,9 @@ export async function fhirWorkflowEventHandler(
     case Events.VIEWED:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
+      break
+    case Events.VERIFIED_EVENT:
+      response = await anonymousActionEventHandler(request, h, event)
       break
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:

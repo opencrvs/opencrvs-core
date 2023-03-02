@@ -64,6 +64,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { constantsMessages } from '@client/i18n/messages'
 import { Outbox } from './outbox/Outbox'
 import { ArrayElement } from '@client/SubmissionController'
+import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -110,6 +111,7 @@ const DECLARATION_WORKQUEUE_TABS = [
   WORKQUEUE_TABS.readyForReview,
   WORKQUEUE_TABS.requiresUpdate,
   WORKQUEUE_TABS.readyToPrint,
+  WORKQUEUE_TABS.readyToIssue,
   WORKQUEUE_TABS.externalValidation
 ] as const
 
@@ -120,6 +122,7 @@ const WORKQUEUE_TABS_PAGINATION = {
   [WORKQUEUE_TABS.readyForReview]: 'reviewTab',
   [WORKQUEUE_TABS.requiresUpdate]: 'rejectTab',
   [WORKQUEUE_TABS.readyToPrint]: 'printTab',
+  [WORKQUEUE_TABS.readyToIssue]: 'issueTab',
   [WORKQUEUE_TABS.externalValidation]: 'externalValidationTab'
 } as const
 
@@ -266,6 +269,7 @@ class OfficeHomeView extends React.Component<
     reviewCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
+    issueCurrentPage: number,
     externalValidationCurrentPage: number,
     requireUpdateCurrentPage: number
   ) => {
@@ -379,6 +383,19 @@ class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
+            {tabId === WORKQUEUE_TABS.readyToIssue && (
+              <ReadyToIssue
+                queryData={{
+                  data: filteredData.issueTab
+                }}
+                pageSize={this.pageSize}
+                paginationId={issueCurrentPage}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+
             {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
           </>
         ) : (
@@ -424,6 +441,7 @@ class OfficeHomeView extends React.Component<
       reviewTab,
       approvalTab,
       printTab,
+      issueTab,
       externalValidationTab,
       rejectTab
     } = this.props
@@ -447,6 +465,7 @@ class OfficeHomeView extends React.Component<
           reviewTab,
           approvalTab,
           printTab,
+          issueTab,
           externalValidationTab,
           rejectTab
         )}

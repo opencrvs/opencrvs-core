@@ -19,6 +19,7 @@ interface IWorkQueueMessages
   noRecordsExternalValidation: MessageDescriptor
   noRecordsReadyForReview: MessageDescriptor
   noRecordsReadyToPrint: MessageDescriptor
+  noRecordReadyToIssue: MessageDescriptor
   noRecordsRequireUpdates: MessageDescriptor
   noRecordsSentForApproval: MessageDescriptor
   noRecordsSentForReview: MessageDescriptor
@@ -54,6 +55,11 @@ const messagesToDefine: IWorkQueueMessages = {
     id: 'wq.noRecords.readyToPrint',
     defaultMessage: 'No records ready to print',
     description: 'No records messages for ready to print tab'
+  },
+  noRecordReadyToIssue: {
+    id: 'wq.noRecords.readyToIssue',
+    defaultMessage: 'No records ready to issue',
+    description: 'No records messages for ready to issue tab'
   },
   noRecordsRequireUpdates: {
     id: 'wq.noRecords.requiresUpdate',
