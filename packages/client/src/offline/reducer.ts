@@ -21,7 +21,11 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  referenceApi
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
@@ -76,6 +80,7 @@ export interface IOfflineData {
   }
   systems: System[]
   config: IApplicationConfig
+  anonymousConfig: IApplicationConfigAnonymous
   formConfig: IFormConfig
 }
 
@@ -297,6 +302,15 @@ function reducer(
         state,
         Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
       )
+    }
+    case actions.ANONYMOUS_USER_OFFLINE_CONFIG: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          ...action.payload
+        }
+      }
     }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload

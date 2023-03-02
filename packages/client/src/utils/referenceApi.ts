@@ -50,6 +50,13 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+export interface IApplicationConfigAnonymous {
+  APPLICATION_NAME: string
+  COUNTRY_LOGO: ICountryLogo
+  LOGIN_BACKGROUND: ILoginBackground
+  PHONE_NUMBER_PATTERN: RegExp
+}
+
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -115,6 +122,20 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   )
 
   return response
+}
+
+async function loadConfigAnonymousUser(): Promise<
+  Partial<IApplicationConfigResponse>
+> {
+  const url = `${window.config.CONFIG_API_URL}/publicConfig`
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+  return await res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -245,5 +266,6 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadContent,
-  loadConfig
+  loadConfig,
+  loadConfigAnonymousUser
 }
