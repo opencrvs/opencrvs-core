@@ -83,6 +83,8 @@ interface IFormMessages
   contactDetailsBoth: MessageDescriptor
   contactDetailsFather: MessageDescriptor
   contactDetailsMother: MessageDescriptor
+  certifyRecordToMother: MessageDescriptor
+  certifyRecordToFather: MessageDescriptor
   country: MessageDescriptor
   secondaryAddress: MessageDescriptor
   dateOfMarriage: MessageDescriptor
@@ -282,6 +284,7 @@ interface IFormMessages
   self: MessageDescriptor
   signedAffidavitConfirmation: MessageDescriptor
   someoneElse: MessageDescriptor
+  someoneElseCollector: MessageDescriptor
   son: MessageDescriptor
   sonInLaw: MessageDescriptor
   grandson: MessageDescriptor
@@ -800,6 +803,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Mother',
     description: 'Label for "Mother" select option',
     id: 'form.field.label.app.whoContDet.mother'
+  },
+  certifyRecordToMother: {
+    defaultMessage: 'Print and issue to informant (Mother)',
+    description: 'Label for mother select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.mother'
+  },
+  certifyRecordToFather: {
+    defaultMessage: 'Print and issue to informant (Father)',
+    description: 'Label for father select option to certify record',
+    id: 'form.field.label.app.certifyRecordTo.father'
   },
   country: {
     defaultMessage: 'Country',
@@ -1811,6 +1824,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
+  },
+  someoneElseCollector: {
+    defaultMessage: 'Print and issue to someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElseCollector'
   },
   son: {
     defaultMessage: 'Son',

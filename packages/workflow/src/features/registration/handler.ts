@@ -22,7 +22,8 @@ import {
   touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection,
-  validateDeceasedDetails
+  validateDeceasedDetails,
+  markBundleAsIssued
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -432,6 +433,23 @@ export async function markEventAsCertifiedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsIssuedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsIssued(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    await mergePatientIdentifier(payload)
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
     throw new Error(error)
   }
 }

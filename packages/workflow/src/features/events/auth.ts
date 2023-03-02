@@ -77,7 +77,10 @@ function getEventToScopeMap(event: Events) {
     case Events.DEATH_REQUEST_CORRECTION:
     case Events.MARRIAGE_REQUEST_CORRECTION:
       return [USER_SCOPE.REGISTER, USER_SCOPE.CERTIFY]
-
+    case Events.BIRTH_MARK_ISSUE:
+    case Events.DEATH_MARK_ISSUE:
+    case Events.MARRIAGE_MARK_ISSUE:
+      return [USER_SCOPE.CERTIFY]
     case Events.DOWNLOADED:
       return [
         USER_SCOPE.DECLARE,

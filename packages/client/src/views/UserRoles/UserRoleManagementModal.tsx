@@ -230,7 +230,7 @@ export function UserRoleManagementModal(props: IProps) {
                     setActives(newActiveItems)
                   }}
                 >
-                  <Icon name="Edit" color="primary" />
+                  <Icon name="Pencil" color="primary" />
                 </Button>
               )}
             </Stack>

@@ -21,10 +21,12 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  actionEventHandler
+  actionEventHandler,
+  markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
+  hasCertificateDataInDocRef,
   hasCorrectionEncounterSection,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -79,6 +81,8 @@ function detectEvent(request: Hapi.Request): Events {
               hasCorrectionEncounterSection(firstEntry as fhir.Composition)
             ) {
               return Events[`${eventType}_REQUEST_CORRECTION`]
+            } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+              return Events[`${eventType}_MARK_ISSUE`]
             } else {
               return Events[`${eventType}_MARK_CERT`]
             }
@@ -226,6 +230,22 @@ export async function fhirWorkflowEventHandler(
     case Events.MARRIAGE_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
       await triggerEvent(event, request.payload, request.headers)
+      break
+    case Events.BIRTH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.DEATH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
       break
     case Events.BIRTH_MARK_VOID:
     case Events.DEATH_MARK_VOID:

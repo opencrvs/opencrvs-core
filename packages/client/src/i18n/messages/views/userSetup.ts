@@ -55,6 +55,7 @@ interface IUserSetupMessages
   registeredAuditAction: MessageDescriptor
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
+  issuedAuditAction: MessageDescriptor
   showMoreAuditList: MessageDescriptor
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
@@ -293,6 +294,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Certified',
     description: 'Description for certified declaration',
     id: 'user.profile.audit.description.certified'
+  },
+  issuedAuditAction: {
+    defaultMessage: 'Issued',
+    description: 'Description for Issued declaration',
+    id: 'user.profile.audit.description.issued'
   },
   showMoreAuditList: {
     defaultMessage: 'Show next {pageSize} of {totalItems}',
