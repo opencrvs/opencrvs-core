@@ -28,3 +28,5 @@ src/i18n/locales/en.csv
 
 .vscode
 graphql.schema.json
+.lh
+.idea

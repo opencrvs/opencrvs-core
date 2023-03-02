@@ -165,7 +165,8 @@ vi.doMock(
         Promise.resolve({
           languages: mockOfflineData.languages
         }),
-      loadConfig: () => Promise.resolve(mockConfigResponse)
+      loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse)
     }
   })
 )
