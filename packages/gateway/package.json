@@ -25,6 +25,7 @@
     "@graphql-tools/graphql-file-loader": "^6.0.9",
     "@graphql-tools/load": "^6.0.9",
     "@graphql-tools/schema": "^6.0.9",
+    "@graphql-tools/utils": "^9.2.1",
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^7.0.0",
     "@hapi/vision": "^7.0.0",

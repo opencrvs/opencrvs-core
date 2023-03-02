@@ -13,8 +13,10 @@
 import { IAuthHeader } from '../common-types'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
+import { Request } from '@hapi/hapi'
 
 export interface Context {
+  request: Request
   dataSources: {
     locationsAPI: LocationsAPI
     practitionerRoleAPI: PractitionerRoleAPI

@@ -22,6 +22,7 @@ export {
   ArrowLeft,
   ArrowRight,
   Share,
+  Lock,
   ListBullets,
   Compass,
   ChatCircle,

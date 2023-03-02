@@ -27,6 +27,7 @@ import { identityNameMapper } from '@client/forms/identity'
 import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -147,6 +148,10 @@ class IDVerifierComponent extends React.Component<
     const { positiveAction, negativeAction } = this.props.actionProps
     const { showPrompt } = this.state
     const { intl, id } = this.props
+    const isIssueUrl = window.location.href.includes('issue')
+    const modalTitle = isIssueUrl
+      ? intl.formatMessage(issueMessages.idCheckWithoutVerify)
+      : intl.formatMessage(certificateMessages.idCheckDialogTitle)
 
     return (
       <div id={id}>
@@ -175,7 +180,7 @@ class IDVerifierComponent extends React.Component<
         <ResponsiveModal
           id="withoutVerificationPrompt"
           show={showPrompt}
-          title={intl.formatMessage(certificateMessages.idCheckDialogTitle)}
+          title={modalTitle}
           contentHeight={96}
           handleClose={this.togglePrompt}
           actions={[

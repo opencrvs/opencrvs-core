@@ -14,6 +14,8 @@ import * as fetch from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
+import { ContextFunction } from 'apollo-server-core'
+import { ApolloServer } from 'apollo-server-hapi'
 
 describe('Test apollo server config', () => {
   const token = jwt.sign(
@@ -63,20 +65,22 @@ describe('Test apollo server config', () => {
     fetch.mockResponseOnce(JSON.stringify(mockUser), { status: 200 })
     const config = getApolloConfig()
 
-    // @ts-ignore
-    const context = await config.context({
-      request: {
-        headers: {
-          authorization: `Bearer ${token}`,
-          'user-agent': 'OpenCRVS'
-        },
-        info: {
-          remoteAddress: '1.1.1.1'
-        }
+    const request = {
+      headers: {
+        authorization: `Bearer ${token}`,
+        'user-agent': 'OpenCRVS'
       },
+      info: {
+        remoteAddress: '1.1.1.1'
+      }
+    }
+
+    const context = await (config.context as ContextFunction)({
+      request,
       h: {}
     })
     expect(context).toStrictEqual({
+      request,
       headers: {
         Authorization: `Bearer ${token}`,
         'x-correlation-id': '1',
@@ -85,6 +89,7 @@ describe('Test apollo server config', () => {
       }
     })
   })
+
   it('throws authentication error when the token holder does not exist', async () => {
     fetch.mockResponses(
       [JSON.stringify(null), { status: 200 }],
@@ -92,17 +97,32 @@ describe('Test apollo server config', () => {
     )
     const config = getApolloConfig()
 
-    await expect(
-      // @ts-ignore
-      config.context({
-        request: {
-          headers: {
-            authorization: `Bearer ${token}`
-          }
-        },
-        h: {}
-      })
-    ).rejects.toThrowError('Authentication failed')
+    const testServer = new ApolloServer(config)
+    const request = {
+      auth: {
+        isAuthenticated: true,
+        credentials: jwt.decode(token)
+      },
+      headers: new Headers({
+        authorization: `Bearer ${token}`,
+        'user-agent': 'OpenCRVS'
+      }),
+      info: {
+        remoteAddress: '1.1.1.1'
+      }
+    }
+
+    const response = await testServer.executeOperation(
+      {
+        query:
+          'query fetchBirthRegistration($id: ID!) { fetchBirthRegistration(id: $id) { id } }',
+        variables: { id: '123-123-123-123' }
+      },
+      {
+        request: request
+      }
+    )
+    expect(response.errors![0].message).toBe('Authentication failed')
   })
   it('throws authentication error when the token holder is not an active user', async () => {
     const deactivatedUser = cloneDeep(mockUser)
@@ -111,17 +131,32 @@ describe('Test apollo server config', () => {
     fetch.mockResponseOnce(JSON.stringify(deactivatedUser), { status: 200 })
     const config = getApolloConfig()
 
-    await expect(
-      // @ts-ignore
-      config.context({
-        request: {
-          headers: {
-            authorization: `Bearer ${token}`
-          }
-        },
-        h: {}
-      })
-    ).rejects.toThrowError('Authentication failed')
+    const testServer = new ApolloServer(config)
+    const request = {
+      auth: {
+        isAuthenticated: true,
+        credentials: jwt.decode(token)
+      },
+      headers: new Headers({
+        authorization: `Bearer ${token}`,
+        'user-agent': 'OpenCRVS'
+      }),
+      info: {
+        remoteAddress: '1.1.1.1'
+      }
+    }
+
+    const response = await testServer.executeOperation(
+      {
+        query:
+          'query fetchBirthRegistration($id: ID!) { fetchBirthRegistration(id: $id) { id } }',
+        variables: { id: '123-123-123-123' }
+      },
+      {
+        request: request
+      }
+    )
+    expect(response.errors![0].message).toBe('Authentication failed')
   })
   it('throws authentication error when the token holder has different scope', async () => {
     const userWithDifferentScope = cloneDeep(mockUser)
@@ -133,33 +168,31 @@ describe('Test apollo server config', () => {
     })
     const config = getApolloConfig()
 
-    await expect(
-      // @ts-ignore
-      config.context({
-        request: {
-          headers: {
-            authorization: `Bearer ${token}`
-          }
-        },
-        h: {}
-      })
-    ).rejects.toThrowError('Authentication failed')
-  })
-  it('throws authentication for unexpected error in user detection', async () => {
-    const config = getApolloConfig()
+    const testServer = new ApolloServer(config)
+    const request = {
+      auth: {
+        isAuthenticated: true,
+        credentials: jwt.decode(token)
+      },
+      headers: new Headers({
+        authorization: `Bearer ${token}`,
+        'user-agent': 'OpenCRVS'
+      }),
+      info: {
+        remoteAddress: '1.1.1.1'
+      }
+    }
 
-    await expect(
-      // @ts-ignore
-      config.context({
-        request: {
-          headers: {
-            authorization: `Bearer abc`
-          }
-        },
-        h: {}
-      })
-    ).rejects.toThrowError(
-      "Error: getTokenPayload: Error occurred during token decode : InvalidTokenError: Invalid token specified: Cannot read property 'replace' of undefined"
+    const response = await testServer.executeOperation(
+      {
+        query:
+          'query fetchBirthRegistration($id: ID!) { fetchBirthRegistration(id: $id) { id } }',
+        variables: { id: '123-123-123-123' }
+      },
+      {
+        request: request
+      }
     )
+    expect(response.errors![0].message).toBe('Authentication failed')
   })
 })
