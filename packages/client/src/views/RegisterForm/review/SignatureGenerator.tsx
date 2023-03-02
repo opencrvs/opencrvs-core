@@ -71,7 +71,7 @@ export interface SignatureInputProps {
   onChange: (value: string) => void
   disabled?: boolean
   isRequired?: boolean
-  inputLabel: string
+  label: string
   description?: string
 }
 
@@ -80,8 +80,9 @@ export function SignatureGenerator({
   value,
   onChange,
   disabled,
-  inputLabel,
-  description
+  label,
+  description,
+  isRequired
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
   const [signatureValue, setSignatureValue] = useState('')
@@ -99,8 +100,8 @@ export function SignatureGenerator({
       <InputField
         id={id}
         touched={false}
-        required={window.config.INFORMANT_SIGNATURE_REQUIRED}
-        label={inputLabel}
+        required={isRequired}
+        label={label}
       >
         <div>
           {description && (
@@ -140,7 +141,7 @@ export function SignatureGenerator({
               />
             </>
           )}
-          {value && <SignaturePreview alt={inputLabel} src={value} />}
+          {value && <SignaturePreview alt={label} src={value} />}
           {value && (
             <TertiaryButton onClick={() => onChange('')}>
               {intl.formatMessage(messages.signatureDelete)}
@@ -149,7 +150,7 @@ export function SignatureGenerator({
 
           <ResponsiveModal
             id={`${id}_modal`}
-            title={inputLabel}
+            title={label}
             autoHeight={true}
             titleHeightAuto={true}
             width={600}

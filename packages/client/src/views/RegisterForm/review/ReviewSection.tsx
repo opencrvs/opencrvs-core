@@ -1741,7 +1741,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       sectionType: string,
       id: string,
       value: string,
-      inputLabel: string
+      inputLabel: string,
+      isRequired: boolean
     ): SignatureInputProps => {
       return {
         id: id,
@@ -1754,7 +1755,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )
         },
         value: value,
-        inputLabel: inputLabel
+        label: inputLabel,
+        isRequired: isRequired
       }
     }
 
@@ -1764,7 +1766,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           SignatureSectionType.INFORMANT_SIGNATURE,
           'informants_signature',
           declaration.data.registration?.informantsSignature as string,
-          intl.formatMessage(messages.informantsSignature)
+          intl.formatMessage(messages.informantsSignature),
+          window.config.INFORMANT_SIGNATURE_REQUIRED
         )
         return (
           <>
@@ -1779,28 +1782,34 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           SignatureSectionType.BRIDE_SIGNATURE,
           'bride_signature',
           declaration.data.registration?.brideSignature as string,
-          intl.formatMessage(messages.brideSignature)
+          intl.formatMessage(messages.brideSignature),
+          window.config.BRIDE_SIGNATURE_REQUIRED
         )
 
         const groomSignatureInputPros = generateSignatureProps(
           SignatureSectionType.GROOM_SIGNATURE,
           'groom_signature',
           declaration.data.registration?.groomSignature as string,
-          intl.formatMessage(messages.groomSignature)
+          intl.formatMessage(messages.groomSignature),
+          window.config.GROOM_SIGNATURE_REQUIRED
         )
 
         const witnessOneSignatureInputPros = generateSignatureProps(
           SignatureSectionType.WITNESS_ONE_SIGNATURE,
           'witness_one_signature',
           declaration.data.registration?.witnessOneSignature as string,
-          intl.formatMessage(messages.witnessOneSignature)
+          intl.formatMessage(messages.witnessOneSignature),
+          window.config.WITNESS_ONE_SIGNATURE_REQUIRED
         )
+
         const witnessTwoSignatureInputPros = generateSignatureProps(
           SignatureSectionType.WITNESS_TWO_SIGNATURE,
           'witness_two_signature',
           declaration.data.registration?.witnessTwoSignature as string,
-          intl.formatMessage(messages.witnessTwoSignature)
+          intl.formatMessage(messages.witnessTwoSignature),
+          window.config.WITNESS_TWO_SIGNATURE_REQUIRED
         )
+
         return (
           <>
             <Text id="terms" element="p" variant="reg16">
