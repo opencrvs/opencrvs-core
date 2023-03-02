@@ -43,7 +43,7 @@ const RESET_PASSWORD_SMS = gql`
 `
 async function sendResetPasswordSMS(
   userId: string,
-  applicationName: string,
+  applicationName: string | undefined,
   refetchQueries: InternalRefetchQueriesInclude
 ) {
   return (

@@ -108,7 +108,7 @@ export default function getRoutes() {
     },
     {
       method: 'GET',
-      path: '/loginConfig',
+      path: '/publicConfig',
       handler: getLoginConfigHandler,
       config: {
         auth: false,
