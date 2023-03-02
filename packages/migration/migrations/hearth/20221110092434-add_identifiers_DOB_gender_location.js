@@ -29,7 +29,7 @@ export const up = async (db, client) => {
   let processedDocCount = 0
   try {
     await session.withTransaction(async () => {
-      //rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on OpenSearch
+      //rename field name declarationLocationHirarchyIds to declarationJurisdictionIds on opensearch
       await updateFieldNameByCompositionId(
         'declarationJurisdictionIds',
         'declarationLocationHirarchyIds'

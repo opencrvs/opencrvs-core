@@ -10,11 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as opensearch from '@opensearch-project/opensearch'
+import * as openseearch from '@opensearch-project/opensearch'
+
 const OPENSEARCH_HOST = process.env.OPENSEARCH_HOST || 'localhost:9200'
 const OPENSEARCH_INDEX_NAME = 'ocrvs'
 
-export const client = new opensearch.Client({
+export const client = new openseearch.Client({
   node: `http://${OPENSEARCH_HOST}`
 })
 
