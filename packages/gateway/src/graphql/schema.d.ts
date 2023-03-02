@@ -6175,6 +6175,10 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMarriageTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
   FEE?: MarriageToFEEResolver<TParent>
@@ -6188,9 +6192,6 @@ export interface MarriageToREGISTRATION_TARGETResolver<
 }
 
 export interface MarriageToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -247,6 +247,11 @@ const messagesToDefine = {
     id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
+  },
+  clear: {
+    defaultMessage: 'Clear',
+    description: 'Label for button that clear signature input',
+    id: 'review.signature.clear'
   }
 }
 

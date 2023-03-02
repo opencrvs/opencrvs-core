@@ -146,7 +146,10 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
-import { SignatureGenerator } from '@client/views/RegisterForm/review/Signature'
+import {
+  SignatureGenerator,
+  SignatureInputProps
+} from '@client/views/RegisterForm/review/SignatureGenerator'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1739,7 +1742,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       id: string,
       value: string,
       inputLabel: string
-    ) => {
+    ): SignatureInputProps => {
       return {
         id: id,
         onChange: (value: string) => {
@@ -1800,7 +1803,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
         return (
           <>
-            <Text id="terms" element="p" variant="reg12">
+            <Text id="terms" element="p" variant="reg16">
               {intl.formatMessage(messages.terms)}
             </Text>
             <SignatureGenerator {...brideSignatureInputPros} />

@@ -65,13 +65,12 @@ const CustomImageUpload = styled(ImageUploader)`
   border: 0 !important;
 `
 
-type SignatureInputProps = {
+export interface SignatureInputProps {
   id: string
   value?: string
   onChange: (value: string) => void
   disabled?: boolean
   isRequired?: boolean
-  label?: boolean
   inputLabel: string
   description?: string
 }
@@ -103,81 +102,83 @@ export function SignatureGenerator({
         required={window.config.INFORMANT_SIGNATURE_REQUIRED}
         label={inputLabel}
       >
-        {description && (
-          <SignatureDescription>{description}</SignatureDescription>
-        )}
-        <ErrorMessage id="signature-upload-error">
-          {signatureError && <ErrorText>{signatureError}</ErrorText>}
-        </ErrorMessage>
-        {!value && (
-          <>
-            <SecondaryButton
-              onClick={() => setSignatureDialogOpen(true)}
-              disabled={disabled}
-            >
-              {intl.formatMessage(messages.signatureOpenSignatureInput)}
-            </SecondaryButton>
-            <CustomImageUpload
-              id="signature-file-upload"
-              title="Upload"
-              handleFileChange={async (file) => {
-                if (!allowedSignatureFormat.includes(file.type)) {
-                  setSignatureError(
-                    intl.formatMessage(formMessages.fileUploadError, {
-                      type: allowedSignatureFormat
-                        .map((signatureFormat) =>
-                          signatureFormat.split('/').pop()
-                        )
-                        .join(', ')
-                    })
-                  )
-                  return
-                }
-                onChange((await getBase64String(file)).toString())
-                setSignatureError('')
-              }}
-              disabled={disabled}
-            />
-          </>
-        )}
-        {value && <SignaturePreview alt={inputLabel} src={value} />}
-        {value && (
-          <TertiaryButton onClick={() => onChange('')}>
-            {intl.formatMessage(messages.signatureDelete)}
-          </TertiaryButton>
-        )}
+        <div>
+          {description && (
+            <SignatureDescription>{description}</SignatureDescription>
+          )}
+          <ErrorMessage id="signature-upload-error">
+            {signatureError && <ErrorText>{signatureError}</ErrorText>}
+          </ErrorMessage>
+          {!value && (
+            <>
+              <SecondaryButton
+                onClick={() => setSignatureDialogOpen(true)}
+                disabled={disabled}
+              >
+                {intl.formatMessage(messages.signatureOpenSignatureInput)}
+              </SecondaryButton>
+              <CustomImageUpload
+                id="signature-file-upload"
+                title="Upload"
+                handleFileChange={async (file) => {
+                  if (!allowedSignatureFormat.includes(file.type)) {
+                    setSignatureError(
+                      intl.formatMessage(formMessages.fileUploadError, {
+                        type: allowedSignatureFormat
+                          .map((signatureFormat) =>
+                            signatureFormat.split('/').pop()
+                          )
+                          .join(', ')
+                      })
+                    )
+                    return
+                  }
+                  onChange((await getBase64String(file)).toString())
+                  setSignatureError('')
+                }}
+                disabled={disabled}
+              />
+            </>
+          )}
+          {value && <SignaturePreview alt={inputLabel} src={value} />}
+          {value && (
+            <TertiaryButton onClick={() => onChange('')}>
+              {intl.formatMessage(messages.signatureDelete)}
+            </TertiaryButton>
+          )}
 
-        <ResponsiveModal
-          id={`${id}_modal`}
-          title={inputLabel}
-          autoHeight={true}
-          titleHeightAuto={true}
-          width={600}
-          show={signatureDialogOpen}
-          actions={[
-            <CancelButton
-              key="cancel"
-              id="modal_cancel"
-              onClick={() => setSignatureDialogOpen(false)}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </CancelButton>,
-            <ApplyButton
-              key="apply"
-              id="apply_change"
-              disabled={false}
-              onClick={apply}
-            >
-              {intl.formatMessage(buttonMessages.apply)}
-            </ApplyButton>
-          ]}
-          handleClose={() => setSignatureDialogOpen(false)}
-        >
-          <SignatureDescription>
-            {intl.formatMessage(messages.signatureInputDescription)}
-          </SignatureDescription>
-          <SignCanvas value={value} onChange={setSignatureValue} />
-        </ResponsiveModal>
+          <ResponsiveModal
+            id={`${id}_modal`}
+            title={inputLabel}
+            autoHeight={true}
+            titleHeightAuto={true}
+            width={600}
+            show={signatureDialogOpen}
+            actions={[
+              <CancelButton
+                key="cancel"
+                id="modal_cancel"
+                onClick={() => setSignatureDialogOpen(false)}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </CancelButton>,
+              <ApplyButton
+                key="apply"
+                id="apply_change"
+                disabled={false}
+                onClick={apply}
+              >
+                {intl.formatMessage(buttonMessages.apply)}
+              </ApplyButton>
+            ]}
+            handleClose={() => setSignatureDialogOpen(false)}
+          >
+            <SignatureDescription>
+              {intl.formatMessage(messages.signatureInputDescription)}
+            </SignatureDescription>
+            <SignCanvas value={value} onChange={setSignatureValue} />
+          </ResponsiveModal>
+        </div>
       </InputField>
     </InputWrapper>
   )
@@ -193,6 +194,7 @@ function SignCanvas({
   const [canvasWidth, setCanvasWidth] = useState(300)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<SignatureCanvas>(null)
+  const intl = useIntl()
 
   useEffect(() => {
     function handleResize() {
@@ -242,7 +244,9 @@ function SignCanvas({
           }}
         />
       </SignatureContainer>
-      <TertiaryButton onClick={clear}>Clear</TertiaryButton>
+      <TertiaryButton onClick={clear}>
+        {intl.formatMessage(messages.clear)}
+      </TertiaryButton>
     </SignatureInputContainer>
   )
 }
