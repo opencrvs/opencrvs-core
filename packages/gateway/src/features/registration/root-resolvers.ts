@@ -508,6 +508,13 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
+    async markBirthAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
+      } else {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+    },
     async markDeathAsCertified(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
@@ -526,6 +533,15 @@ export const resolvers: GQLResolver = {
         )
       } else {
         return Promise.reject(new Error('User does not have a certify scope'))
+      }
+    },
+    async markDeathAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a certify scope')
+        )
       }
     },
     async notADuplicate(_, { id, duplicateId }, authHeader) {
@@ -683,7 +699,6 @@ async function markEventAsRegistered(
     | GQLMarriageRegistrationInput
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
@@ -702,6 +717,16 @@ async function markEventAsCertified(
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
+  return getIDFromResponse(res)
+}
+
+async function markEventAsIssued(
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  const doc = await buildFHIRBundle(details, event, authHeader)
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   return getIDFromResponse(res)
 }
 

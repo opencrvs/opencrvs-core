@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormData, ISelectOption } from '@client/forms'
+import {
+  IFormData,
+  IFormSectionGroup,
+  IRadioGroupWithNestedFieldsFormField,
+  ISelectOption
+} from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
@@ -269,4 +274,17 @@ export function getRegistrarSignatureHandlebarName(
     signatureImage?.getAttribute('xlink:href') ||
     ''
   return handlebarText?.match(/^{{(\w+)}}$/)?.[1] || ''
+}
+
+export function filterPrintInAdvancedOption(collectionForm: IFormSectionGroup) {
+  const filtredCollectionForm = (
+    collectionForm.fields as unknown as IRadioGroupWithNestedFieldsFormField[]
+  ).map((field) => {
+    const filteredOption = field.options.filter(
+      (option) => option.value !== 'PRINT_IN_ADVANCE'
+    )
+    return { ...field, options: filteredOption }
+  })
+
+  return { ...collectionForm, fields: filtredCollectionForm }
 }

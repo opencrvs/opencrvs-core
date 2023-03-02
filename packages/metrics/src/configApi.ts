@@ -19,6 +19,7 @@ interface IBirth {
     LATE: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
@@ -26,6 +27,7 @@ interface IDeath {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IMarriage {
   REGISTRATION_TARGET: number

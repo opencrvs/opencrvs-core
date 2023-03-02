@@ -65,6 +65,7 @@ export interface GQLMutation {
   markBirthAsValidated?: string
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
+  markBirthAsIssued: string
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
@@ -76,6 +77,7 @@ export interface GQLMutation {
   markDeathAsValidated?: string
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
+  markDeathAsIssued: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
   createMarriageRegistration: GQLCreatedIds
@@ -1238,7 +1240,8 @@ export const enum GQLRegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  ISSUED = 'ISSUED'
 }
 
 export interface GQLMedicalPractitionerInput {
@@ -1274,6 +1277,7 @@ export interface GQLBirth {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
   FEE?: GQLBirthFee
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLCountryLogo {
@@ -1289,6 +1293,7 @@ export interface GQLCurrency {
 export interface GQLDeath {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFee
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLMarriage {
@@ -1306,6 +1311,7 @@ export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
   FEE?: GQLBirthFeeInput
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLCountryLogoInput {
@@ -1321,6 +1327,7 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLMarriageInput {
@@ -2722,6 +2729,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
+  markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
@@ -2733,6 +2741,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsValidated?: MutationToMarkDeathAsValidatedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
+  markDeathAsIssued?: MutationToMarkDeathAsIssuedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
   createMarriageRegistration?: MutationToCreateMarriageRegistrationResolver<TParent>
@@ -2887,6 +2896,22 @@ export interface MutationToMarkBirthAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkBirthAsIssuedArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToMarkBirthAsIssuedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkBirthAsIssuedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3058,6 +3083,22 @@ export interface MutationToMarkDeathAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkDeathAsIssuedArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToMarkDeathAsIssuedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkDeathAsIssuedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -6349,6 +6390,7 @@ export interface GQLBirthTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
   LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
   FEE?: BirthToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: BirthToPRINT_IN_ADVANCEResolver<TParent>
 }
 
 export interface BirthToREGISTRATION_TARGETResolver<
@@ -6366,6 +6408,10 @@ export interface BirthToLATE_REGISTRATION_TARGETResolver<
 }
 
 export interface BirthToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -6401,6 +6447,7 @@ export interface CurrencyToLanguagesAndCountryResolver<
 export interface GQLDeathTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: DeathToREGISTRATION_TARGETResolver<TParent>
   FEE?: DeathToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: DeathToPRINT_IN_ADVANCEResolver<TParent>
 }
 
 export interface DeathToREGISTRATION_TARGETResolver<
@@ -6427,6 +6474,9 @@ export interface MarriageToREGISTRATION_TARGETResolver<
 }
 
 export interface MarriageToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

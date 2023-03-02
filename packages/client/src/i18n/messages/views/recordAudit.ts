@@ -277,6 +277,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     description: 'Label for registration status certified',
     id: 'recordAudit.regStatus.certified'
   },
+  [RegStatus.Issued]: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status Issued',
+    id: 'recordAudit.regStatus.issued'
+  },
   [RegStatus.Rejected]: {
     defaultMessage: 'Rejected',
     description: 'A label for registration status rejected',

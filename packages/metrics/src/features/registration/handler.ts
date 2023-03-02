@@ -422,14 +422,6 @@ export async function markCertifiedHandler(
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
       }),
-      generatePaymentPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        },
-        'certification'
-      ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
@@ -440,6 +432,38 @@ export async function markCertifiedHandler(
       )
     ])
 
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markIssuedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ISSUED', request)
+  try {
+    const points = await Promise.all([
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'certification'
+      ),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['CERTIFIED'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      )
+    ])
     await writePoints(points)
   } catch (err) {
     return internal(err)

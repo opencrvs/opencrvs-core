@@ -60,6 +60,7 @@ export interface IApplicationConfig {
       LATE: number
       DELAYED: number
     }
+    PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
@@ -69,6 +70,7 @@ export interface IApplicationConfig {
       ON_TIME: number
       DELAYED: number
     }
+    PRINT_IN_ADVANCE: boolean
   }
   MARRIAGE: {
     REGISTRATION_TARGET: number

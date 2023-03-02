@@ -168,6 +168,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -188,6 +189,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
@@ -1338,6 +1340,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 input MedicalPractitionerInput {
@@ -1373,6 +1376,7 @@ type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type CountryLogo {
@@ -1388,6 +1392,7 @@ type Currency {
 type Death {
   REGISTRATION_TARGET: Int
   FEE: DeathFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type Marriage {
@@ -1405,6 +1410,7 @@ input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input CountryLogoInput {
@@ -1420,6 +1426,7 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input MarriageInput {

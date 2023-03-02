@@ -87,6 +87,18 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
         },
         birthDateField: 'fatherBirthDate',
         nationalityField: 'nationality'
+      },
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
       }
     },
     death: {
@@ -121,8 +133,8 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'MOTHER', label: formMessages.contactDetailsMother },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'MOTHER', label: formMessages.certifyRecordToMother },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -148,8 +160,8 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'FATHER', label: formMessages.contactDetailsFather },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'FATHER', label: formMessages.certifyRecordToFather },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -175,9 +187,9 @@ export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
         initialValue: '',
         validate: [],
         options: [
-          { value: 'MOTHER', label: formMessages.contactDetailsMother },
-          { value: 'FATHER', label: formMessages.contactDetailsFather },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'MOTHER', label: formMessages.certifyRecordToMother },
+          { value: 'FATHER', label: formMessages.certifyRecordToFather },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -203,7 +215,7 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -408,7 +420,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           ],
           options: [
             { value: 'INFORMANT', label: formMessages.informantName },
-            { value: 'OTHER', label: formMessages.someoneElse },
+            { value: 'OTHER', label: formMessages.someoneElseCollector },
             {
               value: 'PRINT_IN_ADVANCE',
               label: formMessages.certificatePrintInAdvance
