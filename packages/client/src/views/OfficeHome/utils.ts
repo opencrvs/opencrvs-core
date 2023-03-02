@@ -20,6 +20,7 @@ export interface IQueryData {
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
+  issueTab: GQLEventSearchResultSet
   externalValidationTab: GQLEventSearchResultSet
 }
 
@@ -106,6 +107,8 @@ export const getStatusWiseWQTab = (status: string) => {
       return 'printTab'
     case 'VALIDATED':
       return 'approvalTab'
+    case 'ISSUED':
+      return 'issueTab'
     default:
       return 'reviewTab'
   }

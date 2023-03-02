@@ -18,6 +18,7 @@ interface IBirth {
     LATE: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
@@ -25,6 +26,7 @@ interface IDeath {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IMarriage {
   REGISTRATION_TARGET: number
@@ -77,7 +79,8 @@ const birthSchema = new Schema<IBirth>({
     ON_TIME: Number,
     LATE: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const deathSchema = new Schema<IDeath>({
@@ -85,7 +88,8 @@ const deathSchema = new Schema<IDeath>({
   FEE: {
     ON_TIME: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const marriageSchema = new Schema<IMarriage>({

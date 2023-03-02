@@ -45,7 +45,8 @@ import {
   declarationReinstatedHandler,
   declarationUpdatedHandler,
   markEventRegisteredHandler,
-  newEventRegistrationHandler
+  newEventRegistrationHandler,
+  markIssuedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -211,6 +212,24 @@ export const getRoutes = () => {
             event: Joi.string().valid(...Object.values(EventType))
           })
         }
+      }
+    },
+
+    // Mark issued
+    {
+      method: 'POST',
+      path: '/events/birth/mark-issued',
+      handler: markIssuedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-issued',
+      handler: markIssuedHandler,
+      config: {
+        tags: ['api']
       }
     },
 

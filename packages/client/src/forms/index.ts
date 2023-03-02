@@ -79,10 +79,12 @@ export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
-  COLLECT_CERTIFICATE = 'collect certificate',
+  CERTIFY_DECLARATION = 'certify declaration',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction'
+  REQUEST_CORRECTION_DECLARATION = 'request correction',
+  ISSUE_DECLARATION = 'issue certificate',
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
 }
 
 export enum DownloadAction {
