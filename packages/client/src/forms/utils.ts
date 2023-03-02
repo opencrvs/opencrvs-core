@@ -44,7 +44,9 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
-  IContactPoint
+  IContactPoint,
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -153,6 +155,18 @@ export const internationaliseFieldObject = (
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
+    )
+  }
+
+  if (base.type === NID_VERIFICATION_BUTTON) {
+    ;(base as any).labelForVerifiedState = intl.formatMessage(
+      (field as INidVerificationButton).labelForVerifiedState
+    )
+    ;(base as any).labelForUnverifiedState = intl.formatMessage(
+      (field as INidVerificationButton).labelForUnverifiedState
+    )
+    ;(base as any).labelForLoadingState = intl.formatMessage(
+      (field as INidVerificationButton).labelForLoadingState
     )
   }
 
@@ -545,6 +559,7 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
+
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
