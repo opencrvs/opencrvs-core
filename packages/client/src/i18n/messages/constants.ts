@@ -82,6 +82,7 @@ interface IConstantsMessages
   name: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
+  newMarriageRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
   noResults: MessageDescriptor
   pendingConnection: MessageDescriptor
@@ -529,6 +530,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'register.selectInformant.newDeathRegistration',
     defaultMessage: 'New death declaration',
     description: 'The title that appears for new death registrations'
+  },
+  newMarriageRegistration: {
+    id: 'register.selectInformant.newMarriageRegistration',
+    defaultMessage: 'New marriage declaration',
+    description: 'The title that appears for new marriage registrations'
   },
   noNameProvided: {
     defaultMessage: 'No name provided',

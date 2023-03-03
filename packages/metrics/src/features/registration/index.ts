@@ -213,7 +213,7 @@ export interface IUserAuditBody {
 export interface IPaymentPoints {
   measurement: string
   tags: ILocationTags & {
-    eventType: 'BIRTH' | 'DEATH'
+    eventType: 'BIRTH' | 'DEATH' | 'MARRIAGE'
     paymentType: 'certification' | 'correction'
   }
   fields: IPaymentFields
@@ -222,7 +222,7 @@ export interface IPaymentPoints {
 export interface ICorrectionPoint {
   measurement: string
   tags: ILocationTags & {
-    eventType: 'BIRTH' | 'DEATH'
+    eventType: 'BIRTH' | 'DEATH' | 'MARRIAGE'
     // CLERICAL_ERROR, MATERIAL_ERROR, MATERIAL_OMISSION, JUDICIAL_ORDER, OTHER
     reason: string
   }

@@ -79,6 +79,11 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
   const DEATH_ON_TIME_FEE = offlineData.config.DEATH.FEE.ON_TIME
   const DEATH_DELAYED_FEE = offlineData.config.DEATH.FEE.DELAYED
 
+  const MARRIAGE_REGISTRATION_TARGET =
+    offlineData.config.MARRIAGE.REGISTRATION_TARGET
+  const MARRIAGE_ON_TIME_FEE = offlineData.config.MARRIAGE.FEE.ON_TIME
+  const MARRIAGE_DELAYED_FEE = offlineData.config.MARRIAGE.FEE.DELAYED
+
   const birthRanges = [
     { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
     {
@@ -94,10 +99,20 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
     { start: DEATH_REGISTRATION_TARGET + 1, value: DEATH_DELAYED_FEE }
   ]
 
+  const marriageRanges = [
+    {
+      start: 0,
+      end: MARRIAGE_REGISTRATION_TARGET,
+      value: MARRIAGE_ON_TIME_FEE
+    },
+    { start: MARRIAGE_REGISTRATION_TARGET + 1, value: MARRIAGE_DELAYED_FEE }
+  ]
+
   return {
     rangeData: {
       [Event.Birth]: birthRanges,
-      [Event.Death]: deathRanges
+      [Event.Death]: deathRanges,
+      [Event.Marriage]: marriageRanges
     }
   }
 }
@@ -187,7 +202,7 @@ export function getServiceMessage(
         target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
-  } else {
+  } else if (event === Event.Death) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
@@ -195,6 +210,16 @@ export function getServiceMessage(
     } else {
       return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
+      })
+    }
+  } else if (event === Event.Marriage) {
+    if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
+        target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
+      })
+    } else {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
+        target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
       })
     }
   }
