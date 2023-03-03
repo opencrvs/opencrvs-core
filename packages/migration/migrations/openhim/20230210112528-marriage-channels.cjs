@@ -288,6 +288,42 @@ const marriageRequestCorrectionChannel = {
   urlPattern: '^/events/marriage/request-correction$'
 }
 
+const marriageCertificateIssueChannel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      name: 'Metrics -> Marriage Issue',
+      secured: false,
+      host: 'metrics',
+      port: 1050,
+      path: '',
+      pathTransform: '',
+      primary: false,
+      username: '',
+      password: '',
+      forwardAuthHeader: true,
+      status: 'enabled',
+      type: 'http'
+    },
+    {
+      type: 'http',
+      status: 'enabled',
+      forwardAuthHeader: true,
+      name: 'Search -> Marriage Issue',
+      secured: false,
+      host: 'search',
+      port: 9090,
+      path: '',
+      pathTransform: '',
+      primary: true,
+      username: '',
+      password: ''
+    }
+  ],
+  name: 'Marriage Issue',
+  urlPattern: '^/events/marriage/mark-issued$'
+}
+
 exports.up = async (db, client) => {
   const session = client.startSession()
   try {
@@ -307,6 +343,7 @@ exports.up = async (db, client) => {
       await upsertChannel(db, marriageArchiveChannel)
       await upsertChannel(db, marriageReinstateChannel)
       await upsertChannel(db, marriageRequestCorrectionChannel)
+      await upsertChannel(db, marriageCertificateIssueChannel)
     })
   } finally {
     await session.endSession()
@@ -332,6 +369,7 @@ exports.down = async (db, client) => {
       await removeChannel(db, marriageArchiveChannel)
       await removeChannel(db, marriageReinstateChannel)
       await removeChannel(db, marriageRequestCorrectionChannel)
+      await removeChannel(db, marriageCertificateIssueChannel)
     })
   } finally {
     await session.endSession()

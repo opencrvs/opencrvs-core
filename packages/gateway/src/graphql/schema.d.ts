@@ -84,6 +84,7 @@ export interface GQLMutation {
   markMarriageAsValidated?: string
   markMarriageAsRegistered: GQLMarriageRegistration
   markMarriageAsCertified: string
+  markMarriageAsIssued: string
   requestMarriageRegistrationCorrection: string
   createOrUpdateUser: GQLUser
   activateUser?: string
@@ -239,7 +240,7 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   witnessOne?: GQLRelatedPerson
   witnessTwo?: GQLRelatedPerson
   eventLocation?: GQLLocation
-  marriageType?: GQLMarriageType
+  typeOfMarriage?: GQLMarriageType
   questionnaire?: Array<GQLQuestionnaireQuestion | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -2748,6 +2749,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsValidated?: MutationToMarkMarriageAsValidatedResolver<TParent>
   markMarriageAsRegistered?: MutationToMarkMarriageAsRegisteredResolver<TParent>
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
+  markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
   requestMarriageRegistrationCorrection?: MutationToRequestMarriageRegistrationCorrectionResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
@@ -3193,6 +3195,22 @@ export interface MutationToMarkMarriageAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkMarriageAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkMarriageAsIssuedArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToMarkMarriageAsIssuedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkMarriageAsIssuedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4138,7 +4156,7 @@ export interface GQLMarriageRegistrationTypeResolver<TParent = any> {
   witnessOne?: MarriageRegistrationToWitnessOneResolver<TParent>
   witnessTwo?: MarriageRegistrationToWitnessTwoResolver<TParent>
   eventLocation?: MarriageRegistrationToEventLocationResolver<TParent>
-  marriageType?: MarriageRegistrationToMarriageTypeResolver<TParent>
+  typeOfMarriage?: MarriageRegistrationToTypeOfMarriageResolver<TParent>
   questionnaire?: MarriageRegistrationToQuestionnaireResolver<TParent>
   createdAt?: MarriageRegistrationToCreatedAtResolver<TParent>
   updatedAt?: MarriageRegistrationToUpdatedAtResolver<TParent>
@@ -4201,7 +4219,7 @@ export interface MarriageRegistrationToEventLocationResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MarriageRegistrationToMarriageTypeResolver<
+export interface MarriageRegistrationToTypeOfMarriageResolver<
   TParent = any,
   TResult = any
 > {
@@ -6461,6 +6479,10 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMarriageTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
   FEE?: MarriageToFEEResolver<TParent>
@@ -6474,9 +6496,6 @@ export interface MarriageToREGISTRATION_TARGETResolver<
 }
 
 export interface MarriageToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

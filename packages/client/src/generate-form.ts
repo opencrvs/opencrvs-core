@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable */
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import * as fs from 'fs'
 import { createUserForm } from './forms/user/fieldDefinitions/createUser'
 

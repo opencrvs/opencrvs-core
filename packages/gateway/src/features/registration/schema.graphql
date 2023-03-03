@@ -384,7 +384,7 @@ type MarriageRegistration implements EventRegistration { # -> Composition
   witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
   witnessTwo: RelatedPerson # -> .section(code='witnessTwo-details').entry.reference
   eventLocation: Location
-  marriageType: MarriageType # -> Observation.valueInteger
+  typeOfMarriage: MarriageType # -> Observation.valueInteger
   questionnaire: [QuestionnaireQuestion]
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
@@ -647,6 +647,7 @@ type Mutation {
     details: MarriageRegistrationInput!
   ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   requestMarriageRegistrationCorrection(
     id: ID!
     details: MarriageRegistrationInput!

@@ -100,7 +100,7 @@ export type USER_ACTION =
   | 'USERNAME_REMINDER_BY_ADMIN'
   | 'PASSWORD_RESET_BY_ADMIN'
 
-export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
+export type DECLARATION_TYPE = 'BIRTH' | 'DEATH' | 'MARRIAGE'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,

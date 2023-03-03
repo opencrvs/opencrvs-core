@@ -130,6 +130,7 @@ interface State {
   allowPrinting: {
     birth: boolean
     death: boolean
+    marriage: boolean
   }
 }
 
@@ -235,7 +236,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       },
       allowPrinting: {
         birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
-        death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE
+        death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE,
+        marriage: true
       }
     }
   }

@@ -103,6 +103,15 @@ export const MARK_EVENT_UNASSIGNED = gql`
   }
 `
 
+export const ISSUE_MARRIAGE_CERTIFICATE = gql`
+  mutation markMarriageAsIssued(
+    $id: ID!
+    $details: MarriageRegistrationInput!
+  ) {
+    markMarriageAsIssued(id: $id, details: $details)
+  }
+`
+
 export function getMarriageMutation(action: SubmissionAction) {
   switch (action) {
     case SubmissionAction.SUBMIT_FOR_REVIEW:
@@ -115,8 +124,11 @@ export function getMarriageMutation(action: SubmissionAction) {
       return REJECT_MARRIAGE_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_MARRIAGE_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_MARRIAGE_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_MARRIAGE_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_MARRIAGE_REG_CORRECTION
   }

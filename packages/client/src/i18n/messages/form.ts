@@ -33,7 +33,8 @@ interface IFormMessages
   informantsRelationWithChild: MessageDescriptor
   informantsRelationWithDeceased: MessageDescriptor
   informantTitle: MessageDescriptor
-  witnessTitle: MessageDescriptor
+  witnessOneTitle: MessageDescriptor
+  witnessTwoTitle: MessageDescriptor
   assignedRegistrationOffice: MessageDescriptor
   assignedRegistrationOfficeGroupTitle: MessageDescriptor
   attendantAtBirth: MessageDescriptor
@@ -549,10 +550,15 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Form section title for informants',
     id: 'form.section.informant.title'
   },
-  witnessTitle: {
-    defaultMessage: 'What are the witnesses details?',
+  witnessOneTitle: {
+    defaultMessage: 'What are the witnesses one details?',
     description: 'Form section title for witnesses',
-    id: 'form.section.witness.title'
+    id: 'form.section.witnessOne.title'
+  },
+  witnessTwoTitle: {
+    defaultMessage: 'What are the witnesses two details?',
+    description: 'Form section title for witnesses',
+    id: 'form.section.witnessTwo.title'
   },
   assignedRegistrationOffice: {
     defaultMessage: 'Assigned Registration Office',

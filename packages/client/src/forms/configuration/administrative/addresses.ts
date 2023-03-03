@@ -108,7 +108,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
   },
   {
     precedingFieldId:
-      'marriage.marriageEvent.marriage-event-details.typeOfMarriage',
+      'marriage.marriageEvent.marriage-event-details.placeOfMarriageTitle',
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_MARRIAGE }]
   },
   {

@@ -401,6 +401,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             use
             firstNames
             familyName
+            marriedLastName
           }
           birthDate
           maritalStatus
@@ -433,6 +434,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             use
             firstNames
             familyName
+            marriedLastName
           }
           birthDate
           maritalStatus
@@ -530,7 +532,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           registrationNumber
           mosipAid
         }
-        marriageType
+        typeOfMarriage
         eventLocation {
           id
           address {

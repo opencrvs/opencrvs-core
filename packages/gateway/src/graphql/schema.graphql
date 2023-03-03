@@ -202,6 +202,7 @@ type Mutation {
     details: MarriageRegistrationInput!
   ): MarriageRegistration!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
   requestMarriageRegistrationCorrection(
     id: ID!
     details: MarriageRegistrationInput!
@@ -375,7 +376,7 @@ type MarriageRegistration implements EventRegistration {
   witnessOne: RelatedPerson
   witnessTwo: RelatedPerson
   eventLocation: Location
-  marriageType: MarriageType
+  typeOfMarriage: MarriageType
   questionnaire: [QuestionnaireQuestion]
   createdAt: Date
   updatedAt: Date

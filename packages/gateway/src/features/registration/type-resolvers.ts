@@ -260,8 +260,7 @@ export const typeResolvers: GQLResolver = {
       return (
         relatedPerson &&
         relatedPerson.relationship &&
-        relatedPerson.relationship.coding &&
-        relatedPerson.relationship.coding[0].display
+        relatedPerson.relationship.text
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
@@ -1805,7 +1804,7 @@ export const typeResolvers: GQLResolver = {
 
       if (observations) {
         const observationKeys = {
-          marriageType: MARRIAGE_TYPE_CODE
+          typeOfMarriage: MARRIAGE_TYPE_CODE
         }
         observations.entry.map(
           (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
@@ -1935,7 +1934,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async marriageType(composition: ITemplatedComposition, _, authHeader) {
+    async typeOfMarriage(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         MARRIAGE_ENCOUNTER_CODE,
         composition
@@ -1947,13 +1946,7 @@ export const typeResolvers: GQLResolver = {
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MARRIAGE_TYPE_CODE}`,
         authHeader
       )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueQuantity.value) ||
-        null
-      )
+      return observations?.entry?.[0]?.resource?.valueQuantity?.value || null
     },
     async eventLocation(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(

@@ -23,6 +23,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
@@ -55,6 +56,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
@@ -152,7 +154,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         registrationNumber
         mosipAid
       }
-      marriageType
+      typeOfMarriage
       eventLocation {
         id
         address {
@@ -273,6 +275,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
@@ -305,6 +308,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
@@ -402,7 +406,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         registrationNumber
         mosipAid
       }
-      marriageType
+      typeOfMarriage
       eventLocation {
         id
         address {

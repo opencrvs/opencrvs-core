@@ -218,18 +218,15 @@ export const getRoutes = () => {
     // Mark issued
     {
       method: 'POST',
-      path: '/events/birth/mark-issued',
+      path: '/events/{event}/mark-issued',
       handler: markIssuedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-issued',
-      handler: markIssuedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 

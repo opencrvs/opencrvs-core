@@ -524,6 +524,15 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async markDeathAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a certify scope')
+        )
+      }
+    },
     async markMarriageAsCertified(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(
@@ -535,9 +544,9 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markDeathAsIssued(_, { id, details }, authHeader) {
+    async markMarriageAsIssued(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
-        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
       } else {
         return await Promise.reject(
           new Error('User does not have a certify scope')

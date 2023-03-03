@@ -1086,7 +1086,7 @@ export const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      marriageType: (fhirBundle, fieldValue, context) => {
+      typeOfMarriage: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           MARRIAGE_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,

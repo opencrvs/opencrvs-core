@@ -213,7 +213,7 @@ export class InProgressComponent extends React.Component<
         const brideNamesMap = createNamesMap(brideNames)
         const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
         const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
-        name = `${groomName} & ${brideName}`
+        name = groomName + (brideName ? ` & ${brideName}` : '')
         const date = (reg as GQLMarriageEventSearchSet).dateOfMarriage
         eventDate = date && date
       }
