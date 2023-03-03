@@ -10,35 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export * from './custom-icons'
-export {
-  GitBranch,
-  List,
-  Target,
-  Medal,
-  CreditCard,
-  Phone,
-  User,
-  ArrowLeft,
-  ArrowRight,
-  Share,
-  Lock,
-  ListBullets,
-  Compass,
-  ChatCircle,
-  Star,
-  MagnifyingGlass,
-  Plus,
-  SignOut,
-  Pencil,
-  CaretRight,
-  CaretDown,
-  Copy,
-  Paperclip,
-  TrashSimple,
-  TextT,
-  Database,
-  CheckSquare,
-  X,
-  Activity
-} from 'phosphor-react'
+import { useEffect } from 'react'
+
+export const useTimeout = (
+  callback: () => void,
+  timeout = 0,
+  trigger = false
+) => {
+  useEffect(() => {
+    let timeoutReference: NodeJS.Timeout | undefined = undefined
+
+    if (trigger) timeoutReference = setTimeout(callback, timeout)
+
+    return () => {
+      if (timeoutReference) clearTimeout(timeoutReference)
+    }
+  }, [callback, timeout, trigger])
+}
