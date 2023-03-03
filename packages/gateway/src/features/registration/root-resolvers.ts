@@ -17,7 +17,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -46,7 +47,12 @@ import {
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import {
+  AUTH_URL,
+  COUNTRY_CONFIG_URL,
+  FHIR_URL,
+  SEARCH_URL
+} from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -54,7 +60,20 @@ import {
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
 
+async function getAnonymousToken() {
+  const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
+  const { token } = await res.json()
+  return token
+}
+
 export const resolvers: GQLResolver = {
+  RecordDetails: {
+    __resolveType(obj): any {
+      if (!obj?.type?.text) return 'BirthRegistration'
+      if (obj.type.text == 'Birth Declaration') return 'BirthRegistration'
+      if (obj.type.text == 'Death Declaration') return 'DeathRegistration'
+    }
+  },
   Query: {
     async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -261,6 +280,30 @@ export const resolvers: GQLResolver = {
         return await Promise.reject(
           new Error('User does not have enough scope')
         )
+      }
+    },
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      try {
+        const token = await getAnonymousToken()
+        context.Authorization = `Bearer ${token}`
+        const authHeader = {
+          Authorization: context.Authorization
+        }
+        const taskEntry = await getTaskEntry(id, authHeader)
+
+        const taskBundle = taskBundleWithExtension(taskEntry, {
+          url: VERIFIED_EXTENSION_URL,
+          valueString: context['x-real-ip']
+        })
+        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+
+        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
+        if (!record) {
+          await Promise.reject(new Error('Invalid QrCode'))
+        }
+        return record
+      } catch (e) {
+        await Promise.reject(new Error(e))
       }
     }
   },
@@ -655,6 +698,7 @@ async function markEventAsIssued(
 
 const ACTION_EXTENSIONS = [
   ASSIGNED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,

@@ -201,6 +201,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     defaultMessage: 'Assigned',
     description: 'Assigned action'
   },
+  [RegAction.Verified]: {
+    id: 'recordAudit.regAction.verified',
+    defaultMessage: 'Certificate verified',
+    description: 'Verified action'
+  },
   [RegAction.Unassigned]: {
     id: 'recordAudit.regAction.unassigned',
     defaultMessage: 'Unassigned',
