@@ -1259,8 +1259,8 @@ const dummyMarriageRegistrationResponse = {
       {
         type: 'PRIMARY_ADDRESS',
         line: ['', '', '', '', 'Mother village', 'RURAL'],
-        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+        state: 'df669feb-61a3-4984-ab24-4b28511b472a',
         city: null,
         postalCode: null,
         country: 'FAR',
@@ -1299,8 +1299,8 @@ const dummyMarriageRegistrationResponse = {
       {
         type: 'PRIMARY_ADDRESS',
         line: ['', '', '', '', '', 'URBAN', '', '', '', '', '', '', '', '', ''],
-        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+        state: 'df669feb-61a3-4984-ab24-4b28511b472a',
         city: null,
         postalCode: null,
         country: 'FAR',
@@ -1407,8 +1407,8 @@ const dummyMarriageRegistrationResponse = {
     id: 'fc388391-c8af-43c3-ba23-303735bf9bea',
     address: {
       line: ['', '', '', '', '', 'URBAN', '', '', '', '', '', '', '', '', ''],
-      district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-      state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+      district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+      state: 'df669feb-61a3-4984-ab24-4b28511b472a',
       city: '',
       postalCode: '',
       country: 'FAR',
