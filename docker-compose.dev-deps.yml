@@ -34,6 +34,7 @@ services:
       - path.repo=/data/backups/opensearch
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
+      - plugins.security.disabled=true
 
   minio:
     ports:

@@ -22,7 +22,6 @@ export const indexComposition = async (
   try {
     response = await client.index({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       id: compositionIdentifier,
       body,
       refresh: 'wait_for' // makes the call wait until the change is available via search
@@ -39,7 +38,6 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   try {
     response = await client.update({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       id,
       body: {
         doc: body
@@ -57,7 +55,6 @@ export const searchComposition = async (body: ICompositionBody) => {
   try {
     const response = client.search<ISearchResponse<any>>({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: buildQuery(body)
       }
@@ -73,7 +70,6 @@ export const searchByCompositionId = async (compositionId: string) => {
   try {
     const response = await client.search<ISearchResponse<any>>({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           match: {
