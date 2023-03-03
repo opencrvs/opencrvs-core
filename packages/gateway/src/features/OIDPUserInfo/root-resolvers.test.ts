@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { fetchToken, FetchTokenProps, fetchUserInfo } from './utils'
+import { resolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
 
-export async function oidpGetUserInfoHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const tokenResponse = await fetchToken(request.payload as FetchTokenProps)
-  const userInfo = await fetchUserInfo(tokenResponse.access_token)
+const fetch = fetchAny as any
 
-  return userInfo
-}
+describe('OIDP user info root resolvers', () => {
+  describe('getOIDPUserInfo()', () => {
+    // TODO!
+    expect(1).toBe(1)
+  })
+})

@@ -16,7 +16,8 @@
     "lib": [
       "esnext.asynciterable",
       "es6",
-      "es2019"
+      "es2019",
+      "DOM.Iterable"
     ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

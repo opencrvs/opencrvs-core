@@ -150,6 +150,12 @@ type Query {
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
   informantSMSNotifications: [SMSNotification!]
+  getOIDPUserInfo(
+    code: String!
+    clientId: String!
+    redirectUri: String!
+    grantType: String
+  ): OIDPUserInfo
 }
 
 type Mutation {
@@ -608,6 +614,29 @@ type SMSNotification {
   enabled: Boolean!
   updatedAt: String!
   createdAt: String!
+}
+
+type OIDPUserInfo {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  middle_name: String
+  nickname: String
+  preferred_username: String
+  profile: String
+  picture: String
+  website: String
+  email: String
+  email_verified: Boolean
+  gender: String
+  birthdate: String
+  zoneinfo: String
+  locale: String
+  phone_number: String
+  phone_number_verified: Boolean
+  address: OIDPUserAddress
+  updated_at: Int
 }
 
 input NotificationInput {
@@ -1199,6 +1228,15 @@ type SystemSettings {
 type FormDatasetOption {
   value: String!
   label: [FormDatasetOptionLabel]
+}
+
+type OIDPUserAddress {
+  formatted: String
+  street_address: String
+  locality: String
+  region: String
+  postal_code: String
+  country: String
 }
 
 input PersonInput {
