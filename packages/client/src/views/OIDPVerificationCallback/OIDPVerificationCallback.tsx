@@ -9,39 +9,78 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Redirect, useParams } from 'react-router'
+import React, { useEffect, useState } from 'react'
+import { Redirect } from 'react-router'
+import { useQueryParams } from './utils'
 
-export const useRedirect = () => {
-  const { state, nonce, code } = useParams<{
-    state?: string
-    nonce?: string
-    code?: string
-  }>()
+// OIDP Verification Callback
+// --
+// Checks the ?state= query parameter for a JSON string like: { pathname: "/path/somewhere" }
+// Checks that the &nonce= parameter matches the one in localStorage, removes it if yes, throws if not
+// Redirects to the pathname in state
 
-  if (!state) {
-    throw new Error('No state provided from OIDP callback.')
-  }
+export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
+  'oidp-verification-nonce'
 
-  const { pathname } = JSON.parse(state)
+const useCheckNonce = () => {
+  const params = useQueryParams()
+  const [nonceOk, setNonceOk] = useState(false)
 
-  return {
-    pathname,
-    state: {
-      nonce,
-      code
+  useEffect(() => {
+    if (!params.get('nonce')) {
+      throw new Error('No nonce provided from OIDP callback.')
     }
+
+    const nonceMatches =
+      window.localStorage.getItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY) ===
+      params.get('nonce')
+
+    if (nonceMatches) {
+      window.localStorage.removeItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY)
+      setNonceOk(true)
+    } else {
+      throw new Error(
+        'Nonce did not match the one sent to the integration before callback'
+      )
+    }
+  }, [params])
+
+  return nonceOk
+}
+
+const useRedirectPathname = () => {
+  const params = useQueryParams()
+
+  useEffect(() => {
+    if (!params.get('state')) {
+      throw new Error('No state provided from OIDP callback.')
+    }
+  }, [params])
+
+  const { pathname } = JSON.parse(params.get('state') ?? '{}') as {
+    pathname: string | undefined
   }
+
+  return { pathname }
 }
 
 export const OIDPVerificationCallback = () => {
-  const { pathname, state } = useRedirect()
+  const params = useQueryParams()
+  const { pathname } = useRedirectPathname()
+  const isNonceOk = useCheckNonce()
+
+  if (!pathname || !isNonceOk) {
+    // Do not redirect and let the hooks throw
+    return null
+  }
 
   return (
     <Redirect
       to={{
         pathname,
-        state
+        state: {
+          code: params.get('code')
+        }
       }}
     />
   )
