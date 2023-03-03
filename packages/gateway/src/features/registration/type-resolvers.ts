@@ -890,22 +890,13 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
-
-      return {
-        ...userResponse,
-        role: {
-          ...userResponse.role,
-          labels: [
-            {
-              lang: 'en',
-              label:
-                role ??
-                userResponse.role.labels.find((label) => label.lang === 'en')
-                  ?.label
-            }
-          ]
+      userResponse.role.labels.forEach((item) => {
+        if (item.lang === 'en') {
+          item.label = role ?? item.label
         }
-      }
+      })
+
+      return userResponse
     },
     system: async (task: fhir.Task, _: any, authHeader) => {
       const systemIdentifier = task.identifier?.find(

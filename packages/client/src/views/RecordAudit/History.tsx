@@ -257,7 +257,7 @@ export const GetHistory = ({
     ) : isSystemInitiated(item) || !item.user?.systemRole ? (
       intl.formatMessage(getSystemType(item.system?.type))
     ) : (
-      item.user.role.labels.find((label) => label.lang === 'en')?.label
+      getUserRole(currentLanguage, item.user?.role)
     ),
 
     location: isVerifiedAction(item) ? (
