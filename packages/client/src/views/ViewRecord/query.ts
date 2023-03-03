@@ -60,6 +60,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }

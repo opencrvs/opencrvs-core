@@ -63,7 +63,8 @@ import {
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   MARKED_AS_DUPLICATE,
-  MARKED_AS_NOT_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE,
+  VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -971,6 +972,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.ASSIGNED
   } else if (findExtension(UNASSIGNED_EXTENSION_URL, extensions)) {
     return GQLRegAction.UNASSIGNED
+  } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.VERIFIED
   } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
     return GQLRegAction.REQUESTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {

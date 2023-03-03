@@ -25,6 +25,7 @@ export interface GQLQuery {
   fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
+  fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -221,6 +222,23 @@ export interface GQLEventRegistrationNameMap {
 export interface GQLRegistrationCountResult {
   results: Array<GQLStatusWiseRegistrationCount | null>
   total: number
+}
+
+export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
+
+/** Use this to resolve union type RecordDetails */
+export type GQLPossibleRecordDetailsTypeNames =
+  | 'BirthRegistration'
+  | 'DeathRegistration'
+
+export interface GQLRecordDetailsNameMap {
+  RecordDetails: GQLRecordDetails
+  BirthRegistration: GQLBirthRegistration
+  DeathRegistration: GQLDeathRegistration
+}
+
+export const enum GQLAuthorizationStatus {
+  ANONYMOUS = 'ANONYMOUS'
 }
 
 export interface GQLLocation {
@@ -787,6 +805,7 @@ export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
   regStatus?: GQLRegStatus
+  ipAddress?: string
   action?: GQLRegAction
   statusReason?: GQLStatusReason
   reason?: string
@@ -1370,6 +1389,7 @@ export interface GQLDuplicatesInfo {
 }
 
 export const enum GQLRegAction {
+  VERIFIED = 'VERIFIED',
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
@@ -1861,6 +1881,10 @@ export interface GQLResolver {
   }
 
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
+  RecordDetails?: {
+    __resolveType: GQLRecordDetailsTypeResolver
+  }
+
   Location?: GQLLocationTypeResolver
   User?: GQLUserTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -1982,6 +2006,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
+  fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -2218,6 +2243,21 @@ export interface QueryToFetchRegistrationCountByStatusResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationCountByStatusArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRecordDetailsForVerificationArgs {
+  id: string
+}
+export interface QueryToFetchRecordDetailsForVerificationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRecordDetailsForVerificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3972,6 +4012,12 @@ export interface RegistrationCountResultToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLRecordDetailsTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'BirthRegistration'
+    | 'DeathRegistration'
+    | Promise<'BirthRegistration' | 'DeathRegistration'>
+}
 export interface GQLLocationTypeResolver<TParent = any> {
   id?: LocationToIdResolver<TParent>
   _fhirID?: LocationTo_fhirIDResolver<TParent>
@@ -5272,6 +5318,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
   regStatus?: HistoryToRegStatusResolver<TParent>
+  ipAddress?: HistoryToIpAddressResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
@@ -5299,6 +5346,10 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToRegStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToIpAddressResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

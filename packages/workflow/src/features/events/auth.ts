@@ -81,7 +81,8 @@ function getEventToScopeMap() {
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY,
       USER_SCOPE.VALIDATE
-    ]
+    ],
+    [Events.VERIFIED_EVENT]: [USER_SCOPE.VERIFY]
   }
 }
 

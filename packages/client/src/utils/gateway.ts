@@ -329,6 +329,10 @@ export type AuditLogItemBase = {
   userAgent: Scalars['String']
 }
 
+export enum AuthorizationStatus {
+  Anonymous = 'ANONYMOUS'
+}
+
 export type Avatar = {
   __typename?: 'Avatar'
   data: Scalars['String']
@@ -932,6 +936,7 @@ export type History = {
   duplicateOf?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
+  ipAddress?: Maybe<Scalars['String']>
   location?: Maybe<Location>
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
@@ -1581,6 +1586,7 @@ export type Query = {
   fetchEventRegistration?: Maybe<EventRegistration>
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
+  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1643,6 +1649,10 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QueryFetchRecordDetailsForVerificationArgs = {
+  id: Scalars['String']
 }
 
 export type QueryFetchRegistrationArgs = {
@@ -1874,6 +1884,8 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export type RecordDetails = BirthRegistration | DeathRegistration
+
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
@@ -1882,6 +1894,7 @@ export enum RegAction {
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
+  Verified = 'VERIFIED',
   Viewed = 'VIEWED'
 }
 
@@ -3480,6 +3493,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
       statusReason?: {
@@ -3778,6 +3792,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       otherReason?: string | null
       duplicateOf?: string | null
@@ -4154,6 +4169,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
       statusReason?: {
@@ -4438,6 +4454,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       duplicateOf?: string | null
+      ipAddress?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -6590,6 +6607,120 @@ export type SubmitActivateUserMutation = {
   activateUser?: string | null
 }
 
+export type FetchRecordDetailsForVerificationQueryVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type FetchRecordDetailsForVerificationQuery = {
+  __typename?: 'Query'
+  fetchRecordDetailsForVerification?:
+    | {
+        __typename?: 'BirthRegistration'
+        id: string
+        createdAt?: any | null
+        child?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | {
+        __typename?: 'DeathRegistration'
+        id: string
+        createdAt?: any | null
+        deceased?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          deceased?: {
+            __typename?: 'Deceased'
+            deathDate?: string | null
+          } | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | null
+}
+
 export type FetchViewRecordByCompositionQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -6805,6 +6936,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
@@ -7087,6 +7219,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'

@@ -28,6 +28,7 @@ import {
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
+  anonymousActionEventHandler,
   markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
@@ -54,7 +55,8 @@ import {
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE
+  MARKED_AS_DUPLICATE,
+  VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -92,6 +94,7 @@ export enum Events {
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
+  VERIFIED_EVENT = '/events/verified',
   UNKNOWN = 'unknown',
   VIEWED = '/events/viewed',
   MARKED_AS_DUPLICATE = '/events/markAsDuplicate'
@@ -215,6 +218,7 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
     const taskResource = getTaskResource(fhirBundle)
+
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
     }
@@ -233,6 +237,10 @@ function detectEvent(request: Hapi.Request): Events {
     if (hasExtension(taskResource, MARKED_AS_DUPLICATE)) {
       return Events.MARKED_AS_DUPLICATE
     }
+    if (hasExtension(taskResource, VERIFIED_EXTENSION_URL)) {
+      return Events.VERIFIED_EVENT
+    }
+
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
@@ -264,6 +272,7 @@ export async function fhirWorkflowEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const event = detectEvent(request)
+
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary
@@ -474,6 +483,9 @@ export async function fhirWorkflowEventHandler(
     case Events.MARKED_AS_DUPLICATE:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
+      break
+    case Events.VERIFIED_EVENT:
+      response = await anonymousActionEventHandler(request, h, event)
       break
     default:
       // forward as-is to hearth

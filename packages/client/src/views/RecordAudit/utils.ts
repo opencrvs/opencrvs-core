@@ -439,3 +439,7 @@ export function isSystemInitiated(history: History) {
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
+
+export function isVerifiedAction(history: History) {
+  return history.action === RegAction.Verified
+}
