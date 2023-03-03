@@ -10,28 +10,26 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import {
+  svgCode as marriageCertificateTemplateDefault
+  // eslint-disable-next-line import/no-relative-parent-imports
+} from '../../utils/marriage-certificate-template-default.js'
 export const up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('configs').updateMany(
-        {},
-        {
-          $set: {
-            MARRIAGE: {
-              REGISTRATION_TARGET: 45,
-              FEE: {
-                ON_TIME: 10,
-                DELAYED: 45
-              },
-              PRINT_IN_ADVANCE: true
-            }
-          }
-        }
-      )
+      await db.collection('certificates').insert({
+        event: 'marriage',
+        status: 'ACTIVE',
+        svgCode: marriageCertificateTemplateDefault,
+        svgDateCreated: Number(new Date()),
+        svgDateUpdated: Number(new Date()),
+        svgFilename: 'farajaland-marriage-certificate-v1.svg',
+        user: 'j.campbell'
+      })
     })
   } finally {
-    console.log(`Migration - Add Marriage Configuration : Done. `)
+    console.log(`Migration - Add Marriage Certificate Configuration: Done. `)
     await session.endSession()
   }
 }
@@ -40,12 +38,12 @@ export const down = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db
-        .collection('configs')
-        .updateMany({}, { $unset: { MARRIAGE: '' } })
+      await db.collection('certificates').deleteOne({ event: 'marriage' })
     })
   } finally {
-    console.log(`Migration - DOWN - Add Marriage Configuration - DONE `)
+    console.log(
+      `Migration - DOWN - Add Marriage Certificate Configuration: Done `
+    )
     await session.endSession()
   }
 }

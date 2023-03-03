@@ -9953,6 +9953,18 @@
             "deprecationReason": null
           },
           {
+            "name": "PRINT_IN_ADVANCE",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "REGISTRATION_TARGET",
             "description": null,
             "args": [],
@@ -10176,6 +10188,18 @@
             "deprecationReason": null
           },
           {
+            "name": "PRINT_IN_ADVANCE",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "REGISTRATION_TARGET",
             "description": null,
             "type": {
@@ -10290,18 +10314,6 @@
             "deprecationReason": null
           },
           {
-            "name": "marriageType",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "ENUM",
-              "name": "MarriageType",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "questionnaire",
             "description": null,
             "args": [],
@@ -10324,6 +10336,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "Registration",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "typeOfMarriage",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "MarriageType",
               "ofType": null
             },
             "isDeprecated": false,
@@ -12253,6 +12277,55 @@
           },
           {
             "name": "markMarriageAsCertified",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "MarriageRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "markMarriageAsIssued",
             "description": null,
             "args": [
               {

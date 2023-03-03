@@ -79,7 +79,9 @@ export function MarriageFeeOnTime() {
             FEE: {
               ON_TIME: parseFloat(marriageOnTimeFee.replace(/,/g, '')),
               DELAYED: offlineCountryConfiguration.config.MARRIAGE.FEE.DELAYED
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.MARRIAGE.PRINT_IN_ADVANCE
           }
         },
         dispatch,

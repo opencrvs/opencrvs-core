@@ -69,7 +69,7 @@ export interface IOfflineData {
     certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
-      marriage?: ISVGTemplate
+      marriage: ISVGTemplate
     }
   }
   assets: {
@@ -418,7 +418,15 @@ function reducer(
         ({ event, status }) => event === Event.Death && status === 'ACTIVE'
       )
 
-      if (birthCertificateTemplate && deathCertificateTemplate) {
+      const marriageCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.Marriage && status === 'ACTIVE'
+      )
+
+      if (
+        birthCertificateTemplate &&
+        deathCertificateTemplate &&
+        marriageCertificateTemplate
+      ) {
         const certificatesTemplates = {
           birth: {
             id: birthCertificateTemplate.id,
@@ -431,6 +439,12 @@ function reducer(
             definition: deathCertificateTemplate.svgCode,
             fileName: deathCertificateTemplate.svgFilename,
             lastModifiedDate: deathCertificateTemplate.svgDateUpdated
+          },
+          marriage: {
+            id: marriageCertificateTemplate.id,
+            definition: marriageCertificateTemplate.svgCode,
+            fileName: marriageCertificateTemplate.svgFilename,
+            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated
           }
         }
         newOfflineData = {

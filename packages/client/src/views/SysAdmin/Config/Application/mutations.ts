@@ -64,6 +64,7 @@ const applicationConfigMutation = gql`
           ON_TIME
           DELAYED
         }
+        PRINT_IN_ADVANCE
       }
     }
   }

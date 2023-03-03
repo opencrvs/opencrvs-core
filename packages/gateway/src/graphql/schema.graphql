@@ -1399,6 +1399,7 @@ type Death {
 type Marriage {
   REGISTRATION_TARGET: Int
   FEE: MarriageFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type LoginBackground {
@@ -1433,6 +1434,7 @@ input DeathInput {
 input MarriageInput {
   REGISTRATION_TARGET: Int
   FEE: MarriageFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input LoginBackgroundInput {

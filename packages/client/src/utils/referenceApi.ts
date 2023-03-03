@@ -78,6 +78,7 @@ export interface IApplicationConfig {
       ON_TIME: number
       DELAYED: number
     }
+    PRINT_IN_ADVANCE: boolean
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string

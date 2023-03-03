@@ -1145,6 +1145,7 @@ export enum MaritalStatusType {
 export type Marriage = {
   __typename?: 'Marriage'
   FEE?: Maybe<MarriageFee>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -1172,6 +1173,7 @@ export type MarriageFeeInput = {
 
 export type MarriageInput = {
   FEE?: InputMaybe<MarriageFeeInput>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -1184,9 +1186,9 @@ export type MarriageRegistration = EventRegistration & {
   groom?: Maybe<Person>
   history?: Maybe<Array<Maybe<History>>>
   id: Scalars['ID']
-  marriageType?: Maybe<MarriageType>
   questionnaire?: Maybe<Array<Maybe<QuestionnaireQuestion>>>
   registration?: Maybe<Registration>
+  typeOfMarriage?: Maybe<MarriageType>
   updatedAt?: Maybe<Scalars['Date']>
   witnessOne?: Maybe<RelatedPerson>
   witnessTwo?: Maybe<RelatedPerson>
@@ -1292,6 +1294,7 @@ export type Mutation = {
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   markMarriageAsCertified: Scalars['ID']
+  markMarriageAsIssued: Scalars['ID']
   markMarriageAsRegistered: MarriageRegistration
   markMarriageAsValidated?: Maybe<Scalars['ID']>
   modifyDraftStatus?: Maybe<FormDraft>
@@ -1463,6 +1466,11 @@ export type MutationMarkEventAsVoidedArgs = {
 }
 
 export type MutationMarkMarriageAsCertifiedArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkMarriageAsIssuedArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
@@ -4769,6 +4777,16 @@ export type MarkMarriageAsCertifiedMutation = {
   markMarriageAsCertified: string
 }
 
+export type MarkMarriageAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsIssued: string
+}
+
 export type FetchMarriageRegistrationForReviewQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -4779,7 +4797,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
     __typename?: 'MarriageRegistration'
     _fhirIDMap?: any | null
     id: string
-    marriageType?: MarriageType | null
+    typeOfMarriage?: MarriageType | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -4794,6 +4812,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -4831,6 +4850,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -5061,7 +5081,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
     __typename?: 'MarriageRegistration'
     _fhirIDMap?: any | null
     id: string
-    marriageType?: MarriageType | null
+    typeOfMarriage?: MarriageType | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -5076,6 +5096,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -5113,6 +5134,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -7396,6 +7418,7 @@ export type UpdateApplicationConfigMutation = {
     MARRIAGE?: {
       __typename?: 'Marriage'
       REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'MarriageFee'
         ON_TIME?: number | null
@@ -8634,7 +8657,7 @@ export type FetchViewRecordByCompositionQuery = {
         __typename: 'MarriageRegistration'
         _fhirIDMap?: any | null
         id: string
-        marriageType?: MarriageType | null
+        typeOfMarriage?: MarriageType | null
         bride?: {
           __typename?: 'Person'
           id?: string | null
@@ -8649,6 +8672,7 @@ export type FetchViewRecordByCompositionQuery = {
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+            marriedLastName?: string | null
           } | null> | null
           identifier?: Array<{
             __typename?: 'IdentityType'
@@ -8686,6 +8710,7 @@ export type FetchViewRecordByCompositionQuery = {
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+            marriedLastName?: string | null
           } | null> | null
           identifier?: Array<{
             __typename?: 'IdentityType'

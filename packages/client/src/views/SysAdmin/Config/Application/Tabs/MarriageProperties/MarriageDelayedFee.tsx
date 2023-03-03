@@ -80,7 +80,9 @@ export function MarriageDelayedFee() {
             FEE: {
               ON_TIME: offlineCountryConfiguration.config.MARRIAGE.FEE.ON_TIME,
               DELAYED: parseFloat(marriageDelayedFee.replace(/,/g, ''))
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.MARRIAGE.PRINT_IN_ADVANCE
           }
         },
         dispatch,

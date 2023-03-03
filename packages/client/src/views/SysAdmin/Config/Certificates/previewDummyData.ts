@@ -1220,6 +1220,367 @@ const dummyDeathRegistrationResponse = {
   __typename: 'DeathRegistration'
 }
 
+const dummyMarriageRegistrationResponse = {
+  _fhirIDMap: {
+    composition: 'd2de3292-09ac-42e5-97ea-d553578d0f62',
+    encounter: 'db4b8cc7-d440-40d0-9bb7-f5ccfbe31ab0',
+    eventLocation: 'fc388391-c8af-43c3-ba23-303735bf9bea',
+    observation: {
+      typeOfMarriage: 'fe675615-01bb-4d5b-b31a-09557e609464'
+    }
+  },
+  id: 'd2de3292-09ac-42e5-97ea-d553578d0f62',
+  bride: {
+    id: 'e8efd318-9cc2-4f2d-8be3-50bc058e4bfb',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Santina',
+        familyName: 'Mownie',
+        marriedLastName: 'Ginsen',
+        __typename: 'HumanName'
+      }
+    ],
+    birthDate: '1990-01-01',
+    maritalStatus: null,
+    ageOfIndividualInYears: null,
+    exactDateOfBirthUnknown: null,
+    dateOfMarriage: '2020-01-01',
+    nationality: ['FAR'],
+    identifier: [
+      {
+        id: '1234567899',
+        type: 'NATIONAL_ID',
+        otherType: null,
+        __typename: 'IdentityType'
+      }
+    ],
+    address: [
+      {
+        type: 'PRIMARY_ADDRESS',
+        line: ['', '', '', '', 'Mother village', 'RURAL'],
+        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        city: null,
+        postalCode: null,
+        country: 'FAR',
+        __typename: 'Address'
+      }
+    ],
+    telecom: null,
+    __typename: 'Person'
+  },
+  groom: {
+    id: 'a1794572-0001-44d3-9b18-6f519343c849',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Mr.',
+        familyName: 'Brownie',
+        marriedLastName: 'Ginsen',
+        __typename: 'HumanName'
+      }
+    ],
+    birthDate: '1990-01-01',
+    maritalStatus: null,
+    ageOfIndividualInYears: null,
+    exactDateOfBirthUnknown: null,
+    dateOfMarriage: '2020-01-01',
+    nationality: ['FAR'],
+    identifier: [
+      {
+        id: '1234567890',
+        type: 'NATIONAL_ID',
+        otherType: null,
+        __typename: 'IdentityType'
+      }
+    ],
+    address: [
+      {
+        type: 'PRIMARY_ADDRESS',
+        line: ['', '', '', '', '', 'URBAN', '', '', '', '', '', '', '', '', ''],
+        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        city: null,
+        postalCode: null,
+        country: 'FAR',
+        __typename: 'Address'
+      }
+    ],
+    telecom: null,
+    __typename: 'Person'
+  },
+  witnessOne: {
+    id: '85e0e437-657e-41bc-81a6-435b578dc6e3',
+    relationship: 'headOfGroomFamily',
+    otherRelationship: null,
+    individual: {
+      id: '766b3e2f-c6dd-4e47-9642-f2ae43b6fbde',
+      identifier: null,
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Mr.',
+          familyName: 'Jonas',
+          __typename: 'HumanName'
+        }
+      ],
+      __typename: 'Person'
+    },
+    __typename: 'RelatedPerson'
+  },
+  witnessTwo: {
+    id: '596a5c23-1387-41d5-8173-6a4c5b6957c5',
+    relationship: 'headOfBrideFamily',
+    otherRelationship: null,
+    individual: {
+      id: '1b37736e-3606-4553-9de9-cc7b394260ae',
+      identifier: null,
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Mr.',
+          familyName: 'Flex',
+          __typename: 'HumanName'
+        }
+      ],
+      __typename: 'Person'
+    },
+    __typename: 'RelatedPerson'
+  },
+  registration: {
+    id: '914ae021-ffd4-423d-9d50-2f9af9ca23d8',
+    informantType: 'GROOM',
+    otherInformantType: null,
+    contact: 'GROOM',
+    contactRelationship: null,
+    contactPhoneNumber: '+260791111111',
+    informantsSignature: null,
+    duplicates: null,
+    attachments: null,
+    status: [
+      {
+        comments: null,
+        type: 'DECLARED',
+        timestamp: '2023-03-03T10:12:17.879Z',
+        office: {
+          name: 'Ibombo District Office',
+          alias: ['Ibombo District Office'],
+          address: null,
+          __typename: 'Location'
+        },
+        __typename: 'RegWorkflow'
+      },
+      {
+        comments: null,
+        type: 'DECLARED',
+        timestamp: '2023-03-03T09:59:33.849Z',
+        office: {
+          name: 'Ibombo District Office',
+          alias: ['Ibombo District Office'],
+          address: null,
+          __typename: 'Location'
+        },
+        __typename: 'RegWorkflow'
+      },
+      {
+        comments: null,
+        type: 'DECLARED',
+        timestamp: '2023-03-03T09:57:16.204Z',
+        office: {
+          name: 'Ibombo District Office',
+          alias: ['Ibombo District Office'],
+          address: null,
+          __typename: 'Location'
+        },
+        __typename: 'RegWorkflow'
+      }
+    ],
+    type: 'MARRIAGE',
+    trackingId: 'MQMITHX',
+    registrationNumber: '2022MQMITHX',
+    mosipAid: null,
+    __typename: 'Registration'
+  },
+  typeOfMarriage: 'MONOGAMY',
+  eventLocation: {
+    id: 'fc388391-c8af-43c3-ba23-303735bf9bea',
+    address: {
+      line: ['', '', '', '', '', 'URBAN', '', '', '', '', '', '', '', '', ''],
+      district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+      state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+      city: '',
+      postalCode: '',
+      country: 'FAR',
+      __typename: 'Address'
+    },
+    __typename: 'Location'
+  },
+  questionnaire: null,
+  history: [
+    {
+      otherReason: '',
+      requester: '',
+      hasShowedVerifiedDocument: false,
+      date: '2023-03-03T10:12:17.931+00:00',
+      action: 'ASSIGNED',
+      regStatus: 'DECLARED',
+      dhis2Notification: false,
+      statusReason: null,
+      reason: null,
+      location: {
+        id: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        name: 'Ibombo',
+        __typename: 'Location'
+      },
+      office: {
+        id: '230236c1-6cff-4567-a71b-431cc4766f93',
+        name: 'Ibombo District Office',
+        __typename: 'Location'
+      },
+      system: null,
+      user: {
+        id: '63c7ebee48dc29888b5b0204',
+        role: {
+          _id: '6401b9e2e725a5334670c440',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
+        systemRole: 'LOCAL_REGISTRAR',
+        name: [
+          {
+            firstNames: 'Kennedy',
+            familyName: 'Mweene',
+            use: 'en',
+            __typename: 'HumanName'
+          }
+        ],
+        avatar: null,
+        __typename: 'User'
+      },
+      signature: null,
+      comments: [],
+      input: [],
+      output: [],
+      certificates: null,
+      __typename: 'History'
+    },
+    {
+      otherReason: '',
+      requester: '',
+      hasShowedVerifiedDocument: false,
+      date: '2023-03-03T09:59:33.906+00:00',
+      action: 'DOWNLOADED',
+      regStatus: 'DECLARED',
+      dhis2Notification: false,
+      statusReason: null,
+      reason: null,
+      location: {
+        id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        name: 'Ibombo',
+        __typename: 'Location'
+      },
+      office: {
+        id: '230236c1-6cff-4567-a71b-431cc4766f93',
+        name: 'Ibombo District Office',
+        __typename: 'Location'
+      },
+      system: null,
+      user: {
+        id: '63c7ebed48dc29888b5b0202',
+        role: {
+          _id: '6401b9e2e725a5334670c43d',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Social Worker',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
+        systemRole: 'FIELD_AGENT',
+        name: [
+          {
+            firstNames: 'Kalusha',
+            familyName: 'Bwalya',
+            use: 'en',
+            __typename: 'HumanName'
+          }
+        ],
+        avatar: null,
+        __typename: 'User'
+      },
+      signature: null,
+      comments: [],
+      input: [],
+      output: [],
+      certificates: null,
+      __typename: 'History'
+    },
+    {
+      otherReason: '',
+      requester: '',
+      hasShowedVerifiedDocument: false,
+      date: '2023-03-03T09:57:16.345+00:00',
+      action: null,
+      regStatus: 'DECLARED',
+      dhis2Notification: false,
+      statusReason: null,
+      reason: null,
+      location: {
+        id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        name: 'Ibombo',
+        __typename: 'Location'
+      },
+      office: {
+        id: '230236c1-6cff-4567-a71b-431cc4766f93',
+        name: 'Ibombo District Office',
+        __typename: 'Location'
+      },
+      system: null,
+      user: {
+        id: '63c7ebed48dc29888b5b0202',
+        role: {
+          _id: '6401b9e2e725a5334670c43d',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Social Worker',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
+        systemRole: 'FIELD_AGENT',
+        name: [
+          {
+            firstNames: 'Kalusha',
+            familyName: 'Bwalya',
+            use: 'en',
+            __typename: 'HumanName'
+          }
+        ],
+        avatar: null,
+        __typename: 'User'
+      },
+      signature: null,
+      comments: [],
+      input: [],
+      output: [],
+      certificates: null,
+      __typename: 'History'
+    }
+  ],
+  __typename: 'MarriageRegistration'
+}
+
 const mockOfflineData: Partial<IOfflineData> = {
   facilities: {
     '5c6abc88-26b8-4834-a1a6-2992807e3a72': {
@@ -1350,12 +1711,15 @@ const mockUserDetails: UserDetails = {
 
 export const getDummyDeclarationData = (
   event: string,
-  registerForm: { birth: IForm; death: IForm }
+  registerForm: { birth: IForm; death: IForm; marriage: IForm }
 ) => {
   let response: Record<string, unknown>, form: IForm
   if (event === 'birth') {
     response = dummyBirthRegistrationResponse
     form = registerForm.birth
+  } else if (event === 'marriage') {
+    response = dummyMarriageRegistrationResponse
+    form = registerForm.marriage
   } else {
     response = dummyDeathRegistrationResponse
     form = registerForm.death
@@ -1370,7 +1734,7 @@ export const getDummyDeclarationData = (
 
 export const getDummyCertificateTemplateData = (
   event: string,
-  registerForm: { birth: IForm; death: IForm }
+  registerForm: { birth: IForm; death: IForm; marriage: IForm }
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
   return data.template

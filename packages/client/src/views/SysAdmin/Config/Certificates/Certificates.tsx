@@ -66,13 +66,6 @@ import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/u
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { UserDetails } from '@client/utils/userUtils'
 
-const ListViewContainer = styled.div`
-  margin-top: 24px;
-`
-
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   margin-top: 15px;
@@ -113,6 +106,7 @@ type Props = WrappedComponentProps & {
   registerForm: {
     birth: IForm
     death: IForm
+    marriage: IForm
   }
 } & { updateOfflineCertificate: typeof updateOfflineCertificate }
 
@@ -180,7 +174,7 @@ async function updatePreviewSvgWithSampleSignature(
 
 export const printDummyCertificate = async (
   event: string,
-  registerForm: { birth: IForm; death: IForm },
+  registerForm: { birth: IForm; death: IForm; marriage: IForm },
   intl: IntlShape,
   userDetails: UserDetails,
   offlineData: IOfflineData
@@ -189,6 +183,8 @@ export const printDummyCertificate = async (
   let certEvent: Event
   if (event === 'death') {
     certEvent = Event.Death
+  } else if (event === 'marriage') {
+    certEvent = Event.Marriage
   } else {
     certEvent = Event.Birth
   }
@@ -237,7 +233,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       allowPrinting: {
         birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
         death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE,
-        marriage: true
+        marriage: this.props.offlineResources.config.MARRIAGE.PRINT_IN_ADVANCE
       }
     }
   }
@@ -269,6 +265,14 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             DELAYED: this.offlineConfig.DEATH.FEE.DELAYED
           },
           PRINT_IN_ADVANCE: this.state.allowPrinting.death
+        },
+        MARRIAGE: {
+          REGISTRATION_TARGET: this.offlineConfig.MARRIAGE.REGISTRATION_TARGET,
+          FEE: {
+            ON_TIME: this.offlineConfig.MARRIAGE.FEE.ON_TIME,
+            DELAYED: this.offlineConfig.MARRIAGE.FEE.DELAYED
+          },
+          PRINT_IN_ADVANCE: this.state.allowPrinting.marriage
         }
       })
       this.setState({
@@ -451,6 +455,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       {
         id: Event.Death,
         title: intl.formatMessage(constantsMessages.deaths)
+      },
+      {
+        id: Event.Marriage,
+        title: intl.formatMessage(constantsMessages.marriages)
       }
     ]
 
@@ -458,12 +466,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       offlineResources.templates.certificates?.birth.fileName
     const deathCertFileName =
       offlineResources.templates.certificates?.death.fileName
+    const marriageCertFileName =
+      offlineResources.templates.certificates?.marriage.fileName
 
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
     const deathLastModified =
       offlineResources.templates.certificates?.death.lastModifiedDate
-
+    const marriageLastModified =
+      offlineResources.templates.certificates?.marriage.lastModifiedDate
     const CertificateSection = {
       title: intl.formatMessage(messages.listTitle),
       items: [
@@ -516,6 +527,31 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               )}
             </>
           )
+        },
+        {
+          id: 'marriage',
+          label: intl.formatMessage(messages.certificateTemplate),
+          value: marriageLastModified
+            ? intl.formatMessage(messages.eventUpdatedTempDesc, {
+                lastModified: marriageLastModified
+              })
+            : intl.formatMessage(messages.marriageDefaultTempDesc),
+          actionsMenu: (
+            <>
+              {offlineResources.templates.certificates?.marriage && (
+                <ToggleMenu
+                  id={`template-marriage-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItems(
+                    intl,
+                    Event.Marriage,
+                    offlineResources.templates.certificates.marriage.definition,
+                    offlineResources.templates.certificates.marriage.fileName
+                  )}
+                />
+              )}
+            </>
+          )
         }
       ]
     }
@@ -538,7 +574,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     const TabContent = (props: CertificationProps) => {
       certificateFileName =
-        props.item.id === 'birth' ? birthCertFileName : deathCertFileName
+        props.item.id === 'birth'
+          ? birthCertFileName
+          : props.item.id === 'death'
+          ? deathCertFileName
+          : marriageCertFileName
 
       return (
         <>
@@ -595,7 +635,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     defaultChecked={
                       this.state.activeTabId === Event.Birth
                         ? this.state.allowPrinting.birth
-                        : this.state.allowPrinting.death
+                        : this.state.activeTabId === Event.Death
+                        ? this.state.allowPrinting.death
+                        : this.state.allowPrinting.marriage
                     }
                     onChange={async () => {
                       await toggleOnChange(this.state.activeTabId)
@@ -735,10 +777,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.birth.id}`
                     )
-                  } else if (eventName === Event.Death)
+                  } else if (eventName === Event.Death) {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.death.id}`
                     )
+                  } else if (eventName === Event.Marriage) {
+                    this.handleSelectFile(
+                      `${offlineResources.templates.certificates?.marriage.id}`
+                    )
+                  }
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
@@ -785,7 +832,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               title={
                 eventName === Event.Birth
                   ? intl.formatMessage(messages.birthTemplate)
-                  : intl.formatMessage(messages.deathTemplate)
+                  : eventName === Event.Death
+                  ? intl.formatMessage(messages.deathTemplate)
+                  : intl.formatMessage(messages.marriageTemplate)
               }
               goBack={this.closePreviewSection}
               onDelete={this.onDelete}
