@@ -17,17 +17,73 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
       id
-      child {
+      bride {
         id
         name {
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
-        gender
+        maritalStatus
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        nationality
+        identifier {
+          id
+          type
+          otherType
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
       }
-      informant {
+      groom {
+        id
+        name {
+          use
+          firstNames
+          familyName
+          marriedLastName
+        }
+        birthDate
+        maritalStatus
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        dateOfMarriage
+        nationality
+        identifier {
+          id
+          type
+          otherType
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+        telecom {
+          system
+          value
+        }
+      }
+      witnessOne {
         id
         relationship
         otherRelationship
@@ -43,93 +99,24 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
             firstNames
             familyName
           }
-          occupation
-          nationality
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          address {
+        }
+      }
+      witnessTwo {
+        id
+        relationship
+        otherRelationship
+        individual {
+          id
+          identifier {
+            id
             type
-            line
-            district
-            state
-            city
-            postalCode
-            country
+            otherType
           }
-        }
-      }
-      mother {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        multipleBirth
-        birthDate
-        maritalStatus
-        occupation
-        detailsExist
-        reasonNotApplying
-        ageOfIndividualInYears
-        exactDateOfBirthUnknown
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        identifier {
-          id
-          type
-          otherType
-        }
-        address {
-          type
-          line
-          district
-          state
-          city
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
-        }
-      }
-      father {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        maritalStatus
-        occupation
-        detailsExist
-        reasonNotApplying
-        ageOfIndividualInYears
-        exactDateOfBirthUnknown
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        identifier {
-          id
-          type
-          otherType
-        }
-        address {
-          type
-          line
-          district
-          state
-          city
-          postalCode
-          country
-        }
-        telecom {
-          system
-          value
+          name {
+            use
+            firstNames
+            familyName
+          }
         }
       }
       registration {
@@ -167,12 +154,9 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         registrationNumber
         mosipAid
       }
-      attendantAtBirth
-      weightAtBirth
-      birthType
+      typeOfMarriage
       eventLocation {
         id
-        type
         address {
           line
           district
@@ -285,39 +269,20 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
       id
-      child {
-        id
-        multipleBirth
-        identifier {
-          id
-          type
-          otherType
-        }
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        gender
-      }
-      mother {
+      bride {
         id
         name {
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        occupation
-        detailsExist
-        reasonNotApplying
         ageOfIndividualInYears
         exactDateOfBirthUnknown
+        dateOfMarriage
+        nationality
         identifier {
           id
           type
@@ -337,23 +302,20 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           value
         }
       }
-      father {
+      groom {
         id
         name {
           use
           firstNames
           familyName
+          marriedLastName
         }
         birthDate
         maritalStatus
-        dateOfMarriage
-        educationalAttainment
-        nationality
-        occupation
-        detailsExist
-        reasonNotApplying
         ageOfIndividualInYears
         exactDateOfBirthUnknown
+        dateOfMarriage
+        nationality
         identifier {
           id
           type
@@ -373,7 +335,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           value
         }
       }
-      informant {
+      witnessOne {
         id
         relationship
         otherRelationship
@@ -389,19 +351,23 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
             firstNames
             familyName
           }
-          nationality
-          occupation
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          address {
+        }
+      }
+      witnessTwo {
+        id
+        relationship
+        otherRelationship
+        individual {
+          id
+          identifier {
+            id
             type
-            line
-            district
-            state
-            city
-            postalCode
-            country
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
           }
         }
       }
@@ -410,18 +376,22 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         informantType
         otherInformantType
         contact
+        contactRelationship
         contactPhoneNumber
         informantsSignature
+        duplicates
+        attachments {
+          data
+          type
+          contentType
+          subject
+        }
         status {
           comments {
             comment
           }
           type
           timestamp
-          location {
-            name
-            alias
-          }
           office {
             name
             alias
@@ -431,20 +401,14 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
+        type
         trackingId
         registrationNumber
         mosipAid
       }
-      attendantAtBirth
-      weightAtBirth
-      birthType
-      questionnaire {
-        fieldId
-        value
-      }
+      typeOfMarriage
       eventLocation {
         id
-        type
         address {
           line
           district
@@ -454,7 +418,14 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       history {
+        otherReason
+        requester
+        hasShowedVerifiedDocument
         date
         action
         regStatus
@@ -463,7 +434,6 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           text
         }
         reason
-        otherReason
         location {
           id
           name

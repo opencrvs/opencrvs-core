@@ -203,6 +203,26 @@ export function Outbox() {
             declaration.data?.deceased?.familyName as string
           )
         dateOfEvent = declaration.data?.deathEvent?.deathDate as string
+      } else if (declaration?.event?.toString() === 'marriage') {
+        const brideName =
+          getFullName(
+            declaration.data?.bride?.firstNamesEng as string,
+            declaration.data?.bride?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.bride?.firstNames as string,
+            declaration.data?.bride?.familyName as string
+          )
+        const groomName =
+          getFullName(
+            declaration.data?.bride?.firstNamesEng as string,
+            declaration.data?.bride?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.bride?.firstNames as string,
+            declaration.data?.bride?.familyName as string
+          )
+        name = groomName + (brideName ? ` & ${brideName}` : '')
       }
 
       const statusText = intl.formatMessage(

@@ -84,7 +84,7 @@ const messagesToDefine = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {birth} death {death} other {birth}} declaration',
+      '{eventType, select, birth {Birth} death {Death} other {Marriage} } declaration for {name}',
     description:
       'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'

@@ -35,7 +35,9 @@ import {
   DEATH_CORRECTION_ENCOUNTER_CODE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
   CORRECTION_CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -61,7 +63,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARRIAGE_REG_NO
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -70,6 +73,7 @@ import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
@@ -153,6 +157,10 @@ export function selectOrCreateEncounterResource(
     sectionCode = isCorrection
       ? DEATH_CORRECTION_ENCOUNTER_CODE
       : DEATH_ENCOUNTER_CODE
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    sectionCode = isCorrection
+      ? MARRIAGE_CORRECTION_ENCOUNTER_CODE
+      : MARRIAGE_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -605,6 +613,38 @@ export function selectOrCreateInformantResource(
   }
 }
 
+export function selectOrCreateWitnessResource(
+  fhirBundle: ITemplatedBundle,
+  code: string,
+  title: string
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateInformantSection(
+    code,
+    title,
+    fhirBundle
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      (entry) => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related informant person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
+}
+
 export function selectOrCreateRelatedPersonResource(
   fhirBundle: ITemplatedBundle,
   context: any,
@@ -899,7 +939,10 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
   return extension?.valueString
 }
 export async function setCertificateCollector(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
@@ -1282,7 +1325,10 @@ export async function getRegistrationIds(
     registrationNumber = BIRTH_REG_NO
   } else if (eventType === EVENT_TYPE.DEATH) {
     registrationNumber = DEATH_REG_NO
+  } else if (eventType === EVENT_TYPE.MARRIAGE) {
+    registrationNumber = MARRIAGE_REG_NO
   }
+
   let path
   if (isTask) {
     path = `/Task/${compositionId}`

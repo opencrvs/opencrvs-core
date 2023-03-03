@@ -25,7 +25,7 @@ import {
   prepareNewCustomFieldConfig
 } from './utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 import { IDataSourceSelectOption } from '@client/forms/configuration/formConfig/utils'
 

@@ -24,8 +24,10 @@ interface IRecordAuditMessages
   trackingId: MessageDescriptor
   dateOfBirth: MessageDescriptor
   dateOfDeath: MessageDescriptor
+  dateOfMarriage: MessageDescriptor
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
+  placeOfMarriage: MessageDescriptor
   informant: MessageDescriptor
   brn: MessageDescriptor
   drn: MessageDescriptor
@@ -96,6 +98,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Date of death',
     description: 'Label for date of death'
   },
+  dateOfMarriage: {
+    id: 'recordAudit.dateOfMarriage',
+    defaultMessage: 'Date of marriage',
+    description: 'Label for date of marriage'
+  },
   placeOfBirth: {
     id: 'recordAudit.placeOfBirth',
     defaultMessage: 'Place of birth',
@@ -105,6 +112,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.placeOfDeath',
     defaultMessage: 'Place of death',
     description: 'Label for place of death'
+  },
+  placeOfMarriage: {
+    id: 'recordAudit.placeOfMarriage',
+    defaultMessage: 'Place of marriage',
+    description: 'Label for place of marriage'
   },
   informant: {
     id: 'recordAudit.informant',
@@ -120,6 +132,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.drn',
     defaultMessage: 'DRN',
     description: 'Label for Death Registration Number'
+  },
+  registrationNo: {
+    id: 'recordAudit.registrationNo',
+    defaultMessage: 'Registration No',
+    description: 'Label for Event Registration Number'
   },
   noStatus: {
     id: 'recordAudit.noStatus',

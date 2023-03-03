@@ -74,12 +74,10 @@ export interface IBirthRegistrationTags {
 
 export interface IMarriageRegistrationTags {
   regStatus: string
-  gender: string | undefined
   timeLabel: string | undefined
   dateLabel: string | undefined
   registrarPractitionerId: string
   practitionerRole: string
-  eventLocationType: string
   officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string

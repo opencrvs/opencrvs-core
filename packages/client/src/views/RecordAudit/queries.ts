@@ -50,6 +50,24 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           }
         }
       }
+      ... on MarriageRegistration {
+        bride {
+          id
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+        groom {
+          id
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+      }
     }
   }
 `

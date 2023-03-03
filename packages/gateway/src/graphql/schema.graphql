@@ -30,6 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -194,6 +195,18 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration!
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -352,6 +365,22 @@ interface EventRegistration {
 type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
+}
+
+type MarriageRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person
+  groom: Person
+  witnessOne: RelatedPerson
+  witnessTwo: RelatedPerson
+  eventLocation: Location
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
 type Location {
@@ -676,6 +705,20 @@ input DeathRegistrationInput {
   updatedAt: Date
 }
 
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
+  createdAt: Date
+  updatedAt: Date
+}
+
 input UserInput {
   id: ID
   name: [HumanNameInput!]!
@@ -954,6 +997,7 @@ type HumanName {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 type ContactPoint {
@@ -1021,6 +1065,11 @@ enum EducationType {
 type StatusWiseRegistrationCount {
   status: String!
   count: Int!
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 type Identifier {
@@ -1152,6 +1201,7 @@ interface EventSearchSet {
 enum Event {
   birth
   death
+  marriage
 }
 
 type EventProgressSet {
@@ -1304,6 +1354,7 @@ input HumanNameInput {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 input UserIdentifierInput {
@@ -1436,6 +1487,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -1461,6 +1514,7 @@ type RegWorkflow {
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 type Certificate {
@@ -1505,6 +1559,7 @@ enum IdentityIDType {
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER
@@ -1540,6 +1595,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -1706,6 +1762,16 @@ type DeathEventSearchSet implements EventSearchSet {
   type: String
   deceasedName: [HumanName]
   dateOfDeath: Date
+  registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
+type MarriageEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  brideName: [HumanName]
+  groomName: [HumanName]
+  dateOfMarriage: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }

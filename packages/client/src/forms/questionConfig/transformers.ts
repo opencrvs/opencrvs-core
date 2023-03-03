@@ -25,7 +25,7 @@ import {
 } from '@client/forms/configuration/defaultUtils'
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,

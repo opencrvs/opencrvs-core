@@ -16,12 +16,14 @@ input HumanNameInput {
   use: String # bn | en - the language the name text is written in
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 type HumanName { # -> HumanName
   use: String # bn | en - the language the name text is written in
   firstNames: String # -> .given
   familyName: String # -> .family
+  marriedLastName: String # -> .suffix
 }
 
 # Although the recommended way is use ALL_CAPS but keeping it lowercase
@@ -29,6 +31,7 @@ type HumanName { # -> HumanName
 enum Event {
   birth
   death
+  marriage
 }
 
 enum Relationship {
@@ -49,6 +52,7 @@ enum IdentityIDType {
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER

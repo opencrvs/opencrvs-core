@@ -79,7 +79,7 @@ exports.newChannelTemplate = {
   maxBodyAgeDays: 30
 }
 
-exports.commonRoutes = {
+exports.routeTemplate = {
   type: 'http',
   status: 'enabled',
   forwardAuthHeader: true,

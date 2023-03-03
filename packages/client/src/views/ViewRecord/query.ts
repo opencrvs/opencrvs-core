@@ -392,6 +392,163 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         maleDependentsOfDeceased
         femaleDependentsOfDeceased
       }
+      ... on MarriageRegistration {
+        _fhirIDMap
+        id
+        bride {
+          id
+          name {
+            use
+            firstNames
+            familyName
+            marriedLastName
+          }
+          birthDate
+          maritalStatus
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          nationality
+          identifier {
+            id
+            type
+            otherType
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
+        }
+        groom {
+          id
+          name {
+            use
+            firstNames
+            familyName
+            marriedLastName
+          }
+          birthDate
+          maritalStatus
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          nationality
+          identifier {
+            id
+            type
+            otherType
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
+        }
+        witnessOne {
+          id
+          relationship
+          otherRelationship
+          individual {
+            id
+            identifier {
+              id
+              type
+              otherType
+            }
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+        }
+        witnessTwo {
+          id
+          relationship
+          otherRelationship
+          individual {
+            id
+            identifier {
+              id
+              type
+              otherType
+            }
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+        }
+        registration {
+          id
+          informantType
+          otherInformantType
+          contact
+          contactRelationship
+          contactPhoneNumber
+          informantsSignature
+          duplicates
+          attachments {
+            data
+            type
+            contentType
+            subject
+          }
+          status {
+            comments {
+              comment
+            }
+            type
+            timestamp
+            office {
+              name
+              alias
+              address {
+                district
+                state
+              }
+            }
+          }
+          type
+          trackingId
+          registrationNumber
+          mosipAid
+        }
+        typeOfMarriage
+        eventLocation {
+          id
+          address {
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
+        questionnaire {
+          fieldId
+          value
+        }
+      }
     }
   }
 `

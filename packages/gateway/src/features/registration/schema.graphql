@@ -62,6 +62,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -99,6 +101,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -119,6 +122,7 @@ enum AttachmentSubject {
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 enum MannerOfDeath {
@@ -144,6 +148,11 @@ enum CauseOfDeathMethodType {
   LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 input PaymentInput {
@@ -352,6 +361,36 @@ type DeathRegistration implements EventRegistration { # -> Composition
   history: [History]
 }
 
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
+  createdAt: Date
+  updatedAt: Date
+}
+
+type MarriageRegistration implements EventRegistration { # -> Composition
+  id: ID! # long uuid
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person # -> .section(code='bride-details').entry.reference
+  groom: Person # -> .section(code='groom-details').entry.reference
+  witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
+  witnessTwo: RelatedPerson # -> .section(code='witnessTwo-details').entry.reference
+  eventLocation: Location
+  typeOfMarriage: MarriageType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date # -> .date($first)
+  updatedAt: Date # -> .date
+  history: [History]
+}
+
 input CorrectionValueInput {
   section: String
   fieldName: String
@@ -553,6 +592,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
 }
 
 type Mutation {
@@ -599,4 +639,17 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
+  #MARRIAGE
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
 }

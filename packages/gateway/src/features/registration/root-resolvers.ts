@@ -41,6 +41,7 @@ import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
@@ -51,7 +52,8 @@ import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
   validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments
+  validateDeathDeclarationAttachments,
+  validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
@@ -108,6 +110,19 @@ export const resolvers: GQLResolver = {
       }
     },
     async fetchDeathRegistration(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare')
+      ) {
+        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
+    async fetchMarriageRegistration(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -284,6 +299,15 @@ export const resolvers: GQLResolver = {
 
       return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
     },
+    async createMarriageRegistration(_, { details }, authHeader) {
+      try {
+        await validateMarriageDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.MARRIAGE)
+    },
     async updateBirthRegistration(_, { details }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
@@ -335,6 +359,24 @@ export const resolvers: GQLResolver = {
         details
       )
     },
+    async markMarriageAsValidated(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
+      } else {
+        return await markEventAsValidated(
+          id,
+          authHeader,
+          EVENT_TYPE.MARRIAGE,
+          details
+        )
+      }
+    },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
@@ -358,6 +400,24 @@ export const resolvers: GQLResolver = {
           id,
           authHeader,
           EVENT_TYPE.DEATH,
+          details
+        )
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register scope')
+        )
+      }
+    },
+    async markMarriageAsRegistered(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (hasScope(authHeader, 'register')) {
+        return markEventAsRegistered(
+          id,
+          authHeader,
+          EVENT_TYPE.MARRIAGE,
           details
         )
       } else {
@@ -473,6 +533,26 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async markMarriageAsCertified(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsCertified(
+          details,
+          authHeader,
+          EVENT_TYPE.MARRIAGE
+        )
+      } else {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+    },
+    async markMarriageAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a certify scope')
+        )
+      }
+    },
     async notADuplicate(_, { id, duplicateId }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
@@ -536,7 +616,10 @@ export const resolvers: GQLResolver = {
 }
 
 async function createEventRegistration(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
@@ -619,7 +702,10 @@ async function markEventAsRegistered(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))

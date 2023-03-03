@@ -11,9 +11,10 @@
  */
 import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
+import { REQUEST_MARRIAGE_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_MARRIAGE_DECLARATION = gql`
-  mutation createMarriageRegistration($details: BirthRegistrationInput!) {
+  mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
     createMarriageRegistration(details: $details) {
       trackingId
       compositionId
@@ -23,7 +24,7 @@ export const SUBMIT_MARRIAGE_DECLARATION = gql`
 export const APPROVE_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsValidated(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsValidated(id: $id, details: $details)
   }
@@ -31,7 +32,7 @@ export const APPROVE_MARRIAGE_DECLARATION = gql`
 export const REGISTER_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsRegistered(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsRegistered(id: $id, details: $details) {
       id
@@ -90,7 +91,7 @@ export const ARCHIVE_MARRIAGE_DECLARATION = gql`
 export const COLLECT_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsCertified(
     $id: ID!
-    $details: BirthRegistrationInput!
+    $details: MarriageRegistrationInput!
   ) {
     markMarriageAsCertified(id: $id, details: $details)
   }
@@ -99,6 +100,15 @@ export const COLLECT_MARRIAGE_CERTIFICATE = gql`
 export const MARK_EVENT_UNASSIGNED = gql`
   mutation submitMutation($id: String!) {
     markEventAsUnassigned(id: $id)
+  }
+`
+
+export const ISSUE_MARRIAGE_CERTIFICATE = gql`
+  mutation markMarriageAsIssued(
+    $id: ID!
+    $details: MarriageRegistrationInput!
+  ) {
+    markMarriageAsIssued(id: $id, details: $details)
   }
 `
 
@@ -114,7 +124,12 @@ export function getMarriageMutation(action: SubmissionAction) {
       return REJECT_MARRIAGE_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_MARRIAGE_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_MARRIAGE_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_MARRIAGE_CERTIFICATE
+    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
+      return REQUEST_MARRIAGE_REG_CORRECTION
   }
 }

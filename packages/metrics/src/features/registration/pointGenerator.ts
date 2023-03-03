@@ -65,7 +65,8 @@ import {
   getDurationInSeconds,
   getDurationInDays,
   getTimeLabel,
-  getAgeLabel
+  getAgeLabel,
+  getdaysAfterEvent
 } from '@metrics/features/registration/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -662,13 +663,16 @@ export async function generateMarriageRegPoint(
 
   const fields: IMarriageRegistrationFields = {
     compositionId: composition.id,
-    daysAfterEvent: marriageExtension && Number(marriageExtension.valueString)
+    daysAfterEvent: marriageExtension.valueDateTime
+      ? getdaysAfterEvent(
+          marriageExtension.valueDateTime,
+          new Date(composition.date)
+        )
+      : undefined
   }
   const compositionDate = new Date(composition.date)
   const tags: IMarriageRegistrationTags = {
     regStatus: regStatus,
-    eventLocationType: await getEncounterLocationType(payload, authHeader),
-    gender: person.gender,
     registrarPractitionerId,
     practitionerRole,
     dateLabel: !Number.isNaN(compositionDate.getTime())

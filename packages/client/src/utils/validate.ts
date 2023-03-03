@@ -256,7 +256,6 @@ export const minAgeGapExist = (
     (new Date(first).getTime() - new Date(second).getTime()) /
     (1000 * 60 * 60 * 24) /
     365
-
   return diff >= minAgeGap
 }
 
@@ -346,7 +345,8 @@ export const checkBirthDate =
   }
 
 export const checkMarriageDate =
-  (): Validation => (value: IFormFieldValue, drafts) => {
+  (minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
     const cast = value as string
     if (!isAValidDateFormat(cast)) {
       return {
@@ -369,11 +369,20 @@ export const checkMarriageDate =
     if (!groomDOB || !brideDOB) {
       return undefined
     } else {
-      return mDate > new Date(groomDOB) && mDate > new Date(brideDOB)
-        ? undefined
-        : {
-            message: messages.domLaterThanDob
-          }
+      if (
+        !minAgeGapExist(cast, groomDOB, minAge) ||
+        !minAgeGapExist(cast, brideDOB, minAge)
+      ) {
+        return {
+          message: messages.illegalMarriageAge
+        }
+      } else if (mDate < new Date(groomDOB) && mDate < new Date(brideDOB)) {
+        return {
+          message: messages.domLaterThanDob
+        }
+      } else {
+        return undefined
+      }
     }
   }
 
