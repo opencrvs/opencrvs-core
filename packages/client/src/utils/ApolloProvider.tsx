@@ -25,6 +25,6 @@ export function ApolloProvider(
   return client ? (
     <ApolloClientProvider client={client}>{children}</ApolloClientProvider>
   ) : (
-    <>{children}</>
+    <></>
   )
 }
