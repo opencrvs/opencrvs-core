@@ -27,7 +27,7 @@ export function ToggleIcon({
         <Icon
           name={name}
           color={color}
-          fill={defaultChecked ? fill : 'white'}
+          // fill={defaultChecked ? fill : 'white'}
         ></Icon>
       </Button>
     </>

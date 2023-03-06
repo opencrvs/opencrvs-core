@@ -69,13 +69,13 @@ export const Accordion = ({
         </Text>
         {!isActive && (
           <Stack>
-            <Icon name={'ChevronRight'} color={'primary'} size={'large'} />
+            <Icon name={'CaretRight'} color={'primary'} size={'large'} />
             <Link>{labelForShowAction}</Link>
           </Stack>
         )}
         {isActive && (
           <Stack>
-            <Icon name={'ChevronDown'} color={'primary'} size={'large'} />
+            <Icon name={'CaretDown'} color={'primary'} size={'large'} />
             <Link>{labelForHideAction}</Link>
           </Stack>
         )}

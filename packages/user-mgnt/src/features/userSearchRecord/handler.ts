@@ -25,7 +25,8 @@ enum RegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  ISSUED = 'ISSUED'
 }
 interface IUserCreateSearchPayload {
   userId: string

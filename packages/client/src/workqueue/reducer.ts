@@ -50,6 +50,7 @@ export interface IQueryData {
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
+  issueTab: GQLEventSearchResultSet
   externalValidationTab: GQLEventSearchResultSet
 }
 
@@ -85,6 +86,7 @@ export const workqueueInitialState: WorkqueueState = {
       rejectTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
       printTab: { totalItems: 0, results: [] },
+      issueTab: { totalItems: 0, results: [] },
       externalValidationTab: { totalItems: 0, results: [] }
     },
     initialSyncDone: false
@@ -96,7 +98,8 @@ export const workqueueInitialState: WorkqueueState = {
     rejectTab: 1,
     approvalTab: 1,
     externalValidationTab: 1,
-    printTab: 1
+    printTab: 1,
+    issueTab: 1
   }
 }
 
@@ -111,6 +114,7 @@ interface IWorkqueuePaginationParams {
   approvalSkip: number
   externalValidationSkip: number
   printSkip: number
+  issueSkip: number
 }
 
 export function updateRegistrarWorkqueue(
@@ -152,6 +156,7 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   const currentUserWorkqueue: IWorkqueue =
     (currentUserData && currentUserData.workqueue) ||
     workqueueInitialState.workqueue
+
   return JSON.stringify(currentUserWorkqueue)
 }
 
@@ -225,7 +230,8 @@ async function getWorkqueueData(
     rejectSkip,
     approvalSkip,
     externalValidationSkip,
-    printSkip
+    printSkip,
+    issueSkip
   } = workqueuePaginationParams
 
   const result = await syncRegistrarWorkqueue(
@@ -240,6 +246,7 @@ async function getWorkqueueData(
     approvalSkip,
     externalValidationSkip,
     printSkip,
+    issueSkip,
     userId
   )
   let workqueue
@@ -329,7 +336,8 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         inProgressTab,
         externalValidationTab,
         rejectTab,
-        notificationTab
+        notificationTab,
+        issueTab
       } = state.pagination
 
       const { pageSize } = action.payload
@@ -343,7 +351,8 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         approvalSkip: Math.max(approvalTab - 1, 0) * pageSize,
         externalValidationSkip:
           Math.max(externalValidationTab - 1, 0) * pageSize,
-        printSkip: Math.max(printTab - 1, 0) * pageSize
+        printSkip: Math.max(printTab - 1, 0) * pageSize,
+        issueSkip: Math.max(issueTab - 1, 0) * pageSize
       }
 
       return loop(

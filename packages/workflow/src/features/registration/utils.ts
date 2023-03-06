@@ -363,6 +363,28 @@ export function hasCorrectionEncounterSection(
   })
 }
 
+export function hasCertificateDataInDocRef(fhirBundle: fhir.Bundle) {
+  const firstEntry = fhirBundle?.entry?.[0].resource as fhir.Composition
+
+  const certificateSection = firstEntry.section?.find((sec) => {
+    if (sec.code?.coding?.[0]?.code == 'certificates') {
+      return true
+    }
+    return false
+  })
+  const docRefId = certificateSection?.entry?.[0].reference
+
+  return fhirBundle.entry?.some((item) => {
+    if (
+      item.fullUrl === docRefId &&
+      (item.resource as fhir.DocumentReference)?.content
+    ) {
+      return true
+    }
+    return false
+  })
+}
+
 export function isInProgressDeclaration(fhirBundle: fhir.Bundle) {
   const taskEntry =
     fhirBundle &&

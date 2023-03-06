@@ -295,6 +295,48 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export function makeTaskAnonymous(bundle: fhir.Bundle) {
+  const taskResource = getTaskResource(bundle)
+
+  taskResource.extension = taskResource.extension?.filter(
+    ({ url }) =>
+      ![
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+      ].includes(url)
+  )
+
+  return bundle
+}
+
+export async function markBundleAsIssued(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle)
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    RegStatus.ISSUED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
 export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
