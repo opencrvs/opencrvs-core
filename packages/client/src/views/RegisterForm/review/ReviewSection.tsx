@@ -9,20 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { useState, useRef, useEffect } from 'react'
+import * as React from 'react'
 import {
   LinkButton,
-  TertiaryButton,
   PrimaryButton,
-  SecondaryButton
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import SignatureCanvas from 'react-signature-canvas'
 import {
-  ImageUploader,
   InputField,
   ISelectOption as SelectComponentOptions,
-  TextArea,
-  ErrorText
+  Text,
+  TextArea
 } from '@opencrvs/components/lib/'
 
 import { Alert } from '@opencrvs/components/lib/Alert'
@@ -40,11 +37,17 @@ import {
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
   BirthSection,
+  CHECKBOX,
   CHECKBOX_GROUP,
   DATE,
+  DeathSection,
+  DOCUMENT_UPLOADER_WITH_OPTION,
   FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IAttachmentValue,
+  ICheckboxFormField,
   ICheckboxGroupFormField,
+  IDocumentUploaderWithOptionsFormField,
   IDynamicOptions,
   IFileValue,
   IForm,
@@ -54,29 +57,22 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
+  INestedInputFields,
   IPreviewGroup,
   IRadioOption,
   ISelectOption,
   LIST,
+  LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
+  REVIEW_OVERRIDE_POSITION,
   Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
-  WARNING,
-  REVIEW_OVERRIDE_POSITION,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  IDocumentUploaderWithOptionsFormField,
-  LOCATION_SEARCH_INPUT,
-  IAttachmentValue,
   SubmissionAction,
-  ICheckboxFormField,
-  CHECKBOX,
-  INestedInputFields,
-  DeathSection,
-  MarriageSection
+  SUBSECTION,
+  WARNING
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -87,10 +83,10 @@ import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/
 import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
-  getSectionFields,
-  getVisibleSectionGroupsBasedOnConditions,
   getListOfLocations,
-  getSelectedInformantAndContactType
+  getSectionFields,
+  getSelectedInformantAndContactType,
+  getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
   Errors,
@@ -100,8 +96,7 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  formMessageDescriptors,
-  formMessages
+  formMessageDescriptors
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
@@ -118,7 +113,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
+import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -126,14 +121,12 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
-import * as React from 'react'
+import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
   IntlShape,
   MessageDescriptor,
-  useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
@@ -143,21 +136,20 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
-  ApplyButton,
-  CancelButton
-} from '@client/views/SysAdmin/Config/Application/Components'
-import { getBase64String } from '@client/utils/imageUtils'
-import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import {
-  ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
+import {
+  SignatureGenerator,
+  SignatureInputProps
+} from '@client/views/RegisterForm/review/SignatureGenerator'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -166,6 +158,7 @@ const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
+
   &::first-letter {
     text-transform: uppercase;
   }
@@ -183,8 +176,9 @@ const RightColumn = styled.div`
   margin-left: 24px;
 
   &:first-child {
-    margin-left: 0px;
+    margin-left: 0;
   }
+
   &:last-child {
     margin-right: -24px;
   }
@@ -200,15 +194,16 @@ const LeftColumn = styled.div`
   margin-bottom: 200px;
 
   &:first-child {
-    margin-left: 0px;
+    margin-left: 0;
   }
+
   &:last-child {
-    margin-right: 0px;
+    margin-right: 0;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
@@ -272,207 +267,12 @@ const InputWrapper = styled.div`
   margin-top: 56px;
 `
 
-const CustomImageUpload = styled(ImageUploader)`
-  border: 0 !important;
-`
-const SignatureContainer = styled.div`
-  border: 2px solid ${({ theme }) => theme.colors.grey600};
-  border-radius: 4px;
-  width: 100%;
-`
-const SignatureInputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`
-const SignaturePreview = styled.img`
-  max-width: 50%;
-  display: block;
-`
-const ErrorMessage = styled.div`
-  margin-top: 16px;
-`
-
-function SignCanvas({
-  value,
-  onChange
-}: {
-  value?: string
-  onChange: (value: string) => void
-}) {
-  const [canvasWidth, setCanvasWidth] = useState(300)
-  const canvasContainerRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<SignatureCanvas>(null)
-
-  useEffect(() => {
-    function handleResize() {
-      if (canvasContainerRef.current) {
-        setCanvasWidth(canvasContainerRef.current.offsetWidth)
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    handleResize()
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [canvasContainerRef])
-
-  useEffect(() => {
-    if (canvasRef.current && value) {
-      canvasRef.current.fromDataURL(value)
-    }
-  }, [value])
-
-  function emitValueToParent() {
-    const data = canvasRef.current?.toDataURL()
-    if (!data) {
-      return
-    }
-    onChange(data)
-  }
-
-  function clear() {
-    canvasRef.current?.clear()
-    onChange('')
-  }
-
-  return (
-    <SignatureInputContainer>
-      <SignatureContainer ref={canvasContainerRef}>
-        <SignatureCanvas
-          ref={canvasRef}
-          onEnd={() => {
-            emitValueToParent()
-          }}
-          penColor="black"
-          canvasProps={{
-            width: canvasWidth,
-            height: 200
-          }}
-        />
-      </SignatureContainer>
-      <TertiaryButton onClick={clear}>Clear</TertiaryButton>
-    </SignatureInputContainer>
-  )
-}
-
-type SignatureInputProps = {
-  id?: string
-  value?: string
-  onChange: (value: string) => void
-  disabled?: boolean
-}
-
-const SignatureDescription = styled.p`
-  margin-top: 0;
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.grey500};
-`
-
-function SignatureInput({
-  id,
-  value,
-  onChange,
-  disabled
-}: SignatureInputProps) {
-  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
-  const [signatureValue, setSignatureValue] = useState('')
-  const [signatureError, setSignatureError] = useState('')
-  const intl = useIntl()
-  const allowedSignatureFormat = ['image/png']
-
-  function apply() {
-    setSignatureDialogOpen(false)
-    onChange(signatureValue)
-  }
-
-  return (
-    <div>
-      <SignatureDescription>
-        {intl.formatMessage(messages.signatureDescription)}
-      </SignatureDescription>
-      <ErrorMessage id="signature-upload-error">
-        {signatureError && <ErrorText>{signatureError}</ErrorText>}
-      </ErrorMessage>
-      {!value && (
-        <>
-          <SecondaryButton
-            onClick={() => setSignatureDialogOpen(true)}
-            disabled={disabled}
-          >
-            {intl.formatMessage(messages.signatureOpenSignatureInput)}
-          </SecondaryButton>
-          <CustomImageUpload
-            id="signature-file-upload"
-            title="Upload"
-            handleFileChange={async (file) => {
-              if (!allowedSignatureFormat.includes(file.type)) {
-                setSignatureError(
-                  intl.formatMessage(formMessages.fileUploadError, {
-                    type: allowedSignatureFormat
-                      .map((signatureFormat) =>
-                        signatureFormat.split('/').pop()
-                      )
-                      .join(', ')
-                  })
-                )
-                return
-              }
-              onChange((await getBase64String(file)).toString())
-              setSignatureError('')
-            }}
-            disabled={disabled}
-          />
-        </>
-      )}
-      {value && <SignaturePreview alt="Informant's signature" src={value} />}
-      {value && (
-        <TertiaryButton onClick={() => onChange('')}>
-          {intl.formatMessage(messages.signatureDelete)}
-        </TertiaryButton>
-      )}
-
-      <ResponsiveModal
-        id={`${id}Modal`}
-        title={intl.formatMessage(messages.informantsSignature)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        width={600}
-        show={signatureDialogOpen}
-        actions={[
-          <CancelButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={() => setSignatureDialogOpen(false)}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
-            key="apply"
-            id="apply_change"
-            disabled={false}
-            onClick={apply}
-          >
-            {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
-        ]}
-        handleClose={() => setSignatureDialogOpen(false)}
-      >
-        <SignatureDescription>
-          {intl.formatMessage(messages.signatureInputDescription)}
-        </SignatureDescription>
-        <SignCanvas value={value} onChange={setSignatureValue} />
-      </ResponsiveModal>
-    </div>
-  )
-}
-
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: IFormSection,
   declaration: IDeclaration
 ) => void
+
 interface IProps {
   draft: IDeclaration
   registerForm: { [key: string]: IForm }
@@ -494,6 +294,7 @@ interface IProps {
   documentsSection: IFormSection
   viewRecord?: boolean
 }
+
 type State = {
   displayEditDialog: boolean
   editClickedSectionId: string
@@ -803,6 +604,14 @@ const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping,
   [Event.Marriage]: marriageSectionMapping
+}
+
+enum SignatureSectionType {
+  INFORMANT_SIGNATURE = 'informantsSignature',
+  BRIDE_SIGNATURE = 'brideSignature',
+  GROOM_SIGNATURE = 'groomSignature',
+  WITNESS_ONE_SIGNATURE = 'witnessOneSignature',
+  WITNESS_TWO_SIGNATURE = 'witnessTwoSignature'
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -1915,19 +1724,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
-    const signatureInputProps = {
-      id: 'informants_signature',
-      onChange: (value: string) => {
-        this.props.onChangeReviewForm &&
-          this.props.onChangeReviewForm(
-            { informantsSignature: value },
-            registrationSection,
-            declaration
-          )
-      },
-      value: declaration.data.registration?.informantsSignature as string
-    }
-
     const sectionName = this.state.activeSection || this.docSections[0].id
     const informantName = getDraftInformantFullName(
       declaration,
@@ -1940,6 +1736,93 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       errorsOnFields
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
+
+    const generateSignatureProps = (
+      sectionType: SignatureSectionType,
+      id: string,
+      value: string,
+      inputLabel: string,
+      isRequired: boolean
+    ): SignatureInputProps => {
+      return {
+        id: id,
+        onChange: (value: string) => {
+          this.props.onChangeReviewForm &&
+            this.props.onChangeReviewForm(
+              { [sectionType]: value },
+              registrationSection,
+              declaration
+            )
+        },
+        value: value,
+        label: inputLabel,
+        isRequired: isRequired
+      }
+    }
+
+    const getSignature = (eventType: Event) => {
+      if ([Event.Birth, Event.Death].includes(eventType)) {
+        const informantsSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.INFORMANT_SIGNATURE,
+          'informants_signature',
+          declaration.data.registration?.informantsSignature as string,
+          intl.formatMessage(messages.informantsSignature),
+          window.config.INFORMANT_SIGNATURE_REQUIRED
+        )
+        return (
+          <>
+            <SignatureGenerator
+              description={intl.formatMessage(messages.signatureDescription)}
+              {...informantsSignatureInputPros}
+            />
+          </>
+        )
+      } else if ([Event.Marriage].includes(eventType)) {
+        const brideSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.BRIDE_SIGNATURE,
+          'bride_signature',
+          declaration.data.registration?.brideSignature as string,
+          intl.formatMessage(messages.brideSignature),
+          true
+        )
+
+        const groomSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.GROOM_SIGNATURE,
+          'groom_signature',
+          declaration.data.registration?.groomSignature as string,
+          intl.formatMessage(messages.groomSignature),
+          true
+        )
+
+        const witnessOneSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.WITNESS_ONE_SIGNATURE,
+          'witness_one_signature',
+          declaration.data.registration?.witnessOneSignature as string,
+          intl.formatMessage(messages.witnessOneSignature),
+          true
+        )
+
+        const witnessTwoSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.WITNESS_TWO_SIGNATURE,
+          'witness_two_signature',
+          declaration.data.registration?.witnessTwoSignature as string,
+          intl.formatMessage(messages.witnessTwoSignature),
+          true
+        )
+
+        return (
+          <>
+            <Text id="terms" element="p" variant="reg16">
+              {intl.formatMessage(messages.terms)}
+            </Text>
+            <SignatureGenerator {...brideSignatureInputPros} />
+            <SignatureGenerator {...groomSignatureInputPros} />
+            <SignatureGenerator {...witnessOneSignatureInputPros} />
+            <SignatureGenerator {...witnessTwoSignatureInputPros} />
+          </>
+        )
+      }
+    }
 
     return (
       <FullBodyContent>
@@ -2030,21 +1913,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               )}
 
               {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                !isCorrection(declaration) && (
-                  <InputWrapper>
-                    <InputField
-                      id="informant_signature"
-                      touched={false}
-                      required={window.config.INFORMANT_SIGNATURE_REQUIRED}
-                      label={intl.formatMessage(messages.informantsSignature)}
-                    >
-                      <SignatureInput
-                        {...signatureInputProps}
-                        disabled={viewRecord}
-                      />
-                    </InputField>
-                  </InputWrapper>
-                )}
+                !isCorrection(declaration) &&
+                getSignature(declaration?.event as Event)}
+
               {totalFileSizeExceeded && (
                 <Alert type="warning">
                   {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
