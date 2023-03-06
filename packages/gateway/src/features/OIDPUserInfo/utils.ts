@@ -17,11 +17,10 @@ import { OIDP_BASE_URL, OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 const TOKEN_GRANT_TYPE = 'authorization_code'
 const CLIENT_ASSERTION_TYPE =
   'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-const OIDP_TOKEN_ENDPOINT = new URL('oauth/token', OIDP_BASE_URL).toString()
-const OIDP_USERINFO_ENDPOINT = new URL(
-  'oidc/userinfo',
-  OIDP_BASE_URL
-).toString()
+const OIDP_TOKEN_ENDPOINT =
+  OIDP_BASE_URL && new URL('oauth/token', OIDP_BASE_URL).toString()
+const OIDP_USERINFO_ENDPOINT =
+  OIDP_BASE_URL && new URL('oidc/userinfo', OIDP_BASE_URL).toString()
 
 const JWT_ALG = 'RS256'
 const JWT_EXPIRATION_TIME = '1h'
@@ -48,7 +47,7 @@ export const fetchToken = async ({
     client_assertion: await generateSignedJwt(clientId)
   })
 
-  const request = await fetch(OIDP_TOKEN_ENDPOINT, {
+  const request = await fetch(OIDP_TOKEN_ENDPOINT!, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -61,7 +60,7 @@ export const fetchToken = async ({
 }
 
 export const fetchUserInfo = async (accessToken: string) => {
-  const request = await fetch(OIDP_USERINFO_ENDPOINT, {
+  const request = await fetch(OIDP_USERINFO_ENDPOINT!, {
     headers: {
       Authorization: 'Bearer ' + accessToken
     }
@@ -84,7 +83,7 @@ const generateSignedJwt = async (clientId: string) => {
     aud: OIDP_TOKEN_ENDPOINT
   }
 
-  const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY, 'base64')?.toString()
+  const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY!, 'base64')?.toString()
   const jwkObject = JSON.parse(decodeKey)
   const privateKey = await jose.importJWK(jwkObject, JWT_ALG)
 
