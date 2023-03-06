@@ -61,10 +61,6 @@ interface Window {
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
-    BRIDE_SIGNATURE_REQUIRED: boolean
-    GROOM_SIGNATURE_REQUIRED: boolean
-    WITNESS_ONE_SIGNATURE_REQUIRED: boolean
-    WITNESS_TWO_SIGNATURE_REQUIRED: boolean
     ADMIN_LEVELS: number
   }
   __localeId__: string

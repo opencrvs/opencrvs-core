@@ -1738,7 +1738,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
     const generateSignatureProps = (
-      sectionType: string,
+      sectionType: SignatureSectionType,
       id: string,
       value: string,
       inputLabel: string,
@@ -1783,7 +1783,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'bride_signature',
           declaration.data.registration?.brideSignature as string,
           intl.formatMessage(messages.brideSignature),
-          window.config.BRIDE_SIGNATURE_REQUIRED
+          true
         )
 
         const groomSignatureInputPros = generateSignatureProps(
@@ -1791,7 +1791,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'groom_signature',
           declaration.data.registration?.groomSignature as string,
           intl.formatMessage(messages.groomSignature),
-          window.config.GROOM_SIGNATURE_REQUIRED
+          true
         )
 
         const witnessOneSignatureInputPros = generateSignatureProps(
@@ -1799,7 +1799,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'witness_one_signature',
           declaration.data.registration?.witnessOneSignature as string,
           intl.formatMessage(messages.witnessOneSignature),
-          window.config.WITNESS_ONE_SIGNATURE_REQUIRED
+          true
         )
 
         const witnessTwoSignatureInputPros = generateSignatureProps(
@@ -1807,7 +1807,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'witness_two_signature',
           declaration.data.registration?.witnessTwoSignature as string,
           intl.formatMessage(messages.witnessTwoSignature),
-          window.config.WITNESS_TWO_SIGNATURE_REQUIRED
+          true
         )
 
         return (
