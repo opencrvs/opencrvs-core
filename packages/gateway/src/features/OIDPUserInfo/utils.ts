@@ -12,7 +12,6 @@
 import * as jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 import fetch from 'node-fetch'
-import { OpenIDConnectUserInfoResponse } from './oidp-types'
 import { OIDP_BASE_URL, OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 
 const TOKEN_GRANT_TYPE = 'authorization_code'
@@ -97,5 +96,5 @@ const generateSignedJwt = async (clientId: string) => {
 }
 
 const decodeUserInfoResponse = async (response: string) => {
-  return jwt.decode(response) as OpenIDConnectUserInfoResponse
+  return jwt.decode(response)
 }
