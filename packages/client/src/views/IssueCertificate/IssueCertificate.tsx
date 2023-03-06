@@ -46,7 +46,7 @@ export function IssueCertificate() {
           mobileTitle={intl.formatMessage(issueMessages.issueCertificate)}
           mobileRight={
             <Button
-              size="large"
+              size="medium"
               type="tertiary"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
@@ -57,7 +57,7 @@ export function IssueCertificate() {
           desktopLeft={<HistoryNavigator hideForward={true} />}
           desktopRight={
             <Button
-              size="large"
+              size="medium"
               type="tertiary"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
