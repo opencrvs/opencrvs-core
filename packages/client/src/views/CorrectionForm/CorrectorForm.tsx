@@ -34,7 +34,6 @@ import {
   ReviewSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -44,6 +43,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 type IProps = {
   declaration: IDeclaration
@@ -60,38 +60,44 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroupWithVisibleFields(
+export function getGroupWithVisibleFields(
   section: IFormSection,
   declaration: IDeclaration
 ) {
   const event = declaration.event
-  const group = section.groups[0]
-  const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
-  if (event === Event.Birth) {
-    const declarationData = declaration.data
+  const group = { ...section.groups[0] }
+  group.fields = group.fields.map((orgField, fieldIndex) => {
+    if (fieldIndex > 0) return orgField
+    const field = {
+      ...orgField
+    } as IRadioGroupWithNestedFieldsFormField
+    if (event === Event.Birth) {
+      const declarationData = declaration.data
 
-    const motherDataExists =
-      declarationData &&
-      declarationData.mother &&
-      declarationData.mother.detailsExist
+      const motherDataExists =
+        declarationData &&
+        declarationData.mother &&
+        declarationData.mother.detailsExist
 
-    const fatherDataExists =
-      declarationData &&
-      declarationData.father &&
-      declarationData.father.detailsExist
+      const fatherDataExists =
+        declarationData &&
+        declarationData.father &&
+        declarationData.father.detailsExist
 
-    if (!fatherDataExists) {
-      field.options = field.options.filter(
-        (option) => option.value !== 'FATHER'
-      )
+      if (!fatherDataExists) {
+        field.options = field.options.filter(
+          (option) => option.value !== 'FATHER'
+        )
+      }
+
+      if (!motherDataExists) {
+        field.options = field.options.filter(
+          (option) => option.value !== 'MOTHER'
+        )
+      }
     }
-
-    if (!motherDataExists) {
-      field.options = field.options.filter(
-        (option) => option.value !== 'MOTHER'
-      )
-    }
-  }
+    return field
+  })
 
   return {
     ...group,

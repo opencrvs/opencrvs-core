@@ -126,7 +126,8 @@ export const updateApplicationConfig = Joi.object({
       ON_TIME: Joi.number(),
       LATE: Joi.number(),
       DELAYED: Joi.number()
-    }
+    },
+    PRINT_IN_ADVANCE: Joi.boolean()
   }),
   COUNTRY_LOGO: Joi.object().keys({
     fileName: Joi.string(),
@@ -141,7 +142,8 @@ export const updateApplicationConfig = Joi.object({
     FEE: {
       ON_TIME: Joi.number(),
       DELAYED: Joi.number()
-    }
+    },
+    PRINT_IN_ADVANCE: Joi.boolean()
   }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
   HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),

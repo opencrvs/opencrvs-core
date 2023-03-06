@@ -201,6 +201,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     defaultMessage: 'Assigned',
     description: 'Assigned action'
   },
+  [RegAction.Verified]: {
+    id: 'recordAudit.regAction.verified',
+    defaultMessage: 'Certificate verified',
+    description: 'Verified action'
+  },
   [RegAction.Unassigned]: {
     id: 'recordAudit.regAction.unassigned',
     defaultMessage: 'Unassigned',
@@ -259,6 +264,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'recordAudit.regStatus.certified'
+  },
+  [RegStatus.Issued]: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status Issued',
+    id: 'recordAudit.regStatus.issued'
   },
   [RegStatus.Rejected]: {
     defaultMessage: 'Rejected',

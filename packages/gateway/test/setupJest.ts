@@ -14,7 +14,9 @@ import * as fetch from 'jest-fetch-mock'
 // eslint-disable-next-line import/no-relative-parent-imports
 import { IDatabaseConnector } from '../src/features/user/database'
 
-jest.setMock('node-fetch', { default: fetch })
+const f = jest.requireActual('node-fetch')
+
+jest.setMock('node-fetch', { default: fetch, Headers: f.Headers })
 
 const database: { [key: string]: string } = {}
 

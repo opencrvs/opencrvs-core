@@ -27,6 +27,7 @@ type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type DeathFee {
@@ -37,6 +38,7 @@ type DeathFee {
 type Death {
   REGISTRATION_TARGET: Int
   FEE: DeathFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type CountryLogo {
@@ -59,6 +61,7 @@ input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input DeathFeeInput {
@@ -69,6 +72,7 @@ input DeathFeeInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input NIDNumberPatternInput {

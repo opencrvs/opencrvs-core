@@ -109,7 +109,8 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin',
   NATLSYSADMIN = 'natlsysadmin',
   VALIDATE = 'validate',
-  RECORDSEARCH = 'recordsearch'
+  RECORDSEARCH = 'recordsearch',
+  VERIFY = 'verify'
 }
 
 export const getRoutes = () => {
@@ -350,6 +351,7 @@ export const getRoutes = () => {
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
+            RouteScope.VERIFY,
             RouteScope.RECORDSEARCH
           ]
         },
@@ -410,7 +412,14 @@ export const getRoutes = () => {
       handler: getSystemRoles,
       config: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: searchRoleSchema
@@ -669,7 +678,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            role: Joi.string().required(),
+            systemRole: Joi.string().required(),
             locationId: Joi.string()
           })
         }

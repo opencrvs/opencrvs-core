@@ -17,9 +17,11 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
@@ -232,6 +234,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -527,6 +530,8 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+union RecordDetails = BirthRegistration | DeathRegistration
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -552,6 +557,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {
@@ -569,6 +576,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -591,6 +599,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!

@@ -30,6 +30,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -173,6 +175,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -193,6 +196,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
@@ -357,6 +361,14 @@ type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
 }
+
+union RecordDetails = BirthRegistration | DeathRegistration
+
+enum AuthorizationStatus {
+  ANONYMOUS
+}
+
+directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
 
 type Location {
   id: ID!
@@ -931,6 +943,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -1111,7 +1124,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  role: String
+  role: Role
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -1328,6 +1341,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 input MedicalPractitionerInput {
@@ -1362,6 +1376,7 @@ type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type CountryLogo {
@@ -1377,6 +1392,7 @@ type Currency {
 type Death {
   REGISTRATION_TARGET: Int
   FEE: DeathFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type LoginBackground {
@@ -1389,6 +1405,7 @@ input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input CountryLogoInput {
@@ -1404,6 +1421,7 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input LoginBackgroundInput {
@@ -1493,6 +1511,7 @@ type Certificate {
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED

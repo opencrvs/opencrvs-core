@@ -47,11 +47,17 @@ export const MY_DRAFTS = '/my-drafts'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
+export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
+export const ISSUE_VERIFY_COLLECTOR =
+  '/issue/check/:registrationId/:eventType/:collector'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
-export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
+export const PRINT_CERTIFICATE_PAYMENT =
+  '/print/payment/:registrationId/:eventType'
+export const ISSUE_CERTIFICATE_PAYMENT =
+  '/issue/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
@@ -98,6 +104,8 @@ export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 export const USER_PROFILE = '/userProfile/:userId'
 
 export const VIEW_RECORD = '/:declarationId/viewRecord'
+
+export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
 
 export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'

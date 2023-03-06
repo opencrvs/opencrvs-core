@@ -381,9 +381,7 @@ export const mockConditionals = {
 }
 
 export const mockOfflineData = {
-  forms: JSON.parse(
-    readFileSync(join(__dirname, './default.json')).toString()
-  ) as any,
+  forms: JSON.parse(readFileSync(join(__dirname, './default.json')).toString()),
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -713,7 +711,8 @@ export const mockOfflineData = {
         ON_TIME: 0,
         LATE: 15,
         DELAYED: 20
-      }
+      },
+      PRINT_IN_ADVANCE: true
     },
     AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
     DEATH: {
@@ -721,7 +720,8 @@ export const mockOfflineData = {
       FEE: {
         ON_TIME: 0,
         DELAYED: 0
-      }
+      },
+      PRINT_IN_ADVANCE: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
@@ -756,6 +756,19 @@ export const mockOfflineData = {
     INFORMANT_SIGNATURE: false,
     INFORMANT_SIGNATURE_REQUIRED: false,
     ADMIN_LEVELS: 2
+  },
+  anonymousConfig: {
+    APPLICATION_NAME: 'Farajaland CRVS',
+    COUNTRY_LOGO: {
+      fileName: 'logo.png',
+      file: `data:image;base64,${validImageB64String}`
+    },
+    LOGIN_BACKGROUND: {
+      backgroundColor: 'FFF',
+      backgroundImage: '',
+      imageFit: 'FILL'
+    },
+    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
   },
   formConfig,
   systems

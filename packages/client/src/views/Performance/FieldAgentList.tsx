@@ -32,7 +32,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -41,7 +41,8 @@ import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Avatar } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { userMessages } from '@client/i18n/messages'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -172,6 +173,7 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const offices = generateLocations(offlineOffices, intl)
+  const language = useSelector(getLanguage)
 
   const isOfficeSelected = offices.some((office) => office.id === locationId)
 
@@ -222,7 +224,7 @@ function FieldAgentListComponent(props: IProps) {
       },
       {
         key: 'role',
-        label: intl.formatMessage(messages.typeColumnHeader),
+        label: intl.formatMessage(messages.roleColumnHeader),
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('role'),
@@ -315,10 +317,6 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
-  function getFieldAgentTypeLabel(role: string) {
-    return userMessages[role] ? intl.formatMessage(userMessages[role]) : role
-  }
-
   function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
       data &&
@@ -339,10 +337,11 @@ function FieldAgentListComponent(props: IProps) {
         const office =
           row.primaryOfficeId &&
           offices.find(({ id }) => id === row.primaryOfficeId)
+
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          role: (row.role && getFieldAgentTypeLabel(row.role)) || '',
+          role: (row.role && getUserRole(language, row.role)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),
