@@ -160,7 +160,7 @@ export function generateConfigFields(
 ) {
   questions = questions.filter((question) => question.fieldId.startsWith(event))
 
-  return getConfiguredQuestions(event, defaultForm, questions)
+  const fields = getConfiguredQuestions(event, defaultForm, questions)
     .map((sectionQuestionConfigs) =>
       sectionQuestionConfigs
         .reduce<IConfigField[]>(
@@ -199,6 +199,8 @@ export function generateConfigFields(
         [sectionId]: sectionConfigFields
       }
     }, {})
+    console.log(fields, 'fields here')
+    return fields
 }
 
 function configFieldsToQuestionConfigs(

@@ -102,7 +102,8 @@ export function questionsTransformer(
       custom,
       conditionals,
       datasetId,
-      options
+      options,
+      validate
     }) => {
       if (custom) {
         return {
@@ -120,7 +121,8 @@ export function questionsTransformer(
           custom,
           conditionals,
           datasetId,
-          options
+          options,
+          validate
         } as ICustomQuestionConfig
       }
 
@@ -130,7 +132,10 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
+      }
+      if(validate && validate?.length > 0) {
+        defaultQuestionConfig.validate = validate
       }
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields

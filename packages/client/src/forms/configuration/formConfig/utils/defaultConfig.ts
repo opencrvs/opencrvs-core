@@ -62,8 +62,11 @@ export function defaultQuestionToConfigField(
       getGroup(question.identifiers, defaultForm),
       previewGroup
     ),
-    configFields: [configField]
+    configFields: [configField],
   }
+  
+  question.validate && (previewGroupConfigField.validate = question.validate)
+  
   return previewGroupConfigField
 }
 

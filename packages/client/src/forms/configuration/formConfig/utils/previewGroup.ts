@@ -16,6 +16,11 @@ import { ISerializedFormSectionGroup } from '@client/forms'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
+interface IValidate{
+  operation: string
+  parameters: number[] | string[]
+}
+
 export type IPreviewGroupConfigField = {
   /*
    * TODO: Make the previewGroupId's unique so that the fieldId
@@ -26,6 +31,7 @@ export type IPreviewGroupConfigField = {
   previewGroupLabel: MessageDescriptor
   configFields: IDefaultConfigField[]
   precedingFieldId: string
+  validate?: IValidate
 }
 
 export function isPlaceHolderPreviewGroup(previewGroup: string) {

@@ -132,6 +132,7 @@ const questionSchema = new Schema({
     type: [conditionals],
     default: undefined
   },
+  validate: {},
   datasetId: { type: Schema.Types.ObjectId, ref: 'FormDataset' }
 })
 

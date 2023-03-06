@@ -36,6 +36,10 @@ interface IBaseQuestionConfig {
   fieldId: string
   precedingFieldId: string
 }
+interface IValidate{
+  operation: string
+  parameters: number[]
+}
 
 export interface IFieldIdentifiers {
   sectionIndex: number
@@ -47,6 +51,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
   identifiers: IFieldIdentifiers
+  validate?: IValidate[]
 }
 
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
@@ -63,6 +68,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
+  validate?: IValidate[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
