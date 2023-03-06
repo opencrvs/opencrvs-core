@@ -18,6 +18,7 @@ import { Text } from '../Text'
 
 interface IVerificationButtonProps {
   status?: 'unverified' | 'loading' | 'verified'
+  id: string
   onClick: () => void
   labelForVerifiedState: string
   labelForUnverifiedState: string

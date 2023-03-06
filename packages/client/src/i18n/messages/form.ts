@@ -2217,6 +2217,21 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Hide',
     description: 'Hide label for accordion component',
     id: 'form.field.hideLabel'
+  },
+  nidNotVerified: {
+    defaultMessage: 'Authenticate',
+    description: 'label for verified nid state',
+    id: 'form.field.nidNotVerified'
+  },
+  nidVerified: {
+    defaultMessage: 'Authenticated',
+    description: 'label for unverified nid state',
+    id: 'form.field.nidVerified'
+  },
+  nidVerificationOngoing: {
+    defaultMessage: 'Authenticating',
+    description: 'label for nid verification ongoing state',
+    id: 'form.field.nidVerificationOngoing'
   }
 }
 

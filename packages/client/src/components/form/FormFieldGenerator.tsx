@@ -81,7 +81,9 @@ import {
   Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
-  IDateRangePickerValue
+  IDateRangePickerValue,
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -124,6 +126,7 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
+import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -567,6 +570,20 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
+    return (
+      <InputField {...inputFieldProps}>
+        <VerificationButton
+          id={fieldDefinition.name}
+          onClick={fieldDefinition.onClick}
+          labelForVerifiedState={fieldDefinition.labelForVerifiedState}
+          labelForUnverifiedState={fieldDefinition.labelForUnverifiedState}
+          labelForLoadingState={fieldDefinition.labelForLoadingState}
+        />
+      </InputField>
+    )
+  }
+
   return (
     <InputField {...inputFieldProps}>
       <TextInput
@@ -966,12 +983,33 @@ class FormSectionComponent extends React.Component<Props> {
                     field.searchableType as LocationType[]
                   )
                 }
+              : field.type === NID_VERIFICATION_BUTTON
+              ? ({
+                  ...field,
+                  onClick: () => {
+                    const section = {
+                      id: this.props.id,
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields: fieldsWithValuesDefined
+                        }
+                      ]
+                    } as IFormSection
+
+                    const form = {
+                      sections: [section]
+                    } as IForm
+                  }
+                  //TODO: HANDLE FETCH FOR NID
+                } as INidVerificationButton)
               : field
 
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === NID_VERIFICATION_BUTTON
           ) {
             return (
               <FormItem

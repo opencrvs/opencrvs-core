@@ -34,6 +34,29 @@ interface IDefaultRegisterForms {
   death: ISerializedForm
 }
 
+export const nidIntegrationConditionals = {
+  hideIfNidIntegrationEnabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem = offlineCountryConfig.systems
+                    .find(s => s.type === 'NATIONAL_ID');
+        nationalIdSystem &&
+        nationalIdSystem.settings.openIdProviderBaseUrl &&
+        nationalIdSystem.settings.openIdProviderClientId &&
+        nationalIdSystem.settings.openIdProviderClaims;
+    `
+  },
+  hideIfNidIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem = offlineCountryConfig.systems
+                      .find(s => s.type === 'NATIONAL_ID');
+      !nationalIdSystem ||
+      !nationalIdSystem.settings.openIdProviderBaseUrl ||
+      !nationalIdSystem.settings.openIdProviderClientId ||
+      !nationalIdSystem.settings.openIdProviderClaims;
+    `
+  }
+}
+
 export const registerForms: IDefaultRegisterForms = {
   birth: {
     sections: [
@@ -1059,7 +1082,9 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['father.iD']
                   }
                 ],
-                conditionals: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationEnabled
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -1087,6 +1112,22 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
+              },
+              {
+                name: 'informantNidVerification',
+                type: 'NID_VERIFICATION_BUTTON',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: true,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                ],
+                labelForVerifiedState: formMessageDescriptors.nidVerified,
+                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
+                labelForLoadingState:
+                  formMessageDescriptors.nidVerificationOngoing
               },
               {
                 name: 'informantBirthDate',
@@ -1434,7 +1475,8 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
-                  }
+                  },
+                  nidIntegrationConditionals.hideIfNidIntegrationEnabled
                 ],
                 mapping: {
                   template: {
@@ -1451,6 +1493,22 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['id', 'NATIONAL_ID']
                   }
                 }
+              },
+              {
+                name: 'motherNidVerification',
+                type: 'NID_VERIFICATION_BUTTON',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: true,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                ],
+                labelForVerifiedState: formMessageDescriptors.nidVerified,
+                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
+                labelForLoadingState:
+                  formMessageDescriptors.nidVerificationOngoing
               },
               {
                 name: 'motherBirthDate',
@@ -1987,7 +2045,8 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
-                  }
+                  },
+                  nidIntegrationConditionals.hideIfNidIntegrationEnabled
                 ],
                 mapping: {
                   template: {
@@ -2004,6 +2063,22 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['id', 'NATIONAL_ID']
                   }
                 }
+              },
+              {
+                name: 'fatherNidVerification',
+                type: 'NID_VERIFICATION_BUTTON',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: true,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                ],
+                labelForVerifiedState: formMessageDescriptors.nidVerified,
+                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
+                labelForLoadingState:
+                  formMessageDescriptors.nidVerificationOngoing
               },
               {
                 name: 'fatherBirthDate',
@@ -3885,7 +3960,9 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['deceased.iD']
                   }
                 ],
-                conditionals: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationEnabled
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -3913,6 +3990,22 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
+              },
+              {
+                name: 'informantNidVerification',
+                type: 'NID_VERIFICATION_BUTTON',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: true,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                ],
+                labelForVerifiedState: formMessageDescriptors.nidVerified,
+                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
+                labelForLoadingState:
+                  formMessageDescriptors.nidVerificationOngoing
               },
               {
                 name: 'informantBirthDate',
