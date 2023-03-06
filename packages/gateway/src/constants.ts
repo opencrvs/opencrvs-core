@@ -67,3 +67,8 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   : 600
 export const DEFAULT_TIMEOUT = 600000
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
+
+export const OIDP_BASE_URL = process.env.NATIONAL_ID_OIDP_BASE_URL
+/** Base64 encoded RS256 JSON Web Key */
+export const OIDP_CLIENT_PRIVATE_KEY =
+  process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY

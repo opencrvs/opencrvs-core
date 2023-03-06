@@ -9,17 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
-import jwt from 'jsonwebtoken'
-import { OpenIDConnectUserInfoResponse } from './oidp-types'
+import * as jwt from 'jsonwebtoken'
+import * as jose from 'jose'
+import fetch from 'node-fetch'
+import { OIDP_BASE_URL, OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
 
 const TOKEN_GRANT_TYPE = 'authorization_code'
-const CLIENT_ASSERTION_TYPE = 'code'
-const OIDP_BASE_URL = process.env.OIDP_BASE_URL!
-const OIDP_AUD_URL = process.env.OIDP_AUD_URL!
-const OIDP_CLIENT_PRIVATE_KEY = process.env.OIDP_CLIENT_PRIVATE_KEY!
-const OIDP_TOKEN_ENDPOINT = '/oauth/token'
-const OIDP_USERINFO_ENDPOINT = '/oidc/userinfo'
+const CLIENT_ASSERTION_TYPE =
+  'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+const OIDP_TOKEN_ENDPOINT =
+  OIDP_BASE_URL && new URL('oauth/token', OIDP_BASE_URL).toString()
+const OIDP_USERINFO_ENDPOINT =
+  OIDP_BASE_URL && new URL('oidc/userinfo', OIDP_BASE_URL).toString()
 
 const JWT_ALG = 'RS256'
 const JWT_EXPIRATION_TIME = '1h'
@@ -28,7 +29,7 @@ export type FetchTokenProps = {
   code: string
   clientId: string
   redirectUri: string
-  grantType: string
+  grantType?: string
 }
 
 export const fetchToken = async ({
@@ -46,7 +47,7 @@ export const fetchToken = async ({
     client_assertion: await generateSignedJwt(clientId)
   })
 
-  const request = await fetch(OIDP_BASE_URL + OIDP_TOKEN_ENDPOINT, {
+  const request = await fetch(OIDP_TOKEN_ENDPOINT!, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -55,25 +56,19 @@ export const fetchToken = async ({
   })
 
   const response = await request.json()
-  return response as { access_token: string }
+  return response as { access_token?: string }
 }
 
-export const fetchTokenPayloadSchema = Joi.object({
-  code: Joi.string().required(),
-  clientId: Joi.string().required(),
-  redirectUri: Joi.string().required(),
-  grantType: Joi.string().required()
-})
-
 export const fetchUserInfo = async (accessToken: string) => {
-  const request = await fetch(OIDP_BASE_URL + OIDP_USERINFO_ENDPOINT, {
+  const request = await fetch(OIDP_USERINFO_ENDPOINT!, {
     headers: {
       Authorization: 'Bearer ' + accessToken
     }
   })
 
-  const response = (await request.json()) as string
-  return decodeUserInfoResponse(response)
+  const response = await request.text()
+  const decodedResponse = await decodeUserInfoResponse(response)
+  return decodedResponse
 }
 
 const generateSignedJwt = async (clientId: string) => {
@@ -85,18 +80,20 @@ const generateSignedJwt = async (clientId: string) => {
   const payload = {
     iss: clientId,
     sub: clientId,
-    aud: OIDP_AUD_URL
+    aud: OIDP_TOKEN_ENDPOINT
   }
 
-  const privateKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY, 'base64').toString()
+  const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY!, 'base64')?.toString()
+  const jwkObject = JSON.parse(decodeKey)
+  const privateKey = await jose.importJWK(jwkObject, JWT_ALG)
 
-  return jwt.sign(payload, privateKey, {
-    header,
-    algorithm: JWT_ALG,
-    expiresIn: JWT_EXPIRATION_TIME
-  })
+  return new jose.SignJWT(payload)
+    .setProtectedHeader(header)
+    .setIssuedAt()
+    .setExpirationTime(JWT_EXPIRATION_TIME)
+    .sign(privateKey)
 }
 
 const decodeUserInfoResponse = async (response: string) => {
-  return jwt.decode(response) as OpenIDConnectUserInfoResponse
+  return jwt.decode(response)
 }

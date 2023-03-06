@@ -27,8 +27,6 @@ import {
   fhirBundleSchema,
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
-import { oidpGetUserInfoHandler } from '@gateway/features/oidp/handler'
-import { fetchTokenPayloadSchema } from '@gateway/features/oidp/utils'
 
 export const getRoutes = () => {
   const routes = [
@@ -124,17 +122,6 @@ export const getRoutes = () => {
         validate: {
           payload: fhirBundleSchema,
           failAction: validationFailedAction
-        }
-      }
-    },
-    // OIDP callback redirect handler back to the client declaration form
-    {
-      method: 'POST',
-      path: '/oidp-userinfo',
-      handler: oidpGetUserInfoHandler,
-      config: {
-        validate: {
-          payload: fetchTokenPayloadSchema
         }
       }
     }
