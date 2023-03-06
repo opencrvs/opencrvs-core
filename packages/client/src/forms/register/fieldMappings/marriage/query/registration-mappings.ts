@@ -36,6 +36,23 @@ export function getMarriageRegistrationSectionTransformer(
     transformedData[sectionId].type = Event.Marriage
   }
 
+  if (queryData[sectionId].groomSignature) {
+    transformedData[sectionId].groomSignature =
+      queryData[sectionId].groomSignature
+  }
+  if (queryData[sectionId].brideSignature) {
+    transformedData[sectionId].brideSignature =
+      queryData[sectionId].brideSignature
+  }
+  if (queryData[sectionId].witnessOneSignature) {
+    transformedData[sectionId].witnessOneSignature =
+      queryData[sectionId].witnessOneSignature
+  }
+  if (queryData[sectionId].witnessTwoSignature) {
+    transformedData[sectionId].witnessTwoSignature =
+      queryData[sectionId].witnessTwoSignature
+  }
+
   if (queryData[sectionId].status) {
     transformStatusData(
       transformedData,

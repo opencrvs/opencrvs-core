@@ -892,6 +892,10 @@ type Registration {
   contact: String
   contactRelationship: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -1301,6 +1305,10 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String

@@ -97,12 +97,7 @@ export function SignatureGenerator({
 
   return (
     <InputWrapper>
-      <InputField
-        id={id}
-        touched={false}
-        required={isRequired}
-        label={label}
-      >
+      <InputField id={id} touched={false} required={isRequired} label={label}>
         <div>
           {description && (
             <SignatureDescription>{description}</SignatureDescription>

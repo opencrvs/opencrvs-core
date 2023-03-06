@@ -1698,15 +1698,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const isSignatureMissing = isCorrection(declaration)
-      ? false
-      : offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
-        !declaration.data.registration?.informantsSignature
+    const isSignatureMissing = () => {
+      if (isCorrection(declaration)) {
+        return false
+      } else {
+        if (event === Event.Birth || event === Event.Death) {
+          return (
+            offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+            !declaration.data.registration?.informantsSignature
+          )
+        } else if (event === Event.Marriage) {
+          return (
+            !declaration.data.registration?.groomSignature &&
+            !declaration.data.registration?.brideSignature &&
+            !declaration.data.registration?.witnessOneSignature &&
+            !declaration.data.registration?.witnessTwoSignature
+          )
+        }
+      }
+    }
 
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0 && !isSignatureMissing
+      ).length === 0 && !isSignatureMissing()
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -1815,8 +1830,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <Text id="terms" element="p" variant="reg16">
               {intl.formatMessage(messages.terms)}
             </Text>
-            <SignatureGenerator {...brideSignatureInputPros} />
             <SignatureGenerator {...groomSignatureInputPros} />
+            <SignatureGenerator {...brideSignatureInputPros} />
             <SignatureGenerator {...witnessOneSignatureInputPros} />
             <SignatureGenerator {...witnessTwoSignatureInputPros} />
           </>
