@@ -95,6 +95,8 @@ function getEventToScopeMap(event: Events) {
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:
       return [USER_SCOPE.VALIDATE, USER_SCOPE.REGISTER]
+    case Events.VERIFIED_EVENT:
+      return [USER_SCOPE.VERIFY]
 
     default:
       return []

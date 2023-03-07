@@ -332,6 +332,10 @@ export type AuditLogItemBase = {
   userAgent: Scalars['String']
 }
 
+export enum AuthorizationStatus {
+  Anonymous = 'ANONYMOUS'
+}
+
 export type Avatar = {
   __typename?: 'Avatar'
   data: Scalars['String']
@@ -932,6 +936,7 @@ export type History = {
   dhis2Notification?: Maybe<Scalars['Boolean']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
+  ipAddress?: Maybe<Scalars['String']>
   location?: Maybe<Location>
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
@@ -1184,9 +1189,9 @@ export type MarriageRegistration = EventRegistration & {
   groom?: Maybe<Person>
   history?: Maybe<Array<Maybe<History>>>
   id: Scalars['ID']
-  marriageType?: Maybe<MarriageType>
   questionnaire?: Maybe<Array<Maybe<QuestionnaireQuestion>>>
   registration?: Maybe<Registration>
+  typeOfMarriage?: Maybe<MarriageType>
   updatedAt?: Maybe<Scalars['Date']>
   witnessOne?: Maybe<RelatedPerson>
   witnessTwo?: Maybe<RelatedPerson>
@@ -1292,6 +1297,7 @@ export type Mutation = {
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   markMarriageAsCertified: Scalars['ID']
+  markMarriageAsIssued: Scalars['ID']
   markMarriageAsRegistered: MarriageRegistration
   markMarriageAsValidated?: Maybe<Scalars['ID']>
   modifyDraftStatus?: Maybe<FormDraft>
@@ -1463,6 +1469,11 @@ export type MutationMarkEventAsVoidedArgs = {
 }
 
 export type MutationMarkMarriageAsCertifiedArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkMarriageAsIssuedArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
@@ -1687,6 +1698,7 @@ export type Query = {
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
+  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1753,6 +1765,10 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QueryFetchRecordDetailsForVerificationArgs = {
+  id: Scalars['String']
 }
 
 export type QueryFetchRegistrationArgs = {
@@ -1984,12 +2000,15 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export type RecordDetails = BirthRegistration | DeathRegistration
+
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
+  Verified = 'VERIFIED',
   Viewed = 'VIEWED'
 }
 
@@ -3643,6 +3662,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -3940,6 +3960,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       otherReason?: string | null
       statusReason?: {
@@ -4321,6 +4342,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -4598,6 +4620,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      ipAddress?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4769,6 +4792,16 @@ export type MarkMarriageAsCertifiedMutation = {
   markMarriageAsCertified: string
 }
 
+export type MarkMarriageAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsIssued: string
+}
+
 export type FetchMarriageRegistrationForReviewQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -4779,7 +4812,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
     __typename?: 'MarriageRegistration'
     _fhirIDMap?: any | null
     id: string
-    marriageType?: MarriageType | null
+    typeOfMarriage?: MarriageType | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -4794,6 +4827,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -4831,6 +4865,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -5061,7 +5096,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
     __typename?: 'MarriageRegistration'
     _fhirIDMap?: any | null
     id: string
-    marriageType?: MarriageType | null
+    typeOfMarriage?: MarriageType | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -5076,6 +5111,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -5113,6 +5149,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        marriedLastName?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -8055,6 +8092,120 @@ export type SubmitActivateUserMutation = {
   activateUser?: string | null
 }
 
+export type FetchRecordDetailsForVerificationQueryVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type FetchRecordDetailsForVerificationQuery = {
+  __typename?: 'Query'
+  fetchRecordDetailsForVerification?:
+    | {
+        __typename?: 'BirthRegistration'
+        id: string
+        createdAt?: any | null
+        child?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | {
+        __typename?: 'DeathRegistration'
+        id: string
+        createdAt?: any | null
+        deceased?: {
+          __typename?: 'Person'
+          birthDate?: string | null
+          gender?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          deceased?: {
+            __typename?: 'Deceased'
+            deathDate?: string | null
+          } | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          name: string
+          description?: string | null
+          type: LocationType
+          address?: {
+            __typename?: 'Address'
+            city?: string | null
+            districtName?: string | null
+            stateName?: string | null
+          } | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          trackingId?: string | null
+          registrationNumber?: string | null
+          type?: RegistrationType | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          user?: {
+            __typename?: 'User'
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+            }>
+            catchmentArea?: Array<{
+              __typename?: 'Location'
+              name: string
+            }> | null
+          } | null
+        } | null> | null
+      }
+    | null
+}
+
 export type FetchViewRecordByCompositionQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -8266,6 +8417,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
@@ -8544,6 +8696,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
@@ -8634,7 +8787,7 @@ export type FetchViewRecordByCompositionQuery = {
         __typename: 'MarriageRegistration'
         _fhirIDMap?: any | null
         id: string
-        marriageType?: MarriageType | null
+        typeOfMarriage?: MarriageType | null
         bride?: {
           __typename?: 'Person'
           id?: string | null
@@ -8649,6 +8802,7 @@ export type FetchViewRecordByCompositionQuery = {
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+            marriedLastName?: string | null
           } | null> | null
           identifier?: Array<{
             __typename?: 'IdentityType'
@@ -8686,6 +8840,7 @@ export type FetchViewRecordByCompositionQuery = {
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
+            marriedLastName?: string | null
           } | null> | null
           identifier?: Array<{
             __typename?: 'IdentityType'
@@ -8818,6 +8973,7 @@ export type FetchViewRecordByCompositionQuery = {
           action?: RegAction | null
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
+          ipAddress?: string | null
           reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'

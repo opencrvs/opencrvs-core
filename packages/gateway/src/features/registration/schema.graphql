@@ -21,6 +21,7 @@ enum RegStatus {
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
@@ -242,6 +243,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -567,6 +569,8 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+union RecordDetails = BirthRegistration | DeathRegistration
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -593,6 +597,8 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {
