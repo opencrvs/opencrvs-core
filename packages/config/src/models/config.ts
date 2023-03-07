@@ -151,7 +151,7 @@ const configSchema = new Schema({
   INFORMANT_SIGNATURE_REQUIRED: {
     type: Boolean,
     required: true,
-    default: true
+    default: false
   },
   LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
   ADMIN_LEVELS: {
