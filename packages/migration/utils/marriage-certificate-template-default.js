@@ -129,9 +129,9 @@ export const svgCode = `<svg width="420" height="595" viewBox="0 0 420 595" fill
 <pattern id="pattern3" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image_qrcode" transform="translate(0 -0.0207101) scale(0.00295858)"/>
 </pattern>
-<image id="image_groom" width="1222" height="446" data-content="signature" xlink:href="{{groomSignature}}"/>
-<image id="image_bride" width="1222" height="446" data-content="signature" xlink:href="{{brideSignature}}"/>
 <image id="image_registrar" width="1222" height="446" data-content="signature" xlink:href="{{registrarSignature}}"/>
-<image id="image_qrcode" width="1222" height="446" data-content="signature" xlink:href="{{qrCode}}"/>
+<image id="image_groom" width="1222" height="446" data-content="groomSignature" xlink:href="{{groomSignature}}"/>
+<image id="image_bride" width="1222" height="446" data-content="brideSignature" xlink:href="{{brideSignature}}"/>
+<image id="image_qrcode" width="1222" height="446" data-content="qrcode" xlink:href="{{qrCode}}"/>
 </defs>
 </svg>`

@@ -1368,6 +1368,8 @@ const dummyMarriageRegistrationResponse = {
     informantsSignature: null,
     duplicates: null,
     attachments: null,
+    groomSignature: signatureImage,
+    brideSignature: signatureImage,
     status: [
       {
         comments: null,
