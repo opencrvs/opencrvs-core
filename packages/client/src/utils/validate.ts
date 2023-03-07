@@ -30,7 +30,7 @@ import {
 } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _ from 'lodash'
+import _, { values } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
 export interface IValidationResult {
@@ -520,7 +520,9 @@ export const isValidEnglishWord = (value: string): boolean => {
     ''
   )
 
-  return englishRe.test(value)
+  const englishApostrophe = XRegExp.cache(`[p{Nd}'_]+`, '')
+
+  return englishRe.test(value) || englishApostrophe.test(value)
 }
 
 type Checker = (value: string) => boolean

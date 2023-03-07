@@ -22,6 +22,7 @@ import {
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
+  anonymousActionEventHandler,
   markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
@@ -46,7 +47,8 @@ import {
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
@@ -116,6 +118,7 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
     const taskResource = getTaskResource(fhirBundle)
+
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
     }
@@ -127,6 +130,10 @@ function detectEvent(request: Hapi.Request): Events {
     }
     if (hasExtension(taskResource, VIEWED_EXTENSION_URL)) {
       return Events.VIEWED
+    }
+
+    if (hasExtension(taskResource, VERIFIED_EXTENSION_URL)) {
+      return Events.VERIFIED_EVENT
     }
     const eventType = getEventType(fhirBundle)
 
@@ -153,6 +160,7 @@ export async function fhirWorkflowEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const event = detectEvent(request)
+
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary
@@ -284,6 +292,9 @@ export async function fhirWorkflowEventHandler(
     case Events.UNASSIGNED_EVENT:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
+      break
+    case Events.VERIFIED_EVENT:
+      response = await anonymousActionEventHandler(request, h, event)
       break
     default:
       // forward as-is to hearth
