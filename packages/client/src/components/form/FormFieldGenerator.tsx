@@ -379,7 +379,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={String(value)}
           selected={(value as string) === checkedValue}
-          onChange={(event) =>
+          onChange={(event: { target: { value: string } }) =>
             onSetFieldValue(
               fieldDefinition.name,
               event.target.value === String(checkedValue)
@@ -478,7 +478,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           max={fieldDefinition.max}
           {...inputProps}
-          onKeyPress={(e) => {
+          onKeyPress={(e: { key: string; preventDefault: () => void }) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
@@ -804,6 +804,7 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   render() {
+    console.log('field', this.props.fields)
     const {
       values,
       fields,

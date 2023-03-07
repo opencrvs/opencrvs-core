@@ -105,9 +105,9 @@ const CTextInput = styled(TextInput)`
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
 `
-const CSelect = styled(Select)`
+const CSelect = styled(Select)<{ removeMargin?: boolean }>`
   width: 100%;
-  margin: 20px 0px;
+  ${({ removeMargin }) => !removeMargin && 'margin: 20px 0px;'}
   border-radius: 2px;
   .react-select__control {
     border: solid 1px ${({ theme }) => theme.colors.grey600};
@@ -270,6 +270,7 @@ interface ICustomField {
   label: string
   placeholder: string
   description: string
+  postfix: string
   tooltip: string
   errorMessage: string
 }
@@ -385,6 +386,7 @@ class CustomFieldToolsComp extends React.Component<
       fieldForms[lang] = {
         label,
         placeholder: this.getIntlMessage(selectedField.placeholder, lang),
+        postfix: this.getIntlMessage(selectedField.postfix, lang),
         description: this.getIntlMessage(selectedField.description, lang),
         tooltip: this.getIntlMessage(selectedField.tooltip, lang),
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
@@ -533,6 +535,13 @@ class CustomFieldToolsComp extends React.Component<
       handleBars,
       languages,
       fieldForms,
+      'postfix',
+      optionalContent
+    )
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
       'tooltip',
       optionalContent
     )
@@ -558,6 +567,7 @@ class CustomFieldToolsComp extends React.Component<
       placeholder: optionalContent.placeholder,
       tooltip: optionalContent.tooltip,
       description: optionalContent.description,
+      postfix: optionalContent.postfix,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
       fieldId: newFieldID,
@@ -648,6 +658,32 @@ class CustomFieldToolsComp extends React.Component<
         </FieldContainer>
       )
     )
+  }
+
+  getUnitValue() {
+    const { intl } = this.props
+    return [
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionEmpty),
+        value: ''
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionG),
+        value: 'g'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionKg),
+        value: 'kg'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionCm),
+        value: 'cm'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionM),
+        value: 'm'
+      }
+    ]
   }
 
   toggleButtons(fieldIds: string[]) {
@@ -834,6 +870,28 @@ class CustomFieldToolsComp extends React.Component<
                   />
                 </CInputField>
               </FieldContainer>
+
+              {formField.type === 'NUMBER' && (
+                <FieldContainer hide={language !== this.state.selectedLanguage}>
+                  <CInputField
+                    required={false}
+                    id={`custom-form-postfix-${language}`}
+                    label={intl.formatMessage(
+                      customFieldFormMessages.unitLabel
+                    )}
+                    touched={false}
+                  >
+                    <CSelect
+                      removeMargin={true}
+                      value={this.state.fieldForms[language].postfix}
+                      onChange={(value: string) => {
+                        this.setValue('postfix', value)
+                      }}
+                      options={this.getUnitValue()}
+                    />
+                  </CInputField>
+                </FieldContainer>
+              )}
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField

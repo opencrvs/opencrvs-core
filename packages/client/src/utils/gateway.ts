@@ -1841,6 +1841,7 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  postfix?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
   fieldId: Scalars['String']
