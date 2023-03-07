@@ -147,7 +147,6 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
-    console.log(fields)
 
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||

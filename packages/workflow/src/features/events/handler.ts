@@ -236,9 +236,6 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_MARK_CERT:
     case Events.DEATH_MARK_CERT:
     case Events.MARRIAGE_MARK_CERT:
-      console.log(
-        'MARRIAGE_MARK_CERTMARRIAGE_MARK_CERTMARRIAGE_MARK_CERTMARRIAGE_MARK_CERTMARRIAGE_MARK_CERTMARRIAGE_MARK_CERT'
-      )
       response = await markEventAsCertifiedHandler(request, h)
       await triggerEvent(event, request.payload, request.headers)
       break
@@ -309,7 +306,6 @@ export async function triggerEvent(
   payload: Hapi.Request['payload'],
   headers: Record<string, string> = {}
 ) {
-  console.log(event)
   try {
     await fetch(`${OPENHIM_URL}${event}`, {
       method: 'POST',
