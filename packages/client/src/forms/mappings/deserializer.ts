@@ -288,7 +288,7 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
 export function deserializeFormField(field: SerializedFormField): IFormField {
   const baseFields = {
     ...field,
-    validator: field.validator.map(fieldValidationDescriptorToValidationFunction),
+    validator: field.validator && field.validator.map(fieldValidationDescriptorToValidationFunction),
     mapping: field.mapping && {
       query:
         field.mapping.query &&
