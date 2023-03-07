@@ -17,7 +17,7 @@ import {
   IQuestionConfig,
   getIdentifiersFromFieldId
 } from '.'
-import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
+import { ISerializedForm, BirthSection, DeathSection, IValidatorDescriptor } from '@client/forms'
 import {
   getField,
   getFieldId,
@@ -26,7 +26,6 @@ import {
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
-import { IValidatorDescriptor } from '../index';
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
