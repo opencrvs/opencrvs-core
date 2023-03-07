@@ -550,7 +550,8 @@ const getLabelForRegistrationStatus = (
       RegStatus.Registered,
       RegStatus.Rejected,
       RegStatus.Validated,
-      RegStatus.WaitingValidation
+      RegStatus.WaitingValidation,
+      RegStatus.Issued
     ],
     IN_REVIEW: [
       RegStatus.WaitingValidation,

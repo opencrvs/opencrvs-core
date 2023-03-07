@@ -44,7 +44,9 @@ function getQueriesToPrefetch(
   const defaultTimeStart = new Date(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   )
-  const defaultTimeEnd = new Date(new Date(Date.now()).setHours(23, 59, 59))
+  const defaultTimeEnd = new Date(
+    new Date(Date.now()).setHours(23, 59, 59, 999)
+  )
 
   return [
     {
@@ -109,14 +111,17 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
       }
     } else if (action.type === READY) {
       const { locations } = getState().offline.offlineData
-      const stateIds = Object.values(locations!)
-        .filter((location) => location.partOf === 'Location/0')
-        .map((location) => location.id)
+      const userDetails = getState().profile.userDetails
+      if (!isFieldAgent(userDetails!)) {
+        const stateIds = Object.values(locations!)
+          .filter((location) => location.partOf === 'Location/0')
+          .map((location) => location.id)
 
-      for (const stateId of stateIds) {
-        const queriesToPrefetch = getQueriesToPrefetch(stateId, false)
-        for (const query of queriesToPrefetch) {
-          await client.query(query)
+        for (const stateId of stateIds) {
+          const queriesToPrefetch = getQueriesToPrefetch(stateId, false)
+          for (const query of queriesToPrefetch) {
+            await client.query(query)
+          }
         }
       }
     }

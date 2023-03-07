@@ -540,6 +540,21 @@ describe('validate', () => {
         expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
       })
 
+      it('should pass when given a good name in English with underscore', () => {
+        const goodValue = 'John_Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with number', () => {
+        const goodValue = 'John 3rd'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with apostrophe', () => {
+        const goodValue = "John O'conor"
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
       it('should error when brackets are wrongly used', () => {
         const badValue1 = 'John Doe()'
         const badValue2 = 'John (Doe'
