@@ -63,7 +63,10 @@ import {
   REQUESTING_INDIVIDUAL,
   HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
-import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import {
+  ITemplatedComposition,
+  SignatureExtensionPostfix
+} from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
@@ -446,7 +449,35 @@ export const typeResolvers: GQLResolver = {
     },
     informantsSignature: (task) => {
       const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    groomSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    brideSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    witnessOneSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    witnessTwoSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
         task.extension
       )
       return (contact && contact.valueString) || null

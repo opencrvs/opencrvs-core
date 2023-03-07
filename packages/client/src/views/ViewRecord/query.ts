@@ -506,6 +506,10 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           contactRelationship
           contactPhoneNumber
           informantsSignature
+          groomSignature
+          brideSignature
+          witnessOneSignature
+          witnessTwoSignature
           duplicates
           attachments {
             data

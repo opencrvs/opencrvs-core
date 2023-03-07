@@ -59,14 +59,13 @@ export const marriageDateFormatTransformation =
     if (Array.isArray(fromSectionIds)) {
       fromSectionIds.forEach((id) => {
         queryValue =
-          queryData[id]?.groom?.marriageDate ||
-          queryData[id]?.bride?.marriageDate
+          queryData[id]?.dateOfMarriage || queryData[id]?.dateOfMarriage
       })
     } else {
       if (!queryData[fromSectionIds]) {
         return transformedData
       }
-      queryValue = queryData[fromSectionIds].groom.marriageDate
+      queryValue = queryData[fromSectionIds].dateOfMarriage
     }
 
     const date = new Date(queryValue)

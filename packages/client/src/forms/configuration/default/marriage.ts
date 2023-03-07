@@ -28,7 +28,7 @@ export const marriageRegisterForms: ISerializedForm = {
       groups: [
         {
           id: 'who-is-applying-view-group',
-          title: informantMessageDescriptors.birthInformantTitle,
+          title: informantMessageDescriptors.marriageInformantTitle,
           conditionals: [],
           preventContinueIfError: true,
           showExitButtonOnly: true,
@@ -36,7 +36,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               name: 'informantType',
               type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-              label: informantMessageDescriptors.birthInformantTitle,
+              label: informantMessageDescriptors.marriageInformantTitle,
               hideHeader: true,
               required: true,
               hideInPreview: false,
@@ -292,6 +292,22 @@ export const marriageRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationLocation',
             operation: 'registrationLocationUserTransformer'
+          },
+          {
+            fieldName: 'groomSignature',
+            operation: 'groomSignatureTransformer'
+          },
+          {
+            fieldName: 'brideSignature',
+            operation: 'brideSignatureTransformer'
+          },
+          {
+            fieldName: 'witnessOneSignature',
+            operation: 'witnessOneSignatureTransformer'
+          },
+          {
+            fieldName: 'witnessTwoSignature',
+            operation: 'witnessTwoSignatureTransformer'
           }
         ],
         mutation: {

@@ -197,7 +197,7 @@ const marriageCertificationChannel = {
     }
   ],
   name: 'Marriage Certification',
-  urlPattern: '^/events/marriage/mark-certification$'
+  urlPattern: '^/events/marriage/mark-certified$'
 }
 
 const marriageRejectionChannel = {

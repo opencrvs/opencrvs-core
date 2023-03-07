@@ -255,6 +255,14 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
+    case Events.MARRIAGE_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.MARRIAGE_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
     case Events.BIRTH_MARK_VOID:
     case Events.DEATH_MARK_VOID:
     case Events.MARRIAGE_MARK_VOID:

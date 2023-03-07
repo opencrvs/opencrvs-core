@@ -126,7 +126,10 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        informantsSignature
+        groomSignature
+        brideSignature
+        witnessOneSignature
+        witnessTwoSignature
         duplicates
         attachments {
           data
@@ -378,7 +381,10 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        informantsSignature
+        groomSignature
+        brideSignature
+        witnessOneSignature
+        witnessTwoSignature
         duplicates
         attachments {
           data
