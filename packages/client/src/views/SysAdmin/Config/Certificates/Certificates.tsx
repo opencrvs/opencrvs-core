@@ -148,31 +148,6 @@ function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
   })
 }
 
-async function updatePreviewSvgWithSampleSignature(
-  svgCode: string
-): Promise<string> {
-  const html = document.createElement('html')
-  if (svgCode.includes('data:image/svg+xml;base64')) {
-    svgCode = atob(svgCode.split(',')[1])
-  }
-  html.innerHTML = svgCode
-
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-
-  if (signatureImage) {
-    const baseURL = window.location.origin
-    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
-}
-
 export const printDummyCertificate = async (
   event: string,
   registerForm: { birth: IForm; death: IForm; marriage: IForm },
@@ -181,35 +156,12 @@ export const printDummyCertificate = async (
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
-  let certEvent: Event
-  if (event === 'death') {
-    certEvent = Event.Death
-  } else if (event === 'marriage') {
-    certEvent = Event.Marriage
-  } else {
-    certEvent = Event.Birth
-  }
-  const updatedOfflineData: IOfflineData = {
-    ...offlineData,
-    templates: {
-      ...offlineData.templates,
-      certificates: {
-        ...offlineData.templates.certificates!,
-        [certEvent]: {
-          ...offlineData.templates.certificates![certEvent]!,
-          definition: await updatePreviewSvgWithSampleSignature(
-            offlineData.templates.certificates![certEvent].definition
-          )
-        }
-      }
-    }
-  }
 
   printCertificate(
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    updatedOfflineData
+    offlineData
   )
 }
 
@@ -257,7 +209,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           )
 
           svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
-          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -511,7 +462,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     let certificateFileName
 
     const toggleOnChange = async (event: Event) => {
-      const upperCaseEvent = event.toUpperCase() as 'BIRTH' | 'DEATH'
+      const upperCaseEvent = event.toUpperCase() as
+        | 'BIRTH'
+        | 'DEATH'
+        | 'MARRIAGE'
       this.props.updateOfflineConfigData({
         config: {
           ...offlineResources.config,
@@ -602,7 +556,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     defaultChecked={
                       this.state.activeTabId === Event.Birth
                         ? offlineResources.config.BIRTH.PRINT_IN_ADVANCE
-                        : offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                        : this.state.activeTabId === Event.Death
+                        ? offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                        : offlineResources.config.MARRIAGE.PRINT_IN_ADVANCE
                     }
                     onChange={async () => {
                       await toggleOnChange(this.state.activeTabId)

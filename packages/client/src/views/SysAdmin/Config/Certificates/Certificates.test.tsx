@@ -101,9 +101,13 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('certificate page test', () => {
-    it('should show birth, and death tab button', async () => {
+    it('should show birth, death and marriage tab button', async () => {
+      console.log(testComponent.debug())
       expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Births')
       expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Deaths')
+      expect(testComponent.find('#tab_marriage').hostNodes().text()).toBe(
+        'Marriages'
+      )
     })
 
     it('shows default birth certificate template text', () => {
