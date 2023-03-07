@@ -26,6 +26,7 @@ import {
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
+import { IValidatorDescriptor } from '../index';
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
@@ -103,7 +104,7 @@ export function questionsTransformer(
       conditionals,
       datasetId,
       options,
-      validate
+      validator
     }) => {
       if (custom) {
         return {
@@ -122,7 +123,7 @@ export function questionsTransformer(
           conditionals,
           datasetId,
           options,
-          validate
+          validator
         } as ICustomQuestionConfig
       }
 
@@ -134,8 +135,8 @@ export function questionsTransformer(
         precedingFieldId,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
       }
-      if(validate && validate?.length > 0) {
-        defaultQuestionConfig.validate = validate
+      if(validator && validator.length > 0) {
+        defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
       }
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields

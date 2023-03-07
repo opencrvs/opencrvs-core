@@ -12,14 +12,10 @@
 import { IConfigField } from '.'
 import { MessageDescriptor } from 'react-intl'
 import { IDefaultConfigField } from './defaultConfig'
-import { ISerializedFormSectionGroup } from '@client/forms'
+import { ISerializedFormSectionGroup, IValidatorDescriptor } from '@client/forms'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
-interface IValidate{
-  operation: string
-  parameters: number[] | string[]
-}
 
 export type IPreviewGroupConfigField = {
   /*
@@ -31,7 +27,7 @@ export type IPreviewGroupConfigField = {
   previewGroupLabel: MessageDescriptor
   configFields: IDefaultConfigField[]
   precedingFieldId: string
-  validate?: IValidate
+  validator?: IValidatorDescriptor[]
 }
 
 export function isPlaceHolderPreviewGroup(previewGroup: string) {

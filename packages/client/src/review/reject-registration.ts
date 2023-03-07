@@ -23,7 +23,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       label: messages.rejectionReason,
       required: true,
       initialValue: [],
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'duplicate',
@@ -48,7 +48,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       type: TEXTAREA,
       label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: true,
       maxLength: 500
     }

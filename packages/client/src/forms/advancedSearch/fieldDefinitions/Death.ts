@@ -30,7 +30,7 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         initialValue: '',
         searchableResource: ['locations', 'offices'],
         searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
-        validate: []
+        validator: []
       },
       {
         name: 'dateOfRegistration',
@@ -39,7 +39,7 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validate: []
+        validator: []
       },
       {
         name: 'registrationStatuses',
@@ -48,7 +48,7 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         label: advancedSearchForm.statusOfRecordLabel,
         required: false,
         initialValue: '',
-        validate: [],
+        validator: [],
         placeholder: formMessageDescriptors.formSelectPlaceholder,
         options: [
           {
@@ -95,7 +95,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedFirstNames',
@@ -105,7 +105,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       maxLength: 32,
       required: false,
       initialValue: 'fasfasf',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedFamilyName',
@@ -115,7 +115,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedGender',
@@ -124,7 +124,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       label: formMessageDescriptors.sex,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -149,7 +149,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       label: formMessageDescriptors.placeOfDeath,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -177,7 +177,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       },
       required: false,
       initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -201,7 +201,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       label: formMessageDescriptors.placeOfBirth,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -226,7 +226,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       dynamicOptions: {
         resource: 'facilities'
       },
-      validate: [],
+      validator: [],
       conditionals: [
         {
           action: 'hide',
@@ -244,7 +244,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
         id: 'form.field.label.country'
       },
       required: false,
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -269,7 +269,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -306,7 +306,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -350,7 +350,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFirstNames',
@@ -361,7 +361,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFamilyName',
@@ -372,7 +372,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     }
   ]
 }

@@ -64,7 +64,7 @@ const getValidationErrors = {
       }
     }
 
-    let validators = Array.from(field.validate)
+    let validators = Array.from(field.validator)
 
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
