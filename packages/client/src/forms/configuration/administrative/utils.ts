@@ -495,7 +495,9 @@ export function getPlaceOfEventLocationSelect(
         operation:
           configCase === EventLocationAddressCases.PLACE_OF_BIRTH
             ? 'birthEventLocationMutationTransformer'
-            : 'deathEventLocationMutationTransformer',
+            : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+            ? 'deathEventLocationMutationTransformer'
+            : 'marriageEventLocationMutationTransformer',
         parameters: [locationIndex]
       },
       query: {

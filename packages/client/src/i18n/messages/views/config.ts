@@ -691,7 +691,7 @@ const messagesToDefine: IConfigMessages = {
   allowPrintingDescription: {
     id: 'config.certificate.printDescription',
     defaultMessage:
-      'This is the content describing what this configuration option is...',
+      'Records printed off in advance of collections will be added to the ready to issue work-queue',
     description: 'Allowing printing'
   },
   updateAllowPrintingNotification: {

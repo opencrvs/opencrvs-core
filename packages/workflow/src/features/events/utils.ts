@@ -68,6 +68,7 @@ export enum Events {
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
+  VERIFIED_EVENT = '/events/verified',
   UNKNOWN = 'unknown',
   VIEWED = '/events/viewed'
 }

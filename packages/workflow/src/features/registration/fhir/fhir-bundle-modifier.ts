@@ -289,6 +289,21 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export function makeTaskAnonymous(bundle: fhir.Bundle) {
+  const taskResource = getTaskResource(bundle)
+
+  taskResource.extension = taskResource.extension?.filter(
+    ({ url }) =>
+      ![
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+      ].includes(url)
+  )
+
+  return bundle
+}
+
 export async function markBundleAsIssued(
   bundle: fhir.Bundle,
   token: string

@@ -1170,7 +1170,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.familyName'
   },
   marriedLastName: {
-    defaultMessage: 'Married last name (If different)',
+    defaultMessage: 'Last name at birth (if different from above)',
     description: 'Label for married last name text input',
     id: 'form.field.label.marriedLastName'
   },
@@ -1402,12 +1402,12 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.typeOfMarriage'
   },
   polygamy: {
-    defaultMessage: 'Polygamy',
+    defaultMessage: 'Polygamous',
     description: 'Option for form field: Polygamy',
     id: 'form.field.label.polygamy'
   },
   monogamy: {
-    defaultMessage: 'Monogamy',
+    defaultMessage: 'Monogamous',
     description: 'Option for form field: Monogamy',
     id: 'form.field.label.monogamy'
   },

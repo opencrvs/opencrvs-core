@@ -473,6 +473,8 @@ const getCollectCertificateForm = (event: Event, state: IStoreState) => {
       return state.printCertificateForm.collectBirthCertificateForm
     case Event.Death:
       return state.printCertificateForm.collectDeathCertificateForm
+    case Event.Marriage:
+      return state.printCertificateForm.collectMarriageCertificateForm
   }
 }
 

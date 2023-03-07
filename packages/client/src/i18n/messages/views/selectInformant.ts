@@ -36,6 +36,7 @@ interface IFormMessages
   otherFamilyMember: MessageDescriptor
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
+  marriageInformantTitle: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -128,6 +129,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is applying for death registration?',
     description: 'Who is applying for death registration',
     id: 'register.selectInformant.deathInformantTitle'
+  },
+  marriageInformantTitle: {
+    defaultMessage: 'Who is applying for marriage registration?',
+    description: 'Who is applying for marriage registration',
+    id: 'register.selectInformant.marriageInformantTitle'
   },
   spouse: {
     defaultMessage: 'Spouse',

@@ -33,6 +33,23 @@ export function setMarriageRegistrationSectionTransformer(
         draftData.registration.registrationNumber
     }
 
+    if (draftData[sectionId].groomSignature) {
+      transformedData[sectionId].groomSignature =
+        draftData[sectionId].groomSignature
+    }
+    if (draftData[sectionId].brideSignature) {
+      transformedData[sectionId].brideSignature =
+        draftData[sectionId].brideSignature
+    }
+    if (draftData[sectionId].witnessOneSignature) {
+      transformedData[sectionId].witnessOneSignature =
+        draftData[sectionId].witnessOneSignature
+    }
+    if (draftData[sectionId].witnessTwoSignature) {
+      transformedData[sectionId].witnessTwoSignature =
+        draftData[sectionId].witnessTwoSignature
+    }
+
     if (!transformedData[sectionId].status) {
       transformedData[sectionId].status = [
         {

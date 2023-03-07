@@ -21,6 +21,7 @@ enum RegStatus {
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
@@ -242,6 +243,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -425,6 +427,10 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
+  groomSignature: String # -> extension(url='http://opencrvs.org/specs/extension/groom-signature').valueString
+  brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
+  witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
+  witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
   informantType: InformantType # -> Observation.valueString
   otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
@@ -458,6 +464,10 @@ type Registration { # -> Task
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
+  groomSignature: String # -> extension(url='http://opencrvs.org/specs/extension/groom-signature').valueString
+  brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
+  witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
+  witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
@@ -567,6 +577,8 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+union RecordDetails = BirthRegistration | DeathRegistration
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -593,6 +605,8 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {

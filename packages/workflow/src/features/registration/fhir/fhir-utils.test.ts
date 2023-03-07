@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getRegistrationNumber,
@@ -28,7 +31,6 @@ import {
   testFhirTaskBundle,
   officeMock
 } from '@workflow/test/utils'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any

@@ -309,7 +309,7 @@ export const getDraftDeclarationName = (declaration: IDeclaration) => {
   if (declarationName) {
     name = declarationName
       .map((obj) =>
-        [obj.firstNamesEng, obj.familyNameEng]
+        [obj?.firstNamesEng, obj?.familyNameEng]
           .filter((part) => Boolean(part))
           .join(' ')
       )
@@ -496,4 +496,7 @@ export function isSystemInitiated(history: History) {
   return Boolean(
     (history.dhis2Notification && !history.user?.id) || history.system
   )
+}
+export function isVerifiedAction(history: History) {
+  return history.action === RegAction.Verified
 }

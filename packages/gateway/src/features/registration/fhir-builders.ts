@@ -105,6 +105,14 @@ import {
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 
+export enum SignatureExtensionPostfix {
+  INFORMANT = 'informants-signature',
+  GROOM = 'groom-signature',
+  BRIDE = 'bride-signature',
+  WITNESS_ONE = 'witness-one-signature',
+  WITNESS_TWO = 'witness-two-signature'
+}
+
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
     use: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
@@ -761,12 +769,16 @@ function createInformantRelationship(resource: fhir.Task, fieldValue: string) {
   })
 }
 
-function createInformantsSignature(resource: fhir.Task, fieldValue: string) {
+function createInformantsSignature(
+  resource: fhir.Task,
+  fieldValue: string,
+  extensionPostfix: string
+) {
   if (!resource.extension) {
     resource.extension = []
   }
   resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/${extensionPostfix}`,
     valueString: fieldValue
   })
 }
@@ -2486,7 +2498,59 @@ export const builders: IFieldBuilders = {
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createInformantsSignature(taskResource, fieldValue)
+      return createInformantsSignature(
+        taskResource,
+        fieldValue,
+        SignatureExtensionPostfix.INFORMANT
+      )
+    },
+    groomSignature: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantsSignature(
+        taskResource,
+        fieldValue,
+        SignatureExtensionPostfix.GROOM
+      )
+    },
+    brideSignature: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantsSignature(
+        taskResource,
+        fieldValue,
+        SignatureExtensionPostfix.BRIDE
+      )
+    },
+    witnessOneSignature: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantsSignature(
+        taskResource,
+        fieldValue,
+        SignatureExtensionPostfix.WITNESS_ONE
+      )
+    },
+    witnessTwoSignature: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantsSignature(
+        taskResource,
+        fieldValue,
+        SignatureExtensionPostfix.WITNESS_TWO
+      )
     },
     contactRelationship: (
       fhirBundle: ITemplatedBundle,

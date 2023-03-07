@@ -10,11 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { LANG_EN } from '@client/utils/constants'
-import { Role } from '@client/utils/gateway'
+import { useEffect } from 'react'
 
-export function getUserRole(lang: string, role: Role) {
-  const defaultLabel = role?.labels?.find((label) => label.lang === LANG_EN)
-  const label = role?.labels?.find((label) => label.lang === lang)
-  return label?.label || defaultLabel?.label
+export const useTimeout = (
+  callback: () => void,
+  timeout = 0,
+  trigger = false
+) => {
+  useEffect(() => {
+    let timeoutReference: NodeJS.Timeout | undefined = undefined
+
+    if (trigger) timeoutReference = setTimeout(callback, timeout)
+
+    return () => {
+      if (timeoutReference) clearTimeout(timeoutReference)
+    }
+  }, [callback, timeout, trigger])
 }

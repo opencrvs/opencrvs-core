@@ -37,7 +37,8 @@ import {
   getFieldValue,
   getFormattedDate,
   getStatusLabel,
-  isSystemInitiated
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import {
   CollectorRelationLabelArray,
@@ -557,8 +558,9 @@ export const ActionDetailsModal = ({
   )
 
   let userName = ''
-
-  if (!isSystemInitiated(actionDetailsData)) {
+  if (isVerifiedAction(actionDetailsData) && actionDetailsData.ipAddress) {
+    userName = actionDetailsData.ipAddress
+  } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
           actionDetailsData.user.name as GQLHumanName[],
