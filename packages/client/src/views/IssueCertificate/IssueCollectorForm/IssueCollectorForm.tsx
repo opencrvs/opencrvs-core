@@ -40,7 +40,7 @@ const fields: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'MOTHER', label: issueMessages.issueToMother },
       { value: 'FATHER', label: issueMessages.issueToFather },
@@ -58,7 +58,7 @@ const commonFields: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'INFORMANT', label: issueMessages.issueToInformant },
       { value: 'OTHER', label: issueMessages.issueToSomeoneElse }

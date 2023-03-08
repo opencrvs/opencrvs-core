@@ -230,7 +230,7 @@ export function generateModifiedQuestionConfigs(
 ): QuestionInput[] {
   const questionConfigs = configFieldsToQuestionConfigs(configFields)
 
-  return questionConfigs
+  const fields = questionConfigs
     .filter((questionConfig) => {
       if (isDefaultQuestionConfig(questionConfig)) {
         return hasDefaultFieldChanged(questionConfig, defaultRegisterForm)
@@ -242,9 +242,10 @@ export function generateModifiedQuestionConfigs(
         const { identifiers, ...rest } = questionConfig
         return rest
       }
-       
+
       delete questionConfig.options
-     
       return questionConfig as QuestionInput
     })
+
+    return fields as QuestionInput[];
 }
