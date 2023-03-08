@@ -181,7 +181,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
   }
   unit?: {
     dependency: string
-    postfixMapper: Operation<typeof labels>
+    unitMapper: Operation<typeof labels>
   }
   type?:
     | IStaticFieldType
