@@ -40,5 +40,7 @@ export {
   Database,
   CheckSquare,
   X,
-  Activity
+  Activity,
+  CircleWavyCheck,
+  WarningCircle
 } from 'phosphor-react'
