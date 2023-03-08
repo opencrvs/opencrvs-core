@@ -24,7 +24,7 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 export function Password() {
   const intl = useIntl()

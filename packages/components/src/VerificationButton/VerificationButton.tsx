@@ -13,16 +13,16 @@ import * as React from 'react'
 import { Icon } from '../Icon'
 import { Button } from '../Button'
 import styled from 'styled-components'
-import { Spinner } from '../Spinner'
 import { Text } from '../Text'
+import { Stack } from '../Stack'
 
-interface IVerificationButtonProps {
-  status?: 'unverified' | 'loading' | 'verified'
-  id: string
+export interface VerificationButtonProps {
+  status?: 'unverified' | 'verified' | 'offline'
+  id?: string
   onClick: () => void
-  labelForVerifiedState: string
-  labelForUnverifiedState: string
-  labelForLoadingState: string
+  labelForVerified: string
+  labelForUnverified: string
+  labelForOffline: string
 }
 
 const StyledDiv = styled.div`
@@ -45,37 +45,41 @@ const StyledDiv = styled.div`
 export const VerificationButton = ({
   status = 'unverified',
   onClick,
-  labelForUnverifiedState,
-  labelForLoadingState,
-  labelForVerifiedState
-}: IVerificationButtonProps) => {
+  labelForUnverified,
+  labelForVerified,
+  labelForOffline
+}: VerificationButtonProps) => {
   return (
     <>
       {status === 'unverified' && (
         <Button size="medium" type="secondary" onClick={onClick}>
           <Icon name="CircleWavyCheck" />
-          {labelForUnverifiedState}
+          {labelForUnverified}
         </Button>
       )}
 
-      {status === 'loading' && (
-        <StyledDiv>
-          <Spinner
-            id="nid-verification-loading"
-            size={24}
-            baseColor="currentColor"
-          />
-          <Text variant="bold16" element="p" color="primary">
-            {labelForLoadingState}...
+      {status === 'offline' && (
+        <Stack direction="column" alignItems="flex-start">
+          <Button
+            size="medium"
+            type="secondary"
+            disabled={true}
+            aria-disabled={true}
+          >
+            <Icon name="CircleWavyCheck" />
+            {labelForUnverified}
+          </Button>
+          <Text element="span" color="red" variant="reg18">
+            {labelForOffline}
           </Text>
-        </StyledDiv>
+        </Stack>
       )}
 
       {status === 'verified' && (
         <StyledDiv>
           <Icon name="CircleWavyCheck" fill="green" color="green" />
           <Text variant="bold16" element="p" color="green">
-            {labelForVerifiedState}
+            {labelForVerified}
           </Text>
         </StyledDiv>
       )}
