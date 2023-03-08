@@ -15,7 +15,7 @@ import {
   mockDeclarationData,
   goToEndOfForm,
   waitForReady,
-  validateScopeToken,
+  validatorScopeToken,
   registerScopeToken,
   primaryAddressData,
   primaryInternationalAddressLines,
@@ -375,7 +375,7 @@ describe('when user is previewing the form data', () => {
 
   describe('when user has validate scope', () => {
     beforeEach(async () => {
-      getItem.mockReturnValue(validateScopeToken)
+      getItem.mockReturnValue(validatorScopeToken)
       await store.dispatch(checkAuth())
       await flushPromises()
       const data = {
