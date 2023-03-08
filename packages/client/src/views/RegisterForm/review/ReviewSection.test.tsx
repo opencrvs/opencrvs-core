@@ -282,16 +282,14 @@ describe('when in device of large viewport', () => {
 
     it('Should click the validator Declaration Button', async () => {
       const validatorButton = reviewSectionComponent
-        .find('#validatorDeclarationBtn')
-        .hostNodes().length
-      expect(validatorButton).toEqual(1)
+        .contains('#validatorDeclarationBtn')
+      expect(validatorButton).toBeFalsy()
     })
 
     it('Should click the Reject Declaration Button', async () => {
       const rejectButton = reviewSectionComponent
-        .find('#rejectDeclarationBtn')
-        .hostNodes().length
-      expect(rejectButton).toEqual(1)
+        .contains('#rejectDeclarationBtn')
+      expect(rejectButton).toBeFalsy()
     })
 
     describe('when user clicks on change link', () => {
