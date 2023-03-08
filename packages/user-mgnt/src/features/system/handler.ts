@@ -373,8 +373,9 @@ const webHookSchema = Joi.array().items(
 
 const settingsSchema = Joi.object({
   dailyQuota: Joi.number(),
-  openIdConnectBaseUrl: Joi.string(),
-  openIdConnectClientId: Joi.string(),
+  openIdProviderBaseUrl: Joi.string(),
+  openIdProviderClientId: Joi.string(),
+  openIdProviderClaims: Joi.string(),
   webhook: webHookSchema
 })
 
