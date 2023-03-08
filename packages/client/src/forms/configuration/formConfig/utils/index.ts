@@ -199,7 +199,6 @@ export function generateConfigFields(
         [sectionId]: sectionConfigFields
       }
     }, {})
-    console.log(fields, 'fields here')
     return fields
 }
 
@@ -228,7 +227,7 @@ function configFieldsToQuestionConfigs(
 export function generateModifiedQuestionConfigs(
   configFields: ISectionFieldMap,
   defaultRegisterForm: ISerializedForm
-): QuestionInput[] {
+){
   const questionConfigs = configFieldsToQuestionConfigs(configFields)
 
   return questionConfigs
@@ -243,7 +242,7 @@ export function generateModifiedQuestionConfigs(
         const { identifiers, ...rest } = questionConfig
         return rest
       }
-
+      
       delete questionConfig.options
       return questionConfig as QuestionInput
     })

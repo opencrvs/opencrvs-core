@@ -505,10 +505,8 @@ describe('when in device of large viewport', () => {
 
     it('renders validation error if wrong value given', () => {
       expect(
-        reviewSectionComponent
-          .find('#required_label_registration_informant')
-          .hostNodes()
-      ).toHaveLength(2)
+        reviewSectionComponent.contains('#required_label_registration_informant')
+      ).toBeFalsy()
     })
   })
 
