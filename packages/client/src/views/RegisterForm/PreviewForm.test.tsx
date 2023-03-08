@@ -400,7 +400,7 @@ describe('when user is previewing the form data', () => {
       app.update()
     })
 
-    it.only('shows send for review button', async () => {
+    it('shows send for review button', async () => {
       await waitForElement(app, '#readyDeclaration')
       expect(
         app.update().contains('#validateDeclarationBtn')
