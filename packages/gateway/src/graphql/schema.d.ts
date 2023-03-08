@@ -1317,7 +1317,7 @@ export interface GQLQuestionInput {
   conditionals?: Array<GQLConditionalInput>
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
-  validate?: Array<GQLValidatorInput | null>
+  validator?: Array<GQLValidatorInput>
 }
 
 export interface GQLSystemSettings {
@@ -1771,7 +1771,7 @@ export interface GQLCustomSelectOption {
 
 export interface GQLValidatorInput {
   operation: string
-  parameters?: Array<number | null>
+  parameters?: Array<number>
 }
 
 export interface GQLPayment {

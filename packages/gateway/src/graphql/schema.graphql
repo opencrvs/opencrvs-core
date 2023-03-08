@@ -1406,7 +1406,7 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
   datasetId: String
   options: [CustomSelectOption!]
-  validate: [ValidatorInput]
+  validator: [ValidatorInput!]
 }
 
 input SystemSettings {
@@ -1859,7 +1859,7 @@ input CustomSelectOption {
 
 input ValidatorInput {
   operation: String!
-  parameters: [Int]
+  parameters: [Int!]
 }
 
 type Payment {
