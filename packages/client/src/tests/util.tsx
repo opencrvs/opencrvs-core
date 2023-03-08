@@ -90,8 +90,8 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
 } as const
 
-export const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
+export const validatorScopeToken = jwt.sign(
+  { scope: ['validator'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
@@ -2734,7 +2734,7 @@ export const mockUserGraphqlOperation = {
                     required: false,
                     hidden: true,
                     initialValue: '',
-                    validate: []
+                    validator: []
                   },
                   {
                     name: 'registrationOffice',
@@ -2749,7 +2749,7 @@ export const mockUserGraphqlOperation = {
                     searchableResource: ['facilities'],
                     searchableType: ['CRVS_OFFICE'],
                     locationList: [],
-                    validate: [
+                    validator: [
                       {
                         operation: 'officeMustBeSelected'
                       }
@@ -2780,7 +2780,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: []
+                    validator: []
                   },
                   {
                     name: 'firstNames',
@@ -2792,7 +2792,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
+                    validator: [{ operation: 'bengaliOnlyNameFormat' }],
                     mapping: {
                       mutation: {
                         operation: 'fieldToNameTransformer',
@@ -2814,7 +2814,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
+                    validator: [{ operation: 'bengaliOnlyNameFormat' }],
                     mapping: {
                       mutation: {
                         operation: 'fieldToNameTransformer',
@@ -2836,7 +2836,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
+                    validator: [{ operation: 'englishOnlyNameFormat' }],
                     mapping: {
                       mutation: {
                         operation: 'fieldToNameTransformer',
@@ -2858,7 +2858,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
+                    validator: [{ operation: 'englishOnlyNameFormat' }],
                     mapping: {
                       mutation: {
                         operation: 'fieldToNameTransformer',
@@ -2880,7 +2880,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [{ operation: 'phoneNumberFormat' }],
+                    validator: [{ operation: 'phoneNumberFormat' }],
                     mapping: {
                       mutation: {
                         operation: 'msisdnTransformer',
@@ -2902,7 +2902,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'validIDNumber',
                         parameters: ['NATIONAL_ID']
@@ -2929,7 +2929,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: []
+                    validator: []
                   },
                   {
                     name: 'systemRole',
@@ -2941,7 +2941,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [],
+                    validator: [],
                     options: []
                   },
                   {
@@ -2955,7 +2955,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    validate: [],
+                    validator: [],
                     dynamicOptions: {
                       dependency: 'systemRole',
                       options: {}
@@ -2971,7 +2971,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: []
+                    validator: []
                   }
                 ]
               },
@@ -3001,7 +3001,7 @@ export const mockUserGraphqlOperation = {
                     },
                     required: false,
                     initialValue: '',
-                    validate: []
+                    validator: []
                   },
                   {
                     name: 'signature',
@@ -3020,7 +3020,7 @@ export const mockUserGraphqlOperation = {
                     allowedDocType: ['image/png'],
                     initialValue: '',
                     required: false,
-                    validate: []
+                    validator: []
                   }
                 ]
               }

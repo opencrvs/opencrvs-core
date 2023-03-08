@@ -264,10 +264,10 @@ describe('when in device of large viewport', () => {
     })
   })
 
-  describe('when user is in the review page to validate birth declaration', () => {
+  describe('when user is in the review page to validator birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -280,11 +280,11 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should click the Validate Declaration Button', async () => {
-      const validateButton = reviewSectionComponent
-        .find('#validateDeclarationBtn')
+    it('Should click the validator Declaration Button', async () => {
+      const validatorButton = reviewSectionComponent
+        .find('#validatorDeclarationBtn')
         .hostNodes().length
-      expect(validateButton).toEqual(1)
+      expect(validatorButton).toEqual(1)
     })
 
     it('Should click the Reject Declaration Button', async () => {
@@ -362,7 +362,7 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       options: [
                         {
                           value: 'FATHER',
@@ -393,7 +393,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ],
                         MOTHER: [
@@ -407,7 +407,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ]
                       }
@@ -447,7 +447,7 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       conditionals: []
                     }
                   ]
@@ -539,7 +539,7 @@ describe('when in device of large viewport', () => {
                       searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
-                      validate: [],
+                      validator: [],
                       label: formMessages.birthLocation
                     }
                   ]
@@ -624,7 +624,7 @@ describe('when in device of small viewport', () => {
                     type: DATE,
                     label: formMessages.dateOfBirth,
                     required: true,
-                    validate: [],
+                    validator: [],
                     initialValue: ''
                   }
                 ]
@@ -646,7 +646,7 @@ describe('when in device of small viewport', () => {
                     type: DOCUMENT_UPLOADER_WITH_OPTION,
                     label: formMessages.uploadDocForMother,
                     required: true,
-                    validate: [],
+                    validator: [],
                     options: [
                       {
                         label: formMessages.docTypeBirthCert,

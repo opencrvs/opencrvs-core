@@ -1836,9 +1836,9 @@ export type QueryVerifyPasswordByIdArgs = {
   password: Scalars['String']
 }
 
-export type Validator = {
+export type IValidatorDescriptor = {
   operation: Scalars['String']
-  parameters: Array<Scalars['Int']>
+  parameters: Array<Scalars['Int']> | Array<Scalars['String']> | Array<Scalars['Boolean']> | Array<Scalars['Date']>
 }
 
 export type QuestionInput = {
@@ -1858,7 +1858,7 @@ export type QuestionInput = {
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
-  validator?: Array<Validator>
+  validator?: Array<IValidatorDescriptor>
 }
 
 export type QuestionnaireQuestion = {
