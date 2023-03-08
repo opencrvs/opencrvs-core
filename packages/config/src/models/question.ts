@@ -107,6 +107,11 @@ const questionSchema = new Schema({
       type: message
     }
   ],
+  unit: [
+    {
+      type: message
+    }
+  ],
   tooltip: [
     {
       type: message

@@ -55,7 +55,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   required: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
-  postfix?: IMessage[]
+  unit?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
   maxLength?: number

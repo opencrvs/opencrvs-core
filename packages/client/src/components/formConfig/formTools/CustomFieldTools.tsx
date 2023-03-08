@@ -270,7 +270,7 @@ interface ICustomField {
   label: string
   placeholder: string
   description: string
-  postfix: string
+  unit: string
   tooltip: string
   errorMessage: string
 }
@@ -386,7 +386,7 @@ class CustomFieldToolsComp extends React.Component<
       fieldForms[lang] = {
         label,
         placeholder: this.getIntlMessage(selectedField.placeholder, lang),
-        postfix: this.getIntlMessage(selectedField.postfix, lang),
+        unit: this.getIntlMessage(selectedField.unit, lang),
         description: this.getIntlMessage(selectedField.description, lang),
         tooltip: this.getIntlMessage(selectedField.tooltip, lang),
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
@@ -535,7 +535,7 @@ class CustomFieldToolsComp extends React.Component<
       handleBars,
       languages,
       fieldForms,
-      'postfix',
+      'unit',
       optionalContent
     )
     this.populateOptionalContent(
@@ -567,7 +567,7 @@ class CustomFieldToolsComp extends React.Component<
       placeholder: optionalContent.placeholder,
       tooltip: optionalContent.tooltip,
       description: optionalContent.description,
-      postfix: optionalContent.postfix,
+      unit: optionalContent.unit,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
       fieldId: newFieldID,
@@ -669,19 +669,19 @@ class CustomFieldToolsComp extends React.Component<
       },
       {
         label: intl.formatMessage(customFieldFormMessages.unitOptionG),
-        value: 'g'
+        value: 'G'
       },
       {
         label: intl.formatMessage(customFieldFormMessages.unitOptionKg),
-        value: 'kg'
+        value: 'Kg'
       },
       {
         label: intl.formatMessage(customFieldFormMessages.unitOptionCm),
-        value: 'cm'
+        value: 'Cm'
       },
       {
         label: intl.formatMessage(customFieldFormMessages.unitOptionM),
-        value: 'm'
+        value: 'M'
       }
     ]
   }
@@ -875,7 +875,7 @@ class CustomFieldToolsComp extends React.Component<
                 <FieldContainer hide={language !== this.state.selectedLanguage}>
                   <CInputField
                     required={false}
-                    id={`custom-form-postfix-${language}`}
+                    id={`custom-form-unit-${language}`}
                     label={intl.formatMessage(
                       customFieldFormMessages.unitLabel
                     )}
@@ -883,9 +883,9 @@ class CustomFieldToolsComp extends React.Component<
                   >
                     <CSelect
                       removeMargin={true}
-                      value={this.state.fieldForms[language].postfix}
+                      value={this.state.fieldForms[language].unit}
                       onChange={(value: string) => {
-                        this.setValue('postfix', value)
+                        this.setValue('unit', value)
                       }}
                       options={this.getUnitValue()}
                     />

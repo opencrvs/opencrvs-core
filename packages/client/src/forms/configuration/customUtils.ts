@@ -59,6 +59,7 @@ export function createCustomField({
   label,
   description,
   tooltip,
+  unit,
   placeholder,
   required,
   maxLength,
@@ -118,6 +119,9 @@ export function createCustomField({
     baseField.type === 'TEL'
   ) {
     baseField.placeholder = getDefaultLanguageMessage(placeholder)
+  }
+  if (baseField.type === 'NUMBER') {
+    baseField.unit = getDefaultLanguageMessage(unit)
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [

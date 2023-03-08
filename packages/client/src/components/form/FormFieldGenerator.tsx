@@ -213,6 +213,7 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
+    unit: fieldDefinition.unit,
     hideAsterisk: fieldDefinition.hideAsterisk,
     hideInputHeader: fieldDefinition.hideHeader,
     error,
@@ -804,7 +805,6 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   render() {
-    console.log('field', this.props.fields)
     const {
       values,
       fields,

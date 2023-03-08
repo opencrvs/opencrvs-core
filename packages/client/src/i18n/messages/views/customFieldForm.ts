@@ -28,11 +28,12 @@ interface ICustomFieldFormMessages
   label: MessageDescriptor
   placeholderLabel: MessageDescriptor
   descriptionLabel: MessageDescriptor
-  postfixLabel: MessageDescriptor
-  postfixOptionG: MessageDescriptor
-  postfixOptionKg: MessageDescriptor
-  postfixOptionCm: MessageDescriptor
-  postfixOptionM: MessageDescriptor
+  unitLabel: MessageDescriptor
+  unitOptionEmpty: MessageDescriptor
+  unitOptionG: MessageDescriptor
+  unitOptionKg: MessageDescriptor
+  unitOptionCm: MessageDescriptor
+  unitOptionM: MessageDescriptor
   tooltipLabel: MessageDescriptor
   errorMessage: MessageDescriptor
   maxLengthLabel: MessageDescriptor
@@ -140,22 +141,22 @@ const messagesToDefine: ICustomFieldFormMessages = {
   },
   unitOptionG: {
     id: 'custom.field.form.unitOptionG',
-    defaultMessage: 'Gram',
+    defaultMessage: 'Gram (G)',
     description: 'Option of unit'
   },
   unitOptionKg: {
     id: 'custom.field.form.unitOptionKg',
-    defaultMessage: 'Kilogram',
+    defaultMessage: 'Kilogram (Kg)',
     description: 'Option of unit'
   },
   unitOptionCm: {
     id: 'custom.field.form.unitOptionCm',
-    defaultMessage: 'Centimeter',
+    defaultMessage: 'Centimeter (Cm)',
     description: 'Option of unit'
   },
   unitOptionM: {
     id: 'custom.field.form.unitOptionM',
-    defaultMessage: 'Meter',
+    defaultMessage: 'Meter (M)',
     description: 'Option of unit'
   },
   tooltipLabel: {
