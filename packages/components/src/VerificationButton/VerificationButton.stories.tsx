@@ -10,16 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { VerificationButton } from './VerificationButton'
-
-interface IVerificationButtonProps {
-  status: 'unverified' | 'loading' | 'verified'
-  onClick: () => void
-  labelForVerifiedState: string
-  labelForUnverifiedState: string
-  labelForLoadingState: string
-}
 
 export default {
   title: 'Controls/Verification button',
@@ -28,20 +20,42 @@ export default {
     docs: {
       description: {
         component: `
-\`<VerificationButton />\` is used for authentication flow. It can show a button, a spinner or a verified state.`
+\`<VerificationButton />\` is used for authentication flow. It can show an action button, a verified icon or a disabled button with an offline message.`
       }
     }
   }
-} as Meta
+} as ComponentMeta<typeof VerificationButton>
 
-const Template: Story<IVerificationButtonProps> = (args) => {
+const Template: ComponentStory<typeof VerificationButton> = (args) => {
   return <VerificationButton {...args} />
 }
-export const Default = Template.bind({})
-Default.args = {
+
+export const Unverified = Template.bind({})
+Unverified.args = {
   status: 'unverified',
   onClick: () => {},
-  labelForVerifiedState: 'Authenticated',
-  labelForUnverifiedState: 'Authenticate',
-  labelForLoadingState: 'Authenticating'
+  labelForVerified: 'Authenticated',
+  labelForUnverified: 'Authenticate',
+  labelForOffline:
+    'National ID authentication is currently not available offline.'
+}
+
+export const Verified = Template.bind({})
+Verified.args = {
+  status: 'verified',
+  onClick: () => {},
+  labelForVerified: 'Authenticated',
+  labelForUnverified: 'Authenticate',
+  labelForOffline:
+    'National ID authentication is currently not available offline.'
+}
+
+export const Offline = Template.bind({})
+Offline.args = {
+  status: 'offline',
+  onClick: () => {},
+  labelForVerified: 'Authenticated',
+  labelForUnverified: 'Authenticate',
+  labelForOffline:
+    'National ID authentication is currently not available offline.'
 }

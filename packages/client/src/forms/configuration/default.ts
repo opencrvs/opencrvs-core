@@ -1128,10 +1128,9 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   nidIntegrationConditionals.hideIfNidIntegrationDisabled
                 ],
-                labelForVerifiedState: formMessageDescriptors.nidVerified,
-                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
-                labelForLoadingState:
-                  formMessageDescriptors.nidVerificationOngoing
+                labelForVerified: formMessageDescriptors.nidVerified,
+                labelForUnverified: formMessageDescriptors.nidNotVerified,
+                labelForOffline: formMessageDescriptors.nidOffline
               },
               {
                 name: 'informantBirthDate',
@@ -1509,10 +1508,9 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   nidIntegrationConditionals.hideIfNidIntegrationDisabled
                 ],
-                labelForVerifiedState: formMessageDescriptors.nidVerified,
-                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
-                labelForLoadingState:
-                  formMessageDescriptors.nidVerificationOngoing
+                labelForVerified: formMessageDescriptors.nidVerified,
+                labelForUnverified: formMessageDescriptors.nidNotVerified,
+                labelForOffline: formMessageDescriptors.nidOffline
               },
               {
                 name: 'motherBirthDate',
@@ -2079,10 +2077,9 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   nidIntegrationConditionals.hideIfNidIntegrationDisabled
                 ],
-                labelForVerifiedState: formMessageDescriptors.nidVerified,
-                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
-                labelForLoadingState:
-                  formMessageDescriptors.nidVerificationOngoing
+                labelForVerified: formMessageDescriptors.nidVerified,
+                labelForUnverified: formMessageDescriptors.nidNotVerified,
+                labelForOffline: formMessageDescriptors.nidOffline
               },
               {
                 name: 'fatherBirthDate',
@@ -4010,10 +4007,9 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   nidIntegrationConditionals.hideIfNidIntegrationDisabled
                 ],
-                labelForVerifiedState: formMessageDescriptors.nidVerified,
-                labelForUnverifiedState: formMessageDescriptors.nidNotVerified,
-                labelForLoadingState:
-                  formMessageDescriptors.nidVerificationOngoing
+                labelForVerified: formMessageDescriptors.nidVerified,
+                labelForUnverified: formMessageDescriptors.nidNotVerified,
+                labelForOffline: formMessageDescriptors.nidOffline
               },
               {
                 name: 'informantBirthDate',
