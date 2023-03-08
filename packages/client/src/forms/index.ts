@@ -664,9 +664,9 @@ export interface ILoaderButton extends IFormFieldBase {
 
 export interface INidVerificationButton extends IFormFieldBase {
   type: typeof NID_VERIFICATION_BUTTON
-  labelForVerifiedState: MessageDescriptor
-  labelForUnverifiedState: MessageDescriptor
-  labelForLoadingState: MessageDescriptor
+  labelForVerified: MessageDescriptor
+  labelForUnverified: MessageDescriptor
+  labelForOffline: MessageDescriptor
 }
 
 export type IFormField =
@@ -1209,9 +1209,9 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
 export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
   type: typeof NID_VERIFICATION_BUTTON
   onClick: () => void
-  labelForVerifiedState: string
-  labelForUnverifiedState: string
-  labelForLoadingState: string
+  labelForVerified: string
+  labelForUnverified: string
+  labelForOffline: string
 }
 
 export type Ii18nFormField =

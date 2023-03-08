@@ -49,7 +49,7 @@ import {
   INPROGRESS_STATUS,
   IRetryStatus
 } from '@client/SubmissionController'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { Spinner } from '@opencrvs/components/lib'
 

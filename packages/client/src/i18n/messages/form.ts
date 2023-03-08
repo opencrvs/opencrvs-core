@@ -2246,9 +2246,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'label for unverified nid state',
     id: 'form.field.nidVerified'
   },
-  nidVerificationOngoing: {
-    defaultMessage: 'Authenticating',
-    description: 'label for nid verification ongoing state',
+  nidOffline: {
+    defaultMessage:
+      'National ID authentication is currently not available offline.',
+    description:
+      'Label for indicating offline status for the user. NID verification is not currently available offline.',
     id: 'form.field.nidVerificationOngoing'
   }
 }
