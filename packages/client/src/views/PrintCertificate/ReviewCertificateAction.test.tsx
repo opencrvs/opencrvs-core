@@ -255,7 +255,7 @@ describe('when user wants to review birth certificate', () => {
   })
 })
 
-describe.only('when user wants to review marriage certificate', () => {
+describe('when user wants to review marriage certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
