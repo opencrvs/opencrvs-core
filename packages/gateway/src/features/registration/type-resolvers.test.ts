@@ -1205,13 +1205,15 @@ describe('Registration type resolvers', () => {
 
     it('returns an array of duplicates', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
 
       // @ts-ignore
       const duplicates = await typeResolvers.Registration.duplicates(mockTask)
       expect(duplicates).toBeDefined()
       expect(duplicates).toHaveLength(2)
-      expect(duplicates[0]).toBe('xyz')
-      expect(duplicates[1]).toBe('abc')
+      expect(duplicates[0].compositionId).toBe('xyz')
+      expect(duplicates[1].compositionId).toBe('abc')
     })
 
     it('throws when task has no focus in duplicate resolver', async () => {

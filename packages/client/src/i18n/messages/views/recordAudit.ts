@@ -42,6 +42,7 @@ interface IRecordAuditMessages
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
   reinstateDeclarationDialogDescription: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
@@ -187,6 +188,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage:
       'This will revert the application back to its original status and add it to your workqueue.',
     description: 'Description for the dialog when reinstate declaration'
+  },
+  markAsDuplicate: {
+    id: 'recordAudit.declaration.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 }
 
@@ -200,6 +205,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.assigned',
     defaultMessage: 'Assigned',
     description: 'Assigned action'
+  },
+  [RegAction.Verified]: {
+    id: 'recordAudit.regAction.verified',
+    defaultMessage: 'Certificate verified',
+    description: 'Verified action'
   },
   [RegAction.Unassigned]: {
     id: 'recordAudit.regAction.unassigned',
@@ -221,6 +231,16 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.viewed',
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
+  },
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
+  },
+  MARKED_AS_NOT_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsNotDuplicate',
+    defaultMessage: 'Marked not a duplicate',
+    description: 'Marked not a duplicate status message for record audit'
   }
 }
 
@@ -259,6 +279,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'recordAudit.regStatus.certified'
+  },
+  [RegStatus.Issued]: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status Issued',
+    id: 'recordAudit.regStatus.issued'
   },
   [RegStatus.Rejected]: {
     defaultMessage: 'Rejected',

@@ -11,11 +11,15 @@
  */
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
-  forwardToHearth
+  forwardToHearth,
+  forwardEntriesToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
@@ -23,10 +27,13 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  actionEventHandler
+  actionEventHandler,
+  anonymousActionEventHandler,
+  markEventAsIssuedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
+  hasCertificateDataInDocRef,
   hasCorrectionEncounterSection,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -46,7 +53,10 @@ import {
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -61,6 +71,7 @@ export enum Events {
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
+  BIRTH_MARK_ISSUE = '/events/birth/mark-issued',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
@@ -73,6 +84,7 @@ export enum Events {
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
+  DEATH_MARK_ISSUE = '/events/death/mark-issued',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
@@ -82,8 +94,10 @@ export enum Events {
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
+  VERIFIED_EVENT = '/events/verified',
   UNKNOWN = 'unknown',
-  VIEWED = '/events/viewed'
+  VIEWED = '/events/viewed',
+  MARKED_AS_DUPLICATE = '/events/markAsDuplicate'
 }
 
 function detectEvent(request: Hapi.Request): Events {
@@ -92,16 +106,19 @@ function detectEvent(request: Hapi.Request): Events {
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    if (
-      fhirBundle.entry &&
-      fhirBundle.entry[0] &&
-      fhirBundle.entry[0].resource
-    ) {
-      const firstEntry = fhirBundle.entry[0].resource
+    const firstEntry = fhirBundle.entry?.[0]?.resource
+    if (firstEntry) {
+      const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
+        const composition = firstEntry as fhir.Composition
+        const isADuplicate = composition?.extension?.find(
+          (ext) =>
+            ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+            ext.valueBoolean
+        )
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          if (firstEntry.id) {
+          if (!isNewEntry) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.BIRTH_MARK_VALID
@@ -115,12 +132,18 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.BIRTH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.BIRTH_MARK_ISSUE
               } else {
                 return Events.BIRTH_MARK_CERT
               }
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.BIRTH_NEW_DEC
+              }
+
               return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
@@ -133,7 +156,7 @@ function detectEvent(request: Hapi.Request): Events {
               : Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
-          if (firstEntry.id) {
+          if (!isNewEntry) {
             if (!hasDeathRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.DEATH_MARK_VALID
@@ -147,12 +170,18 @@ function detectEvent(request: Hapi.Request): Events {
                 hasCorrectionEncounterSection(firstEntry as fhir.Composition)
               ) {
                 return Events.DEATH_REQUEST_CORRECTION
+              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+                return Events.DEATH_MARK_ISSUE
               } else {
                 return Events.DEATH_MARK_CERT
               }
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.DEATH_NEW_DEC
+              }
+
               return Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
@@ -166,7 +195,7 @@ function detectEvent(request: Hapi.Request): Events {
           }
         }
       }
-      if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+      if (firstEntry.resourceType === 'Task' && !isNewEntry) {
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
@@ -189,6 +218,7 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
     const taskResource = getTaskResource(fhirBundle)
+
     if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
       return Events.ASSIGNED_EVENT
     }
@@ -201,6 +231,16 @@ function detectEvent(request: Hapi.Request): Events {
     if (hasExtension(taskResource, VIEWED_EXTENSION_URL)) {
       return Events.VIEWED
     }
+    if (hasExtension(taskResource, MARKED_AS_NOT_DUPLICATE)) {
+      return Events.EVENT_NOT_DUPLICATE
+    }
+    if (hasExtension(taskResource, MARKED_AS_DUPLICATE)) {
+      return Events.MARKED_AS_DUPLICATE
+    }
+    if (hasExtension(taskResource, VERIFIED_EXTENSION_URL)) {
+      return Events.VERIFIED_EVENT
+    }
+
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
@@ -224,11 +264,6 @@ function detectEvent(request: Hapi.Request): Events {
       }
     }
   }
-
-  if (request.method === 'put' && request.path.includes('/fhir/Composition')) {
-    return Events.EVENT_NOT_DUPLICATE
-  }
-
   return Events.UNKNOWN
 }
 
@@ -237,6 +272,7 @@ export async function fhirWorkflowEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const event = detectEvent(request)
+
   logger.info(`Event detected: ${event}`)
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary
@@ -247,7 +283,7 @@ export async function fhirWorkflowEventHandler(
     return h.response().code(401)
   }
 
-  if (event != Events.UNKNOWN) {
+  if (event != Events.UNKNOWN && event != Events.EVENT_NOT_DUPLICATE) {
     setupSystemIdentifier(request)
   }
 
@@ -395,6 +431,22 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
+    case Events.BIRTH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.DEATH_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_MARK_ISSUE,
+        request.payload,
+        request.headers
+      )
+      break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
       await triggerEvent(
@@ -417,7 +469,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(event, request.payload, request.headers)
       break
     case Events.EVENT_NOT_DUPLICATE:
-      response = await forwardToHearth(request, h)
+      response = await forwardEntriesToHearth(request, h)
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
         request.payload,
@@ -426,13 +478,14 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.DOWNLOADED:
     case Events.VIEWED:
+    case Events.ASSIGNED_EVENT:
+    case Events.UNASSIGNED_EVENT:
+    case Events.MARKED_AS_DUPLICATE:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
       break
-    case Events.ASSIGNED_EVENT:
-    case Events.UNASSIGNED_EVENT:
-      response = await actionEventHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
+    case Events.VERIFIED_EVENT:
+      response = await anonymousActionEventHandler(request, h, event)
       break
     default:
       // forward as-is to hearth

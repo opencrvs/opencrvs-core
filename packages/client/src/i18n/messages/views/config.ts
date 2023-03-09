@@ -36,6 +36,11 @@ interface IConfigMessages
   listDetails: MessageDescriptor
   birthTemplate: MessageDescriptor
   deathTemplate: MessageDescriptor
+  certificateTemplate: MessageDescriptor
+  template: MessageDescriptor
+  options: MessageDescriptor
+  allowPrinting: MessageDescriptor
+  allowPrintingDescription: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
@@ -229,7 +234,7 @@ const messagesToDefine: IConfigMessages = {
   },
   listTitle: {
     id: 'config.listTitle',
-    defaultMessage: 'Certificates templates',
+    defaultMessage: 'Certification',
     description: 'Title for certificates templates list'
   },
   listDetails: {
@@ -252,6 +257,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.deathTemplate',
     defaultMessage: 'Death certificate',
     description: 'Label for death certificate template'
+  },
+  certificateTemplate: {
+    id: 'config.certTemplate',
+    defaultMessage: 'Certificate Template',
+    description: 'Label for certificate templates'
   },
   birthDefaultTempDesc: {
     id: 'config.birthDefaultTempDesc',
@@ -617,6 +627,32 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.informantNotification.success',
     defaultMessage: 'Informant notifications updated',
     description: 'Notification for informant update success'
+  },
+  template: {
+    id: 'config.certificate.template',
+    defaultMessage: 'Template',
+    description: 'Template for certificates'
+  },
+  allowPrinting: {
+    id: 'config.certificate.allowPrinting',
+    defaultMessage: 'Allow printing in advanced of issuance',
+    description: 'To allow printing in advanced of issuance'
+  },
+  options: {
+    id: 'config.certificate.options',
+    defaultMessage: 'Options',
+    description: 'Show options'
+  },
+  allowPrintingDescription: {
+    id: 'config.certificate.printDescription',
+    defaultMessage:
+      'Records printed off in advance of collections will be added to the ready to issue work-queue',
+    description: 'Allowing printing'
+  },
+  updateAllowPrintingNotification: {
+    id: 'config.certificate.allowPrintingNotification',
+    defaultMessage: 'Allow printing in advance of issuance updated',
+    description: 'Message for allowing printing notification'
   },
   userRoles: {
     id: 'config.userRoles.title',

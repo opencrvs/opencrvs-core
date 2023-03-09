@@ -30,6 +30,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
+    @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -167,14 +169,20 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
-  markEventAsArchived(id: String!): ID!
-  notADuplicate(id: String!, duplicateId: String!): ID!
+  markEventAsNotDuplicate(id: String!): ID!
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
@@ -187,11 +195,18 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -351,6 +366,14 @@ type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
 }
+
+union RecordDetails = BirthRegistration | DeathRegistration
+
+enum AuthorizationStatus {
+  ANONYMOUS
+}
+
+directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
 
 type Location {
   id: ID!
@@ -624,6 +647,7 @@ type CreatedIds {
   compositionId: String
   trackingId: String
   registrationNumber: String
+  isPotentiallyDuplicate: Boolean
 }
 
 input BirthRegistrationInput {
@@ -851,7 +875,7 @@ type Registration {
   inCompleteFields: String
   attachments: [Attachment]
   certificates: [Certificate]
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 type RelatedPerson {
@@ -902,6 +926,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -917,6 +942,7 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
 }
 
 enum MannerOfDeath {
@@ -1287,6 +1313,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 input MedicalPractitionerInput {
@@ -1321,6 +1348,7 @@ type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type CountryLogo {
@@ -1336,6 +1364,7 @@ type Currency {
 type Death {
   REGISTRATION_TARGET: Int
   FEE: DeathFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type LoginBackground {
@@ -1348,6 +1377,7 @@ input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input CountryLogoInput {
@@ -1363,6 +1393,7 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input LoginBackgroundInput {
@@ -1451,13 +1482,21 @@ type Certificate {
   data: String
 }
 
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
+}
+
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
 }
 
 type StatusReason {

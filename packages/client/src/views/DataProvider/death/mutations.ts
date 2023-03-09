@@ -77,14 +77,30 @@ export const REJECT_DEATH_DECLARATION = gql`
 `
 
 export const ARCHIVE_DEATH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
 export const COLLECT_DEATH_CERTIFICATE = gql`
   mutation markDeathAsCertified($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
+  }
+`
+
+export const ISSUE_DEATH_CERTIFICATE = gql`
+  mutation markDeathAsIssued($id: ID!, $details: DeathRegistrationInput!) {
+    markDeathAsIssued(id: $id, details: $details)
   }
 `
 
@@ -100,8 +116,11 @@ export function getDeathMutation(action: SubmissionAction) {
       return REJECT_DEATH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_DEATH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_DEATH_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_DEATH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_DEATH_REG_CORRECTION
   }

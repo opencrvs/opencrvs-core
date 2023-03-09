@@ -88,6 +88,24 @@ Toast automatically closes after 8 seconds, unless `timeout` -prop is set to `nu
 )}`}
 />
 
+## Info
+
+<br />
+
+<Story name="Info" storyName="Info">
+  <ToastToggler type="info">Hello! I'm a info toast</ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast type="info" onClose={() => setVisible(false)}>
+    Hello! I'm an info toast
+  </Toast>
+)}`}
+/>
+
 ## Loading
 
 Loading toasts cannot be dismissed.

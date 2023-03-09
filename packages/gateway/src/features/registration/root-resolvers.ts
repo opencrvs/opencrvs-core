@@ -17,7 +17,12 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  OPENCRVS_SPECIFICATION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID,
+  VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -46,7 +51,7 @@ import {
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -54,7 +59,20 @@ import {
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
 
+async function getAnonymousToken() {
+  const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
+  const { token } = await res.json()
+  return token
+}
+
 export const resolvers: GQLResolver = {
+  RecordDetails: {
+    __resolveType(obj): any {
+      if (!obj?.type?.text) return 'BirthRegistration'
+      if (obj.type.text == 'Birth Declaration') return 'BirthRegistration'
+      if (obj.type.text == 'Death Declaration') return 'DeathRegistration'
+    }
+  },
   Query: {
     async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -262,6 +280,30 @@ export const resolvers: GQLResolver = {
           new Error('User does not have enough scope')
         )
       }
+    },
+    async fetchRecordDetailsForVerification(_, { id }, context) {
+      try {
+        const token = await getAnonymousToken()
+        context.Authorization = `Bearer ${token}`
+        const authHeader = {
+          Authorization: context.Authorization
+        }
+        const taskEntry = await getTaskEntry(id, authHeader)
+
+        const taskBundle = taskBundleWithExtension(taskEntry, {
+          url: VERIFIED_EXTENSION_URL,
+          valueString: context['x-real-ip']
+        })
+        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+
+        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
+        if (!record) {
+          await Promise.reject(new Error('Invalid QrCode'))
+        }
+        return record
+      } catch (e) {
+        await Promise.reject(new Error(e))
+      }
     }
   },
 
@@ -385,10 +427,15 @@ export const resolvers: GQLResolver = {
       )
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsArchived(_, { id }, authHeader) {
+    async markEventAsArchived(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -401,7 +448,10 @@ export const resolvers: GQLResolver = {
       const taskEntry = await getTaskEntry(id, authHeader)
       const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
-        GQLRegStatus.ARCHIVED
+        GQLRegStatus.ARCHIVED,
+        reason,
+        comment,
+        duplicateTrackingId
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
@@ -448,6 +498,13 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
+    async markBirthAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
+      } else {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+    },
     async markDeathAsCertified(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
@@ -457,44 +514,44 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async notADuplicate(_, { id, duplicateId }, authHeader) {
+    async markDeathAsIssued(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a certify scope')
+        )
+      }
+    },
+    async markEventAsNotDuplicate(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition = await fetchFHIR(
+        const composition: fhir.Composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
           'GET'
         )
-        removeDuplicatesFromComposition(composition, id, duplicateId)
+        await removeDuplicatesFromComposition(composition, id)
+        const compositionEntry: fhir.BundleEntry = {
+          resource: composition
+        }
 
-        await fetch(`${SEARCH_URL}/events/not-duplicate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`Search request failed: ${error.message}`)
-          )
-        })
+        const taskEntry = await getTaskEntry(id, authHeader)
 
-        await fetch(`${FHIR_URL}/Composition/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`FHIR request failed: ${error.message}`)
-          )
-        })
-
+        const extension: fhir.Extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const taskBundle = taskBundleWithExtension(taskEntry, extension)
+        const payloadBundle: fhir.Bundle = {
+          ...taskBundle,
+          entry: [compositionEntry, ...taskBundle.entry]
+        }
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(payloadBundle)
+        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -515,6 +572,46 @@ export const resolvers: GQLResolver = {
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       // return the taskId
       return taskEntry.resource.id
+    },
+    async markEventAsDuplicate(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const extension: fhir.Extension = { url: MARKED_AS_DUPLICATE }
+
+      if (comment || reason) {
+        if (!taskEntry.resource.reason) {
+          taskEntry.resource.reason = {
+            text: ''
+          }
+        }
+
+        taskEntry.resource.reason.text = reason || ''
+        const statusReason: fhir.CodeableConcept = {
+          text: comment
+        }
+        taskEntry.resource.statusReason = statusReason
+      }
+
+      if (duplicateTrackingId) {
+        extension.valueString = duplicateTrackingId
+      }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      return taskEntry.resource.id
     }
   }
 }
@@ -528,33 +625,53 @@ async function createEventRegistration(
   const draftId =
     details && details.registration && details.registration.draftId
 
-  const duplicateCompostion =
-    draftId && (await lookForDuplicate(draftId, authHeader))
+  const existingComposition =
+    draftId && (await lookForComposition(draftId, authHeader))
 
-  if (duplicateCompostion) {
+  if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
-        duplicateCompostion,
+        existingComposition,
         event,
         false,
         authHeader
       )
     } else {
       // return tracking-id
-      return await getDeclarationIds(duplicateCompostion, authHeader)
+      return await getDeclarationIds(existingComposition, authHeader)
     }
   }
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  if (hasScope(authHeader, 'register')) {
+
+  /*
+   * Some custom logic added here. If you are a registar and
+   * we flagged the declaration as a duplicate, we push the declaration into
+   * "Ready for review" queue and not ready to print.
+   */
+  const hasDuplicates = Boolean(
+    doc.entry
+      .find((entry) => entry.resource.resourceType === 'Composition')
+      ?.resource?.extension?.find(
+        (ext) =>
+          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+          ext.valueBoolean
+      )
+  )
+
+  if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
-    // return tracking-id
-    return await getDeclarationIdsFromResponse(res, authHeader)
+    // return tracking-id and potential duplicates
+    const ids = await getDeclarationIdsFromResponse(res, authHeader)
+    return {
+      ...ids,
+      isPotentiallyDuplicate: hasDuplicates
+    }
   }
 }
 
-export async function lookForDuplicate(
+export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {
@@ -606,13 +723,12 @@ async function markEventAsRegistered(
   details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
 
-  return res
+  return composition
 }
 
 async function markEventAsCertified(
@@ -628,13 +744,27 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
+async function markEventAsIssued(
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE
+) {
+  const doc = await buildFHIRBundle(details, event, authHeader)
+  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  return getIDFromResponse(res)
+}
+
 const ACTION_EXTENSIONS = [
   ASSIGNED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {

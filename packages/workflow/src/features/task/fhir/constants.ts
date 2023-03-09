@@ -14,6 +14,9 @@ import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir
 export const REINSTATED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
 export const ASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
+export const VERIFIED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`
 export const UNASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regUnassigned`
 export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
 export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
+export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
+export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`

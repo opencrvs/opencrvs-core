@@ -9,14 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IStoreState } from '@opencrvs/client/src/store'
-import { IRejectState } from '@opencrvs/client/src/review/reducer'
 
-const getPartialState = (store: IStoreState): IRejectState => store.reject
+import { useEffect } from 'react'
 
-function getKey<K extends keyof IRejectState>(store: IStoreState, key: K) {
-  return getPartialState(store)[key]
+export const useTimeout = (
+  callback: () => void,
+  timeout = 0,
+  trigger = false
+) => {
+  useEffect(() => {
+    let timeoutReference: NodeJS.Timeout | undefined = undefined
+
+    if (trigger) timeoutReference = setTimeout(callback, timeout)
+
+    return () => {
+      if (timeoutReference) clearTimeout(timeoutReference)
+    }
+  }, [callback, timeout, trigger])
 }
-
-export const getRejectForm = (store: IStoreState): IRejectState['rejectForm'] =>
-  getKey(store, 'rejectForm')
