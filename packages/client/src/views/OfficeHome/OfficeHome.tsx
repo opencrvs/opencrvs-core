@@ -104,7 +104,6 @@ interface IOfficeHomeState {
   draftCurrentPage: number
   showCertificateToast: boolean
   offlineResources: IOfflineData
-  isOnePrintInAdvanceOn: boolean
 }
 
 type IOfficeHomeProps = IntlShapeProps &
@@ -158,7 +157,6 @@ class OfficeHomeView extends React.Component<
   constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
-      isOnePrintInAdvanceOn: false,
       draftCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.declarations.filter(
