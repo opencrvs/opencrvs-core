@@ -17,7 +17,12 @@ import {
   IQuestionConfig,
   getIdentifiersFromFieldId
 } from '.'
-import { ISerializedForm, BirthSection, DeathSection, IValidatorDescriptor } from '@client/forms'
+import {
+  ISerializedForm,
+  BirthSection,
+  DeathSection,
+  IValidatorDescriptor
+} from '@client/forms'
 import {
   getField,
   getFieldId,
@@ -93,6 +98,7 @@ export function questionsTransformer(
       description,
       tooltip,
       errorMessage,
+      validateEmpty,
       maxLength,
       fieldName,
       fieldType,
@@ -111,6 +117,7 @@ export function questionsTransformer(
           label,
           placeholder,
           description,
+          validateEmpty,
           tooltip,
           errorMessage,
           maxLength,
@@ -132,17 +139,24 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
+        validateEmpty: validateEmpty ?? false,
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
-      if(validator && validator.length > 0) {
+      if (validator && validator.length > 0) {
         defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
       }
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields
        */
+
       if (required) {
         defaultQuestionConfig.required = true
       }
+
+      if (required === false) {
+        defaultQuestionConfig.required = false
+      }
+
       return defaultQuestionConfig
     }
   )

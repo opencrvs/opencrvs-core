@@ -182,7 +182,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
         dependency: string
         typeMapper: Operation<typeof types>
       }
-      validator?: Array<{
+  validator?: Array<{
     dependencies: string[]
     validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
@@ -441,6 +441,9 @@ export interface IFormFieldBase {
   tooltip?: MessageDescriptor
   validator: validators.Validation[]
   required?: boolean
+  // Whether or not to run validation functions on the field if it's empty
+  // Default false
+  validateEmpty?: boolean
   prefix?: string
   postfix?: string
   disabled?: boolean

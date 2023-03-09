@@ -46,6 +46,7 @@ export interface IFieldIdentifiers {
 export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
+  validateEmpty: boolean
   identifiers: IFieldIdentifiers
   validator?: IValidatorDescriptor[]
 }
@@ -58,6 +59,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   description?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
+  validateEmpty?: boolean
   maxLength?: number
   fieldName: string
   fieldType: CustomFieldType
@@ -96,7 +98,6 @@ export function getCustomizedDefaultField(
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-
   return {
     ...serializedField,
     ...rest

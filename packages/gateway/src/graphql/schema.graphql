@@ -1400,6 +1400,7 @@ input QuestionInput {
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!
+  validateEmpty: Boolean
   required: Boolean
   enabled: String
   custom: Boolean
