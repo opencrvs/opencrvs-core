@@ -386,6 +386,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the marriage event',
     id: 'constants.marriage'
   },
+  marriages: {
+    defaultMessage: 'Marriages',
+    description: 'A label from the marriages event',
+    id: 'constants.marriages'
+  },
   declared: {
     defaultMessage: 'submitted',
     description: 'A label for submitted',

@@ -150,7 +150,8 @@ export const updateApplicationConfig = Joi.object({
     FEE: {
       ON_TIME: Joi.number(),
       DELAYED: Joi.number()
-    }
+    },
+    PRINT_IN_ADVANCE: Joi.boolean()
   }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
   HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),

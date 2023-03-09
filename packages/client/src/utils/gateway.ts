@@ -1150,6 +1150,7 @@ export enum MaritalStatusType {
 export type Marriage = {
   __typename?: 'Marriage'
   FEE?: Maybe<MarriageFee>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -1177,6 +1178,7 @@ export type MarriageFeeInput = {
 
 export type MarriageInput = {
   FEE?: InputMaybe<MarriageFeeInput>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -7433,6 +7435,7 @@ export type UpdateApplicationConfigMutation = {
     MARRIAGE?: {
       __typename?: 'Marriage'
       REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'MarriageFee'
         ON_TIME?: number | null

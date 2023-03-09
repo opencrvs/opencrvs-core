@@ -1327,6 +1327,7 @@ export interface GQLDeath {
 export interface GQLMarriage {
   REGISTRATION_TARGET?: number
   FEE?: GQLMarriageFee
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLLoginBackground {
@@ -1361,6 +1362,7 @@ export interface GQLDeathInput {
 export interface GQLMarriageInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLMarriageFeeInput
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLLoginBackgroundInput {
@@ -6577,6 +6579,7 @@ export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
 export interface GQLMarriageTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
   FEE?: MarriageToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: MarriageToPRINT_IN_ADVANCEResolver<TParent>
 }
 
 export interface MarriageToREGISTRATION_TARGETResolver<
@@ -6587,6 +6590,13 @@ export interface MarriageToREGISTRATION_TARGETResolver<
 }
 
 export interface MarriageToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MarriageToPRINT_IN_ADVANCEResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

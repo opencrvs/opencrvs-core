@@ -41,9 +41,11 @@ interface IConfigMessages
   options: MessageDescriptor
   allowPrinting: MessageDescriptor
   allowPrintingDescription: MessageDescriptor
+  marriageTemplate: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  marriageDefaultTempDesc: MessageDescriptor
   certificateUploading: MessageDescriptor
   certificateUpdated: MessageDescriptor
   certificateValidationError: MessageDescriptor
@@ -268,6 +270,11 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Certificate Template',
     description: 'Label for certificate templates'
   },
+  marriageTemplate: {
+    id: 'config.marriageTemplate',
+    defaultMessage: 'Marriage certificate',
+    description: 'Label for marriage certificate template'
+  },
   birthDefaultTempDesc: {
     id: 'config.birthDefaultTempDesc',
     defaultMessage: 'Default birth certificate template',
@@ -282,6 +289,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.deathDefaultTempDesc',
     defaultMessage: 'Default death certificate template',
     description: 'Label for default death certificate template'
+  },
+  marriageDefaultTempDesc: {
+    id: 'config.marriageDefaultTempDesc',
+    defaultMessage: 'Default marriage certificate template',
+    description: 'Label for default marriage certificate template'
   },
   certificateUploading: {
     id: 'config.certificate.certificateUploading',

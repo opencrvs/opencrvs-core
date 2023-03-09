@@ -34,6 +34,7 @@ interface IMarriage {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface ICurrency {
   isoCode: string
@@ -97,7 +98,8 @@ const marriageSchema = new Schema<IMarriage>({
   FEE: {
     ON_TIME: { type: Number, default: 10 },
     DELAYED: { type: Number, default: 45 }
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const countryLogoSchema = new Schema<ICountryLogo>({

@@ -9982,6 +9982,18 @@
             "deprecationReason": null
           },
           {
+            "name": "PRINT_IN_ADVANCE",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "REGISTRATION_TARGET",
             "description": null,
             "args": [],
@@ -10198,6 +10210,18 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "MarriageFeeInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PRINT_IN_ADVANCE",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null,

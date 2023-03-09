@@ -726,7 +726,8 @@ export const mockOfflineData = {
       FEE: {
         ON_TIME: 0,
         DELAYED: 0
-      }
+      },
+      PRINT_IN_ADVANCE: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',

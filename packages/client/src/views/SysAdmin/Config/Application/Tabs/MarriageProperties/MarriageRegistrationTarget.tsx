@@ -78,7 +78,9 @@ export function MarriageRegistrationTarget() {
             FEE: {
               ON_TIME: offlineCountryConfiguration.config.MARRIAGE.FEE.ON_TIME,
               DELAYED: offlineCountryConfiguration.config.MARRIAGE.FEE.DELAYED
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.MARRIAGE.PRINT_IN_ADVANCE
           }
         },
         dispatch,
