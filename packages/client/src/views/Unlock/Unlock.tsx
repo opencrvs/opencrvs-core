@@ -197,7 +197,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       <BackgroundWrapper id="unlockPage">
         <Box id="Box">
           <LogoutButton type="icon" onClick={this.logout} id="logout">
-            <Icon name="LogOut" />
+            <Icon name="SignOut" />
           </LogoutButton>
 
           <Content direction="column" gap={0} justifyContent="flex-start">

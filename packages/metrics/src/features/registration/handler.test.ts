@@ -1329,8 +1329,9 @@ describe('When an existing declaration is marked certified', () => {
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
         influxClient.writePoints.mock.calls[1][0].find(
-          ({ measurement }: { measurement: string }) =>
-            measurement === 'payment'
+          ({ measurement }: { measurement: string }) => {
+            return measurement === 'certification'
+          }
         )
 
       expect(declarationEventPoint).toMatchSnapshot()

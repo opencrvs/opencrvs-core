@@ -18,6 +18,7 @@ interface IBirth {
     LATE: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
@@ -25,6 +26,7 @@ interface IDeath {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface ICurrency {
   isoCode: string
@@ -69,7 +71,8 @@ const birthSchema = new Schema<IBirth>({
     ON_TIME: Number,
     LATE: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const deathSchema = new Schema<IDeath>({
@@ -77,7 +80,8 @@ const deathSchema = new Schema<IDeath>({
   FEE: {
     ON_TIME: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const countryLogoSchema = new Schema<ICountryLogo>({
@@ -147,7 +151,7 @@ const configSchema = new Schema({
   INFORMANT_SIGNATURE_REQUIRED: {
     type: Boolean,
     required: true,
-    default: true
+    default: false
   },
   LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
   ADMIN_LEVELS: {

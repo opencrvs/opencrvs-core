@@ -18,6 +18,7 @@ import {
   goToAdvancedSearch,
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
+  goToIssueCertificate as goToIssueCertificateAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
@@ -111,6 +112,7 @@ interface IBaseSearchResultProps {
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToIssueCertificate: typeof goToIssueCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
@@ -246,6 +248,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           reg.declarationStatus === RegStatus.Validated
         const declarationIsInProgress =
           reg.declarationStatus === RegStatus.InProgress
+        const declarationIsIssued = reg.declarationStatus === RegStatus.Issued
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -255,7 +258,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
-            (declarationIsRegistered || declarationIsCertified) &&
+            (declarationIsRegistered || declarationIsIssued) &&
             userHasCertifyScope()
           ) {
             actions.push({
@@ -265,6 +268,17 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               ) => {
                 e && e.stopPropagation()
                 props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (declarationIsCertified && userHasCertifyScope()) {
+            actions.push({
+              label: intl.formatMessage(buttonMessages.issue),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                props.goToIssueCertificate(reg.id)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -515,6 +529,7 @@ export const AdvancedSearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToPrintCertificate: goToPrintCertificateAction,
+    goToIssueCertificate: goToIssueCertificateAction,
     goToDeclarationRecordAudit
   }
 )(withTheme(AdvancedSearchResultComp))

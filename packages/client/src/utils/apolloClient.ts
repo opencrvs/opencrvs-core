@@ -98,9 +98,8 @@ async function createPersistentClient(store: Store<IStoreState, AnyAction>) {
 }
 
 export function useApolloClient(store: Store<IStoreState, AnyAction>) {
-  const [client, setClient] = React.useState<
-    ApolloClient<NormalizedCacheObject>
-  >(createClient(store))
+  const [client, setClient] =
+    React.useState<ApolloClient<NormalizedCacheObject> | null>(null)
   const [persistor, setPersistor] =
     React.useState<CachePersistor<NormalizedCacheObject>>()
   const clearCache = React.useCallback(() => {
