@@ -1935,6 +1935,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
@@ -1948,6 +1949,7 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }

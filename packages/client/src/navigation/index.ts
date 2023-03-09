@@ -241,7 +241,7 @@ export function goToPerformanceHome(
   timeStart: Date = new Date(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   ),
-  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59)),
+  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
   event?: Event,
   locationId?: string
 ) {

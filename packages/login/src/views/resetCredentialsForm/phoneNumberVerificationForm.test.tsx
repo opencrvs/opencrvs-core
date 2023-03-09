@@ -37,7 +37,7 @@ const server = setupServer(
       )
     }
   ),
-  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+  rest.get(`${window.config.CONFIG_API_URL}/publicConfig`, (req, res, ctx) => {
     return res(
       ctx.json({
         config: {

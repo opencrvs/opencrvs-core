@@ -224,7 +224,8 @@ export const createStatusHistory = async (
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
     operatorRole:
-      user.role.labels.find((label) => label.lang === 'en')?.label || '',
+      // user could be a system as well and systems don't have role
+      user.role?.labels.find((label) => label.lang === 'en')?.label || '',
     operatorFirstNames,
     operatorFamilyName,
     operatorFirstNamesLocale,
