@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Icon, IconProps } from '../Icon'
-import { Button } from '../Button'
+import {
+  ApolloProvider as ApolloClientProvider,
+  ApolloProviderProps
+} from '@apollo/client/react/context'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
-export function ToggleIcon({
-  name,
-  size = 'medium',
-  color = 'currentColor',
-  weight = 'fill',
-  ...rest
-}: IconProps & React.HTMLAttributes<HTMLButtonElement>) {
-  return (
-    <>
-      <Button type="icon" {...rest}>
-        <Icon name={name} color={color} weight={weight}></Icon>
-      </Button>
-    </>
+export function ApolloProvider(
+  props: Omit<ApolloProviderProps<any>, 'client'> & {
+    client: ApolloClient<NormalizedCacheObject> | null
+  }
+) {
+  const { client, children } = props
+  return client ? (
+    <ApolloClientProvider client={client}>{children}</ApolloClientProvider>
+  ) : (
+    <></>
   )
 }
