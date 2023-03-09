@@ -47,6 +47,7 @@ export interface IQuestion {
   placeholder?: IMessage[]
   description?: IMessage[]
   tooltip?: IMessage[]
+  unit?: IMessage[]
   errorMessage?: IMessage[]
   maxLength?: number
   fieldName?: string

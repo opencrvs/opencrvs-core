@@ -67,6 +67,7 @@ export const requestSchema = Joi.object({
   placeholder: messageSchema,
   description: messageSchema,
   tooltip: messageSchema,
+  unit: messageSchema,
   errorMessage: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),

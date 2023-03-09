@@ -57,7 +57,7 @@ input QuestionInput {
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
   tooltip: [MesssageInput!]
-  postfix: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
