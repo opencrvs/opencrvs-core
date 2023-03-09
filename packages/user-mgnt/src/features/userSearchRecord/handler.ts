@@ -170,7 +170,8 @@ export const createSearchrequestSchema = Joi.object({
         RegStatus.VALIDATED,
         RegStatus.REGISTERED,
         RegStatus.CERTIFIED,
-        RegStatus.REJECTED
+        RegStatus.REJECTED,
+        RegStatus.ISSUED
       )
     ),
     dateOfEvent: Joi.string(),
