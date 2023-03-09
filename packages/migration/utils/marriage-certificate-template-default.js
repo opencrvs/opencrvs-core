@@ -107,11 +107,11 @@ export const svgCode = `<svg width="420" height="595" viewBox="0 0 420 595" fill
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px"><tspan x="211.45" y="546.552">{{registrarName}}&#10;</tspan></text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="161.122" y="546.552">Registered by </tspan></text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="210" y="573.309">&#10;</tspan></text>
-<!-- <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="141.746" y="561.309">Date of registration: </tspan></text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px"><tspan x="214.965" y="561.309">10 October 2018&#10;</tspan></text> -->
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="141.746" y="561.309">Date of registration: </tspan></text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px"><tspan x="214.965" y="561.309">{{registrationDate}}&#10;</tspan></text>
 <rect x="359.771" y="534" width="40" height="40" fill="url(#pattern3)"/>
 <defs>
-<style type="text/css">
+<style type="text/css"> 
     @font-face {
       font-family: Noto Sans;
       src: url(${notoSans});

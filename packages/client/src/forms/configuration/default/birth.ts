@@ -569,6 +569,11 @@ export const birthRegisterForms: ISerializedForm = {
             operation: 'registrarSignatureUserTransformer'
           },
           {
+            fieldName: 'registrationDate',
+            operation: 'registrationDateTransformer',
+            parameters: ['en', 'dd MMMM yyyy']
+          },
+          {
             fieldName: 'registrationLocation',
             operation: 'registrationLocationUserTransformer'
           }
