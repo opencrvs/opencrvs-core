@@ -65,7 +65,7 @@ on:
           - qa
           - production
           - config
-          - migrate
+          - demo
       core-image-tag:
         description: Core DockerHub image tag
         required: false
