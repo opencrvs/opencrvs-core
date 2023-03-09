@@ -157,6 +157,8 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
+        : localState.registrationStatuses === 'REGISTERED'
+        ? [RegStatus.Registered, RegStatus.Certified]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
