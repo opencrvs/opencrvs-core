@@ -27,6 +27,7 @@ type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type DeathFee {
@@ -37,16 +38,12 @@ type DeathFee {
 type Death {
   REGISTRATION_TARGET: Int
   FEE: DeathFee
+  PRINT_IN_ADVANCE: Boolean
 }
 
 type CountryLogo {
   fileName: String
   file: String
-}
-
-type Integration {
-  name: String
-  status: String
 }
 
 type Currency {
@@ -64,6 +61,7 @@ input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input DeathFeeInput {
@@ -74,6 +72,7 @@ input DeathFeeInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
 }
 
 input NIDNumberPatternInput {
@@ -87,14 +86,26 @@ input CountryLogoInput {
   file: String
 }
 
-input IntegrationInput {
-  name: String
-  status: String
-}
-
 input CurrencyInput {
   isoCode: String
   languagesAndCountry: [String]
+}
+
+enum ImageFit {
+  FILL
+  TILE
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input ApplicationConfigurationInput {
@@ -109,7 +120,11 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 type ApplicationConfiguration {
@@ -124,7 +139,11 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 type Mutation {

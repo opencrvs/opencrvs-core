@@ -22,7 +22,7 @@ import {
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { LinkButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -37,9 +37,8 @@ import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
-import { IAttachmentValue, IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
+import { IAttachmentValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
   getDummyCertificateTemplateData,
@@ -52,7 +51,10 @@ import {
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
-import { updateOfflineCertificate } from '@client/offline/actions'
+import {
+  updateOfflineCertificate,
+  updateOfflineConfigData
+} from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -60,6 +62,12 @@ import {
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Link, Text, Toggle } from '@client/../../components/lib'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ListViewContainer = styled.div`
   margin-top: 24px;
@@ -69,7 +77,29 @@ const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
 const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
+  ${({ theme }) => theme.fonts.reg16};
+  margin-top: 15px;
+  margin-bottom: 8px;
+`
+
+const ToggleWrapper = styled.div`
+  margin-left: 24px;
+`
+const StyledText = styled.h6`
+  ${({ theme }) => theme.fonts.h4}
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 15px;
+  margin-bottom: 8px;
+`
+const StyledSubtext = styled(Text)`
+  flex: none;
+  color: ${({ theme }) => theme.colors.grey500};
+  order: 1;
+  flex-grow: 0;
+`
+
+const StyledHeader = styled(ListViewItemSimplified)`
+  color: ${({ theme }) => theme.colors.grey400};
 `
 
 export type Scope = string[]
@@ -79,24 +109,41 @@ export enum SVGFile {
 }
 
 type Props = WrappedComponentProps & {
-  userDetails: IUserDetails | null
+  intl: IntlShape
+  userDetails: UserDetails | null
   scope: Scope | null
   offlineResources: IOfflineData
   registerForm: {
     birth: IForm
     death: IForm
   }
-} & { updateOfflineCertificate: typeof updateOfflineCertificate }
+} & {
+  updateOfflineCertificate: typeof updateOfflineCertificate
+  updateOfflineConfigData: typeof updateOfflineConfigData
+}
 
 interface State {
   selectedSubMenuItem: string
   imageUploading: boolean
   imageLoadingError: string
   showNotification: boolean
+  notificationForPrinting: NOTIFICATION_STATUS
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
+  activeTabId: Event
+}
+
+interface ICertification {
+  id: string
+  label: string
+  value: string
+  actionsMenu: JSX.Element
+}
+
+type CertificationProps = {
+  item: ICertification
 }
 
 function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
@@ -136,7 +183,7 @@ export const printDummyCertificate = async (
   event: string,
   registerForm: { birth: IForm; death: IForm },
   intl: IntlShape,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
@@ -174,10 +221,12 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      activeTabId: Event.Birth,
       selectedSubMenuItem: this.SUB_MENU_ID.certificatesConfig,
       imageUploading: false,
       imageLoadingError: '',
       showNotification: false,
+      notificationForPrinting: NOTIFICATION_STATUS.IDLE,
       showPrompt: false,
       eventName: '',
       previewImage: null,
@@ -193,6 +242,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     certificatesConfig: 'Certificates'
   }
 
+  handleTabChange = (tab: Event) => {
+    this.setState({ activeTabId: tab })
+  }
   getMenuItems(
     intl: IntlShape,
     event: string,
@@ -226,7 +278,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             event,
             this.props.registerForm,
             intl,
-            this.props.userDetails as IUserDetails,
+            this.props.userDetails as UserDetails,
             this.props.offlineResources
           )
         }
@@ -346,20 +398,38 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       imageUploading,
       imageLoadingError,
       showNotification,
-      showPrompt
+      showPrompt,
+      activeTabId
     } = this.state
 
     const { intl, offlineResources } = this.props
+    const tabSections = [
+      {
+        id: Event.Birth,
+        title: intl.formatMessage(constantsMessages.births)
+      },
+      {
+        id: Event.Death,
+        title: intl.formatMessage(constantsMessages.deaths)
+      }
+    ]
+
+    const birthCertFileName =
+      offlineResources.templates.certificates?.birth.fileName
+    const deathCertFileName =
+      offlineResources.templates.certificates?.death.fileName
+
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
     const deathLastModified =
       offlineResources.templates.certificates?.death.lastModifiedDate
+
     const CertificateSection = {
       title: intl.formatMessage(messages.listTitle),
       items: [
         {
           id: 'birth',
-          label: intl.formatMessage(messages.birthTemplate),
+          label: intl.formatMessage(messages.certificateTemplate),
           value: birthLastModified
             ? intl.formatMessage(messages.eventUpdatedTempDesc, {
                 lastModified: birthLastModified
@@ -384,7 +454,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         },
         {
           id: 'death',
-          label: intl.formatMessage(messages.deathTemplate),
+          label: intl.formatMessage(messages.certificateTemplate),
           value: deathLastModified
             ? intl.formatMessage(messages.eventUpdatedTempDesc, {
                 lastModified: deathLastModified
@@ -409,6 +479,110 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         }
       ]
     }
+
+    let certificateFileName
+
+    const toggleOnChange = async (event: Event) => {
+      const upperCaseEvent = event.toUpperCase() as 'BIRTH' | 'DEATH'
+      this.props.updateOfflineConfigData({
+        config: {
+          ...offlineResources.config,
+          [upperCaseEvent]: {
+            ...offlineResources.config[upperCaseEvent],
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+          }
+        }
+      })
+      try {
+        await configApplicationMutations.mutateApplicationConfig({
+          [upperCaseEvent]: {
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+          }
+        })
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
+        })
+      } catch (err) {
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.ERROR
+        })
+      }
+    }
+
+    const TabContent = (props: CertificationProps) => {
+      certificateFileName =
+        props.item.id === 'birth' ? birthCertFileName : deathCertFileName
+
+      return (
+        <>
+          <ListViewSimplified key={'certification'}>
+            <StyledHeader
+              key="template"
+              label={
+                <Text variant="bold14" element="p" color="grey400">
+                  {intl.formatMessage(messages.template)}
+                </Text>
+              }
+            />
+
+            <ListViewItemSimplified
+              compactLabel
+              key={`${props.item.id}_file`}
+              label={
+                <div>
+                  <StyledText>{props.item.label}</StyledText>
+                </div>
+              }
+              value={
+                <Value id={`${props.item.id}_value`}>
+                  {certificateFileName}
+                </Value>
+              }
+              actions={props.item.actionsMenu}
+            />
+
+            <StyledHeader
+              key="options"
+              label={
+                <Text variant="bold14" element="p" color="grey400">
+                  {intl.formatMessage(messages.options)}
+                </Text>
+              }
+            />
+            <ListViewItemSimplified
+              key={`${props.item.id}`}
+              label={
+                <div>
+                  <StyledText>
+                    {intl.formatMessage(messages.allowPrinting)}
+                  </StyledText>
+                  <StyledSubtext element="p" variant="reg14">
+                    {intl.formatMessage(messages.allowPrintingDescription)}
+                  </StyledSubtext>
+                </div>
+              }
+              actions={
+                <ToggleWrapper>
+                  <Toggle
+                    id={'allow-printing-toggle'}
+                    defaultChecked={
+                      this.state.activeTabId === Event.Birth
+                        ? offlineResources.config.BIRTH.PRINT_IN_ADVANCE
+                        : offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                    }
+                    onChange={async () => {
+                      await toggleOnChange(this.state.activeTabId)
+                    }}
+                  />
+                </ToggleWrapper>
+              }
+            />
+          </ListViewSimplified>
+        </>
+      )
+    }
     return (
       <>
         <SysAdminContentWrapper
@@ -417,10 +591,20 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         >
           {this.state.selectedSubMenuItem ===
             this.SUB_MENU_ID.certificatesConfig && (
-            <Content title={CertificateSection.title} titleColor={'copy'}>
+            <Content
+              title={CertificateSection.title}
+              titleColor={'copy'}
+              tabBarContent={
+                <FormTabs
+                  sections={tabSections}
+                  activeTabId={activeTabId}
+                  onTabClick={(id: Event) => this.handleTabChange(id)}
+                />
+              }
+            >
               <>
                 {intl.formatMessage(messages.listDetails)}
-                <LinkButton
+                <Link
                   id="certificate-instructions-link"
                   onClick={() => {
                     window.open(
@@ -431,26 +615,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   }}
                 >
                   {intl.formatMessage(messages.listDetailsQsn)}
-                </LinkButton>
+                </Link>
               </>
-              <ListViewContainer>
-                <ListViewSimplified>
-                  {CertificateSection.items.map((item) => {
-                    return (
-                      <ListViewItemSimplified
-                        key={item.id}
-                        label={
-                          <Label id={`${item.id}_label`}>{item.label}</Label>
-                        }
-                        value={
-                          <Value id={`${item.id}_value`}>{item.value}</Value>
-                        }
-                        actions={item.actionsMenu}
-                      />
-                    )
-                  })}
-                </ListViewSimplified>
-              </ListViewContainer>
+              <TabContent
+                item={
+                  CertificateSection.items.find(
+                    (item) => item.id === activeTabId
+                  ) as ICertification
+                }
+              />
             </Content>
           )}
           {showNotification && (
@@ -481,6 +654,38 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               />
             </Toast>
           )}
+
+          {this.state.notificationForPrinting !== NOTIFICATION_STATUS.IDLE && (
+            <Toast
+              id="allow-printing-notification"
+              type={
+                this.state.notificationForPrinting ===
+                NOTIFICATION_STATUS.SUCCESS
+                  ? 'success'
+                  : this.state.notificationForPrinting ===
+                    NOTIFICATION_STATUS.IN_PROGRESS
+                  ? 'loading'
+                  : this.state.notificationForPrinting ===
+                    NOTIFICATION_STATUS.ERROR
+                  ? 'error'
+                  : 'warning'
+              }
+              onClose={() =>
+                this.setState({
+                  notificationForPrinting: NOTIFICATION_STATUS.IDLE
+                })
+              }
+            >
+              {this.state.notificationForPrinting ===
+              NOTIFICATION_STATUS.IN_PROGRESS
+                ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+                : this.state.notificationForPrinting ===
+                  NOTIFICATION_STATUS.SUCCESS
+                ? intl.formatMessage(messages.updateAllowPrintingNotification)
+                : intl.formatMessage(messages.applicationConfigChangeError)}
+            </Toast>
+          )}
+
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}
@@ -577,5 +782,6 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const CertificatesConfig = connect(mapStateToProps, {
+  updateOfflineConfigData,
   updateOfflineCertificate
 })(injectIntl(CertificatesConfigComponent))

@@ -67,8 +67,16 @@ describe('User audit list tests', () => {
               system: 'NATIONAL_ID',
               value: '1014881922'
             },
-            role: 'FIELD_AGENT',
-            type: 'CHA',
+            systemRole: 'FIELD_AGENT',
+            role: {
+              _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'CHA'
+                }
+              ]
+            },
             status: 'active',
             underInvestigation: true,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { grid } from '../grid'
-import { IDynamicValues, IColumn, IActionObject } from './types'
+import { IColumn, IActionObject } from './types'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
 import { ITheme } from '../theme'
@@ -106,7 +106,9 @@ export enum COLUMNS {
   LAST_UPDATED = 'lastUpdated',
   ACTIONS = 'actions',
   NOTIFICATION_SENT = 'notificationSent',
-  NAME = 'name'
+  NAME = 'name',
+  TRACKING_ID = 'trackingId',
+  REGISTRATION_NO = 'registrationNumber'
 }
 
 export enum SORT_ORDER {
@@ -120,7 +122,7 @@ interface IComponentWithTheme {
 
 interface IWorkqueueProps extends IComponentWithTheme {
   /** Workqueue data */
-  content: IDynamicValues[]
+  content: Array<Record<string, unknown>>
   /** Data columns */
   columns: IColumn[]
   /** Text if there are now content on the table */

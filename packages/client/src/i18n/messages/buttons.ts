@@ -39,6 +39,7 @@ interface IButtonsMessages
   no: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
+  issue: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
   rejectDeclaration: MessageDescriptor
@@ -46,6 +47,7 @@ interface IButtonsMessages
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
+  saving: MessageDescriptor
   refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
@@ -173,7 +175,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgotPassword'
   },
   forgottenPIN: {
-    defaultMessage: 'Forgotten pin',
+    defaultMessage: 'Forgotten PIN',
     description: 'The label for forgotten pin button',
     id: 'buttons.forgottenPIN'
   },
@@ -211,6 +213,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Print',
     description: 'Print button text',
     id: 'buttons.print'
+  },
+  issue: {
+    id: 'buttons.issue',
+    defaultMessage: 'Issue',
+    description: 'Button for issuing'
   },
   reinstate: {
     defaultMessage: 'Reinstate',
@@ -253,11 +260,15 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Refresh button',
     id: 'buttons.refresh'
   },
-
   save: {
     defaultMessage: 'Save',
     description: 'Save Button Text',
     id: 'buttons.save'
+  },
+  saving: {
+    defaultMessage: 'Saving...',
+    description: 'Saving Button Text',
+    id: 'buttons.saving'
   },
   saveExitButton: {
     defaultMessage: 'Save & Exit',
@@ -351,7 +362,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Correct record',
+    defaultMessage: 'No, make correction',
     description: 'Correct record button text on review certificate'
   },
   makeCorrection: {

@@ -202,6 +202,7 @@ export const sectionFieldToBundleFieldTransformer =
     } else {
       transformedData[field.name] = draftData[sectionId][field.name]
     }
+
     return transformedData
   }
 

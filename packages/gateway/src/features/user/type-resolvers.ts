@@ -32,6 +32,14 @@ interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -44,8 +52,8 @@ export interface IUserModelData {
   email: string
   mobile: string
   status: string
-  role: string
-  type: string
+  systemRole: string
+  role: IUserRole
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -79,11 +87,12 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'identifiers'
+    | 'role'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
+  systemRole: string
   role: string
-  type: string
   signature?: GQLSignatureInput
 }
 
@@ -91,7 +100,7 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -185,7 +194,7 @@ export const userTypeResolvers: GQLResolver = {
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${userModel.practitionerId}`,
-            practitionerRole: userModel.role
+            practitionerRole: userModel.systemRole
           }
 
       if (!practitionerId) {
@@ -204,7 +213,7 @@ export const userTypeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
       const signature =
-        userModel.role === 'FIELD_AGENT'
+        userModel.systemRole === 'FIELD_AGENT'
           ? null
           : signatureExtension && signatureExtension.valueSignature
 

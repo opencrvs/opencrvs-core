@@ -30,8 +30,8 @@ import {
 } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _ from 'lodash'
-import format from '@client/utils/date-formatting'
+import _, { values } from 'lodash'
+import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -293,9 +293,11 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
 }
 
 export const isValidParentsBirthDate =
-  (minAgeGap: number): Validation =>
+  (minAgeGap: number, isAge?: boolean): Validation =>
   (value: IFormFieldValue, drafts) => {
-    const parentsBirthDate = value as string
+    const parentsBirthDate = isAge
+      ? convertAgeToDate(value as string)
+      : (value as string)
     const childBirthDate =
       drafts && drafts.child && (drafts.child.childBirthDate as string)
 
@@ -430,7 +432,7 @@ export const dateInPast = (): Validation => (value: IFormFieldValue) =>
   isDateInPast(value)
 
 export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
-  dateFormat(value)
+  dateFormat(value as string)
 
 /*
  * TODO: The name validation functions should be refactored out.
@@ -473,7 +475,9 @@ export const isValidEnglishWord = (value: string): boolean => {
     ''
   )
 
-  return englishRe.test(value)
+  const englishApostrophe = XRegExp.cache(`[p{Nd}'_]+`, '')
+
+  return englishRe.test(value) || englishApostrophe.test(value)
 }
 
 type Checker = (value: string) => boolean

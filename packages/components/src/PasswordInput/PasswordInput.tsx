@@ -32,6 +32,7 @@ interface IPasswordInputState {
 export type IPasswordInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 const StyledField = styled.div<IPasswordInputProps>`
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -40,7 +41,7 @@ const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;

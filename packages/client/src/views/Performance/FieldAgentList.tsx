@@ -32,16 +32,17 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IAvatar } from '@client/utils/userUtils'
+import { Avatar } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { userMessages } from '@client/i18n/messages'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -53,7 +54,7 @@ interface SortMap {
   rawName: SORT_ORDER
   startMonth: SORT_ORDER
   avgCompleteDeclarationTime: SORT_ORDER
-  type: SORT_ORDER
+  role: SORT_ORDER
   officeName: SORT_ORDER
   inProgressDeclarations: SORT_ORDER
   rejectedDeclarations: SORT_ORDER
@@ -63,7 +64,7 @@ const INITIAL_SORT_MAP = {
   rawName: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
   avgCompleteDeclarationTime: SORT_ORDER.ASCENDING,
-  type: SORT_ORDER.ASCENDING,
+  role: SORT_ORDER.ASCENDING,
   officeName: SORT_ORDER.ASCENDING,
   inProgressDeclarations: SORT_ORDER.ASCENDING,
   rejectedDeclarations: SORT_ORDER.ASCENDING
@@ -111,7 +112,7 @@ const NameAvatar = styled.div`
   }
 `
 
-function getNameWithAvatar(userName: string, avatar?: IAvatar) {
+function getNameWithAvatar(userName: string, avatar?: Avatar) {
   return (
     <NameAvatar>
       <AvatarSmall name={userName} avatar={avatar} />
@@ -172,6 +173,7 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const offices = generateLocations(offlineOffices, intl)
+  const language = useSelector(getLanguage)
 
   const isOfficeSelected = offices.some((office) => office.id === locationId)
 
@@ -221,13 +223,13 @@ function FieldAgentListComponent(props: IProps) {
         isSorted: columnToBeSort === 'rawName' ? true : false
       },
       {
-        key: 'type',
-        label: intl.formatMessage(messages.typeColumnHeader),
+        key: 'role',
+        label: intl.formatMessage(messages.roleColumnHeader),
         width: 12,
         isSortable: true,
-        sortFunction: () => toggleSort('type'),
-        icon: columnToBeSort === 'type' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'type' ? true : false
+        sortFunction: () => toggleSort('role'),
+        icon: columnToBeSort === 'role' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'role' ? true : false
       },
       {
         key: 'officeName',
@@ -315,10 +317,6 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
-  function getFieldAgentTypeLabel(type: string) {
-    return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
-  }
-
   function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
       data &&
@@ -327,7 +325,7 @@ function FieldAgentListComponent(props: IProps) {
         if (row === null) {
           return {
             name: '',
-            type: '',
+            role: '',
             officeName: '',
             startMonth: '',
             totalDeclarations: '',
@@ -339,10 +337,11 @@ function FieldAgentListComponent(props: IProps) {
         const office =
           row.primaryOfficeId &&
           offices.find(({ id }) => id === row.primaryOfficeId)
+
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          type: (row.type && getFieldAgentTypeLabel(row.type)) || '',
+          role: (row.role && getUserRole(language, row.role)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),

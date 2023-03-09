@@ -26,6 +26,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         age
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         gender
         maritalStatus
         nationality
@@ -67,6 +69,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           nationality
           occupation
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           telecom {
             system
             value
@@ -118,6 +122,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         duplicates
         attachments {
           data
@@ -176,6 +181,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -194,8 +200,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -270,6 +282,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         birthDate
         age
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         gender
         maritalStatus
         nationality
@@ -362,6 +376,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment
@@ -416,6 +431,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -433,8 +449,14 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName

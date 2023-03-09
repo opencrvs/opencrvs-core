@@ -11,6 +11,8 @@
  */
 import { LoginState } from '@login/login/reducer'
 import { IStoreState } from '@login/store'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 const getPartialState = (store: IStoreState): LoginState => store.login
 
 function getKey<K extends keyof LoginState>(store: IStoreState, key: K) {
@@ -33,6 +35,31 @@ export function selectCountryLogo(store: IStoreState) {
   return getKey(store, 'config').COUNTRY_LOGO?.file
 }
 
+export function selectCountryBackground(store: IStoreState) {
+  const countryBackground = getKey(store, 'config').LOGIN_BACKGROUND
+  if (countryBackground?.backgroundImage) {
+    return {
+      backgroundImage: countryBackground.backgroundImage,
+      imageFit: countryBackground.imageFit
+    }
+  } else if (countryBackground?.backgroundColor) {
+    return {
+      backgroundColor: countryBackground?.backgroundColor
+    }
+  }
+}
 export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }
+
+export function selectImageToObjectFit(store: IStoreState) {
+  if (getKey(store, 'config').LOGIN_BACKGROUND?.imageFit) {
+    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
+  } else {
+    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
+  }
+}
+
+export const getStepOneDetails = (
+  store: IStoreState
+): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')

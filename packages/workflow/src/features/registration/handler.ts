@@ -23,7 +23,9 @@ import {
   touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection,
-  validateDeceasedDetails
+  validateDeceasedDetails,
+  makeTaskAnonymous,
+  markBundleAsIssued
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -165,9 +167,10 @@ export async function createRegistrationHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     if (
       event ===
@@ -177,16 +180,13 @@ export async function createRegistrationHandler(
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
-        getToken(request)
+        token
       )
     } else if (
       event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
       event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
     ) {
-      payload = await markBundleAsValidated(
-        payload as fhir.Bundle,
-        getToken(request)
-      )
+      payload = await markBundleAsValidated(payload as fhir.Bundle, token)
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
@@ -430,6 +430,23 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
+export async function markEventAsIssuedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsIssued(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    await mergePatientIdentifier(payload)
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
 export async function actionEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
@@ -446,6 +463,29 @@ export async function actionEventHandler(
         'Content-Type': 'application/fhir+json'
       }
     })
+  } catch (error) {
+    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
+    throw new Error(error)
+  }
+}
+export async function anonymousActionEventHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit,
+  event: Events
+) {
+  try {
+    const payload = request.payload as fhir.Bundle
+    const anonymousPayload = makeTaskAnonymous(payload)
+
+    const taskResource = anonymousPayload.entry?.[0].resource as fhir.Task
+    const res = await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskResource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    })
+    return res
   } catch (error) {
     logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)

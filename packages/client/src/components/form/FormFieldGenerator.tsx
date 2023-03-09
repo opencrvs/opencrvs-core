@@ -119,11 +119,11 @@ import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { UserDetails } from '@client/utils/userUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -227,7 +227,7 @@ function GeneratedInputField({
     onChange,
     onBlur,
     value,
-    disabled: fieldDefinition.disabled,
+    disabled: fieldDefinition.disabled ?? disabled,
     error: Boolean(error),
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder
@@ -582,7 +582,7 @@ function GeneratedInputField({
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 ) {
   let fieldInitialValue = field.initialValue as IFormFieldValue
   const catchmentAreas = userDetails?.catchmentArea
@@ -591,10 +591,16 @@ export function getInitialValueForSelectDynamicValue(
 
   if (catchmentAreas) {
     catchmentAreas.forEach((catchmentArea) => {
-      if (catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')) {
+      if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'DISTRICT'
+        )
+      ) {
         district = catchmentArea.id
       } else if (
-        catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'STATE'
+        )
       ) {
         state = catchmentArea.id
       }
@@ -612,7 +618,7 @@ export function getInitialValueForSelectDynamicValue(
 
 const mapFieldsToValues = (
   fields: IFormField[],
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 ) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
@@ -663,7 +669,7 @@ interface IFormSectionProps {
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }
 
 interface IDispatchProps {

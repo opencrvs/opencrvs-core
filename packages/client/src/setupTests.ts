@@ -150,6 +150,7 @@ console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
 roleQueries.fetchRoles = vi.fn()
+
 userQueries.searchUsers = vi.fn()
 
 vi.doMock(
@@ -164,7 +165,8 @@ vi.doMock(
         Promise.resolve({
           languages: mockOfflineData.languages
         }),
-      loadConfig: () => Promise.resolve(mockConfigResponse)
+      loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse)
     }
   })
 )

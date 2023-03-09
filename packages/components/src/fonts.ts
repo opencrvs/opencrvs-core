@@ -28,7 +28,7 @@ const h2 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 24px;
-  line-height: 140%;
+  line-height: 120%;
 `
 const h3 = `
   font-family: ${family};

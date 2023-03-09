@@ -44,6 +44,7 @@ export const RESEND_SMS = 'login/RESEND_SMS'
 export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
+export const AUTHENTICATE_RESET = 'login/AUTHENTICATE_RESET'
 export const GOTO_APP = 'login/GOTO_APP'
 
 export enum FORGOTTEN_ITEMS {
@@ -72,6 +73,10 @@ export type AuthenticationDataAction = {
 export type AuthenticationFieldValidationAction = {
   type: typeof AUTHENTICATE_VALIDATE
   payload: number
+}
+
+export type AuthenticationResetAction = {
+  type: typeof AUTHENTICATE_RESET
 }
 
 export type AuthenticateResponseAction = {
@@ -134,11 +139,17 @@ export type Action =
   | VerifyCodeFailedAction
   | GoToAppAction
   | AuthenticationFieldValidationAction
+  | AuthenticationResetAction
 
 export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
   type: CONFIG_LOAD
 })
 
+export const resetSubmissionError = (): AuthenticationResetAction => {
+  return {
+    type: AUTHENTICATE_RESET
+  }
+}
 export const applicationConfigLoadedAction = (
   response: IApplicationConfigResponse
 ): ApplicationConfigLoaded => ({

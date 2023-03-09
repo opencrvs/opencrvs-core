@@ -160,6 +160,28 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
+    ageOfIndividualInYears: (person) => {
+      const ageOfIndividualInYearsExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (ageOfIndividualInYearsExtension &&
+          ageOfIndividualInYearsExtension.valueString) ||
+        null
+      )
+    },
+    exactDateOfBirthUnknown: (person) => {
+      const exactDateOfBirthUnknownExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (exactDateOfBirthUnknownExtension &&
+          exactDateOfBirthUnknownExtension.valueString) ||
+        null
+      )
+    },
     detailsExist: (person) => {
       return person.active
     },
@@ -405,6 +427,15 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+
+    informantsSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
@@ -794,6 +825,16 @@ export const typeResolvers: GQLResolver = {
     },
     regStatus: (task: fhir.Task) => getStatusFromTask(task),
     action: (task) => getActionFromTask(task),
+    ipAddress: (task) => {
+      const verifiedExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`,
+        task.extension as fhir.Extension[]
+      )
+      if (!verifiedExtension || !verifiedExtension.valueString) {
+        return null
+      }
+      return verifiedExtension.valueString
+    },
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
     otherReason: (task: fhir.Task) => {
@@ -832,7 +873,12 @@ export const typeResolvers: GQLResolver = {
           it.resource?.meta?.lastUpdated <= task.lastModified!
       )?.resource as fhir.PractitionerRole | undefined
 
-      const role = result?.code?.[0]?.coding?.[0]?.code
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+      })
+
+      const role = targetCode?.coding?.[0].code
+
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
@@ -844,9 +890,21 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
+
       return {
         ...userResponse,
-        role: role ?? userResponse.role
+        role: {
+          ...userResponse.role,
+          labels: [
+            {
+              lang: 'en',
+              label:
+                role ??
+                userResponse.role.labels.find((label) => label.lang === 'en')
+                  ?.label
+            }
+          ]
+        }
       }
     },
     system: async (task: fhir.Task, _: any, authHeader) => {

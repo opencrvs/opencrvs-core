@@ -129,7 +129,7 @@ export async function registerSystem(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    const role = createFhirPractitionerRole(
+    const role = await createFhirPractitionerRole(
       systemAdminUser,
       practitionerId,
       true

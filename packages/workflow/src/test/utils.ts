@@ -281,6 +281,23 @@ export const testFhirBundleWithIds = {
                 reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
               }
             ]
+          },
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221'
+              }
+            ]
           }
         ]
       }
@@ -368,6 +385,21 @@ export const testFhirBundleWithIds = {
         ],
         gender: 'male'
       }
+    },
+    {
+      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221',
+      resource: {
+        id: '555',
+        resourceType: 'DocumentReference',
+        content: [
+          {
+            attachment: {
+              contentType: 'application/pdf',
+              data: '/ocrvs/1a1af870-3e2a-4ec6-a879-085c4ad033ce.pdf'
+            }
+          }
+        ]
+      }
     }
   ]
 }
@@ -440,6 +472,23 @@ export const testFhirBundleWithIdsForDeath = {
             entry: [
               {
                 reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc'
+              }
+            ]
+          },
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221'
               }
             ]
           }
@@ -532,6 +581,21 @@ export const testFhirBundleWithIdsForDeath = {
           {
             system: 'phone',
             value: '+8801622688231'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221',
+      resource: {
+        id: '555',
+        resourceType: 'DocumentReference',
+        content: [
+          {
+            attachment: {
+              contentType: 'application/pdf',
+              data: '/ocrvs/1a1af870-3e2a-4ec6-a879-085c4ad033ce.pdf'
+            }
           }
         ]
       }
@@ -871,6 +935,65 @@ export const officeMock = JSON.stringify({
     ]
   }
 })
+
+export const informantSMSNotificationMock = [
+  {
+    _id: '63a30240ee4b270dc91f53d0',
+    name: 'birthInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d1',
+    name: 'birthDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d2',
+    name: 'birthRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d3',
+    name: 'birthRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d4',
+    name: 'deathInProgressSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d5',
+    name: 'deathDeclarationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d6',
+    name: 'deathRegistrationSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  },
+  {
+    _id: '63a30240ee4b270dc91f53d7',
+    name: 'deathRejectionSMS',
+    enabled: true,
+    createdAt: 1671627328205,
+    updatedAt: 1671627328205
+  }
+]
 
 export const compositionMock = JSON.stringify({
   identifier: {

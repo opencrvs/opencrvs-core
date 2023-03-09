@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils'
+import { defaultFieldResolver, GraphQLSchema } from 'graphql'
 
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
@@ -28,25 +30,26 @@ import { resolvers as applicationRootResolvers } from '@gateway/features/applica
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
+import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
-import {
-  getUser,
-  getTokenPayload,
-  getSystem
-} from '@gateway/features/user/utils'
+import { getUser, getSystem } from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
-import { addResolversToSchema } from '@graphql-tools/schema'
+import {
+  addResolversToSchema,
+  makeExecutableSchema
+} from '@graphql-tools/schema'
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
-import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
+import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
+import { Request } from '@hapi/hapi'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -78,7 +81,9 @@ const resolvers: StringIndexed<IResolvers> = merge(
   integrationResolver as IResolvers,
   formDatasetResolvers as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  formDatasetResolvers as IResolvers
+  formDatasetResolvers as IResolvers,
+  informantSMSNotificationResolvers as IResolvers,
+  informantSMSNotiTypeResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -92,47 +97,92 @@ export const getExecutableSchema = (): GraphQLSchema => {
   })
 }
 
-export const getApolloConfig = (): Config => {
+export function authSchemaTransformer(schema: GraphQLSchema) {
+  const directiveName = 'auth'
+
+  return mapSchema(schema, {
+    [MapperKind.OBJECT_FIELD]: (fieldConfig, _fieldName, fieldType) => {
+      if (!['Mutation', 'Query'].includes(fieldType)) {
+        return undefined
+      }
+
+      const authDirective = getDirective(
+        schema,
+        fieldConfig,
+        directiveName
+      )?.[0]
+
+      const { resolve = defaultFieldResolver } = fieldConfig
+      fieldConfig.resolve = async function (source, args, context, info) {
+        if (authDirective && authDirective.requires === 'ANONYMOUS') {
+          return resolve(source, args, context, info)
+        }
+
+        if (!context.request.auth.isAuthenticated) {
+          throw new AuthenticationError('Unauthorized')
+        }
+
+        const credentials = context.request.auth.credentials
+
+        try {
+          const userId = credentials.sub
+          let user: IUserModelData | ISystemModelData
+          const isSystemUser = credentials.scope.indexOf('recordsearch') > -1
+          if (isSystemUser) {
+            user = await getSystem(
+              { systemId: userId },
+              { Authorization: context.request.headers.authorization }
+            )
+          } else {
+            user = await getUser(
+              { userId },
+              { Authorization: context.request.headers.authorization }
+            )
+          }
+
+          if (!user || !['active', 'pending'].includes(user.status)) {
+            throw new AuthenticationError('Authentication failed')
+          }
+
+          if (credentials && !isEqual(credentials.scope, user.scope)) {
+            throw new AuthenticationError('Authentication failed')
+          }
+        } catch (err) {
+          throw new AuthenticationError(err)
+        }
+
+        return resolve(source, args, context, info)
+      }
+      return fieldConfig
+    }
+  })
+}
+
+type Context = {
+  request: Request
+  Authorization: string
+  'x-correlation-id': string
+  'x-real-ip': string
+  'x-real-user-agent': string
+}
+
+export const getApolloConfig = (): Config<Context> => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
   `
+  const schema = authSchemaTransformer(
+    makeExecutableSchema({
+      typeDefs,
+      resolvers
+    })
+  )
 
   return {
-    typeDefs,
-    resolvers,
+    schema,
     introspection: true,
-    context: async ({ request, h }) => {
-      try {
-        const tokenPayload = getTokenPayload(
-          request.headers.authorization.split(' ')[1]
-        )
-        const userId = tokenPayload.sub
-        let user: IUserModelData | ISystemModelData
-        const isSystemUser = tokenPayload.scope.indexOf('recordsearch') > -1
-        if (isSystemUser) {
-          user = await getSystem(
-            { systemId: userId },
-            { Authorization: request.headers.authorization }
-          )
-        } else {
-          user = await getUser(
-            { userId },
-            { Authorization: request.headers.authorization }
-          )
-        }
-
-        if (!user || !['active', 'pending'].includes(user.status)) {
-          throw new AuthenticationError('Authentication failed')
-        }
-
-        if (tokenPayload && !isEqual(tokenPayload.scope, user.scope)) {
-          throw new AuthenticationError('Authentication failed')
-        }
-      } catch (err) {
-        throw new AuthenticationError(err)
-      }
-
+    context: async ({ request }) => {
       return {
+        request,
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
         'x-real-ip':

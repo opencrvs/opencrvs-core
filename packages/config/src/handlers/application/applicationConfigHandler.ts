@@ -85,7 +85,8 @@ export async function getLoginConfigHandler(
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
-    'PHONE_NUMBER_PATTERN'
+    'PHONE_NUMBER_PATTERN',
+    'LOGIN_BACKGROUND'
   ])
   return { config: refineConfigResponse }
 }
@@ -125,7 +126,8 @@ export const updateApplicationConfig = Joi.object({
       ON_TIME: Joi.number(),
       LATE: Joi.number(),
       DELAYED: Joi.number()
-    }
+    },
+    PRINT_IN_ADVANCE: Joi.boolean()
   }),
   COUNTRY_LOGO: Joi.object().keys({
     fileName: Joi.string(),
@@ -140,7 +142,8 @@ export const updateApplicationConfig = Joi.object({
     FEE: {
       ON_TIME: Joi.number(),
       DELAYED: Joi.number()
-    }
+    },
+    PRINT_IN_ADVANCE: Joi.boolean()
   }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
   HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
@@ -150,5 +153,13 @@ export const updateApplicationConfig = Joi.object({
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2]),
-  ADMIN_LEVELS: Joi.number().valid(...[1, 2, 3, 4, 5])
+  INFORMANT_SIGNATURE: Joi.boolean(),
+  DATE_OF_BIRTH_UNKNOWN: Joi.boolean(),
+  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean(),
+  ADMIN_LEVELS: Joi.number().valid(...[1, 2, 3, 4, 5]),
+  LOGIN_BACKGROUND: Joi.object({
+    backgroundColor: Joi.string().allow('').optional(),
+    backgroundImage: Joi.string().allow('').optional(),
+    imageFit: Joi.string().allow('').optional()
+  })
 })

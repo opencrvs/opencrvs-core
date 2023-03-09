@@ -22,6 +22,7 @@ interface Window {
         LATE: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
     COUNTRY: string
@@ -39,6 +40,7 @@ interface Window {
         ON_TIME: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
@@ -56,6 +58,9 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
+    DATE_OF_BIRTH_UNKNOWN: boolean
+    INFORMANT_SIGNATURE: boolean
+    INFORMANT_SIGNATURE_REQUIRED: boolean
     ADMIN_LEVELS: number
   }
   __localeId__: string

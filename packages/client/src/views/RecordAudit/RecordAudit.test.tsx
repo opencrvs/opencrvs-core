@@ -57,14 +57,15 @@ declaration.data.registration = {
   }
 }
 
-// @ts-ignore
 declaration.data.history = [
+  // @ts-ignore
   {
     date: new Date().toString(),
     regStatus: 'STARTED',
     user: {
       id: userDetails.userMgntUserID,
       name: userDetails.name,
+      systemRole: userDetails.systemRole,
       role: userDetails.role
     },
     office: userDetails.primaryOffice,
@@ -86,6 +87,7 @@ const workqueue: IWorkqueue = {
     rejectTab: {},
     approvalTab: {},
     printTab: {},
+    issueTab: {},
     externalValidationTab: {}
   },
   initialSyncDone: true

@@ -57,6 +57,7 @@ interface IProps {
   icon?: () => React.ReactNode
   id?: string
   goHome?: () => void
+  children?: React.ReactNode
 }
 
 export class ActionPageLight extends React.Component<

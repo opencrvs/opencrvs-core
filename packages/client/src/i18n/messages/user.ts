@@ -95,6 +95,7 @@ interface IUserMessages
   systemLanguage: MessageDescriptor
   profileImage: MessageDescriptor
   duplicateUserMobileErrorMessege: MessageDescriptor
+  enterPinLabel: MessageDescriptor
 }
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -491,6 +492,11 @@ const messagesToDefine: IUserMessages = {
     description:
       'This error messege shows when user try to input already exsisted mobile number',
     id: 'system.user.duplicateMobileError'
+  },
+  enterPinLabel: {
+    id: 'system.user.unlock.pinLabel',
+    defaultMessage: 'Enter your pin',
+    description: 'Label for entering unlock user profile'
   }
 }
 

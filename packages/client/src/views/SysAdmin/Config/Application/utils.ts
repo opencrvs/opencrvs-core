@@ -97,6 +97,27 @@ export function isValidRegEx(pattern: string): boolean {
   if (pattern === '') return false
   return true
 }
+export function isValidHexColorCode(value: string): boolean {
+  const pattern = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
+  return true
+}
+export function isValidHexColorCodeEntry(value: string): boolean {
+  const pattern = /^[A-Fa-f0-9]{0,6}$/
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
+  return true
+}
 
 export function isValidExample(pattern: string, example: string) {
   if (
@@ -188,7 +209,12 @@ export async function callApplicationConfigMutation(
   try {
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      isGeneralOrConfigAction(configProperty)
+      configProperty === ConfigActionType.INFORMANT_SIGNATURE
+        ? {
+            INFORMANT_SIGNATURE: appConfig.INFORMANT_SIGNATURE,
+            INFORMANT_SIGNATURE_REQUIRED: appConfig.INFORMANT_SIGNATURE_REQUIRED
+          }
+        : isGeneralOrConfigAction(configProperty)
         ? {
             [configProperty]: appConfig[configProperty]
           }

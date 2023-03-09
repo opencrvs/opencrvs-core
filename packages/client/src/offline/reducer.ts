@@ -21,17 +21,21 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  referenceApi
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
 import { Event, System } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig
 } from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
@@ -76,6 +80,7 @@ export interface IOfflineData {
   }
   systems: System[]
   config: IApplicationConfig
+  anonymousConfig: IApplicationConfigAnonymous
   formConfig: IFormConfig
 }
 
@@ -83,7 +88,7 @@ export type IOfflineDataState = {
   offlineData: Partial<IOfflineData>
   offlineDataLoaded: boolean
   loadingError: boolean
-  userDetails?: IUserDetails
+  userDetails?: UserDetails
 }
 
 export const initialState: IOfflineDataState = {
@@ -297,6 +302,15 @@ function reducer(
         state,
         Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
       )
+    }
+    case actions.ANONYMOUS_USER_OFFLINE_CONFIG: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          ...action.payload
+        }
+      }
     }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload

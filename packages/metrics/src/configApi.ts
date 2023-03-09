@@ -19,6 +19,7 @@ interface IBirth {
     LATE: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
@@ -26,12 +27,18 @@ interface IDeath {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 export interface ICountryLogo {
   fileName: string
   file: string
 }
 
+export interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -49,6 +56,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   ADDRESSES: number
+  LOGIN_BACKGROUND: ILoginBackground
   ADMIN_LEVELS: number
 }
 

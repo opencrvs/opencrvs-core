@@ -292,7 +292,8 @@ export class SearchTool extends React.Component<IProps, IState> {
       document.removeEventListener('click', handler)
     }
     if (!this.state.dropDownIsVisible) {
-      document.addEventListener('click', handler)
+      //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+      setTimeout(() => document.addEventListener('click', handler), 0)
     }
 
     this.setState((prevState) => ({
@@ -324,7 +325,7 @@ export class SearchTool extends React.Component<IProps, IState> {
             id="searchIconButton"
             onClick={this.search}
           >
-            <Icon color="currentColor" name="Search" size="large" />
+            <Icon color="currentColor" name="MagnifyingGlass" size="large" />
           </Button>
           <SearchTextInput
             id="searchText"

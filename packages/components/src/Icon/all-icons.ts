@@ -11,4 +11,34 @@
  */
 
 export * from './custom-icons'
-export * from 'react-feather'
+export {
+  GitBranch,
+  List,
+  Target,
+  Medal,
+  CreditCard,
+  Phone,
+  User,
+  ArrowLeft,
+  ArrowRight,
+  Share,
+  Lock,
+  ListBullets,
+  Compass,
+  ChatCircle,
+  Star,
+  MagnifyingGlass,
+  Plus,
+  SignOut,
+  Pencil,
+  CaretRight,
+  CaretDown,
+  Copy,
+  Paperclip,
+  TrashSimple,
+  TextT,
+  Database,
+  CheckSquare,
+  X,
+  Activity
+} from 'phosphor-react'

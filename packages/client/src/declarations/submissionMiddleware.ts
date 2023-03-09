@@ -16,7 +16,9 @@ import {
   deleteDeclaration,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration
+  writeDeclaration,
+  ICertificate,
+  Payment
 } from '@client/declarations'
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -33,6 +35,8 @@ import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
+// eslint-disable-next-line no-restricted-imports
+import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -49,7 +53,10 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
   [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
-  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
+    SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.ISSUING,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
@@ -70,8 +77,9 @@ function updateDeclaration(dispatch: Dispatch, declaration: IDeclaration) {
 }
 
 function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
-  const role = store.offline.userDetails?.role
-  const isFieldAgent = role && FIELD_AGENT_ROLES.includes(role) ? true : false
+  const systemRole = store.offline.userDetails?.systemRole
+  const isFieldAgent =
+    systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
 }
@@ -86,14 +94,34 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     }
     const declaration = action.payload
     const { event, action: submissionAction } = declaration
+    let payments: Payment | undefined
     updateDeclaration(dispatch, {
       ...declaration,
       submissionStatus: STATUS_CHANGE_MAP[submissionAction]
     })
+    //If SubmissionAction is certify and issue declaration then remove payment for certify first
+    if (submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION) {
+      const certificate = (
+        declaration.data.registration.certificates as ICertificate[]
+      )?.[0]
+      if (certificate) {
+        payments = certificate.payments
+        delete certificate.payments
+      }
+    }
+
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration
     )
+
+    //then add payment while issue declaration
+    if (payments) {
+      ;(
+        declaration.data.registration.certificates as ICertificate[]
+      )[0].payments = payments
+    }
+
     const mutation =
       event === Event.Birth
         ? getBirthMutation(submissionAction)
@@ -113,6 +141,28 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             ...declaration.payload
           }
         })
+      } else if (
+        submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+      ) {
+        await client.mutate({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: gqlDetails
+          }
+        })
+        //delete data from certificates to identify event in workflow for markEventAsIssued
+        if (declaration.data.registration.certificates) {
+          delete (
+            declaration.data.registration.certificates as ICertificate[]
+          )?.[0].data
+        }
+        updateDeclaration(dispatch, {
+          ...declaration,
+          action: SubmissionAction.ISSUE_DECLARATION,
+          submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
+        })
+        return
       } else {
         await client.mutate({
           mutation,
@@ -130,6 +180,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.FAILED
         })
+        captureException(error)
         return
       }
       if (

@@ -33,7 +33,6 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -77,6 +76,8 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import startOfMonth from 'date-fns/startOfMonth'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;
@@ -220,7 +221,7 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
@@ -238,7 +239,7 @@ interface ICorrectionsQueryResult {
 
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
-    const { selectedLocation, locations, offices } = props
+    const { selectedLocation } = props
     return {
       toggleStatus: false,
       officeSelected: this.isOfficeSelected(selectedLocation),
@@ -312,7 +313,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         />
         <PerformanceSelect
           onChange={(option) => {
-            const { timeStart, timeEnd, selectedLocation } = this.props
+            const { timeStart, timeEnd } = this.props
             this.props.goToPerformanceHome(
               timeStart,
               timeEnd,
@@ -371,12 +372,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       selectedLocation &&
       this.isOfficeSelected(selectedLocation) &&
       this.props.userDetails &&
-      this.props.userDetails.role
+      this.props.userDetails.systemRole
     ) {
-      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+      if (this.props.userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
         return true
       } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        REGISTRAR_ROLES.includes(this.props.userDetails?.systemRole) &&
         this.props.userDetails.primaryOffice?.id === selectedLocation.id
       ) {
         return true
@@ -387,7 +388,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, isOnline } = this.props
-    const { toggleStatus, officeSelected, isAccessibleOffice } = this.state
+    const { toggleStatus, officeSelected } = this.state
     const { timeStart, timeEnd, event, selectedLocation } = this.props
 
     const queryVariablesWithoutLocationId = {
@@ -413,7 +414,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
                         ? {
@@ -490,7 +491,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     query={CORRECTION_TOTALS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -523,7 +524,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-first"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -583,7 +584,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="no-cache"
+            fetchPolicy="cache-first"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -710,8 +711,13 @@ function mapStateToProps(
   return {
     locations,
     timeStart:
-      (timeStart && new Date(timeStart)) || subMonths(new Date(Date.now()), 11),
-    timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
+      (timeStart && new Date(timeStart)) ||
+      new Date(
+        startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+      ),
+    timeEnd:
+      (timeEnd && new Date(timeEnd)) ||
+      new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
     event: event || Event.Birth,
     selectedLocation,
     offices: offlineCountryConfiguration.offices,

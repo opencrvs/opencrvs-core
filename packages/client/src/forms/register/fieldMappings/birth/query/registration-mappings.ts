@@ -17,11 +17,12 @@ import {
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
+import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   GQLRegStatus,
   GQLRegWorkflow
@@ -29,7 +30,7 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-
+import QRCode from 'qrcode'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -105,6 +106,11 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].status as GQLRegWorkflow[],
       sectionId
     )
+  }
+
+  if (queryData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      queryData[sectionId].informantsSignature
   }
 }
 
@@ -244,8 +250,7 @@ export const registrarNameUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -265,8 +270,7 @@ export const roleUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -278,8 +282,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }
@@ -312,8 +316,7 @@ export const registrarSignatureUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -327,4 +330,22 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        VIEW_VERIFY_CERTIFICATE,
+        {
+          declarationId: queryData.id
+        }
+      )}`
+    )
 }

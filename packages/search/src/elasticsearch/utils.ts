@@ -156,9 +156,17 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantDoB?: string
   informantIdentifier?: string
 }
+
+type Label = {
+  lang: string
+  label: string
+}
+interface IUserRole {
+  labels: Label[]
+}
 export interface IUserModelData {
   _id: string
-  role: string
+  role: IUserRole
   name: fhir.HumanName[]
 }
 
@@ -215,7 +223,9 @@ export const createStatusHistory = async (
     operatedOn: task?.lastModified,
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
-    operatorRole: user.role,
+    operatorRole:
+      // user could be a system as well and systems don't have role
+      user.role?.labels.find((label) => label.lang === 'en')?.label || '',
     operatorFirstNames,
     operatorFamilyName,
     operatorFirstNamesLocale,
