@@ -600,6 +600,7 @@ export type CountryLogoInput = {
 export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
+  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
   registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
@@ -749,6 +750,12 @@ export enum DraftStatus {
 export type Dummy = {
   __typename?: 'Dummy'
   dummy: Scalars['String']
+}
+
+export type DuplicatesInfo = {
+  __typename?: 'DuplicatesInfo'
+  compositionId?: Maybe<Scalars['ID']>
+  trackingId?: Maybe<Scalars['String']>
 }
 
 export enum EducationType {
@@ -926,6 +933,7 @@ export type History = {
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  duplicateOf?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   ipAddress?: Maybe<Scalars['String']>
@@ -1208,11 +1216,12 @@ export type Mutation = {
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
+  markEventAsDuplicate: Scalars['ID']
+  markEventAsNotDuplicate: Scalars['ID']
   markEventAsReinstated?: Maybe<Reinstated>
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
-  notADuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
@@ -1347,6 +1356,20 @@ export type MutationMarkDeathAsVerifiedArgs = {
 }
 
 export type MutationMarkEventAsArchivedArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+}
+
+export type MutationMarkEventAsDuplicateArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  reason: Scalars['String']
+}
+
+export type MutationMarkEventAsNotDuplicateArgs = {
   id: Scalars['String']
 }
 
@@ -1366,11 +1389,6 @@ export type MutationMarkEventAsVoidedArgs = {
 
 export type MutationModifyDraftStatusArgs = {
   formDraft: FormDraftStatusModifyInput
-}
-
-export type MutationNotADuplicateArgs = {
-  duplicateId: Scalars['String']
-  id: Scalars['String']
 }
 
 export type MutationReactivateSystemArgs = {
@@ -1871,6 +1889,8 @@ export type RecordDetails = BirthRegistration | DeathRegistration
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
+  MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
+  MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
@@ -1925,7 +1945,7 @@ export type Registration = {
   contactPhoneNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   draftId?: Maybe<Scalars['String']>
-  duplicates?: Maybe<Array<Maybe<Scalars['ID']>>>
+  duplicates?: Maybe<Array<Maybe<DuplicatesInfo>>>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
@@ -3133,6 +3153,7 @@ export type CreateBirthRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -3213,6 +3234,9 @@ export type MarkEventAsVoidedMutation = {
 
 export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
 export type MarkEventAsArchivedMutation = {
@@ -3237,6 +3261,18 @@ export type SubmitMutationMutationVariables = Exact<{
 export type SubmitMutationMutation = {
   __typename?: 'Mutation'
   markEventAsUnassigned: string
+}
+
+export type MarkEventAsDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+  reason: Scalars['String']
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+}>
+
+export type MarkEventAsDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsDuplicate: string
 }
 
 export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
@@ -3393,11 +3429,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -3455,6 +3495,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       reason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3754,6 +3795,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       ipAddress?: string | null
       reason?: string | null
       otherReason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4063,10 +4105,14 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -4125,6 +4171,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       reason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4348,6 +4395,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
@@ -4401,6 +4453,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      duplicateOf?: string | null
       ipAddress?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -4484,6 +4537,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       } | null> | null
     } | null> | null
   } | null
+}
+
+export type MarkEventAsNotDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsNotDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsNotDuplicate: string
 }
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {
@@ -5732,10 +5794,14 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -5764,10 +5830,14 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -6824,11 +6894,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null
@@ -7103,11 +7177,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null
