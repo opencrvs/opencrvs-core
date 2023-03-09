@@ -560,7 +560,9 @@ export const isValidEnglishWord = (value: string): boolean => {
     ''
   )
 
-  return englishRe.test(value)
+  const englishApostrophe = XRegExp.cache(`['-]+`, '')
+
+  return englishRe.test(value) || englishApostrophe.test(value)
 }
 
 type Checker = (value: string) => boolean
