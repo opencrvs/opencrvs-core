@@ -43,11 +43,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import {
-  ApolloClient,
-  ApolloProvider,
-  NormalizedCacheObject
-} from '@apollo/client'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
@@ -75,6 +71,7 @@ import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificat
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>

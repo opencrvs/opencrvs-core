@@ -159,14 +159,14 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === NID_VERIFICATION_BUTTON) {
-    ;(base as any).labelForVerifiedState = intl.formatMessage(
-      (field as INidVerificationButton).labelForVerifiedState
+    ;(base as any).labelForVerified = intl.formatMessage(
+      (field as INidVerificationButton).labelForVerified
     )
-    ;(base as any).labelForUnverifiedState = intl.formatMessage(
-      (field as INidVerificationButton).labelForUnverifiedState
+    ;(base as any).labelForUnverified = intl.formatMessage(
+      (field as INidVerificationButton).labelForUnverified
     )
-    ;(base as any).labelForLoadingState = intl.formatMessage(
-      (field as INidVerificationButton).labelForLoadingState
+    ;(base as any).labelForOffline = intl.formatMessage(
+      (field as INidVerificationButton).labelForOffline
     )
   }
 

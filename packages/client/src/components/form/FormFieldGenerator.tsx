@@ -127,6 +127,7 @@ import { DateRangePickerForFormField } from '@client/components/DateRangePickerF
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
+import { useOnlineStatus } from '@client/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -225,6 +226,8 @@ function GeneratedInputField({
   }
 
   const intl = useIntl()
+  const isOnline = useOnlineStatus()
+
   const inputProps = {
     id: fieldDefinition.name,
     onChange,
@@ -576,9 +579,10 @@ function GeneratedInputField({
         <VerificationButton
           id={fieldDefinition.name}
           onClick={fieldDefinition.onClick}
-          labelForVerifiedState={fieldDefinition.labelForVerifiedState}
-          labelForUnverifiedState={fieldDefinition.labelForUnverifiedState}
-          labelForLoadingState={fieldDefinition.labelForLoadingState}
+          labelForVerified={fieldDefinition.labelForVerified}
+          labelForUnverified={fieldDefinition.labelForUnverified}
+          labelForOffline={fieldDefinition.labelForOffline}
+          status={isOnline ? 'unverified' : 'offline'}
         />
       </InputField>
     )
