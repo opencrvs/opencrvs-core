@@ -865,11 +865,20 @@ export const typeResolvers: GQLResolver = {
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
     user: async (task: fhir.Task, _: any, authHeader: any) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension as fhir.Extension[]
       )
-      if (!user || !user.valueReference || !user.valueReference.reference) {
+      if (
+        systemIdentifier ||
+        !user ||
+        !user.valueReference ||
+        !user.valueReference.reference
+      ) {
         return null
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
