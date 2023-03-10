@@ -90,8 +90,8 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
 } as const
 
-export const validatorScopeToken = jwt.sign(
-  { scope: ['validator'] },
+export const validateScopeToken = jwt.sign(
+  { scope: ['validate'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
