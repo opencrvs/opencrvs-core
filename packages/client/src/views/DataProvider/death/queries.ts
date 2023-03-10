@@ -122,8 +122,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        duplicates {
+          compositionId
+          trackingId
+        }
         informantsSignature
-        duplicates
         attachments {
           data
           type
@@ -263,6 +266,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -377,6 +381,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactRelationship
         contactPhoneNumber
         informantsSignature
+        duplicates {
+          compositionId
+          trackingId
+        }
         status {
           comments {
             comment
@@ -512,6 +520,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
