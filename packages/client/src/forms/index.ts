@@ -182,7 +182,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
         dependency: string
         typeMapper: Operation<typeof types>
       }
-  validate?: Array<{
+      validator?: Array<{
     dependencies: string[]
     validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
@@ -193,7 +193,7 @@ export interface IDynamicFormFieldDefinitions {
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
   type?: IDynamicFieldType | IStaticFieldType
-  validate?: IDynamicFormFieldValidators[]
+  validator?: IDynamicFormFieldValidators[]
 }
 
 export interface IDynamicFieldLabel {
@@ -411,9 +411,9 @@ export type SerializedFormField = UnionOmit<
   | SerializedFormFieldWithDynamicDefinitions
   | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
-  'validate' | 'mapping'
+  'validator' | 'mapping'
 > & {
-  validate: IValidatorDescriptor[]
+  validator: IValidatorDescriptor[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
@@ -439,7 +439,7 @@ export interface IFormFieldBase {
   label: MessageDescriptor
   helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
   prefix?: string
   postfix?: string
@@ -1024,7 +1024,7 @@ export interface Ii18nFormFieldBase {
   helperText?: string
   tooltip?: string
   description?: string
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue

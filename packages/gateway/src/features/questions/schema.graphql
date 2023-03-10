@@ -50,7 +50,10 @@ input CustomSelectOption {
   # label: [MesssageInput!]
   label: MesssageDescriptorInput!
 }
-
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
+}
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -68,4 +71,5 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
   datasetId: String
   options: [CustomSelectOption!]
+  validator: [ValidatorInput!]
 }

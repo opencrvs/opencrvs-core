@@ -33,7 +33,7 @@ export const paymentFormSection: IFormSection = {
           label: messages.paymentMethod,
           initialValue: 'MANUAL',
           required: true,
-          validate: [],
+          validator: [],
           options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]
         },
         {
@@ -41,14 +41,14 @@ export const paymentFormSection: IFormSection = {
           type: PARAGRAPH,
           label: messages.collectPayment,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'service',
           type: PARAGRAPH,
           label: messages.service,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'paymentAmount',
@@ -57,7 +57,7 @@ export const paymentFormSection: IFormSection = {
           initialValue: '',
           fontVariant: 'h1',
           required: false,
-          validate: []
+          validator: []
         }
       ]
     }

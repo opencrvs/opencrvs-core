@@ -64,6 +64,9 @@ export function defaultQuestionToConfigField(
     ),
     configFields: [configField]
   }
+  
+  question.validator && (previewGroupConfigField.validator = question.validator)
+  
   return previewGroupConfigField
 }
 

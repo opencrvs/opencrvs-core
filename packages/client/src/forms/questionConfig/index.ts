@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISerializedForm } from '@client/forms'
+import { ISerializedForm, IValidatorDescriptor } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
@@ -47,6 +47,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
   identifiers: IFieldIdentifiers
+  validator?: IValidatorDescriptor[]
 }
 
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
@@ -63,6 +64,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
+  validator?: IValidatorDescriptor[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

@@ -63,7 +63,8 @@ export function createCustomField({
   required,
   maxLength,
   conditionals,
-  options
+  options,
+  validator
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -73,7 +74,7 @@ export function createCustomField({
     type: fieldType,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: '',
-    validate: [],
+    validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
     options: [],
@@ -90,6 +91,7 @@ export function createCustomField({
       }
     }
   }
+
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
 
   const othersConditionals = getOtherConditionalsAction(conditionals)
@@ -120,7 +122,7 @@ export function createCustomField({
     baseField.placeholder = getDefaultLanguageMessage(placeholder)
   }
   if (baseField.type === 'TEL') {
-    baseField.validate = [
+    baseField.validator = [
       {
         operation: 'phoneNumberFormat'
       }
