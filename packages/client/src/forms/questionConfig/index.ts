@@ -46,7 +46,7 @@ export interface IFieldIdentifiers {
 export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
-  validateEmpty: boolean
+  validateEmpty?: boolean
   identifiers: IFieldIdentifiers
   validator?: IValidatorDescriptor[]
 }
