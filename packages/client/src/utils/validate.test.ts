@@ -559,6 +559,14 @@ describe('validate', () => {
           message: messages.englishOnlyNameFormat
         })
       })
+
+      it('should pass when used apostrophe or hyphen', () => {
+        const goodValue1 = "John O'conor"
+        const goodValue2 = 'John Doe-in'
+
+        expect(englishOnlyNameFormat(goodValue1)).toBeUndefined()
+        expect(englishOnlyNameFormat(goodValue2)).toBeUndefined()
+      })
     })
   })
 
