@@ -199,7 +199,8 @@ export function generateConfigFields(
         [sectionId]: sectionConfigFields
       }
     }, {})
-    return fields
+
+  return fields
 }
 
 function configFieldsToQuestionConfigs(
@@ -247,5 +248,5 @@ export function generateModifiedQuestionConfigs(
       return questionConfig as QuestionInput
     })
 
-    return fields as QuestionInput[];
+  return fields as QuestionInput[]
 }

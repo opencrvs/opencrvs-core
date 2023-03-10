@@ -11,26 +11,23 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormField
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_ALPHA_NUMERIC,
   REGEXP_DECIMAL_POINT_NUMBER,
   INFORMANT_MINIMUM_AGE
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
 import { isArray } from 'util'
-import {
-  NATIONAL_ID,
-  BIRTH_REGISTRATION_NUMBER,
-  DEATH_REGISTRATION_NUMBER,
-  PASSPORT,
-  DRIVING_LICENSE
-} from '@client/forms/identity'
+import { NATIONAL_ID } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _, { values } from 'lodash'
+import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
 export interface IValidationResult {
@@ -534,6 +531,21 @@ export const range: RangeValidation =
       ? undefined
       : { message: messages.range, props: { min, max } }
   }
+
+export const oneOf = (
+  fields: string[],
+  errorMessage: MessageDescriptor
+): Validation => {
+  return (_value, fieldValues) => {
+    const someFilled = fields.some((field) => get(fieldValues, field))
+
+    if (someFilled) {
+      return undefined
+    }
+
+    return { message: errorMessage }
+  }
+}
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
   const pattern = window.config.NID_NUMBER_PATTERN

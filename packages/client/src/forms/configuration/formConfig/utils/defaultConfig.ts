@@ -58,15 +58,16 @@ export function defaultQuestionToConfigField(
     fieldId: getPreviewGroupFieldId(question.fieldId, previewGroup),
     previewGroup,
     precedingFieldId: question.precedingFieldId,
+    required: question.required,
     previewGroupLabel: getPreviewGroupLabel(
       getGroup(question.identifiers, defaultForm),
       previewGroup
     ),
     configFields: [configField]
   }
-  
+
   question.validator && (previewGroupConfigField.validator = question.validator)
-  
+
   return previewGroupConfigField
 }
 

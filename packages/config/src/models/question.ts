@@ -92,7 +92,10 @@ export const message = new Schema(
 export const validator = new Schema(
   {
     operation: { type: String, required: true },
-    parameters: [{ type: Number, required: true }]
+    parameters: {
+      type: [{ type: Schema.Types.Mixed, required: false }],
+      default: undefined
+    }
   },
   { _id: false }
 )
