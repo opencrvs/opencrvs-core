@@ -1154,7 +1154,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             return declaration
           })
         },
-        Cmd.action(writeDeclaration(orignalAppliation))
+        Cmd.action(modifyDeclaration(orignalAppliation))
       )
     }
 
