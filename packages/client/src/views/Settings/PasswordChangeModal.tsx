@@ -13,7 +13,8 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ErrorMessage,
   InputField,
-  TextInput
+  TextInput,
+  PasswordInput
 } from '@opencrvs/components/lib/forms'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
@@ -96,6 +97,7 @@ const Row = styled.div`
   }
 `
 const Field = styled.div`
+  position: relative;
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
@@ -315,7 +317,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   touched={true}
                   required={false}
                 >
-                  <TextInput
+                  <PasswordInput
                     id="NewPassword"
                     type="password"
                     touched={true}
@@ -373,7 +375,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   required={false}
                   optionalLabel=""
                 >
-                  <TextInput
+                  <PasswordInput
                     id="ConfirmPassword"
                     type="password"
                     touched={true}

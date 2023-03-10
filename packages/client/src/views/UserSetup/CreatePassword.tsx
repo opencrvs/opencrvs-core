@@ -16,6 +16,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
+  PasswordInput,
   TextInput,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
@@ -58,6 +59,14 @@ const ValidationRulesSection = styled.div`
     }
   }
 `
+const Field = styled.div`
+  position: relative;
+  margin-bottom: 30px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-bottom: 0px;
+  }
+`
+
 interface IProps {
   setupData: IProtectedAccountSetupData
   goToStep: (
@@ -157,59 +166,63 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
             )}
           </GlobalError>
           <PasswordContents>
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.newPassword)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="NewPassword"
-                type="password"
+            <Field>
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.newPassword)}
                 touched={true}
-                value={newPassword}
-                onChange={checkPasswordStrength}
-                error={continuePressed && newPassword.length === 0}
-              />
-            </InputField>
-            <ValidationRulesSection>
-              <div>{intl.formatMessage(messages.validationMsg)}</div>
-              <div>
-                {validLength && <TickOn />}
-                {!validLength && <TickOff />}
-                <span>
-                  {intl.formatMessage(messages.minLength, { min: 8 })}
-                </span>
-              </div>
-              <div>
-                {hasCases && <TickOn />}
-                {!hasCases && <TickOff />}
-                <span>{intl.formatMessage(messages.hasCases)}</span>
-              </div>
-              <div>
-                {hasNumber && <TickOn />}
-                {!hasNumber && <TickOff />}
-                <span>{intl.formatMessage(messages.hasNumber)}</span>
-              </div>
-            </ValidationRulesSection>
+                required={false}
+                optionalLabel=""
+              >
+                <PasswordInput
+                  id="NewPassword"
+                  type="password"
+                  touched={true}
+                  value={newPassword}
+                  onChange={checkPasswordStrength}
+                  error={continuePressed && newPassword.length === 0}
+                />
+              </InputField>
+              <ValidationRulesSection>
+                <div>{intl.formatMessage(messages.validationMsg)}</div>
+                <div>
+                  {validLength && <TickOn />}
+                  {!validLength && <TickOff />}
+                  <span>
+                    {intl.formatMessage(messages.minLength, { min: 8 })}
+                  </span>
+                </div>
+                <div>
+                  {hasCases && <TickOn />}
+                  {!hasCases && <TickOff />}
+                  <span>{intl.formatMessage(messages.hasCases)}</span>
+                </div>
+                <div>
+                  {hasNumber && <TickOn />}
+                  {!hasNumber && <TickOff />}
+                  <span>{intl.formatMessage(messages.hasNumber)}</span>
+                </div>
+              </ValidationRulesSection>
+            </Field>
 
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.confirmPassword)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="ConfirmPassword"
-                type="password"
+            <Field>
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.confirmPassword)}
                 touched={true}
-                error={continuePressed && passwordMismatched}
-                value={confirmPassword}
-                onChange={matchPassword}
-              />
-            </InputField>
+                required={false}
+                optionalLabel=""
+              >
+                <PasswordInput
+                  id="ConfirmPassword"
+                  type="password"
+                  touched={true}
+                  error={continuePressed && passwordMismatched}
+                  value={confirmPassword}
+                  onChange={matchPassword}
+                />
+              </InputField>
+            </Field>
             {passwordMismatched && (
               <PasswordMismatch>
                 {intl.formatMessage(messages.mismatch)}
