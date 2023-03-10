@@ -118,6 +118,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+  MARRIAGE_NOTICE_PROOF
 }
 
 enum RegistrationType {

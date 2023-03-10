@@ -271,11 +271,7 @@ export function isCertificateForPrintInAdvance(
   declaration: IPrintableDeclaration | undefined
 ) {
   const collectorType =
-    declaration &&
-    declaration.data.registration.certificates &&
-    declaration.data.registration.certificates[0] &&
-    declaration.data.registration.certificates[0].collector &&
-    declaration.data.registration.certificates[0].collector.type
+    declaration?.data?.registration?.certificates?.[0]?.collector?.type
   if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
     return true
   }

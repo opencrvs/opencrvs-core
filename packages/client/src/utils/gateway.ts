@@ -289,6 +289,7 @@ export enum AttachmentSubject {
   Father = 'FATHER',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
+  MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
   Mother = 'MOTHER',
   Other = 'OTHER',
   Parent = 'PARENT'
@@ -2056,12 +2057,14 @@ export type Registration = {
   assignment?: Maybe<AssignmentData>
   attachments?: Maybe<Array<Maybe<Attachment>>>
   book?: Maybe<Scalars['String']>
+  brideSignature?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   contact?: Maybe<Scalars['String']>
   contactPhoneNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   draftId?: Maybe<Scalars['String']>
   duplicates?: Maybe<Array<Maybe<Scalars['ID']>>>
+  groomSignature?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
@@ -2074,6 +2077,8 @@ export type Registration = {
   status?: Maybe<Array<Maybe<RegWorkflow>>>
   trackingId?: Maybe<Scalars['String']>
   type?: Maybe<RegistrationType>
+  witnessOneSignature?: Maybe<Scalars['String']>
+  witnessTwoSignature?: Maybe<Scalars['String']>
 }
 
 export type RegistrationCountResult = {
@@ -2086,12 +2091,14 @@ export type RegistrationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   attachments?: InputMaybe<Array<AttachmentInput>>
   book?: InputMaybe<Scalars['String']>
+  brideSignature?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
   contact?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
   contactRelationship?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
   draftId?: InputMaybe<Scalars['String']>
+  groomSignature?: InputMaybe<Scalars['String']>
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
   informantsSignature?: InputMaybe<Scalars['String']>
@@ -2104,6 +2111,8 @@ export type RegistrationInput = {
   status?: InputMaybe<Array<InputMaybe<RegWorkflowInput>>>
   trackingId?: InputMaybe<Scalars['String']>
   type?: InputMaybe<RegistrationType>
+  witnessOneSignature?: InputMaybe<Scalars['String']>
+  witnessTwoSignature?: InputMaybe<Scalars['String']>
 }
 
 export type RegistrationSearchSet = {
@@ -4943,7 +4952,10 @@ export type FetchMarriageRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
-      informantsSignature?: string | null
+      groomSignature?: string | null
+      brideSignature?: string | null
+      witnessOneSignature?: string | null
+      witnessTwoSignature?: string | null
       duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
@@ -5227,7 +5239,10 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
-      informantsSignature?: string | null
+      groomSignature?: string | null
+      brideSignature?: string | null
+      witnessOneSignature?: string | null
+      witnessTwoSignature?: string | null
       duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
@@ -8920,6 +8935,10 @@ export type FetchViewRecordByCompositionQuery = {
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
           informantsSignature?: string | null
+          groomSignature?: string | null
+          brideSignature?: string | null
+          witnessOneSignature?: string | null
+          witnessTwoSignature?: string | null
           duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null

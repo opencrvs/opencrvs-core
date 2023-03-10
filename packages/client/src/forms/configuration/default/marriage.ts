@@ -1085,10 +1085,6 @@ export const marriageRegisterForms: ISerializedForm = {
                   label: formMessageDescriptors.headOfGroomFamily
                 },
                 {
-                  value: 'headOfBrideFamily',
-                  label: formMessageDescriptors.headOfBrideFamily
-                },
-                {
                   value: 'other',
                   label: formMessageDescriptors.other
                 }
@@ -1241,10 +1237,6 @@ export const marriageRegisterForms: ISerializedForm = {
               validate: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
-                {
-                  value: 'headOfGroomFamily',
-                  label: formMessageDescriptors.headOfGroomFamily
-                },
                 {
                   value: 'headOfBrideFamily',
                   label: formMessageDescriptors.headOfBrideFamily

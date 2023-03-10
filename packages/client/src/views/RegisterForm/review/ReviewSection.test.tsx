@@ -90,6 +90,12 @@ const rejectedDraftDeath = createReviewDeclaration(
   DeclarationEvent.Death,
   REJECTED
 )
+const rejectedDraftMarriage = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.Marriage,
+  REJECTED
+)
 
 describe('when in device of large viewport', () => {
   let userAgentMock: SpyInstance
@@ -249,6 +255,29 @@ describe('when in device of large viewport', () => {
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={rejectedDraftDeath}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('Should not click the Reject Declaration', async () => {
+      const rejectButton = reviewSectionComponent.find(
+        '#rejectDeclarationBtn'
+      ).length
+      expect(rejectButton).toEqual(0)
+    })
+  })
+
+  describe('when user is in the review page for rejected marriage declaration', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={rejectedDraftMarriage}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
