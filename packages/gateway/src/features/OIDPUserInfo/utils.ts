@@ -12,7 +12,14 @@
 import * as jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 import fetch from 'node-fetch'
-import { OIDP_BASE_URL, OIDP_CLIENT_PRIVATE_KEY } from '@gateway/constants'
+import {
+  OIDP_BASE_URL,
+  OIDP_CLIENT_PRIVATE_KEY,
+  OIDP_JWT_AUD_CLAIM
+} from '@gateway/constants'
+import { fetchFromHearth } from '@gateway/features/fhir/utils'
+import { logger } from '@gateway/logger'
+import { OIDPUserInfo } from './oidp-types'
 
 const TOKEN_GRANT_TYPE = 'authorization_code'
 const CLIENT_ASSERTION_TYPE =
@@ -30,6 +37,40 @@ export type FetchTokenProps = {
   clientId: string
   redirectUri: string
   grantType?: string
+}
+
+const searchLocationFromHearth = (name: string) =>
+  fetchFromHearth<fhir.Bundle>(
+    `/location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
+  )
+
+const findAdminStructureLocationWithName = async (name: string) => {
+  const fhirBundleLocations = await searchLocationFromHearth(name)
+
+  if ((fhirBundleLocations.entry?.length ?? 0) > 1) {
+    throw new Error(
+      'Multiple admin structure locations found with the same name'
+    )
+  }
+
+  if ((fhirBundleLocations.entry?.length ?? 0) === 0) {
+    logger.warn('No admin structure location found with the name: ' + name)
+    return null
+  }
+
+  return fhirBundleLocations.entry?.[0].resource?.id
+}
+
+const pickUserInfo = async (userInfo: OIDPUserInfo) => {
+  return {
+    oidpUserInfo: userInfo,
+    cityFhirId:
+      userInfo.address?.locality &&
+      (await findAdminStructureLocationWithName(userInfo.address.locality)),
+    districtFhirId:
+      userInfo.address?.region &&
+      (await findAdminStructureLocationWithName(userInfo.address.region))
+  }
 }
 
 export const fetchToken = async ({
@@ -67,8 +108,8 @@ export const fetchUserInfo = async (accessToken: string) => {
   })
 
   const response = await request.text()
-  const decodedResponse = await decodeUserInfoResponse(response)
-  return decodedResponse
+  const decodedResponse = decodeUserInfoResponse(response)
+  return pickUserInfo(decodedResponse)
 }
 
 const generateSignedJwt = async (clientId: string) => {
@@ -80,7 +121,7 @@ const generateSignedJwt = async (clientId: string) => {
   const payload = {
     iss: clientId,
     sub: clientId,
-    aud: OIDP_TOKEN_ENDPOINT
+    aud: OIDP_JWT_AUD_CLAIM
   }
 
   const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY!, 'base64')?.toString()
@@ -94,6 +135,6 @@ const generateSignedJwt = async (clientId: string) => {
     .sign(privateKey)
 }
 
-const decodeUserInfoResponse = async (response: string) => {
-  return jwt.decode(response)
+const decodeUserInfoResponse = (response: string) => {
+  return jwt.decode(response) as OIDPUserInfo
 }
