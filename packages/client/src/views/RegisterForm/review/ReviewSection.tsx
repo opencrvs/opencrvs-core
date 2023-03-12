@@ -156,11 +156,12 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const RequiredField = styled.span`
+export const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
@@ -191,9 +192,10 @@ const RightColumn = styled.div`
     display: none;
   }
 `
-
-const LeftColumn = styled.div`
+const Items = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+const LeftColumn = styled.div`
   width: 60%;
   margin-bottom: 200px;
 
@@ -213,7 +215,7 @@ const LeftColumn = styled.div`
   }
 `
 
-const ZeroDocument = styled.div`
+export const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
@@ -222,6 +224,8 @@ const ZeroDocument = styled.div`
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
+  position: fixed;
+  width: fill-available;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -501,7 +505,7 @@ type State = {
   previewImage: IFileValue | null
 }
 
-interface IErrorsBySection {
+export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
@@ -751,7 +755,7 @@ const renderValue = (
   return value
 }
 
-const getErrorsOnFieldsBySection = (
+export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration
@@ -797,7 +801,7 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-const SECTION_MAPPING = {
+export const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping
 }
@@ -1744,10 +1748,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   shouldShowChangeAll = (section: IFormSection) => {
     const {
-      draft: { data, event },
+      draft: { data, event, duplicates },
       viewRecord
     } = this.props
-    if (viewRecord) {
+
+    if (
+      viewRecord ||
+      (Boolean(duplicates) && !isCorrection(this.props.draft))
+    ) {
       return false
     }
     return (
@@ -1867,19 +1875,21 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const formSections = viewRecord
-      ? this.getViewableSection(registerForm[event]).map((section) => {
-          return {
-            ...section,
-            groups: section.groups.map((group) => {
-              return {
-                ...group,
-                fields: group.fields.map(fieldToReadOnlyFields)
-              }
-            })
-          }
-        })
-      : this.getViewableSection(registerForm[event])
+    const isDuplicate = Boolean(declaration.duplicates?.length)
+    const formSections =
+      (viewRecord || isDuplicate) && !isCorrection(declaration)
+        ? this.getViewableSection(registerForm[event]).map((section) => {
+            return {
+              ...section,
+              groups: section.groups.map((group) => {
+                return {
+                  ...group,
+                  fields: group.fields.map(fieldToReadOnlyFields)
+                }
+              })
+            }
+          })
+        : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1942,146 +1952,167 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <FullBodyContent>
         <Row>
           <LeftColumn>
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              title={intl.formatMessage(messages.govtName)}
-              subject={
-                informantName
-                  ? intl.formatMessage(messages.headerSubjectWithName, {
-                      eventType: event,
-                      name: informantName
-                    })
-                  : intl.formatMessage(messages.headerSubjectWithoutName, {
-                      eventType: event
-                    })
-              }
-            />
-            <FormData>
-              {transformedSectionData.map((sec, index) => {
-                const { uploadedDocuments, selectOptions } =
-                  this.prepSectionDocuments(declaration, sec.id)
-                return (
-                  <SectionContainer key={index}>
-                    {sec.title && (
-                      <Title>
-                        {sec.title}
-                        {sec.action && (
-                          <LinkButton onClick={sec.action.handler}>
-                            {sec.action.label}
-                          </LinkButton>
-                        )}
-                      </Title>
-                    )}
-                    {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
-                      <DocumentListPreviewContainer>
-                        <DocumentListPreview
-                          id={sec.id}
-                          documents={uploadedDocuments}
-                          onSelect={this.selectForPreview}
-                          dropdownOptions={selectOptions}
-                          inReviewSection={true}
-                        />
-                      </DocumentListPreviewContainer>
-                    )}
-                    <ListViewSimplified id={'Section_' + sec.id}>
-                      {sec.items.map((item, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            label={<Label>{item.label}</Label>}
-                            value={
-                              <Value id={item.label.split(' ')[0]}>
-                                {item.value}
-                              </Value>
-                            }
-                            actions={
-                              <LinkButton
-                                id={item.action.id}
-                                disabled={item.action.disabled}
-                                onClick={item.action.handler}
-                              >
-                                {item.action.label}
-                              </LinkButton>
-                            }
+            {!isCorrection(declaration) && isDuplicate && (
+              <DuplicateForm declaration={declaration} />
+            )}
+            <Items>
+              <ReviewHeader
+                id="review_header"
+                logoSource={
+                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                }
+                title={intl.formatMessage(messages.govtName)}
+                subject={
+                  informantName
+                    ? intl.formatMessage(messages.headerSubjectWithName, {
+                        eventType: event,
+                        name: informantName
+                      })
+                    : intl.formatMessage(messages.headerSubjectWithoutName, {
+                        eventType: event
+                      })
+                }
+              />
+              <FormData>
+                {transformedSectionData.map((sec, index) => {
+                  const { uploadedDocuments, selectOptions } =
+                    this.prepSectionDocuments(declaration, sec.id)
+                  return (
+                    <SectionContainer key={index}>
+                      {sec.title && (
+                        <Title>
+                          {sec.title}
+                          {sec.action && (
+                            <LinkButton onClick={sec.action.handler}>
+                              {sec.action.label}
+                            </LinkButton>
+                          )}
+                        </Title>
+                      )}
+                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
+                        <DocumentListPreviewContainer>
+                          <DocumentListPreview
+                            id={sec.id}
+                            documents={uploadedDocuments}
+                            onSelect={this.selectForPreview}
+                            dropdownOptions={selectOptions}
+                            inReviewSection={true}
                           />
-                        )
-                      })}
-                    </ListViewSimplified>
-                  </SectionContainer>
-                )
-              })}
-              {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                this.getAllAttachmentInPreviewList(declaration)}
-              {(!isCorrection(declaration) || viewRecord) && (
-                <InputWrapper>
-                  <InputField
-                    id="additional_comments"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.additionalComments)}
-                  >
-                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
-                  </InputField>
-                </InputWrapper>
-              )}
-
-              {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                !isCorrection(declaration) && (
+                        </DocumentListPreviewContainer>
+                      )}
+                      <ListViewSimplified id={'Section_' + sec.id}>
+                        {sec.items.map((item, index) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={index}
+                              label={<Label>{item.label}</Label>}
+                              value={
+                                <Value id={item.label.split(' ')[0]}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={
+                                <LinkButton
+                                  id={item.action.id}
+                                  disabled={item.action.disabled}
+                                  onClick={item.action.handler}
+                                >
+                                  {item.action.label}
+                                </LinkButton>
+                              }
+                            />
+                          )
+                        })}
+                      </ListViewSimplified>
+                    </SectionContainer>
+                  )
+                })}
+                {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                  this.getAllAttachmentInPreviewList(declaration)}
+                {!isCorrection(declaration) && (
                   <InputWrapper>
                     <InputField
-                      id="informant_signature"
+                      id="additional_comments"
                       touched={false}
-                      required={window.config.INFORMANT_SIGNATURE_REQUIRED}
-                      label={intl.formatMessage(messages.informantsSignature)}
+                      required={false}
+                      label={intl.formatMessage(messages.additionalComments)}
                     >
-                      <SignatureInput
-                        {...signatureInputProps}
-                        disabled={viewRecord}
+                      <TextArea
+                        {...{
+                          ...textAreaProps,
+                          disabled: viewRecord || isDuplicate
+                        }}
                       />
                     </InputField>
                   </InputWrapper>
                 )}
-              {totalFileSizeExceeded && (
-                <Alert type="warning">
-                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
-                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
-                  })}
-                </Alert>
-              )}
-              {viewRecord ? null : (
-                <>
-                  {!isCorrection(declaration) ? (
-                    <>
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
-                      <ReviewAction
-                        completeDeclaration={isComplete}
-                        totalFileSizeExceeded={totalFileSizeExceeded}
-                        declarationToBeValidated={this.userHasValidateScope()}
-                        declarationToBeRegistered={this.userHasRegisterScope()}
-                        alreadyRejectedDeclaration={
-                          this.props.draft.registrationStatus === REJECTED
-                        }
-                        draftDeclaration={draft}
-                        declaration={declaration}
-                        submitDeclarationAction={submitClickEvent}
-                        rejectDeclarationAction={rejectDeclarationClickEvent}
-                      />
-                    </>
-                  ) : (
-                    <FooterArea>
-                      <PrimaryButton
-                        id="continue_button"
-                        onClick={onContinue}
-                        disabled={!isComplete || !this.hasChangesBeenMade}
+
+                {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
+                  !isCorrection(declaration) &&
+                  !isDuplicate &&
+                  !viewRecord && (
+                    <InputWrapper>
+                      <InputField
+                        id="informant_signature"
+                        touched={false}
+                        required={window.config.INFORMANT_SIGNATURE_REQUIRED}
+                        label={intl.formatMessage(messages.informantsSignature)}
                       >
-                        {intl.formatMessage(buttonMessages.continueButton)}
-                      </PrimaryButton>
-                    </FooterArea>
+                        <SignatureInput
+                          {...signatureInputProps}
+                          disabled={viewRecord}
+                        />
+                      </InputField>
+                    </InputWrapper>
                   )}
-                </>
-              )}
-            </FormData>
+                {totalFileSizeExceeded && (
+                  <Alert type="warning">
+                    {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                      fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                    })}
+                  </Alert>
+                )}
+                {(viewRecord || isDuplicate) &&
+                !isCorrection(declaration) ? null : (
+                  <>
+                    {!isCorrection(declaration) ? (
+                      <>
+                        {isDuplicate && (
+                          <DuplicateWarning
+                            duplicateIds={declaration.duplicates?.map(
+                              (duplicate) => duplicate.compositionId
+                            )}
+                          />
+                        )}
+                        <ReviewAction
+                          completeDeclaration={isComplete}
+                          totalFileSizeExceeded={totalFileSizeExceeded}
+                          declarationToBeValidated={this.userHasValidateScope()}
+                          declarationToBeRegistered={this.userHasRegisterScope()}
+                          alreadyRejectedDeclaration={
+                            this.props.draft.registrationStatus === REJECTED
+                          }
+                          draftDeclaration={draft}
+                          declaration={declaration}
+                          submitDeclarationAction={submitClickEvent}
+                          rejectDeclarationAction={rejectDeclarationClickEvent}
+                        />
+                      </>
+                    ) : (
+                      <FooterArea>
+                        <PrimaryButton
+                          id="continue_button"
+                          onClick={onContinue}
+                          disabled={!isComplete || !this.hasChangesBeenMade}
+                        >
+                          {intl.formatMessage(buttonMessages.continueButton)}
+                        </PrimaryButton>
+                      </FooterArea>
+                    )}
+                  </>
+                )}
+              </FormData>
+            </Items>
           </LeftColumn>
           <RightColumn>
             <ResponsiveDocumentViewer
@@ -2102,7 +2133,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord ? null : (
+                  {(viewRecord || isDuplicate) &&
+                  !isCorrection(declaration) ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={

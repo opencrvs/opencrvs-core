@@ -13,6 +13,7 @@
 import * as React from 'react'
 import { colors } from '../colors'
 import * as icons from './all-icons'
+import { IconWeight } from 'phosphor-react'
 
 enum IconSize {
   small = 16,
@@ -26,14 +27,14 @@ export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
-  fill?: IconColor | 'none'
+  weight?: IconWeight
 }
 
 export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  fill = 'none',
+  weight = 'regular',
   ...rest
 }: IconProps) {
   const IconComponent = icons['' + name]
@@ -41,7 +42,7 @@ export function Icon({
     <IconComponent
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
       size={IconSize[size]}
-      weight={'bold'}
+      weight={weight}
       {...rest}
     />
   )

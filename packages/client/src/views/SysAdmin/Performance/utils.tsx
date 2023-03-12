@@ -296,6 +296,10 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  },
+  MARKED_AS_DUPLICATE: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
   }
 }
 

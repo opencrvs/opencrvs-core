@@ -89,7 +89,7 @@ const InformantNotification = () => {
           if (data && data.informantSMSNotifications) {
             setInformantSMSNotificationState((state) => {
               const modifiedState: IState = { ...state }
-              informantNotifitionsData.forEach((notification) => {
+              data.informantSMSNotifications?.forEach((notification) => {
                 modifiedState[notification.name as INotificationName] =
                   notification.enabled
               })
