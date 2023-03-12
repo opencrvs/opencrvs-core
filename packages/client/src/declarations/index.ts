@@ -748,21 +748,29 @@ export async function updateWorkqueueData(
       (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
-  if (declaration.event === 'birth') {
-    ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
-    ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
-    ;(
-      (workqueueApp as GQLDeathEventSearchSet)
-        .registration as GQLRegistrationSearchSet
-    ).contactNumber = transformedInformantContactNumber
-  } else {
-    ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
-    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
-    ;(
-      (workqueueApp as GQLDeathEventSearchSet)
-        .registration as GQLRegistrationSearchSet
-    ).contactNumber = transformedInformantContactNumber
+
+  const birthEventSearchSet: GQLBirthEventSearchSet = {
+    ...workqueueApp,
+    childName: transformedName,
+    dateOfBirth: transformedBirthDate,
+    registration: {
+      contactNumber: transformedInformantContactNumber
+    }
   }
+
+  const deathEventSearchSet: GQLDeathEventSearchSet = {
+    ...workqueueApp,
+    deceasedName: transformedName,
+    dateOfDeath: transformedDeathDate,
+    registration: {
+      contactNumber: transformedInformantContactNumber
+    }
+  }
+
+  const workqueueAppResult =
+    declaration.event === 'birth' ? birthEventSearchSet : deathEventSearchSet
+
+  return workqueueAppResult
 }
 
 export async function writeDeclarationByUser(
