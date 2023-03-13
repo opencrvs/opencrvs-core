@@ -60,6 +60,7 @@ export const requestSchema = Joi.object({
   unit: messageSchema,
   errorMessage: messageSchema,
   maxLength: Joi.number(),
+  inputWidth: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
   precedingFieldId: Joi.string().required(),

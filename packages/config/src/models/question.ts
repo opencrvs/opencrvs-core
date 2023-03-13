@@ -50,6 +50,7 @@ export interface IQuestion {
   unit?: IMessage[]
   errorMessage?: IMessage[]
   maxLength?: number
+  inputWidth?: number
   fieldName?: string
   fieldType?: FieldType
   // must be the fieldId for the field vertically above this one in the form or the string "TOP"
@@ -124,6 +125,7 @@ const questionSchema = new Schema({
     }
   ],
   maxLength: { type: Number, default: 280 },
+  inputWidth: { type: Number, default: 100 },
   fieldName: { type: String },
   fieldType: {
     type: String,

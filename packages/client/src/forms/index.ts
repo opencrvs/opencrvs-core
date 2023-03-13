@@ -561,6 +561,7 @@ export interface INumberFormField extends IFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -1116,6 +1117,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {

@@ -63,6 +63,7 @@ export function createCustomField({
   placeholder,
   required,
   maxLength,
+  inputWidth,
   conditionals,
   options
 }: ICustomQuestionConfig): SerializedFormField {
@@ -122,6 +123,7 @@ export function createCustomField({
   }
   if (baseField.type === 'NUMBER') {
     baseField.unit = getDefaultLanguageMessage(unit)
+    baseField.inputWidth = inputWidth
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [

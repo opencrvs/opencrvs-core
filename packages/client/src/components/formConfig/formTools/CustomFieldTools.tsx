@@ -93,6 +93,7 @@ import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
+const DEFAULT_INPUT_WIDTH = 100
 
 const CInputField = styled(InputField)`
   label {
@@ -299,6 +300,7 @@ interface ICustomFieldState {
   conditionalField: IConditionalFieldForms
   handleBars: string
   maxLength: number
+  inputWidth: number
   fieldForms: IFieldForms
   showCSVUploadingModal: boolean
   CSVUploadStatuses: CSVUploadStatus[]
@@ -401,6 +403,7 @@ class CustomFieldToolsComp extends React.Component<
         regex: conditionalfield?.regexp ?? EMPTY_STRING
       },
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
+      inputWidth: selectedField.inputWidth ?? DEFAULT_INPUT_WIDTH,
       fieldForms,
       showCSVUploadingModal: false,
       CSVUploadStatuses: [],
@@ -573,6 +576,7 @@ class CustomFieldToolsComp extends React.Component<
       fieldId: newFieldID,
       /* We can't let maxlength be 0 as it doesn't make any sense */
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
+      inputWidth: this.state.inputWidth || DEFAULT_INPUT_WIDTH,
       label
     }
 
@@ -976,6 +980,28 @@ class CustomFieldToolsComp extends React.Component<
             />
           </CInputField>
         </FieldContainer>
+        {formField.type === 'NUMBER' && (
+          <FieldContainer>
+            <CInputField
+              required={false}
+              id="custom-form-input-width"
+              label={intl.formatMessage(
+                customFieldFormMessages.inputWidthLabel
+              )}
+              touched={false}
+            >
+              <CTextInput
+                type="number"
+                defaultValue={this.state.inputWidth}
+                onChange={(event: { target: { value: string | number } }) =>
+                  this.setState({
+                    inputWidth: +event.target.value
+                  })
+                }
+              />
+            </CInputField>
+          </FieldContainer>
+        )}
       </>
     )
   }

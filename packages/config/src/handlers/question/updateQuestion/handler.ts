@@ -38,6 +38,7 @@ export default async function updateQuestion(
   existingQuestion.label = question.label
   existingQuestion.placeholder = question.placeholder
   existingQuestion.maxLength = question.maxLength
+  existingQuestion.inputWidth = question.inputWidth
   existingQuestion.fieldName = question.fieldName
   existingQuestion.fieldType = question.fieldType
   existingQuestion.precedingFieldId = question.precedingFieldId
@@ -70,6 +71,7 @@ export const requestSchema = Joi.object({
   unit: messageSchema,
   errorMessage: messageSchema,
   maxLength: Joi.number(),
+  inputWidth: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
   precedingFieldId: Joi.string(),

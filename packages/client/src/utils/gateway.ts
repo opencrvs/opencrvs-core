@@ -1849,6 +1849,7 @@ export type QuestionInput = {
   fieldType?: InputMaybe<CustomFieldType>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
+  inputWidth?: InputMaybe<Scalars['Int']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']

@@ -1309,6 +1309,7 @@ export interface GQLQuestionInput {
   unit?: Array<GQLMesssageInput>
   errorMessage?: Array<GQLMesssageInput>
   maxLength?: number
+  inputWidth?: number
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string

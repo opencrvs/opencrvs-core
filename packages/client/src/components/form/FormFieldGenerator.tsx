@@ -472,6 +472,11 @@ function GeneratedInputField({
     return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
+    let inputFieldWidth = fieldDefinition.inputFieldWidth
+    if (fieldDefinition?.inputWidth) {
+      inputFieldWidth = fieldDefinition.inputWidth + 'px'
+    }
+
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -488,7 +493,7 @@ function GeneratedInputField({
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
           }}
-          inputFieldWidth={fieldDefinition.inputFieldWidth}
+          inputFieldWidth={inputFieldWidth}
         />
       </InputField>
     )

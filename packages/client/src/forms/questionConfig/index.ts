@@ -59,6 +59,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
   maxLength?: number
+  inputWidth?: number
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]

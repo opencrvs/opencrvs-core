@@ -37,6 +37,7 @@ interface ICustomFieldFormMessages
   tooltipLabel: MessageDescriptor
   errorMessage: MessageDescriptor
   maxLengthLabel: MessageDescriptor
+  inputWidthLabel: MessageDescriptor
   duplicateField: MessageDescriptor
   copyHeading: MessageDescriptor
   copyDescription: MessageDescriptor
@@ -172,6 +173,11 @@ const messagesToDefine: ICustomFieldFormMessages = {
   maxLengthLabel: {
     id: 'custom.field.form.maxLength',
     defaultMessage: 'Max length',
+    description: 'Heading of Custom FieldForm'
+  },
+  inputWidthLabel: {
+    id: 'custom.field.form.inputWidth',
+    defaultMessage: 'Input width',
     description: 'Heading of Custom FieldForm'
   },
   duplicateField: {
