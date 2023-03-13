@@ -56,8 +56,7 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData,
-  LocationType
+  IOfflineData
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -66,8 +65,6 @@ import {
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
-import { generateLocations } from '@client/utils/locationUtils'
-import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'

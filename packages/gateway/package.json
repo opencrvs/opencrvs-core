@@ -39,7 +39,6 @@
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",
     "bunyan": "^1.8.12",
-    "country-data": "^0.0.31",
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
     "file-type": "^16.5.3",

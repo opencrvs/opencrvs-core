@@ -9,20 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { callingCountries } from 'country-data'
 
-export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
+import { allCountries } from '@login/utils/countryUtils'
+
+export const convertToMSISDN = (phone: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+    window.config.COUNTRY.toUpperCase() === 'FAR'
+      ? 'ZMB'
+      : window.config.COUNTRY.toUpperCase()
 
-  return `${
-    callingCountries[countryCode].countryCallingCodes[0]
-  }${localPhoneNumber.substring(1)}`
-}
+  const defaultCountryZambia = allCountries[allCountries.length - 3]
+  const data =
+    allCountries.find(
+      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
+    ) || defaultCountryZambia
 
-export const getMSISDNCountryCode = (countryCode: string) => {
-  return callingCountries[countryCode.toUpperCase()].countryCallingCodes[0]
+  if (
+    phone.startsWith(data.dialCode) ||
+    `+${phone}`.startsWith(data.dialCode)
+  ) {
+    return phone.startsWith('+') ? phone : `+${phone}`
+  }
+  return phone.startsWith('0')
+    ? `${data.dialCode}${phone.substring(1)}`
+    : `${data.dialCode}${phone}`
 }

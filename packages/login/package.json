@@ -18,7 +18,6 @@
     "@vitejs/plugin-react": "^2.0.0",
     "axios": "^0.27.2",
     "connected-react-router": "^6.5.2",
-    "country-data": "^0.0.31",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.17.3",
