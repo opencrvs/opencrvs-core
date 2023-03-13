@@ -20162,18 +20162,6 @@
         "description": null,
         "fields": [
           {
-            "name": "cityFhirId",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "districtFhirId",
             "description": null,
             "args": [],
@@ -20192,6 +20180,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "OIDPUserInfo",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stateFhirId",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,

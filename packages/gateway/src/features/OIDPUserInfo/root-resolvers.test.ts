@@ -217,8 +217,8 @@ describe('get user info from OIDP national id integration', () => {
 
     expect(data).toEqual({
       oidpUserInfo: jwtPayload,
-      cityFhirId: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-      districtFhirId: '5dd96001-7c94-4eeb-b96e-8a987957f7a2'
+      districtFhirId: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+      stateFhirId: '5dd96001-7c94-4eeb-b96e-8a987957f7a2'
     })
   })
 

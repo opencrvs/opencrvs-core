@@ -514,8 +514,8 @@ export interface GQLSMSNotification {
 
 export interface GQLUserInfo {
   oidpUserInfo?: GQLOIDPUserInfo
-  cityFhirId?: string
   districtFhirId?: string
+  stateFhirId?: string
 }
 
 export interface GQLNotificationInput {
@@ -4859,15 +4859,11 @@ export interface SMSNotificationToCreatedAtResolver<
 
 export interface GQLUserInfoTypeResolver<TParent = any> {
   oidpUserInfo?: UserInfoToOidpUserInfoResolver<TParent>
-  cityFhirId?: UserInfoToCityFhirIdResolver<TParent>
   districtFhirId?: UserInfoToDistrictFhirIdResolver<TParent>
+  stateFhirId?: UserInfoToStateFhirIdResolver<TParent>
 }
 
 export interface UserInfoToOidpUserInfoResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserInfoToCityFhirIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4875,6 +4871,10 @@ export interface UserInfoToDistrictFhirIdResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserInfoToStateFhirIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

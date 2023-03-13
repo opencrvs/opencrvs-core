@@ -64,10 +64,10 @@ const findAdminStructureLocationWithName = async (name: string) => {
 const pickUserInfo = async (userInfo: OIDPUserInfo) => {
   return {
     oidpUserInfo: userInfo,
-    cityFhirId:
+    districtFhirId:
       userInfo.address?.locality &&
       (await findAdminStructureLocationWithName(userInfo.address.locality)),
-    districtFhirId:
+    stateFhirId:
       userInfo.address?.region &&
       (await findAdminStructureLocationWithName(userInfo.address.region))
   }

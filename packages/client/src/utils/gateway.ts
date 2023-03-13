@@ -2353,9 +2353,9 @@ export type UserIdentifierInput = {
 
 export type UserInfo = {
   __typename?: 'UserInfo'
-  cityFhirId?: Maybe<Scalars['String']>
   districtFhirId?: Maybe<Scalars['String']>
   oidpUserInfo?: Maybe<OidpUserInfo>
+  stateFhirId?: Maybe<Scalars['String']>
 }
 
 export type UserInput = {

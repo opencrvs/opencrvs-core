@@ -42,8 +42,8 @@ type OIDPUserInfo {
 
 type UserInfo {
   oidpUserInfo: OIDPUserInfo
-  cityFhirId: String
   districtFhirId: String
+  stateFhirId: String
 }
 
 type Query {

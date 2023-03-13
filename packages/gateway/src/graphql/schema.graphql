@@ -630,8 +630,8 @@ type SMSNotification {
 
 type UserInfo {
   oidpUserInfo: OIDPUserInfo
-  cityFhirId: String
   districtFhirId: String
+  stateFhirId: String
 }
 
 input NotificationInput {
