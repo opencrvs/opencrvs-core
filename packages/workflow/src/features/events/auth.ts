@@ -97,6 +97,8 @@ function getEventToScopeMap(event: Events) {
       return [USER_SCOPE.VALIDATE, USER_SCOPE.REGISTER]
     case Events.VERIFIED_EVENT:
       return [USER_SCOPE.VERIFY]
+    case Events.MARKED_AS_DUPLICATE:
+      return [USER_SCOPE.REGISTER, USER_SCOPE.CERTIFY, USER_SCOPE.VALIDATE]
 
     default:
       return []

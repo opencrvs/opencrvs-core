@@ -11,7 +11,7 @@
  */
 import {
   resolvers,
-  lookForDuplicate
+  lookForComposition
 } from '@gateway/features/registration/root-resolvers'
 import {
   DOWNLOADED_EXTENSION_URL,
@@ -567,7 +567,7 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('ducplicate entry', () => {
+  describe('duplicate entry', () => {
     const details = {
       child: {
         name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
@@ -589,6 +589,7 @@ describe('Registration root resolvers', () => {
     }
     it('checks duplicate draftId', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -633,7 +634,7 @@ describe('Registration root resolvers', () => {
     it('checks no task entry with draftId', async () => {
       fetch.mockResponses([JSON.stringify({})])
 
-      const result = await lookForDuplicate(
+      const result = await lookForComposition(
         '9633042c-ca34-4b9f-959b-9d16909fd85c'
       )
 
@@ -686,7 +687,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'DewpkiM'
+        trackingId: 'DewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^D/)
@@ -824,6 +826,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -858,7 +861,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'BewpkiM'
+        trackingId: 'BewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^B/)
@@ -879,6 +883,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -981,6 +986,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2058,6 +2064,7 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2135,6 +2142,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        ['[]'],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2271,8 +2279,8 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a certify scope')
     })
   })
-  describe('notADuplicate()', () => {
-    it('returns composition id after removing duplicate id from it', async () => {
+  describe('markEventAsNotDuplicate()', () => {
+    it('returns composition id after removing all duplicates from it', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -2292,24 +2300,7 @@ describe('Registration root resolvers', () => {
             ]
           })
         ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'DewpkiM'
-            },
-            relatesTo: [
-              {
-                code: 'duplicate',
-                targetReference: {
-                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
-                }
-              }
-            ]
-          })
-        ],
+        [JSON.stringify(mockTaskBundle)],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2327,11 +2318,10 @@ describe('Registration root resolvers', () => {
         ]
       )
       // @ts-ignore
-      const result = await resolvers.Mutation.notADuplicate(
+      const result = await resolvers.Mutation.markEventAsNotDuplicate(
         {},
         {
-          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-          duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
         },
         authHeaderRegCert
       )
@@ -2346,11 +2336,10 @@ describe('Registration root resolvers', () => {
       ])
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
@@ -2381,25 +2370,23 @@ describe('Registration root resolvers', () => {
       )
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('Search request failed: Some error from search')
+      ).rejects.toThrowError('FHIR request failed: Some error from search')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderNotRegCert
         )

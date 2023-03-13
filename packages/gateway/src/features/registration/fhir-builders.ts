@@ -12,45 +12,44 @@
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
-  createCompositionTemplate,
-  updateTaskTemplate,
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE,
-  BIRTH_ENCOUNTER_CODE,
-  BIRTH_TYPE_CODE,
+  ATTACHMENT_CONTEXT_KEY,
   ATTACHMENT_DOCS_CODE,
-  BODY_WEIGHT_CODE,
+  ATTACHMENT_DOCS_TITLE,
   BIRTH_ATTENDANT_CODE,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  BIRTH_ENCOUNTER_CODE,
   BIRTH_REG_TYPE_CODE,
-  NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE,
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
+  CAUSE_OF_DEATH_CODE,
+  CAUSE_OF_DEATH_ESTABLISHED_CODE,
+  CAUSE_OF_DEATH_METHOD_CODE,
+  CHILD_CODE,
+  CHILD_TITLE,
+  createCompositionTemplate,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_DESCRIPTION_CODE,
+  DEATH_ENCOUNTER_CODE,
+  DECEASED_CODE,
+  DECEASED_TITLE,
+  FATHER_CODE,
+  FATHER_TITLE,
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  INFORMANT_CODE,
+  INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
-  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  MANNER_OF_DEATH_CODE,
+  MOTHER_CODE,
+  MOTHER_TITLE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
   OBSERVATION_CATEGORY_VSIGN_DESC,
-  MOTHER_TITLE,
-  FATHER_TITLE,
-  CHILD_TITLE,
-  ATTACHMENT_DOCS_TITLE,
-  ATTACHMENT_CONTEXT_KEY,
-  DEATH_ENCOUNTER_CODE,
-  CAUSE_OF_DEATH_CODE,
-  DECEASED_CODE,
-  DECEASED_TITLE,
-  INFORMANT_CODE,
-  INFORMANT_TITLE,
-  MANNER_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE,
   SPOUSE_CODE,
   SPOUSE_TITLE,
-  BIRTH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_DESCRIPTION_CODE,
-  CAUSE_OF_DEATH_ESTABLISHED_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
   BRIDE_CODE,
@@ -61,41 +60,44 @@ import {
   WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
   WITNESS_TWO_TITLE,
-  MARRIAGE_CORRECTION_ENCOUNTER_CODE
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  updateTaskTemplate
 } from '@gateway/features/fhir/templates'
 import {
-  selectOrCreateEncounterResource,
-  selectOrCreateObservationResource,
-  selectOrCreatePersonResource,
-  selectOrCreateDocRefResource,
-  setObjectPropInResourceArray,
+  findBirthDuplicates,
+  findDeathDuplicates,
   getMaritalStatusCode,
-  selectOrCreateTaskRefResource,
-  selectOrCreateCertificateDocRefResource,
-  selectOrCreateRelatedPersonResource,
-  selectOrCreateCollectorPersonResource,
-  setCertificateCollectorReference,
-  selectOrCreatePaymentReconciliationResource,
-  selectOrCreateLocationRefResource,
-  selectOrCreateEncounterLocationRef,
-  selectOrCreateInformantSection,
-  selectOrCreateInformantResource,
-  setInformantReference,
-  selectOrCreateEncounterPartitioner,
-  selectOrCreateEncounterParticipant,
-  selectOrCreateQuestionnaireResource,
-  setQuestionnaireItem,
-  uploadBase64ToMinio,
   isBase64FileString,
   postAssignmentSearch,
-  selectOrCreateWitnessResource
+  selectOrCreateCertificateDocRefResource,
+  selectOrCreateCollectorPersonResource,
+  selectOrCreateDocRefResource,
+  selectOrCreateEncounterLocationRef,
+  selectOrCreateEncounterParticipant,
+  selectOrCreateEncounterPartitioner,
+  selectOrCreateEncounterResource,
+  selectOrCreateInformantResource,
+  selectOrCreateInformantSection,
+  selectOrCreateLocationRefResource,
+  selectOrCreateObservationResource,
+  selectOrCreatePaymentReconciliationResource,
+  selectOrCreatePersonResource,
+  selectOrCreateQuestionnaireResource,
+  selectOrCreateRelatedPersonResource,
+  selectOrCreateTaskRefResource,
+  setCertificateCollectorReference,
+  setInformantReference,
+  setObjectPropInResourceArray,
+  setQuestionnaireItem,
+  selectOrCreateWitnessResource,
+  uploadBase64ToMinio
 } from '@gateway/features/fhir/utils'
 import {
-  OPENCRVS_SPECIFICATION_URL,
-  FHIR_SPECIFICATION_URL,
   EVENT_TYPE,
-  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT
+  FHIR_SPECIFICATION_URL,
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  OPENCRVS_SPECIFICATION_URL,
+  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload } from '@gateway/features/user/utils'
@@ -4201,10 +4203,11 @@ export async function buildFHIRBundle(
   const context: any = {
     event: eventType
   }
+  const composition = createCompositionTemplate(ref, context)
   const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(ref, context)]
+    entry: [composition]
   }
 
   if (authHeader) {
@@ -4216,17 +4219,83 @@ export async function buildFHIRBundle(
     builders,
     context
   )
+  let isADuplicate = false
+  if (eventType === EVENT_TYPE.BIRTH) {
+    isADuplicate = await hasBirthDuplicates(
+      authHeader,
+      reg as GQLBirthRegistrationInput
+    )
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    isADuplicate = await hasDeathDuplicates(
+      authHeader,
+      reg as GQLDeathRegistrationInput
+    )
+  }
+
+  if (isADuplicate) {
+    composition.resource.extension = composition.resource.extension || []
+    composition.resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
+      valueBoolean: true
+    })
+  }
   return fhirBundle
+}
+
+async function hasBirthDuplicates(
+  authHeader: IAuthHeader,
+  bundle: GQLBirthRegistrationInput
+) {
+  if (!bundle || !bundle.child) {
+    return false
+  }
+
+  const res = await findBirthDuplicates(authHeader, {
+    childFirstNames: bundle.child.name?.[0]?.firstNames,
+    childFamilyName: bundle.child.name?.[0]?.familyName,
+    childDoB: bundle.child.birthDate,
+    motherFirstNames: bundle.mother?.name?.[0]?.firstNames,
+    motherFamilyName: bundle.mother?.name?.[0]?.familyName,
+    motherDoB: bundle.mother?.birthDate
+  })
+
+  return !res || res.length > 0
+}
+
+async function hasDeathDuplicates(
+  authHeader: IAuthHeader,
+  bundle: GQLDeathRegistrationInput
+) {
+  if (!bundle || !bundle.causeOfDeath) {
+    return false
+  }
+
+  const res = await findDeathDuplicates(authHeader, {
+    deceasedFirstNames: bundle.deceased?.name?.[0]?.firstNames,
+    deceasedFamilyName: bundle.deceased?.name?.[0]?.familyName,
+    deceasedIdentifier: bundle.deceased?.identifier?.[0]?.id,
+    deceasedDoB: bundle.deceased?.birthDate,
+    deathDate: bundle.deceased?.deceased?.deathDate
+  })
+
+  return !res || res.length > 0
 }
 
 export async function updateFHIRTaskBundle(
   taskEntry: ITaskBundleEntry,
   status: string,
   reason?: string,
-  comment?: string
+  comment?: string,
+  duplicateTrackingId?: string
 ) {
   const taskResource = taskEntry.resource
-  taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  taskEntry.resource = updateTaskTemplate(
+    taskResource,
+    status,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
   taskEntry.resource.lastModified = new Date().toISOString()
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',

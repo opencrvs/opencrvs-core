@@ -60,6 +60,8 @@ interface IConstantsMessages
   downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
+  registeredAt: MessageDescriptor
+  registeredBy: MessageDescriptor
   lastUpdated: MessageDescriptor
   startedAt: MessageDescriptor
   startedBy: MessageDescriptor
@@ -160,6 +162,7 @@ interface IConstantsMessages
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
+  duplicateOf: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -425,6 +428,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Event',
     description: 'Label for table header column Event type',
     id: 'constants.eventType'
+  },
+  registeredAt: {
+    defaultMessage: 'Registered at',
+    description: 'Label for comparison row registeredAt type',
+    id: 'constants.registeredAt'
+  },
+  registeredBy: {
+    defaultMessage: 'Registered by',
+    description: 'Label for comparison row registeredBy type',
+    id: 'constants.registeredBy'
   },
   lastUpdated: {
     defaultMessage: 'Last updated',
@@ -941,6 +954,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Refresh',
     description: 'label for refresh',
     id: 'constants.refresh'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'constants.duplicateOf'
   }
 }
 

@@ -42,6 +42,7 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
+import { client } from '@search/elasticsearch/client'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'
@@ -132,7 +133,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
@@ -141,7 +142,7 @@ async function indexDeclaration(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
     event: EVENT.MARRIAGE,
     createdAt:
@@ -153,7 +154,7 @@ async function indexDeclaration(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
+  await indexComposition(compositionId, body, client)
 }
 
 async function createIndexBody(

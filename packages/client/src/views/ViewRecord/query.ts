@@ -11,10 +11,11 @@
  */
 
 import { gql } from '@apollo/client'
+import { client } from '@client/utils/apolloClient'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
-    fetchRegistrationForViewing(id: $id) {
+    fetchRegistrationForViewing(id: $id) @persist {
       __typename
       id
       registration {
@@ -24,7 +25,10 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         attachments {
           data
           type
@@ -498,45 +502,6 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             }
           }
         }
-        registration {
-          id
-          informantType
-          otherInformantType
-          contact
-          contactRelationship
-          contactPhoneNumber
-          informantsSignature
-          groomSignature
-          brideSignature
-          witnessOneSignature
-          witnessTwoSignature
-          duplicates
-          attachments {
-            data
-            type
-            contentType
-            subject
-          }
-          status {
-            comments {
-              comment
-            }
-            type
-            timestamp
-            office {
-              name
-              alias
-              address {
-                district
-                state
-              }
-            }
-          }
-          type
-          trackingId
-          registrationNumber
-          mosipAid
-        }
         typeOfMarriage
         eventLocation {
           id
@@ -557,3 +522,30 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
     }
   }
 `
+
+async function fetchDuplicateDeclarations(id: string) {
+  return (
+    client &&
+    client.query({
+      query: FETCH_VIEW_RECORD_BY_COMPOSITION,
+      variables: { id },
+      fetchPolicy: 'network-only'
+    })
+  )
+}
+
+async function fetchDeclarationForViewing(id: string) {
+  return (
+    client &&
+    client.query({
+      query: FETCH_VIEW_RECORD_BY_COMPOSITION,
+      variables: { id },
+      fetchPolicy: 'cache-first'
+    })
+  )
+}
+
+export const ViewRecordQueries = {
+  fetchDuplicateDeclarations,
+  fetchDeclarationForViewing
+}

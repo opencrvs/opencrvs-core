@@ -23,7 +23,10 @@ import {
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { client } from '@client/utils/apolloClient'
-import { getBirthMutation } from '@client/views/DataProvider/birth/mutations'
+import {
+  getBirthMutation,
+  MARK_EVENT_AS_DUPLICATE
+} from '@client/views/DataProvider/birth/mutations'
 import { Event } from '@client/utils/gateway'
 import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
 import {
@@ -32,10 +35,14 @@ import {
 } from '@client/transformer'
 import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
-import { showUnassigned } from '@client/notification/actions'
+import {
+  showDuplicateRecordsToast,
+  showUnassigned
+} from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
 import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutations'
+import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
 // eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
 
@@ -72,7 +79,10 @@ function getGqlDetails(form: IForm, draft: IDeclaration) {
   return gqlDetails
 }
 
-function updateDeclaration(dispatch: Dispatch, declaration: IDeclaration) {
+export function updateDeclaration(
+  dispatch: Dispatch,
+  declaration: IDeclaration
+) {
   dispatch(modifyDeclaration(declaration))
   dispatch(writeDeclaration(declaration))
 }
@@ -83,6 +93,27 @@ function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
     systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
+}
+
+async function removeDuplicatesFromCompositionAndElastic(
+  declaration: IDeclaration,
+  submissionAction: SubmissionAction
+) {
+  if (
+    declaration.isNotDuplicate &&
+    [
+      SubmissionAction.REGISTER_DECLARATION,
+      SubmissionAction.REJECT_DECLARATION,
+      SubmissionAction.APPROVE_DECLARATION
+    ].includes(submissionAction)
+  ) {
+    await client.mutate({
+      mutation: NOT_A_DUPLICATE,
+      variables: {
+        id: declaration.id
+      }
+    })
+  }
 }
 
 export const submissionMiddleware: Middleware<{}, IStoreState> =
@@ -131,13 +162,41 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         : getMarriageMutation(submissionAction)
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
-        await client.mutate({
+        const response = await client.mutate({
           mutation,
           variables: {
             details: gqlDetails
           }
         })
-      } else if (submissionAction === SubmissionAction.REJECT_DECLARATION) {
+        const { isPotentiallyDuplicate, trackingId, compositionId } =
+          response?.data?.createBirthRegistration ?? {}
+
+        if (isPotentiallyDuplicate) {
+          dispatch(
+            showDuplicateRecordsToast({
+              trackingId,
+              compositionId
+            })
+          )
+        }
+      } else if (
+        [
+          SubmissionAction.REJECT_DECLARATION,
+          SubmissionAction.ARCHIVE_DECLARATION
+        ].includes(submissionAction)
+      ) {
+        if (
+          declaration.payload?.reason === 'duplicate' &&
+          SubmissionAction.ARCHIVE_DECLARATION === submissionAction
+        ) {
+          await client.mutate({
+            mutation: MARK_EVENT_AS_DUPLICATE,
+            variables: {
+              ...declaration.payload
+            }
+          })
+        }
+        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
         await client.mutate({
           mutation,
           variables: {
@@ -167,6 +226,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
         return
       } else {
+        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
         await client.mutate({
           mutation,
           variables: {

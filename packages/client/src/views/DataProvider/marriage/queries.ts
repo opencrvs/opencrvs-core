@@ -130,7 +130,10 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         brideSignature
         witnessOneSignature
         witnessTwoSignature
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         attachments {
           data
           type
@@ -385,7 +388,10 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         brideSignature
         witnessOneSignature
         witnessTwoSignature
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         attachments {
           data
           type

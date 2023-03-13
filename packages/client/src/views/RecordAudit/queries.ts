@@ -22,7 +22,10 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
         status {
           type
         }
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         assignment {
           userId
           firstName

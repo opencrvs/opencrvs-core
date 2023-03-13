@@ -83,7 +83,7 @@ export const REJECT_MARRIAGE_DECLARATION = gql`
 `
 
 export const ARCHIVE_MARRIAGE_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
+  mutation markMarriageAsArchived($id: String!) {
     markEventAsArchived(id: $id)
   }
 `

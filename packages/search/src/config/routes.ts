@@ -16,7 +16,9 @@ import {
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
   advancedRecordSearch,
-  searchAssignment
+  searchAssignment,
+  searchForBirthDeDuplication,
+  searchForDeathDeDuplication
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -208,6 +210,40 @@ export const getRoutes = () => {
           scope: [RouteScope.NATLSYSADMIN]
         },
         description: 'Delete ocrvs index from elasticsearch'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/duplicates/birth',
+      handler: searchForBirthDeDuplication,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        description: 'Handles searching from declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/duplicates/death',
+      handler: searchForDeathDeDuplication,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        description: 'Handle searching from death declarations'
       }
     }
   ]

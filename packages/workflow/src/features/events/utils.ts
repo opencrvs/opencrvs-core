@@ -70,7 +70,8 @@ export enum Events {
   UNASSIGNED_EVENT = '/events/unassigned',
   VERIFIED_EVENT = '/events/verified',
   UNKNOWN = 'unknown',
-  VIEWED = '/events/viewed'
+  VIEWED = '/events/viewed',
+  MARKED_AS_DUPLICATE = '/events/markAsDuplicate'
 }
 
 export const SECTION_CODE: Record<EVENT_TYPE, string[]> = {
