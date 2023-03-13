@@ -237,26 +237,26 @@ export const getFieldValidation = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): Validation[] => {
-  const validate: Validation[] = []
+  const validator: Validation[] = []
   if (
     field.dynamicDefinitions &&
-    field.dynamicDefinitions.validate &&
-    field.dynamicDefinitions.validate.length > 0
+    field.dynamicDefinitions.validator &&
+    field.dynamicDefinitions.validator.length > 0
   ) {
-    field.dynamicDefinitions.validate.map(
+    field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
         )
         const fun = element.validator(...params)
-        validate.push(fun)
+        validator.push(fun)
         return element
       }
     )
   }
 
-  return validate
+  return validator
 }
 
 export function getNextSectionIds(

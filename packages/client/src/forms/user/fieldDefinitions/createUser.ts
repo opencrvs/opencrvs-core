@@ -47,7 +47,7 @@ export const userSectionFormType: ISerializedFormSection = {
           required: false,
           hidden: true,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'registrationOffice',
@@ -57,7 +57,7 @@ export const userSectionFormType: ISerializedFormSection = {
           initialValue: '',
           searchableResource: ['offices'],
           searchableType: ['CRVS_OFFICE'],
-          validate: [
+          validator: [
             {
               operation: 'officeMustBeSelected'
             }
@@ -86,7 +86,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.firstNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -104,7 +104,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -123,7 +123,7 @@ export const userSectionFormType: ISerializedFormSection = {
           previewGroup: 'userNameGroup',
           required: false,
           initialValue: '',
-          validate: [],
+          validator: [],
           readonly: true,
           hidden: true
         },
@@ -133,7 +133,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat' }],
+          validator: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
               operation: 'msisdnTransformer',
@@ -151,7 +151,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.NID,
           required: false,
           initialValue: '',
-          validate: [
+          validator: [
             {
               operation: 'validIDNumber',
               parameters: [NATIONAL_ID]
@@ -178,7 +178,7 @@ export const userSectionFormType: ISerializedFormSection = {
           },
           initialValue: '',
           ignoreBottomMargin: true,
-          validate: [],
+          validator: [],
           conditionals: []
         },
         {
@@ -187,7 +187,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.role,
           required: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           options: [],
           conditionals: []
         },
@@ -199,7 +199,7 @@ export const userSectionFormType: ISerializedFormSection = {
           hidden: true,
           hideValueInPreview: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           conditionals: []
         },
 
@@ -209,7 +209,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userDevice,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         }
       ]
     },
@@ -231,7 +231,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userAttachmentSection,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'signature',
@@ -241,7 +241,7 @@ export const userSectionFormType: ISerializedFormSection = {
           allowedDocType: ['image/png'],
           initialValue: '',
           required: true,
-          validate: []
+          validator: []
         }
       ]
     }

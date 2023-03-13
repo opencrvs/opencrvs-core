@@ -58,7 +58,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideInPreview: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 size: RadioSize.LARGE,
                 options: [
                   {
@@ -117,7 +117,7 @@ export const registerForms: IDefaultRegisterForms = {
                         formMessageDescriptors.relationshipPlaceHolder,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'englishOnlyNameFormat'
                         }
@@ -173,7 +173,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideHeader: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 size: RadioSize.LARGE,
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
@@ -222,7 +222,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -258,7 +258,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -294,7 +294,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -330,7 +330,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -366,7 +366,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -402,7 +402,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -438,7 +438,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -474,7 +474,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -510,7 +510,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -619,7 +619,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'isValidChildBirthDate'
                   }
@@ -649,7 +649,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -679,7 +679,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -707,7 +707,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.sex,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
@@ -740,7 +740,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 initialValue: '',
                 ignoreBottomMargin: true,
-                validate: [],
+                validator: [],
                 conditionals: []
               },
               {
@@ -750,7 +750,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.attendantAtBirth,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
@@ -810,7 +810,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
@@ -858,7 +858,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [0, 6]
@@ -888,7 +888,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'placeOfBirth',
                 ignoreBottomMargin: true,
                 initialValue: '',
-                validate: []
+                validator: []
               },
               {
                 name: 'placeOfBirth',
@@ -899,7 +899,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.placeOfBirth,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
@@ -939,7 +939,7 @@ export const registerForms: IDefaultRegisterForms = {
                 dynamicOptions: {
                   resource: 'facilities'
                 },
-                validate: [
+                validator: [
                   {
                     operation: 'facilityMustBeSelected'
                   }
@@ -1008,7 +1008,7 @@ export const registerForms: IDefaultRegisterForms = {
                   typeof window !== 'undefined'
                     ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
@@ -1045,7 +1045,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'validIDNumber',
                     parameters: ['NATIONAL_ID']
@@ -1099,7 +1099,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'dateFormatIsCorrect',
                     parameters: []
@@ -1161,7 +1161,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideHeader: true,
                 initialValue: false,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1189,7 +1189,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.ageOfInformant,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [12, 120]
@@ -1226,7 +1226,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -1268,7 +1268,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -1347,7 +1347,7 @@ export const registerForms: IDefaultRegisterForms = {
                 uncheckedValue: true,
                 hideHeader: true,
                 initialValue: true,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1371,7 +1371,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 type: 'TEXT',
                 label: formMessageDescriptors.reasonNA,
-                validate: [],
+                validator: [],
                 initialValue: '',
                 customisable: true,
                 required: true,
@@ -1391,7 +1391,7 @@ export const registerForms: IDefaultRegisterForms = {
                   typeof window !== 'undefined'
                     ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
@@ -1423,7 +1423,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'validIDNumber',
                     parameters: ['NATIONAL_ID']
@@ -1473,7 +1473,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'dateFormatIsCorrect',
                     parameters: []
@@ -1515,7 +1515,7 @@ export const registerForms: IDefaultRegisterForms = {
                 hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1538,7 +1538,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.ageOfMother,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [12, 120]
@@ -1570,7 +1570,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -1613,7 +1613,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -1644,7 +1644,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 initialValue: '',
                 ignoreBottomMargin: true,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1664,7 +1664,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
@@ -1748,7 +1748,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'greaterThanZero'
                   },
@@ -1775,7 +1775,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1797,7 +1797,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1900,7 +1900,7 @@ export const registerForms: IDefaultRegisterForms = {
                 uncheckedValue: true,
                 hideHeader: true,
                 initialValue: true,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1925,7 +1925,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.reasonNA,
                 customisable: true,
-                validate: [],
+                validator: [],
                 initialValue: '',
                 required: true,
                 mapping: {
@@ -1944,7 +1944,7 @@ export const registerForms: IDefaultRegisterForms = {
                   typeof window !== 'undefined'
                     ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
@@ -1976,7 +1976,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'validIDNumber',
                     parameters: ['NATIONAL_ID']
@@ -2015,7 +2015,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'dateFormatIsCorrect',
                     parameters: []
@@ -2068,7 +2068,7 @@ export const registerForms: IDefaultRegisterForms = {
                 hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -2091,7 +2091,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.ageOfFather,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [12, 120]
@@ -2123,7 +2123,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -2159,7 +2159,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -2197,7 +2197,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 initialValue: '',
                 ignoreBottomMargin: true,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -2217,7 +2217,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
@@ -2294,7 +2294,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -2316,7 +2316,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
@@ -2411,7 +2411,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'PARAGRAPH',
                 label: formMessageDescriptors.documentsParagraph,
                 initialValue: '',
-                validate: []
+                validator: []
               },
               {
                 name: 'uploadDocForChildDOB',
@@ -2420,7 +2420,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: birthDocumentForWhomFhirMapping.CHILD,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
@@ -2443,7 +2443,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: birthDocumentForWhomFhirMapping.MOTHER,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2487,7 +2487,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: birthDocumentForWhomFhirMapping.FATHER,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2531,7 +2531,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2574,7 +2574,7 @@ export const registerForms: IDefaultRegisterForms = {
                 extraValue:
                   birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value:
@@ -2632,7 +2632,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideInPreview: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 size: RadioSize.LARGE,
                 options: [
                   {
@@ -2697,7 +2697,7 @@ export const registerForms: IDefaultRegisterForms = {
                         formMessageDescriptors.relationshipPlaceHolder,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'englishOnlyNameFormat'
                         }
@@ -2753,7 +2753,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideHeader: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 size: RadioSize.LARGE,
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
@@ -2806,7 +2806,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -2842,7 +2842,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -2878,7 +2878,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -2914,7 +2914,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -2950,7 +2950,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -2986,7 +2986,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -3022,7 +3022,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -3058,7 +3058,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -3094,7 +3094,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -3130,7 +3130,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
-                      validate: [
+                      validator: [
                         {
                           operation: 'phoneNumberFormat'
                         }
@@ -3233,7 +3233,7 @@ export const registerForms: IDefaultRegisterForms = {
                   typeof window !== 'undefined'
                     ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
@@ -3258,7 +3258,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'validIDNumber',
                     parameters: ['NATIONAL_ID']
@@ -3297,7 +3297,7 @@ export const registerForms: IDefaultRegisterForms = {
                     expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
-                validate: [
+                validator: [
                   {
                     operation: 'isValidBirthDate'
                   }
@@ -3326,7 +3326,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideHeader: true,
                 initialValue: false,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -3348,7 +3348,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.ageOfDeceased,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [12, 120]
@@ -3375,7 +3375,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -3404,7 +3404,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -3431,7 +3431,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.sex,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
@@ -3464,7 +3464,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 initialValue: '',
                 ignoreBottomMargin: true,
-                validate: [],
+                validator: [],
                 conditionals: []
               },
               {
@@ -3474,7 +3474,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
@@ -3565,7 +3565,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.deathEventDate,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'isValidDeathOccurrenceDate'
                   }
@@ -3598,7 +3598,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.manner,
                 required: false,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
@@ -3647,7 +3647,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 hideHeader: true,
                 initialValue: 'false',
-                validate: [],
+                validator: [],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
@@ -3670,7 +3670,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 customisable: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
@@ -3723,7 +3723,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: '',
-                validate: [],
+                validator: [],
                 required: true,
                 customisable: true,
                 maxLength: 500,
@@ -3751,7 +3751,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.placeOfDeath,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
@@ -3796,7 +3796,7 @@ export const registerForms: IDefaultRegisterForms = {
                 dynamicOptions: {
                   resource: 'facilities'
                 },
-                validate: [
+                validator: [
                   {
                     operation: 'facilityMustBeSelected'
                   }
@@ -3846,7 +3846,7 @@ export const registerForms: IDefaultRegisterForms = {
                   typeof window !== 'undefined'
                     ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
-                validate: [],
+                validator: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
@@ -3883,7 +3883,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 customisable: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'validIDNumber',
                     parameters: ['NATIONAL_ID']
@@ -3935,7 +3935,7 @@ export const registerForms: IDefaultRegisterForms = {
                     expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
-                validate: [
+                validator: [
                   {
                     operation: 'dateFormatIsCorrect',
                     parameters: []
@@ -3991,7 +3991,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 hideHeader: true,
                 initialValue: false,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',
@@ -4019,7 +4019,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.ageOfInformant,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'range',
                     parameters: [12, 120]
@@ -4056,7 +4056,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -4098,7 +4098,7 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
-                validate: [
+                validator: [
                   {
                     operation: 'englishOnlyNameFormat'
                   }
@@ -4175,7 +4175,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'PARAGRAPH',
                 label: formMessageDescriptors.deceasedParagraph,
                 initialValue: '',
-                validate: []
+                validator: []
               },
               {
                 name: 'uploadDocForDeceased',
@@ -4184,7 +4184,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: deathDocumentTypeFhirMapping.NATIONAL_ID,
@@ -4219,7 +4219,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 extraValue: deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value: deathDocumentTypeFhirMapping.NATIONAL_ID,
@@ -4255,7 +4255,7 @@ export const registerForms: IDefaultRegisterForms = {
                 extraValue:
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 options: [
                   {
                     value:
@@ -4303,7 +4303,7 @@ export const registerForms: IDefaultRegisterForms = {
                 extraValue:
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
                 hideAsterisk: true,
-                validate: [],
+                validator: [],
                 conditionals: [
                   {
                     action: 'hide',

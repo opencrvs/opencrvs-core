@@ -348,6 +348,7 @@ export type Birth = {
   __typename?: 'Birth'
   FEE?: Maybe<BirthFee>
   LATE_REGISTRATION_TARGET?: Maybe<Scalars['Int']>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -377,6 +378,7 @@ export type BirthFeeInput = {
 export type BirthInput = {
   FEE?: InputMaybe<BirthFeeInput>
   LATE_REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -633,6 +635,7 @@ export type CustomSelectOption = {
 export type Death = {
   __typename?: 'Death'
   FEE?: Maybe<DeathFee>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -659,6 +662,7 @@ export type DeathFeeInput = {
 
 export type DeathInput = {
   FEE?: InputMaybe<DeathFeeInput>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -1200,10 +1204,12 @@ export type Mutation = {
   deleteFormDraft?: Maybe<Scalars['String']>
   deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
+  markBirthAsIssued: Scalars['ID']
   markBirthAsRegistered: BirthRegistration
   markBirthAsValidated?: Maybe<Scalars['ID']>
   markBirthAsVerified?: Maybe<BirthRegistration>
   markDeathAsCertified: Scalars['ID']
+  markDeathAsIssued: Scalars['ID']
   markDeathAsRegistered: DeathRegistration
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
@@ -1311,6 +1317,11 @@ export type MutationMarkBirthAsCertifiedArgs = {
   id: Scalars['ID']
 }
 
+export type MutationMarkBirthAsIssuedArgs = {
+  details: BirthRegistrationInput
+  id: Scalars['ID']
+}
+
 export type MutationMarkBirthAsRegisteredArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
@@ -1327,6 +1338,11 @@ export type MutationMarkBirthAsVerifiedArgs = {
 }
 
 export type MutationMarkDeathAsCertifiedArgs = {
+  details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkDeathAsIssuedArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
@@ -1855,6 +1871,8 @@ export type QuestionInput = {
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
+  validator?: InputMaybe<Array<ValidatorInput>>
 }
 
 export type QuestionnaireQuestion = {
@@ -1886,11 +1904,11 @@ export enum RegStatus {
   DeclarationUpdated = 'DECLARATION_UPDATED',
   Declared = 'DECLARED',
   InProgress = 'IN_PROGRESS',
+  Issued = 'ISSUED',
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
   Validated = 'VALIDATED',
-  WaitingValidation = 'WAITING_VALIDATION',
-  Issued = 'ISSUED'
+  WaitingValidation = 'WAITING_VALIDATION'
 }
 
 export type RegWorkflow = {
@@ -2309,6 +2327,11 @@ export type VsExport = {
   fileSize: Scalars['String']
   startDate: Scalars['Date']
   url: Scalars['String']
+}
+
+export type ValidatorInput = {
+  operation: Scalars['String']
+  parameters?: InputMaybe<Array<Scalars['Int']>>
 }
 
 export type VerifyPasswordResult = {
@@ -3232,6 +3255,16 @@ export type MarkBirthAsCertifiedMutation = {
   markBirthAsCertified: string
 }
 
+export type MarkBirthAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type MarkBirthAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markBirthAsIssued: string
+}
+
 export type SubmitMutationMutationVariables = Exact<{
   id: Scalars['String']
 }>
@@ -3925,6 +3958,16 @@ export type MarkDeathAsCertifiedMutationVariables = Exact<{
 export type MarkDeathAsCertifiedMutation = {
   __typename?: 'Mutation'
   markDeathAsCertified: string
+}
+
+export type MarkDeathAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type MarkDeathAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markDeathAsIssued: string
 }
 
 export type FetchDeathRegistrationForReviewQueryVariables = Exact<{
@@ -5870,6 +5913,7 @@ export type UpdateApplicationConfigMutation = {
       __typename?: 'Birth'
       REGISTRATION_TARGET?: number | null
       LATE_REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'BirthFee'
         ON_TIME?: number | null
@@ -5880,6 +5924,7 @@ export type UpdateApplicationConfigMutation = {
     DEATH?: {
       __typename?: 'Death'
       REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'DeathFee'
         ON_TIME?: number | null

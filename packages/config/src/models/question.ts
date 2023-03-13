@@ -39,6 +39,12 @@ export interface ISelectOption {
   value: string
   label: IMessage[]
 }
+
+export interface IValidate {
+  operation: string
+  parameters: number[]
+}
+
 export interface IQuestion {
   // fieldId is in the format:
   // event.sectionId.groupId.fieldName
@@ -63,6 +69,7 @@ export interface IQuestion {
   conditionals?: ICondition[]
   datasetId?: string
   options?: ISelectOption[]
+  validator?: IValidate[]
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -80,6 +87,17 @@ export const message = new Schema(
   {
     lang: { type: String, required: true },
     descriptor: { type: messageDescriptor, required: true }
+  },
+  { _id: false }
+)
+
+export const validator = new Schema(
+  {
+    operation: { type: String, required: true },
+    parameters: {
+      type: [{ type: Schema.Types.Mixed, required: false }],
+      default: undefined
+    }
   },
   { _id: false }
 )
@@ -140,6 +158,11 @@ const questionSchema = new Schema({
     type: [conditionals],
     default: undefined
   },
+  validator: [
+    {
+      type: validator
+    }
+  ],
   datasetId: { type: Schema.Types.ObjectId, ref: 'FormDataset' }
 })
 
