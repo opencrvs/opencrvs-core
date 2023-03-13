@@ -213,6 +213,7 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
+    unit: fieldDefinition.unit,
     hideAsterisk: fieldDefinition.hideAsterisk,
     hideInputHeader: fieldDefinition.hideHeader,
     error,
@@ -379,7 +380,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={String(value)}
           selected={(value as string) === checkedValue}
-          onChange={(event) =>
+          onChange={(event: { target: { value: string } }) =>
             onSetFieldValue(
               fieldDefinition.name,
               event.target.value === String(checkedValue)
@@ -471,6 +472,11 @@ function GeneratedInputField({
     return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
+    let inputFieldWidth = fieldDefinition.inputFieldWidth
+    if (fieldDefinition?.inputWidth) {
+      inputFieldWidth = fieldDefinition.inputWidth + 'px'
+    }
+
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -478,7 +484,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           max={fieldDefinition.max}
           {...inputProps}
-          onKeyPress={(e) => {
+          onKeyPress={(e: { key: string; preventDefault: () => void }) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
@@ -487,7 +493,7 @@ function GeneratedInputField({
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
           }}
-          inputFieldWidth={fieldDefinition.inputFieldWidth}
+          inputFieldWidth={inputFieldWidth}
         />
       </InputField>
     )

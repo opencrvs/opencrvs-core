@@ -93,6 +93,7 @@ import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
+const DEFAULT_INPUT_WIDTH = 100
 
 const CInputField = styled(InputField)`
   label {
@@ -105,9 +106,9 @@ const CTextInput = styled(TextInput)`
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
 `
-const CSelect = styled(Select)`
+const CSelect = styled(Select)<{ removeMargin?: boolean }>`
   width: 100%;
-  margin: 20px 0px;
+  ${({ removeMargin }) => !removeMargin && 'margin: 20px 0px;'}
   border-radius: 2px;
   .react-select__control {
     border: solid 1px ${({ theme }) => theme.colors.grey600};
@@ -270,6 +271,7 @@ interface ICustomField {
   label: string
   placeholder: string
   description: string
+  unit: string
   tooltip: string
   errorMessage: string
 }
@@ -298,6 +300,7 @@ interface ICustomFieldState {
   conditionalField: IConditionalFieldForms
   handleBars: string
   maxLength: number
+  inputWidth: number
   fieldForms: IFieldForms
   showCSVUploadingModal: boolean
   CSVUploadStatuses: CSVUploadStatus[]
@@ -385,6 +388,7 @@ class CustomFieldToolsComp extends React.Component<
       fieldForms[lang] = {
         label,
         placeholder: this.getIntlMessage(selectedField.placeholder, lang),
+        unit: this.getIntlMessage(selectedField.unit, lang),
         description: this.getIntlMessage(selectedField.description, lang),
         tooltip: this.getIntlMessage(selectedField.tooltip, lang),
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
@@ -399,6 +403,7 @@ class CustomFieldToolsComp extends React.Component<
         regex: conditionalfield?.regexp ?? EMPTY_STRING
       },
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
+      inputWidth: selectedField.inputWidth ?? DEFAULT_INPUT_WIDTH,
       fieldForms,
       showCSVUploadingModal: false,
       CSVUploadStatuses: [],
@@ -533,6 +538,13 @@ class CustomFieldToolsComp extends React.Component<
       handleBars,
       languages,
       fieldForms,
+      'unit',
+      optionalContent
+    )
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
       'tooltip',
       optionalContent
     )
@@ -558,11 +570,13 @@ class CustomFieldToolsComp extends React.Component<
       placeholder: optionalContent.placeholder,
       tooltip: optionalContent.tooltip,
       description: optionalContent.description,
+      unit: optionalContent.unit,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
       fieldId: newFieldID,
       /* We can't let maxlength be 0 as it doesn't make any sense */
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
+      inputWidth: this.state.inputWidth || DEFAULT_INPUT_WIDTH,
       label
     }
 
@@ -648,6 +662,32 @@ class CustomFieldToolsComp extends React.Component<
         </FieldContainer>
       )
     )
+  }
+
+  getUnitValue() {
+    const { intl } = this.props
+    return [
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionEmpty),
+        value: ''
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionG),
+        value: 'G'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionKg),
+        value: 'Kg'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionCm),
+        value: 'Cm'
+      },
+      {
+        label: intl.formatMessage(customFieldFormMessages.unitOptionM),
+        value: 'M'
+      }
+    ]
   }
 
   toggleButtons(fieldIds: string[]) {
@@ -835,6 +875,28 @@ class CustomFieldToolsComp extends React.Component<
                 </CInputField>
               </FieldContainer>
 
+              {formField.type === 'NUMBER' && (
+                <FieldContainer hide={language !== this.state.selectedLanguage}>
+                  <CInputField
+                    required={false}
+                    id={`custom-form-unit-${language}`}
+                    label={intl.formatMessage(
+                      customFieldFormMessages.unitLabel
+                    )}
+                    touched={false}
+                  >
+                    <CSelect
+                      removeMargin={true}
+                      value={this.state.fieldForms[language].unit}
+                      onChange={(value: string) => {
+                        this.setValue('unit', value)
+                      }}
+                      options={this.getUnitValue()}
+                    />
+                  </CInputField>
+                </FieldContainer>
+              )}
+
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
                   id={`custom-form-description-${language}`}
@@ -918,6 +980,28 @@ class CustomFieldToolsComp extends React.Component<
             />
           </CInputField>
         </FieldContainer>
+        {formField.type === 'NUMBER' && (
+          <FieldContainer>
+            <CInputField
+              required={false}
+              id="custom-form-input-width"
+              label={intl.formatMessage(
+                customFieldFormMessages.inputWidthLabel
+              )}
+              touched={false}
+            >
+              <CTextInput
+                type="number"
+                defaultValue={this.state.inputWidth}
+                onChange={(event: { target: { value: string | number } }) =>
+                  this.setState({
+                    inputWidth: +event.target.value
+                  })
+                }
+              />
+            </CInputField>
+          </FieldContainer>
+        )}
       </>
     )
   }

@@ -251,6 +251,10 @@ function deserializeDynamicDefinitions(
       dependency: descriptor.tooltip.dependency,
       tooltipMapper: labels[descriptor.tooltip.tooltipMapper.operation]
     },
+    unit: descriptor.unit && {
+      dependency: descriptor.unit.dependency,
+      unitMapper: labels[descriptor.unit.unitMapper.operation]
+    },
     type:
       descriptor.type &&
       (descriptor.type.kind === 'static'

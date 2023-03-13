@@ -158,6 +158,10 @@ export type IDynamicFormFieldToolTipMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
+export type IDynamicFormFieldUnitMapper = (
+  key: string
+) => MessageDescriptor | undefined
+
 export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
@@ -174,6 +178,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
   tooltip?: {
     dependency: string
     tooltipMapper: Operation<typeof labels>
+  }
+  unit?: {
+    dependency: string
+    unitMapper: Operation<typeof labels>
   }
   type?:
     | IStaticFieldType
@@ -192,6 +200,7 @@ export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
+  unit?: IDynamicFieldUnit
   type?: IDynamicFieldType | IStaticFieldType
   validator?: IDynamicFormFieldValidators[]
 }
@@ -209,6 +218,11 @@ export interface IDynamicFieldHelperText {
 export interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
+}
+
+export interface IDynamicFieldUnit {
+  dependency: string
+  unitMapper: IDynamicFormFieldUnitMapper
 }
 
 export interface IDynamicFieldType {
@@ -446,6 +460,7 @@ export interface IFormFieldBase {
   validateEmpty?: boolean
   prefix?: string
   postfix?: string
+  unit?: MessageDescriptor
   disabled?: boolean
   enabled?: string
   custom?: boolean
@@ -549,6 +564,7 @@ export interface INumberFormField extends IFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -1033,6 +1049,7 @@ export interface Ii18nFormFieldBase {
   initialValue?: IFormFieldValue
   extraValue?: IFormFieldValue
   postfix?: string
+  unit?: string
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
@@ -1103,6 +1120,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {

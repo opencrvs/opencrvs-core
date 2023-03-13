@@ -1117,8 +1117,10 @@ input QuestionInput {
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
   tooltip: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
   maxLength: Int
+  inputWidth: Int
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!

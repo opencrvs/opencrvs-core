@@ -1857,6 +1857,7 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  unit?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
   fieldId: Scalars['String']
@@ -1864,6 +1865,7 @@ export type QuestionInput = {
   fieldType?: InputMaybe<CustomFieldType>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
+  inputWidth?: InputMaybe<Scalars['Int']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
