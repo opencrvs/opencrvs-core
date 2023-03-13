@@ -237,20 +237,16 @@ export interface GQLRecordDetailsNameMap {
   DeathRegistration: GQLDeathRegistration
 }
 
-export const enum GQLAuthorizationStatus {
-  ANONYMOUS = 'ANONYMOUS'
-}
-
 export interface GQLLocation {
   id: string
   _fhirID?: string
   identifier?: Array<GQLIdentifier>
-  status: string
-  name: string
-  alias: Array<string>
+  status?: string
+  name?: string
+  alias?: Array<string>
   description?: string
-  partOf: string
-  type: GQLLocationType
+  partOf?: string
+  type?: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number

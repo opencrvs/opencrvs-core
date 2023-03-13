@@ -567,7 +567,6 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {
