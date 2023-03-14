@@ -269,8 +269,6 @@ describe('when user is previewing the form data', () => {
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
-      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
-
       app
         .find('#rejectionCommentForHealthWorker')
         .hostNodes()
