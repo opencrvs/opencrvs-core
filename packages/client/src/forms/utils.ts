@@ -56,7 +56,8 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData
+  IOfflineData,
+  LocationType
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -65,10 +66,12 @@ import {
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
+import { generateLocations } from '@client/utils/locationUtils'
+import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
-import { allCountries } from '@client/utils/countryUtils'
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -649,25 +652,14 @@ export const convertToMSISDN = (phone: string) => {
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    window.config.COUNTRY.toUpperCase() === 'FAR'
-      ? 'ZMB'
-      : window.config.COUNTRY.toUpperCase()
+  window.config.COUNTRY.toUpperCase() === 'FAR'
+    ? 'ZM'
+    : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
-  const defaultCountryZambia = allCountries[allCountries.length - 3]
-  const data =
-    allCountries.find(
-      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-    ) || defaultCountryZambia
+  const phoneUtil = PhoneNumberUtil.getInstance()
+  const number = phoneUtil.parse(phone, countryCode)
 
-  if (
-    phone.startsWith(data.dialCode) ||
-    `+${phone}`.startsWith(data.dialCode)
-  ) {
-    return phone.startsWith('+') ? phone : `+${phone}`
-  }
-  return phone.startsWith('0')
-    ? `${data.dialCode}${phone.substring(1)}`
-    : `${data.dialCode}${phone}`
+  return phoneUtil.format(number, PhoneNumberFormat.INTERNATIONAL)
 }
 
 export const isRadioGroupWithNestedField = (
