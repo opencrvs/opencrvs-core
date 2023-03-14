@@ -333,10 +333,6 @@ export type AuditLogItemBase = {
   userAgent: Scalars['String']
 }
 
-export enum AuthorizationStatus {
-  Anonymous = 'ANONYMOUS'
-}
-
 export type Avatar = {
   __typename?: 'Avatar'
   data: Scalars['String']
@@ -1060,7 +1056,7 @@ export type Location = {
   __typename?: 'Location'
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Address>
-  alias: Array<Scalars['String']>
+  alias?: Maybe<Array<Scalars['String']>>
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
@@ -1068,11 +1064,11 @@ export type Location = {
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
   longitude?: Maybe<Scalars['Float']>
-  name: Scalars['String']
-  partOf: Scalars['String']
-  status: Scalars['String']
+  name?: Maybe<Scalars['String']>
+  partOf?: Maybe<Scalars['String']>
+  status?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
-  type: LocationType
+  type?: Maybe<LocationType>
 }
 
 export type LocationInput = {
@@ -2905,9 +2901,9 @@ export type FetchUserQuery = {
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -2917,9 +2913,9 @@ export type FetchUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
@@ -3304,14 +3300,14 @@ export type GetUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
     } | null
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -3409,13 +3405,13 @@ export type MarkBirthAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3442,14 +3438,14 @@ export type MarkEventAsVoidedMutation = {
   markEventAsVoided: string
 }
 
-export type MarkBirthAsArchivedMutationVariables = Exact<{
+export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
   reason?: InputMaybe<Scalars['String']>
   comment?: InputMaybe<Scalars['String']>
   duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
-export type MarkBirthAsArchivedMutation = {
+export type MarkEventAsArchivedMutation = {
   __typename?: 'Mutation'
   markEventAsArchived: string
 }
@@ -3675,8 +3671,8 @@ export type FetchBirthRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3688,7 +3684,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3720,8 +3716,16 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3972,13 +3976,13 @@ export type FetchBirthRegistrationForCertificateQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3995,7 +3999,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -4020,8 +4024,16 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4155,13 +4167,13 @@ export type MarkDeathAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4175,18 +4187,6 @@ export type MarkDeathAsRegisteredMutation = {
       } | null> | null
     } | null
   }
-}
-
-export type MarkDeathAsArchivedMutationVariables = Exact<{
-  id: Scalars['String']
-  reason?: InputMaybe<Scalars['String']>
-  comment?: InputMaybe<Scalars['String']>
-  duplicateTrackingId?: InputMaybe<Scalars['String']>
-}>
-
-export type MarkDeathAsArchivedMutation = {
-  __typename?: 'Mutation'
-  markEventAsArchived: string
 }
 
 export type MarkDeathAsCertifiedMutationVariables = Exact<{
@@ -4372,8 +4372,8 @@ export type FetchDeathRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4385,7 +4385,7 @@ export type FetchDeathRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4418,8 +4418,16 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4652,13 +4660,13 @@ export type FetchDeathRegistrationForCertificationQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4675,7 +4683,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4701,8 +4709,16 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4836,13 +4852,13 @@ export type MarkMarriageAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4856,15 +4872,6 @@ export type MarkMarriageAsRegisteredMutation = {
       } | null> | null
     } | null
   }
-}
-
-export type MarkMarriageAsArchivedMutationVariables = Exact<{
-  id: Scalars['String']
-}>
-
-export type MarkMarriageAsArchivedMutation = {
-  __typename?: 'Mutation'
-  markEventAsArchived: string
 }
 
 export type MarkMarriageAsCertifiedMutationVariables = Exact<{
@@ -5056,8 +5063,8 @@ export type FetchMarriageRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -5098,8 +5105,16 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -5347,8 +5362,8 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -5389,8 +5404,16 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -7929,7 +7952,7 @@ export type HasChildLocationQuery = {
   hasChildLocation?: {
     __typename?: 'Location'
     id: string
-    type: LocationType
+    type?: LocationType | null
     identifier?: Array<{
       __typename?: 'Identifier'
       system?: string | null
@@ -8067,7 +8090,7 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           home: number
           healthFacility: number
-          location: { __typename?: 'Location'; name: string }
+          location: { __typename?: 'Location'; name?: string | null }
         }>
       }
     | {
@@ -8084,7 +8107,7 @@ export type GetRegistrationsListByFilterQuery = {
             systemRole: SystemRoleType
             primaryOffice?: {
               __typename?: 'Location'
-              name: string
+              name?: string | null
               id: string
             } | null
             name: Array<{
@@ -8236,9 +8259,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -8265,7 +8288,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -8290,9 +8313,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -8319,7 +8342,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -8476,7 +8499,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             line?: Array<string | null> | null
@@ -8526,8 +8549,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -8551,9 +8574,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string
@@ -8758,7 +8785,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             type?: AddressType | null
@@ -8809,8 +8836,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -8834,9 +8861,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string
@@ -9089,8 +9120,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -9114,9 +9145,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string

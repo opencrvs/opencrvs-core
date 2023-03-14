@@ -77,7 +77,7 @@ export const REJECT_DEATH_DECLARATION = gql`
 `
 
 export const ARCHIVE_DEATH_DECLARATION = gql`
-  mutation markDeathAsArchived(
+  mutation markEventAsArchived(
     $id: String!
     $reason: String
     $comment: String

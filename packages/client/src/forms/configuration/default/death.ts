@@ -732,7 +732,7 @@ export const deathRegisterForms: ISerializedForm = {
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
               hideInPreview: true,
-              required: true,
+              required: false,
               hideHeader: true,
               initialValue: false,
               validate: [],
@@ -1391,7 +1391,7 @@ export const deathRegisterForms: ISerializedForm = {
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
               hideInPreview: true,
-              required: true,
+              required: false,
               hideHeader: true,
               initialValue: false,
               validate: [],

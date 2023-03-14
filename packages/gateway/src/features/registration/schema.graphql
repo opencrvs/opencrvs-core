@@ -616,7 +616,6 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {

@@ -83,8 +83,18 @@ export const REJECT_MARRIAGE_DECLARATION = gql`
 `
 
 export const ARCHIVE_MARRIAGE_DECLARATION = gql`
-  mutation markMarriageAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
