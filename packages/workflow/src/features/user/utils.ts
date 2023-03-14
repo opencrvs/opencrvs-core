@@ -68,7 +68,7 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
-  countryCode = countryCode.toUpperCase()
+  countryCode = countryCode.toUpperCase().slice(0, 2)
 
 
     const phoneUtil = PhoneNumberUtil.getInstance()

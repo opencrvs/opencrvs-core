@@ -17,7 +17,7 @@ export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+    country.toUpperCase() === 'FAR' ? 'ZM' : country.toUpperCase().slice(0,2)
 
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(localPhoneNumber, countryCode)

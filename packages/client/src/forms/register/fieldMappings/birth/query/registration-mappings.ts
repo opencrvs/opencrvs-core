@@ -177,14 +177,13 @@ export const certificateDateTransformer =
 const convertToLocal = (
   mobileWithCountryCode: string,
   country: string,
-  codeReplacement?: string
 ) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-
-    const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+  
+  const countryCode =
+    country.toUpperCase() === 'FAR' ? 'ZM' : country.toUpperCase().slice(0,2)
 
     const phoneUtil = PhoneNumberUtil.getInstance()
     const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
@@ -205,8 +204,7 @@ export const localPhoneTransformer =
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
     const localPhone = convertToLocal(
       msisdnPhone,
-      window.config.COUNTRY,
-      codeReplacement
+      window.config.COUNTRY
     )
     transformedData[sectionId][field.name] = localPhone
     return transformedData

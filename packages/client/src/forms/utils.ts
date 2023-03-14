@@ -653,8 +653,8 @@ export const convertToMSISDN = (phone: string) => {
    */
   const countryCode =
     window.config.COUNTRY.toUpperCase() === 'FAR'
-      ? 'ZMB'
-      : window.config.COUNTRY.toUpperCase()
+      ? 'ZM'
+      : window.config.COUNTRY.toUpperCase().slice(0,2)
 
   // const countryCallingCode =
   //   callingCountries[countryCode].countryCallingCodes[0]
