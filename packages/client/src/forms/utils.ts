@@ -71,6 +71,7 @@ import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -658,15 +659,10 @@ export const convertToMSISDN = (phone: string) => {
   const countryCallingCode =
     callingCountries[countryCode].countryCallingCodes[0]
 
-  if (
-    phone.startsWith(countryCallingCode) ||
-    `+${phone}`.startsWith(countryCallingCode)
-  ) {
-    return phone.startsWith('+') ? phone : `+${phone}`
-  }
-  return phone.startsWith('0')
-    ? `${countryCallingCode}${phone.substring(1)}`
-    : `${countryCallingCode}${phone}`
+  const phoneUtil = PhoneNumberUtil.getInstance()
+  const number = phoneUtil.parse(phone, countryCallingCode)
+
+  return phoneUtil.format(number, PhoneNumberFormat.E164)
 }
 
 export const isRadioGroupWithNestedField = (
