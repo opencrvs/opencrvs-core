@@ -656,13 +656,13 @@ export const convertToMSISDN = (phone: string) => {
       ? 'ZMB'
       : window.config.COUNTRY.toUpperCase()
 
-  const countryCallingCode =
-    callingCountries[countryCode].countryCallingCodes[0]
+  // const countryCallingCode =
+  //   callingCountries[countryCode].countryCallingCodes[0]
 
   const phoneUtil = PhoneNumberUtil.getInstance()
-  const number = phoneUtil.parse(phone, countryCallingCode)
+  const number = phoneUtil.parse(phone, countryCode)
 
-  return phoneUtil.format(number, PhoneNumberFormat.E164)
+  return phoneUtil.format(number, PhoneNumberFormat.INTERNATIONAL)
 }
 
 export const isRadioGroupWithNestedField = (

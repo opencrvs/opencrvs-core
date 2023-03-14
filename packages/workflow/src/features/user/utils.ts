@@ -14,6 +14,7 @@ import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
 export async function getUser(
   userId: string,
@@ -68,10 +69,13 @@ export const convertToLocal = (
   countryCode: string
 ) => {
   countryCode = countryCode.toUpperCase()
-  return mobileWithCountryCode.replace(
-    callingCountries[countryCode].countryCallingCodes[0],
-    '0'
-  )
+
+
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode.toUpperCase())
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+
 }
 
 // @todo remove this as it's not used anywhere (other than tests)

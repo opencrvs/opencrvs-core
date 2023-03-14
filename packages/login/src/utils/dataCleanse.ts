@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { callingCountries } from 'country-data'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
 export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
   /*
@@ -18,9 +19,11 @@ export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
   const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
-  return `${
-    callingCountries[countryCode].countryCallingCodes[0]
-  }${localPhoneNumber.substring(1)}`
+  const phoneUtil = PhoneNumberUtil.getInstance()
+  const number = phoneUtil.parse(localPhoneNumber, countryCode)
+
+  return phoneUtil.format(number, PhoneNumberFormat.INTERNATIONAL)
+
 }
 
 export const getMSISDNCountryCode = (countryCode: string) => {

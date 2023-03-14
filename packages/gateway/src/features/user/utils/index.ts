@@ -16,9 +16,9 @@ import {
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
-import { callingCountries } from 'country-data'
 import * as decode from 'jwt-decode'
 import fetch from 'node-fetch'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -31,10 +31,12 @@ export const convertToLocal = (
   countryCode: string
 ) => {
   countryCode = countryCode.toUpperCase()
-  return mobileWithCountryCode.replace(
-    callingCountries[countryCode].countryCallingCodes[0],
-    '0'
-  )
+
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+
 }
 
 export async function getUser(

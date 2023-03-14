@@ -31,6 +31,7 @@ import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -181,16 +182,15 @@ const convertToLocal = (
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-  const countryCode =
+
+    const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
-  return (
-    mobileWithCountryCode &&
-    mobileWithCountryCode.replace(
-      callingCountries[countryCode].countryCallingCodes[0],
-      codeReplacement ? codeReplacement : '0'
-    )
-  )
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+
 }
 
 export const localPhoneTransformer =
