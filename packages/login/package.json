@@ -73,6 +73,7 @@
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
+    "@types/google-libphonenumber": "^7.4.23",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.12.5",
@@ -87,6 +88,7 @@
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react-hooks": "^4.0.8",
+    "google-libphonenumber": "^3.2.32",
     "jwt-decode": "^2.2.0",
     "msw": "0.22.0",
     "opener": "^1.5.1",

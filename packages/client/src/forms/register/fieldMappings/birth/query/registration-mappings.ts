@@ -29,9 +29,10 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-import { allCountries } from '@client/utils/countryUtils'
+import { callingCountries } from 'country-data'
 
 import QRCode from 'qrcode'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -230,23 +231,23 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (mobileWithCountryCode: string, country: string) => {
+const convertToLocal = (
+  mobileWithCountryCode: string,
+  country: string,
+) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
+  
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+    country.toUpperCase() === 'FAR' ? 'ZM' : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
-  const defaultCountryZambia = allCountries[allCountries.length - 3]
-  const data =
-    allCountries.find(
-      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-    ) || defaultCountryZambia
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    console.log(mobileWithCountryCode)
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
 
-  return (
-    mobileWithCountryCode &&
-    mobileWithCountryCode.replace(data.dialCode, data.priority)
-  )
 }
 
 export const localPhoneTransformer =
@@ -259,7 +260,10 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
-    const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
+    const localPhone = convertToLocal(
+      msisdnPhone,
+      window.config.COUNTRY
+    )
     transformedData[sectionId][field.name] = localPhone
     return transformedData
   }
