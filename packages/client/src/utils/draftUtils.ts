@@ -18,13 +18,15 @@ import {
   BirthSection,
   DeathSection,
   IForm,
-  IFormSectionData
+  IFormSectionData,
+  MarriageSection
 } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLEventSearchSet
+  GQLEventSearchSet,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
@@ -90,6 +92,24 @@ export const getDraftInformantFullName = (
       return getInformantFullName(draft.data.child, language, lastNameFirst)
     case Event.Death:
       return getInformantFullName(draft.data.deceased, language, lastNameFirst)
+    case Event.Marriage:
+      if (draft.data.bride && draft.data.bride) {
+        const brideName = getInformantFullName(
+          draft.data.bride,
+          language,
+          lastNameFirst
+        )
+        const groomName = getInformantFullName(
+          draft.data.groom,
+          language,
+          lastNameFirst
+        )
+        return groomName + (brideName ? ` & ${brideName}` : '')
+      } else {
+        return draft.data.groom
+          ? getInformantFullName(draft.data.groom, language, lastNameFirst)
+          : getInformantFullName(draft.data.bride, language, lastNameFirst)
+      }
   }
 }
 
@@ -159,6 +179,67 @@ const transformDeathSearchQueryDataToDraft = (
   }
 }
 
+const transformMarriageSearchQueryDataToDraft = (
+  data: GQLMarriageEventSearchSet,
+  declaration: IDeclaration
+) => {
+  declaration.data.bride = {
+    brideFirstNamesEng:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    brideFamilyNameEng:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    brideFirstNames:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    brideFamilyName:
+      (data.brideName &&
+        data.brideName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    marriageDate: data.dateOfMarriage && data.dateOfMarriage
+  }
+
+  declaration.data.groom = {
+    groomFirstNamesEng:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    groomFamilyNameEng:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    groomFirstNames:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
+      '',
+    groomFamilyName:
+      (data.groomName &&
+        data.groomName
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
+      '',
+    marriageDate: data.dateOfMarriage && data.dateOfMarriage
+  }
+}
+
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
 ): IDeclaration => {
@@ -192,6 +273,9 @@ export const transformSearchQueryDataToDraft = (
     case Event.Death:
       transformDeathSearchQueryDataToDraft(data, declaration)
       break
+    case Event.Marriage:
+      transformMarriageSearchQueryDataToDraft(data, declaration)
+      break
   }
 
   return declaration
@@ -202,9 +286,11 @@ export const getAttachmentSectionKey = (declarationEvent: Event): string => {
     case Event.Death:
       return DeathSection.DeathDocuments
     case Event.Birth:
-    default:
       return BirthSection.Documents
+    case Event.Marriage:
+    default:
   }
+  return MarriageSection.Documents
 }
 
 export function isDeclarationInReadyToReviewStatus(

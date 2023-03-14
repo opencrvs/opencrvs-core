@@ -25,7 +25,7 @@ import {
   prepareNewCustomFieldConfig
 } from './utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 import { IDataSourceSelectOption } from '@client/forms/configuration/formConfig/utils'
 
@@ -43,6 +43,10 @@ export type IFormConfigState =
         configFields: ISectionFieldMap
       }
       death: {
+        formDraft: IFormDraft
+        configFields: ISectionFieldMap
+      }
+      marriage: {
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
@@ -71,6 +75,11 @@ function getReadyState(formConfig: IFormConfig) {
     Event.Death
   )
 
+  const defaultMarriageForm = populateRegisterFormsWithAddresses(
+    registerForms[Event.Marriage],
+    Event.Marriage
+  )
+
   return {
     state: 'READY' as const,
     birth: {
@@ -91,6 +100,17 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
+        questionConfig,
+        formDataset
+      )
+    },
+    marriage: {
+      formDraft:
+        getEventDraft(formDrafts, Event.Marriage) ||
+        DEFAULT_FORM_DRAFT[Event.Marriage],
+      configFields: generateConfigFields(
+        Event.Marriage,
+        defaultMarriageForm,
         questionConfig,
         formDataset
       )
