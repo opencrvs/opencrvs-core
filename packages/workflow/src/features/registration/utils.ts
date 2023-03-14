@@ -270,13 +270,28 @@ export async function sendRegisteredNotification(
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
-  if (eventType === EVENT_TYPE.BIRTH) {
+  const informantSMSNotifications = (await getInformantSMSNotification(
+    authHeader.Authorization
+  )) as IInformantSMSNotification[] | []
+  if (
+    eventType === EVENT_TYPE.BIRTH &&
+    isInformantSMSNotificationEnabled(
+      informantSMSNotifications,
+      InformantSMSNotificationName.birthRegistrationSMS
+    )
+  ) {
     await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
       name: informantName,
       trackingId,
       registrationNumber
     })
-  } else {
+  } else if (
+    eventType === EVENT_TYPE.DEATH &&
+    isInformantSMSNotificationEnabled(
+      informantSMSNotifications,
+      InformantSMSNotificationName.deathRegistrationSMS
+    )
+  ) {
     await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
       name: informantName,
       trackingId,
