@@ -70,7 +70,7 @@ type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
-  handleVerification = () => {
+  handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const isIssueUrl = window.location.href.includes('issue')
     const event = this.props.declaration.event
     const eventDate = getEventDate(this.props.declaration.data, event)
@@ -80,7 +80,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const declaration = { ...this.props.declaration }
     if (declaration.data.registration.certificates.length) {
       declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
-        true
+        hasShowedVerifiedDocument
     }
 
     this.props.modifyDeclaration(declaration)
@@ -120,28 +120,8 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  handleNegativeVerification = () => {
-    const { declaration } = this.props
-    const certificates = declaration.data.registration.certificates
-
-    const certificate = (certificates && certificates[0]) || {}
-
-    this.props.modifyDeclaration({
-      ...declaration,
-      data: {
-        ...declaration.data,
-        registration: {
-          ...declaration.data.registration,
-          certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
-        }
-      }
-    })
-
-    this.handleVerification()
-  }
-
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
-    const { intl, declaration, offlineCountryConfiguration } = this.props
+    const { intl, declaration } = this.props
     const info = declaration.data[collector]
     const fields = verifyIDOnBirthCertificateCollectorDefinition[
       declaration.event
@@ -222,11 +202,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
-              handler: this.handleVerification
+              handler: () => this.handleVerification(true)
             },
             negativeAction: {
               label: intl.formatMessage(messages.idCheckWithoutVerify),
-              handler: this.handleNegativeVerification
+              handler: () => this.handleVerification(false)
             }
           }}
         />
