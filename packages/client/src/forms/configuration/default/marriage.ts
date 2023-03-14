@@ -443,7 +443,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 description: 'Checkbox for exact date of birth unknown',
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
-              required: true,
+              required: false,
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
@@ -716,7 +716,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 description: 'Checkbox for exact date of birth unknown',
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
-              required: true,
+              required: false,
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,

@@ -1136,7 +1136,7 @@ export const birthRegisterForms: ISerializedForm = {
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
               hideInPreview: true,
-              required: true,
+              required: false,
               hideHeader: true,
               initialValue: false,
               validate: [],
@@ -1489,7 +1489,7 @@ export const birthRegisterForms: ISerializedForm = {
                 description: 'Checkbox for exact date of birth unknown',
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
-              required: true,
+              required: false,
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
@@ -2042,7 +2042,7 @@ export const birthRegisterForms: ISerializedForm = {
                 description: 'Checkbox for exact date of birth unknown',
                 id: 'form.field.label.exactDateOfBirthUnknown'
               },
-              required: true,
+              required: false,
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,

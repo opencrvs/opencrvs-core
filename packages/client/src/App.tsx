@@ -110,11 +110,6 @@ export function App(props: IAppProps) {
                     <SessionExpireConfirmation />
                     <NotificationComponent>
                       <Switch>
-                        <UnprotectedRoute
-                          exact
-                          path={routes.VIEW_VERIFY_CERTIFICATE}
-                          component={VerifyCertificatePage}
-                        />
                         <Route>
                           <Page>
                             <MainSection>
@@ -176,6 +171,13 @@ export function App(props: IAppProps) {
                                                 routes.DRAFT_BIRTH_PARENT_FORM
                                               }
                                               component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.VIEW_VERIFY_CERTIFICATE
+                                              }
+                                              component={VerifyCertificatePage}
                                             />
                                             <ProtectedRoute
                                               exact
