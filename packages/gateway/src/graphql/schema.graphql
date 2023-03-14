@@ -31,7 +31,6 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-    @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -369,22 +368,16 @@ type RegistrationCountResult {
 
 union RecordDetails = BirthRegistration | DeathRegistration
 
-enum AuthorizationStatus {
-  ANONYMOUS
-}
-
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
-
 type Location {
   id: ID!
   _fhirID: ID
   identifier: [Identifier!]
-  status: String!
-  name: String!
-  alias: [String!]!
+  status: String
+  name: String
+  alias: [String!]
   description: String
-  partOf: String!
-  type: LocationType!
+  partOf: String
+  type: LocationType
   telecom: [ContactPoint]
   address: Address
   longitude: Float

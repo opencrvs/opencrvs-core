@@ -329,10 +329,6 @@ export type AuditLogItemBase = {
   userAgent: Scalars['String']
 }
 
-export enum AuthorizationStatus {
-  Anonymous = 'ANONYMOUS'
-}
-
 export type Avatar = {
   __typename?: 'Avatar'
   data: Scalars['String']
@@ -348,6 +344,7 @@ export type Birth = {
   __typename?: 'Birth'
   FEE?: Maybe<BirthFee>
   LATE_REGISTRATION_TARGET?: Maybe<Scalars['Int']>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -377,6 +374,7 @@ export type BirthFeeInput = {
 export type BirthInput = {
   FEE?: InputMaybe<BirthFeeInput>
   LATE_REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -634,6 +632,7 @@ export type CustomSelectOption = {
 export type Death = {
   __typename?: 'Death'
   FEE?: Maybe<DeathFee>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: Maybe<Scalars['Int']>
 }
 
@@ -660,6 +659,7 @@ export type DeathFeeInput = {
 
 export type DeathInput = {
   FEE?: InputMaybe<DeathFeeInput>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
   REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
 }
 
@@ -1046,7 +1046,7 @@ export type Location = {
   __typename?: 'Location'
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Address>
-  alias: Array<Scalars['String']>
+  alias?: Maybe<Array<Scalars['String']>>
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
@@ -1054,11 +1054,11 @@ export type Location = {
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
   longitude?: Maybe<Scalars['Float']>
-  name: Scalars['String']
-  partOf: Scalars['String']
-  status: Scalars['String']
+  name?: Maybe<Scalars['String']>
+  partOf?: Maybe<Scalars['String']>
+  status?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
-  type: LocationType
+  type?: Maybe<LocationType>
 }
 
 export type LocationInput = {
@@ -1208,10 +1208,12 @@ export type Mutation = {
   deleteFormDraft?: Maybe<Scalars['String']>
   deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
+  markBirthAsIssued: Scalars['ID']
   markBirthAsRegistered: BirthRegistration
   markBirthAsValidated?: Maybe<Scalars['ID']>
   markBirthAsVerified?: Maybe<BirthRegistration>
   markDeathAsCertified: Scalars['ID']
+  markDeathAsIssued: Scalars['ID']
   markDeathAsRegistered: DeathRegistration
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
@@ -1320,6 +1322,11 @@ export type MutationMarkBirthAsCertifiedArgs = {
   id: Scalars['ID']
 }
 
+export type MutationMarkBirthAsIssuedArgs = {
+  details: BirthRegistrationInput
+  id: Scalars['ID']
+}
+
 export type MutationMarkBirthAsRegisteredArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
@@ -1336,6 +1343,11 @@ export type MutationMarkBirthAsVerifiedArgs = {
 }
 
 export type MutationMarkDeathAsCertifiedArgs = {
+  details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkDeathAsIssuedArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
@@ -1904,11 +1916,11 @@ export enum RegStatus {
   DeclarationUpdated = 'DECLARATION_UPDATED',
   Declared = 'DECLARED',
   InProgress = 'IN_PROGRESS',
+  Issued = 'ISSUED',
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
   Validated = 'VALIDATED',
-  WaitingValidation = 'WAITING_VALIDATION',
-  Issued = 'ISSUED'
+  WaitingValidation = 'WAITING_VALIDATION'
 }
 
 export type RegWorkflow = {
@@ -2749,9 +2761,9 @@ export type FetchUserQuery = {
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -2761,9 +2773,9 @@ export type FetchUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
@@ -3094,14 +3106,14 @@ export type GetUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
     } | null
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -3199,13 +3211,13 @@ export type MarkBirthAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3252,6 +3264,16 @@ export type MarkBirthAsCertifiedMutationVariables = Exact<{
 export type MarkBirthAsCertifiedMutation = {
   __typename?: 'Mutation'
   markBirthAsCertified: string
+}
+
+export type MarkBirthAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type MarkBirthAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markBirthAsIssued: string
 }
 
 export type SubmitMutationMutationVariables = Exact<{
@@ -3455,8 +3477,8 @@ export type FetchBirthRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3468,7 +3490,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3500,8 +3522,16 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3752,13 +3782,13 @@ export type FetchBirthRegistrationForCertificateQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3775,7 +3805,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3800,8 +3830,16 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3935,13 +3973,13 @@ export type MarkDeathAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3965,6 +4003,16 @@ export type MarkDeathAsCertifiedMutationVariables = Exact<{
 export type MarkDeathAsCertifiedMutation = {
   __typename?: 'Mutation'
   markDeathAsCertified: string
+}
+
+export type MarkDeathAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type MarkDeathAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markDeathAsIssued: string
 }
 
 export type FetchDeathRegistrationForReviewQueryVariables = Exact<{
@@ -4130,8 +4178,8 @@ export type FetchDeathRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4143,7 +4191,7 @@ export type FetchDeathRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4176,8 +4224,16 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4410,13 +4466,13 @@ export type FetchDeathRegistrationForCertificationQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4433,7 +4489,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4453,14 +4509,22 @@ export type FetchDeathRegistrationForCertificationQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
-      duplicateOf?: string | null
       ipAddress?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -5938,6 +6002,7 @@ export type UpdateApplicationConfigMutation = {
       __typename?: 'Birth'
       REGISTRATION_TARGET?: number | null
       LATE_REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'BirthFee'
         ON_TIME?: number | null
@@ -5948,6 +6013,7 @@ export type UpdateApplicationConfigMutation = {
     DEATH?: {
       __typename?: 'Death'
       REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'DeathFee'
         ON_TIME?: number | null
@@ -6323,7 +6389,7 @@ export type HasChildLocationQuery = {
   hasChildLocation?: {
     __typename?: 'Location'
     id: string
-    type: LocationType
+    type?: LocationType | null
     identifier?: Array<{
       __typename?: 'Identifier'
       system?: string | null
@@ -6461,7 +6527,7 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           home: number
           healthFacility: number
-          location: { __typename?: 'Location'; name: string }
+          location: { __typename?: 'Location'; name?: string | null }
         }>
       }
     | {
@@ -6478,7 +6544,7 @@ export type GetRegistrationsListByFilterQuery = {
             systemRole: SystemRoleType
             primaryOffice?: {
               __typename?: 'Location'
-              name: string
+              name?: string | null
               id: string
             } | null
             name: Array<{
@@ -6630,9 +6696,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -6659,7 +6725,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -6684,9 +6750,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -6713,7 +6779,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -6870,7 +6936,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             line?: Array<string | null> | null
@@ -6920,8 +6986,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -6945,9 +7011,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string
@@ -7152,7 +7222,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             type?: AddressType | null
@@ -7203,8 +7273,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -7228,9 +7298,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string

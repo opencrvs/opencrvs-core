@@ -865,11 +865,20 @@ export const typeResolvers: GQLResolver = {
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
     user: async (task: fhir.Task, _: any, authHeader: any) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension as fhir.Extension[]
       )
-      if (!user || !user.valueReference || !user.valueReference.reference) {
+      if (
+        systemIdentifier ||
+        !user ||
+        !user.valueReference ||
+        !user.valueReference.reference
+      ) {
         return null
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
@@ -908,22 +917,13 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
-
-      return {
-        ...userResponse,
-        role: {
-          ...userResponse.role,
-          labels: [
-            {
-              lang: 'en',
-              label:
-                role ??
-                userResponse.role.labels.find((label) => label.lang === 'en')
-                  ?.label
-            }
-          ]
+      userResponse.role.labels.forEach((item) => {
+        if (item.lang === 'en') {
+          item.label = role ?? item.label
         }
-      }
+      })
+
+      return userResponse
     },
     system: async (task: fhir.Task, _: any, authHeader) => {
       const systemIdentifier = task.identifier?.find(
