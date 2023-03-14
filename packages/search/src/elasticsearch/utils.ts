@@ -27,7 +27,8 @@ import {
 
 export const enum EVENT {
   BIRTH = 'Birth',
-  DEATH = 'Death'
+  DEATH = 'Death',
+  MARRIAGE = 'Marriage'
 }
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
@@ -161,6 +162,29 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantFamilyNameLocal?: string
   informantDoB?: string
   informantIdentifier?: string
+}
+export interface IMarriageCompositionBody extends ICompositionBody {
+  brideFirstNames?: string
+  groomFirstNames?: string
+  brideFamilyName?: string
+  groomFamilyName?: string
+  brideFirstNamesLocal?: string
+  groomFirstNamesLocal?: string
+  brideFamilyNameLocal?: string
+  groomFamilyNameLocal?: string
+  brideDoB?: string
+  groomDoB?: string
+  marriageDate?: string
+  brideIdentifier?: string
+  groomIdentifier?: string
+  witnessOneFirstNames?: string
+  witnessOneFamilyName?: string
+  witnessOneFirstNamesLocal?: string
+  witnessOneFamilyNameLocal?: string
+  witnessTwoFirstNames?: string
+  witnessTwoFamilyName?: string
+  witnessTwoFirstNamesLocal?: string
+  witnessTwoFamilyNameLocal?: string
 }
 
 type Label = {

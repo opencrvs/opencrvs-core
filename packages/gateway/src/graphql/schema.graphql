@@ -30,6 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -200,6 +201,18 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration!
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   markEventAsDuplicate(
     id: String!
     reason: String!
@@ -364,6 +377,22 @@ interface EventRegistration {
 type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
+}
+
+type MarriageRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person
+  groom: Person
+  witnessOne: RelatedPerson
+  witnessTwo: RelatedPerson
+  eventLocation: Location
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
 union RecordDetails = BirthRegistration | DeathRegistration
@@ -691,6 +720,20 @@ input DeathRegistrationInput {
   updatedAt: Date
 }
 
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
+  createdAt: Date
+  updatedAt: Date
+}
+
 input UserInput {
   id: ID
   name: [HumanNameInput!]!
@@ -749,6 +792,7 @@ type ApplicationConfiguration {
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   DEATH: Death
+  MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -768,6 +812,7 @@ input ApplicationConfigurationInput {
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   DEATH: DeathInput
+  MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -862,6 +907,10 @@ type Registration {
   contact: String
   contactRelationship: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -969,6 +1018,7 @@ type HumanName {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 type ContactPoint {
@@ -1036,6 +1086,11 @@ enum EducationType {
 type StatusWiseRegistrationCount {
   status: String!
   count: Int!
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 type Identifier {
@@ -1167,6 +1222,7 @@ interface EventSearchSet {
 enum Event {
   birth
   death
+  marriage
 }
 
 type EventProgressSet {
@@ -1266,6 +1322,10 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
@@ -1319,6 +1379,7 @@ input HumanNameInput {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 input UserIdentifierInput {
@@ -1360,6 +1421,12 @@ type Death {
   PRINT_IN_ADVANCE: Boolean
 }
 
+type Marriage {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFee
+  PRINT_IN_ADVANCE: Boolean
+}
+
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1386,6 +1453,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
+}
+
+input MarriageInput {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -1441,6 +1514,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -1466,6 +1541,7 @@ type RegWorkflow {
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 type Certificate {
@@ -1518,6 +1594,7 @@ enum IdentityIDType {
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER
@@ -1553,6 +1630,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -1568,6 +1646,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+  MARRIAGE_NOTICE_PROOF
 }
 
 type RoleLabel {
@@ -1723,6 +1802,16 @@ type DeathEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
+type MarriageEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  brideName: [HumanName]
+  groomName: [HumanName]
+  dateOfMarriage: Date
+  registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
 type EventProgressData {
   timeInProgress: Int
   timeInReadyForReview: Int
@@ -1828,6 +1917,11 @@ type DeathFee {
   DELAYED: Float
 }
 
+type MarriageFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
 enum ImageFit {
   FILL
   TILE
@@ -1840,6 +1934,11 @@ input BirthFeeInput {
 }
 
 input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input MarriageFeeInput {
   ON_TIME: Float
   DELAYED: Float
 }

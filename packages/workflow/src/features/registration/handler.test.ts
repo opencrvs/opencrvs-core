@@ -917,7 +917,7 @@ describe('markEventAsRegisteredHandler handler', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/specs/types',
-                  code: 'birth-registration'
+                  code: 'BIRTH'
                 }
               ]
             },
@@ -1031,7 +1031,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             },
             identifier: [
               {
-                system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                system: 'http://opencrvs.org/specs/id/death-tracking-id',
                 value: 'D5WGYJE'
               }
             ],
