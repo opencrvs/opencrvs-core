@@ -29,13 +29,16 @@ export default {
   }
 } as Meta
 
-const Template: Story<ISelectProps> = (args) => <Select {...args} />
+const Template: Story<ISelectProps> = (args) => {
+  const [value, setValue] = React.useState('chocolate')
+  return <Select {...args} value={value} onChange={setValue} />
+}
 
 export const Default = Template.bind({})
 Default.args = {
   options: [
     { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'strawberry', label: 'Strawberry', disabled: true },
     { value: 'vanilla', label: 'Vanilla' }
   ],
   placeholder: 'Select a flavour'
