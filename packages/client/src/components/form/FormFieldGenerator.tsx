@@ -125,6 +125,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { Warning } from '@opencrvs/components/lib/icons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -248,7 +249,10 @@ function GeneratedInputField({
   }
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
-      <InputField {...inputFieldProps}>
+      <InputField
+        {...inputFieldProps}
+        postfix={error && touched ? <Warning /> : undefined}
+      >
         <Select
           {...inputProps}
           inputId={fieldDefinition.name}
@@ -409,7 +413,10 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === DATE) {
     return (
-      <InputField {...inputFieldProps}>
+      <InputField
+        {...inputFieldProps}
+        postfix={error && touched ? <Warning /> : undefined}
+      >
         <DateField
           {...inputProps}
           notice={fieldDefinition.notice}
@@ -473,7 +480,10 @@ function GeneratedInputField({
   }
   if (fieldDefinition.type === NUMBER) {
     return (
-      <InputField {...inputFieldProps}>
+      <InputField
+        {...inputFieldProps}
+        postfix={error && touched ? <Warning /> : undefined}
+      >
         <TextInput
           type="number"
           step={fieldDefinition.step}
@@ -496,7 +506,10 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === FORCED_NUMBER_MAX_LENGTH) {
     return (
-      <InputField {...inputFieldProps}>
+      <InputField
+        {...inputFieldProps}
+        postfix={error && touched ? <Warning /> : undefined}
+      >
         <TextInput
           type="text"
           inputMode="numeric"
@@ -602,7 +615,10 @@ function GeneratedInputField({
   }
 
   return (
-    <InputField {...inputFieldProps}>
+    <InputField
+      {...inputFieldProps}
+      postfix={error && touched ? <Warning /> : undefined}
+    >
       <TextInput
         type="text"
         {...inputProps}
