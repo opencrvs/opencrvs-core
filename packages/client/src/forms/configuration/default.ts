@@ -1158,7 +1158,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 hideInPreview: true,
-                required: true,
+                required: false,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
@@ -1511,7 +1511,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Checkbox for exact date of birth unknown',
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
-                required: true,
+                required: false,
                 hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
@@ -2064,7 +2064,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Checkbox for exact date of birth unknown',
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
-                required: true,
+                required: false,
                 hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
@@ -3323,7 +3323,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 hideInPreview: true,
-                required: true,
+                required: false,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
@@ -3988,7 +3988,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 hideInPreview: true,
-                required: true,
+                required: false,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],

@@ -95,9 +95,9 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
-  const informantSMSNotifications = (await getInformantSMSNotification(
+  const informantSMSNotifications = await getInformantSMSNotification(
     authHeader.Authorization
-  )) as IInformantSMSNotification[] | []
+  )
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       if (
@@ -270,9 +270,9 @@ export async function sendRegisteredNotification(
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
-  const informantSMSNotifications = (await getInformantSMSNotification(
+  const informantSMSNotifications = await getInformantSMSNotification(
     authHeader.Authorization
-  )) as IInformantSMSNotification[] | []
+  )
   if (
     eventType === EVENT_TYPE.BIRTH &&
     isInformantSMSNotificationEnabled(
@@ -598,7 +598,7 @@ async function getInformantSMSNotification(token: string) {
         Authorization: `Bearer ${token}`
       }
     })
-    return await res.json()
+    return (await res.json()) as IInformantSMSNotification[]
   } catch (err) {
     logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
     throw err
