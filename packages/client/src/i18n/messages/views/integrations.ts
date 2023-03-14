@@ -228,14 +228,6 @@ const messagesToDefine = {
       'A notification client (eg. hospital) can send a partial notification or a full declaration of a birth or death to OpenCRVS for processing. For more information, visit:',
     description: 'Label for  health notification description'
   },
-
-  nationalidAlertDescription: {
-    id: 'integrations.nationalidAlertDescription',
-    defaultMessage:
-      'A National ID client (eg. MOSIP) can react to birth or death webhooks to create or invalidate NID numbers, and respond to OpenCRVS to provide a temporary ID to children, and link vital events to each other. For more information, visit:',
-    description: 'Label for  national id description'
-  },
-
   recordSearchDescription: {
     id: 'integrations.recordSearchDescription',
     defaultMessage:
@@ -338,6 +330,41 @@ const messagesToDefine = {
     id: 'integrations.deleteSystemMsg',
     defaultMessage: 'System has been deleted successfully',
     description: 'Label for system deletion success message'
+  },
+  integratingSystemTypeMosip: {
+    id: 'integrations.integratingSystemTypeMosip',
+    defaultMessage: 'MOSIP',
+    description: 'Integrating system type option "MOSIP"'
+  },
+  integratingSystemTypeOsia: {
+    id: 'integrations.integratingSystemTypeOsia',
+    defaultMessage: 'OSIA (Coming soon)',
+    description: 'Integrating system type option "OSIA"'
+  },
+  integratingSystemTypeOther: {
+    id: 'integrations.integratingSystemTypeOther',
+    defaultMessage: 'Other',
+    description: 'Integrating system type option "Other"'
+  },
+  integratingSystemType: {
+    id: 'integrations.integratingSystemType',
+    defaultMessage: 'System',
+    description: 'Label for integrating system type'
+  },
+  integratingSystemTypeAlertMosip: {
+    id: 'integrations.integratingSystemTypeAlertMosip',
+    defaultMessage: 'Mosip copy tbd. TODO: Euan',
+    description: 'Label for alert when selecting MOSIP type'
+  },
+  integratingSystemTypeAlertOsia: {
+    id: 'integrations.integratingSystemTypeAlertOsia',
+    defaultMessage: 'Osia copy tbd. TODO: Euan',
+    description: 'Label for alert when selecting OSIA type'
+  },
+  integratingSystemTypeAlertOther: {
+    id: 'integrations.integratingSystemTypeAlertOther',
+    defaultMessage: 'Other copy tbd. TODO: Euan',
+    description: 'Label for alert when selecting other type'
   }
 }
 

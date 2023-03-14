@@ -16,6 +16,7 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   Event,
+  IntegratingSystemType,
   System,
   SystemStatus,
   SystemType,
@@ -144,7 +145,9 @@ export function SystemList() {
     refreshTokenLoading,
     refreshTokenError,
     resetData,
-    shouldWarnAboutNationalId
+    shouldWarnAboutNationalId,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType
   } = useSystems()
 
   function changeActiveStatusIntl(status: SystemStatus) {
@@ -543,6 +546,50 @@ export function SystemList() {
               </InputField>
             </Field>
 
+            {newSystemType === SystemType.NationalId && (
+              <Field>
+                <InputField
+                  id="integrating-system-type"
+                  touched={false}
+                  label={intl.formatMessage(
+                    integrationMessages.integratingSystemType
+                  )}
+                >
+                  <Select
+                    ignoreMediaQuery
+                    onChange={(val) => {
+                      setNewIntegratingSystemType(val as IntegratingSystemType)
+                    }}
+                    value={
+                      newIntegratingSystemType ?? IntegratingSystemType.Mosip
+                    }
+                    options={[
+                      {
+                        label: intl.formatMessage(
+                          integrationMessages.integratingSystemTypeMosip
+                        ),
+                        value: IntegratingSystemType.Mosip
+                      },
+                      {
+                        label: intl.formatMessage(
+                          integrationMessages.integratingSystemTypeOsia
+                        ),
+                        value: IntegratingSystemType.Osia,
+                        disabled: true
+                      },
+                      {
+                        label: intl.formatMessage(
+                          integrationMessages.integratingSystemTypeOther
+                        ),
+                        value: IntegratingSystemType.Other
+                      }
+                    ]}
+                    id={'integrating-system-select'}
+                  />
+                </InputField>
+              </Field>
+            )}
+
             {shouldWarnAboutNationalId && (
               <PaddedAlert type="error">
                 {intl.formatMessage(integrationMessages.onlyOneNationalIdError)}
@@ -567,9 +614,18 @@ export function SystemList() {
 
             {newSystemType === SystemType.NationalId && (
               <PaddedAlert type="info">
-                {intl.formatMessage(
-                  integrationMessages.nationalidAlertDescription
-                )}
+                {newIntegratingSystemType === IntegratingSystemType.Mosip &&
+                  intl.formatMessage(
+                    integrationMessages.integratingSystemTypeAlertMosip
+                  )}
+                {newIntegratingSystemType === IntegratingSystemType.Osia &&
+                  intl.formatMessage(
+                    integrationMessages.integratingSystemTypeAlertOsia
+                  )}
+                {newIntegratingSystemType === IntegratingSystemType.Other &&
+                  intl.formatMessage(
+                    integrationMessages.integratingSystemTypeAlertOther
+                  )}
                 <Link
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')

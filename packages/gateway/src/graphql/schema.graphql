@@ -609,6 +609,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  integratingSystemType: IntegratingSystemType
   settings: SystemSettings
 }
 
@@ -1228,6 +1229,12 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+}
+
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
 }
 
 type SystemSettings {

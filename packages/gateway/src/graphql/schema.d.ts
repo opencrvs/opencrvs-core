@@ -493,6 +493,7 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
+  integratingSystemType?: GQLIntegratingSystemType
   settings?: GQLSystemSettings
 }
 
@@ -1134,6 +1135,12 @@ export const enum GQLSystemType {
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
   WEBHOOK = 'WEBHOOK'
+}
+
+export const enum GQLIntegratingSystemType {
+  MOSIP = 'MOSIP',
+  OSIA = 'OSIA',
+  OTHER = 'OTHER'
 }
 
 export interface GQLSystemSettings {
@@ -4751,6 +4758,7 @@ export interface GQLSystemTypeResolver<TParent = any> {
   status?: SystemToStatusResolver<TParent>
   name?: SystemToNameResolver<TParent>
   type?: SystemToTypeResolver<TParent>
+  integratingSystemType?: SystemToIntegratingSystemTypeResolver<TParent>
   settings?: SystemToSettingsResolver<TParent>
 }
 
@@ -4775,6 +4783,13 @@ export interface SystemToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToIntegratingSystemTypeResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
