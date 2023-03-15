@@ -233,7 +233,7 @@ export function SystemList() {
       integrationMessages.integratingSystemTypeOsia
     ),
     [IntegratingSystemType.Other]: intl.formatMessage(
-      integrationMessages.integratingSystemTypeOther
+      integrationMessages.nationalID
     )
   }
 
