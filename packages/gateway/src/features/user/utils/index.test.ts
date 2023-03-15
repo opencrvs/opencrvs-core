@@ -30,6 +30,6 @@ describe('Verify utility functions', () => {
     )
   })
   it('replaces country code', async () => {
-    expect(convertToLocal('+8801711111111', 'bgd')).toBe('01711111111')
+    expect(convertToLocal('+8801711111111', 'ZM')).toBe('01711-111111')
   })
 })
