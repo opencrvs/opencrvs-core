@@ -57,10 +57,12 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   required: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
+  unit?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
   validateEmpty?: boolean
   maxLength?: number
+  inputWidth?: number
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]

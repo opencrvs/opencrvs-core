@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - 'develop'
+      - 'release-v1.4.0'
 
 jobs:
   push:
