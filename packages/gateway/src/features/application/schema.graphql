@@ -41,6 +41,17 @@ type Death {
   PRINT_IN_ADVANCE: Boolean
 }
 
+type MarriageFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+type Marriage {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFee
+  PRINT_IN_ADVANCE: Boolean
+}
+
 type CountryLogo {
   fileName: String
   file: String
@@ -72,6 +83,17 @@ input DeathFeeInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
+}
+
+input MarriageFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input MarriageInput {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -114,6 +136,7 @@ input ApplicationConfigurationInput {
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   DEATH: DeathInput
+  MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -133,6 +156,7 @@ type ApplicationConfiguration {
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   DEATH: Death
+  MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean

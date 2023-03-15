@@ -32,6 +32,8 @@ import {
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
 import { unionBy } from 'lodash'
+import { SECTION_CODE } from '@workflow/features/events/utils'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -118,15 +120,14 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
 }
 
 export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const eventType = getTaskEventType(taskResource) as EVENT_TYPE
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&
     taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
-          `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id` ||
-        identifier.system ===
-          `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`
+        `${OPENCRVS_SPECIFICATION_URL}id/${eventType.toLowerCase()}-tracking-id`
       )
     })
   if (!trackingIdentifier || !trackingIdentifier.value) {
@@ -135,14 +136,17 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
   return trackingIdentifier.value
 }
 
-export function getBirthRegistrationNumber(taskResource: fhir.Task) {
+export function getRegistrationNumber(
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
   const brnIdentifier =
     taskResource &&
     taskResource.identifier &&
     taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+        `${OPENCRVS_SPECIFICATION_URL}id/${eventType.toLowerCase()}-registration-number`
       )
     })
   if (!brnIdentifier || !brnIdentifier.value) {
@@ -150,33 +154,13 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   }
   return brnIdentifier.value
 }
-export function getDeathRegistrationNumber(taskResource: fhir.Task) {
-  const drnIdentifier =
-    taskResource &&
-    taskResource.identifier &&
-    taskResource.identifier.find((identifier) => {
-      return (
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
-      )
-    })
-  if (!drnIdentifier || !drnIdentifier.value) {
-    throw new Error("Didn't find any identifier for death registration number")
-  }
-  return drnIdentifier.value
-}
 
-export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+export function hasRegistrationNumber(
+  fhirBundle: fhir.Bundle,
+  eventType: EVENT_TYPE
+) {
   try {
-    getBirthRegistrationNumber(getTaskResource(fhirBundle))
-    return true
-  } catch (error) {
-    return false
-  }
-}
-export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
-  try {
-    getDeathRegistrationNumber(getTaskResource(fhirBundle))
+    getRegistrationNumber(getTaskResource(fhirBundle), eventType)
     return true
   } catch (error) {
     return false
@@ -313,6 +297,7 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
   return res.text()
 }
 
+//TODO: need to modifty for marriage event
 export async function getPhoneNo(
   taskResource: fhir.Task,
   eventType: EVENT_TYPE
@@ -336,6 +321,7 @@ export async function getPhoneNo(
   return phoneNumber
 }
 
+//TODO: need to modifty for marriage event
 export async function getEventInformantName(
   composition: fhir.Composition,
   eventType: EVENT_TYPE
@@ -346,7 +332,7 @@ export async function getEventInformantName(
       composition,
       CHILD_SECTION_CODE
     )
-  } else {
+  } else if (eventType === EVENT_TYPE.DEATH) {
     informantSection = getSectionEntryBySectionCode(
       composition,
       DECEASED_SECTION_CODE
@@ -396,36 +382,35 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
 export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
-  const section = getSectionEntryBySectionCode(
-    composition,
-    event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
-  )
-  const patient = getPatientBySection(bundle, section)
-  const patientFromFhir: fhir.Patient = await getFromFhir(
-    `/Patient/${patient?.id}`
-  )
-  if (patientFromFhir) {
-    bundle.entry =
-      bundle &&
-      bundle.entry &&
-      bundle.entry.map((entry) => {
-        if (entry.resource?.id === patientFromFhir.id) {
-          return {
-            ...entry,
-            resource: {
-              ...entry.resource,
-              identifier: unionBy(
-                (entry.resource as fhir.Patient).identifier,
-                patientFromFhir.identifier,
-                'type'
-              )
+  SECTION_CODE[event].map(async (sectionCode: string) => {
+    const section = getSectionEntryBySectionCode(composition, sectionCode)
+    const patient = getPatientBySection(bundle, section)
+    const patientFromFhir: fhir.Patient = await getFromFhir(
+      `/Patient/${patient?.id}`
+    )
+    if (patientFromFhir) {
+      bundle.entry =
+        bundle &&
+        bundle.entry &&
+        bundle.entry.map((entry) => {
+          if (entry.resource?.id === patientFromFhir.id) {
+            return {
+              ...entry,
+              resource: {
+                ...entry.resource,
+                identifier: unionBy(
+                  (entry.resource as fhir.Patient).identifier,
+                  patientFromFhir.identifier,
+                  'type'
+                )
+              }
             }
+          } else {
+            return entry
           }
-        } else {
-          return entry
-        }
-      })
-  }
+        })
+    }
+  })
 }
 
 export async function forwardEntriesToHearth(
