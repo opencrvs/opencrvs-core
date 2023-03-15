@@ -957,7 +957,12 @@ export const typeResolvers: GQLResolver = {
     },
     signature: async (task: fhir.Task, _: any, authHeader: any) => {
       const action = getActionFromTask(task)
-      if (action || getStatusFromTask(task) !== GQLRegStatus.REGISTERED) {
+      const status = getStatusFromTask(task)
+      if (
+        action ||
+        (status !== GQLRegStatus.REGISTERED &&
+          status !== GQLRegStatus.VALIDATED)
+      ) {
         return null
       }
       const user = findExtension(
