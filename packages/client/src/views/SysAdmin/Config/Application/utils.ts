@@ -15,7 +15,8 @@ import { orderBy, uniqBy } from 'lodash'
 import {
   BirthActionId,
   DeathActionId,
-  GeneralActionId
+  GeneralActionId,
+  MarriageActionId
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
@@ -29,6 +30,7 @@ export type IActionType =
   | keyof typeof GeneralActionId
   | keyof typeof BirthActionId
   | keyof typeof DeathActionId
+  | keyof typeof MarriageActionId
 interface ICurrencyOptions {
   [key: string]: string
 }
@@ -220,7 +222,9 @@ export async function callApplicationConfigMutation(
           }
         : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
-        : { DEATH: appConfig.DEATH }
+        : configProperty in DeathActionId
+        ? { DEATH: appConfig.DEATH }
+        : { MARRIAGE: appConfig.MARRIAGE }
     )
     if (res && res.data) {
       const updatedConfigs = res.data.updateApplicationConfig

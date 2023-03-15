@@ -31,6 +31,7 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
@@ -170,6 +171,8 @@ export const ShowUpdateButton = ({
         PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (type.toString() === 'death') {
         PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      } else if (type.toString() === 'marriage') {
+        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
       }
     } else {
       PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
