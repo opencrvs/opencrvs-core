@@ -3351,7 +3351,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'range',
-                    parameters: [1, 120]
+                    parameters: [12, 120]
                   },
                   {
                     operation: 'maxLength',
