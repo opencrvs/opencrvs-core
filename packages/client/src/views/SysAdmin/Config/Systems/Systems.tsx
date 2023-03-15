@@ -218,11 +218,33 @@ export function SystemList() {
     return menuItems
   }
 
-  const sysType = {
+  const systemTypeLabels = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+  }
+
+  const nationalIdLabels = {
+    [IntegratingSystemType.Mosip]: intl.formatMessage(
+      integrationMessages.integratingSystemTypeMosip
+    ),
+    [IntegratingSystemType.Osia]: intl.formatMessage(
+      integrationMessages.integratingSystemTypeOsia
+    ),
+    [IntegratingSystemType.Other]: intl.formatMessage(
+      integrationMessages.integratingSystemTypeOther
+    )
+  }
+
+  const systemToLabel = (system: System) => {
+    if (system.type === SystemType.NationalId) {
+      return nationalIdLabels[
+        system.integratingSystemType ?? IntegratingSystemType.Mosip
+      ]
+    } else {
+      return systemTypeLabels[system.type]
+    }
   }
 
   return (
@@ -283,7 +305,7 @@ export function SystemList() {
                 </>
               }
               label={system.name}
-              value={sysType[system.type]}
+              value={systemToLabel(system)}
             />
           ))}
 
