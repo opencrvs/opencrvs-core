@@ -652,12 +652,9 @@ export const convertToMSISDN = (phone: string) => {
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    window.config.COUNTRY.toUpperCase() === 'FAR'
-      ? 'ZM'
-      : window.config.COUNTRY.toUpperCase().slice(0,2)
-
-  // const countryCallingCode =
-  //   callingCountries[countryCode].countryCallingCodes[0]
+  window.config.COUNTRY.toUpperCase() === 'FAR'
+    ? 'ZM'
+    : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(phone, countryCode)

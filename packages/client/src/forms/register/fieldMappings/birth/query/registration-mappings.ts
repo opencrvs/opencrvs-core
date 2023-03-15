@@ -183,9 +183,10 @@ const convertToLocal = (
    */
   
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZM' : country.toUpperCase().slice(0,2)
+    country.toUpperCase() === 'FAR' ? 'ZM' : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
     const phoneUtil = PhoneNumberUtil.getInstance()
+    console.log(mobileWithCountryCode)
     const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
   
     return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
