@@ -29,4 +29,7 @@ describe('Verify utility functions', () => {
       'Unable to retrieve mobile for error : Error: Mock Error'
     )
   })
+  it('replaces country code', async () => {
+    expect(convertToLocal('+8801711111111', 'ZM')).toBe('01711-111111')
+  })
 })
