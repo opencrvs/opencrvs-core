@@ -74,6 +74,16 @@ type DeathEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
+type MarriageEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  brideName: [HumanName]
+  groomName: [HumanName]
+  dateOfMarriage: Date
+  registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
 type EventProgressResultSet {
   results: [EventProgressSet]
   totalItems: Int
