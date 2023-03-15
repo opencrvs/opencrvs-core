@@ -23,6 +23,7 @@ interface IRejectMessages
   rejectionReasonOther: MessageDescriptor
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRejectMessages = {
@@ -34,7 +35,7 @@ const messagesToDefine: IRejectMessages = {
   rejectionFormInstruction: {
     id: 'review.rejection.form.instruction',
     defaultMessage:
-      'Please document specific details of required updates for follow up action.',
+      'Please describe the updates required to this record for follow up action.',
     description: 'Rejection form instruction'
   },
   rejectionReasonSubmit: {
@@ -55,6 +56,11 @@ const messagesToDefine: IRejectMessages = {
   rejectionReasonDuplicate: {
     id: 'review.rejection.form.reasons.duplicate',
     defaultMessage: 'Duplicate declaration',
+    description: 'Label for rejection option duplicate'
+  },
+  markAsDuplicate: {
+    id: 'review.rejection.form.reasons.markDuplicate',
+    defaultMessage: 'Mark as a duplicate',
     description: 'Label for rejection option duplicate'
   },
   rejectionReasonMisspelling: {

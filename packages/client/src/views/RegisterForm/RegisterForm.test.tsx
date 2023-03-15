@@ -15,6 +15,7 @@ import {
   selectOption,
   mockDeclarationData,
   mockDeathDeclarationData,
+  mockMarriageDeclarationData,
   mockDeathDeclarationDataWithoutFirstNames,
   getRegisterFormFromStore,
   getReviewFormFromStore,
@@ -38,7 +39,8 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   HOME,
-  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+  DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 
 import { IFormData } from '@opencrvs/client/src/forms'
@@ -190,42 +192,6 @@ describe('when user is in the register form for death event', () => {
       ).toHaveLength(1)
     })
   })
-
-  /*
-
-// ID API Check not available in Farajaland form
-
-  describe('when user is in deceased section', () => {
-
-    it('renders loader button when idType is Birth Registration Number', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      selectOption(component, '#iDType', 'Birth registration number')
-      expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
-    })
-  })
-*/
   describe('when user is in contact point page', () => {
     it('shows error if click continue without any value', async () => {
       const testComponent = await createTestComponent(
@@ -280,576 +246,122 @@ describe('when user is in the register form for death event', () => {
 
       expect(history.location.pathname).toContain('/')
     })
-
-    /*
-
-    // ID API Check not available in Farajaland form
-
-    it('renders loader button when idType is National ID', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      selectOption(component, '#iD', 'National ID')
-      expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
-    })
-
-    it('fetches deceased information by entered BRN', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_REGISTRATION,
-            variables: {
-              identifier: '2019333494BQNXOHJ2'
-            }
-          },
-          result: {
-            data: {
-              queryRegistrationByIdentifier: {
-                id: '47cc78a6-3d42-4253-8050-843b278d496b',
-                child: {
-                  id: 'e969527e-be14-4577-99b6-8e1f8000c274',
-                  name: [
-                    {
-                      use: 'bn',
-                      firstNames: 'গায়ত্রী',
-                      familyName: 'স্পিভক'
-                    },
-                    {
-                      use: 'en',
-                      firstNames: 'Gayatri',
-                      familyName: 'Spivak'
-                    }
-                  ],
-                  birthDate: '2018-08-01',
-                  gender: 'female'
-                }
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
-      selectOption(component, '#iDType', 'Birth registration number')
-
-      component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '201933349411111112' }
-      })
-
-      component.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      component.update()
-
-      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
-        0
-      )
-    })
-
-    it('fetches deceased information by entered NID', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_PERSON_NID,
-            variables: {
-              nid: '123456789',
-              dob: '1992-10-10',
-              country: 'bgd'
-            }
-          },
-          result: {
-            data: {
-              queryPersonByNidIdentifier: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                gender: 'female'
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
-      selectOption(component, '#iDType', 'National ID number')
-
-      component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '123456789' }
-      })
-
-      component.find('input#birthDate-dd').simulate('change', {
-        target: { id: 'birthDate-dd', value: '10' }
-      })
-
-      component.find('input#birthDate-mm').simulate('change', {
-        target: { id: 'birthDate-mm', value: '10' }
-      })
-
-      component.find('input#birthDate-yyyy').simulate('change', {
-        target: { id: 'birthDate-yyyy', value: '1992' }
-      })
-
-      component.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      component.update()
-      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
-        1
-      )
-    })
-
-    it('fetches informant information by entered NID', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_PERSON_NID,
-            variables: {
-              nid: '1234567898',
-              dob: '1992-10-10',
-              country: 'bgd'
-            }
-          },
-          result: {
-            data: {
-              queryPersonByNidIdentifier: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: 'গায়ত্রী',
-                    familyName: 'স্পিভক'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: 'Gayatri',
-                    familyName: 'Spivak'
-                  }
-                ],
-                gender: 'female'
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'informant',
-              groupId: 'informant-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
-      selectOption(component, '#iDType', 'National ID number')
-
-      component.find('input#informantID').simulate('change', {
-        target: { id: 'informantID', value: '1234567898' }
-      })
-
-      component.find('input#informantBirthDate-dd').simulate('change', {
-        target: { id: 'informantBirthDate-dd', value: '10' }
-      })
-
-      component.find('input#informantBirthDate-mm').simulate('change', {
-        target: { id: 'informantBirthDate-mm', value: '10' }
-      })
-
-      component.find('input#informantBirthDate-yyyy').simulate('change', {
-        target: { id: 'informantBirthDate-yyyy', value: '1992' }
-      })
-
-      component.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-      component.update()
-
-      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
-        1
-      )
-    })
-
-    it('displays error message if no registration found by BRN', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_REGISTRATION,
-            variables: {
-              identifier: '2019333494BQNXOHJ2'
-            }
-          },
-          error: new Error('boom')
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
-      selectOption(component, '#iDType', 'Birth registration number')
-
-      const input = component.find('input#iD')
-      // @ts-ignore
-      input
-        .props()
-        // @ts-ignore
-        .onChange({
-          // @ts-ignore
-          target: {
-            // @ts-ignore
-            id: 'iD',
-            value: '201933349411111112'
-          }
-        })
-      component.update()
-
-      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
-        0
-      )
-    })
-
-    it('displays error message if no registration found by NID', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_PERSON_NID,
-            variables: {
-              nid: '1234567898',
-              dob: '1992-10-10',
-              country: 'bgd'
-            }
-          },
-          result: {
-            data: {
-              queryPersonByNidIdentifier: null
-            },
-            errors: [
-              {
-                message: 'An internal server error occurred',
-                locations: [{ line: 2, column: 3 }],
-                path: ['queryPersonByNidIdentifier']
-              }
-            ]
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock as any }
-      )
-
-      component = testComponent
-      await waitForElement(component, '#iDType')
-      selectOption(component, '#iDType', 'National ID number')
-
-      const input = component.find('input#iD') as any
-
-      input.hostNodes().props().onChange!({
-        target: {
-          id: 'iD',
-          value: '1234567898'
-        }
-      })
-
-      component.find('input#birthDate-dd').simulate('change', {
-        target: { id: 'birthDate-dd', value: '10' }
-      })
-
-      component.find('input#birthDate-mm').simulate('change', {
-        target: { id: 'birthDate-mm', value: '10' }
-      })
-
-      component.find('input#birthDate-yyyy').simulate('change', {
-        target: { id: 'birthDate-yyyy', value: '1992' }
-      })
-
-      component.update()
-
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
-
-      const element = await waitForElement(component, '#loader-button-error')
-
-      expect(element.hostNodes()).toHaveLength(1)
-    })
-
-    it('should displays network error message if timeout', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_PERSON_NID,
-            variables: {
-              nid: '1234567898',
-              dob: '1992-10-10',
-              country: 'bgd'
-            }
-          },
-          error: new Error('timeout')
-        }
-      ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deceased',
-              groupId: 'deceased-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-
-      component = testComponent
-      await waitForElement(component, '#iDType')
-      selectOption(component, '#iDType', 'National ID number')
-
-      const input = component.find('input#iD') as any
-
-      input.hostNodes().props().onChange!({
-        target: {
-          id: 'iD',
-          value: '1234567897'
-        }
-      })
-
-      component.find('input#birthDate-dd').simulate('change', {
-        target: { id: 'birthDate-dd', value: '10' }
-      })
-
-      component.find('input#birthDate-mm').simulate('change', {
-        target: { id: 'birthDate-mm', value: '10' }
-      })
-
-      component.find('input#birthDate-yyyy').simulate('change', {
-        target: { id: 'birthDate-yyyy', value: '1992' }
-      })
-
-      component.update()
-
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
-
-      const element = await waitForElement(component, '#loader-button-error')
-
-      expect(element.hostNodes()).toHaveLength(1)
-    })
-  })
-  describe('when user is death event section', () => {
-    it('renders the notice label for date field', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
-              declarationId: draft.id,
-              pageId: 'deathEvent',
-              groupId: 'death-event-details'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      expect(testComponent.find('#deathDate_notice').hostNodes()).toHaveLength(
-        1
-      )
-    })
-*/
   })
 })
+
+describe('when user is in the register form for marriage event', () => {
+  let component: ReactWrapper<{}, {}>
+
+  const mock: any = vi.fn()
+  let form: IForm
+  let store: AppStore
+  let history: History
+  let draft: ReturnType<typeof createDeclaration>
+
+  beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+    const mock: any = vi.fn()
+    draft = createDeclaration(Event.Marriage)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
+    form = await getRegisterFormFromStore(store, Event.Marriage)
+  })
+  describe('when user is in marriage section', () => {
+    beforeEach(async () => {
+      const clonedForm = cloneDeep(form)
+      clonedForm.sections[2].optional = true
+      clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
+      const mock: any = vi.fn()
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={clonedForm}
+          declaration={draft}
+          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
+          match={{
+            params: {
+              declarationId: draft.id,
+              pageId: 'marriageEvent',
+              groupId: 'marriage-event-details'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+      component = testComponent
+    })
+
+    it('renders the marriageEvent details page', () => {
+      expect(
+        component.find('#form_section_id_marriage-event-details').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
+  describe('when user is in contact point page', () => {
+    it('shows error if click continue without any value', async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          declaration={draft}
+          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
+          match={{
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+      component = testComponent
+      component.find('#next_section').hostNodes().simulate('click')
+      await waitForElement(component, '#informantType_error')
+      expect(component.find('#informantType_error').hostNodes().text()).toBe(
+        'Required for registration'
+      )
+    })
+
+    it('after clicking exit, takes back home', async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          declaration={draft}
+          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
+          match={{
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+      component = testComponent
+      component.find('#crcl-btn').hostNodes().simulate('click')
+
+      component.update()
+
+      expect(history.location.pathname).toContain('/')
+    })
+  })
+})
+
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -1362,6 +874,94 @@ describe('When user is in Preview section death event in offline mode', () => {
   })
 
   it('Should be able to submit the form', async () => {
+    component.find('#submit_form').hostNodes().simulate('click')
+
+    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    expect(confirmBtn.length).toEqual(1)
+
+    confirmBtn.simulate('click')
+    component.update()
+
+    expect(history.location.pathname).toBe(HOME)
+  })
+})
+
+describe('When user is in Preview section marriage event', () => {
+  let store: AppStore
+  let history: History
+  let component: ReactWrapper<{}, {}>
+  let marriageDraft
+  let marriageForm: IForm
+
+  const mock: any = vi.fn()
+
+  beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    const draft = createDeclaration(Event.Death)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
+    vi.clearAllMocks()
+    // @ts-ignore
+    marriageDraft = createReviewDeclaration(
+      uuid(),
+      // @ts-ignore
+      mockDeathDeclarationData,
+      Event.Marriage
+    )
+    marriageDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(marriageDraft))
+
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
+
+    marriageForm = await getRegisterFormFromStore(store, Event.Marriage)
+    const nTestComponent = await createTestComponent(
+      // @ts-ignore
+      <RegisterForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={marriageForm}
+        declaration={marriageDraft}
+        pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
+        match={{
+          params: {
+            declarationId: marriageDraft.id,
+            pageId: 'preview',
+            groupId: 'preview-view-group'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      { store, history }
+    )
+    component = nTestComponent
+  })
+
+  it('Check if marriage location partOf is parsed properly', () => {
+    expect(
+      draftToGqlTransformer(
+        marriageForm,
+        mockMarriageDeclarationData as unknown as IFormData
+      ).eventLocation.address.country
+    ).toEqual('FAR')
+  })
+
+  it('Check if data has witnessOne', () => {
+    expect(
+      draftToGqlTransformer(
+        marriageForm,
+        mockMarriageDeclarationData as unknown as IFormData
+      ).witnessOne._fhirID
+    ).toEqual('36972633-1c80-4fb4-a636-17f7dc9c2e14')
+  })
+
+  it('Should be able to submit the form', () => {
     component.find('#submit_form').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
