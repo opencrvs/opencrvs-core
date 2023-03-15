@@ -78,7 +78,7 @@ const messagesToDefine = {
   },
   nationalIDName: {
     id: 'integrations.nationalIDName',
-    defaultMessage: 'Name (If using MOSIP, enter: "MOSIP")',
+    defaultMessage: 'Name',
     description: 'Label for name input for National ID'
   },
   type: {
