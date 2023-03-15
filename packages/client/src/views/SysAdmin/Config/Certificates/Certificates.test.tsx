@@ -232,7 +232,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       expect(updateCertificateMutationSpy).toBeCalledTimes(1)
     })
 
-    it.only('should render preview certificate template when clicked on preview', async () => {
+    it('should render preview certificate template when clicked on preview', async () => {
       
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
     
