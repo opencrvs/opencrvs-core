@@ -578,20 +578,14 @@ export const registerForms: IDefaultRegisterForms = {
               parameters: ['en', 'dd MMMM yyyy']
             },
             {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
+              fieldName: 'registrar',
+              operation: 'userTransformer',
+              parameters: ['REGISTERED']
             },
             {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'registrationAgent',
+              operation: 'userTransformer',
+              parameters: ['VALIDATED']
             }
           ],
           mutation: {
@@ -3190,20 +3184,14 @@ export const registerForms: IDefaultRegisterForms = {
               parameters: ['en', 'dd MMMM yyyy']
             },
             {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
+              fieldName: 'registrar',
+              operation: 'userTransformer',
+              parameters: ['REGISTERED']
             },
             {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'registrationAgent',
+              operation: 'userTransformer',
+              parameters: ['VALIDATED']
             }
           ],
           mutation: {

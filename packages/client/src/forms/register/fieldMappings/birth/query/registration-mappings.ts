@@ -13,7 +13,8 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
@@ -244,6 +245,31 @@ export const changeHirerchyQueryTransformer =
     return transformedData
   }
 
+const getUserFullName = (history: History): string => {
+  return history?.user ? getUserName(history.user) : ''
+}
+
+const getUserRole = (history: History): MessageDescriptor => {
+  return (
+    (history?.user && userMessages[history.user.systemRole]) || {
+      defaultMessage: ' ',
+      description: 'empty string',
+      id: 'form.field.label.empty'
+    }
+  )
+}
+
+const getUserOfficeName = (history: History): string => {
+  const officeName = history?.office?.name || ''
+  const officeAddressLevel3 = history?.office?.address?.district || ''
+  const officeAddressLevel4 = history?.office?.address?.state || ''
+  return [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
+}
+
+const getUserSignature = (history: History): string => {
+  return history?.signature?.data as string
+}
+
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -331,6 +357,34 @@ export const registrarSignatureUserTransformer = (
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
 }
+
+export const userTransformer =
+  (status: RegStatus) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    const history: History = _.history.findLast(
+      ({ action, regStatus }: History) =>
+        !action && regStatus && regStatus === status
+    )
+
+    if (history) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrar'
+      ] = {
+        name: getUserFullName(history),
+        role: getUserRole(history),
+        office: getUserOfficeName(history),
+        signature: getUserSignature(history)
+      } as IFormSectionData
+    }
+  }
+
 export const QRCodeTransformerTransformer = async (
   transformedData: IFormData,
   queryData: { id: string },
