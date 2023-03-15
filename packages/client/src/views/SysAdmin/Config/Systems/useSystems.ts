@@ -302,6 +302,7 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
+          integratingSystemType: newIntegratingSystemType,
           ...(newSystemType === 'WEBHOOK' && {
             settings: {
               dailyQuota: 0,

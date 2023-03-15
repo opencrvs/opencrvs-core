@@ -714,6 +714,7 @@ export interface GQLSystemInput {
   name: string
   type: GQLSystemType
   settings?: GQLSystemSettingsInput
+  integratingSystemType?: GQLIntegratingSystemType
 }
 
 export interface GQLUpdatePermissionsInput {

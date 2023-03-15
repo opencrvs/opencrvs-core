@@ -2203,6 +2203,7 @@ export type System = {
 }
 
 export type SystemInput = {
+  integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType

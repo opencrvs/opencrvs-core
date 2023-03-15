@@ -18809,6 +18809,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "integratingSystemType",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegratingSystemType",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": null,
             "type": {
