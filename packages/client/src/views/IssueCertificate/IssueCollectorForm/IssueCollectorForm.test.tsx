@@ -31,6 +31,7 @@ import { vi } from 'vitest'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { Event } from '@client/utils/gateway'
 import { flush } from 'fetch-mock'
+import { IssueCollectorFormForOthers } from './IssueFormForOthers'
 
 let store: AppStore
 let history: History
@@ -191,12 +192,6 @@ const birthDeclarationForIssuance = {
   event: Event.Birth
 }
 
-const deathDeclarationForIssuance = {
-  id: '16ff35e1-3f92-4db3-b812-c402e609fb00',
-  data: mockDeathDeclarationData,
-  event: Event.Death
-}
-
 beforeEach(() => {
   const s = createStore()
   store = s.store
@@ -234,7 +229,6 @@ describe('Certificate issue collector test for a birth registration without fath
 
     it('father option will be available', async () => {
       await waitForElement(component, '#type_FATHER')
-      component.debug()
       expect(component.find('#type_FATHER').hostNodes()).toHaveLength(1)
     })
 
@@ -245,7 +239,7 @@ describe('Certificate issue collector test for a birth registration without fath
       ).toBeTruthy()
     })
 
-    describe('test the component with certificate', () => {
+    describe('Test the component with certificate', () => {
       beforeEach(async () => {
         const updatedCertificateArray = [
           {
@@ -294,7 +288,6 @@ describe('Certificate issue collector test for a birth registration without fath
           .simulate('change', { target: { value: 'FATHER' } })
 
         component.update()
-
         component.find('#continue-button').hostNodes().simulate('click')
         await new Promise((resolve) => {
           setTimeout(resolve, 500)
@@ -304,254 +297,169 @@ describe('Certificate issue collector test for a birth registration without fath
           '/issue/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
         )
       })
-    })
 
-    // need to fix the following tests later
+      it('redirects to user form for other collector upon Someone else option selection', async () => {
+        const updatedCertificateArray = [
+          {
+            collector: {
+              type: 'OTHER'
+            }
+          }
+        ]
 
-    it('should redirects back to certificate collector option selection with father already selected', async () => {
-      component
-        .find('#type_FATHER')
-        .hostNodes()
-        .simulate('change', { target: { value: 'FATHER' } })
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-      component.find('#confirm_form').hostNodes().simulate('click')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-      component.find('#action_page_back_button').hostNodes().simulate('click')
-      component.update()
-      expect(component.find('#type_FATHER').hostNodes().props().checked).toBe(
-        true
-      )
-    })
+        const updatedMockDeclarationData = {
+          ...birthDeclarationForIssuance,
+          data: {
+            ...birthDeclarationForIssuance.data,
+            registration: {
+              ...birthDeclarationForIssuance.data.registration,
+              certificates: updatedCertificateArray
+            }
+          }
+        }
 
-    it('redirects to user form for other collector upon Someone else option selection', async () => {
-      component
-        .find('#type_OTHER')
-        .hostNodes()
-        .simulate('change', { target: { value: 'OTHER' } })
+        const testComponent = await createTestComponent(
+          <IssueCollectorForm
+            location={location}
+            history={history}
+            //@ts-ignore
+            declaration={updatedMockDeclarationData}
+            match={{
+              params: {
+                registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
+                groupId: 'collector'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          { history, store }
+        )
+        component = testComponent
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
+        component
+          .find('#type_OTHER')
+          .hostNodes()
+          .simulate('change', { target: { value: 'OTHER' } })
+
+        component.update()
+        component.find('#continue-button').hostNodes().simulate('click')
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500)
+        })
+        component.update()
+        expect(history.location.pathname).toBe(
+          '/issue/6a5fd35d-01ec-4c37-976e-e055107a74a1/otherCollector'
+        )
       })
-      component.update()
-      component.find('#confirm_form').hostNodes().simulate('click')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-      expect(history.location.pathname).toBe(
-        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/otherCertCollector'
-      )
     })
   })
 
   describe('Test other collector group', () => {
     let component: ReactWrapper<{}, {}>
-
     beforeEach(async () => {
-      store.dispatch(storeDeclaration(birthDeclarationForIssuance))
-      component = await createTestComponent(
-        <IssueCollectorForm
-          //@ts-ignore
+      const updatedCertificateArray = [
+        {
+          collector: {
+            type: 'OTHER'
+          }
+        }
+      ]
+
+      const updatedMockDeclarationData = {
+        ...birthDeclarationForIssuance,
+        data: {
+          ...birthDeclarationForIssuance.data,
+          registration: {
+            ...birthDeclarationForIssuance.data.registration,
+            certificates: updatedCertificateArray
+          }
+        }
+      }
+
+      const testComponent = await createTestComponent(
+        <IssueCollectorFormForOthers
           location={location}
           history={history}
+          //@ts-ignore
+          declaration={updatedMockDeclarationData}
           match={{
             params: {
               registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
+              groupId: 'otherCollector'
             },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        { store, history }
+        { history, store }
       )
+      component = testComponent
+    })
 
-      const form = await waitForElement(component, '#collector_form')
+    it('continue button diabled when necessary fields are not filled', async () => {
+      await waitForElement(component, '#continue-button')
+      expect(
+        component.find('#continue-button').hostNodes().props().disabled
+      ).toBeTruthy()
+    })
+  })
 
-      form
-        .find('#type_OTHER')
-        .hostNodes()
-        .simulate('change', { target: { value: 'OTHER' } })
+  describe('After user submits all other collector details', async () => {
+    let component: ReactWrapper<{}, {}>
+    it('takes the user to payment view', async () => {
+      const updatedCertificateArray = [
+        {
+          collector: {
+            type: 'OTHER',
+            iDType: 'NATIONAL_ID',
+            iDTypeOther: '',
+            iD: '123456678',
+            firstName: 'Jon',
+            lastName: 'Doe',
+            relationship: 'Uncle'
+          },
+          hasShowedVerifiedDocument: false
+        }
+      ]
 
-      // Continue
-      form.find('#confirm_form').hostNodes().simulate('click')
-
-      component.setProps(
-        merge({}, component.props(), {
-          match: {
-            params: {
-              groupId: 'otherCertCollector'
-            }
+      const updatedMockDeclarationData = {
+        ...birthDeclarationForIssuance,
+        data: {
+          ...birthDeclarationForIssuance.data,
+          registration: {
+            ...birthDeclarationForIssuance.data.registration,
+            certificates: updatedCertificateArray
           }
-        })
+        }
+      }
+
+      const testComponent = await createTestComponent(
+        <IssueCollectorFormForOthers
+          location={location}
+          history={history}
+          //@ts-ignore
+          declaration={updatedMockDeclarationData}
+          match={{
+            params: {
+              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
+              groupId: 'otherCollector'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { history, store }
       )
-      await waitForElement(component, '#iDType')
-    })
-
-    it('show form level error when the mandatory fields are not filled', async () => {
-      component.find('#confirm_form').hostNodes().simulate('click')
-      await waitForElement(component, '#form_error')
-      expect(component.find('#form_error').hostNodes().text()).toBe(
-        'Complete all the mandatory fields'
+      component = testComponent
+      component.find('#continue-button').hostNodes().simulate('click')
+      component.update()
+      expect(history.location.pathname).toBe(
+        '/issue/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
-    })
-
-    describe('After user submits all other collector details', () => {
-      beforeEach(async () => {
-        await selectOption(
-          component,
-          '#iDType',
-          'National ID number (in English)'
-        )
-
-        component
-          .find('#iD')
-          .hostNodes()
-          .simulate('change', { target: { value: '123456789', id: 'iD' } })
-
-        component
-          .find('#firstName')
-          .hostNodes()
-          .simulate('change', { target: { value: 'Jon', id: 'firstName' } })
-
-        component
-          .find('#lastName')
-          .hostNodes()
-          .simulate('change', { target: { value: 'Doe', id: 'lastName' } })
-
-        component
-          .find('#relationship')
-          .hostNodes()
-          .simulate('change', {
-            target: { value: 'Uncle', id: 'relationship' }
-          })
-
-        const $confirm = await waitForElement(component, '#confirm_form')
-        $confirm.hostNodes().simulate('click')
-
-        component.setProps(
-          merge({}, component.props(), {
-            match: {
-              params: {
-                groupId: 'affidavit'
-              }
-            }
-          })
-        )
-        await waitForElement(component, '#image_file_uploader_field')
-      })
-      it('takes the user to affedavit view', async () => {
-        expect(history.location.pathname).toBe(
-          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
-        )
-      })
-
-      it('show form level error when the mandatory fields are not filled', async () => {
-        component.find('#confirm_form').hostNodes().simulate('click')
-        await waitForElement(component, '#form_error')
-        expect(component.find('#form_error').hostNodes().text()).toBe(
-          'Upload signed affidavit or click the checkbox if they do not have one.'
-        )
-      })
-
-      it('shows form level error when invalid type of file is uploaded as affidavit file', async () => {
-        component
-          .find('#image_file_uploader_field')
-          .hostNodes()
-          .simulate('change', {
-            target: {
-              files: [
-                getFileFromBase64String(
-                  inValidImageB64String,
-                  'index.svg',
-                  'image/svg'
-                )
-              ]
-            }
-          })
-        waitFor(() => component.find('#field_error').hostNodes().length > 0)
-      })
-
-      it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-        Date.now = vi.fn(() => 1538352000000) // 2018-10-01
-        await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
-        component
-          .find('#noAffidavitAgreementAFFIDAVIT')
-          .hostNodes()
-          .simulate('change', {
-            checked: true
-          })
-
-        await waitForElement(component, '#confirm_form')
-        component.find('#confirm_form').hostNodes().simulate('click')
-        await waitForElement(
-          component,
-          '#noAffidavitAgreementConfirmationModal'
-        )
-        expect(
-          component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
-        ).toHaveLength(1)
-
-        component.find('#submit_confirm').hostNodes().simulate('click')
-
-        expect(history.location.pathname).toBe(
-          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
-        )
-      })
-
-      it('continue to review section when the mandatory fields are filled and birth event is before target days', async () => {
-        birthDeclarationForIssuance.data.child.childBirthDate = '2022-09-20'
-        store.dispatch(storeDeclaration(birthDeclarationForIssuance))
-        const comp = await waitForElement(
-          component,
-          '#noAffidavitAgreementAFFIDAVIT'
-        )
-        comp.hostNodes().simulate('change', {
-          checked: true
-        })
-
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500)
-        })
-        component.update()
-        component.find('#confirm_form').hostNodes().simulate('click')
-        expect(
-          component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
-        ).toHaveLength(1)
-        component.find('#submit_confirm').hostNodes().simulate('click')
-        expect(history.location.pathname).toBe(
-          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
-        )
-      })
-
-      it('should hide form level error while uploading valid file', async () => {
-        const $confirm = await waitForElement(component, '#confirm_form')
-        $confirm.hostNodes().simulate('click')
-        await waitForElement(component, '#form_error')
-        component
-          .find('#image_file_uploader_field')
-          .hostNodes()
-          .simulate('change', {
-            target: {
-              files: [
-                getFileFromBase64String(
-                  validImageB64String,
-                  'index.png',
-                  'image/png'
-                )
-              ]
-            }
-          })
-        waitFor(() => component.find('#form_error').hostNodes().length === 0)
-      })
     })
   })
 })
