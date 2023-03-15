@@ -11,7 +11,6 @@
  */
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { callingCountries } from 'country-data'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
