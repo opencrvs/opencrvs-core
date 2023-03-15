@@ -18,11 +18,24 @@ import {
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
 import fetch from 'node-fetch'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
   scope: string[]
+}
+
+export const convertToLocal = (
+  mobileWithCountryCode: string,
+  countryCode: string
+) => {
+  countryCode = countryCode.toUpperCase().slice(0, 2)
+
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
 }
 
 export async function getUser(

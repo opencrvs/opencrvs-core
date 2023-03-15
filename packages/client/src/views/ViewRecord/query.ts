@@ -11,10 +11,11 @@
  */
 
 import { gql } from '@apollo/client'
+import { client } from '@client/utils/apolloClient'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
-    fetchRegistrationForViewing(id: $id) {
+    fetchRegistrationForViewing(id: $id) @persist {
       __typename
       id
       registration {
@@ -24,7 +25,10 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         attachments {
           data
           type
@@ -56,6 +60,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -392,6 +397,155 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         maleDependentsOfDeceased
         femaleDependentsOfDeceased
       }
+      ... on MarriageRegistration {
+        _fhirIDMap
+        id
+        bride {
+          id
+          name {
+            use
+            firstNames
+            familyName
+            marriedLastName
+          }
+          birthDate
+          maritalStatus
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          nationality
+          identifier {
+            id
+            type
+            otherType
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
+        }
+        groom {
+          id
+          name {
+            use
+            firstNames
+            familyName
+            marriedLastName
+          }
+          birthDate
+          maritalStatus
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          dateOfMarriage
+          nationality
+          identifier {
+            id
+            type
+            otherType
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+          telecom {
+            system
+            value
+          }
+        }
+        witnessOne {
+          id
+          relationship
+          otherRelationship
+          individual {
+            id
+            identifier {
+              id
+              type
+              otherType
+            }
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+        }
+        witnessTwo {
+          id
+          relationship
+          otherRelationship
+          individual {
+            id
+            identifier {
+              id
+              type
+              otherType
+            }
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+        }
+        typeOfMarriage
+        eventLocation {
+          id
+          address {
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
+        questionnaire {
+          fieldId
+          value
+        }
+      }
     }
   }
 `
+
+async function fetchDuplicateDeclarations(id: string) {
+  return (
+    client &&
+    client.query({
+      query: FETCH_VIEW_RECORD_BY_COMPOSITION,
+      variables: { id },
+      fetchPolicy: 'network-only'
+    })
+  )
+}
+
+async function fetchDeclarationForViewing(id: string) {
+  return (
+    client &&
+    client.query({
+      query: FETCH_VIEW_RECORD_BY_COMPOSITION,
+      variables: { id },
+      fetchPolicy: 'cache-first'
+    })
+  )
+}
+
+export const ViewRecordQueries = {
+  fetchDuplicateDeclarations,
+  fetchDeclarationForViewing
+}

@@ -64,7 +64,7 @@ async function clickOnMenuItem(
 
 describe('ConfigHome page when already has uploaded certificate template', async () => {
   const { store, history } = createStore()
-  await loginAsFieldAgent(store)
+  loginAsFieldAgent(store)
   let testComponent: ReactWrapper
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
 
@@ -101,9 +101,12 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('certificate page test', () => {
-    it('should show birth, and death tab button', async () => {
+    it('should show birth, death and marriage tab button', async () => {
       expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Births')
       expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Deaths')
+      expect(testComponent.find('#tab_marriage').hostNodes().text()).toBe(
+        'Marriages'
+      )
     })
 
     it('shows default birth certificate template text', () => {
@@ -230,9 +233,11 @@ describe('ConfigHome page when already has uploaded certificate template', async
     })
 
     it('should render preview certificate template when clicked on preview', async () => {
+      
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+    
       await waitForElement(testComponent, '#preview_image_field')
-
+      
       expect(
         testComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(1)

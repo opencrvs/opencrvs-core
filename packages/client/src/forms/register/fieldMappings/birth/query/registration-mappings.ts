@@ -17,6 +17,8 @@ import {
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
+import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
@@ -27,8 +29,10 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-import { allCountries } from '@client/utils/countryUtils'
+import { callingCountries } from 'country-data'
 
+import QRCode from 'qrcode'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -126,6 +130,62 @@ export function registrationNumberTransformer(
   }
 }
 
+export function groomSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].groomSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'groomSignature'
+    ] = queryData[sectionId].groomSignature
+  }
+}
+
+export function brideSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].brideSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'brideSignature'
+    ] = queryData[sectionId].brideSignature
+  }
+}
+
+export function witnessOneSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessOneSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessOneSignature'
+    ] = queryData[sectionId].witnessOneSignature
+  }
+}
+
+export function witnessTwoSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessTwoSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessTwoSignature'
+    ] = queryData[sectionId].witnessTwoSignature
+  }
+}
+
 export function mosipAidTransformer(
   transformedData: IFormData,
   queryData: any,
@@ -171,23 +231,23 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (mobileWithCountryCode: string, country: string) => {
+const convertToLocal = (
+  mobileWithCountryCode: string,
+  country: string,
+) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
+  
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+    country.toUpperCase() === 'FAR' ? 'ZM' : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
-  const defaultCountryZambia = allCountries[allCountries.length - 3]
-  const data =
-    allCountries.find(
-      (countryData) => countryData.iso2 === countryCode.slice(0, 2)
-    ) || defaultCountryZambia
+    const phoneUtil = PhoneNumberUtil.getInstance()
+    console.log(mobileWithCountryCode)
+    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  
+    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
 
-  return (
-    mobileWithCountryCode &&
-    mobileWithCountryCode.replace(data.dialCode, data.priority)
-  )
 }
 
 export const localPhoneTransformer =
@@ -200,7 +260,10 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
-    const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
+    const localPhone = convertToLocal(
+      msisdnPhone,
+      window.config.COUNTRY
+    )
     transformedData[sectionId][field.name] = localPhone
     return transformedData
   }
@@ -323,4 +386,50 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+
+export const registrationDateTransformer =
+  (locale: string, dateFormat: string) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    if (!_.history) {
+      return
+    }
+
+    const history = _.history.find(
+      ({ action, regStatus }: History) =>
+        !action && regStatus === RegStatus.Registered
+    )
+
+    const prevLocale = window.__localeId__
+    window.__localeId__ = locale
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationDate'
+    ] = format(new Date(history?.date), dateFormat)
+    window.__localeId__ = prevLocale
+  }
+
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        VIEW_VERIFY_CERTIFICATE,
+        {
+          declarationId: queryData.id
+        }
+      )}`
+    )
 }

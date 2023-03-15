@@ -19,7 +19,8 @@ import {
   getFormattedDate,
   getPageItems,
   getStatusLabel,
-  isSystemInitiated
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
@@ -224,7 +225,9 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isSystemInitiated(item) ? (
+        {isVerifiedAction(item) ? (
+          <div />
+        ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
@@ -249,12 +252,17 @@ export const GetHistory = ({
         )}
       </>
     ),
-    role:
-      isSystemInitiated(item) || !item.user?.systemRole
-        ? intl.formatMessage(getSystemType(item.system?.type))
-        : getUserRole(currentLanguage, item.user.role),
+    role: isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
+      intl.formatMessage(getSystemType(item.system?.type))
+    ) : (
+      getUserRole(currentLanguage, item.user?.role)
+    ),
 
-    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+    location: isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
       <Link

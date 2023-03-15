@@ -219,6 +219,27 @@ export const influx = new Influx.InfluxDB({
         userAgent: Influx.FieldType.STRING
       },
       tags: ['action', 'practitionerId']
+    },
+    {
+      measurement: 'marriage_registration',
+      fields: {
+        compositionId: Influx.FieldType.STRING,
+        currentStatus: Influx.FieldType.STRING,
+        daysAfterEvent: Influx.FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'timeLabel',
+        'dateLabel',
+        'registrarPractitionerId',
+        'practitionerRole',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2',
+        'locationLevel1'
+      ]
     }
   ]
 })
@@ -258,7 +279,8 @@ export async function deleteMeasurements() {
       influx.dropMeasurement('correction_payment', INFLUX_DB),
       influx.dropMeasurement('declarations_started', INFLUX_DB),
       influx.dropMeasurement('declarations_rejected', INFLUX_DB),
-      influx.dropMeasurement('user_audit_event', INFLUX_DB)
+      influx.dropMeasurement('user_audit_event', INFLUX_DB),
+      influx.dropMeasurement('marriage_registration', INFLUX_DB)
     ])
     return {
       status: `Successfully deleted all the measurements form ${INFLUX_DB} database`

@@ -112,7 +112,7 @@ describe('when draft data is transformed to graphql', () => {
       expect(
         draftToGqlTransformer(form, birthDraftData).registration
           .contactPhoneNumber
-      ).toBe('2601733333333')
+      ).toBe('+880 1733-333333')
     })
     it('Pass false as detailsExist on father section', () => {
       const data = {

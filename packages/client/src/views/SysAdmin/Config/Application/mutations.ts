@@ -58,6 +58,14 @@ const applicationConfigMutation = gql`
         }
         PRINT_IN_ADVANCE
       }
+      MARRIAGE {
+        REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          DELAYED
+        }
+        PRINT_IN_ADVANCE
+      }
     }
   }
 `

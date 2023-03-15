@@ -93,7 +93,7 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: resolve(window.config.CONFIG_API_URL, '/loginConfig'),
+    url: resolve(window.config.CONFIG_API_URL, '/publicConfig'),
     method: 'GET'
   })
 }

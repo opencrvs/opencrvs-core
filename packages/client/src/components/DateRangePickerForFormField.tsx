@@ -112,8 +112,7 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
         ignorePlaceHolder={props.ignorePlaceHolder}
         onChange={handleExactDateChange}
         value={props.value.exact as string}
-        isDisabled={props.value.isDateRangeActive}
-        disabled={true}
+        disabled={props.value.isDateRangeActive}
       />
       <DateRangeBody>
         {isValidDateRange && (

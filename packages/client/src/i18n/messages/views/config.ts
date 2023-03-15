@@ -41,9 +41,11 @@ interface IConfigMessages
   options: MessageDescriptor
   allowPrinting: MessageDescriptor
   allowPrintingDescription: MessageDescriptor
+  marriageTemplate: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  marriageDefaultTempDesc: MessageDescriptor
   certificateUploading: MessageDescriptor
   certificateUpdated: MessageDescriptor
   certificateValidationError: MessageDescriptor
@@ -67,12 +69,16 @@ interface IConfigMessages
   applicationBirthDelayedFeeChangeNotification: MessageDescriptor
   applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
   applicationDeathDelayedFeeChangeNotification: MessageDescriptor
+  applicationMarriageRegTargetChangeNotification: MessageDescriptor
+  applicationMarriageOnTimeFeeChangeNotification: MessageDescriptor
+  applicationMarriageDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   applicationConfigUpdatingMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
   deathLegallySpecifiedDialogTitle: MessageDescriptor
+  marriageLegallySpecifiedDialogTitle: MessageDescriptor
   onTimeFeeDialogTitle: MessageDescriptor
   lateFeeDialogTitle: MessageDescriptor
   delayedFeeDialogTitle: MessageDescriptor
@@ -95,6 +101,7 @@ interface IConfigMessages
   birthTabTitle: MessageDescriptor
   birthTabTitleExport: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  marriageTabTitle: MessageDescriptor
   imageTabTitle: MessageDescriptor
   colourTabTitle: MessageDescriptor
   colourTabText: MessageDescriptor
@@ -263,6 +270,11 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Certificate Template',
     description: 'Label for certificate templates'
   },
+  marriageTemplate: {
+    id: 'config.marriageTemplate',
+    defaultMessage: 'Marriage certificate',
+    description: 'Label for marriage certificate template'
+  },
   birthDefaultTempDesc: {
     id: 'config.birthDefaultTempDesc',
     defaultMessage: 'Default birth certificate template',
@@ -277,6 +289,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.deathDefaultTempDesc',
     defaultMessage: 'Default death certificate template',
     description: 'Label for default death certificate template'
+  },
+  marriageDefaultTempDesc: {
+    id: 'config.marriageDefaultTempDesc',
+    defaultMessage: 'Default marriage certificate template',
+    description: 'Label for default marriage certificate template'
   },
   certificateUploading: {
     id: 'config.certificate.certificateUploading',
@@ -389,6 +406,24 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Death delayed fee updated',
     description: 'Message for application death delayed fee change notification'
   },
+  applicationMarriageOnTimeFeeChangeNotification: {
+    id: 'config.application.marriageOnTimeFeeChangeNotification',
+    defaultMessage: 'Marriage on time fee updated',
+    description:
+      'Message for application marriage on time fee change notification'
+  },
+  applicationMarriageRegTargetChangeNotification: {
+    id: 'config.application.marriageRegTargetChangeNotification',
+    defaultMessage: 'Marriage registration target days updated',
+    description:
+      'Message for application marriage registration target change notification'
+  },
+  applicationMarriageDelayedFeeChangeNotification: {
+    id: 'config.application.marriageDelayedFeeChangeNotification',
+    defaultMessage: 'Marriage delayed fee updated',
+    description:
+      'Message for application marriage delayed fee change notification'
+  },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
@@ -434,6 +469,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathLegallySpecifiedDialogTitle',
     defaultMessage: 'Legally specified time period for death registration',
     description: 'Legally specified dialog title for death'
+  },
+  marriageLegallySpecifiedDialogTitle: {
+    id: 'config.application.marriageLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for marriage registration',
+    description: 'Legally specified dialog title for marriage'
   },
   onTimeFeeDialogTitle: {
     id: 'config.application.onTimeFeeDialogTitle',
@@ -504,6 +544,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  marriageTabTitle: {
+    id: 'config.application.marriageTabTitle',
+    defaultMessage: 'Marriage',
+    description: 'The title for marriage tab'
   },
   imageTabTitle: {
     id: 'config.application.imageTabTitle',
@@ -646,7 +691,7 @@ const messagesToDefine: IConfigMessages = {
   allowPrintingDescription: {
     id: 'config.certificate.printDescription',
     defaultMessage:
-      'This is the content describing what this configuration option is...',
+      'Records printed off in advance of collections will be added to the ready to issue work-queue',
     description: 'Allowing printing'
   },
   updateAllowPrintingNotification: {
