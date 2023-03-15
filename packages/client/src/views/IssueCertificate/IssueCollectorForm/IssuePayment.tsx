@@ -170,7 +170,7 @@ export const IssuePayment: React.FC<Props> = ({
   return (
     <>
       <ActionPageLight
-        title={titleMessage}
+        title={intl.formatMessage(issueMessages.issueCertificate)}
         goBack={() => dispatch(goBack())}
         hideBackground
         goHome={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
@@ -236,5 +236,7 @@ const getEvent = (eventType: string | undefined) => {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }

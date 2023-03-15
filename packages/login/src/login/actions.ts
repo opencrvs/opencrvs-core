@@ -47,6 +47,8 @@ export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
 export const AUTHENTICATE_RESET = 'login/AUTHENTICATE_RESET'
 export const GOTO_APP = 'login/GOTO_APP'
 
+export const CLIENT_REDIRECT_ROUTE = 'login/CLIENT_REDIRECT_ROUTE'
+
 export enum FORGOTTEN_ITEMS {
   USERNAME = 'username',
   PASSWORD = 'password'
@@ -103,6 +105,11 @@ export type ResendSMSFailedAction = {
   payload: Error
 }
 
+export type StoreClientRedirectRouteAction = {
+  type: typeof CLIENT_REDIRECT_ROUTE
+  payload: { url: string }
+}
+
 export type VerifyCodeAction = {
   type: typeof VERIFY_CODE
   payload: { code: string }
@@ -140,6 +147,7 @@ export type Action =
   | GoToAppAction
   | AuthenticationFieldValidationAction
   | AuthenticationResetAction
+  | StoreClientRedirectRouteAction
 
 export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
   type: CONFIG_LOAD
@@ -217,6 +225,16 @@ export const failSMSResend = (error: AxiosError): ResendSMSFailedAction => ({
   type: RESEND_SMS_FAILED,
   payload: error
 })
+
+export const storeClientRedirectRoute = (
+  redirectUrlRoute: string
+): StoreClientRedirectRouteAction => {
+  const url = redirectUrlRoute
+  return {
+    type: CLIENT_REDIRECT_ROUTE,
+    payload: { url }
+  }
+}
 
 export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')

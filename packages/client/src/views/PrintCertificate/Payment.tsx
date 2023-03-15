@@ -185,6 +185,8 @@ const getEvent = (eventType: string | undefined) => {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }
 

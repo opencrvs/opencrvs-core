@@ -9,23 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import {
+  DUPLICATE_TRACKING_ID,
+  EVENT_TYPE
+} from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
 export const CHILD_CODE = 'child-details'
 export const DECEASED_CODE = 'deceased-details'
 export const INFORMANT_CODE = 'informant-details'
+export const WITNESS_ONE_CODE = 'witness-one-details'
+export const WITNESS_TWO_CODE = 'witness-two-details'
 export const SPOUSE_CODE = 'spouse-details'
+export const BRIDE_CODE = 'bride-details'
+export const GROOM_CODE = 'groom-details'
 export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
 export const CERTIFICATE_DOCS_CODE = 'certificates'
 export const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
 export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
 export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
+export const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
+export const MARRIAGE_TYPE_CODE = 'partnership'
 export const BIRTH_ATTENDANT_CODE = '73764-3'
 export const BIRTH_REG_TYPE_CODE = 'birth-reg-type'
 export const INFORMANT_TYPE = 'informant-type'
@@ -46,6 +55,10 @@ export const SPOUSE_TITLE = "Spouse's details"
 export const CHILD_TITLE = 'Child details'
 export const DECEASED_TITLE = 'Deceased details'
 export const INFORMANT_TITLE = "Informant's details"
+export const WITNESS_ONE_TITLE = "Witness One's details"
+export const WITNESS_TWO_TITLE = "Witness Two's details"
+export const BRIDE_TITLE = "Bride's details"
+export const GROOM_TITLE = "Groom's details"
 export const ATTACHMENT_DOCS_TITLE = 'Supporting Documents'
 export const CERTIFICATE_DOCS_TITLE = 'Certificates'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
@@ -60,6 +73,8 @@ export const DEATH_DESCRIPTION_CODE =
 export const PARENT_DETAILS = 'parent-details'
 export const BIRTH_CORRECTION_ENCOUNTER_CODE = 'birth-correction-encounters'
 export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
+export const MARRIAGE_CORRECTION_ENCOUNTER_CODE =
+  'marriage-correction-encounters'
 
 export function createPersonSection(
   refUuid: string,
@@ -101,6 +116,8 @@ export function createEncounterSection(refUuid: string, sectionCode: string) {
     sectionTitle = 'Birth encounter'
   } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
     sectionTitle = 'Death encounter'
+  } else if (sectionCode === MARRIAGE_ENCOUNTER_CODE) {
+    sectionTitle = 'Marriage encounter'
   } else if (sectionCode === BIRTH_CORRECTION_ENCOUNTER_CODE) {
     sectionTitle = 'Birth correction encounters'
   } else if (sectionCode === DEATH_CORRECTION_ENCOUNTER_CODE) {
@@ -163,9 +180,12 @@ export function createCompositionTemplate(refUuid: string, context: any) {
   if (context.event === EVENT_TYPE.BIRTH) {
     declarationCode = 'birth-declaration'
     declarationText = 'Birth Declaration'
-  } else {
+  } else if (context.event === EVENT_TYPE.DEATH) {
     declarationCode = 'death-declaration'
     declarationText = 'Death Declaration'
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    declarationCode = 'marriage-declaration'
+    declarationText = 'Marriage Declaration'
   }
 
   return {
@@ -208,7 +228,8 @@ export function updateTaskTemplate(
   task: fhir.Task,
   status: string,
   reason?: string,
-  comment?: string
+  comment?: string,
+  duplicateTrackingId?: string
 ): fhir.Task {
   if (
     !task ||
@@ -232,6 +253,13 @@ export function updateTaskTemplate(
       text: comment
     }
     task.statusReason = statusReason
+  }
+  if (duplicateTrackingId) {
+    task.extension = task.extension || []
+    task.extension.push({
+      url: DUPLICATE_TRACKING_ID,
+      valueString: duplicateTrackingId
+    })
   }
   return task
 }

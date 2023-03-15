@@ -50,9 +50,9 @@ describe('reject registration form', () => {
 
   it('enables submit button when form is complete', () => {
     component
-      .find('#rejectionReasonother')
+      .find('#rejectionReasonduplicate')
       .hostNodes()
-      .simulate('change', { checked: true })
+      .simulate('change', { checked: false })
 
     component
       .find('#rejectionCommentForHealthWorker')

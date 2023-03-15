@@ -25,6 +25,7 @@
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
     "country-data": "^0.0.31",
+    "date-fns": "^2.29.3",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
@@ -53,6 +54,7 @@
     "lint-staged": "^7.1.0",
     "nodemon": "^1.17.5",
     "prettier": "^2.5.1",
+    "testcontainers": "^9.1.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
     "typescript": "^4.8.3"

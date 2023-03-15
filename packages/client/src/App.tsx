@@ -43,11 +43,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import {
-  ApolloClient,
-  ApolloProvider,
-  NormalizedCacheObject
-} from '@apollo/client'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
@@ -76,6 +72,7 @@ import { UnprotectedRoute } from '@client/components/UnprotectedRoute'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -113,11 +110,6 @@ export function App(props: IAppProps) {
                     <SessionExpireConfirmation />
                     <NotificationComponent>
                       <Switch>
-                        <UnprotectedRoute
-                          exact
-                          path={routes.VIEW_VERIFY_CERTIFICATE}
-                          component={VerifyCertificatePage}
-                        />
                         <Route>
                           <Page>
                             <MainSection>
@@ -169,9 +161,23 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={
+                                                routes.SELECT_MARRIAGE_INFORMANT
+                                              }
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
                                                 routes.DRAFT_BIRTH_PARENT_FORM
                                               }
                                               component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.VIEW_VERIFY_CERTIFICATE
+                                              }
+                                              component={VerifyCertificatePage}
                                             />
                                             <ProtectedRoute
                                               exact
@@ -201,8 +207,27 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              path={routes.DRAFT_MARRIAGE_FORM}
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
                                               path={
                                                 routes.DRAFT_DEATH_FORM_PAGE_GROUP
+                                              }
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.DRAFT_MARRIAGE_FORM_PAGE
+                                              }
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP
                                               }
                                               component={DeclarationForm}
                                             />

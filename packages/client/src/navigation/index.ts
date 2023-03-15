@@ -59,6 +59,7 @@ import {
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
+  SELECT_MARRIAGE_INFORMANT,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT
@@ -157,6 +158,14 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(SELECT_MARRIAGE_INFORMANT, {
+      declarationId
+    })
+  )
+}
+
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
 }
@@ -241,7 +250,7 @@ export function goToPerformanceHome(
   timeStart: Date = new Date(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   ),
-  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59)),
+  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
   event?: Event,
   locationId?: string
 ) {

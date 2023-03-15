@@ -364,9 +364,11 @@ function RecordAuditBody({
 
   if (
     isDownloaded &&
+    declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED)
+      declaration.status === SUBMISSION_STATUS.CERTIFIED ||
+      declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton

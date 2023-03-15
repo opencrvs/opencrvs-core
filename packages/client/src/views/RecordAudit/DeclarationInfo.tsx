@@ -90,10 +90,10 @@ export const GetDeclarationInfo = ({
       info.status &&
       [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
-      if (declaration?.brnDrn) {
-        info.brn = declaration.brnDrn
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
       } else if (!isDownloaded) {
-        info.brn = ''
+        info.registrationNo = ''
       }
     }
     info = {
@@ -108,10 +108,10 @@ export const GetDeclarationInfo = ({
       info.status &&
       [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
-      if (declaration?.brnDrn) {
-        info.drn = declaration.brnDrn
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
       } else if (!isDownloaded) {
-        info.drn = ''
+        info.registrationNo = ''
       }
     }
     info = {
@@ -121,7 +121,26 @@ export const GetDeclarationInfo = ({
       placeOfDeath: declaration?.placeOfDeath,
       informant: removeUnderscore(informant)
     }
+  } else if (info.type === 'Marriage') {
+    if (
+      info.status &&
+      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+    ) {
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
+      } else if (!isDownloaded) {
+        info.registrationNo = ''
+      }
+    }
+    info = {
+      ...info,
+      type: intl.formatMessage(constantsMessages.marriage),
+      dateOfMarriage: declaration?.dateOfMarriage,
+      placeOfMarriage: declaration?.placeOfMarriage,
+      informant: removeUnderscore(informant)
+    }
   }
+
   const mobileActions = actions.map((action, index) => (
     <MobileDiv key={index}>{action}</MobileDiv>
   ))
@@ -131,7 +150,9 @@ export const GetDeclarationInfo = ({
         {Object.entries(info).map(([key, value]) => {
           const rowValue =
             value &&
-            (key === 'dateOfBirth' || key === 'dateOfDeath'
+            (key === 'dateOfBirth' ||
+            key === 'dateOfDeath' ||
+            key === 'dateOfMarriage'
               ? format(new Date(value), 'MMMM dd, yyyy')
               : value)
 
