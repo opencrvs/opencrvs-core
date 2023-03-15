@@ -51,7 +51,10 @@ import {
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
-import { updateOfflineCertificate } from '@client/offline/actions'
+import {
+  updateOfflineCertificate,
+  updateOfflineConfigData
+} from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -114,7 +117,10 @@ type Props = WrappedComponentProps & {
     birth: IForm
     death: IForm
   }
-} & { updateOfflineCertificate: typeof updateOfflineCertificate }
+} & {
+  updateOfflineCertificate: typeof updateOfflineCertificate
+  updateOfflineConfigData: typeof updateOfflineConfigData
+}
 
 interface State {
   selectedSubMenuItem: string
@@ -127,10 +133,6 @@ interface State {
   previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
   activeTabId: Event
-  allowPrinting: {
-    birth: boolean
-    death: boolean
-  }
 }
 
 interface ICertification {
@@ -232,10 +234,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         name: EMPTY_STRING,
         type: EMPTY_STRING,
         data: EMPTY_STRING
-      },
-      allowPrinting: {
-        birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
-        death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE
       }
     }
   }
@@ -244,45 +242,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     certificatesConfig: 'Certificates'
   }
 
-  offlineConfig = this.props.offlineResources.config
-
-  async allowPrintMutationHandler() {
-    try {
-      await configApplicationMutations.mutateApplicationConfig({
-        BIRTH: {
-          REGISTRATION_TARGET: this.offlineConfig.BIRTH.REGISTRATION_TARGET,
-          LATE_REGISTRATION_TARGET:
-            this.offlineConfig.BIRTH.LATE_REGISTRATION_TARGET,
-          FEE: {
-            ON_TIME: this.offlineConfig.BIRTH.FEE.ON_TIME,
-            LATE: this.offlineConfig.BIRTH.FEE.LATE,
-            DELAYED: this.offlineConfig.BIRTH.FEE.DELAYED
-          },
-          PRINT_IN_ADVANCE: this.state.allowPrinting.birth
-        },
-        DEATH: {
-          REGISTRATION_TARGET: this.offlineConfig.DEATH.REGISTRATION_TARGET,
-          FEE: {
-            ON_TIME: this.offlineConfig.DEATH.FEE.ON_TIME,
-            DELAYED: this.offlineConfig.DEATH.FEE.DELAYED
-          },
-          PRINT_IN_ADVANCE: this.state.allowPrinting.death
-        }
-      })
-      this.setState({
-        notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
-      })
-    } catch (err) {
-      this.setState({
-        notificationForPrinting: NOTIFICATION_STATUS.ERROR
-      })
-    }
-  }
-
   handleTabChange = (tab: Event) => {
     this.setState({ activeTabId: tab })
   }
-
   getMenuItems(
     intl: IntlShape,
     event: string,
@@ -520,18 +482,33 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     let certificateFileName
 
-    const toggleOnChange = (event: Event) => {
-      this.setState(
-        (prevState) => ({
-          allowPrinting: {
-            ...prevState.allowPrinting,
-            [event]: !prevState.allowPrinting[event]
+    const toggleOnChange = async (event: Event) => {
+      const upperCaseEvent = event.toUpperCase() as 'BIRTH' | 'DEATH'
+      this.props.updateOfflineConfigData({
+        config: {
+          ...offlineResources.config,
+          [upperCaseEvent]: {
+            ...offlineResources.config[upperCaseEvent],
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
           }
-        }),
-        async () => {
-          await this.allowPrintMutationHandler()
         }
-      )
+      })
+      try {
+        await configApplicationMutations.mutateApplicationConfig({
+          [upperCaseEvent]: {
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+          }
+        })
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
+        })
+      } catch (err) {
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.ERROR
+        })
+      }
     }
 
     const TabContent = (props: CertificationProps) => {
@@ -592,8 +569,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     id={'allow-printing-toggle'}
                     defaultChecked={
                       this.state.activeTabId === Event.Birth
-                        ? this.state.allowPrinting.birth
-                        : this.state.allowPrinting.death
+                        ? offlineResources.config.BIRTH.PRINT_IN_ADVANCE
+                        : offlineResources.config.DEATH.PRINT_IN_ADVANCE
                     }
                     onChange={async () => {
                       await toggleOnChange(this.state.activeTabId)
@@ -805,5 +782,6 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const CertificatesConfig = connect(mapStateToProps, {
+  updateOfflineConfigData,
   updateOfflineCertificate
 })(injectIntl(CertificatesConfigComponent))

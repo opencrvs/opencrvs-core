@@ -21,7 +21,7 @@ import { Icon } from '../Icon'
 
 const TOAST_DEFAULT_DURATION_MS = 32000
 
-type ToastType = 'success' | 'warning' | 'loading' | 'error'
+type ToastType = 'success' | 'warning' | 'loading' | 'error' | 'info'
 
 const deepToast = keyframes`
   from { bottom: -10px; }
@@ -38,7 +38,7 @@ const Container = styled.div<{
 }>`
   --color: ${({ $type, theme }) => `
     ${$type === 'success' ? theme.colors.positiveDark : ''}
-    ${$type === 'loading' ? theme.colors.primaryDark : ''}
+    ${$type === 'loading' || $type === 'info' ? theme.colors.primaryDark : ''}
     ${$type === 'error' ? theme.colors.negativeDark : ''}
     ${$type === 'warning' ? theme.colors.orangeDark : ''}
     ${$type === undefined ? theme.colors.positiveDark : ''}

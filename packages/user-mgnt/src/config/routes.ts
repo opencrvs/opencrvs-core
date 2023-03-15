@@ -109,7 +109,8 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin',
   NATLSYSADMIN = 'natlsysadmin',
   VALIDATE = 'validate',
-  RECORDSEARCH = 'recordsearch'
+  RECORDSEARCH = 'recordsearch',
+  VERIFY = 'verify'
 }
 
 export const getRoutes = () => {
@@ -350,6 +351,7 @@ export const getRoutes = () => {
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
+            RouteScope.VERIFY,
             RouteScope.RECORDSEARCH
           ]
         },
