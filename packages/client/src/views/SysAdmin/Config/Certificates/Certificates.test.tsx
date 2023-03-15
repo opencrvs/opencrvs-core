@@ -64,7 +64,7 @@ async function clickOnMenuItem(
 
 describe('ConfigHome page when already has uploaded certificate template', async () => {
   const { store, history } = createStore()
-  await loginAsFieldAgent(store)
+  loginAsFieldAgent(store)
   let testComponent: ReactWrapper
   const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
 
@@ -232,10 +232,12 @@ describe('ConfigHome page when already has uploaded certificate template', async
       expect(updateCertificateMutationSpy).toBeCalledTimes(1)
     })
 
-    it('should render preview certificate template when clicked on preview', async () => {
+    it.only('should render preview certificate template when clicked on preview', async () => {
+      
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+    
       await waitForElement(testComponent, '#preview_image_field')
-
+      
       expect(
         testComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(1)

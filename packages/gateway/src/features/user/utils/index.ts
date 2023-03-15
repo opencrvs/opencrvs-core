@@ -36,7 +36,6 @@ export const convertToLocal = (
     const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
   
     return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
-
 }
 
 export async function getUser(
