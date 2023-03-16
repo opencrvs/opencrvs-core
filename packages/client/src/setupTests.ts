@@ -232,7 +232,11 @@ beforeEach(() => {
 vi.mock('lodash/debounce', () => ({
   default: vi.fn().mockImplementation((arg) => arg)
 }))
-vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
+
+vi.mock('./utils', async () => ({
+  ...((await vi.importActual('./utils')) as any),
+  isNavigatorOnline: () => true
+}))
 
 vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
