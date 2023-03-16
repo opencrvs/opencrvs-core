@@ -81,7 +81,7 @@ describe('createUser handler', () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        JSON.stringify({ id: '321', partOf: { reference: 'Location/22' } }),
         { status: 200 }
       ],
       [
@@ -164,12 +164,13 @@ describe('createUser handler', () => {
       ],
       location: [
         { reference: 'Location/321' },
-        { reference: 'Location/11' },
         { reference: 'Location/22' },
         { reference: 'Location/33' },
         { reference: 'Location/44' }
       ]
     }
+
+    console.log('fetch.mock', fetch.mock.calls[5][1].body)
 
     expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(

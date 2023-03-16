@@ -94,9 +94,9 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
-  const informantSMSNotifications = (await getInformantSMSNotification(
+  const informantSMSNotifications = await getInformantSMSNotification(
     authHeader.Authorization
-  )) as IInformantSMSNotification[] | []
+  )
 
   const eventType = getEventType(fhirBundle)
 
@@ -274,13 +274,28 @@ export async function sendRegisteredNotification(
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
-  if (eventType === EVENT_TYPE.BIRTH) {
+  const informantSMSNotifications = await getInformantSMSNotification(
+    authHeader.Authorization
+  )
+  if (
+    eventType === EVENT_TYPE.BIRTH &&
+    isInformantSMSNotificationEnabled(
+      informantSMSNotifications,
+      InformantSMSNotificationName.birthRegistrationSMS
+    )
+  ) {
     await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
       name: informantName,
       trackingId,
       registrationNumber
     })
-  } else {
+  } else if (
+    eventType === EVENT_TYPE.DEATH &&
+    isInformantSMSNotificationEnabled(
+      informantSMSNotifications,
+      InformantSMSNotificationName.deathRegistrationSMS
+    )
+  ) {
     await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
       name: informantName,
       trackingId,
@@ -592,7 +607,7 @@ async function getInformantSMSNotification(token: string) {
         Authorization: `Bearer ${token}`
       }
     })
-    return await res.json()
+    return (await res.json()) as IInformantSMSNotification[]
   } catch (err) {
     logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
     throw err
