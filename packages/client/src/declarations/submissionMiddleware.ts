@@ -41,6 +41,7 @@ import {
 } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
+import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutations'
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
 // eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
@@ -156,7 +157,9 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     const mutation =
       event === Event.Birth
         ? getBirthMutation(submissionAction)
-        : getDeathMutation(submissionAction)
+        : event === Event.Death
+        ? getDeathMutation(submissionAction)
+        : getMarriageMutation(submissionAction)
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         const response = await client.mutate({

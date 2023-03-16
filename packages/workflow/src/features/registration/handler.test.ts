@@ -39,7 +39,8 @@ import {
   relatedPersonMock,
   hearthResponseMock,
   userResponseMock,
-  wrapInBundle
+  wrapInBundle,
+  informantSMSNotificationMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
@@ -917,7 +918,7 @@ describe('markEventAsRegisteredHandler handler', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/specs/types',
-                  code: 'birth-registration'
+                  code: 'BIRTH'
                 }
               ]
             },
@@ -1031,7 +1032,7 @@ describe('markEventAsRegisteredHandler handler', () => {
             },
             identifier: [
               {
-                system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                system: 'http://opencrvs.org/specs/id/death-tracking-id',
                 value: 'D5WGYJE'
               }
             ],
@@ -1097,7 +1098,8 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [patientMock, { status: 200 }],
-      [motherMock, { status: 200 }]
+      [motherMock, { status: 200 }],
+      [JSON.stringify(informantSMSNotificationMock), { status: 200 }]
     )
     const res = await server.server.inject({
       method: 'POST',
