@@ -2022,8 +2022,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {(viewRecord || isDuplicate) &&
-                  !isCorrection(declaration) ? null : (
+                  {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={
