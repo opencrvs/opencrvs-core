@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { logger } from '@gateway/logger'
-import { getUserMobile } from '@gateway/features/user/utils/'
+import { getUserMobile, convertToLocal } from '@gateway/features/user/utils/'
 import * as fetchAny from 'jest-fetch-mock'
-
 const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
