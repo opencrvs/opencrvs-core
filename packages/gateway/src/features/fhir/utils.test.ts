@@ -93,9 +93,9 @@ describe('Fhir util function testing', () => {
     })
   })
   describe('removeDuplicatesFromComposition()', () => {
-    it('should remove only specific duplicate entry', () => {
+    it('should remove only specific duplicate entry', async () => {
       const mockCompositionCloned = clone(mockComposition)
-      const composition = removeDuplicatesFromComposition(
+      const composition = await removeDuplicatesFromComposition(
         // @ts-ignore
         mockCompositionCloned,
         '123',
@@ -104,12 +104,11 @@ describe('Fhir util function testing', () => {
       expect(composition.relatesTo.length).toEqual(1)
     })
 
-    it('should remove all duplicates', () => {
+    it('should remove all duplicates', async () => {
       const mockCompositionCloned = clone(mockComposition)
-      const composition = removeDuplicatesFromComposition(
+      const composition = await removeDuplicatesFromComposition(
         // @ts-ignore
         mockCompositionCloned,
-        '123',
         '123'
       )
       expect(composition.relatesTo.length).toEqual(0)

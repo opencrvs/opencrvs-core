@@ -41,6 +41,7 @@ interface INotificationsMessages
   downloadDeclarationFailed: MessageDescriptor
   unassigned: MessageDescriptor
   onlineUserStatus: MessageDescriptor
+  duplicateRecord: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
@@ -205,6 +206,13 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'You are back online',
     id: 'misc.notif.onlineUserStatus',
     description: 'Label for online user status toast notification'
+  },
+  duplicateRecord: {
+    defaultMessage:
+      '{trackingId} is a potential duplicate. Record is ready for review.',
+    id: 'misc.notif.duplicateRecord',
+    description:
+      'Label for when a duplicate record is detected when registering a record.'
   }
 }
 
