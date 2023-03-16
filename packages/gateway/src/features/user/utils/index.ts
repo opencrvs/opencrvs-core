@@ -41,7 +41,7 @@ export const convertToLocal = (
 
   return phoneUtil
     .format(number, PhoneNumberFormat.NATIONAL)
-    .replaceAll(/[^A-Z0-9]+/gi, '')
+    .replace(/[^A-Z0-9]+/gi, '')
 }
 
 export async function getUser(
