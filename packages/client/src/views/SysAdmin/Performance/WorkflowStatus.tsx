@@ -49,7 +49,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -66,6 +66,8 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import register from '@client/registerServiceWorker'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -218,6 +220,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
+  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
@@ -496,23 +499,22 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           let starterPractitionerName = ''
           let starterPractitionerRole = ''
 
+          const user = eventProgress.startedBy
+          starterPractitionerName =
+            (user &&
+              user.name &&
+              ((createNamesMap(user.name as GQLHumanName[])[
+                intl.locale
+              ] as string) ||
+                (createNamesMap(user.name as GQLHumanName[])[
+                  LANG_EN
+                ] as string))) ||
+            eventProgress.startedByFacility ||
+            ''
           if (eventProgress.startedBy != null) {
             const user = eventProgress.startedBy
-            starterPractitionerName =
-              (user &&
-                user.name &&
-                ((createNamesMap(user.name as GQLHumanName[])[
-                  intl.locale
-                ] as string) ||
-                  (createNamesMap(user.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string))) ||
-              eventProgress.startedByFacility ||
-              ''
             starterPractitionerRole =
-              (user.systemRole &&
-                intl.formatMessage(userMessages[user.systemRole as string])) ||
-              ''
+              (user.role && getUserRole(language, user.role)) || ''
           }
 
           const event =

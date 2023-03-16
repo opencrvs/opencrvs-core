@@ -321,10 +321,12 @@ export const searchTypeResolvers: GQLResolver = {
       return startedAt
     },
     startedBy: async (searchData: ISearchEventDataTemplate, _, authHeader) => {
-      return await getUser(
+      const res = await getUser(
         { practitionerId: searchData._source && searchData._source.createdBy },
         authHeader
       )
+      if (res.status) return res
+      return null
     },
     startedByFacility(searchData: ISearchEventDataTemplate) {
       let facilityName = null
