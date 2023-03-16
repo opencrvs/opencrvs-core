@@ -586,6 +586,23 @@ export const registerForms: IDefaultRegisterForms = {
               fieldName: 'registrationAgent',
               operation: 'userTransformer',
               parameters: ['VALIDATED']
+            },
+            // backward compatibility
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
             }
           ],
           mutation: {
@@ -3192,6 +3209,23 @@ export const registerForms: IDefaultRegisterForms = {
               fieldName: 'registrationAgent',
               operation: 'userTransformer',
               parameters: ['VALIDATED']
+            },
+            // backward compatibility
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
             }
           ],
           mutation: {

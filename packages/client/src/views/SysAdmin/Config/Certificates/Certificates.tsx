@@ -164,11 +164,10 @@ async function updatePreviewSvgWithSampleSignature(
   html.innerHTML = svgCode
 
   const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
+  const signatureImages = Array.from(certificateImages).filter(
     (image) => image.getAttribute('data-content') === 'signature'
   )
-
-  if (signatureImage) {
+  for (const signatureImage of signatureImages) {
     const baseURL = window.location.origin
     const res = await fetch(`${baseURL}/assets/sample-signature.png`)
     const blob = await res.blob()

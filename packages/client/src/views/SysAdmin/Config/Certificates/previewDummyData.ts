@@ -386,7 +386,7 @@ const dummyBirthRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:19:25.860+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -396,12 +396,16 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
         id: '622f81b42cd537bf91daa106',
         type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
         name: [
           {
             firstNames: 'Kennedy',
@@ -421,7 +425,7 @@ const dummyBirthRegistrationResponse = {
     },
     {
       date: '2022-03-25T10:07:26.988+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'VALIDATED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -431,471 +435,20 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
         id: '622f81b42cd537bf91daa106',
         type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'REGISTRATION_AGENT',
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-25T06:55:46.119+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-25T06:36:17.234+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-25T05:53:43.728+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-25T05:53:07.817+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T13:35:14.047+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T13:21:06.687+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T13:10:36.259+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:50:10.340+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:31:50.360+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:29:48.346+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:16:13.229+00:00',
-      action: 'DOWNLOADED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:16:08.295+00:00',
-      action: 'REGISTERED',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-24T12:16:08.173+00:00',
-      action: 'WAITING_VALIDATION',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1113,7 +666,7 @@ const dummyDeathRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:30:51.727+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -1123,12 +676,16 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
         id: '622f81b42cd537bf91daa106',
         type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
         name: [
           {
             firstNames: 'Kennedy',
@@ -1148,7 +705,7 @@ const dummyDeathRegistrationResponse = {
     },
     {
       date: '2022-03-25T12:30:34.653+00:00',
-      action: 'REGISTERED',
+      regStatus: 'VALIDATED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -1158,51 +715,20 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
         id: '622f81b42cd537bf91daa106',
         type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'REGISTRATION_AGENT',
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
-            use: 'en',
-            __typename: 'HumanName'
-          }
-        ],
-        avatar: null,
-        __typename: 'User'
-      },
-      comments: [],
-      input: [],
-      output: [],
-      certificates: null,
-      __typename: 'History'
-    },
-    {
-      date: '2022-03-25T12:30:34.597+00:00',
-      action: 'WAITING_VALIDATION',
-      reinstated: false,
-      location: {
-        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        name: 'Ibombo',
-        __typename: 'Location'
-      },
-      office: {
-        id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
-        name: 'Ibombo District Office',
-        __typename: 'Location'
-      },
-      user: {
-        id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
-        name: [
-          {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
