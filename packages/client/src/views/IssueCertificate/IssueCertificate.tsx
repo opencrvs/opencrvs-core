@@ -47,10 +47,10 @@ export function IssueCertificate() {
           mobileRight={
             <Button
               size="medium"
-              type="tertiary"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
           desktopTitle={intl.formatMessage(issueMessages.issueCertificate)}
@@ -58,10 +58,10 @@ export function IssueCertificate() {
           desktopRight={
             <Button
               size="medium"
-              type="tertiary"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
         />

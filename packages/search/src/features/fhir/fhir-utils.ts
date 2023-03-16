@@ -61,6 +61,18 @@ export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
   )
 }
 
+export function findExtension(
+  url: string,
+  extensions: fhir.Extension[]
+): fhir.Extension | undefined {
+  const extension =
+    extensions &&
+    extensions.find((obj: fhir.Extension) => {
+      return obj.url === url
+    })
+  return extension
+}
+
 export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
   return (
     task &&

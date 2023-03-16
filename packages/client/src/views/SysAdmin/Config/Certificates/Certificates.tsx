@@ -69,13 +69,6 @@ import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/u
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { UserDetails } from '@client/utils/userUtils'
 
-const ListViewContainer = styled.div`
-  margin-top: 24px;
-`
-
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   margin-top: 15px;
@@ -116,6 +109,7 @@ type Props = WrappedComponentProps & {
   registerForm: {
     birth: IForm
     death: IForm
+    marriage: IForm
   }
 } & {
   updateOfflineCertificate: typeof updateOfflineCertificate
@@ -154,66 +148,20 @@ function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
   })
 }
 
-async function updatePreviewSvgWithSampleSignature(
-  svgCode: string
-): Promise<string> {
-  const html = document.createElement('html')
-  if (svgCode.includes('data:image/svg+xml;base64')) {
-    svgCode = atob(svgCode.split(',')[1])
-  }
-  html.innerHTML = svgCode
-
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-
-  if (signatureImage) {
-    const baseURL = window.location.origin
-    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
-}
-
 export const printDummyCertificate = async (
   event: string,
-  registerForm: { birth: IForm; death: IForm },
+  registerForm: { birth: IForm; death: IForm; marriage: IForm },
   intl: IntlShape,
   userDetails: UserDetails,
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
-  let certEvent: Event
-  if (event === 'death') {
-    certEvent = Event.Death
-  } else {
-    certEvent = Event.Birth
-  }
-  const updatedOfflineData: IOfflineData = {
-    ...offlineData,
-    templates: {
-      ...offlineData.templates,
-      certificates: {
-        ...offlineData.templates.certificates!,
-        [certEvent]: {
-          ...offlineData.templates.certificates![certEvent]!,
-          definition: await updatePreviewSvgWithSampleSignature(
-            offlineData.templates.certificates![certEvent].definition
-          )
-        }
-      }
-    }
-  }
 
   printCertificate(
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    updatedOfflineData
+    offlineData
   )
 }
 
@@ -261,7 +209,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           )
 
           svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
-          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -411,6 +358,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       {
         id: Event.Death,
         title: intl.formatMessage(constantsMessages.deaths)
+      },
+      {
+        id: Event.Marriage,
+        title: intl.formatMessage(constantsMessages.marriages)
       }
     ]
 
@@ -418,12 +369,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       offlineResources.templates.certificates?.birth.fileName
     const deathCertFileName =
       offlineResources.templates.certificates?.death.fileName
+    const marriageCertFileName =
+      offlineResources.templates.certificates?.marriage.fileName
 
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
     const deathLastModified =
       offlineResources.templates.certificates?.death.lastModifiedDate
-
+    const marriageLastModified =
+      offlineResources.templates.certificates?.marriage.lastModifiedDate
     const CertificateSection = {
       title: intl.formatMessage(messages.listTitle),
       items: [
@@ -476,6 +430,31 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               )}
             </>
           )
+        },
+        {
+          id: 'marriage',
+          label: intl.formatMessage(messages.certificateTemplate),
+          value: marriageLastModified
+            ? intl.formatMessage(messages.eventUpdatedTempDesc, {
+                lastModified: marriageLastModified
+              })
+            : intl.formatMessage(messages.marriageDefaultTempDesc),
+          actionsMenu: (
+            <>
+              {offlineResources.templates.certificates?.marriage && (
+                <ToggleMenu
+                  id={`template-marriage-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItems(
+                    intl,
+                    Event.Marriage,
+                    offlineResources.templates.certificates.marriage.definition,
+                    offlineResources.templates.certificates.marriage.fileName
+                  )}
+                />
+              )}
+            </>
+          )
         }
       ]
     }
@@ -484,6 +463,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     const toggleOnChange = async (event: Event) => {
       const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+
       this.props.updateOfflineConfigData({
         config: {
           ...offlineResources.config,
@@ -513,7 +493,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     const TabContent = (props: CertificationProps) => {
       certificateFileName =
-        props.item.id === 'birth' ? birthCertFileName : deathCertFileName
+        props.item.id === 'birth'
+          ? birthCertFileName
+          : props.item.id === 'death'
+          ? deathCertFileName
+          : marriageCertFileName
 
       return (
         <>
@@ -570,7 +554,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     defaultChecked={
                       this.state.activeTabId === Event.Birth
                         ? offlineResources.config.BIRTH.PRINT_IN_ADVANCE
-                        : offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                        : this.state.activeTabId === Event.Death
+                        ? offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                        : offlineResources.config.MARRIAGE.PRINT_IN_ADVANCE
                     }
                     onChange={async () => {
                       await toggleOnChange(this.state.activeTabId)
@@ -710,10 +696,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.birth.id}`
                     )
-                  } else if (eventName === Event.Death)
+                  } else if (eventName === Event.Death) {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.death.id}`
                     )
+                  } else if (eventName === Event.Marriage) {
+                    this.handleSelectFile(
+                      `${offlineResources.templates.certificates?.marriage.id}`
+                    )
+                  }
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
@@ -760,7 +751,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               title={
                 eventName === Event.Birth
                   ? intl.formatMessage(messages.birthTemplate)
-                  : intl.formatMessage(messages.deathTemplate)
+                  : eventName === Event.Death
+                  ? intl.formatMessage(messages.deathTemplate)
+                  : intl.formatMessage(messages.marriageTemplate)
               }
               goBack={this.closePreviewSection}
               onDelete={this.onDelete}

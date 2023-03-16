@@ -82,6 +82,26 @@ export const secondary = css`
   }
 `
 
+export const secondary_negative = css`
+  border: 2px solid ${({ theme }) => theme.colors.negative};
+  color: ${({ theme }) => theme.colors.negative};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.negativeDark};
+    color: ${({ theme }) => theme.colors.negativeDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.negativeDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.negativeDarker};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.negativeDarker};
+  }
+`
+
 export const tertiary = css`
   color: ${({ theme }) => theme.colors.primary};
 

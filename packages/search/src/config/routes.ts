@@ -16,7 +16,9 @@ import {
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
   advancedRecordSearch,
-  searchAssignment
+  searchAssignment,
+  searchForBirthDeDuplication,
+  searchForDeathDeDuplication
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -24,6 +26,7 @@ import {
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
+import { marriageEventHandler } from '@search/features/registration/marriage/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -91,6 +94,16 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/{eventType}',
       handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Handles indexing a new declaration or updating an existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/marriage/{eventType}',
+      handler: marriageEventHandler,
       config: {
         tags: ['api'],
         description:
@@ -197,6 +210,40 @@ export const getRoutes = () => {
           scope: [RouteScope.NATLSYSADMIN]
         },
         description: 'Delete ocrvs index from elasticsearch'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/duplicates/birth',
+      handler: searchForBirthDeDuplication,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        description: 'Handles searching from declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/duplicates/death',
+      handler: searchForDeathDeDuplication,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        description: 'Handle searching from death declarations'
       }
     }
   ]
