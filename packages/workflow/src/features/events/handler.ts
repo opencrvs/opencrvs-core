@@ -81,9 +81,6 @@ function detectEvent(request: Hapi.Request): Events {
               return Events[`${eventType}_MARK_VALID`]
             }
             if (hasRegisterScope(request)) {
-              if (isADuplicate) {
-                return Events[`${eventType}_NEW_DEC`]
-              }
               return Events[`${eventType}_WAITING_EXTERNAL_RESOURCE_VALIDATION`]
             }
           } else {
