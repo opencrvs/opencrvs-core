@@ -251,7 +251,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
       expect(
         testComponent.find('#preview_image_field').hostNodes()
-      ).toBeTruthy()
+      ).toHaveLength(0)
     })
 
     it('should call print certificate after clicking print', async () => {
@@ -260,6 +260,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
+
       expect(printCertificateSpy).toBeCalledTimes(1)
     })
 

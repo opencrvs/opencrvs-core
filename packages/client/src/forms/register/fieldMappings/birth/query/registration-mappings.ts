@@ -243,7 +243,9 @@ const convertToLocal = (
     country.toUpperCase() === 'FAR' ? 'ZM' : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
     const phoneUtil = PhoneNumberUtil.getInstance()
-    console.log(mobileWithCountryCode)
+    if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)){
+      return
+    }
     const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
   
     return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
@@ -260,6 +262,7 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
+    
     const localPhone = convertToLocal(
       msisdnPhone,
       window.config.COUNTRY
