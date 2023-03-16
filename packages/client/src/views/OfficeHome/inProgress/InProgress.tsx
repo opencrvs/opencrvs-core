@@ -55,7 +55,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, HumanName, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -185,21 +185,21 @@ export class InProgressComponent extends React.Component<
         ''
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
-      let name
+      let name: string
       let eventDate = ''
       if (reg.registration && reg.type === 'Birth') {
-        const birthReg = reg as GQLBirthEventSearchSet
-        const names = birthReg && (birthReg.childName as GQLHumanName[])
+        const birthReg: GQLBirthEventSearchSet = { ...reg }
+        const names = birthReg && (birthReg.childName as HumanName[])
         const namesMap = createNamesMap(names)
         name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLBirthEventSearchSet).dateOfBirth
+        const date = birthReg.dateOfBirth
         eventDate = date && date
       } else {
-        const deathReg = reg as GQLDeathEventSearchSet
-        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+        const deathReg: GQLDeathEventSearchSet = { ...reg }
+        const names = deathReg && (deathReg.deceasedName as HumanName[])
         const namesMap = createNamesMap(names)
         name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLDeathEventSearchSet).dateOfDeath
+        const date = deathReg.dateOfDeath
         eventDate = date && date
       }
       const dateOfEvent =

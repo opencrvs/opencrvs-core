@@ -24,10 +24,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,

@@ -28,7 +28,7 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
