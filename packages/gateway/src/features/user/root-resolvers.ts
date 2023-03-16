@@ -476,7 +476,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     name: (user.name as GQLHumanNameInput[]).map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName as string,
-      given: (name.firstNames || '').split(' ') as string[]
+      given: [name.firstNames || '']
     })),
     role: user.role as string,
     type: user.type as string,
