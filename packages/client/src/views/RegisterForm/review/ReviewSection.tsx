@@ -146,13 +146,21 @@ import {
 import { getBase64String } from '@client/utils/imageUtils'
 import { formatName } from '@client/utils/name'
 import { Base64String } from '@opencrvs/components/lib/forms/AudioRecorder/useRecorder'
+import { Warning as WarningCircle } from '@opencrvs/components/lib/icons'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
+  display: flex;
+  padding: 2px;
+  vertical-align: middle;
+  gap: 2px;
+  > svg,
+  > span {
+    flex-shrink: 0;
+  }
   text-transform: lowercase;
   &::first-letter {
     text-transform: uppercase;
@@ -1130,6 +1138,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     return (
       <RequiredField id={`required_label_${section.id}_${field.name}`}>
+        <WarningCircle />
         {field.ignoreFieldLabelOnErrorMessage ||
           (field.previewGroup &&
             this.props.intl.formatMessage(field.label) + ' ')}
