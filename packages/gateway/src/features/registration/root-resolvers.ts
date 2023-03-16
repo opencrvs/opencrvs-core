@@ -18,6 +18,10 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
+  OPENCRVS_SPECIFICATION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID,
   VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
@@ -47,12 +51,7 @@ import {
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import {
-  AUTH_URL,
-  COUNTRY_CONFIG_URL,
-  FHIR_URL,
-  SEARCH_URL
-} from '@gateway/constants'
+import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -428,10 +427,15 @@ export const resolvers: GQLResolver = {
       )
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsArchived(_, { id }, authHeader) {
+    async markEventAsArchived(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -444,7 +448,10 @@ export const resolvers: GQLResolver = {
       const taskEntry = await getTaskEntry(id, authHeader)
       const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
-        GQLRegStatus.ARCHIVED
+        GQLRegStatus.ARCHIVED,
+        reason,
+        comment,
+        duplicateTrackingId
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
@@ -516,44 +523,35 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async notADuplicate(_, { id, duplicateId }, authHeader) {
+    async markEventAsNotDuplicate(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition = await fetchFHIR(
+        const composition: fhir.Composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
           'GET'
         )
-        removeDuplicatesFromComposition(composition, id, duplicateId)
+        await removeDuplicatesFromComposition(composition, id)
+        const compositionEntry: fhir.BundleEntry = {
+          resource: composition
+        }
 
-        await fetch(`${SEARCH_URL}/events/not-duplicate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`Search request failed: ${error.message}`)
-          )
-        })
+        const taskEntry = await getTaskEntry(id, authHeader)
 
-        await fetch(`${FHIR_URL}/Composition/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`FHIR request failed: ${error.message}`)
-          )
-        })
-
+        const extension: fhir.Extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const taskBundle = taskBundleWithExtension(taskEntry, extension)
+        const payloadBundle: fhir.Bundle = {
+          ...taskBundle,
+          entry: [compositionEntry, ...taskBundle.entry]
+        }
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(payloadBundle)
+        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -574,6 +572,46 @@ export const resolvers: GQLResolver = {
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       // return the taskId
       return taskEntry.resource.id
+    },
+    async markEventAsDuplicate(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const extension: fhir.Extension = { url: MARKED_AS_DUPLICATE }
+
+      if (comment || reason) {
+        if (!taskEntry.resource.reason) {
+          taskEntry.resource.reason = {
+            text: ''
+          }
+        }
+
+        taskEntry.resource.reason.text = reason || ''
+        const statusReason: fhir.CodeableConcept = {
+          text: comment
+        }
+        taskEntry.resource.statusReason = statusReason
+      }
+
+      if (duplicateTrackingId) {
+        extension.valueString = duplicateTrackingId
+      }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      return taskEntry.resource.id
     }
   }
 }
@@ -587,33 +625,53 @@ async function createEventRegistration(
   const draftId =
     details && details.registration && details.registration.draftId
 
-  const duplicateCompostion =
-    draftId && (await lookForDuplicate(draftId, authHeader))
+  const existingComposition =
+    draftId && (await lookForComposition(draftId, authHeader))
 
-  if (duplicateCompostion) {
+  if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
-        duplicateCompostion,
+        existingComposition,
         event,
         false,
         authHeader
       )
     } else {
       // return tracking-id
-      return await getDeclarationIds(duplicateCompostion, authHeader)
+      return await getDeclarationIds(existingComposition, authHeader)
     }
   }
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  if (hasScope(authHeader, 'register')) {
+
+  /*
+   * Some custom logic added here. If you are a registar and
+   * we flagged the declaration as a duplicate, we push the declaration into
+   * "Ready for review" queue and not ready to print.
+   */
+  const hasDuplicates = Boolean(
+    doc.entry
+      .find((entry) => entry.resource.resourceType === 'Composition')
+      ?.resource?.extension?.find(
+        (ext) =>
+          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+          ext.valueBoolean
+      )
+  )
+
+  if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
-    // return tracking-id
-    return await getDeclarationIdsFromResponse(res, authHeader)
+    // return tracking-id and potential duplicates
+    const ids = await getDeclarationIdsFromResponse(res, authHeader)
+    return {
+      ...ids,
+      isPotentiallyDuplicate: hasDuplicates
+    }
   }
 }
 
-export async function lookForDuplicate(
+export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {
@@ -668,9 +726,9 @@ async function markEventAsRegistered(
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
 
-  return res
+  return composition
 }
 
 async function markEventAsCertified(
@@ -703,7 +761,10 @@ const ACTION_EXTENSIONS = [
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {

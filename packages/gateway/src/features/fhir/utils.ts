@@ -62,6 +62,8 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
   VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
@@ -978,6 +980,10 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VIEWED
+  } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_DUPLICATE
+  } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_NOT_DUPLICATE
   }
   return null
 }
@@ -1007,24 +1013,30 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function removeDuplicatesFromComposition(
+export async function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
-  duplicateId: string
+  duplicateId?: string
 ) {
-  const removeAllDuplicates = compositionId === duplicateId
-  const updatedRelatesTo =
-    composition.relatesTo &&
-    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
-      return (
-        relatesTo.code !== 'duplicate' ||
-        (!removeAllDuplicates &&
-          relatesTo.targetReference &&
-          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
-      )
-    })
-  composition.relatesTo = updatedRelatesTo
-  return composition
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
 }
 
 export const fetchFHIR = <T = any>(
@@ -1122,6 +1134,66 @@ export const postAdvancedSearch = (
   criteria: ISearchCriteria
 ) => {
   return fetch(`${SEARCH_URL}advancedRecordSearch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type BirthDuplicateSearchBody = {
+  childFirstNames?: string
+  childFamilyName?: string
+  childDoB?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+}
+
+export const findBirthDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: BirthDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/birth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type DeathDuplicateSearchBody = {
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedIdentifier?: string
+  deceasedDoB?: string
+  deathDate?: string
+}
+export const findDeathDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: DeathDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/death`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1421,4 +1493,9 @@ export function isBase64FileString(str: string) {
   }
   const strSplit = str.split(':')
   return strSplit.length > 0 && strSplit[0] === 'data'
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }

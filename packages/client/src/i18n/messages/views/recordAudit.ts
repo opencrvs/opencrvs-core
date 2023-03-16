@@ -42,6 +42,7 @@ interface IRecordAuditMessages
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
   reinstateDeclarationDialogDescription: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
@@ -187,6 +188,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage:
       'This will revert the application back to its original status and add it to your workqueue.',
     description: 'Description for the dialog when reinstate declaration'
+  },
+  markAsDuplicate: {
+    id: 'recordAudit.declaration.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 }
 
@@ -226,6 +231,16 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.viewed',
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
+  },
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
+  },
+  MARKED_AS_NOT_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsNotDuplicate',
+    defaultMessage: 'Marked not a duplicate',
+    description: 'Marked not a duplicate status message for record audit'
   }
 }
 

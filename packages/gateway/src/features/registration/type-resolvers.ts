@@ -17,7 +17,8 @@ import {
   getStatusFromTask,
   ITimeLoggedResponse,
   getCertificatesFromTask,
-  getActionFromTask
+  getActionFromTask,
+  fetchTaskByCompositionIdFromHearth
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -55,9 +56,13 @@ import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   REQUESTING_INDIVIDUAL,
-  HAS_SHOWED_VERIFIED_DOCUMENT
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  DUPLICATE_TRACKING_ID
 } from '@gateway/features/fhir/constants'
-import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import {
+  ITaskBundle,
+  ITemplatedComposition
+} from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
@@ -520,7 +525,7 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      return (
+      const duplicateCompositionIds =
         composition.relatesTo &&
         composition.relatesTo.map((duplicate: fhir.CompositionRelatesTo) => {
           if (
@@ -533,7 +538,20 @@ export const typeResolvers: GQLResolver = {
           }
           return null
         })
-      )
+
+      const duplicateData =
+        duplicateCompositionIds &&
+        (await Promise.all(
+          duplicateCompositionIds.map(async (compositionId: string) => {
+            const taskData: ITaskBundle =
+              await fetchTaskByCompositionIdFromHearth(compositionId)
+            return {
+              compositionId: compositionId,
+              trackingId: taskData.entry?.[0].resource?.identifier?.[1].value
+            }
+          })
+        ))
+      return duplicateData
     },
     certificates: async (task, _, authHeader) =>
       await getCertificatesFromTask(task, _, authHeader),
@@ -847,11 +865,20 @@ export const typeResolvers: GQLResolver = {
           system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
       ),
     user: async (task: fhir.Task, _: any, authHeader: any) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension as fhir.Extension[]
       )
-      if (!user || !user.valueReference || !user.valueReference.reference) {
+      if (
+        systemIdentifier ||
+        !user ||
+        !user.valueReference ||
+        !user.valueReference.reference
+      ) {
         return null
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
@@ -890,22 +917,13 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
-
-      return {
-        ...userResponse,
-        role: {
-          ...userResponse.role,
-          labels: [
-            {
-              lang: 'en',
-              label:
-                role ??
-                userResponse.role.labels.find((label) => label.lang === 'en')
-                  ?.label
-            }
-          ]
+      userResponse.role.labels.forEach((item) => {
+        if (item.lang === 'en') {
+          item.label = role ?? item.label
         }
-      }
+      })
+
+      return userResponse
     },
     system: async (task: fhir.Task, _: any, authHeader) => {
       const systemIdentifier = task.identifier?.find(
@@ -981,6 +999,14 @@ export const typeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    },
+    duplicateOf: (task: fhir.Task) => {
+      const extensions = task.extension || []
+      const duplicateTrackingIdExt = findExtension(
+        DUPLICATE_TRACKING_ID,
+        extensions
+      )
+      return duplicateTrackingIdExt?.valueString
     }
   },
 

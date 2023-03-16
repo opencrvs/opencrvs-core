@@ -130,7 +130,6 @@ function mapStatetoProps(
   const declaration = state.declarationsState.declarations.find(
     ({ id, review }) => id === match.params.declarationId && review === true
   )
-  const historyState = history.location.state as any
   return {
     declaration,
     scope: getScope(state),
@@ -138,7 +137,7 @@ function mapStatetoProps(
     event: getEvent(match.params.event),
     registerForm: form,
     pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
-    duplicate: historyState && historyState.duplicate
+    duplicate: Boolean(declaration?.duplicates?.length)
   }
 }
 
