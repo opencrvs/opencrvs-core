@@ -231,25 +231,26 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (
-  mobileWithCountryCode: string,
-  country: string,
-) => {
+const convertToLocal = (mobileWithCountryCode: string, country: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-  
+
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZM' : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
+    country.toUpperCase() === 'FAR'
+      ? 'ZM'
+      : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
-    const phoneUtil = PhoneNumberUtil.getInstance()
-    if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)){
-      return
-    }
-    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
-  
-    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+  const phoneUtil = PhoneNumberUtil.getInstance()
 
+  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
+    return
+  }
+  const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+
+  return phoneUtil
+    .format(number, PhoneNumberFormat.NATIONAL)
+    .replaceAll(/[^A-Z0-9]+/gi, '')
 }
 
 export const localPhoneTransformer =
@@ -262,11 +263,9 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
-    
-    const localPhone = convertToLocal(
-      msisdnPhone,
-      window.config.COUNTRY
-    )
+
+    const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
+
     transformedData[sectionId][field.name] = localPhone
     return transformedData
   }

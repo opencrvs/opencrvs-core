@@ -32,10 +32,16 @@ export const convertToLocal = (
 ) => {
   countryCode = countryCode.toUpperCase().slice(0, 2)
 
-    const phoneUtil = PhoneNumberUtil.getInstance()
-    const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+  const phoneUtil = PhoneNumberUtil.getInstance()
+
+  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
+    return
+  }
+  const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
   
-    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+  return phoneUtil
+  .format(number, PhoneNumberFormat.NATIONAL)
+  .replaceAll(/[^A-Z0-9]+/gi, '')
 }
 
 export async function getUser(

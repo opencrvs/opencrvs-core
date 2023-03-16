@@ -652,14 +652,16 @@ export const convertToMSISDN = (phone: string) => {
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-  window.config.COUNTRY.toUpperCase() === 'FAR'
-    ? 'ZM'
-    : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
+    window.config.COUNTRY.toUpperCase() === 'FAR'
+      ? 'ZM'
+      : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(phone, countryCode)
 
-  return phoneUtil.format(number, PhoneNumberFormat.INTERNATIONAL)
+  return phoneUtil
+    .format(number, PhoneNumberFormat.INTERNATIONAL)
+    .replaceAll(/[\s~`!@#$%^&*()_\-={[}\]|\\:;"'<,>.?/]+/g, '')
 }
 
 export const isRadioGroupWithNestedField = (

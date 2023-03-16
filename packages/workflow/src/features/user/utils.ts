@@ -69,10 +69,16 @@ export const convertToLocal = (
 ) => {
   countryCode = countryCode.toUpperCase().slice(0, 2)
 
-    const phoneUtil = PhoneNumberUtil.getInstance()
-    const number = phoneUtil.parse(mobileWithCountryCode, countryCode.toUpperCase())
-  
-    return phoneUtil.format(number, PhoneNumberFormat.NATIONAL)
+  const phoneUtil = PhoneNumberUtil.getInstance()
+
+  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
+    return
+  }
+  const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+
+  return phoneUtil
+    .format(number, PhoneNumberFormat.NATIONAL)
+    .replaceAll(/[^A-Z0-9]+/gi, '')
 }
 
 // @todo remove this as it's not used anywhere (other than tests)
