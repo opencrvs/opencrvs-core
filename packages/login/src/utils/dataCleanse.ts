@@ -12,7 +12,7 @@
 import { callingCountries } from 'country-data'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
-export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
+export const convertToMSISDN = (localPhoneNumber: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
