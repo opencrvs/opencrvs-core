@@ -38,10 +38,10 @@ export const convertToLocal = (
     return
   }
   const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
-  
+
   return phoneUtil
-  .format(number, PhoneNumberFormat.NATIONAL)
-  .replaceAll(/[^A-Z0-9]+/gi, '')
+    .format(number, PhoneNumberFormat.NATIONAL)
+    .replaceAll(/[^A-Z0-9]+/gi, '')
 }
 
 export async function getUser(
