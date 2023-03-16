@@ -4266,7 +4266,7 @@ async function hasDeathDuplicates(
   authHeader: IAuthHeader,
   bundle: GQLDeathRegistrationInput
 ) {
-  if (!bundle || !bundle.causeOfDeath) {
+  if (!bundle || !bundle.deceased) {
     return false
   }
 
