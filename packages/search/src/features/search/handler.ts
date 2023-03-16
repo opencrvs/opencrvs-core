@@ -193,6 +193,10 @@ export async function advancedRecordSearch(
       isExternalSearch,
       request.payload as ISearchCriteria
     )
+    if (!result) {
+      return h.response({}).code(404)
+    }
+
     return h.response(result).code(200)
   } catch (err) {
     logger.error(`Search/searchDeclarationHandler: error: ${err}`)

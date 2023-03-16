@@ -54,13 +54,16 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (params.registrationStatuses) {
+  if (
+    (params.registrationStatuses && params.registrationStatuses?.length > 0) ||
+    isExternalSearch
+  ) {
     must.push({
       query_string: {
         default_field: 'type',
         query: isExternalSearch
           ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
-          : `(${params.registrationStatuses.join(') OR (')})`
+          : `(${params.registrationStatuses!.join(') OR (')})`
       }
     })
   }
