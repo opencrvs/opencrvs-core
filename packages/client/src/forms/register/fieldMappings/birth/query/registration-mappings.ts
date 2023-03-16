@@ -368,10 +368,15 @@ export const userTransformer =
     targetFieldName?: string,
     __?: IOfflineData
   ) => {
-    const history: History = _.history.findLast(
-      ({ action, regStatus }: History) =>
-        !action && regStatus && regStatus === status
-    )
+    if (!_.history) {
+      return
+    }
+    const history: History = _.history
+      .reverse()
+      .find(
+        ({ action, regStatus }: History) =>
+          !action && regStatus && regStatus === status
+      )
 
     if (history) {
       transformedData[targetSectionId || sectionId][
