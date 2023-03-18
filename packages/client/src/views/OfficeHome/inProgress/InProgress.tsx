@@ -78,6 +78,11 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  isMarriageEvent,
+  isBirthEvent,
+  isDeathEvent
+} from '@client/search/transformer'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -187,35 +192,33 @@ export class InProgressComponent extends React.Component<
         ''
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
-      let name: string
+      let name
       let eventDate = ''
-      if (reg.registration && reg.type === 'Birth') {
-        const birthReg: GQLBirthEventSearchSet = { ...reg }
-        const names = birthReg && (birthReg.childName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = birthReg.dateOfBirth
-        eventDate = date && date
-      } else if (reg.registration && reg.type === 'Death') {
-        const deathReg: GQLDeathEventSearchSet = { ...reg }
-        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = deathReg.dateOfDeath
-        eventDate = date && date
-      } else if (reg.registration && reg.type === 'Marriage') {
-        const marriageReg = reg as GQLMarriageEventSearchSet
-        const groomNames =
-          marriageReg && (marriageReg.groomName as GQLHumanName[])
-        const groomNamesMap = createNamesMap(groomNames)
-        const brideNames =
-          marriageReg && (marriageReg.groomName as GQLHumanName[])
-        const brideNamesMap = createNamesMap(brideNames)
-        const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
-        const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
-        name = groomName + (brideName ? ` & ${brideName}` : '')
-        const date = (reg as GQLMarriageEventSearchSet).dateOfMarriage
-        eventDate = date && date
+
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          const names = reg.childName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          const date = reg.dateOfBirth
+          eventDate = date && date
+        } else if (isDeathEvent(reg)) {
+          const names = reg.deceasedName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          const date = reg.dateOfDeath
+          eventDate = date && date
+        } else if (isMarriageEvent(reg)) {
+          const groomNames = reg.groomName as GQLHumanName[]
+          const groomNamesMap = createNamesMap(groomNames)
+          const brideNames = reg.groomName as GQLHumanName[]
+          const brideNamesMap = createNamesMap(brideNames)
+          const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
+          const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
+          name = groomName + (brideName ? ` & ${brideName}` : '')
+          const date = reg.dateOfMarriage
+          eventDate = date && date
+        }
       }
       const dateOfEvent =
         eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
