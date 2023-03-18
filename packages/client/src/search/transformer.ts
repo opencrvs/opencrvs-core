@@ -24,17 +24,21 @@ import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import { LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
 
-function isBirthEvent(req: GQLEventSearchSet): req is GQLBirthEventSearchSet {
+export const isBirthEvent = (
+  req: GQLEventSearchSet
+): req is GQLBirthEventSearchSet => {
   return req.type === 'Birth'
 }
 
-function isDeathEvent(req: GQLEventSearchSet): req is GQLDeathEventSearchSet {
+export const isDeathEvent = (
+  req: GQLEventSearchSet
+): req is GQLDeathEventSearchSet => {
   return req.type === 'Death'
 }
 
-function isMarriageEvent(
+export const isMarriageEvent = (
   reg: GQLEventSearchSet
-): reg is GQLMarriageEventSearchSet {
+): reg is GQLMarriageEventSearchSet => {
   return reg.type === 'Marriage'
 }
 
