@@ -19,10 +19,14 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
 import { HumanName, LocalRegistrar } from '@client/utils/gateway'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { UserDetails } from '@client/utils/userUtils'
 
 export function getUserName(
-  userDetails: Pick<UserDetails | LocalRegistrar, 'name'>
+  userDetails: Pick<
+    UserDetails | NonNullable<UserDetails['localRegistrar']>,
+    'name'
+  >
 ) {
   const nameObj =
     userDetails.name &&

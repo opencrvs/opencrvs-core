@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
-
+import { Button } from '@opencrvs/components/lib/Button'
 import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
 import { Box } from '@opencrvs/components/lib/Box'
 import { Frame } from '@opencrvs/components/lib/Frame'
@@ -25,7 +25,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   selectApplicationName,
   selectCountryLogo
@@ -44,6 +44,7 @@ import {
   RegStatus
 } from '@client/utils/gateway'
 import { useTimeout } from '@client/hooks/useTimeout'
+import { goToHome } from '@client/navigation'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -250,6 +251,7 @@ const TimeOutState = () => {
 
 export function VerifyCertificatePage() {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const { declarationId } = useParams<{ declarationId: string }>()
 
   const logo = useSelector(selectCountryLogo)
@@ -389,7 +391,30 @@ export function VerifyCertificatePage() {
 
   return (
     <Frame
-      header={<AppBar mobileTitle={appName} desktopTitle={appName} />}
+      header={
+        <AppBar
+          mobileTitle={appName}
+          desktopTitle={appName}
+          mobileRight={
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => dispatch(goToHome())}
+            >
+              <Icon name={'X'} weight={'bold'} />
+            </Button>
+          }
+          desktopRight={
+            <Button
+              size="medium"
+              type="icon"
+              onClick={() => dispatch(goToHome())}
+            >
+              <Icon name={'X'} weight={'bold'} />
+            </Button>
+          }
+        />
+      }
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
       )}

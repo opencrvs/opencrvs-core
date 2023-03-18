@@ -46,7 +46,8 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLRegistrationSearchSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ApolloClient,
@@ -71,8 +72,8 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
+import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
@@ -733,32 +734,87 @@ export async function updateWorkqueueData(
   if (!workqueueApp) {
     return
   }
-  const sectionId = declaration.event === 'birth' ? 'child' : 'deceased'
-  const sectionDefinition = getRegisterForm(state)[
-    declaration.event
-  ].sections.find((section) => section.id === sectionId)
+  const sectionIds =
+    declaration.event === 'birth'
+      ? ['child']
+      : declaration.event === 'death'
+      ? ['deceased']
+      : ['groom', 'bride']
 
-  const transformedDeclaration = draftToGqlTransformer(
-    // transforming required section only
-    { sections: sectionDefinition ? [sectionDefinition] : [] },
-    declaration.data
-  )
-  const transformedName =
-    (transformedDeclaration &&
-      transformedDeclaration[sectionId] &&
-      transformedDeclaration[sectionId].name) ||
-    []
-  const transformedDeathDate =
-    (declaration.data &&
-      declaration.data.deathEvent &&
-      declaration.data.deathEvent.deathDate) ||
-    []
-  const transformedBirthDate =
-    (declaration.data &&
-      declaration.data.child &&
-      declaration.data.child.childBirthDate) ||
-    []
-  const transformedInformantContactNumber =
+  let transformedName: (GQLHumanName | null)[] | undefined
+  let transformedNameForGroom: (GQLHumanName | null)[] | undefined
+  let transformedNameForBride: (GQLHumanName | null)[] | undefined
+  let transformedDeathDate: IFormFieldValue = EMPTY_STRING
+  let transformedBirthDate: IFormFieldValue = EMPTY_STRING
+  let transformedMarriageDate: IFormFieldValue = EMPTY_STRING
+  let transformedInformantContactNumber = EMPTY_STRING
+
+  if (declaration.event === 'marriage') {
+    const groomSectionId = sectionIds[0]
+    const brideSectionId = sectionIds[1]
+
+    const groomSectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === groomSectionId)
+    const brideSectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === brideSectionId)
+
+    const transformedDeclarationForGroom = draftToGqlTransformer(
+      // transforming required section only
+      { sections: groomSectionDefinition ? [groomSectionDefinition] : [] },
+      declaration.data
+    )
+
+    const transformedDeclarationForBride = draftToGqlTransformer(
+      // transforming required section only
+      { sections: brideSectionDefinition ? [brideSectionDefinition] : [] },
+      declaration.data
+    )
+
+    transformedNameForGroom =
+      (transformedDeclarationForGroom &&
+        transformedDeclarationForGroom[groomSectionId] &&
+        transformedDeclarationForGroom[groomSectionId].name) ||
+      []
+    transformedNameForBride =
+      (transformedDeclarationForBride &&
+        transformedDeclarationForBride[brideSectionId] &&
+        transformedDeclarationForBride[brideSectionId].name) ||
+      []
+    transformedMarriageDate =
+      (declaration.data &&
+        declaration.data.marriageEvent &&
+        declaration.data.marriageEvent.marriageDate) ||
+      []
+  } else {
+    const sectionId = sectionIds[0]
+    const sectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === sectionId)
+
+    const transformedDeclaration = draftToGqlTransformer(
+      // transforming required section only
+      { sections: sectionDefinition ? [sectionDefinition] : [] },
+      declaration.data
+    )
+    transformedName =
+      (transformedDeclaration &&
+        transformedDeclaration[sectionId] &&
+        transformedDeclaration[sectionId].name) ||
+      []
+    transformedDeathDate =
+      (declaration.data &&
+        declaration.data.deathEvent &&
+        declaration.data.deathEvent.deathDate) ||
+      []
+    transformedBirthDate =
+      (declaration.data &&
+        declaration.data.child &&
+        declaration.data.child.childBirthDate) ||
+      []
+  }
+  transformedInformantContactNumber =
     (declaration.data &&
       declaration.data.registration &&
       declaration.data.registration.contactPoint &&
@@ -766,7 +822,7 @@ export async function updateWorkqueueData(
         .registrationPhone) ||
     ''
 
-  const birthEventSearchSet: GQLBirthEventSearchSet = {
+  const birthEventData: GQLBirthEventSearchSet = {
     ...workqueueApp,
     childName: transformedName,
     dateOfBirth: transformedBirthDate,
@@ -775,7 +831,7 @@ export async function updateWorkqueueData(
     }
   }
 
-  const deathEventSearchSet: GQLDeathEventSearchSet = {
+  const deathEventData: GQLDeathEventSearchSet = {
     ...workqueueApp,
     deceasedName: transformedName,
     dateOfDeath: transformedDeathDate,
@@ -783,11 +839,33 @@ export async function updateWorkqueueData(
       contactNumber: transformedInformantContactNumber
     }
   }
+    
+  const marriageEventData: GQLMarriageEventSearchSet = {
+    ...workqueueApp,
+    brideName: transformedNameForBride,
+    groomName: transformedNameForGroom,
+    dateOfMarriage: transformedMarriageDate,
+    registration: {
+      contactNumber: transformedInformantContactNumber
+    }
+  }
 
-  const workqueueAppResult =
-    declaration.event === 'birth' ? birthEventSearchSet : deathEventSearchSet
+  const generateWorkqueueResult = () => {
+    if (declaration.event === 'birth') {
+      return birthEventData
+    }
+    if (declaration.event === 'death') {
+      return deathEventData
+    }
+    if (declaration.event === 'marriage') {
+      return marriageEventData
+    }
+    return workqueueApp
+  }
+  
+  const workqueueResult = generateWorkqueueResult()
 
-  return workqueueAppResult
+  return workqueueResult
 }
 
 export async function writeDeclarationByUser(
@@ -979,7 +1057,8 @@ function requestWithStateWrapper(
 async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
 
   const attachments = registration?.attachments
   if (!attachments) {

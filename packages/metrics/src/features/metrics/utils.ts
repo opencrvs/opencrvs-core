@@ -62,7 +62,8 @@ export interface IMonthRangeFilter {
 
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
 
 export type Location = fhir.Location & { id: string }
@@ -422,7 +423,9 @@ export async function getRegistrationTargetDays(
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.REGISTRATION_TARGET
-      : applicationConfig.DEATH?.REGISTRATION_TARGET
+      : event === EVENT_TYPE.DEATH
+      ? applicationConfig.DEATH?.REGISTRATION_TARGET
+      : applicationConfig.MARRIAGE?.REGISTRATION_TARGET
   return targetDays
 }
 
