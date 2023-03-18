@@ -24,6 +24,20 @@ import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import { LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
 
+function isBirthEvent(req: GQLEventSearchSet): req is GQLBirthEventSearchSet {
+  return req.type === 'Birth'
+}
+
+function isDeathEvent(req: GQLEventSearchSet): req is GQLDeathEventSearchSet {
+  return req.type === 'Death'
+}
+
+function isMarriageEvent(
+  reg: GQLEventSearchSet
+): reg is GQLMarriageEventSearchSet {
+  return reg.type === 'Marriage'
+}
+
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
   intl: IntlShape
@@ -33,27 +47,30 @@ export const transformData = (
     return []
   }
 
-  return data.results
-    .filter((req): req is GQLEventSearchSet => req !== null)
-    .map((reg: GQLEventSearchSet) => {
-      let birthReg
-      let deathReg
-      let marriageReg
-      let names
-      let groomNames
-      let brideNames
-      let dateOfEvent
-      const assignedReg = reg
-      if (assignedReg.registration && assignedReg.type === 'Birth') {
-        birthReg = reg as GQLBirthEventSearchSet
-        names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
-        dateOfEvent = birthReg && birthReg.dateOfBirth
-      } else if (assignedReg.registration && assignedReg.type === 'Death') {
-        deathReg = reg as GQLDeathEventSearchSet
-        names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
+  const results = data.results.filter(
+    (req): req is GQLEventSearchSet => req !== null
+  )
+  return results.map((reg: GQLEventSearchSet) => {
+    let birthReg
+    let deathReg
+    let marriageReg
+    let names
+    let groomNames
+    let brideNames
+    let dateOfEvent
+    const assignedReg = reg
+
+    if (reg.registration) {
+      if (isBirthEvent(reg)) {
+        birthReg = reg
+        names = (birthReg.childName as GQLHumanName[]) || []
+        dateOfEvent = birthReg.dateOfBirth
+      } else if (isDeathEvent(reg)) {
+        deathReg = reg
+        names = (deathReg.deceasedName as GQLHumanName[]) || []
         dateOfEvent = deathReg && deathReg.dateOfDeath
-      } else {
-        marriageReg = reg as GQLMarriageEventSearchSet
+      } else if (isMarriageEvent(reg)) {
+        marriageReg = reg
         groomNames =
           (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
         brideNames =
@@ -61,70 +78,68 @@ export const transformData = (
 
         dateOfEvent = marriageReg && marriageReg.dateOfMarriage
       }
-      const status =
-        assignedReg.registration &&
-        (assignedReg.registration.status as GQLRegStatus)
+    }
+    const status =
+      assignedReg.registration &&
+      (assignedReg.registration.status as GQLRegStatus)
 
-      return {
-        id: assignedReg.id,
-        name:
-          assignedReg.type === 'Marriage'
-            ? `${
-                (createNamesMap(groomNames as HumanName[])[locale] as string) ||
-                (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
-              } & ${
-                (createNamesMap(brideNames as HumanName[])[locale] as string) ||
-                (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
-              }
+    return {
+      id: assignedReg.id,
+      name:
+        assignedReg.type === 'Marriage'
+          ? `${
+              (createNamesMap(groomNames as HumanName[])[locale] as string) ||
+              (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
+            } & ${
+              (createNamesMap(brideNames as HumanName[])[locale] as string) ||
+              (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
+            }
               `
-            : (createNamesMap(names as HumanName[])[locale] as string) ||
-              (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
-              '',
-        dob:
-          (birthReg?.dateOfBirth?.length &&
-            formatLongDate(birthReg.dateOfBirth, locale)) ||
-          '',
-        dod:
-          (deathReg?.dateOfDeath?.length &&
-            formatLongDate(deathReg.dateOfDeath, locale)) ||
-          '',
-        dateOfEvent,
-        registrationNumber:
-          (assignedReg.registration &&
-            assignedReg.registration.registrationNumber) ||
-          '',
-        trackingId:
-          (assignedReg.registration && assignedReg.registration.trackingId) ||
-          '',
-        event: assignedReg.type || '',
-        declarationStatus: status || '',
-        contactNumber:
-          (assignedReg.registration &&
-            assignedReg.registration.contactNumber) ||
-          '',
-        duplicates:
-          (assignedReg.registration && assignedReg.registration.duplicates) ||
-          [],
-        rejectionReasons:
-          (status === 'REJECTED' &&
-            assignedReg.registration &&
-            assignedReg.registration.reason) ||
-          '',
-        rejectionComment:
-          (status === 'REJECTED' &&
-            assignedReg.registration &&
-            assignedReg.registration.comment) ||
-          '',
-        createdAt: assignedReg?.registration?.createdAt,
-        assignment: assignedReg?.registration?.assignment as Record<
-          string,
-          unknown
-        >,
-        modifiedAt:
+          : (createNamesMap(names as HumanName[])[locale] as string) ||
+            (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
+            '',
+      dob:
+        (birthReg?.dateOfBirth?.length &&
+          formatLongDate(birthReg.dateOfBirth, locale)) ||
+        '',
+      dod:
+        (deathReg?.dateOfDeath?.length &&
+          formatLongDate(deathReg.dateOfDeath, locale)) ||
+        '',
+      dateOfEvent,
+      registrationNumber:
+        (assignedReg.registration &&
+          assignedReg.registration.registrationNumber) ||
+        '',
+      trackingId:
+        (assignedReg.registration && assignedReg.registration.trackingId) || '',
+      event: assignedReg.type || '',
+      declarationStatus: status || '',
+      contactNumber:
+        (assignedReg.registration && assignedReg.registration.contactNumber) ||
+        '',
+      duplicates:
+        (assignedReg.registration && assignedReg.registration.duplicates) || [],
+      rejectionReasons:
+        (status === 'REJECTED' &&
           assignedReg.registration &&
-          (assignedReg.registration.modifiedAt ||
-            assignedReg.registration.createdAt),
-        operationHistories: assignedReg.operationHistories as ITaskHistory[]
-      }
-    })
+          assignedReg.registration.reason) ||
+        '',
+      rejectionComment:
+        (status === 'REJECTED' &&
+          assignedReg.registration &&
+          assignedReg.registration.comment) ||
+        '',
+      createdAt: assignedReg?.registration?.createdAt,
+      assignment: assignedReg?.registration?.assignment as Record<
+        string,
+        unknown
+      >,
+      modifiedAt:
+        assignedReg.registration &&
+        (assignedReg.registration.modifiedAt ||
+          assignedReg.registration.createdAt),
+      operationHistories: assignedReg.operationHistories as ITaskHistory[]
+    }
+  })
 }
