@@ -54,7 +54,6 @@ interface Window {
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
-    MINIO_URL: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     HIDE_EVENT_REGISTER_INFORMATION: boolean

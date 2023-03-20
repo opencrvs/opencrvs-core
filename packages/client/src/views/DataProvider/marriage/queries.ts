@@ -136,6 +136,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         }
         attachments {
           data
+          uri
           type
           contentType
           subject
@@ -394,6 +395,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         attachments {
           data
+          uri
           type
           contentType
           subject

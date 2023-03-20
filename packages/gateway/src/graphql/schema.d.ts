@@ -936,6 +936,7 @@ export interface GQLAttachment {
   _fhirID?: string
   contentType?: string
   data?: string
+  uri?: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -1758,7 +1759,8 @@ export interface GQLAddressInput {
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
-  data: string
+  data?: string
+  uri?: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -5954,6 +5956,7 @@ export interface GQLAttachmentTypeResolver<TParent = any> {
   _fhirID?: AttachmentTo_fhirIDResolver<TParent>
   contentType?: AttachmentToContentTypeResolver<TParent>
   data?: AttachmentToDataResolver<TParent>
+  uri?: AttachmentToUriResolver<TParent>
   status?: AttachmentToStatusResolver<TParent>
   originalFileName?: AttachmentToOriginalFileNameResolver<TParent>
   systemFileName?: AttachmentToSystemFileNameResolver<TParent>
@@ -5976,6 +5979,10 @@ export interface AttachmentToContentTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AttachmentToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AttachmentToUriResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

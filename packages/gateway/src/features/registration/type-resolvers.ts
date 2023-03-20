@@ -71,13 +71,14 @@ import {
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { MINIO_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { getSystem, getUser } from '@gateway/features/user/utils'
+import { fromBuffer } from 'file-type'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -721,7 +722,31 @@ export const typeResolvers: GQLResolver = {
     id(docRef: fhir.DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
-    data(docRef: fhir.DocumentReference) {
+    data: async (docRef: fhir.DocumentReference, _, authHeader) => {
+      const minioDocumentURL = new URL(
+        `${docRef.content[0].attachment.data}`,
+        MINIO_URL
+      ).toString()
+      const file = await fetch(minioDocumentURL, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authHeader}`
+        }
+      })
+
+      const fileBuffer = await file.buffer()
+      const fileType = await fromBuffer(fileBuffer)
+
+      // Convert the buffer to a base64-encoded string
+      const base64String = fileBuffer.toString('base64')
+
+      // Combine the base64 string and the file type into a data URL
+      if (fileType) {
+        return `data:${fileType.mime};base64,${base64String}`
+      }
+      return base64String
+    },
+    uri(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
     },
     contentType(docRef: fhir.DocumentReference) {

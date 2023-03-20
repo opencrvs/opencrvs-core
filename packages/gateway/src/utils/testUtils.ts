@@ -172,7 +172,7 @@ export const mockDocumentReference = {
     {
       attachment: {
         contentType: 'image/jpeg | image/png | application/pdf',
-        data: 'PGJhc2U2NEJpbmFyeT4K'
+        data: '/ocrvs/2a6928d3-8b76-42ef-8018-2cc4b5a572f6.jpg'
       }
     }
   ]

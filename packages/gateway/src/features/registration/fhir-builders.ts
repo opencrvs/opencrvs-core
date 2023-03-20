@@ -3348,6 +3348,27 @@ export const builders: IFieldBuilders = {
         }
         docRef.content[0].attachment.data = fieldValue
       },
+      uri: async (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const docRef = selectOrCreateDocRefResource(
+          ATTACHMENT_DOCS_CODE,
+          ATTACHMENT_DOCS_TITLE,
+          fhirBundle,
+          context,
+          ATTACHMENT_CONTEXT_KEY
+        )
+        if (!docRef.content) {
+          docRef.content = [
+            {
+              attachment: {}
+            }
+          ]
+        }
+        docRef.content[0].attachment.data = fieldValue
+      },
       subject: (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,

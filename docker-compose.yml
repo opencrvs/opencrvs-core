@@ -51,6 +51,7 @@ services:
       - WORKFLOW_URL=http://workflow:5050/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
+      - MINIO_URL=http://minio:9000
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
   # User facing services

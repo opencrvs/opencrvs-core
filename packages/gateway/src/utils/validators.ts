@@ -19,30 +19,34 @@ import {
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
-  attachments: Array<{ data: string }>
+  attachments: Array<{ data?: string; url?: string }>
 ) {
   for (const file of attachments) {
-    const isMinioUrl =
-      file.data.split('/').length > 1 &&
-      file.data.split('/')[1] === MINIO_BUCKET
-    if (isMinioUrl) {
-      continue
-    }
-    const data = file.data.split('base64,')?.[1] || ''
-    const mime = file.data.split(';')[0].replace('data:', '')
+    if (file.data) {
+      const data = file.data.split('base64,')?.[1] || ''
+      const mime = file.data.split(';')[0].replace('data:', '')
 
-    if (!mime.startsWith('image/')) {
-      throw new Error(`File type doesn't match image/*`)
-    }
+      if (!mime.startsWith('image/')) {
+        throw new Error(`File type doesn't match image/*`)
+      }
 
-    const buffer = Buffer.from(data, 'base64')
-    const type = await fromBuffer(buffer)
-    if (!type) {
-      throw new Error("File type couldn't be determined")
-    }
+      const buffer = Buffer.from(data, 'base64')
+      const type = await fromBuffer(buffer)
+      if (!type) {
+        throw new Error("File type couldn't be determined")
+      }
 
-    if (!type.mime.startsWith('image/')) {
-      throw new Error(`File type doesn't match image/*`)
+      if (!type.mime.startsWith('image/')) {
+        throw new Error(`File type doesn't match image/*`)
+      }
+    } else if (file.url) {
+      const isMinioUrl =
+        file.url.split('/').length > 1 &&
+        file.url.split('/')[1] === MINIO_BUCKET
+
+      if (isMinioUrl) {
+        continue
+      }
     }
   }
 }

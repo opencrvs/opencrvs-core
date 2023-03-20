@@ -421,7 +421,8 @@ export type SerializedFormField = UnionOmit<
   }
 }
 export interface IAttachment {
-  data: string
+  data?: string
+  uri?: string
   optionValues: string[]
   type: string
   title?: string

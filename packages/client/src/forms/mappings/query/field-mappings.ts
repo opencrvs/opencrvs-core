@@ -385,6 +385,7 @@ export function attachmentToFieldTransformer(
         if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
           attachments.push({
             data: attachment.data,
+            uri: attachment.uri,
             type: attachment.contentType,
             optionValues: [subject, type],
             title: subject,

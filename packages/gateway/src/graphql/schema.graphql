@@ -1058,6 +1058,7 @@ type Attachment {
   _fhirID: ID
   contentType: String
   data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String
@@ -1855,7 +1856,8 @@ input AddressInput {
 input AttachmentInput {
   _fhirID: ID
   contentType: String
-  data: String!
+  data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String

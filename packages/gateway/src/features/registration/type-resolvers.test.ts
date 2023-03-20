@@ -852,10 +852,11 @@ describe('Registration type resolvers', () => {
       expect(id).toBe('b9648bdf-fb4e-4216-905f-d7fc3930301d')
     })
 
-    it('returns base64 data', () => {
-      // @ts-ignore
-      const data = typeResolvers.Attachment.data(mockDocumentReference)
-      expect(data).toBe('PGJhc2U2NEJpbmFyeT4K')
+    it('returns base64 data', async () => {
+      fetch.mockResponse(Buffer.from('fileData', 'utf-8'))
+      const data = await typeResolvers.Attachment.data(mockDocumentReference)
+      expect(data).toBe('ZmlsZURhdGE=')
+      fetch.resetMocks()
     })
 
     it('returns originalFileName', () => {

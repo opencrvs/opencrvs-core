@@ -75,6 +75,7 @@ import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
+import { getToken } from '@client/utils/authUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -1028,29 +1029,11 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data as Query)
       }
-      await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
     }
   })
-}
-
-async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
-
-  const attachments = registration?.attachments
-  if (!attachments) {
-    return
-  }
-  const urlsWithMinioPath = attachments
-    .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
-
-  return Promise.all(urlsWithMinioPath)
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1834,8 +1817,11 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
+  const minioFullUrls = minioUrls.map((pathToImage) =>
+    new URL(
+      `document?documentName=${pathToImage}`,
+      window.config.API_GATEWAY_URL
+    ).toString()
   )
   navigator?.serviceWorker?.controller?.postMessage({
     minioUrls: minioFullUrls

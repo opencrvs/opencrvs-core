@@ -277,7 +277,6 @@ services:
       - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
     ports:
-      - '9000:9000'
       - '9001:9001'
     volumes:
       - '/data/minio:/data'
@@ -285,19 +284,14 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
+        - 'traefik.docker.network=opencrvs_overlay_net'
         # Console
         - 'traefik.http.routers.minio-console.rule=Host(`minio-console.{{hostname}}`)'
         - 'traefik.http.routers.minio-console.entrypoints=websecure'
         - 'traefik.http.routers.minio-console.tls.certresolver=certResolver'
         - 'traefik.http.routers.minio-console.service=minio-console'
         - 'traefik.http.services.minio-console.loadbalancer.server.port=9001'
-        # APi
-        - 'traefik.http.routers.minio.rule=Host(`minio.{{hostname}}`)'
-        - 'traefik.http.routers.minio.entrypoints=websecure'
-        - 'traefik.http.routers.minio.tls.certresolver=certResolver'
-        - 'traefik.http.routers.minio.service=minio'
-        - 'traefik.http.services.minio.loadbalancer.server.port=9000'
-        - 'traefik.docker.network=opencrvs_overlay_net'
+ 
     networks:
       - overlay_net
 

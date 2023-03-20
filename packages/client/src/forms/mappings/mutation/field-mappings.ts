@@ -398,7 +398,9 @@ export function fieldToAttachmentTransformer(
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     (attachment) => {
       return {
-        data: attachment.data,
+        ...(attachment.uri
+          ? { uri: attachment.uri }
+          : { data: attachment.data }),
         subject: attachment.optionValues[0],
         type: typeMapper
           ? typeMapper[attachment.optionValues[1]]

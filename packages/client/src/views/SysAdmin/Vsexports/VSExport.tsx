@@ -33,6 +33,7 @@ import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 import { Link } from '@client/../../components/lib'
 import { chunk, sortBy } from 'lodash'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { getToken } from '@client/utils/authUtils'
 const DEFAULT_LIST_SIZE = 12
 
 const UserTable = styled(BodyContent)`
@@ -47,7 +48,12 @@ type VSExportProps = {
 }
 
 async function downloadURI(uri: string, name: string) {
-  await fetch(uri)
+  await fetch(uri, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
     .then((res) => {
       return res.blob()
     })
@@ -81,7 +87,11 @@ function TabContent(props: VSExportProps) {
           event: item.event,
           fileSize: item.fileSize
         })
-        const downloadFilePath = `${window.config.MINIO_URL}${item.url}`
+
+        const downloadFilePath = new URL(
+          `document?documentName=${item.url}`,
+          window.config.API_GATEWAY_URL
+        ).toString()
 
         return (
           <ListViewSimplified
