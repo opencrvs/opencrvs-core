@@ -18,6 +18,8 @@ interface IIssueMessages
   collectorDetails: MessageDescriptor
   issueToMother: MessageDescriptor
   issueToFather: MessageDescriptor
+  issueToGroom: MessageDescriptor
+  issueToBride: MessageDescriptor
   issueToSomeoneElse: MessageDescriptor
   issueToInformant: MessageDescriptor
   issueConfirmationMessage: MessageDescriptor
@@ -49,6 +51,16 @@ const messagesToDefine: IIssueMessages = {
     defaultMessage: 'Issue to informant (Father)',
     description: 'Issuing to father',
     id: 'constants.issueToFather'
+  },
+  issueToGroom: {
+    defaultMessage: 'Issue to informant (Groom)',
+    description: 'Issuing to groom',
+    id: 'constants.issueToGroom'
+  },
+  issueToBride: {
+    defaultMessage: 'Issue to informant (Bride)',
+    description: 'Issuing to bride',
+    id: 'constants.issueToBride'
   },
   issueToSomeoneElse: {
     defaultMessage: 'Issue to someone else',

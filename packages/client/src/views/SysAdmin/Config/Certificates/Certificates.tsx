@@ -51,7 +51,10 @@ import {
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
-import { updateOfflineCertificate } from '@client/offline/actions'
+import {
+  updateOfflineCertificate,
+  updateOfflineConfigData
+} from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -66,13 +69,6 @@ import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/u
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { UserDetails } from '@client/utils/userUtils'
 
-const ListViewContainer = styled.div`
-  margin-top: 24px;
-`
-
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   margin-top: 15px;
@@ -113,8 +109,12 @@ type Props = WrappedComponentProps & {
   registerForm: {
     birth: IForm
     death: IForm
+    marriage: IForm
   }
-} & { updateOfflineCertificate: typeof updateOfflineCertificate }
+} & {
+  updateOfflineCertificate: typeof updateOfflineCertificate
+  updateOfflineConfigData: typeof updateOfflineConfigData
+}
 
 interface State {
   selectedSubMenuItem: string
@@ -127,10 +127,6 @@ interface State {
   previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
   activeTabId: Event
-  allowPrinting: {
-    birth: boolean
-    death: boolean
-  }
 }
 
 interface ICertification {
@@ -152,66 +148,20 @@ function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
   })
 }
 
-async function updatePreviewSvgWithSampleSignature(
-  svgCode: string
-): Promise<string> {
-  const html = document.createElement('html')
-  if (svgCode.includes('data:image/svg+xml;base64')) {
-    svgCode = atob(svgCode.split(',')[1])
-  }
-  html.innerHTML = svgCode
-
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-
-  if (signatureImage) {
-    const baseURL = window.location.origin
-    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
-}
-
 export const printDummyCertificate = async (
   event: string,
-  registerForm: { birth: IForm; death: IForm },
+  registerForm: { birth: IForm; death: IForm; marriage: IForm },
   intl: IntlShape,
   userDetails: UserDetails,
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
-  let certEvent: Event
-  if (event === 'death') {
-    certEvent = Event.Death
-  } else {
-    certEvent = Event.Birth
-  }
-  const updatedOfflineData: IOfflineData = {
-    ...offlineData,
-    templates: {
-      ...offlineData.templates,
-      certificates: {
-        ...offlineData.templates.certificates!,
-        [certEvent]: {
-          ...offlineData.templates.certificates![certEvent]!,
-          definition: await updatePreviewSvgWithSampleSignature(
-            offlineData.templates.certificates![certEvent].definition
-          )
-        }
-      }
-    }
-  }
 
   printCertificate(
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    updatedOfflineData
+    offlineData
   )
 }
 
@@ -232,10 +182,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         name: EMPTY_STRING,
         type: EMPTY_STRING,
         data: EMPTY_STRING
-      },
-      allowPrinting: {
-        birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
-        death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE
       }
     }
   }
@@ -244,45 +190,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     certificatesConfig: 'Certificates'
   }
 
-  offlineConfig = this.props.offlineResources.config
-
-  async allowPrintMutationHandler() {
-    try {
-      await configApplicationMutations.mutateApplicationConfig({
-        BIRTH: {
-          REGISTRATION_TARGET: this.offlineConfig.BIRTH.REGISTRATION_TARGET,
-          LATE_REGISTRATION_TARGET:
-            this.offlineConfig.BIRTH.LATE_REGISTRATION_TARGET,
-          FEE: {
-            ON_TIME: this.offlineConfig.BIRTH.FEE.ON_TIME,
-            LATE: this.offlineConfig.BIRTH.FEE.LATE,
-            DELAYED: this.offlineConfig.BIRTH.FEE.DELAYED
-          },
-          PRINT_IN_ADVANCE: this.state.allowPrinting.birth
-        },
-        DEATH: {
-          REGISTRATION_TARGET: this.offlineConfig.DEATH.REGISTRATION_TARGET,
-          FEE: {
-            ON_TIME: this.offlineConfig.DEATH.FEE.ON_TIME,
-            DELAYED: this.offlineConfig.DEATH.FEE.DELAYED
-          },
-          PRINT_IN_ADVANCE: this.state.allowPrinting.death
-        }
-      })
-      this.setState({
-        notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
-      })
-    } catch (err) {
-      this.setState({
-        notificationForPrinting: NOTIFICATION_STATUS.ERROR
-      })
-    }
-  }
-
   handleTabChange = (tab: Event) => {
     this.setState({ activeTabId: tab })
   }
-
   getMenuItems(
     intl: IntlShape,
     event: string,
@@ -299,7 +209,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           )
 
           svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
-          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -449,6 +358,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       {
         id: Event.Death,
         title: intl.formatMessage(constantsMessages.deaths)
+      },
+      {
+        id: Event.Marriage,
+        title: intl.formatMessage(constantsMessages.marriages)
       }
     ]
 
@@ -456,12 +369,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       offlineResources.templates.certificates?.birth.fileName
     const deathCertFileName =
       offlineResources.templates.certificates?.death.fileName
+    const marriageCertFileName =
+      offlineResources.templates.certificates?.marriage.fileName
 
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
     const deathLastModified =
       offlineResources.templates.certificates?.death.lastModifiedDate
-
+    const marriageLastModified =
+      offlineResources.templates.certificates?.marriage.lastModifiedDate
     const CertificateSection = {
       title: intl.formatMessage(messages.listTitle),
       items: [
@@ -514,29 +430,74 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               )}
             </>
           )
+        },
+        {
+          id: 'marriage',
+          label: intl.formatMessage(messages.certificateTemplate),
+          value: marriageLastModified
+            ? intl.formatMessage(messages.eventUpdatedTempDesc, {
+                lastModified: marriageLastModified
+              })
+            : intl.formatMessage(messages.marriageDefaultTempDesc),
+          actionsMenu: (
+            <>
+              {offlineResources.templates.certificates?.marriage && (
+                <ToggleMenu
+                  id={`template-marriage-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItems(
+                    intl,
+                    Event.Marriage,
+                    offlineResources.templates.certificates.marriage.definition,
+                    offlineResources.templates.certificates.marriage.fileName
+                  )}
+                />
+              )}
+            </>
+          )
         }
       ]
     }
 
     let certificateFileName
 
-    const toggleOnChange = (event: Event) => {
-      this.setState(
-        (prevState) => ({
-          allowPrinting: {
-            ...prevState.allowPrinting,
-            [event]: !prevState.allowPrinting[event]
+    const toggleOnChange = async (event: Event) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+
+      this.props.updateOfflineConfigData({
+        config: {
+          ...offlineResources.config,
+          [upperCaseEvent]: {
+            ...offlineResources.config[upperCaseEvent],
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
           }
-        }),
-        async () => {
-          await this.allowPrintMutationHandler()
         }
-      )
+      })
+      try {
+        await configApplicationMutations.mutateApplicationConfig({
+          [upperCaseEvent]: {
+            PRINT_IN_ADVANCE:
+              !offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+          }
+        })
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
+        })
+      } catch (err) {
+        this.setState({
+          notificationForPrinting: NOTIFICATION_STATUS.ERROR
+        })
+      }
     }
 
     const TabContent = (props: CertificationProps) => {
       certificateFileName =
-        props.item.id === 'birth' ? birthCertFileName : deathCertFileName
+        props.item.id === 'birth'
+          ? birthCertFileName
+          : props.item.id === 'death'
+          ? deathCertFileName
+          : marriageCertFileName
 
       return (
         <>
@@ -592,8 +553,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     id={'allow-printing-toggle'}
                     defaultChecked={
                       this.state.activeTabId === Event.Birth
-                        ? this.state.allowPrinting.birth
-                        : this.state.allowPrinting.death
+                        ? offlineResources.config.BIRTH.PRINT_IN_ADVANCE
+                        : this.state.activeTabId === Event.Death
+                        ? offlineResources.config.DEATH.PRINT_IN_ADVANCE
+                        : offlineResources.config.MARRIAGE.PRINT_IN_ADVANCE
                     }
                     onChange={async () => {
                       await toggleOnChange(this.state.activeTabId)
@@ -733,10 +696,15 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.birth.id}`
                     )
-                  } else if (eventName === Event.Death)
+                  } else if (eventName === Event.Death) {
                     this.handleSelectFile(
                       `${offlineResources.templates.certificates?.death.id}`
                     )
+                  } else if (eventName === Event.Marriage) {
+                    this.handleSelectFile(
+                      `${offlineResources.templates.certificates?.marriage.id}`
+                    )
+                  }
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
@@ -783,7 +751,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               title={
                 eventName === Event.Birth
                   ? intl.formatMessage(messages.birthTemplate)
-                  : intl.formatMessage(messages.deathTemplate)
+                  : eventName === Event.Death
+                  ? intl.formatMessage(messages.deathTemplate)
+                  : intl.formatMessage(messages.marriageTemplate)
               }
               goBack={this.closePreviewSection}
               onDelete={this.onDelete}
@@ -805,5 +775,6 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const CertificatesConfig = connect(mapStateToProps, {
+  updateOfflineConfigData,
   updateOfflineCertificate
 })(injectIntl(CertificatesConfigComponent))

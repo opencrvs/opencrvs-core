@@ -15,7 +15,8 @@ import {
   GQLDeathInput,
   GQLCountryLogoInput,
   GQLLoginBackgroundInput,
-  GQLResolver
+  GQLResolver,
+  GQLMarriageInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
@@ -44,6 +45,7 @@ export const resolvers: GQLResolver = {
         CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
         BIRTH: applicationConfig.BIRTH as GQLBirthInput,
         DEATH: applicationConfig.DEATH as GQLDeathInput,
+        MARRIAGE: applicationConfig.MARRIAGE as GQLMarriageInput,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
         HIDE_EVENT_REGISTER_INFORMATION:

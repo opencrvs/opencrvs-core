@@ -24,7 +24,8 @@ import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 import {
   validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments
+  validateDeathDeclarationAttachments,
+  validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import { UnassignError } from '@gateway/utils/unassignError'
@@ -68,6 +69,31 @@ export const resolvers: GQLResolver = {
         }
         try {
           await validateDeathDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
+        return await requestEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.DEATH
+        )
+      } else {
+        throw new Error('User does not have a register scope')
+      }
+    },
+    async requestMarriageRegistrationCorrection(
+      _,
+      { id, details },
+      authHeader
+    ) {
+      if (hasScope(authHeader, 'register')) {
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
+        try {
+          await validateMarriageDeclarationAttachments(details)
         } catch (error) {
           throw new UserInputError(error.message)
         }

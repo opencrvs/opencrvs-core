@@ -105,13 +105,68 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
   return names
 }
 
+const getBrideName = (source: ISearchDataTemplate) => {
+  if (!source) {
+    return null
+  }
+  const names = [
+    {
+      use: 'en',
+      given: (source.brideFirstNames && [source.brideFirstNames]) || null,
+      family: (source.brideFamilyName && [source.brideFamilyName]) || null
+    }
+  ]
+
+  if (NATIVE_LANGUAGE) {
+    names.push({
+      use: NATIVE_LANGUAGE,
+      given:
+        (source.brideFirstNamesLocal && [source.brideFirstNamesLocal]) || null,
+      family:
+        (source.brideFamilyNameLocal && [source.brideFamilyNameLocal]) || null
+    })
+  }
+
+  return names
+}
+
+const getGroomName = (source: ISearchDataTemplate) => {
+  if (!source) {
+    return null
+  }
+  const names = [
+    {
+      use: 'en',
+      given: (source.groomFirstNames && [source.groomFirstNames]) || null,
+      family: (source.groomFamilyName && [source.groomFamilyName]) || null
+    }
+  ]
+
+  if (NATIVE_LANGUAGE) {
+    names.push({
+      use: NATIVE_LANGUAGE,
+      given:
+        (source.groomFirstNamesLocal && [source.groomFirstNamesLocal]) || null,
+      family:
+        (source.groomFamilyNameLocal && [source.groomFamilyNameLocal]) || null
+    })
+  }
+
+  return names
+}
+
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
       if (obj._type === 'compositions' && obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'
-      } else {
+      } else if (
+        obj._type === 'compositions' &&
+        obj._source.event === 'Death'
+      ) {
         return 'DeathEventSearchSet'
+      } else {
+        return 'MarriageEventSearchSet'
       }
     }
   },
@@ -153,6 +208,29 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfDeath(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.deathDate) || null
+    }
+  },
+  MarriageEventSearchSet: {
+    id(resultSet: ISearchEventDataTemplate) {
+      return resultSet._id
+    },
+    type(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.event
+    },
+    registration(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source
+    },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
+    },
+    brideName(resultSet: ISearchEventDataTemplate) {
+      return getBrideName(resultSet._source)
+    },
+    groomName(resultSet: ISearchEventDataTemplate) {
+      return getGroomName(resultSet._source)
+    },
+    dateOfMarriage(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.marriageDate) || null
     }
   },
   RegistrationSearchSet: {

@@ -18,4 +18,7 @@ export * from '@client/forms/register/fieldMappings/death/query/declaration-mapp
 export * from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/event-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/spouse-mappings'
+export * from '@client/forms/register/fieldMappings/marriage/query/registration-mappings'
+export * from '@client/forms/register/fieldMappings/marriage/query/documents-mappings'
+export * from '@client/forms/register/fieldMappings/marriage/query/event-mappings'
 export * from '@client/forms/register/customFieldMappings/query/customField-mappings'

@@ -46,22 +46,22 @@ export function IssueCertificate() {
           mobileTitle={intl.formatMessage(issueMessages.issueCertificate)}
           mobileRight={
             <Button
-              size="large"
-              type="tertiary"
+              size="medium"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
           desktopTitle={intl.formatMessage(issueMessages.issueCertificate)}
           desktopLeft={<HistoryNavigator hideForward={true} />}
           desktopRight={
             <Button
-              size="large"
-              type="tertiary"
+              size="medium"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
         />

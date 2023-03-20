@@ -26,6 +26,7 @@ export interface GQLQuery {
   fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
+  fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
@@ -70,8 +71,8 @@ export interface GQLMutation {
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
+  markEventAsNotDuplicate: string
   markEventAsArchived: string
-  notADuplicate: string
   createDeathRegistration: GQLCreatedIds
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
@@ -81,6 +82,13 @@ export interface GQLMutation {
   markDeathAsIssued: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
+  createMarriageRegistration: GQLCreatedIds
+  markMarriageAsValidated?: string
+  markMarriageAsRegistered: GQLMarriageRegistration
+  markMarriageAsCertified: string
+  markMarriageAsIssued: string
+  requestMarriageRegistrationCorrection: string
+  markEventAsDuplicate: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -212,16 +220,34 @@ export interface GQLEventRegistration {
 export type GQLPossibleEventRegistrationTypeNames =
   | 'BirthRegistration'
   | 'DeathRegistration'
+  | 'MarriageRegistration'
 
 export interface GQLEventRegistrationNameMap {
   EventRegistration: GQLEventRegistration
   BirthRegistration: GQLBirthRegistration
   DeathRegistration: GQLDeathRegistration
+  MarriageRegistration: GQLMarriageRegistration
 }
 
 export interface GQLRegistrationCountResult {
   results: Array<GQLStatusWiseRegistrationCount | null>
   total: number
+}
+
+export interface GQLMarriageRegistration extends GQLEventRegistration {
+  id: string
+  _fhirIDMap?: GQLMap
+  registration?: GQLRegistration
+  bride?: GQLPerson
+  groom?: GQLPerson
+  witnessOne?: GQLRelatedPerson
+  witnessTwo?: GQLRelatedPerson
+  eventLocation?: GQLLocation
+  typeOfMarriage?: GQLMarriageType
+  questionnaire?: Array<GQLQuestionnaireQuestion | null>
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
+  history?: Array<GQLHistory | null>
 }
 
 export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
@@ -237,20 +263,16 @@ export interface GQLRecordDetailsNameMap {
   DeathRegistration: GQLDeathRegistration
 }
 
-export const enum GQLAuthorizationStatus {
-  ANONYMOUS = 'ANONYMOUS'
-}
-
 export interface GQLLocation {
   id: string
   _fhirID?: string
   identifier?: Array<GQLIdentifier>
-  status: string
-  name: string
-  alias: Array<string>
+  status?: string
+  name?: string
+  alias?: Array<string>
   description?: string
-  partOf: string
-  type: GQLLocationType
+  partOf?: string
+  type?: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number
@@ -526,6 +548,7 @@ export interface GQLCreatedIds {
   compositionId?: string
   trackingId?: string
   registrationNumber?: string
+  isPotentiallyDuplicate?: boolean
 }
 
 export interface GQLBirthRegistrationInput {
@@ -572,6 +595,20 @@ export interface GQLDeathRegistrationInput {
   maleDependentsOfDeceased?: number
   femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitionerInput
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
+}
+
+export interface GQLMarriageRegistrationInput {
+  _fhirIDMap?: GQLMap
+  registration?: GQLRegistrationInput
+  bride?: GQLPersonInput
+  groom?: GQLPersonInput
+  witnessOne?: GQLRelatedPersonInput
+  witnessTwo?: GQLRelatedPersonInput
+  eventLocation?: GQLLocationInput
+  typeOfMarriage?: GQLMarriageType
+  questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
 }
@@ -634,6 +671,7 @@ export interface GQLApplicationConfiguration {
   COUNTRY_LOGO?: GQLCountryLogo
   CURRENCY?: GQLCurrency
   DEATH?: GQLDeath
+  MARRIAGE?: GQLMarriage
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -653,6 +691,7 @@ export interface GQLApplicationConfigurationInput {
   COUNTRY_LOGO?: GQLCountryLogoInput
   CURRENCY?: GQLCurrencyInput
   DEATH?: GQLDeathInput
+  MARRIAGE?: GQLMarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -747,13 +786,17 @@ export interface GQLRegistration {
   contact?: string
   contactRelationship?: string
   informantsSignature?: string
+  groomSignature?: string
+  brideSignature?: string
+  witnessOneSignature?: string
+  witnessTwoSignature?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
-  duplicates?: Array<string | null>
+  duplicates?: Array<GQLDuplicatesInfo | null>
 }
 
 export interface GQLRelatedPerson {
@@ -820,6 +863,7 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  duplicateOf?: string
 }
 
 export const enum GQLMannerOfDeath {
@@ -853,6 +897,7 @@ export interface GQLHumanName {
   use?: string
   firstNames?: string
   familyName?: string
+  marriedLastName?: string
 }
 
 export interface GQLContactPoint {
@@ -920,6 +965,11 @@ export const enum GQLEducationType {
 export interface GQLStatusWiseRegistrationCount {
   status: string
   count: number
+}
+
+export const enum GQLMarriageType {
+  POLYGAMY = 'POLYGAMY',
+  MONOGAMY = 'MONOGAMY'
 }
 
 export interface GQLIdentifier {
@@ -1063,16 +1113,19 @@ export interface GQLEventSearchSet {
 export type GQLPossibleEventSearchSetTypeNames =
   | 'BirthEventSearchSet'
   | 'DeathEventSearchSet'
+  | 'MarriageEventSearchSet'
 
 export interface GQLEventSearchSetNameMap {
   EventSearchSet: GQLEventSearchSet
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
+  MarriageEventSearchSet: GQLMarriageEventSearchSet
 }
 
 export const enum GQLEvent {
   birth = 'birth',
-  death = 'death'
+  death = 'death',
+  marriage = 'marriage'
 }
 
 export interface GQLEventProgressSet {
@@ -1172,6 +1225,10 @@ export interface GQLRegistrationInput {
   page?: string
   book?: string
   informantsSignature?: string
+  groomSignature?: string
+  brideSignature?: string
+  witnessOneSignature?: string
+  witnessTwoSignature?: string
   informantType?: GQLInformantType
   otherInformantType?: string
   contact?: string
@@ -1225,6 +1282,7 @@ export interface GQLHumanNameInput {
   use?: string
   firstNames?: string
   familyName?: string
+  marriedLastName?: string
 }
 
 export interface GQLUserIdentifierInput {
@@ -1266,6 +1324,12 @@ export interface GQLDeath {
   PRINT_IN_ADVANCE?: boolean
 }
 
+export interface GQLMarriage {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLMarriageFee
+  PRINT_IN_ADVANCE?: boolean
+}
+
 export interface GQLLoginBackground {
   backgroundColor?: string
   backgroundImage?: string
@@ -1292,6 +1356,12 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+  PRINT_IN_ADVANCE?: boolean
+}
+
+export interface GQLMarriageInput {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLMarriageFeeInput
   PRINT_IN_ADVANCE?: boolean
 }
 
@@ -1347,6 +1417,8 @@ export const enum GQLInformantType {
   DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
   GRANDSON = 'GRANDSON',
   GRANDDAUGHTER = 'GRANDDAUGHTER',
+  BRIDE = 'BRIDE',
+  GROOM = 'GROOM',
   OTHER = 'OTHER'
 }
 
@@ -1371,7 +1443,8 @@ export interface GQLRegWorkflow {
 
 export const enum GQLRegistrationType {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
 
 export interface GQLCertificate {
@@ -1381,6 +1454,11 @@ export interface GQLCertificate {
   data?: string
 }
 
+export interface GQLDuplicatesInfo {
+  compositionId?: string
+  trackingId?: string
+}
+
 export const enum GQLRegAction {
   VERIFIED = 'VERIFIED',
   ASSIGNED = 'ASSIGNED',
@@ -1388,7 +1466,9 @@ export const enum GQLRegAction {
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   DOWNLOADED = 'DOWNLOADED',
-  VIEWED = 'VIEWED'
+  VIEWED = 'VIEWED',
+  MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE',
+  MARKED_AS_NOT_DUPLICATE = 'MARKED_AS_NOT_DUPLICATE'
 }
 
 export interface GQLStatusReason {
@@ -1417,6 +1497,7 @@ export const enum GQLIdentityIDType {
   DRIVING_LICENSE = 'DRIVING_LICENSE',
   BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
+  MARRIAGE_REGISTRATION_NUMBER = 'MARRIAGE_REGISTRATION_NUMBER',
   REFUGEE_NUMBER = 'REFUGEE_NUMBER',
   ALIEN_NUMBER = 'ALIEN_NUMBER',
   OTHER = 'OTHER',
@@ -1452,6 +1533,7 @@ export const enum GQLAttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   VERBAL_AUTOPSY_REPORT = 'VERBAL_AUTOPSY_REPORT',
   CORONERS_REPORT = 'CORONERS_REPORT',
+  MARRIAGE_NOTICE = 'MARRIAGE_NOTICE',
   OTHER = 'OTHER'
 }
 
@@ -1466,7 +1548,8 @@ export const enum GQLAttachmentSubject {
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
   DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
   INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
-  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
+  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
+  MARRIAGE_NOTICE_PROOF = 'MARRIAGE_NOTICE_PROOF'
 }
 
 export interface GQLRoleLabel {
@@ -1623,6 +1706,16 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
 
+export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
+  id: string
+  type?: string
+  brideName?: Array<GQLHumanName | null>
+  groomName?: Array<GQLHumanName | null>
+  dateOfMarriage?: GQLDate
+  registration?: GQLRegistrationSearchSet
+  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+}
+
 export interface GQLEventProgressData {
   timeInProgress?: number
   timeInReadyForReview?: number
@@ -1728,6 +1821,11 @@ export interface GQLDeathFee {
   DELAYED?: number
 }
 
+export interface GQLMarriageFee {
+  ON_TIME?: number
+  DELAYED?: number
+}
+
 export const enum GQLImageFit {
   FILL = 'FILL',
   TILE = 'TILE'
@@ -1740,6 +1838,11 @@ export interface GQLBirthFeeInput {
 }
 
 export interface GQLDeathFeeInput {
+  ON_TIME?: number
+  DELAYED?: number
+}
+
+export interface GQLMarriageFeeInput {
   ON_TIME?: number
   DELAYED?: number
 }
@@ -1872,6 +1975,7 @@ export interface GQLResolver {
   }
 
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
+  MarriageRegistration?: GQLMarriageRegistrationTypeResolver
   RecordDetails?: {
     __resolveType: GQLRecordDetailsTypeResolver
   }
@@ -1952,10 +2056,12 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  Marriage?: GQLMarriageTypeResolver
   LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
+  DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
@@ -1970,10 +2076,12 @@ export interface GQLResolver {
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
+  MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
+  MarriageFee?: GQLMarriageFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
@@ -1996,6 +2104,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
+  fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
@@ -2238,6 +2347,21 @@ export interface QueryToFetchRegistrationCountByStatusResolver<
   ): TResult
 }
 
+export interface QueryToFetchMarriageRegistrationArgs {
+  id: string
+}
+export interface QueryToFetchMarriageRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchMarriageRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface QueryToFetchRecordDetailsForVerificationArgs {
   id: string
 }
@@ -2248,7 +2372,7 @@ export interface QueryToFetchRecordDetailsForVerificationResolver<
   (
     parent: TParent,
     args: QueryToFetchRecordDetailsForVerificationArgs,
-    context: any,
+    context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
@@ -2694,8 +2818,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
+  markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
   markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
-  notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
@@ -2705,6 +2829,13 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsIssued?: MutationToMarkDeathAsIssuedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
+  createMarriageRegistration?: MutationToCreateMarriageRegistrationResolver<TParent>
+  markMarriageAsValidated?: MutationToMarkMarriageAsValidatedResolver<TParent>
+  markMarriageAsRegistered?: MutationToMarkMarriageAsRegisteredResolver<TParent>
+  markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
+  markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
+  requestMarriageRegistrationCorrection?: MutationToRequestMarriageRegistrationCorrectionResolver<TParent>
+  markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2868,7 +2999,7 @@ export interface MutationToMarkBirthAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsIssuedArgs,
-    context: any,
+    context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
@@ -2921,8 +3052,26 @@ export interface MutationToMarkEventAsReinstatedResolver<
   ): TResult
 }
 
+export interface MutationToMarkEventAsNotDuplicateArgs {
+  id: string
+}
+export interface MutationToMarkEventAsNotDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsNotDuplicateArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToMarkEventAsArchivedArgs {
   id: string
+  reason?: string
+  comment?: string
+  duplicateTrackingId?: string
 }
 export interface MutationToMarkEventAsArchivedResolver<
   TParent = any,
@@ -2931,19 +3080,6 @@ export interface MutationToMarkEventAsArchivedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsArchivedArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToNotADuplicateArgs {
-  id: string
-  duplicateId: string
-}
-export interface MutationToNotADuplicateResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToNotADuplicateArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -3055,7 +3191,7 @@ export interface MutationToMarkDeathAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsIssuedArgs,
-    context: any,
+    context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
@@ -3086,6 +3222,119 @@ export interface MutationToMarkEventAsUnassignedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsUnassignedArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateMarriageRegistrationArgs {
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToCreateMarriageRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateMarriageRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkMarriageAsValidatedArgs {
+  id: string
+  details?: GQLMarriageRegistrationInput
+}
+export interface MutationToMarkMarriageAsValidatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkMarriageAsValidatedArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkMarriageAsRegisteredArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToMarkMarriageAsRegisteredResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkMarriageAsRegisteredArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkMarriageAsCertifiedArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToMarkMarriageAsCertifiedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkMarriageAsCertifiedArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkMarriageAsIssuedArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToMarkMarriageAsIssuedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkMarriageAsIssuedArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToRequestMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestMarriageRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsDuplicateArgs {
+  id: string
+  reason: string
+  comment?: string
+  duplicateTrackingId?: string
+}
+export interface MutationToMarkEventAsDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsDuplicateArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -4347,7 +4596,10 @@ export interface GQLEventRegistrationTypeResolver<TParent = any> {
   (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'BirthRegistration'
     | 'DeathRegistration'
-    | Promise<'BirthRegistration' | 'DeathRegistration'>
+    | 'MarriageRegistration'
+    | Promise<
+        'BirthRegistration' | 'DeathRegistration' | 'MarriageRegistration'
+      >
 }
 export interface GQLRegistrationCountResultTypeResolver<TParent = any> {
   results?: RegistrationCountResultToResultsResolver<TParent>
@@ -4378,8 +4630,180 @@ export interface RegistrationCountResultToTotalResolver<
   ): TResult
 }
 
+export interface GQLMarriageRegistrationTypeResolver<TParent = any> {
+  id?: MarriageRegistrationToIdResolver<TParent>
+  _fhirIDMap?: MarriageRegistrationTo_fhirIDMapResolver<TParent>
+  registration?: MarriageRegistrationToRegistrationResolver<TParent>
+  bride?: MarriageRegistrationToBrideResolver<TParent>
+  groom?: MarriageRegistrationToGroomResolver<TParent>
+  witnessOne?: MarriageRegistrationToWitnessOneResolver<TParent>
+  witnessTwo?: MarriageRegistrationToWitnessTwoResolver<TParent>
+  eventLocation?: MarriageRegistrationToEventLocationResolver<TParent>
+  typeOfMarriage?: MarriageRegistrationToTypeOfMarriageResolver<TParent>
+  questionnaire?: MarriageRegistrationToQuestionnaireResolver<TParent>
+  createdAt?: MarriageRegistrationToCreatedAtResolver<TParent>
+  updatedAt?: MarriageRegistrationToUpdatedAtResolver<TParent>
+  history?: MarriageRegistrationToHistoryResolver<TParent>
+}
+
+export interface MarriageRegistrationToIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationTo_fhirIDMapResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToBrideResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToGroomResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToWitnessOneResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToWitnessTwoResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToEventLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToTypeOfMarriageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToQuestionnaireResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToHistoryResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (parent: TParent, context: any, info: GraphQLResolveInfo):
+  (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | Promise<'BirthRegistration' | 'DeathRegistration'>
@@ -5775,6 +6199,7 @@ export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
   registrationNumber?: CreatedIdsToRegistrationNumberResolver<TParent>
+  isPotentiallyDuplicate?: CreatedIdsToIsPotentiallyDuplicateResolver<TParent>
 }
 
 export interface CreatedIdsToCompositionIdResolver<
@@ -5799,6 +6224,18 @@ export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
 }
 
 export interface CreatedIdsToRegistrationNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface CreatedIdsToIsPotentiallyDuplicateResolver<
   TParent = any,
   TResult = any
 > {
@@ -5881,6 +6318,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
+  MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
@@ -5943,6 +6381,18 @@ export interface ApplicationConfigurationToCURRENCYResolver<
 }
 
 export interface ApplicationConfigurationToDEATHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToMARRIAGEResolver<
   TParent = any,
   TResult = any
 > {
@@ -6186,6 +6636,10 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   informantsSignature?: RegistrationToInformantsSignatureResolver<TParent>
+  groomSignature?: RegistrationToGroomSignatureResolver<TParent>
+  brideSignature?: RegistrationToBrideSignatureResolver<TParent>
+  witnessOneSignature?: RegistrationToWitnessOneSignatureResolver<TParent>
+  witnessTwoSignature?: RegistrationToWitnessTwoSignatureResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -6343,6 +6797,54 @@ export interface RegistrationToContactRelationshipResolver<
 }
 
 export interface RegistrationToInformantsSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToGroomSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToBrideSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToWitnessOneSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToWitnessTwoSignatureResolver<
   TParent = any,
   TResult = any
 > {
@@ -6582,6 +7084,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  duplicateOf?: HistoryToDuplicateOfResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -6612,7 +7115,12 @@ export interface HistoryToRegStatusResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToIpAddressResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface HistoryToActionResolver<TParent = any, TResult = any> {
@@ -6756,6 +7264,15 @@ export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLMedicalPractitionerTypeResolver<TParent = any> {
   name?: MedicalPractitionerToNameResolver<TParent>
   qualification?: MedicalPractitionerToQualificationResolver<TParent>
@@ -6835,6 +7352,7 @@ export interface GQLHumanNameTypeResolver<TParent = any> {
   use?: HumanNameToUseResolver<TParent>
   firstNames?: HumanNameToFirstNamesResolver<TParent>
   familyName?: HumanNameToFamilyNameResolver<TParent>
+  marriedLastName?: HumanNameToMarriedLastNameResolver<TParent>
 }
 
 export interface HumanNameToUseResolver<TParent = any, TResult = any> {
@@ -6856,6 +7374,18 @@ export interface HumanNameToFirstNamesResolver<TParent = any, TResult = any> {
 }
 
 export interface HumanNameToFamilyNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HumanNameToMarriedLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
@@ -7801,7 +8331,10 @@ export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
-    | Promise<'BirthEventSearchSet' | 'DeathEventSearchSet'>
+    | 'MarriageEventSearchSet'
+    | Promise<
+        'BirthEventSearchSet' | 'DeathEventSearchSet' | 'MarriageEventSearchSet'
+      >
 }
 export interface GQLEventProgressSetTypeResolver<TParent = any> {
   id?: EventProgressSetToIdResolver<TParent>
@@ -8066,7 +8599,12 @@ export interface BirthToFEEResolver<TParent = any, TResult = any> {
 }
 
 export interface BirthToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLCountryLogoTypeResolver<TParent = any> {
@@ -8146,7 +8684,51 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLMarriageTypeResolver<TParent = any> {
+  REGISTRATION_TARGET?: MarriageToREGISTRATION_TARGETResolver<TParent>
+  FEE?: MarriageToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: MarriageToPRINT_IN_ADVANCEResolver<TParent>
+}
+
+export interface MarriageToREGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageToFEEResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageToPRINT_IN_ADVANCEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLLoginBackgroundTypeResolver<TParent = any> {
@@ -8374,6 +8956,35 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
 }
 
 export interface CertificateToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLDuplicatesInfoTypeResolver<TParent = any> {
+  compositionId?: DuplicatesInfoToCompositionIdResolver<TParent>
+  trackingId?: DuplicatesInfoToTrackingIdResolver<TParent>
+}
+
+export interface DuplicatesInfoToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DuplicatesInfoToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
@@ -10052,6 +10663,100 @@ export interface DeathEventSearchSetToOperationHistoriesResolver<
   ): TResult
 }
 
+export interface GQLMarriageEventSearchSetTypeResolver<TParent = any> {
+  id?: MarriageEventSearchSetToIdResolver<TParent>
+  type?: MarriageEventSearchSetToTypeResolver<TParent>
+  brideName?: MarriageEventSearchSetToBrideNameResolver<TParent>
+  groomName?: MarriageEventSearchSetToGroomNameResolver<TParent>
+  dateOfMarriage?: MarriageEventSearchSetToDateOfMarriageResolver<TParent>
+  registration?: MarriageEventSearchSetToRegistrationResolver<TParent>
+  operationHistories?: MarriageEventSearchSetToOperationHistoriesResolver<TParent>
+}
+
+export interface MarriageEventSearchSetToIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToBrideNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToGroomNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToDateOfMarriageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToOperationHistoriesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLEventProgressDataTypeResolver<TParent = any> {
   timeInProgress?: EventProgressDataToTimeInProgressResolver<TParent>
   timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<TParent>
@@ -10210,6 +10915,29 @@ export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLMarriageFeeTypeResolver<TParent = any> {
+  ON_TIME?: MarriageFeeToON_TIMEResolver<TParent>
+  DELAYED?: MarriageFeeToDELAYEDResolver<TParent>
+}
+
+export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

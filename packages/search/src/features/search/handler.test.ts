@@ -18,9 +18,6 @@ import {
   mockAggregationSearchResult
 } from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'
-// import * as fetchMock from 'jest-fetch-mock'
-
-// const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('./service.ts')
 

@@ -20,23 +20,33 @@ import { IConditional, SerializedFormField } from '@client/forms/index'
 export function getDependency(location: string, useCase: string) {
   switch (location) {
     case 'state':
-      return useCase === 'placeOfBirth' || useCase === 'placeOfDeath'
+      return useCase === 'placeOfBirth' ||
+        useCase === 'placeOfDeath' ||
+        useCase === 'placeOfMarriage'
         ? 'country'
         : `country${sentenceCase(useCase)}`
     case 'district':
-      return useCase === 'placeOfBirth' || useCase === 'placeOfDeath'
+      return useCase === 'placeOfBirth' ||
+        useCase === 'placeOfDeath' ||
+        useCase === 'placeOfMarriage'
         ? 'state'
         : `state${sentenceCase(useCase)}`
     case 'locationLevel3':
-      return useCase === 'placeOfBirth' || useCase === 'placeOfDeath'
+      return useCase === 'placeOfBirth' ||
+        useCase === 'placeOfDeath' ||
+        useCase === 'placeOfMarriage'
         ? 'district'
         : `district${sentenceCase(useCase)}`
     case 'locationLevel4':
-      return useCase === 'placeOfBirth' || useCase === 'placeOfDeath'
+      return useCase === 'placeOfBirth' ||
+        useCase === 'placeOfDeath' ||
+        useCase === 'placeOfMarriage'
         ? 'locationLevel3'
         : `locationLevel3${sentenceCase(useCase)}`
     case 'locationLevel5':
-      return useCase === 'placeOfBirth' || useCase === 'placeOfDeath'
+      return useCase === 'placeOfBirth' ||
+        useCase === 'placeOfDeath' ||
+        useCase === 'placeOfMarriage'
         ? 'locationLevel4'
         : `locationLevel4${sentenceCase(useCase)}`
   }
@@ -321,7 +331,10 @@ export function getPlaceOfEventConditionals(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -340,7 +353,10 @@ export function getPlaceOfEventConditionals(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -363,7 +379,10 @@ export function getPlaceOfEventConditionals(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -390,7 +409,10 @@ export function getPlaceOfEventConditionals(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -421,7 +443,10 @@ export function getPlaceOfEventConditionals(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -470,7 +495,9 @@ export function getPlaceOfEventLocationSelect(
         operation:
           configCase === EventLocationAddressCases.PLACE_OF_BIRTH
             ? 'birthEventLocationMutationTransformer'
-            : 'deathEventLocationMutationTransformer',
+            : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+            ? 'deathEventLocationMutationTransformer'
+            : 'marriageEventLocationMutationTransformer',
         parameters: [locationIndex]
       },
       query: {

@@ -148,7 +148,7 @@ describe('Correction root resolvers', () => {
 
     it('posts a fhir bundle', async () => {
       fetch.mockResponses([JSON.stringify({ userId: '121223' })])
-
+      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
