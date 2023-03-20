@@ -417,22 +417,16 @@ export async function markCertifiedHandler(
 ) {
   await createUserAuditPointFromFHIR('CERTIFIED', request)
   try {
-    const points = await Promise.all([
-      generateCertificationPoint(request.payload as fhir.Bundle, {
+    const points = await generateEventDurationPoint(
+      request.payload as fhir.Bundle,
+      ['REGISTERED'],
+      {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
-      }),
-      generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['REGISTERED'],
-        {
-          Authorization: request.headers.authorization,
-          'x-correlation-id': request.headers['x-correlation-id']
-        }
-      )
-    ])
+      }
+    )
 
-    await writePoints(points)
+    await writePoints([points])
   } catch (err) {
     return internal(err)
   }
@@ -455,6 +449,10 @@ export async function markIssuedHandler(
         },
         'certification'
       ),
+      generateCertificationPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['CERTIFIED'],
