@@ -55,7 +55,7 @@ export function advancedQueryBuilder(
   }
 
   if (
-    (params.registrationStatuses && params.registrationStatuses?.length > 0) ||
+    (params.registrationStatuses && params.registrationStatuses.length > 0) ||
     isExternalSearch
   ) {
     must.push({
