@@ -20,6 +20,7 @@ import {
 import { findName, findTaskExtension } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { getTokenPayload, ITokenPayload } from '@search/utils/authUtils'
+import { client } from '@search/elasticsearch/client'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as fhir.Bundle
@@ -77,7 +78,7 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
       body.assignment.firstName = userFirstNames
       body.assignment.lastName = userFamilyName
 
-      await updateComposition(compositionId, body)
+      await updateComposition(compositionId, body, client)
     }
   } else {
     throw new Error('No Task found!')
@@ -116,7 +117,7 @@ export async function updateEventToRemoveAssignment(
         regLastUserIdentifier.valueReference &&
         regLastUserIdentifier.valueReference.reference &&
         regLastUserIdentifier.valueReference.reference.split('/')[1]
-      await updateComposition(compositionId, body)
+      await updateComposition(compositionId, body, client)
     }
   } else {
     throw new Error('No Task found!')

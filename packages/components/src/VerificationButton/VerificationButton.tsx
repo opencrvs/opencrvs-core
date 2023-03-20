@@ -61,7 +61,7 @@ export const VerificationButton = ({
 
       {status === 'unverified' && useAsReviewLabel && (
         <VerificationBadge>
-          <Icon name="CircleWavyQuestion" fill="red" color="red" />
+          <Icon name="CircleWavyQuestion" color="red" weight="fill" />
           <Text variant="bold16" element="p" color="red">
             Unauthenticated
           </Text>
@@ -87,7 +87,7 @@ export const VerificationButton = ({
 
       {status === 'verified' && (
         <VerificationBadge>
-          <Icon name="CircleWavyCheck" fill="green" color="green" />
+          <Icon name="CircleWavyCheck" color="green" weight="fill" />
           <Text variant="bold16" element="p" color="green">
             {labelForVerified}
           </Text>
