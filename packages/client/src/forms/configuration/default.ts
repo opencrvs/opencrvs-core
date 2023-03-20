@@ -917,10 +917,6 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
-                  },
-                  {
-                    action: 'hide',
-                    expression: 'values.literacy === "ILLITERATE"'
                   }
                 ],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1558,10 +1554,6 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
-                  },
-                  {
-                    action: 'hide',
-                    expression: 'values.literacy === "ILLITERATE"'
                   }
                 ],
                 options: [
@@ -3156,12 +3148,7 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 initialValue: '',
                 validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: 'values.literacy === "ILLITERATE"'
-                  }
-                ],
+                conditionals: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
