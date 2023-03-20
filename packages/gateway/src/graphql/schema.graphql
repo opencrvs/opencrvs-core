@@ -1551,6 +1551,7 @@ enum IdentityIDType {
   OTHER
   NO_ID
   SOCIAL_SECURITY_NO
+  MOSIP_PERSON_SPECIFIC_USER_TOKEN
 }
 
 enum AddressType {
@@ -1774,6 +1775,7 @@ input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input ContactPointInput {

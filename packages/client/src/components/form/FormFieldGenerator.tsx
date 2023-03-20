@@ -116,7 +116,11 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
-import { dynamicDispatch } from '@client/declarations'
+import {
+  dynamicDispatch,
+  IDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -128,6 +132,8 @@ import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
+import { RouteComponentProps, withRouter } from 'react-router'
+import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -187,7 +193,7 @@ type GeneratedInputFieldProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched?: (name: string, isTouched?: boolean) => void
-} & IDispatchProps
+} & Omit<IDispatchProps, 'writeDeclaration'>
 
 function GeneratedInputField({
   fieldDefinition,
@@ -582,7 +588,13 @@ function GeneratedInputField({
           labelForVerified={fieldDefinition.labelForVerified}
           labelForUnverified={fieldDefinition.labelForUnverified}
           labelForOffline={fieldDefinition.labelForOffline}
-          status={isOnline ? 'unverified' : 'offline'}
+          status={
+            !isOnline
+              ? 'offline'
+              : value === 'verified'
+              ? 'verified'
+              : 'unverified'
+          }
         />
       </InputField>
     )
@@ -691,17 +703,20 @@ interface IFormSectionProps {
 interface IStateProps {
   offlineCountryConfig: IOfflineData
   userDetails: UserDetails | null
+  declarations: IDeclaration[] | null
 }
 
 interface IDispatchProps {
   dynamicDispatch: typeof dynamicDispatch
+  writeDeclaration: typeof writeDeclaration
 }
 
 type Props = IFormSectionProps &
   IStateProps &
   IDispatchProps &
   FormikProps<IFormSectionData> &
-  IntlShapeProps
+  IntlShapeProps &
+  RouteComponentProps
 
 interface IQueryData {
   [key: string]: any
@@ -991,19 +1006,26 @@ class FormSectionComponent extends React.Component<Props> {
               ? ({
                   ...field,
                   onClick: () => {
-                    const section = {
-                      id: this.props.id,
-                      groups: [
-                        {
-                          id: `${this.props.id}-view-group`,
-                          fields: fieldsWithValuesDefined
-                        }
-                      ]
-                    } as IFormSection
-
-                    const form = {
-                      sections: [section]
-                    } as IForm
+                    const matchParams = this.props.match.params as {
+                      declarationId: string
+                      groupId: string
+                      pageId: string
+                    }
+                    const declaration = this.props.declarations?.find(
+                      (declaration) =>
+                        declaration.id === matchParams.declarationId
+                    )
+                    if (!declaration) {
+                      return
+                    }
+                    saveDraftAndRedirectToNidIntegration(
+                      declaration,
+                      this.props.writeDeclaration,
+                      offlineCountryConfig,
+                      matchParams.declarationId,
+                      matchParams.pageId,
+                      this.props.match.url
+                    )
                   }
                   //TODO: HANDLE FETCH FOR NID
                 } as INidVerificationButton)
@@ -1177,7 +1199,7 @@ class FormSectionComponent extends React.Component<Props> {
 }
 
 const FormFieldGeneratorWithFormik = withFormik<
-  IFormSectionProps & IStateProps & IDispatchProps,
+  IFormSectionProps & IStateProps & IDispatchProps & RouteComponentProps,
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
@@ -1199,7 +1221,8 @@ export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
     offlineCountryConfig: getOfflineData(state),
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    declarations: state.declarationsState.declarations
   }),
-  { dynamicDispatch }
-)(FormFieldGeneratorWithFormik)
+  { dynamicDispatch, writeDeclaration }
+)(withRouter(FormFieldGeneratorWithFormik))

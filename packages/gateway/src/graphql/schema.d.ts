@@ -1456,7 +1456,8 @@ export const enum GQLIdentityIDType {
   ALIEN_NUMBER = 'ALIEN_NUMBER',
   OTHER = 'OTHER',
   NO_ID = 'NO_ID',
-  SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
+  SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO',
+  MOSIP_PERSON_SPECIFIC_USER_TOKEN = 'MOSIP_PERSON_SPECIFIC_USER_TOKEN'
 }
 
 export const enum GQLAddressType {
@@ -1681,6 +1682,7 @@ export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLContactPointInput {

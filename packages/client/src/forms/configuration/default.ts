@@ -37,7 +37,7 @@ interface IDefaultRegisterForms {
 export const nidIntegrationConditionals = {
   hideIfNidIntegrationEnabled: {
     action: 'hide',
-    expression: `const nationalIdSystem = offlineCountryConfig.systems
+    expression: `const nationalIdSystem = offlineCountryConfig?.systems
                     .find(s => s.type === 'NATIONAL_ID');
         nationalIdSystem &&
         nationalIdSystem.settings.openIdProviderBaseUrl &&
@@ -47,7 +47,7 @@ export const nidIntegrationConditionals = {
   },
   hideIfNidIntegrationDisabled: {
     action: 'hide',
-    expression: `const nationalIdSystem = offlineCountryConfig.systems
+    expression: `const nationalIdSystem = offlineCountryConfig?.systems
                       .find(s => s.type === 'NATIONAL_ID');
       !nationalIdSystem ||
       !nationalIdSystem.settings.openIdProviderBaseUrl ||
@@ -1126,7 +1126,11 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 conditionals: [
-                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                  {
+                    action: 'disable',
+                    expression: `values.informantNidVerification==='verified'`
+                  }
                 ],
                 labelForVerified: formMessageDescriptors.nidVerified,
                 labelForUnverified: formMessageDescriptors.nidNotVerified,
@@ -1153,6 +1157,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'disable',
                     expression: 'values.exactDateOfBirthUnknown'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                   }
                 ],
                 mapping: {
@@ -1271,6 +1279,12 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'englishOnlyNameFormat'
                   }
                 ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -1311,6 +1325,12 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                   }
                 ],
                 mapping: {
@@ -1506,7 +1526,11 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 conditionals: [
-                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                  {
+                    action: 'disable',
+                    expression: `values.motherNidVerification==='verified'`
+                  }
                 ],
                 labelForVerified: formMessageDescriptors.nidVerified,
                 labelForUnverified: formMessageDescriptors.nidNotVerified,
@@ -1525,6 +1549,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'disable',
                     expression: 'values.exactDateOfBirthUnknown'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
                   }
                 ],
                 required: true,
@@ -1636,6 +1664,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                   }
                 ],
                 mapping: {
@@ -1664,6 +1696,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                   }
                 ],
                 maxLength: 32,
@@ -2075,7 +2111,11 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 conditionals: [
-                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                  {
+                    action: 'disable',
+                    expression: `values.fatherNidVerification==='verified'`
+                  }
                 ],
                 labelForVerified: formMessageDescriptors.nidVerified,
                 labelForUnverified: formMessageDescriptors.nidNotVerified,
@@ -2110,6 +2150,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'disable',
                     expression: 'values.exactDateOfBirthUnknown'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('fatherBirthDate')`
                   }
                 ],
                 mapping: {
@@ -2205,6 +2249,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                   }
                 ],
                 mapping: {
@@ -2241,6 +2289,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                   }
                 ],
                 mapping: {
@@ -4005,7 +4057,11 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 conditionals: [
-                  nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                  nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                  {
+                    action: 'disable',
+                    expression: `values.informantNidVerification==='verified'`
+                  }
                 ],
                 labelForVerified: formMessageDescriptors.nidVerified,
                 labelForUnverified: formMessageDescriptors.nidNotVerified,
@@ -4022,6 +4078,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'disable',
                     expression: 'values.exactDateOfBirthUnknown'
+                  },
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                   }
                 ],
                 validate: [
@@ -4150,6 +4210,12 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'englishOnlyNameFormat'
                   }
                 ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -4190,6 +4256,12 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                   }
                 ],
                 mapping: {

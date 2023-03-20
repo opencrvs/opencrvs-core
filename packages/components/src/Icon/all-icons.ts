@@ -42,5 +42,6 @@ export {
   X,
   Activity,
   CircleWavyCheck,
-  WarningCircle
+  WarningCircle,
+  CircleWavyQuestion
 } from 'phosphor-react'

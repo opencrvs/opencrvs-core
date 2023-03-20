@@ -122,6 +122,30 @@ export const fieldToIdentityTransformer =
     return transformedData
   }
 
+export const fieldToNationalIdSystemIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  fieldToIdentityTransformer('id', 'MOSIP_PERSON_SPECIFIC_USER_TOKEN')(
+    transformedData,
+    draftData,
+    sectionId,
+    field
+  )
+  const sectionData = transformedData[sectionId]
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === 'MOSIP_PERSON_SPECIFIC_USER_TOKEN'
+  )
+  if (existingIdentity) {
+    existingIdentity['fieldsModifiedByIdentity'] =
+      draftData[sectionId]['fieldsModifiedByNidUserInfo']
+  }
+  return transformedData
+}
+
 interface IAddress {
   [key: string]: any
 }

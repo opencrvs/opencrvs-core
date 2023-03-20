@@ -9,23 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { writeDeclaration } from '@client/declarations'
-import { getLanguage } from '@client/i18n/selectors'
-import { goToPageGroup } from '@client/navigation'
+import { modifyDeclaration, writeDeclaration } from '@client/declarations'
 import { selectCountryLogo, getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
 import React, { useEffect, useState } from 'react'
-import { injectIntl, useIntl } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
-import { Redirect } from 'react-router'
-import { useQueryParams } from './utils'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  addNidUserInfoToDeclaration,
+  INidCallbackState,
+  useQueryParams
+} from '@client/views/OIDPVerificationCallback/utils'
 import styled from 'styled-components'
 import { Link, Stack, Text, Spinner, Button, Icon } from '@opencrvs/components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { LogoContainer } from '@client/views/UserSetup/UserSetupPage'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as nidCallbackMessages } from '@client/i18n/messages/views/nidVerificationCallback'
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
+import { getDraftsState } from '@client/declarations/selectors'
+import { GET_OIDP_USER_INFO } from '@client/views/OIDPVerificationCallback/queries'
+import { useHistory } from 'react-router'
+import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 
 // OIDP Verification Callback
 // --
@@ -52,17 +56,6 @@ const UserActionsContainer = styled.div`
   padding: 24px 40px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 10px;
-`
-const LoadingContainer = styled.div`
-  width: 100%;
-  padding-left: 8px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: flex;
-    padding-left: 0px;
-    margin: auto;
-    align-items: center;
-    justify-content: center;
-  }
 `
 
 export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
@@ -94,7 +87,7 @@ const useCheckNonce = () => {
   return nonceOk
 }
 
-const useRedirectPathname = () => {
+const useExtractCallBackState = () => {
   const params = useQueryParams()
 
   useEffect(() => {
@@ -103,74 +96,48 @@ const useRedirectPathname = () => {
     }
   }, [params])
 
-  const { pathname } = JSON.parse(params.get('state') ?? '{}') as {
-    pathname: string | undefined
-  }
+  const { pathname, declarationId, section } = JSON.parse(
+    params.get('state') ?? '{}'
+  ) as INidCallbackState
 
-  return { pathname }
+  return { pathname, declarationId, section }
 }
-const GET_OIDP_USER_INFO = gql`
-  query getOIDPUserInfo(
-    $code: String!
-    $clientId: String!
-    $redirectUri: String!
-    $grantType: String
-  ) {
-    getOIDPUserInfo(
-      code: $code
-      clientId: $clientId
-      redirectUri: $redirectUri
-      grantType: $grantType
-    ) {
-      sub
-      name
-      given_name
-      family_name
-      middle_name
-      nickname
-      preferred_username
-      profile
-      picture
-      website
-      email
-      email_verified
-      gender
-      birthdate
-      zoneinfo
-      locale
-      phone_number
-      phone_number_verified
-      address {
-        formatted
-        street_address
-        locality
-        region
-        postal_code
-        country
-      }
-      updated_at
-    }
-  }
-`
-export const OIDPVerificationCallback = (props: any) => {
+
+export const OIDPVerificationCallback = () => {
   const params = useQueryParams()
-  const { pathname } = useRedirectPathname()
-  const isNonceOk = true
+  const { pathname, declarationId, section } = useExtractCallBackState()
+  const isNonceOk = useCheckNonce()
   const code = params.get('code')
   const offlineData = useSelector(getOfflineData)
   const clientId = offlineData.systems.find((s) => s.type === 'NATIONAL_ID')
     ?.settings?.openIdProviderClientId
   const intl = useIntl()
   const logo = useSelector(selectCountryLogo)
-
+  const declarations = useSelector(getDraftsState)
+  const dispatch = useDispatch()
+  const history = useHistory()
   const oidpUserInfoQueryVariables = {
     code,
     clientId,
-    redirectUri: 'http://localhost:3000/mosip-callback'
+    redirectUri: `${window.location.origin}${OIDP_VERIFICATION_CALLBACK}`
   }
-  const { loading, error, data, refetch } = useQuery(GET_OIDP_USER_INFO, {
+  const { loading, error, refetch } = useQuery(GET_OIDP_USER_INFO, {
     variables: oidpUserInfoQueryVariables,
-    notifyOnNetworkStatusChange: true
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (data) => {
+      const declaration = declarations.declarations.find(
+        (d) => d.id === declarationId
+      )
+
+      if (!declaration || !section) {
+        return
+      }
+
+      addNidUserInfoToDeclaration(declaration, section, data.getOIDPUserInfo)
+      dispatch(modifyDeclaration(declaration))
+      dispatch(writeDeclaration(declaration))
+      goToVerificationOrigin()
+    }
   })
 
   if (!pathname || !isNonceOk) {
@@ -178,24 +145,8 @@ export const OIDPVerificationCallback = (props: any) => {
     return null
   }
 
-  const RedirectComp = () => (
-    <Redirect
-      to={{
-        pathname,
-        state: {
-          code: code
-        }
-      }}
-    />
-  )
-
-  if (data) {
-    //POPULATE DATA & REDIRECT
-    return <RedirectComp />
-  }
-
-  const handleCancel = () => {
-    return <RedirectComp />
+  const goToVerificationOrigin = () => {
+    pathname && history.push(pathname)
   }
 
   const handleRetry = () => refetch(oidpUserInfoQueryVariables)
@@ -230,7 +181,7 @@ export const OIDPVerificationCallback = (props: any) => {
                   </Button>
                 </>
               )}
-              <Link font="reg14" onClick={handleCancel}>
+              <Link font="reg14" onClick={goToVerificationOrigin}>
                 {intl.formatMessage(buttonMessages.cancel)}
               </Link>
             </Stack>
@@ -240,10 +191,3 @@ export const OIDPVerificationCallback = (props: any) => {
     </Page>
   )
 }
-
-export const OIDPVerificationCallbackPage = connect(
-  (state: IStoreState) => ({
-    language: getLanguage(state)
-  }),
-  { goToPageGroup, writeDeclaration }
-)(injectIntl(OIDPVerificationCallback))
