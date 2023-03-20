@@ -39,7 +39,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   IVerifyIDCertificateCollectorField,
-  verifyIDOnBirthCertificateCollectorDefinition
+  verifyIDOnDeclarationCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
@@ -123,9 +123,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, declaration } = this.props
     const info = declaration.data[collector]
-    const fields = verifyIDOnBirthCertificateCollectorDefinition[
+
+    const fields = verifyIDOnDeclarationCertificateCollectorDefinition[
       declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
+
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||
       info[fields.identifierOtherTypeField]) as string

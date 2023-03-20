@@ -79,6 +79,14 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
+  MARRIAGE: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+    PRINT_IN_ADVANCE: boolean
+  }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean

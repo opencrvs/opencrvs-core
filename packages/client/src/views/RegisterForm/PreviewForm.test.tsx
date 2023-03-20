@@ -49,7 +49,8 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
   birthReviewDraftData,
-  deathReviewDraftData
+  deathReviewDraftData,
+  marriageReviewDraftData
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
 
@@ -234,91 +235,6 @@ describe('when user is previewing the form data', () => {
   describe('when user is in the death review section', () => {
     let customDraft: IDeclaration
 
-    const deceasedDetails = {
-      iD: '987987987',
-      iDType: 'NATIONAL_ID',
-      socialSecurityNo: 'hghjkh',
-      firstNames: 'অনিক',
-      familyName: 'অনিক',
-      firstNamesEng: 'Anik',
-      familyNameEng: 'anik',
-      nationality: 'FAR',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      birthDate: '1983-01-01',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
-    }
-
-    const informantDetails = {
-      iDType: 'PASSPORT',
-      informantID: '123456789',
-      socialSecurityNo: 'hghjkh',
-      informantFirstNames: 'অনিক',
-      informantFamilyName: 'অনিক',
-      informantFirstNamesEng: 'Anik',
-      informantFamilyNameEng: 'Anik',
-      nationality: 'FAR',
-      informantBirthDate: '1996-01-01',
-      informantPhone: '0787777676',
-      relationship: 'OTHER',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirIDMap: {
-        relatedPerson: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
-        individual: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1'
-      }
-    }
-
-    const fatherDetails = {
-      fatherFirstNames: 'মোক্তার',
-      fatherFamilyName: 'আলী',
-      fatherFirstNamesEng: 'Moktar',
-      fatherFamilyNameEng: 'Ali'
-    }
-
-    const motherDetails = {
-      motherFirstNames: 'মরিউম',
-      motherFamilyName: 'আলী',
-      motherFirstNamesEng: 'Morium',
-      motherFamilyNameEng: 'Ali'
-    }
-
-    const spouseDetails = {
-      hasDetails: {
-        value: 'Yes',
-        nestedFields: {
-          spouseFirstNames: 'রেহানা',
-          spouseFamilyName: 'আলী',
-          spouseFirstNamesEng: 'Rehana',
-          spouseFamilyNameEng: 'Ali'
-        }
-      }
-    }
-
-    const deathEventDetails = {
-      deathDate: '2017-01-01',
-      manner: 'ACCIDENT',
-      placeOfDeath: 'PRIMARY_ADDRESS',
-      ...eventAddressData
-    }
-    const causeOfDeathDetails = { causeOfDeathEstablished: false }
-
-    const registrationDetails = {
-      _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
-      trackingId: 'DS8QZ0Z',
-      relationship: { value: 'GRANDSON', nestedFields: {} },
-      contactPoint: {
-        value: 'DAUGHTER',
-        nestedFields: { registrationPhone: '0787878787' }
-      }
-    }
-
     const registerScopeToken =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 
@@ -336,6 +252,59 @@ describe('when user is previewing the form data', () => {
           customDraft.id.toString()
         )
           .replace(':event', 'death')
+          .replace(':pageId', 'review')
+      )
+      await waitForElement(app, '#readyDeclaration')
+    })
+
+    it('successfully submits the review form', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+      app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
+      app.update()
+      app.update().find('#submit_confirm').hostNodes().simulate('click')
+    })
+
+    it('rejecting declaration redirects to reject confirmation screen', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
+
+      app
+        .find('#rejectionCommentForHealthWorker')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            id: 'rejectionCommentForHealthWorker',
+            value: 'reject reason'
+          }
+        })
+
+      app.find('#submit_reject_form').hostNodes().simulate('click')
+
+      expect(history.location.pathname).toEqual('/')
+    })
+  })
+
+  describe('when user is in the marriage review section', () => {
+    let customDraft: IDeclaration
+
+    const registerScopeToken =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
+
+    beforeEach(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      store.dispatch(checkAuth())
+      await flushPromises()
+      const data = marriageReviewDraftData
+
+      customDraft = { id: uuid(), data, review: true, event: Event.Marriage }
+      store.dispatch(storeDeclaration(customDraft))
+      history.replace(
+        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
+          ':declarationId',
+          customDraft.id.toString()
+        )
+          .replace(':event', 'marriage')
           .replace(':pageId', 'review')
       )
       await waitForElement(app, '#readyDeclaration')

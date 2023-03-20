@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
-import { Events, triggerEvent } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
   markBundleAsValidated,
@@ -49,20 +48,22 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import {
-  EVENT_TYPE,
-  CHILD_SECTION_CODE,
-  DECEASED_SECTION_CODE,
-  BIRTH_REG_NUMBER_SYSTEM,
-  DEATH_REG_NUMBER_SYSTEM
-} from '@workflow/features/registration/fhir/constants'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { triggerEvent } from '@workflow/features/events/handler'
+import {
+  Events,
+  MARK_REG,
+  REG_NUMBER_SYSTEM,
+  SECTION_CODE
+} from '@workflow/features/events/utils'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
 }
+
 async function sendBundleToHearth(
   payload: fhir.Bundle,
   count = 1
@@ -108,7 +109,9 @@ function getSectionIndex(
   section.filter((obj: fhir.CompositionSection, i: number) => {
     if (
       obj.title &&
-      ['Birth encounter', 'Death encounter'].includes(obj.title)
+      ['Birth encounter', 'Death encounter', 'Marriage encounter'].includes(
+        obj.title
+      )
     ) {
       index = i
     }
@@ -173,18 +176,22 @@ export async function createRegistrationHandler(
       token
     )
     if (
-      event ===
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
-      event ===
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      [
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      ].includes(event)
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
         token
       )
     } else if (
-      event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
-      event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
+      [
+        Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
+        Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION,
+        Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION
+      ].includes(event)
     ) {
       payload = await markBundleAsValidated(payload as fhir.Bundle, token)
     }
@@ -192,10 +199,11 @@ export async function createRegistrationHandler(
     populateCompositionWithID(payload, resBundle)
 
     if (
-      event ===
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
-      event ===
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      [
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      ].includes(event)
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
@@ -292,7 +300,7 @@ export async function markEventAsRegisteredCallbackHandler(
   const composition: fhir.Composition = await getFromFhir(
     `/${task.focus.reference}`
   )
-  const event = getTaskEventType(task)
+  const event = getTaskEventType(task) as EVENT_TYPE
 
   try {
     await markEventAsRegistered(
@@ -302,18 +310,19 @@ export async function markEventAsRegisteredCallbackHandler(
       getToken(request)
     )
 
-    /** pushing registrationNumber on related person's identifier */
-    let patient = await updatePatientIdentifierWithRN(
+    /** pushing registrationNumber on related person's identifier
+     *  taking patients as an array because MARRIAGE Event has two types of patient
+     */
+    const patients: fhir.Patient[] = await updatePatientIdentifierWithRN(
       composition,
-      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
-      event === EVENT_TYPE.BIRTH
-        ? BIRTH_REG_NUMBER_SYSTEM
-        : DEATH_REG_NUMBER_SYSTEM,
+      SECTION_CODE[event],
+      REG_NUMBER_SYSTEM[event],
       registrationNumber
     )
 
     if (event === EVENT_TYPE.DEATH) {
-      patient = await validateDeceasedDetails(patient, {
+      /** using first patient because for death event there is only one patient */
+      patients[0] = await validateDeceasedDetails(patients[0], {
         Authorization: request.headers.authorization
       })
     }
@@ -321,31 +330,34 @@ export async function markEventAsRegisteredCallbackHandler(
     //** Making sure db automicity */
     const bundle = generateEmptyBundle()
     bundle.entry?.push({ resource: task })
-    bundle.entry?.push({ resource: patient })
-
+    for (const patient of patients) {
+      bundle.entry?.push({ resource: patient })
+    }
     await sendBundleToHearth(bundle)
-
-    const phoneNo = await getPhoneNo(task, event)
-    const informantName = await getEventInformantName(composition, event)
-    /* sending notification to the contact */
-    if (phoneNo && informantName) {
-      logger.info(
-        'markEventAsRegisteredCallbackHandler sending event notification'
-      )
-      sendRegisteredNotification(
-        phoneNo,
-        informantName,
-        trackingId,
-        registrationNumber,
-        event,
-        {
-          Authorization: request.headers.authorization
-        }
-      )
-    } else {
-      logger.info(
-        'markEventAsRegisteredCallbackHandler could not send event notification'
-      )
+    //TODO: We have to configure sms and identify informant for marriage event
+    if (event !== EVENT_TYPE.MARRIAGE) {
+      const phoneNo = await getPhoneNo(task, event)
+      const informantName = await getEventInformantName(composition, event)
+      /* sending notification to the contact */
+      if (phoneNo && informantName) {
+        logger.info(
+          'markEventAsRegisteredCallbackHandler sending event notification'
+        )
+        sendRegisteredNotification(
+          phoneNo,
+          informantName,
+          trackingId,
+          registrationNumber,
+          event,
+          {
+            Authorization: request.headers.authorization
+          }
+        )
+      } else {
+        logger.info(
+          'markEventAsRegisteredCallbackHandler could not send event notification'
+        )
+      }
     }
     // Most nations will desire the opportunity to pilot OpenCRVS alongised a legacy system, or an external data store / validation process
     // In the absence of an external process, we must wait at least a second before we continue, because Elasticsearch must
@@ -356,9 +368,7 @@ export async function markEventAsRegisteredCallbackHandler(
     }
     // Trigger an event for the registration
     await triggerEvent(
-      event === EVENT_TYPE.BIRTH
-        ? Events.BIRTH_MARK_REG
-        : Events.DEATH_MARK_REG,
+      MARK_REG[event],
       { resourceType: 'Bundle', entry: [{ resource: task }] },
       request.headers
     )
@@ -425,7 +435,7 @@ export async function markEventAsCertifiedHandler(
     await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
-    logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
   }
 }
