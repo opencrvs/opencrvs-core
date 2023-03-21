@@ -157,7 +157,7 @@ type Query {
     clientId: String!
     redirectUri: String!
     grantType: String
-  ): OIDPUserInfo
+  ): UserInfo
 }
 
 type Mutation {
@@ -661,27 +661,10 @@ type SMSNotification {
   createdAt: String!
 }
 
-type OIDPUserInfo {
-  sub: String!
-  name: String
-  given_name: String
-  family_name: String
-  middle_name: String
-  nickname: String
-  preferred_username: String
-  profile: String
-  picture: String
-  website: String
-  email: String
-  email_verified: Boolean
-  gender: String
-  birthdate: String
-  zoneinfo: String
-  locale: String
-  phone_number: String
-  phone_number_verified: Boolean
-  address: OIDPUserAddress
-  updated_at: Int
+type UserInfo {
+  oidpUserInfo: OIDPUserInfo
+  districtFhirId: String
+  stateFhirId: String
 }
 
 input NotificationInput {
@@ -1305,13 +1288,27 @@ type FormDatasetOption {
   label: [FormDatasetOptionLabel]
 }
 
-type OIDPUserAddress {
-  formatted: String
-  street_address: String
-  locality: String
-  region: String
-  postal_code: String
-  country: String
+type OIDPUserInfo {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  middle_name: String
+  nickname: String
+  preferred_username: String
+  profile: String
+  picture: String
+  website: String
+  email: String
+  email_verified: Boolean
+  gender: String
+  birthdate: String
+  zoneinfo: String
+  locale: String
+  phone_number: String
+  phone_number_verified: Boolean
+  address: OIDPUserAddress
+  updated_at: Int
 }
 
 input PersonInput {
@@ -1871,6 +1868,15 @@ type WebhookPermission {
 type FormDatasetOptionLabel {
   lang: String!
   descriptor: MesssageDescriptor!
+}
+
+type OIDPUserAddress {
+  formatted: String
+  street_address: String
+  locality: String
+  region: String
+  postal_code: String
+  country: String
 }
 
 input IdentityInput {

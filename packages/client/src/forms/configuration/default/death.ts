@@ -21,8 +21,9 @@ import {
 const nidIntegrationConditionals = {
   hideIfNidIntegrationEnabled: {
     action: 'hide',
-    expression: `const nationalIdSystem = offlineCountryConfig.systems
-                    .find(s => s.type === 'NATIONAL_ID');
+    expression: `const nationalIdSystem = 
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.type === 'NATIONAL_ID');
         nationalIdSystem &&
         nationalIdSystem.settings.openIdProviderBaseUrl &&
         nationalIdSystem.settings.openIdProviderClientId &&
@@ -31,8 +32,9 @@ const nidIntegrationConditionals = {
   },
   hideIfNidIntegrationDisabled: {
     action: 'hide',
-    expression: `const nationalIdSystem = offlineCountryConfig.systems
-                      .find(s => s.type === 'NATIONAL_ID');
+    expression: `const nationalIdSystem = 
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.type === 'NATIONAL_ID');
       !nationalIdSystem ||
       !nationalIdSystem.settings.openIdProviderBaseUrl ||
       !nationalIdSystem.settings.openIdProviderClientId ||
