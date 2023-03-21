@@ -312,18 +312,18 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, context) {
+    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
       try {
         const token = await getAnonymousToken()
-        context.Authorization = `Bearer ${token}`
+        headers.Authorization = `Bearer ${token}`
         const authHeader = {
-          Authorization: context.Authorization
+          Authorization: headers.Authorization
         }
         const taskEntry = await getTaskEntry(id, authHeader)
 
         const taskBundle = taskBundleWithExtension(taskEntry, {
           url: VERIFIED_EXTENSION_URL,
-          valueString: context['x-real-ip']
+          valueString: headers['x-real-ip']
         })
         await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
@@ -618,7 +618,7 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markMarriageAsIssued(_, { id, details }, authHeader) {
+    async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
       } else {
@@ -680,7 +680,7 @@ export const resolvers: GQLResolver = {
     async markEventAsDuplicate(
       _,
       { id, reason, comment, duplicateTrackingId },
-      authHeader
+      { headers: authHeader }
     ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {

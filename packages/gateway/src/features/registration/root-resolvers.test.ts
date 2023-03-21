@@ -536,7 +536,7 @@ describe('Registration root resolvers', () => {
       const composition = await resolvers.Query.fetchMarriageRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-        authHeaderRegCert
+        { headers: authHeaderRegCert }
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')

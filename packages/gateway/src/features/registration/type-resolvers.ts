@@ -1940,7 +1940,11 @@ export const typeResolvers: GQLResolver = {
     }
   },
   MarriageRegistration: {
-    async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+    async _fhirIDMap(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(
         MARRIAGE_ENCOUNTER_CODE,
@@ -2003,7 +2007,11 @@ export const typeResolvers: GQLResolver = {
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
-    async bride(composition: ITemplatedComposition, _, authHeader) {
+    async bride(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(BRIDE_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -2013,7 +2021,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async groom(composition: ITemplatedComposition, _, authHeader) {
+    async groom(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const patientSection = findCompositionSection(GROOM_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
@@ -2023,7 +2035,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async witnessOne(composition: ITemplatedComposition, _, authHeader) {
+    async witnessOne(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const relatedPersonSection = findCompositionSection(
         WITNESS_ONE_CODE,
         composition
@@ -2036,7 +2052,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )) as fhir.RelatedPerson
     },
-    async witnessTwo(composition: ITemplatedComposition, _, authHeader) {
+    async witnessTwo(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const relatedPersonSection = findCompositionSection(
         WITNESS_TWO_CODE,
         composition
@@ -2050,7 +2070,11 @@ export const typeResolvers: GQLResolver = {
       )) as fhir.RelatedPerson
       return relatedPerson
     },
-    async registration(composition: ITemplatedComposition, _, authHeader) {
+    async registration(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${composition.id}`,
         authHeader
@@ -2061,7 +2085,11 @@ export const typeResolvers: GQLResolver = {
       }
       return taskBundle.entry[0].resource
     },
-    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+    async questionnaire(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         MARRIAGE_ENCOUNTER_CODE,
         composition
@@ -2103,7 +2131,11 @@ export const typeResolvers: GQLResolver = {
         return null
       }
     },
-    async typeOfMarriage(composition: ITemplatedComposition, _, authHeader) {
+    async typeOfMarriage(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         MARRIAGE_ENCOUNTER_CODE,
         composition
@@ -2117,7 +2149,11 @@ export const typeResolvers: GQLResolver = {
       )
       return observations?.entry?.[0]?.resource?.valueQuantity?.value || null
     },
-    async eventLocation(composition: ITemplatedComposition, _, authHeader) {
+    async eventLocation(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
       const encounterSection = findCompositionSection(
         MARRIAGE_ENCOUNTER_CODE,
         composition
@@ -2139,7 +2175,11 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
+    async history(
+      composition: ITemplatedComposition,
+      _: any,
+      { headers: authHeader }
+    ) {
       const task = await fetchFHIR(
         `/Task/?focus=Composition/${composition.id}`,
         authHeader

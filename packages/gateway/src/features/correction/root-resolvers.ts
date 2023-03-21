@@ -85,7 +85,7 @@ export const resolvers: GQLResolver = {
     async requestMarriageRegistrationCorrection(
       _,
       { id, details },
-      authHeader
+      { headers: authHeader }
     ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
