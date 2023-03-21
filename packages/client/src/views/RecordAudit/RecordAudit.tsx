@@ -320,6 +320,8 @@ function RecordAuditBody({
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
 
+  console.log(declaration)
+
   if (!registerForm.registerForm || !declaration.type) return <></>
 
   const toggleActionDetails = (actionItem: History | null, itemIndex = -1) => {

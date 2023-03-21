@@ -271,6 +271,7 @@ type History {
   certificates: [Certificate]
   signature: Signature
   duplicateOf: String
+  potentialDuplicates: [String]
 }
 
 interface EventRegistration {

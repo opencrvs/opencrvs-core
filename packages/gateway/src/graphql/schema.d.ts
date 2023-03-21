@@ -863,6 +863,7 @@ export interface GQLHistory {
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
   duplicateOf?: string
+  potentialDuplicates?: Array<string | null>
 }
 
 export const enum GQLMannerOfDeath {
@@ -5700,6 +5701,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
   duplicateOf?: HistoryToDuplicateOfResolver<TParent>
+  potentialDuplicates?: HistoryToPotentialDuplicatesResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -5785,6 +5787,13 @@ export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToPotentialDuplicatesResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
