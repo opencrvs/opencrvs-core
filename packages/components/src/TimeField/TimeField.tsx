@@ -68,19 +68,23 @@ export function TimeField(props: ITimeFieldProps) {
   function change(event: React.ChangeEvent<HTMLInputElement>) {
     const val = event.target.value
     if (event.target.id.includes('hh')) {
-      if (Number(val) < 0 && Number(val) > 23) return
-      if (val.length > 2 && mm?.current !== null) {
+      if (Number(val) < 0 || Number(val) > 23) return
+      if (val.length === 2 && mm?.current !== null) {
         mm.current.focusField()
       }
       setState((state) => ({ ...state, hh: val }))
     } else if (event.target.id.includes('mm')) {
-      if (Number(val) < 0 && Number(val) > 59) return
+      if (Number(val) < 0 || Number(val) > 59) return
       setState((state) => ({ ...state, mm: val }))
     }
-    if (state.hh && state.mm) {
-      props.onChange(`${state.hh}-${state.mm}`)
-    }
   }
+  React.useEffect(() => {
+    if (state.hh && state.mm) {
+      props.onChange(
+        `${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`
+      )
+    }
+  }, [state.hh, state.mm, props])
   return (
     <Container id={id}>
       <Segment
