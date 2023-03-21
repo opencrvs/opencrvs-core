@@ -15,15 +15,17 @@ import {
 } from '@client/forms/mappings/query/field-mappings'
 import { IFormField } from '@client/forms'
 import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
+import { LocationType } from '@client/utils/gateway'
 
 describe('Query FieldMapping', () => {
   it('Should return valid data', () => {
     const factory = identityToFieldTransformer('id', 'nationalId')
     const expectedResult = {}
     const queryData = {
-      person: {}
+      id: '12345',
+      mother: {}
     }
-    const sectionId = 'person'
+    const sectionId = 'mother'
     const field = {} as IFormField
     const transformedData = {}
     const result = factory(
@@ -38,21 +40,21 @@ describe('Query FieldMapping', () => {
 
   it('Should return a new ', () => {
     const factory = identityToFieldTransformer('id', 'nationalId')
-    const expectedResult = { person: { nationalId: 151515 } }
+    const expectedResult = { mother: { nationalId: 151515 } }
     const queryData = {
-      person: {
+      id: '12345',
+      mother: {
         identifier: [
           {
-            type: 'nationalId',
-            id: 151515
+            id: '151515'
           }
         ]
       }
     }
-    const sectionId = 'person'
+    const sectionId = 'mother'
     const field = { name: 'nationalId' } as IFormField
     const transformedData = {
-      person: {}
+      mother: {}
     }
     const result = factory(
       transformedData,
@@ -78,20 +80,20 @@ describe('Query FieldMapping', () => {
         placeOfBirthState: 'Central'
       }
     }
+
     const queryData = {
+      id: '12356',
       eventLocation: {
         id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
-        type: 'HEALTH_FACILITY',
+        type: 'HEALTH_FACILITY' as LocationType,
         address: {
           line: [],
           district: null,
           state: null,
           city: null,
           postalCode: null,
-          country: null,
-          __typename: 'Address'
-        },
-        __typename: 'Location'
+          country: null
+        }
       },
       _fhirIDMap: {
         eventLocation: '5c6abc88-26b8-4834-a1a6-2992807e3a72'

@@ -15,7 +15,12 @@ import {
   GQLLocationType,
   GQLAddressType
 } from '@opencrvs/gateway/src/graphql/schema'
-import { BirthRegistration, Address, Attachment } from '@client/utils/gateway'
+import {
+  BirthRegistration,
+  Address,
+  Attachment,
+  EventRegistration
+} from '@client/utils/gateway'
 import {
   IAttachment,
   IFormData,
@@ -355,10 +360,10 @@ export function commentToFieldTransformer(
 
 export function attachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: BirthRegistration,
-  sectionId: keyof BirthRegistration,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
   field: IFormField,
-  alternateSectionId?: keyof BirthRegistration,
+  alternateSectionId?: keyof EventRegistration,
   subjectMapper?: any,
   typeMapper?: any,
   fieldNameMapping?: any
