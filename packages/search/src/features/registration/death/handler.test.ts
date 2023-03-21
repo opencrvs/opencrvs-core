@@ -29,10 +29,12 @@ import {
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
+import { searchForDeathDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any
@@ -40,6 +42,9 @@ describe('Verify handlers', () => {
   describe('deathEventHandler', () => {
     beforeEach(async () => {
       server = await createServer()
+      const mockedsearchForDuplicates =
+        searchForDeathDuplicates as jest.Mocked<any>
+      mockedsearchForDuplicates.mockReturnValue([])
     })
 
     it('should return status code 500 if invalid payload received', async () => {

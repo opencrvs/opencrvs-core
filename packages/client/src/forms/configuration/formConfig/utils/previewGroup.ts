@@ -13,7 +13,7 @@ import { IConfigField } from '.'
 import { MessageDescriptor } from 'react-intl'
 import { IDefaultConfigField } from './defaultConfig'
 import { ISerializedFormSectionGroup } from '@client/forms'
-import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
+import { PlaceholderPreviewGroups } from '@client/forms/configuration/default/index'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 export type IPreviewGroupConfigField = {

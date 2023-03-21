@@ -9,14 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IStoreState } from '@opencrvs/client/src/store'
-import { IRejectState } from '@opencrvs/client/src/review/reducer'
+import { upsertEvent } from '@search/features/registration/marriage/service'
+import { logger } from '@search/logger'
+import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 
-const getPartialState = (store: IStoreState): IRejectState => store.reject
+export async function marriageEventHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    await upsertEvent(request)
+  } catch (error) {
+    logger.error(`Search/marriageEventHandler: error: ${error}`)
+    return internal(error)
+  }
 
-function getKey<K extends keyof IRejectState>(store: IStoreState, key: K) {
-  return getPartialState(store)[key]
+  return h.response().code(200)
 }
-
-export const getRejectForm = (store: IStoreState): IRejectState['rejectForm'] =>
-  getKey(store, 'rejectForm')

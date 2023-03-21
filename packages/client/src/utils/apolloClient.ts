@@ -29,7 +29,7 @@ import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
-import * as localforage from 'localforage'
+import localforage from 'localforage'
 import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
 
 export let client: ApolloClient<NormalizedCacheObject>
