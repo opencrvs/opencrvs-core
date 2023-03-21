@@ -624,7 +624,8 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Time = 'TIME'
 }
 
 export type CustomSelectOption = {
@@ -1857,21 +1858,20 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
-  unit?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
-  inputWidth?: InputMaybe<Scalars['Int']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
-  validateEmpty?: InputMaybe<Scalars['Boolean']>
+  unit?: InputMaybe<Array<MesssageInput>>
   validator?: InputMaybe<Array<ValidatorInput>>
 }
 

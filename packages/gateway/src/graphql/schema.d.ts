@@ -1313,7 +1313,6 @@ export interface GQLQuestionInput {
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
-  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
