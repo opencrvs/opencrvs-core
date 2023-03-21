@@ -41,7 +41,8 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  addFlaggedAsPotentialDuplicate
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
@@ -169,7 +170,12 @@ async function indexAndSearchComposition(
     body.type !== 'WAITING_VALIDATION' &&
     body.type !== 'VALIDATED'
   ) {
-    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
+    await detectAndUpdateBirthDuplicates(
+      compositionId,
+      composition,
+      body,
+      authHeader
+    )
   }
 }
 
@@ -412,7 +418,8 @@ async function createDeclarationIndex(
 async function detectAndUpdateBirthDuplicates(
   compositionId: string,
   composition: fhir.Composition,
-  body: IBirthCompositionBody
+  body: IBirthCompositionBody,
+  authHeader: string
 ) {
   const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
@@ -421,8 +428,15 @@ async function detectAndUpdateBirthDuplicates(
   logger.info(
     `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId,
+    authHeader
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
 export async function updateCompositionWithDuplicates(
@@ -447,5 +461,8 @@ export async function updateCompositionWithDuplicates(
   )) as fhir.Composition
   addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
 
-  return updateInHearth(compositionFromFhir, compositionFromFhir.id)
+  return updateInHearth(
+    `/Composition/${compositionFromFhir.id}`,
+    compositionFromFhir
+  )
 }
