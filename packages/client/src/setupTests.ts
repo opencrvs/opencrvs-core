@@ -234,7 +234,7 @@ vi.mock('lodash/debounce', () => ({
 }))
 
 vi.mock('./utils', async () => ({
-  ...((await vi.importActual('./utils')) as any),
+  useOnlineStatus: () => true,
   isNavigatorOnline: () => true
 }))
 
