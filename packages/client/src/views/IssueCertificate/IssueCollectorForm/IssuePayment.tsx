@@ -68,38 +68,27 @@ const Action = styled.div`
   margin-top: 32px;
 `
 
-type Props = {
-  event: Event
-  declaration: IPrintableDeclaration
-  offlineCountryConfig: IOfflineData
-}
-
-export const IssuePayment: React.FC<Props> = ({
-  event,
-  declaration,
-  offlineCountryConfig
-}) => {
+export const IssuePayment = () => {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+  const offlineCountryConfig = useSelector<IStoreState, any>((state) =>
+    getOfflineData(state)
+  )
   const { registrationId, eventType } = useParams<{
     registrationId: string
     eventType: string
   }>()
-  event = getEvent(eventType)
-  declaration = useSelector<IStoreState, IPrintableDeclaration>(
+  const event = getEvent(eventType)
+  const declaration = useSelector<IStoreState, IPrintableDeclaration>(
     (state) =>
       state.declarationsState.declarations.find(
         (app) => app.id === registrationId && app.event === event
       ) as IPrintableDeclaration
   )
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const declarations = useSelector<IStoreState, IPrintableDeclaration[]>(
     (state) => state.declarationsState.declarations as IPrintableDeclaration[]
-  )
-
-  offlineCountryConfig = useSelector<IStoreState, any>((state) =>
-    getOfflineData(state)
   )
 
   const readyToIssue = () => {
