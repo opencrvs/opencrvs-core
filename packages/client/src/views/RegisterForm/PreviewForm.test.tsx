@@ -402,9 +402,7 @@ describe('when user is previewing the form data', () => {
 
     it('shows send for review button', async () => {
       await waitForElement(app, '#readyDeclaration')
-      expect(
-        app.update().contains('#validateDeclarationBtn')
-      ).toBeFalsy()
+      expect(app.update().contains('#validateDeclarationBtn')).toBeFalsy()
     })
   })
 })
