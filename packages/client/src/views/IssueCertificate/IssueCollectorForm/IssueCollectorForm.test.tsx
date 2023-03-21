@@ -228,12 +228,10 @@ describe('Certificate issue collector test for a birth registration without fath
     })
 
     it('father option will be available', async () => {
-      await waitForElement(component, '#type_FATHER')
       expect(component.find('#type_FATHER').hostNodes()).toHaveLength(1)
     })
 
     it('continue button disabled when not selected', async () => {
-      await waitForElement(component, '#continue-button')
       expect(
         component.find('#continue-button').hostNodes().props().disabled
       ).toBeTruthy()
@@ -282,16 +280,7 @@ describe('Certificate issue collector test for a birth registration without fath
       })
 
       it('redirects to id check component upon FATHER option selection', async () => {
-        component
-          .find('#type_FATHER')
-          .hostNodes()
-          .simulate('change', { target: { value: 'FATHER' } })
-
-        component.update()
         component.find('#continue-button').hostNodes().simulate('click')
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500)
-        })
         component.update()
         expect(history.location.pathname).toBe(
           '/issue/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
@@ -345,9 +334,6 @@ describe('Certificate issue collector test for a birth registration without fath
 
         component.update()
         component.find('#continue-button').hostNodes().simulate('click')
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500)
-        })
         component.update()
         expect(history.location.pathname).toBe(
           '/issue/6a5fd35d-01ec-4c37-976e-e055107a74a1/otherCollector'
@@ -400,7 +386,6 @@ describe('Certificate issue collector test for a birth registration without fath
     })
 
     it('continue button diabled when necessary fields are not filled', async () => {
-      await waitForElement(component, '#continue-button')
       expect(
         component.find('#continue-button').hostNodes().props().disabled
       ).toBeTruthy()

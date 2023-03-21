@@ -77,8 +77,6 @@ describe('verify collector tests for issuance', () => {
   const { store, history } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth())
-    await flushPromises()
     ;(useParams as Mock).mockImplementation(() => ({
       registrationId: 'mockBirth1234',
       eventType: 'birth'
@@ -92,11 +90,8 @@ describe('verify collector tests for issuance', () => {
       store,
       history
     })
-
     expect(testComponent.find('#service').hostNodes().text()).toContain('Birth')
-
     expect(testComponent.find('#amountDue').hostNodes().text()).toContain('20')
-
     testComponent.find('#Continue').hostNodes().simulate('click')
   })
 
@@ -134,8 +129,6 @@ describe('in case of death declaration renders issue payment component', () => {
   const { store, history } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth())
-    await flushPromises()
     ;(useParams as Mock).mockImplementation(() => ({
       registrationId: 'mockDeath1234',
       eventType: 'death'
@@ -149,11 +142,8 @@ describe('in case of death declaration renders issue payment component', () => {
       store,
       history
     })
-
     expect(testComponent.find('#service').hostNodes().text()).toContain('Death')
-
     expect(testComponent.find('#amountDue').hostNodes().text()).toContain('0.0')
-
     testComponent.find('#Continue').hostNodes().simulate('click')
   })
 })
