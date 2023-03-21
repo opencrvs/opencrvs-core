@@ -325,6 +325,8 @@ export const searchTypeResolvers: GQLResolver = {
         { practitionerId: searchData._source && searchData._source.createdBy },
         authHeader
       )
+      // declarations created by health facilities don't have user
+      // associated with it, so it returns an error
       if (res._id) return res
       return null
     },

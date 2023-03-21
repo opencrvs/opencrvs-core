@@ -155,6 +155,10 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  },
+  ISSUED: {
+    labelDescriptor: statusMessages.issued,
+    color: colors.blue
   }
 }
 
