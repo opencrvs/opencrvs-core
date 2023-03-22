@@ -8682,7 +8682,7 @@
             "deprecationReason": null
           },
           {
-            "name": "MOSIP_UINTOKEN",
+            "name": "MOSIP_PSUT_TOKEN_ID",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
