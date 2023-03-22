@@ -863,7 +863,7 @@ export interface GQLHistory {
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
   duplicateOf?: string
-  potentialDuplicates?: Array<string | null>
+  potentialDuplicates?: Array<string>
 }
 
 export const enum GQLMannerOfDeath {

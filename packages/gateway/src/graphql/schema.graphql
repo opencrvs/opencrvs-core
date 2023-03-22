@@ -985,7 +985,7 @@ type History {
   certificates: [Certificate]
   signature: Signature
   duplicateOf: String
-  potentialDuplicates: [String]
+  potentialDuplicates: [String!]
 }
 
 enum MannerOfDeath {
