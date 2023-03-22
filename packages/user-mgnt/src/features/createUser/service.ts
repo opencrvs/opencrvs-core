@@ -143,7 +143,7 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
   primaryOfficeId: string,
   token: string
 ): Promise<string[]> => {
-  const catchmentAreaIds: string[] = [primaryOfficeId]
+  const catchmentAreaIds: string[] = []
   let locationRef = `Location/${primaryOfficeId}`
   let parentLocation: fhir.Location = {}
   while (locationRef !== 'Location/0') {

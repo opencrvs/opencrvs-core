@@ -473,6 +473,8 @@ const getCollectCertificateForm = (event: Event, state: IStoreState) => {
       return state.printCertificateForm.collectBirthCertificateForm
     case Event.Death:
       return state.printCertificateForm.collectDeathCertificateForm
+    case Event.Marriage:
+      return state.printCertificateForm.collectMarriageCertificateForm
   }
 }
 
@@ -499,7 +501,9 @@ const mapStateToProps = (
   const isAllowPrintInAdvance =
     event === Event.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
-      : getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
+      : event === Event.Death
+      ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
+      : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
 
   if (event === Event.Birth && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data

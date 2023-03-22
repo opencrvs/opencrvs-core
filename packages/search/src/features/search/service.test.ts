@@ -19,7 +19,7 @@ import { SortOrder } from '@search/features/search/types'
 describe('elasticsearch db helper', () => {
   it('should index a composition with proper configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    advancedSearch(false, {
+    await advancedSearch(false, {
       parameters: {
         trackingId: 'dummy',
         contactNumber: 'dummy',

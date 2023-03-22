@@ -59,6 +59,7 @@ import {
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
+  SELECT_MARRIAGE_INFORMANT,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT
@@ -152,6 +153,14 @@ export function goToBirthInformant(declarationId: string) {
 export function goToDeathInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_DEATH_INFORMANT, {
+      declarationId
+    })
+  )
+}
+
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(SELECT_MARRIAGE_INFORMANT, {
       declarationId
     })
   )

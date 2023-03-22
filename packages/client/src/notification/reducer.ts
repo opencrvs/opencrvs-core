@@ -39,6 +39,9 @@ export type NotificationState = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
+  showDuplicateRecordsToast: boolean
+  duplicateCompositionId: string | null
+  duplicateTrackingId: string | null
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
@@ -55,6 +58,9 @@ export const initialState: NotificationState = {
   submitFormErrorToast: null,
   userAuditSuccessToast: { visible: false },
   showPINUpdateSuccess: false,
+  showDuplicateRecordsToast: false,
+  duplicateCompositionId: null,
+  duplicateTrackingId: null,
   downloadDeclarationFailedToast: false,
   unassignedModal: null,
   userCreateDuplicateMobileFailedToast: {
@@ -169,6 +175,20 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         showPINUpdateSuccess: false
+      }
+    case actions.SHOW_DUPLICATE_RECORDS_TOAST:
+      return {
+        ...state,
+        showDuplicateRecordsToast: true,
+        duplicateTrackingId: action.payload.trackingId,
+        duplicateCompositionId: action.payload.compositionId
+      }
+    case actions.HIDE_DUPLICATE_RECORDS_TOAST:
+      return {
+        ...state,
+        showDuplicateRecordsToast: false,
+        duplicateTrackingId: null,
+        duplicateCompositionId: null
       }
     case actions.SHOW_UNASSIGNED:
       return {

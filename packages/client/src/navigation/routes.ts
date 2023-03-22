@@ -25,6 +25,10 @@ export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Dea
 export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
 export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Death}/:pageId/group/:groupId`
+export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${Event.Marriage}/registration/informantType`
+export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${Event.Marriage}`
+export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${Event.Marriage}/:pageId`
+export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Marriage}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'

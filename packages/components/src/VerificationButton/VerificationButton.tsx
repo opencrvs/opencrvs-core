@@ -77,7 +77,7 @@ export const VerificationButton = ({
 
       {status === 'verified' && (
         <StyledDiv>
-          <Icon name="CircleWavyCheck" fill="green" color="green" />
+          <Icon name="CircleWavyCheck" color="green" weight="fill" />
           <Text variant="bold16" element="p" color="green">
             {labelForVerified}
           </Text>

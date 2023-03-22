@@ -13,7 +13,8 @@ import { MINIO_BUCKET } from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
@@ -72,6 +73,20 @@ export function validateDeathDeclarationAttachments(
     details.father?.photo,
     details.deceased?.photo,
     details.spouse?.photo
+  ]
+    .flat()
+    .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+  return validateAttachments(attachments)
+}
+
+export function validateMarriageDeclarationAttachments(
+  details: GQLMarriageRegistrationInput
+) {
+  const attachments = [
+    details.registration?.attachments,
+    details.bride?.photo,
+    details.groom?.photo
   ]
     .flat()
     .filter((x): x is GQLAttachmentInput => x !== undefined)

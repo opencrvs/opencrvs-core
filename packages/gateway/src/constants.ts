@@ -72,3 +72,5 @@ export const OIDP_BASE_URL = process.env.NATIONAL_ID_OIDP_BASE_URL
 /** Base64 encoded RS256 JSON Web Key */
 export const OIDP_CLIENT_PRIVATE_KEY =
   process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY
+/** Value for "aud" claim when getting access token for fetching Open ID provider user info */
+export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
