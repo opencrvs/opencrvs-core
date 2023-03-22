@@ -632,13 +632,13 @@ const actionsModalDescriptionMessagesToDefine: Record<
   [Actions.PUBLISH]: {
     id: 'config.form.publish.confirmation.description',
     defaultMessage:
-      'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
+      'When you preview or publish a form configuration, all submitted declarations and registrations that have been previously submitted will be deleted. This is to ensure a clean OpenCRVS system is used in production.',
     description: 'Description for publish confirmation'
   },
   [Actions.PREVIEW]: {
     id: 'config.form.preview.confirmation.description',
     defaultMessage:
-      'This will make the form availble to test users. So that you can test the form and certificate',
+      'When you preview or publish a form configuration, all submitted declarations and registrations that have been previously submitted will be deleted. This is to ensure a clean OpenCRVS system is used in production.',
     description: 'Description for preview confirmation'
   },
   [Actions.EDIT]: {

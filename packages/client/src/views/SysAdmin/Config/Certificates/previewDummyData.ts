@@ -402,8 +402,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -438,8 +453,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -476,8 +506,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -511,8 +556,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -546,8 +606,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -581,8 +656,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -616,8 +706,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -651,8 +756,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -686,8 +806,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -721,8 +856,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -756,8 +906,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -791,8 +956,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -826,8 +1006,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -861,8 +1056,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -896,8 +1106,23 @@ const dummyBirthRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -1133,8 +1358,23 @@ const dummyDeathRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -1169,8 +1409,23 @@ const dummyDeathRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
@@ -1207,8 +1462,23 @@ const dummyDeathRegistrationResponse = {
       },
       user: {
         id: '622f81b42cd537bf91daa106',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
+        role: {
+          _id: '641179a48f408524083f7622',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Local Registrar',
+              __typename: 'RoleLabel'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local',
+              __typename: 'RoleLabel'
+            }
+          ],
+          __typename: 'Role'
+        },
         name: [
           {
             firstNames: 'Kennedy',
