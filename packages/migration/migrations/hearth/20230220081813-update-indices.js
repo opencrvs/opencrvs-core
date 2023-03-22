@@ -51,12 +51,6 @@ export const up = async (db, client) => {
       console.log('Done updating indices for collection: Observation')
 
       // eslint-disable-next-line no-console
-      console.log('Updating indices for collection: Composition')
-      await db.collection('Composition').createIndex({ id: 1 })
-      // eslint-disable-next-line no-console
-      console.log('Done updating indices for collection: Composition')
-
-      // eslint-disable-next-line no-console
       console.log('Updating indices for collection: DocumentReference')
       await db.collection('DocumentReference').createIndex({ id: 1 })
       // eslint-disable-next-line no-console
@@ -105,7 +99,6 @@ export const down = async (db, client) => {
       await db.collection('Location').dropIndex({ id: -1 })
       await db.collection('Encounter').dropIndex({ id: -1 })
       await db.collection('Observation').dropIndex({ id: -1 })
-      await db.collection('Composition').dropIndex({ id: -1 })
       await db.collection('DocumentReference').dropIndex({ id: -1 })
       await db.collection('Practitioner').dropIndex({ id: -1 })
       await db.collection('PractitionerRole').dropIndex({ id: -1 })
