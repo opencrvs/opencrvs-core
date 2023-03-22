@@ -321,10 +321,14 @@ export const searchTypeResolvers: GQLResolver = {
       return startedAt
     },
     startedBy: async (searchData: ISearchEventDataTemplate, _, authHeader) => {
-      return await getUser(
+      const res = await getUser(
         { practitionerId: searchData._source && searchData._source.createdBy },
         authHeader
       )
+      // declarations created by health facilities don't have user
+      // associated with it, so it returns an error
+      if (res._id) return res
+      return null
     },
     startedByFacility(searchData: ISearchEventDataTemplate) {
       let facilityName = null

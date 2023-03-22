@@ -49,7 +49,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -66,6 +66,8 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import register from '@client/registerServiceWorker'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -153,6 +155,10 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  },
+  ISSUED: {
+    labelDescriptor: statusMessages.issued,
+    color: colors.blue
   }
 }
 
@@ -218,6 +224,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
+  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
@@ -478,24 +485,25 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       return timeStructure === null ? 0 : timeStructure
     }
 
-    const content = data.getEventsWithProgress.results.map((eventProgress) => {
-      if (eventProgress !== null) {
-        const nameIntl = createNamesMap(
-          eventProgress && (eventProgress.name as GQLHumanName[])
-        )[LANG_EN] as string
-        const localLang = window.config.LANGUAGES.split(',').find(
-          (lang: string) => lang !== LANG_EN
-        )
-        const nameLocal =
-          (localLang &&
-            (createNamesMap(
-              eventProgress && (eventProgress.name as GQLHumanName[])
-            )[localLang] as string)) ||
-          nameIntl
-        let starterPractitionerName = ''
-        let starterPractitionerRole = ''
 
-        if (eventProgress.startedBy != null) {
+    const content = data.getEventsWithProgress.results.map(
+      (eventProgress) => {
+        if (eventProgress !== null) {
+          const nameIntl = createNamesMap(
+            eventProgress && (eventProgress.name as GQLHumanName[])
+          )[LANG_EN] as string
+          const localLang = window.config.LANGUAGES.split(',').find(
+            (lang: string) => lang !== LANG_EN
+          )
+          const nameLocal =
+            (localLang &&
+              (createNamesMap(
+                eventProgress && (eventProgress.name as GQLHumanName[])
+              )[localLang] as string)) ||
+            nameIntl
+          let starterPractitionerName = ''
+          let starterPractitionerRole = ''
+
           const user = eventProgress.startedBy
           starterPractitionerName =
             (user &&
@@ -507,6 +515,18 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   LANG_EN
                 ] as string))) ||
             eventProgress.startedByFacility ||
+            ''
+          if (eventProgress.startedBy != null) {
+            const user = eventProgress.startedBy
+            starterPractitionerRole =
+              (user.role && getUserRole(language, user.role)) || ''
+          }
+
+          const event =
+            (eventProgress.type &&
+              intl.formatMessage(
+                dynamicConstantsMessages[eventProgress.type.toLowerCase()]
+              )) ||
             ''
           starterPractitionerRole =
             (user.systemRole &&
