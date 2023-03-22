@@ -155,7 +155,9 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     localState.registrationStatuses.length > 0
   ) {
     transformedStoreState.registrationStatuses =
-      localState.registrationStatuses === 'IN_REVIEW'
+      localState.registrationStatuses === RegStatus.Registered
+        ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
+        : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'REGISTERED'
         ? [RegStatus.Registered, RegStatus.Certified]
