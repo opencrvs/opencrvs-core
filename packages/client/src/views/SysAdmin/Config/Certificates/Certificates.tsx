@@ -462,10 +462,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     let certificateFileName
 
     const toggleOnChange = async (event: Event) => {
-      const upperCaseEvent = event.toUpperCase() as
-        | 'BIRTH'
-        | 'DEATH'
-        | 'MARRIAGE'
+      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+
       this.props.updateOfflineConfigData({
         config: {
           ...offlineResources.config,

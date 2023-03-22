@@ -97,7 +97,8 @@ export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED
+    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
+    registrationStatus === SUBMISSION_STATUS.ISSUED
   )
 }
 
