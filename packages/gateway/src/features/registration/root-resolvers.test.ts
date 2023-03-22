@@ -655,6 +655,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify({})],
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -711,6 +712,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2254,6 +2256,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
