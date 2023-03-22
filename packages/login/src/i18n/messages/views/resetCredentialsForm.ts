@@ -183,11 +183,26 @@ const messagesToDefine = {
   error: {
     id: 'label.error',
     defaultMessage: 'Invalid input',
-    description: 'Generic error message for invalid form nput'
+    description: 'Generic error message for invalid form input'
+  },
+  codeSubmissionError: {
+    id: 'login.codeSubmissionError',
+    defaultMessage: 'Incorrect verification code',
+    description: 'Error message for wrong verification code'
+  },
+  errorWrongAnswer: {
+    id: 'label.errorWrongAnswer',
+    defaultMessage: 'Response is incorrect',
+    description: 'Generic error message for wrong answer for security question'
+  },
+  verificationCode: {
+    id: 'validations.verificationCode',
+    defaultMessage: 'Enter a valid verification code',
+    description: 'Error message for empty verification code'
   },
   errorPhoneNumberNotFound: {
     id: 'error.errorPhoneNumberNotFound',
-    defaultMessage: 'Mobile phone number not found.',
+    defaultMessage: 'Mobile phone number is incorrect',
     description: 'Error message for phone number not found'
   },
   resend: {

@@ -48,6 +48,7 @@ interface State {
   touched: boolean
   error: boolean
   resentSMS: boolean
+  errorMessage?: string
 }
 
 type Props = BaseProps & WrappedComponentProps
@@ -74,6 +75,14 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
 
   handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
+    if (!this.state.recoveryCode || this.state.error) {
+      this.setState({
+        touched: true,
+        error: true,
+        errorMessage: this.props.intl.formatMessage(messages.verificationCode)
+      })
+      return
+    }
     if (this.state.error) {
       return
     }
@@ -88,7 +97,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
         this.props.location.state.forgottenItem
       )
     } catch (error) {
-      // @todo error handling
+      this.setState({
+        error: true
+      })
     }
   }
 
@@ -99,7 +110,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
   render() {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
-
+    const { error: responseError, errorMessage } = this.state
+    const validationError =
+      this.state.error && Boolean(!this.state.recoveryCode)
     const { resentSMS } = this.state
 
     return (
@@ -145,8 +158,12 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 )}
                 touched={this.state.touched}
                 error={
-                  this.state.error
-                    ? this.props.intl.formatMessage(messages.error)
+                  validationError
+                    ? errorMessage
+                    : responseError
+                    ? this.props.intl.formatMessage(
+                        messages.codeSubmissionError
+                      )
                     : ''
                 }
                 hideAsterisk={true}
