@@ -11,13 +11,9 @@
  */
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import {
-  EVENT_TYPE,
-  OPENCRVS_SPECIFICATION_URL
-} from '@workflow/features/registration/fhir/constants'
-import {
-  hasBirthRegistrationNumber,
-  hasDeathRegistrationNumber,
+  hasRegistrationNumber,
   forwardToHearth,
   forwardEntriesToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
@@ -59,46 +55,7 @@ import {
   VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-
-// TODO: Change these event names to be closer in definition to the comments
-// https://jembiprojects.jira.com/browse/OCRVS-2767
-export enum Events {
-  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress declaration
-  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed declaration
-  BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/birth/request-for-registrar-validation', // Registration agent new declaration
-  BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/birth/waiting-external-resource-validation',
-  REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/birth/registrar-registration-waiting-external-resource-validation', // Registrar new registration declaration
-  BIRTH_MARK_REG = '/events/birth/mark-registered',
-  BIRTH_MARK_VALID = '/events/birth/mark-validated',
-  BIRTH_MARK_CERT = '/events/birth/mark-certified',
-  BIRTH_MARK_ISSUE = '/events/birth/mark-issued',
-  BIRTH_MARK_VOID = '/events/birth/mark-voided',
-  BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
-  BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
-  BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
-  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress declaration
-  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed declaration
-  DEATH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/death/request-for-registrar-validation', // Registration agent new declaration
-  DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/death/waiting-external-resource-validation',
-  REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/death/registrar-registration-waiting-external-resource-validation', // Registrar new registration declaration
-  DEATH_MARK_REG = '/events/death/mark-registered',
-  DEATH_MARK_VALID = '/events/death/mark-validated',
-  DEATH_MARK_CERT = '/events/death/mark-certified',
-  DEATH_MARK_ISSUE = '/events/death/mark-issued',
-  DEATH_MARK_VOID = '/events/death/mark-voided',
-  DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
-  DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
-  DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
-  DECLARATION_UPDATED = '/events/declaration-updated', // Registration agent or registrar updating declaration before validating/registering
-  EVENT_NOT_DUPLICATE = '/events/not-duplicate',
-  DOWNLOADED = '/events/downloaded',
-  ASSIGNED_EVENT = '/events/assigned',
-  UNASSIGNED_EVENT = '/events/unassigned',
-  VERIFIED_EVENT = '/events/verified',
-  UNKNOWN = 'unknown',
-  VIEWED = '/events/viewed',
-  MARKED_AS_DUPLICATE = '/events/markAsDuplicate'
-}
+import { Events } from '@workflow/features/events/utils'
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as fhir.Bundle
@@ -117,100 +74,52 @@ function detectEvent(request: Hapi.Request): Events {
             ext.valueBoolean
         )
         const eventType = getEventType(fhirBundle)
-        if (eventType === EVENT_TYPE.BIRTH) {
-          if (!isNewEntry) {
-            if (!hasBirthRegistrationNumber(fhirBundle)) {
-              if (hasValidateScope(request)) {
-                return Events.BIRTH_MARK_VALID
-              }
-              if (hasRegisterScope(request)) {
-                return Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION
-              }
-            } else {
-              if (
-                hasRegisterScope(request) &&
-                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
-              ) {
-                return Events.BIRTH_REQUEST_CORRECTION
-              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
-                return Events.BIRTH_MARK_ISSUE
-              } else {
-                return Events.BIRTH_MARK_CERT
-              }
+
+        if (!isNewEntry) {
+          if (!hasRegistrationNumber(fhirBundle, eventType)) {
+            if (hasValidateScope(request)) {
+              return Events[`${eventType}_MARK_VALID`]
+            }
+            if (hasRegisterScope(request)) {
+              return Events[`${eventType}_WAITING_EXTERNAL_RESOURCE_VALIDATION`]
             }
           } else {
-            if (hasRegisterScope(request)) {
-              if (isADuplicate) {
-                return Events.BIRTH_NEW_DEC
-              }
-
-              return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-            }
-
-            if (hasValidateScope(request)) {
-              return Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION
-            }
-
-            return isInProgressDeclaration(fhirBundle)
-              ? Events.BIRTH_IN_PROGRESS_DEC
-              : Events.BIRTH_NEW_DEC
-          }
-        } else if (eventType === EVENT_TYPE.DEATH) {
-          if (!isNewEntry) {
-            if (!hasDeathRegistrationNumber(fhirBundle)) {
-              if (hasValidateScope(request)) {
-                return Events.DEATH_MARK_VALID
-              }
-              if (hasRegisterScope(request)) {
-                return Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION
-              }
+            if (
+              hasRegisterScope(request) &&
+              hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+            ) {
+              return Events[`${eventType}_REQUEST_CORRECTION`]
+            } else if (!hasCertificateDataInDocRef(fhirBundle)) {
+              return Events[`${eventType}_MARK_ISSUE`]
             } else {
-              if (
-                hasRegisterScope(request) &&
-                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
-              ) {
-                return Events.DEATH_REQUEST_CORRECTION
-              } else if (!hasCertificateDataInDocRef(fhirBundle)) {
-                return Events.DEATH_MARK_ISSUE
-              } else {
-                return Events.DEATH_MARK_CERT
-              }
+              return Events[`${eventType}_MARK_CERT`]
             }
-          } else {
-            if (hasRegisterScope(request)) {
-              if (isADuplicate) {
-                return Events.DEATH_NEW_DEC
-              }
-
-              return Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-            }
-
-            if (hasValidateScope(request)) {
-              return Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
-            }
-
-            return isInProgressDeclaration(fhirBundle)
-              ? Events.DEATH_IN_PROGRESS_DEC
-              : Events.DEATH_NEW_DEC
           }
+        } else {
+          if (hasRegisterScope(request)) {
+            if (isADuplicate) {
+              return Events[`${eventType}_NEW_DEC`]
+            }
+            return Events[
+              `REGISTRAR_${eventType}_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION`
+            ]
+          }
+          if (hasValidateScope(request)) {
+            return Events[`${eventType}_REQUEST_FOR_REGISTRAR_VALIDATION`]
+          }
+          return isInProgressDeclaration(fhirBundle)
+            ? Events[`${eventType}_IN_PROGRESS_DEC`]
+            : Events[`${eventType}_NEW_DEC`]
         }
       }
+
       if (firstEntry.resourceType === 'Task' && !isNewEntry) {
         const eventType = getEventType(fhirBundle)
-        if (eventType === EVENT_TYPE.BIRTH) {
-          if (hasValidateScope(request)) {
-            return Events.BIRTH_MARK_VALID
-          }
-          if (hasRegisterScope(request)) {
-            return Events.BIRTH_MARK_REG
-          }
-        } else if (eventType === EVENT_TYPE.DEATH) {
-          if (hasValidateScope(request)) {
-            return Events.DEATH_MARK_VALID
-          }
-          if (hasRegisterScope(request)) {
-            return Events.DEATH_MARK_REG
-          }
+        if (hasValidateScope(request)) {
+          return Events[`${eventType}_MARK_VALID`]
+        }
+        if (hasRegisterScope(request)) {
+          return Events[`${eventType}_MARK_REG`]
         }
       }
     }
@@ -242,26 +151,15 @@ function detectEvent(request: Hapi.Request): Events {
     }
 
     const eventType = getEventType(fhirBundle)
-    if (eventType === EVENT_TYPE.BIRTH) {
-      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
-        return Events.BIRTH_MARK_REINSTATED
-      }
-      if (isRejectedTask(taskResource)) {
-        return Events.BIRTH_MARK_VOID
-      }
-      if (isArchiveTask(taskResource)) {
-        return Events.BIRTH_MARK_ARCHIVED
-      }
-    } else if (eventType === EVENT_TYPE.DEATH) {
-      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
-        return Events.DEATH_MARK_REINSTATED
-      }
-      if (isRejectedTask(taskResource)) {
-        return Events.DEATH_MARK_VOID
-      }
-      if (isArchiveTask(taskResource)) {
-        return Events.DEATH_MARK_ARCHIVED
-      }
+
+    if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
+      return Events[`${eventType}_MARK_REINSTATED`]
+    }
+    if (isRejectedTask(taskResource)) {
+      return Events[`${eventType}_MARK_VOID`]
+    }
+    if (isArchiveTask(taskResource)) {
+      return Events[`${eventType}_MARK_ARCHIVED`]
     }
   }
   return Events.UNKNOWN
@@ -291,145 +189,65 @@ export async function fhirWorkflowEventHandler(
 
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
+    case Events.DEATH_IN_PROGRESS_DEC:
+    case Events.MARRIAGE_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_IN_PROGRESS_DEC,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_NEW_DEC:
+    case Events.DEATH_NEW_DEC:
+    case Events.MARRIAGE_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(Events.BIRTH_NEW_DEC, request.payload, request.headers)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
+    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
+    case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
+    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_REQUEST_CORRECTION:
-      response = await markEventAsRequestedForCorrectionHandler(request, h)
-      await triggerEvent(
-        Events.BIRTH_REQUEST_CORRECTION,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.DEATH_REQUEST_CORRECTION:
+    case Events.MARRIAGE_REQUEST_CORRECTION:
       response = await markEventAsRequestedForCorrectionHandler(request, h)
-      await triggerEvent(
-        Events.DEATH_REQUEST_CORRECTION,
-        request.payload,
-        request.headers
-      )
-      break
-    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
+    case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
+    case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_MARK_REINSTATED:
     case Events.DEATH_MARK_REINSTATED:
+    case Events.MARRIAGE_MARK_REINSTATED:
       response = await updateTaskHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
       break
-    case Events.DEATH_IN_PROGRESS_DEC:
-      response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_IN_PROGRESS_DEC,
-        request.payload,
-        request.headers
-      )
-      break
-    case Events.DEATH_NEW_DEC:
-      response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(Events.DEATH_NEW_DEC, request.payload, request.headers)
-      break
-    case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.BIRTH_MARK_VALID:
-      response = await markEventAsValidatedHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_MARK_VALID,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.DEATH_MARK_VALID:
+    case Events.MARRIAGE_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_MARK_VALID,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_MARK_REG:
-      response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_MARK_REG,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.DEATH_MARK_REG:
+    case Events.MARRIAGE_MARK_REG:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_MARK_REG,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
+
     case Events.BIRTH_MARK_CERT:
-      response = await markEventAsCertifiedHandler(request, h)
-      await triggerEvent(
-        Events.BIRTH_MARK_CERT,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.DEATH_MARK_CERT:
+    case Events.MARRIAGE_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
-      await triggerEvent(
-        Events.DEATH_MARK_CERT,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_MARK_ISSUE:
       response = await markEventAsIssuedHandler(request, h)
@@ -447,24 +265,23 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
-    case Events.BIRTH_MARK_VOID:
-      response = await updateTaskHandler(request, h, event)
+    case Events.MARRIAGE_MARK_ISSUE:
+      response = await markEventAsIssuedHandler(request, h)
       await triggerEvent(
-        Events.BIRTH_MARK_VOID,
+        Events.MARRIAGE_MARK_ISSUE,
         request.payload,
         request.headers
       )
       break
+    case Events.BIRTH_MARK_VOID:
     case Events.DEATH_MARK_VOID:
+    case Events.MARRIAGE_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_MARK_VOID,
-        request.payload,
-        request.headers
-      )
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_MARK_ARCHIVED:
     case Events.DEATH_MARK_ARCHIVED:
+    case Events.MARRIAGE_MARK_ARCHIVED:
       response = await updateTaskHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
       break

@@ -29,13 +29,9 @@ import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEve
 
 import {
   inProgressHandler,
-  markBirthRegisteredHandler,
   markCertifiedHandler,
-  markDeathRegisteredHandler,
   markRejectedHandler,
   markValidatedHandler,
-  newBirthRegistrationHandler,
-  newDeathRegistrationHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
   requestCorrectionHandler,
@@ -45,11 +41,11 @@ import {
   waitingExternalValidationHandler,
   declarationViewedHandler,
   declarationDownloadedHandler,
-  birthDeclarationArchivedHandler,
-  deathDeclarationArchivedHandler,
-  birthDeclarationReinstatedHandler,
-  deathDeclarationReinstatedHandler,
+  declarationArchivedHandler,
+  declarationReinstatedHandler,
   declarationUpdatedHandler,
+  markEventRegisteredHandler,
+  newEventRegistrationHandler,
   markIssuedHandler
 } from '@metrics/features/registration/handler'
 import {
@@ -80,200 +76,172 @@ import {
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
+export enum EventType {
+  BIRTH = 'birth',
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
+}
 
 export const getRoutes = () => {
   const routes = [
     // In progress declaration
     {
       method: 'POST',
-      path: '/events/birth/in-progress-declaration',
+      path: '/events/{event}/in-progress-declaration',
       handler: inProgressHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/in-progress-declaration',
-      handler: inProgressHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // New declaration
     {
       method: 'POST',
-      path: '/events/birth/new-declaration',
+      path: '/events/{event}/new-declaration',
       handler: newDeclarationHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-declaration',
-      handler: newDeclarationHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/birth/request-for-registrar-validation',
+      path: '/events/{event}/request-for-registrar-validation',
       handler: requestForRegistrarValidationHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/request-for-registrar-validation',
-      handler: requestForRegistrarValidationHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/birth/waiting-external-resource-validation',
+      path: '/events/{event}/waiting-external-resource-validation',
       handler: waitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-external-resource-validation',
-      handler: waitingExternalValidationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/registrar-registration-waiting-external-resource-validation',
+      path: '/events/{event}/registrar-registration-waiting-external-resource-validation',
       handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
+
     {
       method: 'POST',
-      path: '/events/death/registrar-registration-waiting-external-resource-validation',
-      handler: registrarRegistrationWaitingExternalValidationHandler,
+      path: '/events/{event}/new-registration',
+      handler: newEventRegistrationHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/new-registration',
-      handler: newBirthRegistrationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-registration',
-      handler: newDeathRegistrationHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark validated
     {
       method: 'POST',
-      path: '/events/birth/mark-validated',
+      path: '/events/{event}/mark-validated',
       handler: markValidatedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-validated',
-      handler: markValidatedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark registered
     {
       method: 'POST',
-      path: '/events/birth/mark-registered',
-      handler: markBirthRegisteredHandler,
+      path: '/events/{event}/mark-registered',
+      handler: markEventRegisteredHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/death/mark-registered',
-      handler: markDeathRegisteredHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-
     // Mark certified
     {
       method: 'POST',
-      path: '/events/birth/mark-certified',
+      path: '/events/{event}/mark-certified',
       handler: markCertifiedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-certified',
-      handler: markCertifiedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark issued
     {
       method: 'POST',
-      path: '/events/birth/mark-issued',
+      path: '/events/{event}/mark-issued',
       handler: markIssuedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-issued',
-      handler: markIssuedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark rejected
     {
       method: 'POST',
-      path: '/events/birth/mark-voided',
+      path: '/events/{event}/mark-voided',
       handler: markRejectedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-voided',
-      handler: markRejectedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
@@ -301,20 +269,18 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
-      path: '/events/birth/request-correction',
+      path: '/events/{event}/request-correction',
       handler: requestCorrectionHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/death/request-correction',
-      handler: requestCorrectionHandler,
-      config: {
-        tags: ['api']
-      }
-    },
+
     // Event assigned / unassigned
     {
       method: 'POST',
@@ -342,34 +308,28 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/birth/mark-archived',
-      handler: birthDeclarationArchivedHandler,
+      path: '/events/{event}/mark-archived',
+      handler: declarationArchivedHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {
       method: 'POST',
-      path: '/events/death/mark-archived',
-      handler: deathDeclarationArchivedHandler,
+      path: '/events/{event}/mark-reinstated',
+      handler: declarationReinstatedHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/mark-reinstated',
-      handler: birthDeclarationReinstatedHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-reinstated',
-      handler: deathDeclarationReinstatedHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {

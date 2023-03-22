@@ -2490,6 +2490,83 @@ export const mockDeathRejectionTaskBundle = {
   ]
 }
 
+export const mockMarriageRejectionTaskBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a/_history/57a41663-6f07-42b7-9cce-c2945ddd3a0c',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'MARRIAGE'
+            }
+          ]
+        },
+        focus: {
+          reference: 'Composition/37df1f45-0b27-43da-aebb-8041a73cb103'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/marriage-tracking-id',
+            value: 'DKCGBVI'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'REJECTED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-27T11:44:41.407Z',
+        meta: {
+          lastUpdated: '2019-03-27T11:38:44.701+00:00',
+          versionId: '57a41663-6f07-42b7-9cce-c2945ddd3a0c'
+        },
+        id: 'be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a',
+        note: [
+          {
+            text: 'reason=missing_supporting_doc&comment=No documents found!',
+            time: 'Wed, 27 Mar 2019 11:44:41 GMT',
+            authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+          }
+        ]
+      },
+      request: {
+        method: 'POST',
+        url: 'Task'
+      }
+    }
+  ]
+}
+
 export const mockDeathRejectionTaskBundleWithoutCompositionReference = {
   resourceType: 'Bundle',
   type: 'document',
@@ -3519,6 +3596,272 @@ export const mockMinimalDeathFhirBundle = {
   }
 }
 
+export const mockMinimalMarriageFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  meta: {
+    lastUpdated: '2019-03-19T13:05:13.524Z'
+  },
+  entry: [
+    {
+      fullUrl: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1',
+      resource: {
+        id: 'ff6a4fce-4e72-463c-a6aa-718054643983',
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'DH86EY1'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'marriage-declaration'
+            }
+          ],
+          text: 'Marriage Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Marriage Declaration',
+        section: [
+          {
+            title: 'Bride details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'bride-details'
+                }
+              ],
+              text: 'Bride details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd'
+              }
+            ]
+          },
+          {
+            title: 'Groom details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'groom-details'
+                }
+              ],
+              text: 'Groom details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd'
+              }
+            ]
+          },
+          {
+            title: 'Marriage encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'marriage-encounter'
+                }
+              ],
+              text: 'Marriage encounter'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df'
+              }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-03-19T13:05:13.524Z',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '1234567890123',
+            type: 'NATIONAL_ID'
+          }
+        ],
+        name: [
+          {
+            use: 'bn',
+            family: ['এলাস্তিচ']
+          },
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        gender: 'male',
+        birthDate: '1940-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        address: [
+          {
+            type: 'PRIMARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'SECONDARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        deceasedBoolean: true,
+        deceasedDateTime: '2019-02-01',
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9'
+            }
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9',
+      resource: {
+        resourceType: 'Location',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/ee72f497-343f-4f0f-9062-d618fafc175c'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'PRIMARY_ADDRESS'
+            }
+          ]
+        },
+        address: {
+          type: 'PRIMARY_ADDRESS',
+          line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+          country: 'BGD'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'MARRIAGE'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/marriage-tracking-id',
+            value: 'DH86EY1'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-19T13:05:19.260Z'
+      }
+    }
+  ]
+}
+
 export const dummyUser = {
   _id: '5d027bc403b93b17526323f6',
   name: [
@@ -3845,6 +4188,736 @@ export const mockTaskBundleWithExtensions = {
           versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
         },
         id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+      }
+    }
+  ]
+}
+
+export const mockMarriageFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1',
+      resource: {
+        id: 'ff6a4fce-4e72-463c-a6aa-718054643983',
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'DH86EY1'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'marriage-declaration'
+            }
+          ],
+          text: 'Marriage Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Marriage Declaration',
+        section: [
+          {
+            title: 'Bride details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'bride-details'
+                }
+              ],
+              text: 'Bride details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd'
+              }
+            ]
+          },
+          {
+            title: 'Groom details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'groom-details'
+                }
+              ],
+              text: 'Groom details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9dc4e44-987a-4313-89b1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'WitnessOne details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'witness-one-details'
+                }
+              ],
+              text: 'WitnessOne details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9rc4e44-987a-4313-89b1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'WitnessTwo details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'witness-two-details'
+                }
+              ],
+              text: 'WitnessTwo details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9rc4e49-983a-4313-89c1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'Marriage encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'marriage-encounter'
+                }
+              ],
+              text: 'Marriage encounter'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df'
+              }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-03-19T13:05:13.524Z',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '1234567890123',
+            type: 'NATIONAL_ID'
+          }
+        ],
+        name: [
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        gender: 'male',
+        birthDate: '1940-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        address: [
+          {
+            type: 'PRIMARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'SECONDARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        deceasedBoolean: true,
+        deceasedDateTime: '2019-02-01',
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9dc4e44-987a-4313-89b1-0a71780c6bea',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '1234567890123',
+            type: 'NATIONAL_ID'
+          }
+        ],
+        name: [
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        gender: 'male',
+        birthDate: '1940-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        address: [
+          {
+            type: 'PRIMARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'SECONDARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        deceasedBoolean: true,
+        deceasedDateTime: '2019-02-01',
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9rc4e44-987a-4313-89b1-0a71780c6bea',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'en',
+            given: ['Habiba'],
+            family: ['Akter']
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9rc4e49-983a-4313-89c1-0a71780c6bea',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'en',
+            given: ['Farabi'],
+            family: ['Akter']
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9'
+            }
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9',
+      resource: {
+        resourceType: 'Location',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/ee72f497-343f-4f0f-9062-d618fafc175c'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'PRIMARY_ADDRESS'
+            }
+          ]
+        },
+        address: {
+          type: 'PRIMARY_ADDRESS',
+          line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+          country: 'BGD'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'MARRIAGE'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'DH86EY1'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-19T13:05:19.260Z'
+      }
+    }
+  ]
+}
+
+export const mockMarriageFhirBundleWithoutCompositionId = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'DH86EY1'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'marriage-declaration'
+            }
+          ],
+          text: 'Marriage Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Marriage Declaration',
+        section: [
+          {
+            title: 'Bride details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'bride-details'
+                }
+              ],
+              text: 'Bride details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd'
+              }
+            ]
+          },
+          {
+            title: 'Groom details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'groom-details'
+                }
+              ],
+              text: 'Groom details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9dc4e44-987a-4313-89b1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'WitnessOne details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'witness-one-details'
+                }
+              ],
+              text: 'WitnessOne details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9rc4e44-987a-4313-89b1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'WitnessTwo details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'witness-two-details'
+                }
+              ],
+              text: 'WitnessTwo details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9rc4e49-983a-4313-89c1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'Marriage encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'marriage-encounter'
+                }
+              ],
+              text: 'Marriage encounter'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df'
+              }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-03-19T13:05:13.524Z',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '1234567890123',
+            type: 'NATIONAL_ID'
+          }
+        ],
+        name: [
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        gender: 'male',
+        birthDate: '1940-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        address: [
+          {
+            type: 'PRIMARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'SECONDARY_ADDRESS',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        deceasedBoolean: true,
+        deceasedDateTime: '2019-02-01',
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9rc4e44-987a-4313-89b1-0a71780c6bea',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'en',
+            given: ['Habiba'],
+            family: ['Akter']
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9rc4e49-983a-4313-89c1-0a71780c6bea',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'en',
+            given: ['Farabi'],
+            family: ['Akter']
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9'
+            }
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9',
+      resource: {
+        resourceType: 'Location',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/ee72f497-343f-4f0f-9062-d618fafc175c'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'PRIMARY_ADDRESS'
+            }
+          ]
+        },
+        address: {
+          type: 'PRIMARY_ADDRESS',
+          line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+          country: 'BGD'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'MARRIAGE'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'DH86EY1'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-19T13:05:19.260Z'
       }
     }
   ]
