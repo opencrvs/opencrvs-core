@@ -616,7 +616,6 @@ export const ActionDetailsModal = ({
   offlineData: Partial<IOfflineData>
   draft: IDeclaration | null
 }) => {
-  console.log(actionDetailsData)
   if (isEmpty(actionDetailsData)) return <></>
 
   const title = getStatusLabel(

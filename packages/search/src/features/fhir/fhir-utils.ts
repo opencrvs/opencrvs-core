@@ -21,16 +21,6 @@ export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
 }
 
-export interface ITaskBundleEntry extends fhir.BundleEntry {
-  resource: fhir.Task
-}
-
-export interface ITaskBundle extends fhir.Bundle {
-  resourceType: fhir.code
-  // prettier-ignore
-  entry: [ITaskBundleEntry]
-}
-
 export function findCompositionSection(
   code: string,
   composition: ITemplatedComposition
