@@ -1872,6 +1872,7 @@ export type QuestionInput = {
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
   unit?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
   validator?: InputMaybe<Array<ValidatorInput>>
 }
 
