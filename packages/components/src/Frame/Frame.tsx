@@ -49,7 +49,6 @@ const FrameHeader = styled.header`
 const FrameMainContent = styled.main`
   grid-area: content;
   height: 100%;
-  overflow-y: auto;
   background: ${({ theme }) => theme.colors.background};
 `
 
