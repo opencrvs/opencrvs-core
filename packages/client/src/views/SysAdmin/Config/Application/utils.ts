@@ -185,12 +185,9 @@ export const getFormattedFee = (value: string) => {
 }
 
 export const isWithinFileLength = (base64data: string) => {
-  const baseStr = base64data.substring(22)
+  const baseStr = base64data.split(',')[1]
   const decoded = window.atob(baseStr)
-  if (decoded.length >= 2000000) {
-    return false
-  }
-  return true
+  return decoded.length < 2000000
 }
 
 const isGeneralOrConfigAction = (

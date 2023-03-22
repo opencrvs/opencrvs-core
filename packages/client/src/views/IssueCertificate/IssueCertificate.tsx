@@ -42,8 +42,8 @@ export function IssueCertificate() {
     <Frame
       header={
         <AppBar
-          mobileLeft={<HistoryNavigator hideForward={true} />}
           mobileTitle={intl.formatMessage(issueMessages.issueCertificate)}
+          mobileLeft={<HistoryNavigator hideForward={true} />}
           mobileRight={
             <Button
               size="medium"
