@@ -42,15 +42,15 @@ export function IssueCertificate() {
     <Frame
       header={
         <AppBar
-          mobileLeft={<HistoryNavigator hideForward={true} />}
           mobileTitle={intl.formatMessage(issueMessages.issueCertificate)}
+          mobileLeft={<HistoryNavigator hideForward={true} />}
           mobileRight={
             <Button
               size="medium"
-              type="tertiary"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
           desktopTitle={intl.formatMessage(issueMessages.issueCertificate)}
@@ -58,10 +58,10 @@ export function IssueCertificate() {
           desktopRight={
             <Button
               size="medium"
-              type="tertiary"
+              type="icon"
               onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))}
             >
-              <Icon name={'X'} />
+              <Icon name={'X'} weight={'bold'} />
             </Button>
           }
         />

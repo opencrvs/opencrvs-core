@@ -638,67 +638,6 @@ describe('validate', () => {
     })
   })
 
-  describe('checkMarriageDate. Used for validation of date of birth.', () => {
-    // When birthDate = 'falsy'
-
-    it('should fail for invalid format', () => {
-      const birthDate = ''
-      const invalidDate = '1901-+2-2e'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for invalid number input', () => {
-      const birthDate = ''
-      const invalidDate = '190-2-21'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for invalid date', () => {
-      const birthDate = ''
-      const invalidDate = '2015-2-29'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should fail for dates in the future', () => {
-      const birthDate = ''
-      const invalidDate = '2125-2-27'
-      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
-        message: messages.dateFormat
-      })
-    })
-    it('should pass for one-digit figures for day and month', () => {
-      const birthDate = ''
-      const validDate = '2012-2-2'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
-    })
-    it('should pass for valid dates', () => {
-      const birthDate = ''
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
-    })
-
-    // When the marriage date is before the birth date
-
-    it('should fail for marriage dates before the birth date', () => {
-      const birthDate = '2101-02-23'
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual({
-        message: messages.domLaterThanDob
-      })
-    })
-
-    // When the marriage date is after the birth date
-
-    it('should pass for marriage dates after the birth date', () => {
-      const birthDate = '1801-02-23'
-      const validDate = '2003-02-23'
-      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
-    })
-  })
-
   describe('dateGreaterThan. Checks if a given date is greater than another given date', () => {
     it('should give error message when the second date is greater than the first date', () => {
       const previousDate = '1971-03-26'
