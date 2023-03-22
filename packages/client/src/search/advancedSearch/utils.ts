@@ -159,8 +159,6 @@ export const transformAdvancedSearchLocalStateToStoreData = (
         ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
-        : localState.registrationStatuses === 'REGISTERED'
-        ? [RegStatus.Registered, RegStatus.Certified]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -301,6 +299,11 @@ export const transformStoreDataToAdvancedSearchLocalState = (
             ].sort()
           )
         ? 'IN_REVIEW'
+        : isEqual(
+            [...reduxState.registrationStatuses].sort(),
+            [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued].sort()
+          )
+        ? 'REGISTERED'
         : 'ALL'
   } else {
     localState.registrationStatuses = ''
