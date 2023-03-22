@@ -15,7 +15,7 @@ import {
 } from '@client/forms/mappings/query/field-mappings'
 import { IFormField } from '@client/forms'
 import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
-import { LocationType } from '@client/utils/gateway'
+import { LocationType, IdentityIdType } from '@client/utils/gateway'
 
 describe('Query FieldMapping', () => {
   it('Should return valid data', () => {
@@ -40,12 +40,13 @@ describe('Query FieldMapping', () => {
 
   it('Should return a new ', () => {
     const factory = identityToFieldTransformer('id', 'nationalId')
-    const expectedResult = { mother: { nationalId: 151515 } }
+    const expectedResult = { mother: { nationalId: '151515' } }
     const queryData = {
       id: '12345',
       mother: {
         identifier: [
           {
+            type: 'nationalId' as IdentityIdType,
             id: '151515'
           }
         ]
