@@ -260,9 +260,9 @@ export const ActionDetailsModalListTable = ({
   const potentialDuplicatesTransformer = (items: string[]) => {
     return (
       <>
-        {items.map((ite) => {
-          return <div>{ite}</div>
-        })}
+        {items.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
       </>
     )
   }
