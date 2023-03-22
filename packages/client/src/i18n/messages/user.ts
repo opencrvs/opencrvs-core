@@ -230,7 +230,7 @@ const messagesToDefine: IUserMessages = {
     id: 'userSetup.type.healthSystem'
   },
   system: {
-    defaultMessage: ' System',
+    defaultMessage: 'System',
     description: 'The description for system type',
     id: 'userSetup.type.system'
   },
