@@ -114,6 +114,13 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
             familyName
           }
           systemRole
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
         }
         startedByFacility
         startedAt
@@ -159,6 +166,13 @@ export const FETCH_REGISTRATIONS = gql`
           registrarPractitioner {
             id
             systemRole
+            role {
+              _id
+              labels {
+                lang
+                label
+              }
+            }
             primaryOffice {
               name
               id
