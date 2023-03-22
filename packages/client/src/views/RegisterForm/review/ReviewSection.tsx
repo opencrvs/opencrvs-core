@@ -745,6 +745,8 @@ const renderValue = (
   if (typeof value === 'string' || typeof value === 'number') {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : field.unit
+      ? String(value).concat(intl.formatMessage(field.unit))
       : value
   }
 
@@ -1779,6 +1781,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
+    console.log(formSections)
     return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []

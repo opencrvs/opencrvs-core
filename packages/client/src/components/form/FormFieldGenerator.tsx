@@ -473,7 +473,7 @@ function GeneratedInputField({
   }
   if (fieldDefinition.type === NUMBER) {
     let inputFieldWidth = fieldDefinition.inputFieldWidth
-    if (!inputFieldWidth && fieldDefinition?.inputWidth) {
+    if (fieldDefinition?.inputWidth) {
       inputFieldWidth = fieldDefinition.inputWidth + 'px'
     }
 
