@@ -574,7 +574,7 @@ export const ActionDetailsModalListTable = ({
         />
       )}
 
-      {/* Matched of */}
+      {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&
         actionDetailsData.action === RegAction.FlaggedAsPotentialDuplicate && (
           <Table
