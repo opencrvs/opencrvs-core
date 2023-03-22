@@ -42,6 +42,7 @@ interface IUserMessages
   HIGH_SCHOOL: MessageDescriptor
   HOSPITAL: MessageDescriptor
   healthSystem: MessageDescriptor
+  system: MessageDescriptor
   labelEnglishName: MessageDescriptor
   LOCAL_REGISTRAR: MessageDescriptor
   LOCAL_SYSTEM_ADMIN: MessageDescriptor
@@ -227,6 +228,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Health System',
     description: 'The description for health system type',
     id: 'userSetup.type.healthSystem'
+  },
+  system: {
+    defaultMessage: ' System',
+    description: 'The description for system type',
+    id: 'userSetup.type.system'
   },
   labelEnglishName: {
     defaultMessage: 'English name',
