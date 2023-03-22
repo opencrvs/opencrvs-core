@@ -65,6 +65,10 @@ import { constantsMessages } from '@client/i18n/messages'
 import { Outbox } from './outbox/Outbox'
 import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { Event } from '@client/utils/gateway'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -89,6 +93,7 @@ interface IDispatchProps {
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   goToHomeTab: typeof goToHomeTab
+  getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
 }
@@ -98,6 +103,7 @@ type IBaseOfficeHomeStateProps = ReturnType<typeof mapStateToProps>
 interface IOfficeHomeState {
   draftCurrentPage: number
   showCertificateToast: boolean
+  offlineResources: IOfflineData
 }
 
 type IOfficeHomeProps = IntlShapeProps &
@@ -156,7 +162,8 @@ class OfficeHomeView extends React.Component<
         this.props.declarations.filter(
           (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
         ).length
-      )
+      ),
+      offlineResources: this.props.offlineResources
     }
   }
 
@@ -273,13 +280,24 @@ class OfficeHomeView extends React.Component<
     externalValidationCurrentPage: number,
     requireUpdateCurrentPage: number
   ) => {
-    const { workqueue, tabId, drafts, selectorId, storedDeclarations } =
-      this.props
+    const {
+      workqueue,
+      tabId,
+      drafts,
+      selectorId,
+      storedDeclarations,
+      offlineResources
+    } = this.props
     const { loading, error, data } = workqueue
     const filteredData = filterProcessingDeclarationsFromQuery(
       data,
       storedDeclarations
     )
+
+    const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+      return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+    })
 
     return (
       <>
@@ -383,7 +401,7 @@ class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
-            {tabId === WORKQUEUE_TABS.readyToIssue && (
+            {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
               <ReadyToIssue
                 queryData={{
                   data: filteredData.issueTab
@@ -511,6 +529,7 @@ function mapStateToProps(
     (match.params.selectorId && Number.parseInt(match.params.selectorId)) ||
     1
   return {
+    offlineResources: getOfflineData(state),
     declarations: state.declarationsState.declarations,
     workqueue: state.workqueueState.workqueue,
     language: state.i18n.language,
@@ -549,6 +568,7 @@ export const OfficeHome = connect(mapStateToProps, {
   goToPage,
   goToPrintCertificate,
   goToHomeTab,
+  getOfflineData,
   updateRegistrarWorkqueue,
   updateWorkqueuePagination
 })(injectIntl(OfficeHomeView))

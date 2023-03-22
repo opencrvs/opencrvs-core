@@ -484,13 +484,26 @@ const dynamicMessagesToDefine = {
   },
   deathServiceBefore: {
     id: 'certificate.receipt.deathService.before',
-    defaultMessage: 'Death registration before {target} days of date of birth',
-    description: 'Amount due on certificate for birth label before target days'
+    defaultMessage: 'Death registration before {target} days of date of death',
+    description: 'Amount due on certificate for death label before target days'
   },
   deathServiceAfter: {
     id: 'certificate.receipt.deathService.after',
     defaultMessage: 'Death registration after {target} days of date of death',
     description: 'Amount due on certificate for death label'
+  },
+  marriageServiceBefore: {
+    id: 'certificate.receipt.marriageService.before',
+    defaultMessage:
+      'Marriage registration before {target} days of date of marriage',
+    description:
+      'Amount due on certificate for marriage label before target days'
+  },
+  marriageServiceAfter: {
+    id: 'certificate.receipt.marriageService.after',
+    defaultMessage:
+      'Marriage registration after {target} days of date of marriage',
+    description: 'Amount due on certificate for marriage label'
   },
   birthServiceBetween: {
     id: 'certificate.receipt.birthService.between',

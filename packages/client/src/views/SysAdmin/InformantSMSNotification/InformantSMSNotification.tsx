@@ -87,7 +87,7 @@ const InformantNotification = () => {
           if (data && data.informantSMSNotifications) {
             setInformantSMSNotificationState((state) => {
               const modifiedState: IState = { ...state }
-              informantNotifitionsData.forEach((notification) => {
+              data.informantSMSNotifications?.forEach((notification) => {
                 modifiedState[notification.name as INotificationName] =
                   notification.enabled
               })
@@ -101,7 +101,7 @@ const InformantNotification = () => {
       }
     )
 
-  const informantNotifitionsData = React.useMemo(() => {
+  const informantNotificationsData = React.useMemo(() => {
     return data?.informantSMSNotifications ?? []
   }, [data])
 
@@ -266,7 +266,7 @@ const InformantNotification = () => {
           {!error && !loading && (
             <>
               <TabContent
-                items={informantNotifitionsData.filter(({ name }) =>
+                items={informantNotificationsData.filter(({ name }) =>
                   name.includes(activeTabId)
                 )}
               />
@@ -277,12 +277,12 @@ const InformantNotification = () => {
                   onClick={async () => {
                     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
                     await informantNotificationMutationHandler(
-                      informantNotifitionsData
+                      informantNotificationsData
                     )
                   }}
                   disabled={
                     !isOnline ||
-                    !isNotificationsChanges(informantNotifitionsData) ||
+                    !isNotificationsChanges(informantNotificationsData) ||
                     notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
                   }
                   loading={

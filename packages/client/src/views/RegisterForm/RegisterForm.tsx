@@ -23,7 +23,7 @@ import {
   SecondaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
+import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
 import {
   FixedEventTopBar,
   IEventTopBarProps,
@@ -60,7 +60,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
-import { Event, User } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -85,6 +85,7 @@ import {
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import {
   buttonMessages,
   constantsMessages,
@@ -97,7 +98,8 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  ACCUMULATED_FILE_SIZE,
+  EMPTY_STRING
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -108,6 +110,7 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
 
 const FormSectionTitle = styled.h4`
@@ -217,6 +220,8 @@ type State = {
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
   startTime: number
+  selectedDuplicateComId: string
+  isDuplicateDeclarationLoading: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -255,10 +260,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
-      startTime: 0
+      startTime: 0,
+      selectedDuplicateComId: props.declaration.id,
+      isDuplicateDeclarationLoading: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  setSelectedCompId = (id: string) => {
+    this.setState({ selectedDuplicateComId: id })
+  }
 
   showAllValidationErrors = () => {
     const touched = getSectionFields(
@@ -677,12 +688,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     />
                   ) : (
                     <FixedEventTopBar
-                      title={intl.formatMessage(
-                        messages.newVitalEventRegistration,
-                        {
-                          event: declaration.event
-                        }
-                      )}
+                      title={
+                        duplicate
+                          ? intl.formatMessage(
+                              duplicateMessages.duplicateReviewHeader,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                          : intl.formatMessage(
+                              messages.newVitalEventRegistration,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                      }
+                      pageIcon={duplicate ? <Duplicate /> : undefined}
                       iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
@@ -693,19 +714,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={declaration}
-                    rejectDeclarationClickEvent={this.toggleRejectForm}
-                    submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyDeclaration}
-                    onContinue={() => {
-                      this.props.goToCertificateCorrection(
-                        this.props.declaration.id,
-                        CorrectionSection.SupportingDocuments
-                      )
-                    }}
-                  />
+                  {duplicate && (
+                    <DuplicateFormTabs
+                      declaration={declaration}
+                      selectedDuplicateComId={this.state.selectedDuplicateComId}
+                      onTabClick={this.setSelectedCompId}
+                    />
+                  )}
+                  {(!duplicate ||
+                    this.state.selectedDuplicateComId === declaration.id) && (
+                    <ReviewSection
+                      pageRoute={this.props.pageRoute}
+                      draft={declaration}
+                      rejectDeclarationClickEvent={this.toggleRejectForm}
+                      submitClickEvent={this.confirmSubmission}
+                      onChangeReviewForm={this.modifyDeclaration}
+                      onContinue={() => {
+                        this.props.goToCertificateCorrection(
+                          this.props.declaration.id,
+                          CorrectionSection.SupportingDocuments
+                        )
+                      }}
+                    />
+                  )}
                 </>
               )}
 
