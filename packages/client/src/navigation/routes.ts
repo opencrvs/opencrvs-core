@@ -25,6 +25,10 @@ export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Dea
 export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
 export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Death}/:pageId/group/:groupId`
+export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${Event.Marriage}/registration/informantType`
+export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${Event.Marriage}`
+export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${Event.Marriage}/:pageId`
+export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Marriage}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
@@ -47,11 +51,17 @@ export const MY_DRAFTS = '/my-drafts'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
+export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
+export const ISSUE_VERIFY_COLLECTOR =
+  '/issue/check/:registrationId/:eventType/:collector'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
-export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
+export const PRINT_CERTIFICATE_PAYMENT =
+  '/print/payment/:registrationId/:eventType'
+export const ISSUE_CERTIFICATE_PAYMENT =
+  '/issue/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
@@ -63,6 +73,7 @@ export const CERTIFICATE_CONFIG = '/config/certificate'
 export const FORM_CONFIG_HOME = '/config/form'
 export const APPLICATION_CONFIG = '/config/application'
 export const SYSTEM_LIST = '/config/integration'
+export const USER_ROLES_CONFIG = '/config/userroles'
 export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'
@@ -97,4 +108,6 @@ export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 export const USER_PROFILE = '/userProfile/:userId'
 
 export const VIEW_RECORD = '/:declarationId/viewRecord'
+
+export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'

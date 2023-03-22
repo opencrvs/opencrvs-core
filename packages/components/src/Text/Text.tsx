@@ -17,6 +17,7 @@ import styled from 'styled-components'
 import type { Property } from 'csstype'
 
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
+type Align = 'left' | 'center'
 
 export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Typographic variant. Defines how the text looks like */
@@ -25,6 +26,8 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   element: Element
   /** Color */
   color?: IColor
+  /** Text alignment */
+  align?: Align
   /** Setting whether the browser should insert line breaks within an otherwise unbreakable string to prevent text from overflowing its line box */
   overflowWrap?: Property.OverflowWrap
 }
@@ -33,8 +36,10 @@ const StyledText = styled.span<{
   $variant: IFont
   $color: IColor
   $overflowWrap?: Property.OverflowWrap
+  $align: Align
 }>`
   ${({ $variant }) => fonts[$variant]}
+  ${({ $align }) => `text-align: ${$align};`}
   ${({ $color }) => `color: ${colors[$color]};`}
   ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap};`}
 `
@@ -45,16 +50,15 @@ export const Text = ({
   element,
   overflowWrap,
   color = 'copy',
+  align = 'left',
   ...props
-}: ITextProps) => {
-  console.log(React)
-  return (
-    <StyledText
-      $variant={variant}
-      $color={color}
-      as={element}
-      $overflowWrap={overflowWrap}
-      {...props}
-    />
-  )
-}
+}: ITextProps) => (
+  <StyledText
+    $variant={variant}
+    $color={color}
+    as={element}
+    $align={align}
+    $overflowWrap={overflowWrap}
+    {...props}
+  />
+)

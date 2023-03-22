@@ -139,7 +139,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
+        informantsSignature
         attachments {
           data
           type
@@ -193,6 +197,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -211,8 +216,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -268,6 +279,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -404,6 +416,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment
@@ -451,6 +464,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -470,8 +484,14 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -527,6 +547,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }

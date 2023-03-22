@@ -49,6 +49,8 @@ import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/u
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+
 const ToggleWrapper = styled.div`
   margin-left: 24px;
 `
@@ -87,7 +89,7 @@ const InformantNotification = () => {
           if (data && data.informantSMSNotifications) {
             setInformantSMSNotificationState((state) => {
               const modifiedState: IState = { ...state }
-              informantNotifitionsData.forEach((notification) => {
+              data.informantSMSNotifications?.forEach((notification) => {
                 modifiedState[notification.name as INotificationName] =
                   notification.enabled
               })
@@ -101,7 +103,7 @@ const InformantNotification = () => {
       }
     )
 
-  const informantNotifitionsData = React.useMemo(() => {
+  const informantNotificationsData = React.useMemo(() => {
     return data?.informantSMSNotifications ?? []
   }, [data])
 
@@ -238,6 +240,7 @@ const InformantNotification = () => {
         header={
           <AppBar
             desktopLeft={<HistoryNavigator />}
+            desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
           />
         }
@@ -265,7 +268,7 @@ const InformantNotification = () => {
           {!error && !loading && (
             <>
               <TabContent
-                items={informantNotifitionsData.filter(({ name }) =>
+                items={informantNotificationsData.filter(({ name }) =>
                   name.includes(activeTabId)
                 )}
               />
@@ -276,12 +279,12 @@ const InformantNotification = () => {
                   onClick={async () => {
                     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
                     await informantNotificationMutationHandler(
-                      informantNotifitionsData
+                      informantNotificationsData
                     )
                   }}
                   disabled={
                     !isOnline ||
-                    !isNotificationsChanges(informantNotifitionsData) ||
+                    !isNotificationsChanges(informantNotificationsData) ||
                     notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
                   }
                   loading={

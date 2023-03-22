@@ -31,7 +31,7 @@ import {
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -64,6 +64,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { constantsMessages } from '@client/i18n/messages'
 import { Outbox } from './outbox/Outbox'
 import { ArrayElement } from '@client/SubmissionController'
+import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { Event } from '@client/utils/gateway'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -88,6 +93,7 @@ interface IDispatchProps {
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   goToHomeTab: typeof goToHomeTab
+  getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
 }
@@ -97,6 +103,7 @@ type IBaseOfficeHomeStateProps = ReturnType<typeof mapStateToProps>
 interface IOfficeHomeState {
   draftCurrentPage: number
   showCertificateToast: boolean
+  offlineResources: IOfflineData
 }
 
 type IOfficeHomeProps = IntlShapeProps &
@@ -110,6 +117,7 @@ const DECLARATION_WORKQUEUE_TABS = [
   WORKQUEUE_TABS.readyForReview,
   WORKQUEUE_TABS.requiresUpdate,
   WORKQUEUE_TABS.readyToPrint,
+  WORKQUEUE_TABS.readyToIssue,
   WORKQUEUE_TABS.externalValidation
 ] as const
 
@@ -120,6 +128,7 @@ const WORKQUEUE_TABS_PAGINATION = {
   [WORKQUEUE_TABS.readyForReview]: 'reviewTab',
   [WORKQUEUE_TABS.requiresUpdate]: 'rejectTab',
   [WORKQUEUE_TABS.readyToPrint]: 'printTab',
+  [WORKQUEUE_TABS.readyToIssue]: 'issueTab',
   [WORKQUEUE_TABS.externalValidation]: 'externalValidationTab'
 } as const
 
@@ -138,7 +147,7 @@ class OfficeHomeView extends React.Component<
   pageSize = 10
   showPaginated = false
   interval: any = undefined
-  role = this.props.userDetails && this.props.userDetails.role
+  role = this.props.userDetails && this.props.userDetails.systemRole
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
       ? true
@@ -153,7 +162,8 @@ class OfficeHomeView extends React.Component<
         this.props.declarations.filter(
           (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
         ).length
-      )
+      ),
+      offlineResources: this.props.offlineResources
     }
   }
 
@@ -266,16 +276,28 @@ class OfficeHomeView extends React.Component<
     reviewCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
+    issueCurrentPage: number,
     externalValidationCurrentPage: number,
     requireUpdateCurrentPage: number
   ) => {
-    const { workqueue, tabId, drafts, selectorId, storedDeclarations } =
-      this.props
+    const {
+      workqueue,
+      tabId,
+      drafts,
+      selectorId,
+      storedDeclarations,
+      offlineResources
+    } = this.props
     const { loading, error, data } = workqueue
     const filteredData = filterProcessingDeclarationsFromQuery(
       data,
       storedDeclarations
     )
+
+    const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+      return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+    })
 
     return (
       <>
@@ -289,7 +311,7 @@ class OfficeHomeView extends React.Component<
             to={{
               pathname: PERFORMANCE_HOME,
               search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as IUserDetails
+                this.props.userDetails as UserDetails
               )}`
             }}
           />
@@ -379,6 +401,19 @@ class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
+            {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
+              <ReadyToIssue
+                queryData={{
+                  data: filteredData.issueTab
+                }}
+                pageSize={this.pageSize}
+                paginationId={issueCurrentPage}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+
             {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
           </>
         ) : (
@@ -424,6 +459,7 @@ class OfficeHomeView extends React.Component<
       reviewTab,
       approvalTab,
       printTab,
+      issueTab,
       externalValidationTab,
       rejectTab
     } = this.props
@@ -447,6 +483,7 @@ class OfficeHomeView extends React.Component<
           reviewTab,
           approvalTab,
           printTab,
+          issueTab,
           externalValidationTab,
           rejectTab
         )}
@@ -492,6 +529,7 @@ function mapStateToProps(
     (match.params.selectorId && Number.parseInt(match.params.selectorId)) ||
     1
   return {
+    offlineResources: getOfflineData(state),
     declarations: state.declarationsState.declarations,
     workqueue: state.workqueueState.workqueue,
     language: state.i18n.language,
@@ -530,6 +568,7 @@ export const OfficeHome = connect(mapStateToProps, {
   goToPage,
   goToPrintCertificate,
   goToHomeTab,
+  getOfflineData,
   updateRegistrarWorkqueue,
   updateWorkqueuePagination
 })(injectIntl(OfficeHomeView))

@@ -26,7 +26,6 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
-import { IUserDetails } from '@client/utils/userUtils'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -42,35 +41,13 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { Summary } from '@opencrvs/components/lib/Summary'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Action = styled.div`
   margin-top: 32px;
 `
 
-const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bold18};
-  margin-right: 2px;
-`
-const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.reg18};
-`
-
-function LabelValue({
-  id,
-  label,
-  value
-}: {
-  id: string
-  label: string
-  value: React.ReactNode | string
-}) {
-  return (
-    <div id={id}>
-      <StyledLabel>{label}</StyledLabel>
-      <StyledValue>{value}</StyledValue>
-    </div>
-  )
-}
 interface IProps {
   event: Event
   registrationId: string
@@ -81,7 +58,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   goToHomeTab: typeof goToHomeTab
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
@@ -159,30 +136,33 @@ class PaymentComponent extends React.Component<IFullProps> {
     return (
       <>
         <ActionPageLight
-          title={'Print certificate'}
+          title={intl.formatMessage(messages.print)}
           goBack={goBack}
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content title={intl.formatMessage(messages.payment)}>
-            <LabelValue
-              id="service"
-              label={intl.formatMessage(messages.receiptService)}
-              value={serviceMessage}
-            />
-            <LabelValue
-              id="amountDue"
-              label={intl.formatMessage(messages.amountDue)}
-              value={
-                <Currency
-                  value={paymentAmount}
-                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
-                  languagesAndCountry={
-                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
-                  }
-                />
-              }
-            />
+            <Summary id="summary">
+              <Summary.Row
+                id="service"
+                label={intl.formatMessage(messages.receiptService)}
+                value={serviceMessage}
+              />
+              <Summary.Row
+                id="amountDue"
+                label={intl.formatMessage(messages.amountDue)}
+                value={
+                  <Currency
+                    value={paymentAmount}
+                    currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                    languagesAndCountry={
+                      offlineCountryConfig.config.CURRENCY
+                        .languagesAndCountry[0]
+                    }
+                  />
+                }
+              />
+            </Summary>
             <Action>
               <PrimaryButton
                 id="Continue"
@@ -205,6 +185,8 @@ const getEvent = (eventType: string | undefined) => {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }
 

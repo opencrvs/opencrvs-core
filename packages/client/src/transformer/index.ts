@@ -27,13 +27,17 @@ import {
   isRadioGroupWithNestedField,
   getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
 import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
-import { EventRegistration, EventSearchSet } from '@client/utils/gateway'
+import {
+  EventRegistration,
+  EventSearchSet,
+  DuplicatesInfo
+} from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -299,7 +303,7 @@ export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any,
   offlineData?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: UserDetails
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -399,13 +403,27 @@ export const gqlToDraftTransformer = (
   if (queryData.history) {
     transformedData.history = queryData.history
   }
+
+  if (queryData.user?.role) {
+    transformedData.user.role = queryData.user.role._id
+  }
+
   return transformedData
 }
 
 export function getPotentialDuplicateIds(
   eventRegistration: EventRegistration | EventSearchSet | null
 ) {
-  return eventRegistration?.registration?.duplicates?.filter(
-    (duplicate): duplicate is string => !!duplicate
-  )
+  const duplicates = eventRegistration?.registration?.duplicates
+  if (duplicates && duplicates[0] && typeof duplicates[0] === 'object') {
+    return (eventRegistration?.registration?.duplicates as DuplicatesInfo[])
+      .filter(
+        (duplicate): duplicate is IDuplicates => !!duplicate.compositionId
+      )
+      .map(({ compositionId }) => compositionId)
+  } else if (duplicates && typeof duplicates[0] === 'string') {
+    return (eventRegistration?.registration?.duplicates as string[]).filter(
+      (duplicate): duplicate is string => !!duplicate
+    )
+  }
 }

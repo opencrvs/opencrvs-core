@@ -19,6 +19,8 @@ interface INotificationsMessages
   updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
   statusArchiving: MessageDescriptor
+  statusCertifying: MessageDescriptor
+  statusIssuing: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusReinstating: MessageDescriptor
@@ -29,6 +31,8 @@ interface INotificationsMessages
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
   statusWaitingToSubmit: MessageDescriptor
+  statusWaitingToCertify: MessageDescriptor
+  statusWaitingToIssue: MessageDescriptor
   userAuditSuccess: MessageDescriptor
   userFormFail: MessageDescriptor
   userFormSuccess: MessageDescriptor
@@ -37,6 +41,7 @@ interface INotificationsMessages
   downloadDeclarationFailed: MessageDescriptor
   unassigned: MessageDescriptor
   onlineUserStatus: MessageDescriptor
+  duplicateRecord: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
@@ -77,6 +82,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Certifying...',
     description: 'Label for declaration status Certifying',
     id: 'regHome.outbox.statusCertifying'
+  },
+  statusIssuing: {
+    defaultMessage: 'Issuing...',
+    description: 'Label for declaration status Issuing',
+    id: 'regHome.outbox.statusIssuing'
   },
   statusRegistering: {
     defaultMessage: 'Registering...',
@@ -122,6 +132,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to certify',
     description: 'Label for declaration status waiting for certify',
     id: 'regHome.outbox.statusWaitingToCertify'
+  },
+  statusWaitingToIssue: {
+    defaultMessage: 'Waiting to issue',
+    description: 'Label for declaration status waiting for certify',
+    id: 'regHome.outbox.statusWaitingToIssue'
   },
   statusWaitingToValidate: {
     defaultMessage: 'Waiting to send for approval',
@@ -191,6 +206,13 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'You are back online',
     id: 'misc.notif.onlineUserStatus',
     description: 'Label for online user status toast notification'
+  },
+  duplicateRecord: {
+    defaultMessage:
+      '{trackingId} is a potential duplicate. Record is ready for review.',
+    id: 'misc.notif.duplicateRecord',
+    description:
+      'Label for when a duplicate record is detected when registering a record.'
   }
 }
 

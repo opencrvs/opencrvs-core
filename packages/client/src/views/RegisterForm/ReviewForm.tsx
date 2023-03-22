@@ -13,7 +13,6 @@ import * as React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@client/styledComponents'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   RegisterForm,
   FullProps
@@ -54,10 +53,6 @@ type IProps = IReviewProps &
 export interface IReviewSectionDetails {
   [key: string]: any
 }
-
-const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
-`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -135,7 +130,6 @@ function mapStatetoProps(
   const declaration = state.declarationsState.declarations.find(
     ({ id, review }) => id === match.params.declarationId && review === true
   )
-  const historyState = history.location.state as any
   return {
     declaration,
     scope: getScope(state),
@@ -143,7 +137,7 @@ function mapStatetoProps(
     event: getEvent(match.params.event),
     registerForm: form,
     pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
-    duplicate: historyState && historyState.duplicate
+    duplicate: Boolean(declaration?.duplicates?.length)
   }
 }
 

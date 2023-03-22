@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -53,7 +54,7 @@ import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getRolesQuery } from '@client/forms/user/query/queries'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
@@ -82,7 +83,10 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ISSUE,
+  [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
+    SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
 } as const
 
@@ -1259,9 +1263,12 @@ export const currentUserDeclarations = {
   ]
 }
 
-export const userDetails = {
+export const userDetails: UserDetails = {
   userMgntUserID: '123',
-  language: 'en',
+  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+  status: 'active' as Status,
+  creationDate: '1487076708000',
+  practitionerId: '12345',
   name: [
     {
       use: 'en',
@@ -1270,7 +1277,16 @@ export const userDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  role: 'FIELD_AGENT',
+  systemRole: SystemRoleType.FieldAgent,
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'ENTREPENEUR'
+      }
+    ]
+  },
   mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
@@ -1349,7 +1365,7 @@ export const userDetails = {
     }
   ],
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR',
+    role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -1471,7 +1487,7 @@ export const mockUserResponse = {
           }
         ]
       },
-      role: 'LOCAL_REGISTRAR'
+      systemRole: 'LOCAL_REGISTRAR'
     }
   }
 }
@@ -1536,7 +1552,7 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_SYSTEM_ADMIN',
+      systemRole: 'LOCAL_SYSTEM_ADMIN',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1620,7 +1636,7 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_REGISTRAR',
+      systemRole: 'LOCAL_REGISTRAR',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1819,6 +1835,139 @@ export const mockDeathDeclarationData = {
   }
 }
 
+export const mockMarriageDeclarationData = {
+  registration: {
+    informantType: {
+      value: 'GROOM',
+      nestedFields: {
+        otherInformantType: ''
+      }
+    },
+    contactPoint: {
+      value: 'GROOM',
+      nestedFields: {
+        registrationPhone: '0751515152'
+      }
+    },
+    _fhirID: 'a833a452-3472-408f-87e3-ad7c6e2cdcd9',
+    trackingId: 'M2LA47X',
+    registrationNumber: '2023M2LA47X',
+    type: 'marriage',
+    groomSignature: 'data:image/png;base64,iVBORw0KGgoAAQmCC',
+    brideSignature: 'data:image/png;base64,iVBORw0KGgomCC',
+    witnessOneSignature: 'data:image/png;base64,iVBORw0KGgNSUCC',
+    commentsOrNotes: '',
+    regStatus: {
+      type: 'REGISTERED',
+      statusDate: '2023-03-09T09:22:12.673Z',
+      officeName: 'Ibombo District Office',
+      officeAlias: 'Ibombo District Office',
+      officeAddressLevel3: '',
+      officeAddressLevel4: ''
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'BRIDE'
+        },
+        hasShowedVerifiedDocument: true
+      }
+    ]
+  },
+  groom: {
+    nationality: 'FAR',
+    iD: '1296566563',
+    groomBirthDate: '1998-12-12',
+    exactDateOfBirthUnknown: false,
+    firstNamesEng: 'Sadman',
+    familyNameEng: 'Anik',
+    marriedLastNameEng: 'Groom Last Name',
+    countryPrimary: 'FAR',
+    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrbanPrimary: 'URBAN',
+    cityUrbanOptionPrimary: '',
+    addressLine3UrbanOptionPrimary: '',
+    addressLine2UrbanOptionPrimary: '',
+    numberUrbanOptionPrimary: '',
+    postcodePrimary: '',
+    addressLine5Primary: '',
+    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    internationalCityPrimary: '',
+    internationalAddressLine1Primary: '',
+    internationalAddressLine2Primary: '',
+    internationalAddressLine3Primary: '',
+    internationalPostcodePrimary: '',
+    _fhirID: '89113c35-1310-4d8f-9352-0269a04a1c4a'
+  },
+  bride: {
+    nationality: 'FAR',
+    iD: '',
+    brideBirthDate: '1998-12-12',
+    exactDateOfBirthUnknown: false,
+    firstNamesEng: 'Kaitlin',
+    familyNameEng: 'Samo',
+    marriedLastNameEng: 'Bride Last Name',
+    countryPrimary: 'FAR',
+    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrbanPrimary: 'URBAN',
+    cityUrbanOptionPrimary: '',
+    addressLine3UrbanOptionPrimary: '',
+    addressLine2UrbanOptionPrimary: '',
+    numberUrbanOptionPrimary: '',
+    postcodePrimary: '',
+    addressLine5Primary: '',
+    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    internationalCityPrimary: '',
+    internationalAddressLine1Primary: '',
+    internationalAddressLine2Primary: '',
+    internationalAddressLine3Primary: '',
+    internationalPostcodePrimary: '',
+    _fhirID: '09a68a88-921f-4eaf-8424-7d9d43e5804c'
+  },
+  marriageEvent: {
+    marriageDate: '2020-12-12',
+    typeOfMarriage: 'MONOGAMY',
+    country: 'FAR',
+    state: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    district: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrban: 'URBAN',
+    addressLine3UrbanOption: '',
+    addressLine2UrbanOption: '',
+    numberUrbanOption: '',
+    addressLine5: '',
+    internationalAddressLine1: '',
+    internationalAddressLine2: '',
+    internationalAddressLine3: ''
+  },
+  witnessOne: {
+    firstNamesEng: 'Sadman',
+    familyNameEng: 'Anik',
+    relationship: 'headOfGroomFamily',
+    _fhirID: '36972633-1c80-4fb4-a636-17f7dc9c2e14'
+  },
+  witnessTwo: {
+    firstNamesEng: 'Edgar',
+    familyNameEng: 'Samo',
+    relationship: 'headOfGroomFamily',
+    _fhirID: '1745b3d2-74fd-4b22-ba62-1c851d632f55'
+  },
+  documents: {
+    imageUploader: [
+      {
+        data: 'base64-data',
+        type: 'image/jpeg',
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
+        title: "Proof of Deceased's ID",
+        description: 'National ID (front)'
+      }
+    ]
+  }
+}
+
 export const mockBirthRegistrationSectionData = {
   whoseContactDetails: {
     value: 'MOTHER',
@@ -1919,6 +2068,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
@@ -1932,6 +2082,7 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }
@@ -2197,8 +2348,16 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          role: RoleType.FieldAgent,
-          type: 'CHA',
+          systemRole: SystemRoleType.FieldAgent,
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'CHA'
+              }
+            ]
+          },
           status: Status.Active,
           name: [
             {
@@ -2224,7 +2383,8 @@ export function loginAsFieldAgent(store: AppStore) {
           primaryOffice: {
             id: '0d8474da-0361-4d32-979e-af91f012340a',
             name: 'Kaliganj Union Sub Center',
-            status: 'active'
+            status: 'active',
+            alias: ['বানিয়াজান']
           },
           localRegistrar: {
             name: [
@@ -2234,7 +2394,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: RoleType.LocalRegistrar,
+            role: SystemRoleType.LocalRegistrar,
             signature: undefined
           }
         }
@@ -2277,43 +2437,367 @@ export function createRouterProps<
   return { location, history, match }
 }
 
+export const mockRoles = {
+  data: {
+    getSystemRoles: [
+      {
+        id: '63c7ebee48dc29888b5b020d',
+        value: 'FIELD_AGENT',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c279',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Health Worker',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Professionnel de Santé',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          },
+          {
+            _id: '63ef9466f708ea080777c27a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Police Worker',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Agent de Police',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          },
+          {
+            _id: '63ef9466f708ea080777c27b',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Social Worker',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Travailleur Social',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          },
+          {
+            _id: '63ef9466f708ea080777c27c',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Leader',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Leader Local',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b020e',
+        value: 'REGISTRATION_AGENT',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c27d',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Registration Agent',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: "Agent d'enregistrement",
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b020f',
+        value: 'LOCAL_REGISTRAR',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c27e',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Registrar',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire local',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b0210',
+        value: 'LOCAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c27f',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local System Admin',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système local',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b0211',
+        value: 'NATIONAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c280',
+            labels: [
+              {
+                lang: 'en',
+                label: 'National System Admin',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système national',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b0212',
+        value: 'PERFORMANCE_MANAGEMENT',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c281',
+            labels: [
+              {
+                lang: 'en',
+                label: 'Performance Manager',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Gestion des performances',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      },
+      {
+        id: '63c7ebee48dc29888b5b0213',
+        value: 'NATIONAL_REGISTRAR',
+        roles: [
+          {
+            _id: '63ef9466f708ea080777c282',
+            labels: [
+              {
+                lang: 'en',
+                label: 'National Registrar',
+                __typename: 'RoleLabel'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire national',
+                __typename: 'RoleLabel'
+              }
+            ],
+            __typename: 'Role'
+          }
+        ],
+        __typename: 'SystemRole'
+      }
+    ]
+  }
+}
+
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getRolesQuery,
+    query: getSystemRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getRoles: [
+      getSystemRoles: [
         {
-          title: 'Field Agent',
           value: 'FIELD_AGENT',
-          types: ['HOSPITAL', 'CHA']
+          roles: [
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Healthcare Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Professionnel de Santé'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Police Officer'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Agent de Police'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Social Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Travailleur Social'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Local Leader'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Leader Local'
+                }
+              ]
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registration Agent',
           value: 'REGISTRATION_AGENT',
-          types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Registration Agent'
+            },
+            {
+              lang: 'fr',
+              label: "Agent d'enregistrement"
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registrar',
           value: 'LOCAL_REGISTRAR',
-          types: ['SECRETARY', 'CHAIRMAN', 'MAYOR']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (local)',
           value: 'LOCAL_SYSTEM_ADMIN',
-          types: ['LOCAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (national)',
           value: 'NATIONAL_SYSTEM_ADMIN',
-          types: ['NATIONAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'National System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système national'
+            }
+          ],
+          active: true
         },
         {
-          title: 'Performance Management',
           value: 'PERFORMANCE_MANAGEMENT',
-          types: ['HEALTH_DIVISION', 'ORG_DIVISION']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Performance Management'
+            },
+            {
+              lang: 'fr',
+              label: 'Gestion des performances'
+            }
+          ],
+          active: true
+        },
+        {
+          value: 'NATIONAL_REGISTRAR',
+          roles: [
+            {
+              lang: 'en',
+              label: 'National Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire national'
+            }
+          ],
+          active: true
         }
       ]
     }
@@ -2331,8 +2815,8 @@ export const mockCompleteFormData = {
   nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  type: 'HOSPITAL',
+  systemRole: 'FIELD_AGENT',
+  role: 'HOSPITAL',
   userDetails: '',
   username: ''
 }
@@ -2581,7 +3065,7 @@ export const mockUserGraphqlOperation = {
                     validate: []
                   },
                   {
-                    name: 'role',
+                    name: 'systemRole',
                     type: 'SELECT_WITH_OPTIONS',
                     label: {
                       defaultMessage: 'Role',
@@ -2594,7 +3078,7 @@ export const mockUserGraphqlOperation = {
                     options: []
                   },
                   {
-                    name: 'type',
+                    name: 'role',
                     type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                     label: {
                       defaultMessage: 'Type',
@@ -2606,7 +3090,7 @@ export const mockUserGraphqlOperation = {
                     initialValue: '',
                     validate: [],
                     dynamicOptions: {
-                      dependency: 'role',
+                      dependency: 'systemRole',
                       options: {}
                     }
                   },
@@ -2635,7 +3119,7 @@ export const mockUserGraphqlOperation = {
                   {
                     action: 'hide',
                     expression:
-                      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
+                      'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
                   }
                 ],
                 fields: [
@@ -2714,8 +3198,8 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'LOCAL_REGISTRAR',
-  type: 'SECRETARY',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: 'SECRETARY',
   userDetails: '',
   username: '',
   signature: {

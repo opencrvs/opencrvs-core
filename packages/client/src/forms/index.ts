@@ -30,7 +30,6 @@ import {
 } from '@client/forms/questionConfig'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -40,7 +39,7 @@ import * as graphQLQueries from './mappings/queries'
 import * as queries from './mappings/query'
 import * as responseTransformers from './mappings/response-transformers'
 import * as types from './mappings/type'
-import { LocationType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -80,10 +79,12 @@ export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
-  COLLECT_CERTIFICATE = 'collect certificate',
+  CERTIFY_DECLARATION = 'certify declaration',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction'
+  REQUEST_CORRECTION_DECLARATION = 'request correction',
+  ISSUE_DECLARATION = 'issue certificate',
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
 }
 
 export enum DownloadAction {
@@ -892,7 +893,7 @@ export type IFormSectionQueryMapFunction = (
   targetSectionId?: string, // used for template query mappings
   targetFieldName?: string, // used for template query mappings
   offlineData?: IOfflineData, // used for template offline mappings
-  userDetails?: IUserDetails // user for template user mappings
+  userDetails?: UserDetails // user for template user mappings
 ) => void
 
 export enum BirthSection {
@@ -911,6 +912,17 @@ export enum DeathSection {
   Event = 'deathEvent',
   Informant = 'informant',
   DeathDocuments = 'documents',
+  Preview = 'preview'
+}
+
+export enum MarriageSection {
+  Registration = 'registration',
+  Groom = 'groom',
+  Bride = 'bride',
+  Event = 'marriageEvent',
+  WitnessOne = 'witnessOne',
+  WitnessTwo = 'witnessTwo',
+  Documents = 'documents',
   Preview = 'preview'
 }
 
@@ -961,6 +973,7 @@ export type Section =
   | CertificateSection
   | CorrectionSection
   | InformantSection
+  | MarriageSection
 
 export interface IFormSection {
   id: Section

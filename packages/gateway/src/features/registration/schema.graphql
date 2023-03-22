@@ -17,15 +17,19 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
 }
 
 enum BirthRegType {
@@ -61,6 +65,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -98,6 +104,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -113,11 +120,13 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+  MARRIAGE_NOTICE_PROOF
 }
 
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 enum MannerOfDeath {
@@ -143,6 +152,11 @@ enum CauseOfDeathMethodType {
   LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 input PaymentInput {
@@ -222,6 +236,11 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
+}
+
 type InputOutput {
   valueCode: String
   valueId: String
@@ -232,6 +251,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -249,6 +269,7 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
 }
 
 interface EventRegistration {
@@ -351,6 +372,36 @@ type DeathRegistration implements EventRegistration { # -> Composition
   history: [History]
 }
 
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
+  createdAt: Date
+  updatedAt: Date
+}
+
+type MarriageRegistration implements EventRegistration { # -> Composition
+  id: ID! # long uuid
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person # -> .section(code='bride-details').entry.reference
+  groom: Person # -> .section(code='groom-details').entry.reference
+  witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
+  witnessTwo: RelatedPerson # -> .section(code='witnessTwo-details').entry.reference
+  eventLocation: Location
+  typeOfMarriage: MarriageType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date # -> .date($first)
+  updatedAt: Date # -> .date
+  history: [History]
+}
+
 input CorrectionValueInput {
   section: String
   fieldName: String
@@ -385,6 +436,10 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
+  groomSignature: String # -> extension(url='http://opencrvs.org/specs/extension/groom-signature').valueString
+  brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
+  witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
+  witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
   informantType: InformantType # -> Observation.valueString
   otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
@@ -418,13 +473,17 @@ type Registration { # -> Task
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
+  groomSignature: String # -> extension(url='http://opencrvs.org/specs/extension/groom-signature').valueString
+  brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
+  witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
+  witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 input CertificateInput {
@@ -520,12 +579,15 @@ type CreatedIds {
   compositionId: String
   trackingId: String
   registrationNumber: String
+  isPotentiallyDuplicate: Boolean
 }
 
 type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
 }
+
+union RecordDetails = BirthRegistration | DeathRegistration
 
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
@@ -552,6 +614,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
 }
 
 type Mutation {
@@ -569,14 +633,20 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
-  markEventAsArchived(id: String!): ID! # updates status to 'archived'
-  notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
+  markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID! # updates status to 'archived'
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
@@ -591,9 +661,29 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
+  #MARRIAGE
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
 }

@@ -22,6 +22,7 @@ interface Window {
         LATE: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
     COUNTRY: string
@@ -39,6 +40,15 @@ interface Window {
         ON_TIME: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
+    }
+    MARRIAGE: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+      PRINT_IN_ADVANCE: boolean
     }
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string

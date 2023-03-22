@@ -85,7 +85,9 @@ const statusMessageMap = {
   [SUBMISSION_STATUS.READY_TO_ARCHIVE]: messages.statusWaitingToBeArchived,
   [SUBMISSION_STATUS.ARCHIVING]: messages.statusArchiving,
   [SUBMISSION_STATUS.READY_TO_CERTIFY]: messages.statusWaitingToCertify,
+  [SUBMISSION_STATUS.READY_TO_ISSUE]: messages.statusWaitingToIssue,
   [SUBMISSION_STATUS.CERTIFYING]: messages.statusCertifying,
+  [SUBMISSION_STATUS.ISSUING]: messages.statusIssuing,
   [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry
 } as const
 
@@ -97,7 +99,8 @@ const statusInprogressIconIdMap = {
   [SUBMISSION_STATUS.REQUESTING_CORRECTION]: 'requestingCorrection',
   [SUBMISSION_STATUS.REINSTATING]: 'reinstating',
   [SUBMISSION_STATUS.ARCHIVING]: 'archiving',
-  [SUBMISSION_STATUS.CERTIFYING]: 'certifying'
+  [SUBMISSION_STATUS.CERTIFYING]: 'certifying',
+  [SUBMISSION_STATUS.ISSUING]: 'issuing'
 }
 
 type OutboxSubmissionStatus = IRetryStatus | IInProgressStatus
@@ -200,6 +203,27 @@ export function Outbox() {
             declaration.data?.deceased?.familyName as string
           )
         dateOfEvent = declaration.data?.deathEvent?.deathDate as string
+      } else if (declaration?.event?.toString() === 'marriage') {
+        const brideName =
+          getFullName(
+            declaration.data?.bride?.firstNamesEng as string,
+            declaration.data?.bride?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.bride?.firstNames as string,
+            declaration.data?.bride?.familyName as string
+          )
+        const groomName =
+          getFullName(
+            declaration.data?.bride?.firstNamesEng as string,
+            declaration.data?.bride?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.bride?.firstNames as string,
+            declaration.data?.bride?.familyName as string
+          )
+        name = groomName + (brideName ? ` & ${brideName}` : '')
+        dateOfEvent = declaration.data?.marriageEvent?.marriageDate.toString()
       }
 
       const statusText = intl.formatMessage(

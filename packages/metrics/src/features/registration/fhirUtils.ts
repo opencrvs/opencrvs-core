@@ -84,6 +84,7 @@ export type DECLARATION_STATUS =
   | 'REJECTED'
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
+  | 'ISSUED'
 
 export type USER_ACTION =
   | 'LOGGED_IN'
@@ -99,7 +100,7 @@ export type USER_ACTION =
   | 'USERNAME_REMINDER_BY_ADMIN'
   | 'PASSWORD_RESET_BY_ADMIN'
 
-export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
+export type DECLARATION_TYPE = 'BIRTH' | 'DEATH' | 'MARRIAGE'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
@@ -254,7 +255,8 @@ export function getTrackingId(task: Task) {
   const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
-      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
+      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id` ||
+      identifier.system === `http://opencrvs.org/specs/id/marriage-tracking-id`
     )
   })
   if (!trackingIdentifier || !trackingIdentifier.value) {

@@ -18,6 +18,7 @@ interface IBirth {
     LATE: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
@@ -25,6 +26,15 @@ interface IDeath {
     ON_TIME: number
     DELAYED: number
   }
+  PRINT_IN_ADVANCE: boolean
+}
+interface IMarriage {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+  PRINT_IN_ADVANCE: boolean
 }
 interface ICurrency {
   isoCode: string
@@ -48,6 +58,7 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: IDeath
+  MARRIAGE: IMarriage
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -69,7 +80,8 @@ const birthSchema = new Schema<IBirth>({
     ON_TIME: Number,
     LATE: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const deathSchema = new Schema<IDeath>({
@@ -77,7 +89,17 @@ const deathSchema = new Schema<IDeath>({
   FEE: {
     ON_TIME: Number,
     DELAYED: Number
-  }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
+})
+
+const marriageSchema = new Schema<IMarriage>({
+  REGISTRATION_TARGET: { type: Number, default: 45 },
+  FEE: {
+    ON_TIME: { type: Number, default: 10 },
+    DELAYED: { type: Number, default: 45 }
+  },
+  PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const countryLogoSchema = new Schema<ICountryLogo>({
@@ -114,6 +136,7 @@ const configSchema = new Schema({
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   CURRENCY: { type: currencySchema, required: false },
   DEATH: { type: deathSchema, required: false },
+  MARRIAGE: { type: marriageSchema, required: false },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,
@@ -147,7 +170,7 @@ const configSchema = new Schema({
   INFORMANT_SIGNATURE_REQUIRED: {
     type: Boolean,
     required: true,
-    default: true
+    default: false
   },
   LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
   ADMIN_LEVELS: {

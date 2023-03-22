@@ -17,11 +17,12 @@ import {
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
+import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   GQLRegStatus,
   GQLRegWorkflow
@@ -29,7 +30,7 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-
+import QRCode from 'qrcode'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -106,6 +107,11 @@ export function getBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+
+  if (queryData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      queryData[sectionId].informantsSignature
+  }
 }
 
 export function registrationNumberTransformer(
@@ -119,6 +125,62 @@ export function registrationNumberTransformer(
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'registrationNumber'
     ] = queryData[sectionId].registrationNumber
+  }
+}
+
+export function groomSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].groomSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'groomSignature'
+    ] = queryData[sectionId].groomSignature
+  }
+}
+
+export function brideSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].brideSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'brideSignature'
+    ] = queryData[sectionId].brideSignature
+  }
+}
+
+export function witnessOneSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessOneSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessOneSignature'
+    ] = queryData[sectionId].witnessOneSignature
+  }
+}
+
+export function witnessTwoSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessTwoSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessTwoSignature'
+    ] = queryData[sectionId].witnessTwoSignature
   }
 }
 
@@ -244,8 +306,7 @@ export const registrarNameUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -265,8 +326,7 @@ export const roleUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -278,8 +338,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }
@@ -312,8 +372,7 @@ export const registrarSignatureUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -327,4 +386,50 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+
+export const registrationDateTransformer =
+  (locale: string, dateFormat: string) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    if (!_.history) {
+      return
+    }
+
+    const history = _.history.find(
+      ({ action, regStatus }: History) =>
+        !action && regStatus === RegStatus.Registered
+    )
+
+    const prevLocale = window.__localeId__
+    window.__localeId__ = locale
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationDate'
+    ] = format(new Date(history?.date), dateFormat)
+    window.__localeId__ = prevLocale
+  }
+
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        VIEW_VERIFY_CERTIFICATE,
+        {
+          declarationId: queryData.id
+        }
+      )}`
+    )
 }

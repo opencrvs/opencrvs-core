@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormData, ISelectOption } from '@client/forms'
+import {
+  IFormData,
+  IFormSectionGroup,
+  IRadioGroupWithNestedFieldsFormField,
+  ISelectOption
+} from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
@@ -74,6 +79,11 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
   const DEATH_ON_TIME_FEE = offlineData.config.DEATH.FEE.ON_TIME
   const DEATH_DELAYED_FEE = offlineData.config.DEATH.FEE.DELAYED
 
+  const MARRIAGE_REGISTRATION_TARGET =
+    offlineData.config.MARRIAGE.REGISTRATION_TARGET
+  const MARRIAGE_ON_TIME_FEE = offlineData.config.MARRIAGE.FEE.ON_TIME
+  const MARRIAGE_DELAYED_FEE = offlineData.config.MARRIAGE.FEE.DELAYED
+
   const birthRanges = [
     { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
     {
@@ -89,10 +99,20 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
     { start: DEATH_REGISTRATION_TARGET + 1, value: DEATH_DELAYED_FEE }
   ]
 
+  const marriageRanges = [
+    {
+      start: 0,
+      end: MARRIAGE_REGISTRATION_TARGET,
+      value: MARRIAGE_ON_TIME_FEE
+    },
+    { start: MARRIAGE_REGISTRATION_TARGET + 1, value: MARRIAGE_DELAYED_FEE }
+  ]
+
   return {
     rangeData: {
       [Event.Birth]: birthRanges,
-      [Event.Death]: deathRanges
+      [Event.Death]: deathRanges,
+      [Event.Marriage]: marriageRanges
     }
   }
 }
@@ -182,7 +202,7 @@ export function getServiceMessage(
         target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
-  } else {
+  } else if (event === Event.Death) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
@@ -190,6 +210,16 @@ export function getServiceMessage(
     } else {
       return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
+      })
+    }
+  } else if (event === Event.Marriage) {
+    if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
+        target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
+      })
+    } else {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
+        target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
       })
     }
   }
@@ -212,6 +242,8 @@ export function getEventDate(data: IFormData, event: Event) {
       return data.child.childBirthDate as string
     case Event.Death:
       return data.deathEvent.deathDate as string
+    case Event.Marriage:
+      return data.marriageEvent.marriageDate as string
   }
 }
 
@@ -230,6 +262,8 @@ export function getEvent(eventType: string | undefined) {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }
 
@@ -237,11 +271,7 @@ export function isCertificateForPrintInAdvance(
   declaration: IPrintableDeclaration | undefined
 ) {
   const collectorType =
-    declaration &&
-    declaration.data.registration.certificates &&
-    declaration.data.registration.certificates[0] &&
-    declaration.data.registration.certificates[0].collector &&
-    declaration.data.registration.certificates[0].collector.type
+    declaration?.data?.registration?.certificates?.[0]?.collector?.type
   if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
     return true
   }
@@ -252,9 +282,10 @@ export function getRegistrarSignatureHandlebarName(
   offlineCountryConfig: IOfflineData,
   event: Event
 ) {
-  const svgCode = offlineCountryConfig.templates.certificates![event].definition
+  const svgCode =
+    offlineCountryConfig.templates.certificates![event]?.definition
   const html = document.createElement('html')
-  html.innerHTML = svgCode
+  html.innerHTML = String(svgCode)
   const certificateImages = html.querySelectorAll('image')
   const signatureImage = Array.from(certificateImages).find(
     (image) => image.getAttribute('data-content') === 'signature'
@@ -264,4 +295,17 @@ export function getRegistrarSignatureHandlebarName(
     signatureImage?.getAttribute('xlink:href') ||
     ''
   return handlebarText?.match(/^{{(\w+)}}$/)?.[1] || ''
+}
+
+export function filterPrintInAdvancedOption(collectionForm: IFormSectionGroup) {
+  const filtredCollectionForm = (
+    collectionForm.fields as unknown as IRadioGroupWithNestedFieldsFormField[]
+  ).map((field) => {
+    const filteredOption = field.options.filter(
+      (option) => option.value !== 'PRINT_IN_ADVANCE'
+    )
+    return { ...field, options: filteredOption }
+  })
+
+  return { ...collectionForm, fields: filtredCollectionForm }
 }

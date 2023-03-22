@@ -30,8 +30,8 @@ import {
 } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
-import _ from 'lodash'
-import format from '@client/utils/date-formatting'
+import _, { values } from 'lodash'
+import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -256,7 +256,6 @@ export const minAgeGapExist = (
     (new Date(first).getTime() - new Date(second).getTime()) /
     (1000 * 60 * 60 * 24) /
     365
-
   return diff >= minAgeGap
 }
 
@@ -293,9 +292,11 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
 }
 
 export const isValidParentsBirthDate =
-  (minAgeGap: number): Validation =>
+  (minAgeGap: number, isAge?: boolean): Validation =>
   (value: IFormFieldValue, drafts) => {
-    const parentsBirthDate = value as string
+    const parentsBirthDate = isAge
+      ? convertAgeToDate(value as string)
+      : (value as string)
     const childBirthDate =
       drafts && drafts.child && (drafts.child.childBirthDate as string)
 
@@ -344,8 +345,8 @@ export const checkBirthDate =
   }
 
 export const checkMarriageDate =
-  (birthDate: string): Validation =>
-  (value: IFormFieldValue) => {
+  (minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
     const cast = value as string
     if (!isAValidDateFormat(cast)) {
       return {
@@ -360,16 +361,62 @@ export const checkMarriageDate =
         message: messages.dateFormat
       }
     }
+    const groomDOB =
+      drafts && drafts.groom && String(drafts.groom.groomBirthDate)
+    const brideDOB =
+      drafts && drafts.bride && String(drafts.bride.brideBirthDate)
 
-    if (!birthDate || !isAValidDateFormat(birthDate)) {
+    if (!groomDOB || !brideDOB) {
       return undefined
-    }
-
-    return mDate > new Date(birthDate)
-      ? undefined
-      : {
+    } else {
+      if (
+        !minAgeGapExist(cast, groomDOB, minAge) ||
+        !minAgeGapExist(cast, brideDOB, minAge)
+      ) {
+        return {
+          message: messages.illegalMarriageAge
+        }
+      } else if (mDate < new Date(groomDOB) && mDate < new Date(brideDOB)) {
+        return {
           message: messages.domLaterThanDob
         }
+      } else {
+        return undefined
+      }
+    }
+  }
+
+export const isValidDateOfBirthForMarriage =
+  (sectionName: string, minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const isExactDateOfBirthUnknown =
+      drafts &&
+      drafts[sectionName] &&
+      drafts[sectionName].exactDateOfBirthUnknown
+    const cast = isExactDateOfBirthUnknown
+      ? convertAgeToDate(value as string)
+      : (value as string)
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
+      }
+    } else if (!isDateNotInFuture(cast)) {
+      return { message: messages.isValidBirthDate }
+    }
+
+    if (
+      !minAgeGapExist(
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
+        String(value),
+        minAge
+      )
+    ) {
+      return {
+        message: messages.illegalMarriageAge
+      }
+    } else {
+      return undefined
+    }
   }
 
 export const dateGreaterThan =
@@ -430,7 +477,7 @@ export const dateInPast = (): Validation => (value: IFormFieldValue) =>
   isDateInPast(value)
 
 export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
-  dateFormat(value)
+  dateFormat(value as string)
 
 /*
  * TODO: The name validation functions should be refactored out.
@@ -473,7 +520,9 @@ export const isValidEnglishWord = (value: string): boolean => {
     ''
   )
 
-  return englishRe.test(value)
+  const englishApostrophe = XRegExp.cache(`[p{Nd}'_]+`, '')
+
+  return englishRe.test(value) || englishApostrophe.test(value)
 }
 
 type Checker = (value: string) => boolean

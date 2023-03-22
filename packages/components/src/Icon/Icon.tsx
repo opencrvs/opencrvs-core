@@ -13,6 +13,7 @@
 import * as React from 'react'
 import { colors } from '../colors'
 import * as icons from './all-icons'
+import { IconWeight } from 'phosphor-react'
 
 enum IconSize {
   small = 16,
@@ -26,30 +27,29 @@ export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
-  fill?: IconColor | 'none'
+  weight?: IconWeight
 }
 
 export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  fill = 'none',
+  weight = 'regular',
   ...rest
 }: IconProps) {
-  const IconComponent = icons[name]
-
+  const IconComponent = icons['' + name]
   return (
     <IconComponent
-      size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
-      fill={
-        fill === 'none'
-          ? 'none'
-          : fill === 'currentColor'
-          ? 'currentColor'
-          : colors[fill]
-      }
+      size={IconSize[size]}
+      weight={weight}
       {...rest}
     />
   )
 }
+
+// ChevronRight = CaretRight
+// ChevronDown = CaretDown
+// Search = MagnifyingGlass
+// MessageCircle = ChatCircle
+// LogOut = SignOut

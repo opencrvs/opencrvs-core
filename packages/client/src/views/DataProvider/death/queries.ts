@@ -122,7 +122,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
+        informantsSignature
         attachments {
           data
           type
@@ -180,6 +184,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -198,8 +203,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -255,6 +266,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -368,6 +380,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
+        duplicates {
+          compositionId
+          trackingId
+        }
         status {
           comments {
             comment
@@ -422,6 +439,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -439,8 +457,14 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -496,6 +520,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }

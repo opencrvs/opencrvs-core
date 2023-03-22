@@ -17,7 +17,8 @@ import {
   GQLIdentifier,
   GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
@@ -34,7 +35,6 @@ import {
   PERFORMANCE_STATS,
   CORRECTION_TOTALS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
-import { Event } from '@client/utils/gateway'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
@@ -192,7 +192,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 export function isUnderJurisdictionOfUser(
   locations: { [key: string]: ILocation },
   locationId: string,
-  jurisdictionLocation: string | undefined
+  jurisdictionLocation: string | undefined | null
 ) {
   if (!jurisdictionLocation) return false
 
@@ -217,16 +217,16 @@ export function getPrimaryLocationIdOfOffice(
 }
 
 export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: IUserDetails
+  userDetails: UserDetails
 ) {
   const location =
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {
       const jurisdictionTypeIdentifier =
-        location.identifier &&
-        location.identifier.find(
+        location?.identifier &&
+        location?.identifier.find(
           (identifier) =>
-            identifier.system ===
+            identifier?.system ===
             'http://opencrvs.org/specs/id/jurisdiction-type'
         )
       return (
@@ -294,6 +294,10 @@ export const StatusMapping: IStatusMapping = {
     color: colors.blue
   },
   ARCHIVED: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
+  },
+  MARKED_AS_DUPLICATE: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
   }

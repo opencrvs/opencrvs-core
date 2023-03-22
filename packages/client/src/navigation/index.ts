@@ -56,8 +56,13 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION
+  INFORMANT_NOTIFICATION,
+  SELECT_MARRIAGE_INFORMANT,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
+  ISSUE_CERTIFICATE_PAYMENT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -66,7 +71,6 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -82,6 +86,7 @@ import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -153,6 +158,14 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(SELECT_MARRIAGE_INFORMANT, {
+      declarationId
+    })
+  )
+}
+
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
 }
@@ -175,6 +188,10 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToUserRolesConfig() {
+  return push(USER_ROLES_CONFIG)
 }
 
 export function goToInformantNotification() {
@@ -230,8 +247,10 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 }
 
 export function goToPerformanceHome(
-  timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
-  timeEnd: Date = new Date(Date.now()),
+  timeStart: Date = new Date(
+    startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+  ),
+  timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
   event?: Event,
   locationId?: string
 ) {
@@ -327,6 +346,32 @@ export function goToPrintCertificate(
   )
 }
 
+export function goToIssueCertificate(
+  registrationId: string,
+  pageId = 'collector'
+) {
+  return push(
+    formatUrl(ISSUE_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      pageId: pageId
+    })
+  )
+}
+
+export function goToVerifyIssueCollector(
+  registrationId: string,
+  event: string,
+  collector: string
+) {
+  return push(
+    formatUrl(ISSUE_VERIFY_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString(),
+      collector: collector.toLowerCase().toString()
+    })
+  )
+}
+
 export function goToViewRecordPage(declarationId: string) {
   return push(
     formatUrl(VIEW_RECORD, {
@@ -386,6 +431,18 @@ export function goToPrintCertificatePayment(
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+      registrationId: registrationId.toString(),
+      eventType: event
+    })
+  )
+}
+
+export function goToIssueCertificatePayment(
+  registrationId: string,
+  event: Event
+) {
+  return push(
+    formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
       registrationId: registrationId.toString(),
       eventType: event
     })
@@ -629,8 +686,8 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
-  const role = userDetails?.role
+export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
+  const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
@@ -648,7 +705,7 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   )
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
+export function goToPerformanceView(userDetails: UserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
@@ -657,15 +714,15 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   )
 }
 
-export function goToTeamView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
+export function goToTeamView(userDetails: UserDetails) {
+  if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
 }
 
-export function goToOrganisationView(userDetails: IUserDetails) {
+export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 

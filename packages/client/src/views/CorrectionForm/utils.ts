@@ -37,12 +37,11 @@ import {
   WARNING,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  Section,
   CHECKBOX,
   ICheckboxFormField
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
+import { getValidationErrorsForForm } from '@client/forms/validation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
   ILocation,
@@ -60,8 +59,8 @@ import {
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { IGQLLocation } from '@client/utils/userUtils'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -98,13 +97,14 @@ export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED
+    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
+    registrationStatus === SUBMISSION_STATUS.ISSUED
   )
 }
 
 export function bytesToSize(bytes: number) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  if (bytes == 0) return '0 Byte'
+  if (bytes === 0) return '0 Byte'
 
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
   return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
@@ -119,16 +119,17 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
     if (!isArray(documents[index])) {
       continue
     }
-    ;(documents[index] as IFileValue[]).forEach((fieldValue) => {
-      totalFileSize += fieldValue.fileSize || 0
-    })
+    totalFileSize = (documents[index] as IFileValue[]).reduce(
+      (total, fieldValue) => (total += fieldValue.fileSize || 0),
+      totalFileSize
+    )
   }
   return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
 export function updateDeclarationRegistrationWithCorrection(
   declaration: IDeclaration,
-  meta?: { userPrimaryOffice?: IGQLLocation }
+  meta?: { userPrimaryOffice?: UserDetails['primaryOffice'] }
 ): void {
   let correctionValues: Record<string, any> = {}
   const { data } = declaration

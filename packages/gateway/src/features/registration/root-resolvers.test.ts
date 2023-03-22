@@ -11,7 +11,7 @@
  */
 import {
   resolvers,
-  lookForDuplicate
+  lookForComposition
 } from '@gateway/features/registration/root-resolvers'
 import {
   DOWNLOADED_EXTENSION_URL,
@@ -445,6 +445,113 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
+  describe('fetchMarriageRegistration()', () => {
+    it('returns object of composition result', async () => {
+      const mockTaskOfComposition = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'MARRIAGE'
+                  }
+                ]
+              },
+              focus: {
+                reference: 'Composition/0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/draft-id',
+                  value: '0b760582-9f9b-4793-a8e3-1022c91c4052'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'BIU2VLU'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'BRIDE'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                  valueString: '+260725632525'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastUser',
+                  valueReference: {
+                    reference:
+                      'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                  valueReference: {
+                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                  valueReference: {
+                    reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
+                  }
+                },
+                {
+                  url: DOWNLOADED_EXTENSION_URL,
+                  valueString: 'DECLARED'
+                }
+              ],
+              lastModified: '2022-02-16T13:07:22.445Z',
+              businessStatus: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/reg-status',
+                    code: 'DECLARED'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2022-02-22T06:55:13.928+00:00',
+                versionId: '80c56eba-9dc1-4d03-aebe-118a7390c8c0'
+              },
+              id: '10b082d6-e152-4391-b1ef-d88586b049b8'
+            }
+          }
+        ]
+      })
+      const mockPost = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
+      // @ts-ignore
+      const composition = await resolvers.Query.fetchMarriageRegistration(
+        {},
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+        authHeaderRegCert
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      await expect(
+        resolvers.Query.fetchMarriageRegistration(
+          {},
+          { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+          authHeaderCertify
+        )
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
   describe('fetchRegistration()', () => {
     it('returns object of composition result', async () => {
       fetch.mockResponseOnce(
@@ -460,7 +567,7 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('ducplicate entry', () => {
+  describe('duplicate entry', () => {
     const details = {
       child: {
         name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
@@ -482,6 +589,7 @@ describe('Registration root resolvers', () => {
     }
     it('checks duplicate draftId', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -526,7 +634,7 @@ describe('Registration root resolvers', () => {
     it('checks no task entry with draftId', async () => {
       fetch.mockResponses([JSON.stringify({})])
 
-      const result = await lookForDuplicate(
+      const result = await lookForComposition(
         '9633042c-ca34-4b9f-959b-9d16909fd85c'
       )
 
@@ -545,6 +653,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify({})],
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -579,7 +688,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'DewpkiM'
+        trackingId: 'DewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^D/)
@@ -599,6 +709,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -717,6 +828,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -751,7 +863,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'BewpkiM'
+        trackingId: 'BewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^B/)
@@ -772,6 +885,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -874,6 +988,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1951,6 +2066,7 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2028,6 +2144,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        ['[]'],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2119,6 +2236,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2164,8 +2282,8 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a certify scope')
     })
   })
-  describe('notADuplicate()', () => {
-    it('returns composition id after removing duplicate id from it', async () => {
+  describe('markEventAsNotDuplicate()', () => {
+    it('returns composition id after removing all duplicates from it', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -2185,24 +2303,7 @@ describe('Registration root resolvers', () => {
             ]
           })
         ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'DewpkiM'
-            },
-            relatesTo: [
-              {
-                code: 'duplicate',
-                targetReference: {
-                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
-                }
-              }
-            ]
-          })
-        ],
+        [JSON.stringify(mockTaskBundle)],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2220,11 +2321,10 @@ describe('Registration root resolvers', () => {
         ]
       )
       // @ts-ignore
-      const result = await resolvers.Mutation.notADuplicate(
+      const result = await resolvers.Mutation.markEventAsNotDuplicate(
         {},
         {
-          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-          duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
         },
         authHeaderRegCert
       )
@@ -2239,11 +2339,10 @@ describe('Registration root resolvers', () => {
       ])
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
@@ -2274,25 +2373,23 @@ describe('Registration root resolvers', () => {
       )
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('Search request failed: Some error from search')
+      ).rejects.toThrowError('FHIR request failed: Some error from search')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderNotRegCert
         )

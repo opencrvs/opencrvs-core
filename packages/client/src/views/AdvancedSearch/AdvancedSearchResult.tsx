@@ -18,6 +18,7 @@ import {
   goToAdvancedSearch,
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
+  goToIssueCertificate as goToIssueCertificateAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
@@ -32,7 +33,6 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
-  ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
   EMPTY_STRING,
   NAME_TEXT,
@@ -48,7 +48,8 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -62,7 +63,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
@@ -108,10 +108,11 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToIssueCertificate: typeof goToIssueCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
@@ -247,6 +248,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           reg.declarationStatus === RegStatus.Validated
         const declarationIsInProgress =
           reg.declarationStatus === RegStatus.InProgress
+        const declarationIsIssued = reg.declarationStatus === RegStatus.Issued
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -256,7 +258,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
-            (declarationIsRegistered || declarationIsCertified) &&
+            (declarationIsRegistered || declarationIsIssued) &&
             userHasCertifyScope()
           ) {
             actions.push({
@@ -266,6 +268,17 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               ) => {
                 e && e.stopPropagation()
                 props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (declarationIsCertified && userHasCertifyScope()) {
+            actions.push({
+              label: intl.formatMessage(buttonMessages.issue),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                props.goToIssueCertificate(reg.id)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -516,6 +529,7 @@ export const AdvancedSearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToPrintCertificate: goToPrintCertificateAction,
+    goToIssueCertificate: goToIssueCertificateAction,
     goToDeclarationRecordAudit
   }
 )(withTheme(AdvancedSearchResultComp))

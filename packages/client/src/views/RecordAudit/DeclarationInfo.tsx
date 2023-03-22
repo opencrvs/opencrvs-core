@@ -20,7 +20,7 @@ import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import format from '@client/utils/date-formatting'
-import { REGISTERED, CERTIFIED } from '@client/utils/constants'
+import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -88,12 +88,12 @@ export const GetDeclarationInfo = ({
   if (info.type === 'Birth') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
-      if (declaration?.brnDrn) {
-        info.brn = declaration.brnDrn
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
       } else if (!isDownloaded) {
-        info.brn = ''
+        info.registrationNo = ''
       }
     }
     info = {
@@ -106,12 +106,12 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Death') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
     ) {
-      if (declaration?.brnDrn) {
-        info.drn = declaration.brnDrn
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
       } else if (!isDownloaded) {
-        info.drn = ''
+        info.registrationNo = ''
       }
     }
     info = {
@@ -121,7 +121,26 @@ export const GetDeclarationInfo = ({
       placeOfDeath: declaration?.placeOfDeath,
       informant: removeUnderscore(informant)
     }
+  } else if (info.type === 'Marriage') {
+    if (
+      info.status &&
+      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+    ) {
+      if (declaration?.registrationNo) {
+        info.registrationNo = declaration.registrationNo
+      } else if (!isDownloaded) {
+        info.registrationNo = ''
+      }
+    }
+    info = {
+      ...info,
+      type: intl.formatMessage(constantsMessages.marriage),
+      dateOfMarriage: declaration?.dateOfMarriage,
+      placeOfMarriage: declaration?.placeOfMarriage,
+      informant: removeUnderscore(informant)
+    }
   }
+
   const mobileActions = actions.map((action, index) => (
     <MobileDiv key={index}>{action}</MobileDiv>
   ))
@@ -131,7 +150,9 @@ export const GetDeclarationInfo = ({
         {Object.entries(info).map(([key, value]) => {
           const rowValue =
             value &&
-            (key === 'dateOfBirth' || key === 'dateOfDeath'
+            (key === 'dateOfBirth' ||
+            key === 'dateOfDeath' ||
+            key === 'dateOfMarriage'
               ? format(new Date(value), 'MMMM dd, yyyy')
               : value)
 

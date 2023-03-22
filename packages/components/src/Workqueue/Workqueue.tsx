@@ -106,7 +106,9 @@ export enum COLUMNS {
   LAST_UPDATED = 'lastUpdated',
   ACTIONS = 'actions',
   NOTIFICATION_SENT = 'notificationSent',
-  NAME = 'name'
+  NAME = 'name',
+  TRACKING_ID = 'trackingId',
+  REGISTRATION_NO = 'registrationNumber'
 }
 
 export enum SORT_ORDER {

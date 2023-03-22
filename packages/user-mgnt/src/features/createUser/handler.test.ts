@@ -16,6 +16,7 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
+import { Types } from 'mongoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -41,7 +42,8 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  role: 'LOCAL_REGISTRAR',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -79,7 +81,7 @@ describe('createUser handler', () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        JSON.stringify({ id: '321', partOf: { reference: 'Location/22' } }),
         { status: 200 }
       ],
       [
@@ -117,8 +119,8 @@ describe('createUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        role: 'FIELD_AGENT',
-        type: 'HEALTHCARE_WORKER',
+        systemRole: 'FIELD_AGENT',
+        role: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -155,19 +157,20 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'HEALTHCARE_WORKER'
+              code: 'Field Agent'
             }
           ]
         }
       ],
       location: [
         { reference: 'Location/321' },
-        { reference: 'Location/11' },
         { reference: 'Location/22' },
         { reference: 'Location/33' },
         { reference: 'Location/44' }
       ]
     }
+
+    console.log('fetch.mock', fetch.mock.calls[5][1].body)
 
     expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(

@@ -34,7 +34,8 @@ import {
   goToPrintCertificate,
   goToUserProfile,
   goToTeamUserList,
-  goToViewRecordPage
+  goToViewRecordPage,
+  goToIssueCertificate
 } from '@client/navigation'
 import {
   injectIntl,
@@ -82,7 +83,12 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import {
+  MarkEventAsReinstatedMutation,
+  MarkEventAsReinstatedMutationVariables,
+  Event,
+  History
+} from '@client/utils/gateway'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
@@ -98,7 +104,8 @@ import {
   ShowDownloadButton,
   ShowReviewButton,
   ShowUpdateButton,
-  ShowPrintButton
+  ShowPrintButton,
+  ShowIssueButton
 } from './ActionButtons'
 import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
@@ -106,12 +113,6 @@ import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { Mutation } from '@apollo/client/react/components'
-import {
-  MarkEventAsReinstatedMutation,
-  MarkEventAsReinstatedMutationVariables,
-  Event,
-  History
-} from '@client/utils/gateway'
 import {
   REINSTATE_BIRTH_DECLARATION,
   REINSTATE_DEATH_DECLARATION
@@ -122,6 +123,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Button } from '@opencrvs/components/lib/Button'
+import { UserDetails } from '@client/utils/userUtils'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -165,7 +167,7 @@ const DesktopDiv = styled.div`
 `
 
 interface IStateProps {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   language: string
   resources: IOfflineData
   scope: Scope | null
@@ -206,10 +208,11 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'blue',
+  CERTIFIED: 'teal',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
-  SUBMITTING: 'orange'
+  SUBMITTING: 'orange',
+  ISSUED: 'blue'
 }
 
 const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
@@ -305,7 +308,7 @@ function RecordAuditBody({
   duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs
@@ -361,9 +364,11 @@ function RecordAuditBody({
 
   if (
     isDownloaded &&
+    declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED)
+      declaration.status === SUBMISSION_STATUS.CERTIFIED ||
+      declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton
@@ -426,8 +431,8 @@ function RecordAuditBody({
   if (
     (declaration.status === SUBMISSION_STATUS.DECLARED ||
       declaration.status === SUBMISSION_STATUS.VALIDATED) &&
-    userDetails?.role &&
-    !FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
   ) {
     actions.push(
       ShowReviewButton({
@@ -450,8 +455,8 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
       declaration.status === SUBMISSION_STATUS.REJECTED) &&
-      userDetails?.role &&
-      !FIELD_AGENT_ROLES.includes(userDetails.role))
+      userDetails?.systemRole &&
+      !FIELD_AGENT_ROLES.includes(userDetails.systemRole))
   ) {
     actions.push(
       ShowUpdateButton({
@@ -472,7 +477,7 @@ function RecordAuditBody({
 
   if (
     declaration.status === SUBMISSION_STATUS.REGISTERED ||
-    declaration.status === SUBMISSION_STATUS.CERTIFIED
+    declaration.status === SUBMISSION_STATUS.ISSUED
   ) {
     actions.push(
       ShowPrintButton({
@@ -492,6 +497,24 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
+  if (declaration.status === SUBMISSION_STATUS.CERTIFIED) {
+    actions.push(
+      ShowIssueButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToIssueCertificate
+      })
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
   if (!isDownloaded) {
     actions.push(
       ShowDownloadButton({

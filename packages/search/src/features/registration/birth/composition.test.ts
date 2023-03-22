@@ -13,7 +13,6 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchComposition,
   updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
@@ -25,14 +24,17 @@ import {
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockEncounterResponse,
-  mockLocationResponse
+  mockLocationResponse,
+  mockUserModelResponse
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any
@@ -45,15 +47,22 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedsearchForDuplicates =
+        searchForBirthDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
+
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
+
       mockedIndexComposition.mockReturnValue({})
-      mockedSearchComposition.mockReturnValue(mockSearchResponse)
+
+      mockedsearchForDuplicates.mockReturnValue(
+        mockSearchResponse.body.hits.hits
+      )
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -62,7 +71,7 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
@@ -89,19 +98,21 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedSearchComposition =
+        searchForBirthDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchComposition.mockReturnValue(
-        mockSearchResponseWithoutCreatedBy
+        mockSearchResponseWithoutCreatedBy.body.hits.hits
       )
       mockedSearchByCompositionId.mockReturnValue(
         mockSearchResponseWithoutCreatedBy
       )
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -110,7 +121,7 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],

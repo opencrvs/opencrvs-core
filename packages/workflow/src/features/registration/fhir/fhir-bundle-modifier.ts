@@ -27,8 +27,7 @@ import {
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
+  generateTrackingIdForEvents,
   getEventType,
   getMosipUINToken,
   isEventNotification,
@@ -244,12 +243,7 @@ export async function markEventAsRegistered(
   token: string
 ): Promise<fhir.Task> {
   /* Setting registration number here */
-  let identifierName
-  if (eventType === EVENT_TYPE.BIRTH) {
-    identifierName = 'birth-registration-number'
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    identifierName = 'death-registration-number'
-  }
+  const identifierName = `${eventType.toLowerCase()}-registration-number`
 
   if (taskResource && taskResource.identifier) {
     taskResource.identifier.push({
@@ -295,6 +289,48 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export function makeTaskAnonymous(bundle: fhir.Bundle) {
+  const taskResource = getTaskResource(bundle)
+
+  taskResource.extension = taskResource.extension?.filter(
+    ({ url }) =>
+      ![
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+      ].includes(url)
+  )
+
+  return bundle
+}
+
+export async function markBundleAsIssued(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle)
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    RegStatus.ISSUED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
 export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
@@ -319,16 +355,9 @@ export async function touchBundle(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  let trackingId: string
-  let trackingIdFhirName: string
   const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    trackingId = generateBirthTrackingId()
-    trackingIdFhirName = 'birth-tracking-id'
-  } else {
-    trackingId = generateDeathTrackingId()
-    trackingIdFhirName = 'death-tracking-id'
-  }
+  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
 
   if (
     !fhirBundle ||
@@ -592,31 +621,35 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
 
 export async function updatePatientIdentifierWithRN(
   composition: fhir.Composition,
-  sectionCode: string,
+  sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<fhir.Patient> {
-  const section = getSectionEntryBySectionCode(composition, sectionCode)
-  const patient: fhir.Patient = await getFromFhir(`/${section.reference}`)
-  if (!patient.identifier) {
-    patient.identifier = []
-  }
-  const rnIdentifier = patient.identifier.find(
-    (identifier) => identifier.type === identifierType
-  )
-  if (rnIdentifier) {
-    rnIdentifier.value = registrationNumber
-  } else {
-    patient.identifier.push({
-      // @ts-ignore
-      // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-      // type should have CodeableConcept instead of string
-      // Need to fix in both places together along with a script for legacy data update
-      type: identifierType,
-      value: registrationNumber
+): Promise<fhir.Patient[]> {
+  return await Promise.all(
+    sectionCodes.map(async (sectionCode) => {
+      const section = getSectionEntryBySectionCode(composition, sectionCode)
+      const patient = await getFromFhir(`/${section.reference}`)
+      if (!patient.identifier) {
+        patient.identifier = []
+      }
+      const rnIdentifier = patient.identifier.find(
+        (identifier: { type: string }) => identifier.type === identifierType
+      )
+      if (rnIdentifier) {
+        rnIdentifier.value = registrationNumber
+      } else {
+        patient.identifier.push({
+          // @ts-ignore
+          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+          // type should have CodeableConcept instead of string
+          // Need to fix in both places together along with a script for legacy data update
+          type: identifierType,
+          value: registrationNumber
+        })
+      }
+      return patient
     })
-  }
-  return patient
+  )
 }
 
 interface Integration {

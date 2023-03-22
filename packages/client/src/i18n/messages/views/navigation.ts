@@ -31,6 +31,7 @@ interface INavigationMessages
   form: MessageDescriptor
   integration: MessageDescriptor
   communications: MessageDescriptor
+  userroles: MessageDescriptor
   informantnotification: MessageDescriptor
   outbox: MessageDescriptor
 }
@@ -103,7 +104,7 @@ const messagesToDefine: INavigationMessages = {
   },
   organisation: {
     defaultMessage: 'Organisation',
-    description: 'List of organisations',
+    description: 'Organisations label in navigation',
     id: 'navigation.organisation'
   },
   completenessRates: {
@@ -126,6 +127,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Communications label in navigation',
     id: 'navigation.communications'
   },
+  userroles: {
+    defaultMessage: 'User roles',
+    description: 'User roles label in navigation',
+    id: 'navigation.userroles'
+  },
   informantnotification: {
     defaultMessage: 'Informant notifications',
     description: 'Informant notifications label in navigation',
@@ -135,6 +141,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Outbox',
     description: 'Label for navigation item outbox',
     id: 'navigation.outbox'
+  },
+  readyToIssue: {
+    defaultMessage: 'Ready to issue',
+    description: 'Ready to issue label in navigation',
+    id: 'navigation.readyToIssue'
   }
 }
 
