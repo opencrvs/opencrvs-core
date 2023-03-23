@@ -222,7 +222,7 @@ export const ZeroDocument = styled.div`
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   position: fixed;
-  width: fill-available;
+  width: calc(40% - 24px);
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
