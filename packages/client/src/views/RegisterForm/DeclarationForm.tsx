@@ -17,12 +17,13 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
+  DRAFT_MARRIAGE_FORM_PAGE_GROUP,
   HOME
 } from '@opencrvs/client/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
-import { IForm } from '@client/forms'
+import { IForm, MarriageSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Redirect } from 'react-router'
@@ -36,7 +37,8 @@ interface IFormProps {
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  death: DRAFT_DEATH_FORM_PAGE_GROUP
+  death: DRAFT_DEATH_FORM_PAGE_GROUP,
+  marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
 export class DeclarationFormView extends React.Component<

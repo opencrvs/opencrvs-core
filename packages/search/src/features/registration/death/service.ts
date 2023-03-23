@@ -17,6 +17,7 @@ import {
 import {
   CERTIFIED_STATUS,
   createStatusHistory,
+  detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -40,6 +41,9 @@ import {
   addEventLocation
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
+import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -56,7 +60,7 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   if (bundleEntries && bundleEntries.length === 1) {
     const resource = bundleEntries[0].resource
     if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task, authHeader)
+      await updateEvent(resource as fhir.Task, authHeader)
       return
     }
   }
@@ -130,7 +134,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
@@ -139,7 +143,7 @@ async function indexDeclaration(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
     event: EVENT.DEATH,
     createdAt:
@@ -151,7 +155,30 @@ async function indexDeclaration(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
+  await indexComposition(compositionId, body, client)
+  if (
+    body.type !== 'IN_PROGRESS' &&
+    body.type !== 'WAITING_VALIDATION' &&
+    body.type !== 'VALIDATED'
+  ) {
+    await detectAndUpdateDeathDuplicates(compositionId, composition, body)
+  }
+}
+
+async function detectAndUpdateDeathDuplicates(
+  compositionId: string,
+  composition: fhir.Composition,
+  body: IDeathCompositionBody
+) {
+  const duplicates = await detectDeathDuplicates(compositionId, body)
+  if (!duplicates.length) {
+    return
+  }
+  logger.info(
+    `Search/service:death: ${duplicates.length} duplicate composition(s) found`
+  )
+
+  return await updateCompositionWithDuplicates(composition, duplicates)
 }
 
 async function createIndexBody(

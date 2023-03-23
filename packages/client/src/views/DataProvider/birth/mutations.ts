@@ -18,6 +18,7 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
     createBirthRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `
@@ -77,8 +78,18 @@ export const REJECT_BIRTH_DECLARATION = gql`
 `
 
 export const ARCHIVE_BIRTH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
@@ -97,6 +108,22 @@ export const ISSUE_BIRTH_CERTIFICATE = gql`
 export const MARK_EVENT_UNASSIGNED = gql`
   mutation submitMutation($id: String!) {
     markEventAsUnassigned(id: $id)
+  }
+`
+
+export const MARK_EVENT_AS_DUPLICATE = gql`
+  mutation markEventAsDuplicate(
+    $id: String!
+    $reason: String!
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsDuplicate(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 

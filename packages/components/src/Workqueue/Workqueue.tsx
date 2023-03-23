@@ -191,32 +191,34 @@ export class WorkqueueComp extends React.Component<
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
-        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
-          <TableHeader>
-            {columns.map((preference, index) => (
-              <ColumnContainer
-                key={index}
-                width={preference.width}
-                onClick={
-                  preference.sortFunction
-                    ? () => preference.sortFunction!(preference.key)
-                    : undefined
-                }
-                clickable={Boolean(preference.sortFunction)}
-              >
-                <ColumnTitleWrapper>
-                  {preference.label && preference.label}
-                  {preference.sortFunction && (
-                    <SortIcon
-                      isSorted={Boolean(preference.isSorted)}
-                      isDescending={sortOrder === SORT_ORDER.DESCENDING}
-                    />
-                  )}
-                </ColumnTitleWrapper>
-              </ColumnContainer>
-            ))}
-          </TableHeader>
-        )}
+        {content.length > 0 &&
+          width > grid.breakpoints.lg &&
+          !hideTableHeader && (
+            <TableHeader>
+              {columns.map((preference, index) => (
+                <ColumnContainer
+                  key={index}
+                  width={preference.width}
+                  onClick={
+                    preference.sortFunction
+                      ? () => preference.sortFunction!(preference.key)
+                      : undefined
+                  }
+                  clickable={Boolean(preference.sortFunction)}
+                >
+                  <ColumnTitleWrapper>
+                    {preference.label && preference.label}
+                    {preference.sortFunction && (
+                      <SortIcon
+                        isSorted={Boolean(preference.isSorted)}
+                        isDescending={sortOrder === SORT_ORDER.DESCENDING}
+                      />
+                    )}
+                  </ColumnTitleWrapper>
+                </ColumnContainer>
+              ))}
+            </TableHeader>
+          )}
         {!isMobileView ? (
           <WorkqueueRowDesktop
             columns={this.props.columns}

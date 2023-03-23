@@ -41,7 +41,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { User } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -68,6 +68,7 @@ import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { UserDetails } from '@client/utils/userUtils'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -346,6 +347,11 @@ export const NavigationView = (props: IFullProps) => {
   )
   const runningVer = String(localStorage.getItem('running-version'))
 
+  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
+    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+  })
+
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
       return
@@ -574,7 +580,8 @@ export const NavigationView = (props: IFullProps) => {
                     />
                   )}
 
-                {userDetails?.systemRole &&
+                {isOnePrintInAdvanceOn &&
+                  userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyToIssue
                   ) && (
@@ -840,7 +847,7 @@ export const NavigationView = (props: IFullProps) => {
             return (
               <NavigationItem
                 icon={() => (
-                  <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+                  <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}

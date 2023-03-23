@@ -21,6 +21,7 @@ interface IFormMessages
   addressLine4: MessageDescriptor
   answer: MessageDescriptor
   proofOfInformantsID: MessageDescriptor
+  witnessName: MessageDescriptor
   informantName: MessageDescriptor
   otherInformantType: MessageDescriptor
   informantsDateOfBirth: MessageDescriptor
@@ -32,6 +33,8 @@ interface IFormMessages
   informantsRelationWithChild: MessageDescriptor
   informantsRelationWithDeceased: MessageDescriptor
   informantTitle: MessageDescriptor
+  witnessOneTitle: MessageDescriptor
+  witnessTwoTitle: MessageDescriptor
   assignedRegistrationOffice: MessageDescriptor
   assignedRegistrationOfficeGroupTitle: MessageDescriptor
   attendantAtBirth: MessageDescriptor
@@ -70,6 +73,7 @@ interface IFormMessages
   sexMale: MessageDescriptor
   childSexOther: MessageDescriptor
   sexUnknown: MessageDescriptor
+  other: MessageDescriptor
   childTab: MessageDescriptor
   childTitle: MessageDescriptor
   commentsOrNotesDescription: MessageDescriptor
@@ -94,8 +98,11 @@ interface IFormMessages
   deathDate: MessageDescriptor
   deathEventName: MessageDescriptor
   deathEventTitle: MessageDescriptor
+  marriageEventName: MessageDescriptor
+  marriageEventTitle: MessageDescriptor
   deathPlace: MessageDescriptor
   placeOfDeath: MessageDescriptor
+  placeOfMarriage: MessageDescriptor
   placeOfDeathOther: MessageDescriptor
   placeOfDeathSameAsCurrent: MessageDescriptor
   placeOfDeathSameAsPrimary: MessageDescriptor
@@ -122,6 +129,7 @@ interface IFormMessages
   docTypeBirthCert: MessageDescriptor
   docTypeChildAgeProof: MessageDescriptor
   docTypeChildBirthProof: MessageDescriptor
+  docTypeMarriageNotice: MessageDescriptor
   docTypeCopyOfBurialReceipt: MessageDescriptor
   docTypeDeathCertificate: MessageDescriptor
   docTypePoliceCertificate: MessageDescriptor
@@ -145,6 +153,7 @@ interface IFormMessages
   educationAttainmentNone: MessageDescriptor
   enterResponse: MessageDescriptor
   familyName: MessageDescriptor
+  marriedLastName: MessageDescriptor
   father: MessageDescriptor
   fatherFamilyName: MessageDescriptor
   fatherFirstNames: MessageDescriptor
@@ -196,6 +205,9 @@ interface IFormMessages
   mannerNatural: MessageDescriptor
   mannerSuicide: MessageDescriptor
   mannerUndetermined: MessageDescriptor
+  typeOfMarriage: MessageDescriptor
+  polygamy: MessageDescriptor
+  monogamy: MessageDescriptor
   maritalStatus: MessageDescriptor
   maritalStatusDivorced: MessageDescriptor
   maritalStatusMarried: MessageDescriptor
@@ -212,6 +224,12 @@ interface IFormMessages
   motherFirstNames: MessageDescriptor
   motherName: MessageDescriptor
   motherTitle: MessageDescriptor
+  groomName: MessageDescriptor
+  groomTitle: MessageDescriptor
+  brideName: MessageDescriptor
+  brideTitle: MessageDescriptor
+  headOfGroomFamily: MessageDescriptor
+  headOfBrideFamily: MessageDescriptor
   multipleBirth: MessageDescriptor
   nationality: MessageDescriptor
   nationalityBangladesh: MessageDescriptor
@@ -240,12 +258,15 @@ interface IFormMessages
   privateHome: MessageDescriptor
   prompt: MessageDescriptor
   proofOfBirth: MessageDescriptor
+  proofOfMarriageNotice: MessageDescriptor
   proofOfDocCertificateOfChild: MessageDescriptor
   proofOfEPICardOfChild: MessageDescriptor
   proofOfFathersID: MessageDescriptor
   otherBirthSupportingDocuments: MessageDescriptor
   legalGuardianProof: MessageDescriptor
   proofOfMothersID: MessageDescriptor
+  proofOfGroomsID: MessageDescriptor
+  proofOfBridesID: MessageDescriptor
   proofOfParentPrimaryAddress: MessageDescriptor
   placeOfBirthPreview: MessageDescriptor
   registrationName: MessageDescriptor
@@ -301,6 +322,8 @@ interface IFormMessages
   ageOfFather: MessageDescriptor
   ageOfInformant: MessageDescriptor
   ageOfDeceased: MessageDescriptor
+  ageOfGroom: MessageDescriptor
+  ageOfBride: MessageDescriptor
   whatDocToUpload: MessageDescriptor
   whoIsPresentLabel: MessageDescriptor
   whoseContactDetailsLabel: MessageDescriptor
@@ -317,6 +340,7 @@ interface IFormMessages
   firstName: MessageDescriptor
   lastName: MessageDescriptor
   relationship: MessageDescriptor
+  relationshipToSpouses: MessageDescriptor
   primaryAddress: MessageDescriptor
   parentDetailsType: MessageDescriptor
   motherRadioButton: MessageDescriptor
@@ -466,6 +490,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.proofOfInformantsID'
   },
+  witnessName: {
+    defaultMessage: 'Witness',
+    description: 'Form section name for Witness',
+    id: 'form.section.witness.name'
+  },
   informantName: {
     defaultMessage: 'Informant',
     description: 'Form section name for Informant',
@@ -520,6 +549,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: "What are the informant's details?",
     description: 'Form section title for informants',
     id: 'form.section.informant.title'
+  },
+  witnessOneTitle: {
+    defaultMessage: 'What are the witnesses one details?',
+    description: 'Form section title for witnesses',
+    id: 'form.section.witnessOne.title'
+  },
+  witnessTwoTitle: {
+    defaultMessage: 'What are the witnesses two details?',
+    description: 'Form section title for witnesses',
+    id: 'form.section.witnessTwo.title'
   },
   assignedRegistrationOffice: {
     defaultMessage: 'Assigned Registration Office',
@@ -714,6 +753,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Option for form field: Sex name',
     id: 'form.field.label.sexUnknown'
   },
+  other: {
+    defaultMessage: 'Other',
+    description: 'Option for form field: Other',
+    id: 'form.field.label.other'
+  },
   childTab: {
     defaultMessage: 'Child',
     description: 'Form section name for Child',
@@ -841,10 +885,25 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Form section title for date of Death Event',
     id: 'form.section.deathEvent.date'
   },
+  marriageEventName: {
+    defaultMessage: 'Marriage event details',
+    description: 'Form section name for Marriage Event',
+    id: 'form.section.marriageEvent.name'
+  },
+  marriageEventDate: {
+    defaultMessage: 'Date of marriage',
+    description: 'Form section title for date of Marriage Event',
+    id: 'form.section.marriageEvent.date'
+  },
   deathEventTitle: {
     defaultMessage: 'Death details?',
     description: 'Form section title for Death Event',
     id: 'form.section.deathEvent.title'
+  },
+  marriageEventTitle: {
+    defaultMessage: 'Marriage details?',
+    description: 'Form section title for Marriage Event',
+    id: 'form.section.marriageEvent.title'
   },
   deathPlace: {
     defaultMessage: 'Place of Occurrence of Death',
@@ -855,6 +914,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Where did the death occur?',
     description: 'Label for form field: Place of occurrence of death',
     id: 'form.field.label.placeOfDeath'
+  },
+  placeOfMarriage: {
+    defaultMessage: 'Place of marriage',
+    description: 'Label for form field: Place of occurrence of marriage',
+    id: 'form.field.label.placeOfMarriage'
   },
   placeOfDeathOther: {
     defaultMessage: 'Different Address',
@@ -985,6 +1049,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for select option Notification of birth',
     id: 'form.field.label.docTypeChildBirthProof'
   },
+  docTypeMarriageNotice: {
+    defaultMessage: 'Notice of marriage',
+    description: 'Label for document section for marriage notice',
+    id: 'form.field.label.docTypeMarriageNotice'
+  },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
     description: 'Label for select option Certified Copy of Burial Receipt',
@@ -1099,6 +1168,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Last name',
     description: 'Label for family name text input',
     id: 'form.field.label.familyName'
+  },
+  marriedLastName: {
+    defaultMessage: 'Last name at birth (if different from above)',
+    description: 'Label for married last name text input',
+    id: 'form.field.label.marriedLastName'
   },
   father: {
     defaultMessage: 'Father',
@@ -1322,6 +1396,21 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Option for form field: Manner of death',
     id: 'form.field.label.mannerOfDeathUndetermined'
   },
+  typeOfMarriage: {
+    defaultMessage: 'Type of marriage',
+    description: 'Option for form field: Type of marriage',
+    id: 'form.field.label.typeOfMarriage'
+  },
+  polygamy: {
+    defaultMessage: 'Polygamous',
+    description: 'Option for form field: Polygamy',
+    id: 'form.field.label.polygamy'
+  },
+  monogamy: {
+    defaultMessage: 'Monogamous',
+    description: 'Option for form field: Monogamy',
+    id: 'form.field.label.monogamy'
+  },
   maritalStatus: {
     defaultMessage: 'Marital status',
     description: 'Label for form field: Marital status',
@@ -1396,6 +1485,36 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: "Mother's details",
     description: 'Form section title for Mother',
     id: 'form.section.mother.title'
+  },
+  groomName: {
+    defaultMessage: 'Groom',
+    description: 'Form section name for Groom',
+    id: 'form.section.groom.name'
+  },
+  groomTitle: {
+    defaultMessage: "Groom's details",
+    description: 'Form section title for Groom',
+    id: 'form.section.groom.title'
+  },
+  brideName: {
+    defaultMessage: 'Bride',
+    description: 'Form section name for Bride',
+    id: 'form.section.bride.name'
+  },
+  brideTitle: {
+    defaultMessage: "Bride's details",
+    description: 'Form section title for Bride',
+    id: 'form.section.bride.title'
+  },
+  headOfGroomFamily: {
+    defaultMessage: "Head of groom's family",
+    description: 'Form select option for witness relationship',
+    id: 'form.section.groom.headOfGroomFamily'
+  },
+  headOfBrideFamily: {
+    defaultMessage: "Head of bride's family",
+    description: 'Form select option for witness relationship',
+    id: 'form.section.bride.headOfBrideFamily'
   },
   multipleBirth: {
     defaultMessage: 'No. of previous births',
@@ -1576,6 +1695,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for list item Proof of birth',
     id: 'form.field.label.proofOfBirth'
   },
+  proofOfMarriageNotice: {
+    defaultMessage: 'Notice of intention to marriage',
+    description: 'Label for list item notice of marriage',
+    id: 'form.field.label.proofOfMarriageNotice'
+  },
   proofOfDocCertificateOfChild: {
     defaultMessage:
       "Certificate from doctor to prove child's age OR School certificate",
@@ -1596,6 +1720,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: "Mother's identity",
     description: 'Label for list item Mother ID Proof',
     id: 'form.field.label.proofOfMothersID'
+  },
+  proofOfGroomsID: {
+    defaultMessage: "Proof of Groom's identity",
+    description: 'Label for list item Groom ID Proof',
+    id: 'form.field.label.proofOfGroomsID'
+  },
+  proofOfBridesID: {
+    defaultMessage: "Proof of Brides's identity",
+    description: 'Label for list item Bride ID Proof',
+    id: 'form.field.label.proofOfBridesID'
   },
   proofOfParentPrimaryAddress: {
     defaultMessage: 'Proof of Primary Address of Parent',
@@ -1931,6 +2065,16 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Age of deceased',
     id: 'form.field.label.ageOfDeceased'
   },
+  ageOfGroom: {
+    defaultMessage: 'Age of groom',
+    description: 'Label for form field: Age of groom',
+    id: 'form.field.label.ageOfGroom'
+  },
+  ageOfBride: {
+    defaultMessage: 'Age of bride',
+    description: 'Label for form field: Age of bride',
+    id: 'form.field.label.ageOfBride'
+  },
   placeOfBirthPreview: {
     defaultMessage: 'Place of delivery',
     description: 'Title for place of birth sub section',
@@ -2008,6 +2152,11 @@ export const formMessageDescriptors: IFormMessages = {
     description:
       "Input label for certificate collector's relationship to the subject",
     id: 'form.field.label.relationship'
+  },
+  relationshipToSpouses: {
+    defaultMessage: 'Relationship to spouses',
+    description: "Input label for witness's relationship with spouses",
+    id: 'form.field.label.relationshipToSpouses'
   },
   parentDetailsType: {
     defaultMessage: "Do you have the mother and father's details?",

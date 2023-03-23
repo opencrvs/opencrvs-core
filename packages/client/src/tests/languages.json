@@ -455,7 +455,7 @@
         "misc.pinSeqDigitsError": "PIN cannot contain sequential digits",
         "misc.reEnterDescription": "Let's make sure we collected your PIN correctly.",
         "misc.reEnterTitle": "Re-enter your new PIN",
-        "duplicates.warning": "Potential duplicate with record {trackingId}",
+        "duplicates.warning": "Potential duplicate of record {trackingId}",
         "error.code": "401",
         "error.draftFailed": "This is some messaging on advicing the user on what to do... in the event of a failed declaration.",
         "error.occurred": "An error occurred. Please try again.",
