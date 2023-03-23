@@ -22,7 +22,7 @@ import { URL } from 'url'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async informantSMSNotifications(_, {}, authHeader) {
+    async informantSMSNotifications(_, {}, { headers: authHeader }) {
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
           new Error(
@@ -89,7 +89,11 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async toggleInformantSMSNotification(_, { smsNotifications }, authHeader) {
+    async toggleInformantSMSNotification(
+      _,
+      { smsNotifications },
+      { headers: authHeader }
+    ) {
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
           new Error(

@@ -203,7 +203,11 @@ describe('Role root resolvers', () => {
     it('returns full role list', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyRoleList))
 
-      const response = await resolvers.Query.getSystemRoles({}, {})
+      const response = await resolvers.Query.getSystemRoles(
+        {},
+        {},
+        { headers: undefined }
+      )
 
       expect(response).toEqual(dummyRoleList)
     })
@@ -219,7 +223,8 @@ describe('Role root resolvers', () => {
           value: 'LOCAL_REGISTRAR',
           type: 'Mayor',
           active: true
-        }
+        },
+        { headers: undefined }
       )
       expect(response).toEqual([dummyRoleList[2]])
     })
@@ -284,7 +289,7 @@ describe('system role update', () => {
     const response = await resolvers.Mutation.updateRole(
       {},
       mockUpdateRoleRequest,
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(mockSystemRole).toEqual(response)

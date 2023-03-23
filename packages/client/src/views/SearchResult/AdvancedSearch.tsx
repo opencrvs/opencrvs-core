@@ -43,6 +43,7 @@ import {
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 export enum TabId {
   BIRTH = 'birth',
@@ -495,7 +496,7 @@ const AdvancedSearch = () => {
               onTabClick={(id: TabId) => {
                 dispatch(
                   setAdvancedSearchParam({
-                    ...advancedSearchParamState,
+                    ...advancedSearchInitialState,
                     event: id
                   })
                 )

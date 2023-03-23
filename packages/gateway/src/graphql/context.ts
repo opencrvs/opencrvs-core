@@ -9,9 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IAuthHeader {
-  Authorization: string
-  'x-correlation-id'?: string
-  'x-real-ip'?: string
-  'x-real-user-agent'?: string
+/* eslint-disable import/no-relative-parent-imports */
+import { IAuthHeader } from '../common-types'
+import LocationsAPI from '../features/fhir/locationsAPI'
+import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
+import { Request } from '@hapi/hapi'
+
+export interface Context {
+  request: Request
+  dataSources: {
+    locationsAPI: LocationsAPI
+    practitionerRoleAPI: PractitionerRoleAPI
+  }
+  headers: IAuthHeader
 }
