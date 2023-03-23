@@ -180,14 +180,15 @@ describe('deduplication tests for death', () => {
   })
 
   describe('standard check for death duplication', () => {
-    it.only('finds a duplicate with very similar details', async () => {
+    it('finds a duplicate with very similar details', async () => {
       await expect(
         compareForDeathDuplication(
           {
             deceasedFirstNames: ['John', 'jhon'],
             deceasedFamilyName: ['koly', 'koly'],
             deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17']
+            deathDate: ['2000-11-12', '2000-11-17'],
+            deceasedDoB: ['2020-11-12', '2020-11-10']
           },
           client
         )
