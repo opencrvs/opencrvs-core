@@ -356,10 +356,7 @@ export const UserAudit = () => {
                       dispatch(goToTeamUserList(user.primaryOffice!.id))
                     }
                   >
-                    {user.primaryOffice && user.primaryOffice.displayLabel}{' '}
-                    {JSON.stringify(userDetails?.primaryOffice)}
-                    {JSON.stringify(userDetails?.systemRole)}
-                    {JSON.stringify(scope)}
+                    {user.primaryOffice && user.primaryOffice.displayLabel}
                   </Link>
                 }
               />
