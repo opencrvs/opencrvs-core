@@ -170,12 +170,7 @@ async function indexAndSearchComposition(
     body.type !== 'WAITING_VALIDATION' &&
     body.type !== 'VALIDATED'
   ) {
-    await detectAndUpdateBirthDuplicates(
-      compositionId,
-      composition,
-      body,
-      authHeader
-    )
+    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }
 
@@ -418,8 +413,7 @@ async function createDeclarationIndex(
 async function detectAndUpdateBirthDuplicates(
   compositionId: string,
   composition: fhir.Composition,
-  body: IBirthCompositionBody,
-  authHeader: string
+  body: IBirthCompositionBody
 ) {
   const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
@@ -430,8 +424,7 @@ async function detectAndUpdateBirthDuplicates(
   )
   await addFlaggedAsPotentialDuplicate(
     duplicates.map((ite) => ite.trackingId).join(','),
-    compositionId,
-    authHeader
+    compositionId
   )
   return await updateCompositionWithDuplicates(
     composition,

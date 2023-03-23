@@ -80,7 +80,7 @@ function SystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
     <NameAvatar>
-      <HealthSystemLogo></HealthSystemLogo>
+      <HealthSystemLogo />
       <span>{name ?? intl.formatMessage(userMessages.system)}</span>
     </NameAvatar>
   )

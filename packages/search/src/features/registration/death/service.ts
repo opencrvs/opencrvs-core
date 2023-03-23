@@ -162,20 +162,14 @@ async function indexDeclaration(
     body.type !== 'WAITING_VALIDATION' &&
     body.type !== 'VALIDATED'
   ) {
-    await detectAndUpdateDeathDuplicates(
-      compositionId,
-      composition,
-      body,
-      authHeader
-    )
+    await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }
 
 async function detectAndUpdateDeathDuplicates(
   compositionId: string,
   composition: fhir.Composition,
-  body: IDeathCompositionBody,
-  authHeader: string
+  body: IDeathCompositionBody
 ) {
   const duplicates = await detectDeathDuplicates(compositionId, body)
   if (!duplicates.length) {
@@ -186,8 +180,7 @@ async function detectAndUpdateDeathDuplicates(
   )
   await addFlaggedAsPotentialDuplicate(
     duplicates.map((ite) => ite.trackingId).join(','),
-    compositionId,
-    authHeader
+    compositionId
   )
   return await updateCompositionWithDuplicates(
     composition,

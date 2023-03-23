@@ -314,26 +314,18 @@ export async function getdeclarationJurisdictionIds(
   return locationHirarchyIds
 }
 
-export async function fetchTaskByCompositionIdFromHearth(
-  id: string,
-  authHeader: string
-) {
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
   const taskBundle: fhir.Bundle = await fetchHearth(
-    `/Task?focus=Composition/${id}`,
-    authHeader
+    `/Task?focus=Composition/${id}`
   )
   return taskBundle.entry?.[0]?.resource as fhir.Task
 }
 
 export async function addFlaggedAsPotentialDuplicate(
   duplicatesIds: string,
-  compositionId: string,
-  authHeader: string
+  compositionId: string
 ) {
-  const task = await fetchTaskByCompositionIdFromHearth(
-    compositionId,
-    authHeader
-  )
+  const task = await fetchTaskByCompositionIdFromHearth(compositionId)
 
   const extension = {
     url: FLAGGED_AS_POTENTIAL_DUPLICATE,
@@ -348,7 +340,6 @@ export async function addFlaggedAsPotentialDuplicate(
 
 export const fetchHearth = async <T = any>(
   suffix: string,
-  authHeader: string,
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
@@ -356,8 +347,7 @@ export const fetchHearth = async <T = any>(
     method: method,
     body,
     headers: {
-      'Content-Type': 'application/fhir+json',
-      Authorization: authHeader
+      'Content-Type': 'application/fhir+json'
     }
   })
 
