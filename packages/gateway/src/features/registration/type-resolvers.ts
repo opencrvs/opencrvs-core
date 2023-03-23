@@ -590,7 +590,14 @@ export const typeResolvers: GQLResolver = {
               await fetchTaskByCompositionIdFromHearth(compositionId)
             return {
               compositionId: compositionId,
-              trackingId: taskData.entry?.[0].resource?.identifier?.[1].value
+              trackingId: taskData.entry?.[0].resource?.identifier?.find(
+                (identifier) =>
+                  identifier.system &&
+                  [
+                    `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
+                    `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`
+                  ].includes(identifier.system)
+              )?.value
             }
           })
         ))
