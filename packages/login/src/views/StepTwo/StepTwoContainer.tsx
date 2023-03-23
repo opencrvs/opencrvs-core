@@ -153,7 +153,10 @@ export function StepTwoContainer() {
                 <Button
                   size="small"
                   type="tertiary"
-                  onClick={() => dispatch(actions.resendSMS())}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    dispatch(actions.resendSMS())
+                  }}
                   id="login-mobile-resend"
                 >
                   {intl.formatMessage(messages.resend)}
