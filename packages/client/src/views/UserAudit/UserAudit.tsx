@@ -294,6 +294,8 @@ export const UserAudit = () => {
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<HistoryNavigator hideForward />}
           mobileRight={
+            userDetails &&
+            scope &&
             user && (
               <>
                 <Status status={user.status || 'pending'} />
@@ -304,7 +306,7 @@ export const UserAudit = () => {
                     user.id as string,
                     user.status as string
                   )}
-                  hide={(scope && !scope.includes('sysadmin')) || false}
+                  hide={!canEditUserDetails(user, userDetails, scope)}
                 />
               </>
             )
@@ -354,7 +356,10 @@ export const UserAudit = () => {
                       dispatch(goToTeamUserList(user.primaryOffice!.id))
                     }
                   >
-                    {user.primaryOffice && user.primaryOffice.displayLabel}
+                    {user.primaryOffice && user.primaryOffice.displayLabel}{' '}
+                    {JSON.stringify(userDetails?.primaryOffice)}
+                    {JSON.stringify(userDetails?.systemRole)}
+                    {JSON.stringify(scope)}
                   </Link>
                 }
               />
