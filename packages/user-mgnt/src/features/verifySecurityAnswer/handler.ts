@@ -40,11 +40,14 @@ export default async function verifySecurityAnswer(
   const questionAnswers = user.securityQuestionAnswers || []
 
   const isCorrect = questionAnswers.some(
-    securityQNA =>
+    (securityQNA) =>
       securityQNA.questionKey === payload.questionKey &&
       generateHash(payload.answer.toLowerCase(), user.salt) ===
         securityQNA.answerHash
   )
+  if (!isCorrect) {
+    throw conflict('User gave wrong answer for security question')
+  }
 
   if (
     !user.securityQuestionAnswers ||

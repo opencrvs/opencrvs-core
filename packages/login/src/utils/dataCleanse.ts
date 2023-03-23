@@ -18,6 +18,12 @@ export const convertToMSISDN = (localPhoneNumber: string, country: string) => {
   const countryCode =
     country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
+  if (localPhoneNumber && localPhoneNumber.startsWith('234')) {
+    return `${
+      callingCountries[countryCode].countryCallingCodes[0]
+    }${localPhoneNumber.substring(3)}`
+  }
+
   return `${
     callingCountries[countryCode].countryCallingCodes[0]
   }${localPhoneNumber.substring(1)}`
