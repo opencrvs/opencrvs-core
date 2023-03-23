@@ -184,11 +184,11 @@ export const searchForBirthDuplicates = async (
                                     childDoB: {
                                       gte: subYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString(),
                                       lte: addYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString()
                                     }
                                   }
