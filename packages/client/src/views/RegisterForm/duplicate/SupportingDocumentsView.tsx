@@ -199,8 +199,7 @@ export const SupportingDocumentsView = (props: IProps) => {
   }
 
   const selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    setPreviewImage(previewImageTransformed as IFileValue)
+    setPreviewImage(previewImage as IFileValue)
   }
 
   const getAllAttachmentInPreviewList = () => {

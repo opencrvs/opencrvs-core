@@ -497,7 +497,7 @@ type Certificate { # -> Document Reference
   collector: RelatedPerson # -> .extension
   hasShowedVerifiedDocument: Boolean # -> .extension
   payments: [Payment] # -> .extension
-  data: String # -> base64 minio data
+  data: String # -> .content.attachment.data minioURI to base64
 }
 
 input QuestionnaireQuestionInput {
@@ -532,7 +532,7 @@ type Attachment { # -> DocumentReference
   contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> base64 file from minio
-  uri: String # -> .content.attachment.data base64
+  uri: String # -> .content.attachment.data minioURI
   # approved/validated/deleted
   status: String # -> .status
   originalFileName: String # -> .identifier

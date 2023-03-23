@@ -1501,8 +1501,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    this.setState({ previewImage: previewImageTransformed as IFileValue })
+    this.setState({ previewImage: previewImage as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {

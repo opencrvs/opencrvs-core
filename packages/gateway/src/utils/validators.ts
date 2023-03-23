@@ -19,34 +19,35 @@ import {
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
-  attachments: Array<{ data?: string; url?: string }>
+  attachments: Array<{ data?: string; uri?: string }>
 ) {
   for (const file of attachments) {
-    if (file.data) {
-      const data = file.data.split('base64,')?.[1] || ''
-      const mime = file.data.split(';')[0].replace('data:', '')
+    const isMinioUrl =
+      file.uri &&
+      file.uri.split('/').length > 1 &&
+      file.uri.split('/')[1] === MINIO_BUCKET
 
-      if (!mime.startsWith('image/')) {
-        throw new Error(`File type doesn't match image/*`)
-      }
+    if (isMinioUrl) {
+      continue
+    }
+    if (!file.data) {
+      throw new Error(`No attachment file found!`)
+    }
+    const data = file.data.split('base64,')?.[1] || ''
+    const mime = file.data.split(';')[0].replace('data:', '')
 
-      const buffer = Buffer.from(data, 'base64')
-      const type = await fromBuffer(buffer)
-      if (!type) {
-        throw new Error("File type couldn't be determined")
-      }
+    if (!mime.startsWith('image/')) {
+      throw new Error(`File type doesn't match image/*`)
+    }
 
-      if (!type.mime.startsWith('image/')) {
-        throw new Error(`File type doesn't match image/*`)
-      }
-    } else if (file.url) {
-      const isMinioUrl =
-        file.url.split('/').length > 1 &&
-        file.url.split('/')[1] === MINIO_BUCKET
+    const buffer = Buffer.from(data, 'base64')
+    const type = await fromBuffer(buffer)
+    if (!type) {
+      throw new Error("File type couldn't be determined")
+    }
 
-      if (isMinioUrl) {
-        continue
-      }
+    if (!type.mime.startsWith('image/')) {
+      throw new Error(`File type doesn't match image/*`)
     }
   }
 }

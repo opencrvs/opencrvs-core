@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { getMinioDocumentHandler } from '@gateway/routes/getMinioDocument/handler'
+import { getDocumentHandler } from '@gateway/routes/getMinioDocument/handler'
 
-// curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/sendVerifyCode
 export default {
   method: 'GET',
   path: '/document',
-  handler: getMinioDocumentHandler,
+  handler: getDocumentHandler,
   config: {
     description: 'Get minio document'
   }

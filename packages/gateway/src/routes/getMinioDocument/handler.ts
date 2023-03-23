@@ -14,7 +14,7 @@ import { MINIO_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
 import { fromBuffer } from 'file-type'
 
-export async function getMinioDocumentHandler(
+export async function getDocumentHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

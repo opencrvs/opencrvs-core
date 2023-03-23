@@ -1196,10 +1196,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const declarationToDelete = state.declarations.find(
         (declaration) => declaration.id === action.payload
       )
-      const declarationMinioUrls =
-        getMinioUrlsFromDeclaration(declarationToDelete)
 
-      postMinioUrlsToServiceWorker(declarationMinioUrls)
       return {
         ...state,
         declarations: state.declarations.filter(
@@ -1790,43 +1787,6 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function getMinioUrlsFromDeclaration(
-  declaration: IDeclaration | undefined
-) {
-  const minioUrls: string[] = []
-  if (!declaration) {
-    return minioUrls
-  }
-  const documentsData = declaration.originalData?.documents as Record<
-    string,
-    IAttachmentValue[]
-  >
-  if (!documentsData) {
-    return minioUrls
-  }
-  const docSections = Object.values(documentsData)
-
-  for (const docSection of docSections) {
-    for (const doc of docSection) {
-      if (doc.data && !isBase64FileString(doc.data)) {
-        minioUrls.push(doc.data)
-      }
-    }
-  }
-  return minioUrls
-}
-
-export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map((pathToImage) =>
-    new URL(
-      `document?documentName=${pathToImage}`,
-      window.config.API_GATEWAY_URL
-    ).toString()
-  )
-  navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioFullUrls
-  })
-}
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
   return declarations
     .filter(
