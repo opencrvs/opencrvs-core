@@ -35,9 +35,13 @@ describe('Form desearializer', () => {
   it('replaces all operator descriptors from the serialized form', async () => {
     const { birth, death } = registerForms
 
-    expect(hasOperatorDescriptors(deserializeForm(birth))[0].length).toBeGreaterThan(5)
+    expect(
+      hasOperatorDescriptors(deserializeForm(birth))[0].length
+    ).toBeGreaterThan(5)
     expect(hasOperatorDescriptors(deserializeForm(birth))[1]).toBeTruthy()
-    expect(hasOperatorDescriptors(deserializeForm(death))[0].length).toBeGreaterThan(5)
+    expect(
+      hasOperatorDescriptors(deserializeForm(death))[0].length
+    ).toBeGreaterThan(5)
     expect(hasOperatorDescriptors(deserializeForm(death))[1]).toBeTruthy()
   })
 

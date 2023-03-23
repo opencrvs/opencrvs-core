@@ -16,6 +16,7 @@ import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
+import { TimeField } from '@opencrvs/components/lib/TimeField'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -81,7 +82,8 @@ import {
   Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
-  IDateRangePickerValue
+  IDateRangePickerValue,
+  TIME
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -399,6 +401,18 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          value={value as string}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === TIME) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TimeField
+          {...inputProps}
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
