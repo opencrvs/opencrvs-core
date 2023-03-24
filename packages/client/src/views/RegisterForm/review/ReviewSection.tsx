@@ -1781,7 +1781,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
-    console.log(formSections)
     return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
