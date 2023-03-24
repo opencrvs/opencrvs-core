@@ -105,6 +105,9 @@ function detectEvent(request: Hapi.Request): Events {
             ]
           }
           if (hasValidateScope(request)) {
+            if (isADuplicate) {
+              return Events[`${eventType}_NEW_DEC`]
+            }
             return Events[`${eventType}_REQUEST_FOR_REGISTRAR_VALIDATION`]
           }
           return isInProgressDeclaration(fhirBundle)
