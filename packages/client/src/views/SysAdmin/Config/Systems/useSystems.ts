@@ -302,8 +302,11 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          integratingSystemType: newIntegratingSystemType,
-          ...(newSystemType === 'WEBHOOK' && {
+          integratingSystemType:
+            newSystemType === SystemType.NationalId
+              ? newIntegratingSystemType
+              : undefined,
+          ...(newSystemType === SystemType.Webhook && {
             settings: {
               dailyQuota: 0,
               webhook: [birthPermissions, deathPermissions]
