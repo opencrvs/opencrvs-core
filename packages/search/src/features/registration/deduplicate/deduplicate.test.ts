@@ -187,7 +187,8 @@ describe('deduplication tests for death', () => {
             deceasedFirstNames: ['John', 'jhon'],
             deceasedFamilyName: ['koly', 'koly'],
             deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17']
+            deathDate: ['2000-11-12', '2000-11-17'],
+            deceasedDoB: ['2020-11-12', '2020-11-10']
           },
           client
         )
