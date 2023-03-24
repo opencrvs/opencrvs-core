@@ -15,6 +15,7 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
   detectDeathDuplicates,
@@ -128,7 +129,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
