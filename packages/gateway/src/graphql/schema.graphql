@@ -1848,6 +1848,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  TIME
 }
 
 input ConditionalInput {

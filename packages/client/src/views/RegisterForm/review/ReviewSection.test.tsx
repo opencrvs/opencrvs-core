@@ -281,14 +281,16 @@ describe('when in device of large viewport', () => {
     })
 
     it('Should click the validator Declaration Button', async () => {
-      const validatorButton = reviewSectionComponent
-        .contains('#validatorDeclarationBtn')
+      const validatorButton = reviewSectionComponent.contains(
+        '#validatorDeclarationBtn'
+      )
       expect(validatorButton).toBeFalsy()
     })
 
     it('Should click the Reject Declaration Button', async () => {
-      const rejectButton = reviewSectionComponent
-        .contains('#rejectDeclarationBtn')
+      const rejectButton = reviewSectionComponent.contains(
+        '#rejectDeclarationBtn'
+      )
       expect(rejectButton).toBeFalsy()
     })
 
@@ -503,7 +505,9 @@ describe('when in device of large viewport', () => {
 
     it('renders validation error if wrong value given', () => {
       expect(
-        reviewSectionComponent.contains('#required_label_registration_informant')
+        reviewSectionComponent.contains(
+          '#required_label_registration_informant'
+        )
       ).toBeFalsy()
     })
   })
