@@ -122,13 +122,13 @@ export const fieldToIdentityTransformer =
     return transformedData
   }
 
-export const fieldToNationalIdSystemIdentityTransformer = (
+export const nidVerificationFieldToIdentityTransformer = (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
-  fieldToIdentityTransformer('id', 'MOSIP_PERSON_SPECIFIC_USER_TOKEN')(
+  fieldToIdentityTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
     transformedData,
     draftData,
     sectionId,
@@ -137,11 +137,13 @@ export const fieldToNationalIdSystemIdentityTransformer = (
   const sectionData = transformedData[sectionId]
   const existingIdentity = sectionData.identifier.find(
     (identifier: fhir.Identifier) =>
-      identifier.type && identifier.type === 'MOSIP_PERSON_SPECIFIC_USER_TOKEN'
+      identifier.type && identifier.type === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (existingIdentity) {
-    existingIdentity['fieldsModifiedByIdentity'] =
-      draftData[sectionId]['fieldsModifiedByNidUserInfo']
+    const modifiedFields = draftData[sectionId][
+      'fieldsModifiedByNidUserInfo'
+    ] as string[]
+    existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
   }
   return transformedData
 }

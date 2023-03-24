@@ -28,7 +28,7 @@ interface OIDPUserAddress {
   country?: string
 }
 
-interface OIDPUserInfo {
+interface oidpUserInfo {
   sub: string
   name?: string
   given_name?: string
@@ -50,6 +50,13 @@ interface OIDPUserInfo {
   address?: OIDPUserAddress
   updated_at?: number
 }
+
+interface UserInfo {
+  oidpUserInfo: oidpUserInfo
+  districtFhirId?: string
+  stateFhirId?: string
+}
+
 export interface INidCallbackState {
   pathname: string | undefined
   declarationId: string | undefined
@@ -65,19 +72,21 @@ export function useQueryParams() {
 export function addNidUserInfoToDeclaration(
   declaration: IDeclaration,
   section: string,
-  nidUserInfo: OIDPUserInfo
+  nidUserInfo: UserInfo
 ) {
+  const oidpUserInfo = nidUserInfo.oidpUserInfo
   const declarationDataSection = declaration.data[section]
   const fieldsModifiedByNidUserInfo = []
-  if (nidUserInfo.birthdate) {
+  const splitFullName = splitName(oidpUserInfo.name)
+
+  if (oidpUserInfo.birthdate) {
     declarationDataSection[`${section}BirthDate`] = formatDate(
-      new Date(nidUserInfo.birthdate),
+      new Date(oidpUserInfo.birthdate),
       'yyyy-MM-dd'
     )
     fieldsModifiedByNidUserInfo.push(`${section}BirthDate`)
   }
 
-  const splitFullName = splitName(nidUserInfo.name)
   if (splitFullName.firstName) {
     declarationDataSection['firstNamesEng'] = splitFullName.firstName
     fieldsModifiedByNidUserInfo.push('firstNamesEng')
@@ -89,9 +98,7 @@ export function addNidUserInfoToDeclaration(
 
   declarationDataSection['fieldsModifiedByNidUserInfo'] =
     fieldsModifiedByNidUserInfo
-  declarationDataSection[`${section}NidVerification`] = 'verified'
-
-  declarationDataSection['psut'] = nidUserInfo.sub
+  declarationDataSection[`${section}NidVerification`] = oidpUserInfo.sub
 }
 
 export function generateNonce() {

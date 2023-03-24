@@ -589,13 +589,7 @@ function GeneratedInputField({
           labelForVerified={fieldDefinition.labelForVerified}
           labelForUnverified={fieldDefinition.labelForUnverified}
           labelForOffline={fieldDefinition.labelForOffline}
-          status={
-            !isOnline
-              ? 'offline'
-              : value === 'verified'
-              ? 'verified'
-              : 'unverified'
-          }
+          status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
         />
       </InputField>
     )

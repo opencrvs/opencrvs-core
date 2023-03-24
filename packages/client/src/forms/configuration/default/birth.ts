@@ -1113,6 +1113,21 @@ export const birthRegisterForms: ISerializedForm = {
               conditionals: [
                 nidIntegrationConditionals.hideIfNidIntegrationDisabled
               ],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
               labelForOffline: formMessageDescriptors.nidOffline
@@ -1138,6 +1153,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                 }
               ],
               mapping: {
@@ -1251,6 +1270,12 @@ export const birthRegisterForms: ISerializedForm = {
                   operation: 'englishOnlyNameFormat'
                 }
               ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1291,6 +1316,12 @@ export const birthRegisterForms: ISerializedForm = {
               validate: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {
@@ -1478,6 +1509,34 @@ export const birthRegisterForms: ISerializedForm = {
               }
             },
             {
+              name: 'motherNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validate: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'nidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
+            },
+            {
               name: 'motherBirthDate',
               type: 'DATE',
               label: formMessageDescriptors.dateOfBirth,
@@ -1490,6 +1549,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
                 }
               ],
               required: true,
@@ -1601,6 +1664,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -1629,6 +1696,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               maxLength: 32,
@@ -2040,8 +2111,21 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               validate: [],
               conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                }
               ],
+              mapping: {
+                mutation: {
+                  operation: 'nidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
               labelForOffline: formMessageDescriptors.nidOffline
@@ -2075,6 +2159,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
                 }
               ],
               mapping: {
@@ -2170,6 +2258,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -2206,6 +2298,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {

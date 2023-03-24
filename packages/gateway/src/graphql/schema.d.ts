@@ -897,6 +897,7 @@ export interface GQLIdentityType {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLHumanName {
@@ -1535,7 +1536,7 @@ export const enum GQLIdentityIDType {
   OTHER = 'OTHER',
   NO_ID = 'NO_ID',
   SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO',
-  MOSIP_PERSON_SPECIFIC_USER_TOKEN = 'MOSIP_PERSON_SPECIFIC_USER_TOKEN'
+  MOSIP_PSUT_TOKEN_ID = 'MOSIP_PSUT_TOKEN_ID'
 }
 
 export const enum GQLAddressType {
@@ -5908,6 +5909,7 @@ export interface GQLIdentityTypeTypeResolver<TParent = any> {
   id?: IdentityTypeToIdResolver<TParent>
   type?: IdentityTypeToTypeResolver<TParent>
   otherType?: IdentityTypeToOtherTypeResolver<TParent>
+  fieldsModifiedByIdentity?: IdentityTypeToFieldsModifiedByIdentityResolver<TParent>
 }
 
 export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
@@ -5919,6 +5921,13 @@ export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentityTypeToOtherTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IdentityTypeToFieldsModifiedByIdentityResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
