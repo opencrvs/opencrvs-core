@@ -18,6 +18,7 @@ export const SUBMIT_DEATH_DECLARATION = gql`
     createDeathRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `

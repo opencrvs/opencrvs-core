@@ -287,6 +287,34 @@ export const searchForDeathDuplicates = async (
                     }
                   ].filter(Boolean)
                 }
+              },
+              {
+                bool: {
+                  must: [
+                    body.deceasedDoB && {
+                      range: {
+                        deceasedDoB: {
+                          gte: subDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString(),
+                          lte: addDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString()
+                        }
+                      }
+                    },
+                    body.deceasedDoB && {
+                      distance_feature: {
+                        field: 'deceasedDoB',
+                        pivot: '5d', // 5 days
+                        origin: new Date(body.deceasedDoB).toISOString(),
+                        boost: 1
+                      }
+                    }
+                  ].filter(Boolean)
+                }
               }
             ].filter(Boolean)
           }

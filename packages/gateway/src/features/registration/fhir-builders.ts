@@ -4251,6 +4251,7 @@ async function hasBirthDuplicates(
   }
 
   const res = await findBirthDuplicates(authHeader, {
+    motherIdentifier: bundle.mother?.identifier?.[0]?.id,
     childFirstNames: bundle.child.name?.[0]?.firstNames,
     childFamilyName: bundle.child.name?.[0]?.familyName,
     childDoB: bundle.child.birthDate,
