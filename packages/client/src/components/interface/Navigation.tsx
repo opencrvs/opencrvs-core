@@ -842,7 +842,7 @@ export const NavigationView = (props: IFullProps) => {
           {userDetails?.role &&
             USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.analytics) && (
               <NavigationGroup>
-                {userDetails?.role &&
+                {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
                     GROUP_ID.analytics
                   ) && (
