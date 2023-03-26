@@ -21,7 +21,13 @@ interface IDashboardMessages
 
 const messagesToDefine: IDashboardMessages = {
   noContent: {
-    defaultMessage: 'No Content',
+    defaultMessage: `No content to show.
+    Make sure the following variables are configured in the <strong>client-config.js</strong> provided by your country config package:<br />
+    <ul>
+      <li><strong>LEADERBOARDS_DASHBOARD_URL</strong></li>
+      <li><strong>REGISTRATIONS_DASHBOARD_URL</strong></li>
+      <li><strong>STATISTICS_DASHBOARD_URL</strong></li>
+    </ul>`,
     description: 'No content information for dashboard',
     id: 'dashboard.noContent'
   },
@@ -36,8 +42,8 @@ const messagesToDefine: IDashboardMessages = {
     id: 'dashboard.leaderboardTitle'
   },
   statisticTitle: {
-    defaultMessage: 'Statitics',
-    description: 'Statitics title',
+    defaultMessage: 'Statistics',
+    description: 'Statistics title',
     id: 'dashboard.statisticTitle'
   }
 }

@@ -75,7 +75,11 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
         ) : (
           <div id={`${title.toLowerCase()}_noContent`}>
             <Content title={title} size={ContentSize.LARGE}>
-              {intl.formatMessage(messages.noContent)}
+              {intl.formatMessage(messages.noContent, {
+                strong: (chunks: any) => <strong>{chunks}</strong>,
+                ul: (chunks: any) => <ul>{chunks}</ul>,
+                li: (chunks: any) => <li>{chunks}</li>
+              })}
             </Content>
           </div>
         )}
