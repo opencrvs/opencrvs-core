@@ -96,7 +96,7 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
   // Consider triggering this a task that will be left to be run in the background.
   return (...params: T) => {
     refresh()
-    handler(...params)
+    return handler(...params)
   }
 }
 
