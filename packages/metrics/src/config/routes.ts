@@ -76,9 +76,25 @@ import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
+import { refresh } from '@metrics/features/performance/viewRefresher'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
+}
+
+/*
+ * This route wrapper triggers a view update for materialised views
+ * we read data to Metabase from. If you are not seeing your data updated
+ * after a user action, you most likely need to add this wrapper to some
+ * new endpoint handler here.
+ */
+function analyticsDataRefreshingRoute<T extends Array<any>, U>(
+  handler: (...args: T) => U
+) {
+  // Do not use await for the refresh operation. This operation can take minutes or more.
+  // Consider triggering this a task that will be left to be run in the background.
+  refresh()
+  return (...params: T) => handler(...params)
 }
 
 export const getRoutes = () => {
@@ -87,7 +103,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/in-progress-declaration',
-      handler: inProgressHandler,
+      handler: analyticsDataRefreshingRoute(inProgressHandler),
       config: {
         tags: ['api']
       }
@@ -95,7 +111,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/in-progress-declaration',
-      handler: inProgressHandler,
+      handler: analyticsDataRefreshingRoute(inProgressHandler),
       config: {
         tags: ['api']
       }
@@ -105,7 +121,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-declaration',
-      handler: newDeclarationHandler,
+      handler: analyticsDataRefreshingRoute(newDeclarationHandler),
       config: {
         tags: ['api']
       }
@@ -113,7 +129,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-declaration',
-      handler: newDeclarationHandler,
+      handler: analyticsDataRefreshingRoute(newDeclarationHandler),
       config: {
         tags: ['api']
       }
@@ -123,7 +139,9 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/request-for-registrar-validation',
-      handler: requestForRegistrarValidationHandler,
+      handler: analyticsDataRefreshingRoute(
+        requestForRegistrarValidationHandler
+      ),
       config: {
         tags: ['api']
       }
@@ -131,7 +149,9 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/request-for-registrar-validation',
-      handler: requestForRegistrarValidationHandler,
+      handler: analyticsDataRefreshingRoute(
+        requestForRegistrarValidationHandler
+      ),
       config: {
         tags: ['api']
       }
@@ -173,7 +193,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-registration',
-      handler: newBirthRegistrationHandler,
+      handler: analyticsDataRefreshingRoute(newBirthRegistrationHandler),
       config: {
         tags: ['api']
       }
@@ -181,7 +201,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-registration',
-      handler: newDeathRegistrationHandler,
+      handler: analyticsDataRefreshingRoute(newDeathRegistrationHandler),
       config: {
         tags: ['api']
       }
@@ -191,7 +211,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-validated',
-      handler: markValidatedHandler,
+      handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
         tags: ['api']
       }
@@ -199,7 +219,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-validated',
-      handler: markValidatedHandler,
+      handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
         tags: ['api']
       }
@@ -209,7 +229,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-registered',
-      handler: markBirthRegisteredHandler,
+      handler: analyticsDataRefreshingRoute(markBirthRegisteredHandler),
       config: {
         tags: ['api']
       }
@@ -217,7 +237,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-registered',
-      handler: markDeathRegisteredHandler,
+      handler: analyticsDataRefreshingRoute(markDeathRegisteredHandler),
       config: {
         tags: ['api']
       }
@@ -227,7 +247,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-certified',
-      handler: markCertifiedHandler,
+      handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
         tags: ['api']
       }
@@ -235,7 +255,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-certified',
-      handler: markCertifiedHandler,
+      handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
         tags: ['api']
       }
@@ -245,7 +265,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-issued',
-      handler: markIssuedHandler,
+      handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
         tags: ['api']
       }
@@ -253,7 +273,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-issued',
-      handler: markIssuedHandler,
+      handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
         tags: ['api']
       }
@@ -263,7 +283,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-voided',
-      handler: markRejectedHandler,
+      handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
         tags: ['api']
       }
@@ -271,7 +291,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-voided',
-      handler: markRejectedHandler,
+      handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
         tags: ['api']
       }
@@ -302,7 +322,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/request-correction',
-      handler: requestCorrectionHandler,
+      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
       config: {
         tags: ['api']
       }
@@ -310,7 +330,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/request-correction',
-      handler: requestCorrectionHandler,
+      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
       config: {
         tags: ['api']
       }
@@ -343,7 +363,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-archived',
-      handler: birthDeclarationArchivedHandler,
+      handler: analyticsDataRefreshingRoute(birthDeclarationArchivedHandler),
       config: {
         tags: ['api']
       }
@@ -351,7 +371,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-archived',
-      handler: deathDeclarationArchivedHandler,
+      handler: analyticsDataRefreshingRoute(deathDeclarationArchivedHandler),
       config: {
         tags: ['api']
       }
@@ -359,7 +379,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-reinstated',
-      handler: birthDeclarationReinstatedHandler,
+      handler: analyticsDataRefreshingRoute(birthDeclarationReinstatedHandler),
       config: {
         tags: ['api']
       }
@@ -367,7 +387,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-reinstated',
-      handler: deathDeclarationReinstatedHandler,
+      handler: analyticsDataRefreshingRoute(deathDeclarationReinstatedHandler),
       config: {
         tags: ['api']
       }
