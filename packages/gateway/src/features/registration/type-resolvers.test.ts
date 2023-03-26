@@ -34,33 +34,51 @@ import {
 import { GQLRegAction } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 
 const fetch = fetchAny as any
+const mockGet = jest.fn()
+jest.mock('apollo-datasource-rest', () => {
+  class MockRESTDataSource {
+    get = mockGet
+  }
+  return {
+    RESTDataSource: MockRESTDataSource
+  }
+})
 
 beforeEach(() => {
   fetch.resetMocks()
 })
 
 describe('Registration type resolvers', () => {
+  afterEach(() => {
+    mockGet.mockReset()
+  })
   it('fetches and returns a mother patient resource from a composition section', async () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.mother({
-      section: [
-        {
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/sections',
-                code: MOTHER_CODE
-              }
-            ]
-          },
-          entry: [{ reference: 'Patient/123' }]
-        }
-      ]
-    })
+    const patient = await typeResolvers.BirthRegistration.mother(
+      {
+        section: [
+          {
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: MOTHER_CODE
+                }
+              ]
+            },
+            entry: [{ reference: 'Patient/123' }]
+          }
+        ]
+      },
+      undefined,
+      { headers: undefined }
+    )
 
     expect(patient).toEqual({ resourceType: 'Patient' })
   })
@@ -69,21 +87,25 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.father({
-      section: [
-        {
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/sections',
-                code: FATHER_CODE
-              }
-            ]
-          },
-          entry: [{ reference: 'Patient/123' }]
-        }
-      ]
-    })
+    const patient = await typeResolvers.BirthRegistration.father(
+      {
+        section: [
+          {
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: FATHER_CODE
+                }
+              ]
+            },
+            entry: [{ reference: 'Patient/123' }]
+          }
+        ]
+      },
+      undefined,
+      { headers: undefined }
+    )
 
     expect(patient).toEqual({ resourceType: 'Patient' })
   })
@@ -92,21 +114,25 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.child({
-      section: [
-        {
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/sections',
-                code: CHILD_CODE
-              }
-            ]
-          },
-          entry: [{ reference: 'Patient/123' }]
-        }
-      ]
-    })
+    const patient = await typeResolvers.BirthRegistration.child(
+      {
+        section: [
+          {
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: CHILD_CODE
+                }
+              ]
+            },
+            entry: [{ reference: 'Patient/123' }]
+          }
+        ]
+      },
+      undefined,
+      { headers: undefined }
+    )
 
     expect(patient).toEqual({ resourceType: 'Patient' })
   })
@@ -115,9 +141,13 @@ describe('Registration type resolvers', () => {
     fetch.mockResponseOnce(JSON.stringify({}))
 
     // @ts-ignore
-    const patient = await typeResolvers.BirthRegistration.child({
-      section: []
-    })
+    const patient = await typeResolvers.BirthRegistration.child(
+      {
+        section: []
+      },
+      undefined,
+      { headers: undefined }
+    )
 
     expect(patient).toBeNull()
   })
@@ -126,7 +156,9 @@ describe('Registration type resolvers', () => {
 
     // @ts-ignore
     const informant = await typeResolvers.BirthRegistration.informant(
-      mockComposition
+      mockComposition,
+      undefined,
+      { headers: undefined }
     )
     expect(informant).toBeDefined()
     expect(informant.resource.resourceType).toEqual('RelatedPerson')
@@ -422,26 +454,26 @@ describe('Registration type resolvers', () => {
           }
         ]
       }
-
-      fetch.mockResponses(
-        [JSON.stringify(roleBundle), { status: 200 }],
-        [JSON.stringify(roleHistoryBundle), { status: 200 }],
-        [JSON.stringify(mockUser), { status: 200 }]
-      )
-      const user = await typeResolvers.History.user(
-        mockTaskDownloaded,
-        null,
-        {}
-      )
+      mockGet
+        .mockResolvedValueOnce(roleBundle)
+        .mockResolvedValueOnce(roleHistoryBundle)
+      fetch.mockResponses([JSON.stringify(mockUser), { status: 200 }])
+      const user = await typeResolvers.History.user(mockTaskDownloaded, null, {
+        dataSources: { practitionerRoleAPI: new PractitionerRoleAPI() }
+      })
       expect(user.role.labels).toEqual(mockUser.role.labels)
     })
 
     it('Should return location', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
       const location = await typeResolvers.History.location(
         mockTaskDownloaded,
         null,
-        {}
+        {
+          dataSources: {
+            locationsAPI: new LocationsAPI()
+          }
+        }
       )
       expect(location.id).toBe(mockLocation.id)
     })
@@ -477,9 +509,13 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.BirthRegistration.registration({
-        id: 123
-      })
+      const registration = await typeResolvers.BirthRegistration.registration(
+        {
+          id: 123
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(registration).toBeDefined()
       expect(registration.resourceType).toBe('Task')
       expect(mock).toBeCalledWith(
@@ -501,9 +537,13 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const registration = await typeResolvers.BirthRegistration.registration({
-        id: 123
-      })
+      const registration = await typeResolvers.BirthRegistration.registration(
+        {
+          id: 123
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(registration).toBeNull()
       expect(mock).toBeCalledWith(
         'http://localhost:5001/fhir/Task?focus=Composition/123',
@@ -640,7 +680,9 @@ describe('Registration type resolvers', () => {
       mockCompositionCloned.section[4].entry[0].reference = 'Encounter/456'
       // @ts-ignore
       const idMap = await typeResolvers.BirthRegistration._fhirIDMap(
-        mockCompositionCloned
+        mockCompositionCloned,
+        undefined,
+        { headers: undefined }
       )
       expect(idMap).toEqual({
         composition: '123',
@@ -659,7 +701,9 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const weight = await typeResolvers.BirthRegistration.weightAtBirth(
-        mockComposition
+        mockComposition,
+        undefined,
+        { headers: undefined }
       )
       expect(weight).toEqual(1.25)
     })
@@ -669,7 +713,9 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const birthType = await typeResolvers.BirthRegistration.birthType(
-        mockComposition
+        mockComposition,
+        undefined,
+        { headers: undefined }
       )
       expect(birthType).toEqual(2)
     })
@@ -679,7 +725,11 @@ describe('Registration type resolvers', () => {
 
       // @ts-ignore
       const attendantAtBirth =
-        await typeResolvers.BirthRegistration.attendantAtBirth(mockComposition)
+        await typeResolvers.BirthRegistration.attendantAtBirth(
+          mockComposition,
+          undefined,
+          { headers: undefined }
+        )
       expect(attendantAtBirth).toEqual('PHYSICIAN')
     })
     it('returns birthRegistrationType', async () => {
@@ -688,7 +738,9 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const birthRegistrationType =
         await typeResolvers.BirthRegistration.birthRegistrationType(
-          mockComposition
+          mockComposition,
+          undefined,
+          { headers: undefined }
         )
       expect(birthRegistrationType).toEqual('BOTH_PARENTS')
     })
@@ -700,7 +752,9 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const lastPreviousLiveBirth =
         await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
-          mockComposition
+          mockComposition,
+          undefined,
+          { headers: undefined }
         )
       expect(lastPreviousLiveBirth).toEqual('2014-01-28')
     })
@@ -712,7 +766,9 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const childrenBornAliveToMother =
         await typeResolvers.BirthRegistration.childrenBornAliveToMother(
-          mockComposition
+          mockComposition,
+          undefined,
+          { headers: undefined }
         )
       expect(childrenBornAliveToMother).toEqual(2)
     })
@@ -724,7 +780,9 @@ describe('Registration type resolvers', () => {
       // @ts-ignore
       const foetalDeathsToMother =
         await typeResolvers.BirthRegistration.foetalDeathsToMother(
-          mockComposition
+          mockComposition,
+          undefined,
+          { headers: undefined }
         )
       expect(foetalDeathsToMother).toEqual(null)
     })
@@ -753,7 +811,9 @@ describe('Registration type resolvers', () => {
       )
       // @ts-ignore
       const eventLocation = await typeResolvers.BirthRegistration.eventLocation(
-        mockComposition
+        mockComposition,
+        undefined,
+        { headers: undefined }
       )
       expect(eventLocation).toBeDefined()
       expect(eventLocation).toEqual(mockLocation)
@@ -763,84 +823,128 @@ describe('Registration type resolvers', () => {
   describe('Birth Registration branch', () => {
     it('returns mother null', async () => {
       // @ts-ignore
-      const value = await typeResolvers.BirthRegistration.mother({
-        section: []
-      })
+      const value = await typeResolvers.BirthRegistration.mother(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(value).toEqual(null)
     })
     it('returns father null', async () => {
       // @ts-ignore
-      const father = await typeResolvers.BirthRegistration.father({
-        section: []
-      })
+      const father = await typeResolvers.BirthRegistration.father(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(father).toEqual(null)
     })
     it('returns child null', async () => {
       // @ts-ignore
-      const child = await typeResolvers.BirthRegistration.father({
-        section: []
-      })
+      const child = await typeResolvers.BirthRegistration.father(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(child).toEqual(null)
     })
     it('returns informant null', async () => {
       // @ts-ignore
-      const informant = await typeResolvers.BirthRegistration.informant({
-        section: []
-      })
+      const informant = await typeResolvers.BirthRegistration.informant(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(informant).toEqual(null)
     })
     it('returns weight At birth null', async () => {
       // @ts-ignore
-      const weight = await typeResolvers.BirthRegistration.weightAtBirth({
-        section: []
-      })
+      const weight = await typeResolvers.BirthRegistration.weightAtBirth(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(weight).toEqual(null)
     })
     it('returns birthType null', async () => {
       // @ts-ignore
-      const birthType = await typeResolvers.BirthRegistration.birthType({
-        section: []
-      })
+      const birthType = await typeResolvers.BirthRegistration.birthType(
+        {
+          section: []
+        },
+        undefined,
+        { headers: undefined }
+      )
       expect(birthType).toEqual(null)
     })
     it('returns attendantAtBirth null', async () => {
       // @ts-ignore
       const attendantAtBirth =
-        await typeResolvers.BirthRegistration.attendantAtBirth({
-          section: []
-        })
+        await typeResolvers.BirthRegistration.attendantAtBirth(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(attendantAtBirth).toEqual(null)
     })
     it('returns birthRegistrationType null', async () => {
       // @ts-ignore
       const birthRegistrationType =
-        await typeResolvers.BirthRegistration.birthRegistrationType({
-          section: []
-        })
+        await typeResolvers.BirthRegistration.birthRegistrationType(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(birthRegistrationType).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore
       const childrenBornAliveToMother =
-        await typeResolvers.BirthRegistration.childrenBornAliveToMother({
-          section: []
-        })
+        await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(childrenBornAliveToMother).toEqual(null)
     })
     it('returns foetalDeathsToMother null', async () => {
       // @ts-ignore
       const foetalDeathsToMother =
-        await typeResolvers.BirthRegistration.foetalDeathsToMother({
-          section: []
-        })
+        await typeResolvers.BirthRegistration.foetalDeathsToMother(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(foetalDeathsToMother).toEqual(null)
     })
     it('returns lastPreviousLiveBirth null', async () => {
       // @ts-ignore
       const lastPreviousLiveBirth =
-        await typeResolvers.BirthRegistration.lastPreviousLiveBirth({
-          section: []
-        })
+        await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+          {
+            section: []
+          },
+          undefined,
+          { headers: undefined }
+        )
       expect(lastPreviousLiveBirth).toEqual(null)
     })
   })
@@ -920,7 +1024,11 @@ describe('Registration type resolvers', () => {
         .mockResponseOnce(JSON.stringify({ id: 'zzz' })) // Doc ref zzz
 
       // @ts-ignore
-      const attachments = await typeResolvers.Registration.attachments(mockTask)
+      const attachments = await typeResolvers.Registration.attachments(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
       expect(attachments).toBeDefined()
       expect(attachments).toHaveLength(3)
 
@@ -962,7 +1070,11 @@ describe('Registration type resolvers', () => {
       const mock = fetch.mockResponseOnce(
         JSON.stringify({ resourceType: 'Composition', section: [] })
       )
-      const attachments = await typeResolvers.Registration.attachments(mockTask)
+      const attachments = await typeResolvers.Registration.attachments(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
       expect(attachments).toBeNull()
       expect(mock).toBeCalledWith(
         'http://localhost:5001/fhir/Composition/123',
@@ -983,7 +1095,11 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const status = await typeResolvers.Registration.status(mockTask)
+      const status = await typeResolvers.Registration.status(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
 
       expect(status).toBeDefined()
       expect(status).toHaveLength(2)
@@ -1104,15 +1220,23 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns office of the task', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
 
-      const office = await typeResolvers.RegWorkflow.office(mockTask)
+      const office = await typeResolvers.RegWorkflow.office(
+        mockTask,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
       expect(office).toBeDefined()
       expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
     })
 
     it('returns null as office of the task', async () => {
-      const office = await typeResolvers.RegWorkflow.office(mockTaskForError)
+      const office = await typeResolvers.RegWorkflow.office(
+        mockTaskForError,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
       expect(office).toBeNull()
     })
 
@@ -1120,13 +1244,29 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockUser))
 
       // @ts-ignore
-      const comments = await typeResolvers.RegWorkflow.comments(mockTask)
+      const comments = await typeResolvers.RegWorkflow.comments(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const comment = await typeResolvers.Comment.comment(mockTask.note[0])
+      const comment = await typeResolvers.Comment.comment(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const user = await typeResolvers.Comment.user(mockTask.note[0])
+      const user = await typeResolvers.Comment.user(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
       // @ts-ignore
-      const time = await typeResolvers.Comment.createdAt(mockTask.note[0])
+      const time = await typeResolvers.Comment.createdAt(
+        mockTask.note[0],
+        undefined,
+        { headers: undefined }
+      )
 
       expect(comments).toBeDefined()
 
@@ -1145,7 +1285,11 @@ describe('Registration type resolvers', () => {
 
     it('returns timeLogged of the task', async () => {
       fetch.mockResponseOnce(JSON.stringify({ timeSpentEditing: 0 }))
-      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(mockTask)
+      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
 
       expect(timeLogged).toBe(0)
     })
@@ -1153,7 +1297,9 @@ describe('Registration type resolvers', () => {
     it('returns user of the task', async () => {
       const mock = fetch.mockResponseOnce(JSON.stringify({ _id: '1' }))
       // @ts-ignore
-      const user = await typeResolvers.RegWorkflow.user(mockTask)
+      const user = await typeResolvers.RegWorkflow.user(mockTask, undefined, {
+        headers: undefined
+      })
 
       expect(mock).toBeCalledWith('http://localhost:3030/getUser', {
         body: JSON.stringify({ practitionerId: '123' }),
@@ -1166,57 +1312,79 @@ describe('Registration type resolvers', () => {
     it('returns null when there is no user extension in task', async () => {
       fetch.mockResponseOnce(JSON.stringify({}))
       // @ts-ignore
-      const user = await typeResolvers.RegWorkflow.user({
-        resourceType: 'Task',
-        extension: []
-      })
+      const user = await typeResolvers.RegWorkflow.user(
+        {
+          resourceType: 'Task',
+          extension: []
+        },
+        undefined,
+        { headers: undefined }
+      )
 
       expect(user).toBeNull()
     })
 
     it('returns location of the task', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      mockGet.mockResolvedValueOnce(mockLocation)
 
-      const taskLocation = await typeResolvers.RegWorkflow.location(mockTask)
-      expect(mock).toBeCalledWith('http://localhost:5001/fhir/Location/123', {
-        body: undefined,
-        headers: { 'Content-Type': 'application/fhir+json' },
-        method: 'GET'
-      })
+      const taskLocation = await typeResolvers.RegWorkflow.location(
+        mockTask,
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
+      expect(mockGet).toBeCalledWith('/123')
 
       expect(taskLocation.resource.resourceType).toBe('Location')
     })
 
     it('returns null when there is no location ref in task extension', async () => {
-      const taskLocation = await typeResolvers.RegWorkflow.location({
-        resourceType: 'Task',
-        extension: []
-      })
+      const taskLocation = await typeResolvers.RegWorkflow.location(
+        {
+          resourceType: 'Task',
+          extension: []
+        },
+        undefined,
+        { dataSources: { locationsAPI: new LocationsAPI() } }
+      )
 
       expect(taskLocation).toBeNull()
     })
 
     it('throw when tasks has no focus', async () => {
       // @ts-ignore
-      expect(typeResolvers.Registration.attachments({})).rejects.toThrowError(
+      expect(
+        typeResolvers.Registration.attachments({}, undefined, {
+          headers: undefined
+        })
+      ).rejects.toThrowError(
         'Task resource does not have a focus property necessary to lookup the composition'
       )
     })
 
     it('returns an array of duplicates', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
 
       // @ts-ignore
-      const duplicates = await typeResolvers.Registration.duplicates(mockTask)
+      const duplicates = await typeResolvers.Registration.duplicates(
+        mockTask,
+        undefined,
+        { headers: undefined }
+      )
       expect(duplicates).toBeDefined()
       expect(duplicates).toHaveLength(2)
-      expect(duplicates[0]).toBe('xyz')
-      expect(duplicates[1]).toBe('abc')
+      expect(duplicates[0].compositionId).toBe('xyz')
+      expect(duplicates[1].compositionId).toBe('abc')
     })
 
     it('throws when task has no focus in duplicate resolver', async () => {
       // @ts-ignore
-      expect(typeResolvers.Registration.duplicates({})).rejects.toThrowError(
+      expect(
+        typeResolvers.Registration.duplicates({}, undefined, {
+          headers: undefined
+        })
+      ).rejects.toThrowError(
         'Task resource does not have a focus property necessary to lookup the composition'
       )
     })
@@ -1302,13 +1470,21 @@ describe('Registration type resolvers', () => {
       [JSON.stringify(mockCertificate)]
     )
 
-    const certificates = await typeResolvers.Registration.certificates(mockTask)
+    const certificates = await typeResolvers.Registration.certificates(
+      mockTask,
+      undefined,
+      { headers: undefined }
+    )
 
     expect(certificates).toBeDefined()
   })
 
   it('throws error as certificate of the task', async () => {
-    expect(typeResolvers.Registration.certificates({})).rejects.toThrowError(
+    expect(
+      typeResolvers.Registration.certificates({}, undefined, {
+        headers: undefined
+      })
+    ).rejects.toThrowError(
       'Task resource does not have a focus property necessary to lookup the composition'
     )
   })
@@ -1319,7 +1495,11 @@ describe('Registration type resolvers', () => {
       [JSON.stringify(mockCertificate)]
     )
 
-    const certificates = await typeResolvers.Registration.certificates(mockTask)
+    const certificates = await typeResolvers.Registration.certificates(
+      mockTask,
+      undefined,
+      { headers: undefined }
+    )
     expect(certificates).toBeNull()
   })
 
@@ -1328,7 +1508,9 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
 
       const relatedPerson = await typeResolvers.Certificate.collector(
-        mockCertificate
+        mockCertificate,
+        undefined,
+        { headers: undefined }
       )
       expect(relatedPerson).toBeDefined()
       expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')

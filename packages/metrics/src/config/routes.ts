@@ -29,13 +29,9 @@ import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEve
 
 import {
   inProgressHandler,
-  markBirthRegisteredHandler,
   markCertifiedHandler,
-  markDeathRegisteredHandler,
   markRejectedHandler,
   markValidatedHandler,
-  newBirthRegistrationHandler,
-  newDeathRegistrationHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
   requestCorrectionHandler,
@@ -45,11 +41,11 @@ import {
   waitingExternalValidationHandler,
   declarationViewedHandler,
   declarationDownloadedHandler,
-  birthDeclarationArchivedHandler,
-  deathDeclarationArchivedHandler,
-  birthDeclarationReinstatedHandler,
-  deathDeclarationReinstatedHandler,
+  declarationArchivedHandler,
+  declarationReinstatedHandler,
   declarationUpdatedHandler,
+  markEventRegisteredHandler,
+  newEventRegistrationHandler,
   markIssuedHandler
 } from '@metrics/features/registration/handler'
 import {
@@ -81,6 +77,11 @@ import { refresh } from '@metrics/features/performance/viewRefresher'
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
+export enum EventType {
+  BIRTH = 'birth',
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
+}
 
 /*
  * This route wrapper triggers a view update for materialised views
@@ -102,198 +103,163 @@ export const getRoutes = () => {
     // In progress declaration
     {
       method: 'POST',
-      path: '/events/birth/in-progress-declaration',
+      path: '/events/{event}/in-progress-declaration',
       handler: analyticsDataRefreshingRoute(inProgressHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/in-progress-declaration',
-      handler: analyticsDataRefreshingRoute(inProgressHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // New declaration
     {
       method: 'POST',
-      path: '/events/birth/new-declaration',
+      path: '/events/{event}/new-declaration',
       handler: analyticsDataRefreshingRoute(newDeclarationHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-declaration',
-      handler: analyticsDataRefreshingRoute(newDeclarationHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/birth/request-for-registrar-validation',
+      path: '/events/{event}/request-for-registrar-validation',
       handler: analyticsDataRefreshingRoute(
         requestForRegistrarValidationHandler
       ),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/request-for-registrar-validation',
-      handler: analyticsDataRefreshingRoute(
-        requestForRegistrarValidationHandler
-      ),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/birth/waiting-external-resource-validation',
+      path: '/events/{event}/waiting-external-resource-validation',
       handler: waitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-external-resource-validation',
-      handler: waitingExternalValidationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/registrar-registration-waiting-external-resource-validation',
+      path: '/events/{event}/registrar-registration-waiting-external-resource-validation',
       handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
+
     {
       method: 'POST',
-      path: '/events/death/registrar-registration-waiting-external-resource-validation',
-      handler: registrarRegistrationWaitingExternalValidationHandler,
+      path: '/events/{event}/new-registration',
+      handler: analyticsDataRefreshingRoute(newEventRegistrationHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/new-registration',
-      handler: analyticsDataRefreshingRoute(newBirthRegistrationHandler),
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-registration',
-      handler: analyticsDataRefreshingRoute(newDeathRegistrationHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark validated
     {
       method: 'POST',
-      path: '/events/birth/mark-validated',
+      path: '/events/{event}/mark-validated',
       handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-validated',
-      handler: analyticsDataRefreshingRoute(markValidatedHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark registered
     {
       method: 'POST',
-      path: '/events/birth/mark-registered',
-      handler: analyticsDataRefreshingRoute(markBirthRegisteredHandler),
+      path: '/events/{event}/mark-registered',
+      handler: analyticsDataRefreshingRoute(markEventRegisteredHandler),
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/death/mark-registered',
-      handler: analyticsDataRefreshingRoute(markDeathRegisteredHandler),
-      config: {
-        tags: ['api']
-      }
-    },
-
     // Mark certified
     {
       method: 'POST',
-      path: '/events/birth/mark-certified',
+      path: '/events/{event}/mark-certified',
       handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-certified',
-      handler: analyticsDataRefreshingRoute(markCertifiedHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark issued
     {
       method: 'POST',
-      path: '/events/birth/mark-issued',
+      path: '/events/{event}/mark-issued',
       handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-issued',
-      handler: analyticsDataRefreshingRoute(markIssuedHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
     // Mark rejected
     {
       method: 'POST',
-      path: '/events/birth/mark-voided',
+      path: '/events/{event}/mark-voided',
       handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-voided',
-      handler: analyticsDataRefreshingRoute(markRejectedHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
 
@@ -321,20 +287,18 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
-      path: '/events/birth/request-correction',
+      path: '/events/{event}/request-correction',
       handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/death/request-correction',
-      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
-      config: {
-        tags: ['api']
-      }
-    },
+
     // Event assigned / unassigned
     {
       method: 'POST',
@@ -362,34 +326,28 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/birth/mark-archived',
-      handler: analyticsDataRefreshingRoute(birthDeclarationArchivedHandler),
+      path: '/events/{event}/mark-archived',
+      handler: analyticsDataRefreshingRoute(declarationArchivedHandler),
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {
       method: 'POST',
-      path: '/events/death/mark-archived',
-      handler: analyticsDataRefreshingRoute(deathDeclarationArchivedHandler),
+      path: '/events/{event}/mark-reinstated',
+      handler: analyticsDataRefreshingRoute(declarationReinstatedHandler),
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/mark-reinstated',
-      handler: analyticsDataRefreshingRoute(birthDeclarationReinstatedHandler),
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-reinstated',
-      handler: analyticsDataRefreshingRoute(deathDeclarationReinstatedHandler),
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
       }
     },
     {

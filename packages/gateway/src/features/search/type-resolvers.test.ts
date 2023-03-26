@@ -622,7 +622,7 @@ describe('Search type resolvers', () => {
       fetch.resetMocks()
       fetch.mockResponse(
         JSON.stringify({
-          id: 'dummy_user_id'
+          _id: 'dummy_user_id'
         })
       )
       const userModelData =
@@ -638,7 +638,7 @@ describe('Search type resolvers', () => {
           }
         )
       expect(userModelData).toEqual({
-        id: 'dummy_user_id'
+        _id: 'dummy_user_id'
       })
     })
     it('return progress report', async () => {

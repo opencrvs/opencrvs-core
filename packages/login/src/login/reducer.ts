@@ -25,6 +25,7 @@ export type LoginState = {
   resentSMS: boolean
   stepOneDetails: { username: string }
   config: Partial<IApplicationConfig>
+  redirectToURL?: string
   errorCode?: number
 }
 
@@ -38,7 +39,8 @@ export const initialState: LoginState = {
   },
   submissionError: false,
   resentSMS: false,
-  stepOneDetails: { username: '' }
+  stepOneDetails: { username: '' },
+  redirectToURL: ''
 }
 
 const CONFIG_CMD = Cmd.run<
@@ -155,6 +157,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           nonce: action.payload.nonce
         }
       }
+    case actions.CLIENT_REDIRECT_ROUTE:
+      const redirectRoute = action.payload.url
+      return {
+        ...state,
+        redirectToURL: redirectRoute
+      }
     case actions.VERIFY_CODE:
       const code = action.payload.code
       return loop(
@@ -186,11 +194,20 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.run(
           (getState: () => IStoreState) => {
-            window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${
-                action.payload.token
-              }&lang=${getState().i18n.language}`
-            )
+            const redirectToURL = getState().login.redirectToURL
+            const fullURL = new URL(
+              redirectToURL
+                ? `${redirectToURL}?token=${action.payload.token}&lang=${
+                    getState().i18n.language
+                  }`
+                : `?token=${action.payload.token}&lang=${
+                    getState().i18n.language
+                  }`,
+
+              window.config.CLIENT_APP_URL
+            ).toString()
+
+            window.location.assign(fullURL)
           },
           { args: [Cmd.getState] }
         )

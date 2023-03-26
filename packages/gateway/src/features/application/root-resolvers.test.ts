@@ -69,7 +69,7 @@ describe('Application config root resolvers', () => {
     const response = await resolvers.Mutation.updateApplicationConfig(
       {},
       { applicationConfig },
-      authHeaderNatlSYSAdmin
+      { headers: authHeaderNatlSYSAdmin }
     )
 
     expect(response).toEqual({
@@ -90,7 +90,7 @@ describe('Application config root resolvers', () => {
       resolvers.Mutation.updateApplicationConfig(
         {},
         { applicationConfig },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
     ).rejects.toThrowError(
       'Update application config is only allowed for natlsysadmin'
@@ -109,7 +109,7 @@ describe('Application config root resolvers', () => {
       resolvers.Mutation.updateApplicationConfig(
         {},
         { applicationConfig },
-        authHeaderNatlSYSAdmin
+        { headers: authHeaderNatlSYSAdmin }
       )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't update application config"
