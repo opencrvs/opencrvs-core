@@ -94,8 +94,10 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
 ) {
   // Do not use await for the refresh operation. This operation can take minutes or more.
   // Consider triggering this a task that will be left to be run in the background.
-  refresh()
-  return (...params: T) => handler(...params)
+  return (...params: T) => {
+    refresh()
+    handler(...params)
+  }
 }
 
 export const getRoutes = () => {
