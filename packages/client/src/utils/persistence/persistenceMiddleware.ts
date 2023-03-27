@@ -70,7 +70,7 @@ function getQueriesToPrefetch(
     {
       query: PERFORMANCE_METRICS,
       variables: {
-        event: 'birth',
+        event: 'BIRTH',
         locationId,
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
