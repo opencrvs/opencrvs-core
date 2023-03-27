@@ -2094,8 +2094,8 @@ const brnIdentifier = {
   value: '2022BSNEYUG'
 } as fhir.CodeableConcept
 
-const mosipUinIdentifier = {
-  type: 'MOSIP_UINTOKEN',
+const mosipPsutTokenIdentifier = {
+  type: 'MOSIP_PSUT_TOKEN_ID',
   value: '257803821990055124230310596669133515'
 } as fhir.CodeableConcept
 
@@ -2152,7 +2152,7 @@ export const mosipBirthPatientMock = {
   gender: 'male',
   birthDate: '1990-09-01',
   multipleBirthInteger: 1,
-  identifier: [brnIdentifier, mosipUinIdentifier]
+  identifier: [brnIdentifier, mosipPsutTokenIdentifier]
 }
 
 export const mosipBirthPatientBundleMock = JSON.stringify({

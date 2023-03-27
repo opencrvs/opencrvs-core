@@ -747,7 +747,7 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.type === 'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )

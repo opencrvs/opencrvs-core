@@ -984,7 +984,7 @@ export enum IdentityIdType {
   DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
   MarriageRegistrationNumber = 'MARRIAGE_REGISTRATION_NUMBER',
-  MosipUintoken = 'MOSIP_UINTOKEN',
+  MosipPsutTokenId = 'MOSIP_PSUT_TOKEN_ID',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
   Other = 'OTHER',
