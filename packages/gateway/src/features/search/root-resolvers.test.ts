@@ -72,7 +72,7 @@ describe('Search root resolvers', () => {
             event: 'Birth'
           }
         },
-        authHeaderValidUserDeclare
+        { headers: authHeaderValidUserDeclare }
       )
 
       expect(result).toBeDefined()
@@ -97,7 +97,7 @@ describe('Search root resolvers', () => {
             registrationStatuses: ['DECLARED']
           }
         },
-        authHeaderValidUserDeclare
+        { headers: authHeaderValidUserDeclare }
       )
 
       expect(result).toBeDefined()
@@ -122,7 +122,7 @@ describe('Search root resolvers', () => {
             compositionType: ['birth-declaration', 'death-declaration']
           }
         },
-        authHeaderValidUserDeclare
+        { headers: authHeaderValidUserDeclare }
       )
 
       expect(result).toBeDefined()
@@ -147,7 +147,7 @@ describe('Search root resolvers', () => {
             eventLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        authHeaderValidUserDeclare
+        { headers: authHeaderValidUserDeclare }
       )
 
       expect(result).toBeDefined()
@@ -172,7 +172,7 @@ describe('Search root resolvers', () => {
           {
             advancedSearchParameters: {}
           },
-          authHeaderValidUserRegister
+          { headers: authHeaderValidUserRegister }
         )
       ).rejects.toThrowError('There is no param to search')
     })
@@ -194,7 +194,7 @@ describe('Search root resolvers', () => {
             trackingId: 'B123456'
           }
         },
-        authHeaderValidUserRegister
+        { headers: authHeaderValidUserRegister }
       )
 
       expect(result).toBeDefined()
@@ -220,7 +220,7 @@ describe('Search root resolvers', () => {
           },
           sortColumn: 'modifiedAt.keyword'
         },
-        authHeaderValidUserRegister
+        { headers: authHeaderValidUserRegister }
       )
 
       expect(result).toBeDefined()
@@ -247,7 +247,7 @@ describe('Search root resolvers', () => {
           count: 10,
           skip: 2
         },
-        authHeaderValidUserRegister
+        { headers: authHeaderValidUserRegister }
       )
 
       expect(result).toBeDefined()
@@ -268,7 +268,7 @@ describe('Search root resolvers', () => {
             declarationLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        authHeaderValidUserRegister
+        { headers: authHeaderValidUserRegister }
       )
 
       expect(result).toBeDefined()
@@ -293,7 +293,7 @@ describe('Search root resolvers', () => {
             name: 'Hasib'
           }
         },
-        authHeaderValidUserRegister
+        { headers: authHeaderValidUserRegister }
       )
 
       expect(result).toBeDefined()
@@ -355,7 +355,7 @@ describe('Search root resolvers', () => {
           compositionType: ['birth-declaration'],
           registrationStatuses: ['REGISTERED']
         },
-        authorizedUser
+        { headers: authorizedUser }
       )
 
       expect(result).toBeDefined()
@@ -364,7 +364,11 @@ describe('Search root resolvers', () => {
     })
     it('throws an error for unauthorized user', async () => {
       await expect(
-        resolvers.Query.getEventsWithProgress({}, {}, unauthorizedUser)
+        resolvers.Query.getEventsWithProgress(
+          {},
+          {},
+          { headers: unauthorizedUser }
+        )
       ).rejects.toThrowError(
         'User does not have a sysadmin or register or validate scope'
       )
@@ -378,7 +382,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.getEventsWithProgress(
         {},
         { declarationJurisdictionId: null },
-        authorizedUser
+        { headers: authorizedUser }
       )
       expect(result.totalItems).toBe(0)
       expect(result.results).toEqual([])

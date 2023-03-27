@@ -32,7 +32,11 @@ import { UnassignError } from '@gateway/utils/unassignError'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
+    async requestBirthRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -53,7 +57,11 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have a register scope')
       }
     },
-    async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
+    async requestDeathRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -77,7 +85,7 @@ export const resolvers: GQLResolver = {
     async requestMarriageRegistrationCorrection(
       _,
       { id, details },
-      authHeader
+      { headers: authHeader }
     ) {
       if (hasScope(authHeader, 'register')) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)

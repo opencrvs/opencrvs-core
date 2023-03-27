@@ -1204,6 +1204,7 @@ type BirthDuplicateSearchBody = {
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
+  motherIdentifier?: string
 }
 
 export const findBirthDuplicates = (

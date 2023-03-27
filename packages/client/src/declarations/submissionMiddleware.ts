@@ -168,8 +168,11 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             details: gqlDetails
           }
         })
+
         const { isPotentiallyDuplicate, trackingId, compositionId } =
-          response?.data?.createBirthRegistration ?? {}
+          response?.data?.createBirthRegistration ??
+          response?.data?.createDeathRegistration ??
+          {}
 
         if (isPotentiallyDuplicate) {
           dispatch(

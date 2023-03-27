@@ -16,7 +16,11 @@ import { USER_MANAGEMENT_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async bookmarkAdvancedSearch(_, { bookmarkSearchInput }, authHeader) {
+    async bookmarkAdvancedSearch(
+      _,
+      { bookmarkSearchInput },
+      { headers: authHeader }
+    ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
@@ -48,7 +52,7 @@ export const resolvers: GQLResolver = {
     async removeBookmarkedAdvancedSearch(
       _,
       { removeBookmarkedSearchInput },
-      authHeader
+      { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
