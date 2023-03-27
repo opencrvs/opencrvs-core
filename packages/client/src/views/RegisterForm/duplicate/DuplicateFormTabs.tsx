@@ -776,7 +776,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           label: (
             <Text variant="bold16" element="span" color="grey600">
               {intl.formatMessage(
-                duplicateRegData.type.toLowerCase() === 'birth'
+                duplicateRegData.type.toLowerCase() === Event.Birth
                   ? recordAuditMessages.brn
                   : recordAuditMessages.drn
               )}
@@ -856,8 +856,8 @@ export const DuplicateFormTabs = (props: IProps) => {
                   </Text>
                 ),
                 heading: {
-                  right: duplicateTrackingId,
-                  left: actualTrackingId
+                  right: String(duplicateRegData.trackingId),
+                  left: String(actualRegData.trackingId)
                 },
                 leftValue: (
                   <Text variant="reg16" element="span" color="grey600">
