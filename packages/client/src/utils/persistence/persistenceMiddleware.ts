@@ -52,6 +52,7 @@ function getQueriesToPrefetch(
     {
       query: PERFORMANCE_STATS,
       variables: {
+        event: 'birth',
         locationId,
         status: [
           'IN_PROGRESS',
@@ -69,7 +70,7 @@ function getQueriesToPrefetch(
     {
       query: PERFORMANCE_METRICS,
       variables: {
-        event: 'BIRTH',
+        event: 'birth',
         locationId,
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
@@ -83,8 +84,7 @@ function getQueriesToPrefetch(
         locationId,
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
-      },
-      fetchPolicy: 'network-only'
+      }
     }
   ]
 }

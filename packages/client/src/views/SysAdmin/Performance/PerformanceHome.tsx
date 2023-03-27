@@ -584,7 +584,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="cache-first"
+            fetchPolicy="cache-and-network"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
