@@ -63,7 +63,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   REQUESTING_INDIVIDUAL,
   HAS_SHOWED_VERIFIED_DOCUMENT,
-  DUPLICATE_TRACKING_ID
+  DUPLICATE_TRACKING_ID,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import {
   ITemplatedComposition,
@@ -1059,6 +1060,14 @@ export const typeResolvers: GQLResolver = {
         extensions
       )
       return duplicateTrackingIdExt?.valueString
+    },
+    potentialDuplicates: (task: fhir.Task) => {
+      const extensions = task.extension || []
+      const duplicateTrackingIdExt = findExtension(
+        FLAGGED_AS_POTENTIAL_DUPLICATE,
+        extensions
+      )
+      return duplicateTrackingIdExt?.valueString?.split(',')
     }
   },
   DeathRegistration: {
