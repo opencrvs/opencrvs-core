@@ -31,6 +31,7 @@ import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
+import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -349,7 +350,8 @@ export const registrationLocationUserTransformer = (
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
-  targetFieldName?: string
+  targetFieldName?: string,
+  offlineData?: IOfflineData
 ) => {
   const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
   const registrationStatus =
@@ -359,11 +361,13 @@ export const registrationLocationUserTransformer = (
     })
   const officeName = registrationStatus?.office?.name || ''
   const officeAddressLevel3 =
-    registrationStatus?.office?.address?.district || ''
-  const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
+    offlineData &&
+    registrationStatus?.office &&
+    getAddressName(offlineData, registrationStatus.office)
+  if (!officeAddressLevel3) throw Error('Location with id not found')
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
-  ] = [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
+  ] = [officeName, officeAddressLevel3].join(', ')
 }
 
 export const registrarSignatureUserTransformer = (
