@@ -485,9 +485,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       return timeStructure === null ? 0 : timeStructure
     }
 
-
     const content = data.getEventsWithProgress.results.map(
-      (eventProgress) => {
+      (eventProgress: GQLEventProgressSet | null) => {
         if (eventProgress !== null) {
           const nameIntl = createNamesMap(
             eventProgress && (eventProgress.name as GQLHumanName[])
@@ -528,118 +527,110 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 dynamicConstantsMessages[eventProgress.type.toLowerCase()]
               )) ||
             ''
-          starterPractitionerRole =
-            (user.systemRole &&
-              intl.formatMessage(userMessages[user.systemRole as string])) ||
-            ''
-        }
-
-        const event =
-          (eventProgress.type &&
-            intl.formatMessage(
-              dynamicConstantsMessages[eventProgress.type.toLowerCase()]
-            )) ||
-          ''
-        const status =
-          (eventProgress.registration &&
-            eventProgress.registration.status &&
-            intl.formatMessage(
-              StatusMapping[eventProgress.registration.status].labelDescriptor
-            )) ||
-          ''
-
-        let timeLoggedInProgress = 0
-        let timeLoggedDeclared = 0
-        let timeLoggedRejected = 0
-        let timeLoggedValidated = 0
-        let timeLoggedWaitingValidation = 0
-        let timeLoggedRegistered = 0
-
-        if (eventProgress.progressReport != null) {
-          const {
-            timeInProgress,
-            timeInReadyForReview,
-            timeInRequiresUpdates,
-            timeInWaitingForApproval,
-            timeInWaitingForBRIS,
-            timeInReadyToPrint
-          } = eventProgress.progressReport
-
-          timeLoggedInProgress = getTimeDuration(
-            timeInProgress as number,
-            'IN_PROGRESS',
-            eventProgress
-          )
-
-          timeLoggedDeclared = getTimeDuration(
-            timeInReadyForReview as number,
-            'DECLARED',
-            eventProgress
-          )
-
-          timeLoggedRejected = getTimeDuration(
-            timeInRequiresUpdates as number,
-            'REJECTED',
-            eventProgress
-          )
-
-          timeLoggedValidated = getTimeDuration(
-            timeInWaitingForApproval as number,
-            'VALIDATED',
-            eventProgress
-          )
-
-          timeLoggedWaitingValidation = getTimeDuration(
-            timeInWaitingForBRIS as number,
-            'WAITING_VALIDATION',
-            eventProgress
-          )
-
-          timeLoggedRegistered = getTimeDuration(
-            timeInReadyToPrint as number,
-            'REGISTERED',
-            eventProgress
-          )
-        }
-        return {
-          id:
-            eventProgress.registration && eventProgress.registration.trackingId,
-          status,
-          compositionId: eventProgress.id,
-          eventType: event,
-          dateOfEvent: eventProgress.dateOfEvent,
-          nameIntl,
-          nameLocal,
-          informant:
+          const status =
             (eventProgress.registration &&
-              ((eventProgress.registration.contactRelationship &&
-                conditioanllyFormatContactRelationship(
-                  eventProgress.registration.contactRelationship
-                ) + ' ') ||
-                '') + (eventProgress.registration.contactNumber || '')) ||
-            '',
-          declarationStartedOn: formateDateWithRelationalText(
-            eventProgress.startedAt
-          ),
-          declarationStartedOnTime:
-            eventProgress.registration &&
-            new Date(eventProgress.registration.dateOfDeclaration)
-              .getTime()
-              .toString(),
-          declarationStartedBy:
-            starterPractitionerRole !== ''
-              ? starterPractitionerName + '\n' + `(${starterPractitionerRole})`
-              : starterPractitionerName,
-          timeLoggedInProgress,
-          timeLoggedDeclared,
-          timeLoggedRejected,
-          timeLoggedValidated,
-          timeLoggedWaitingValidation,
-          timeLoggedRegistered
+              eventProgress.registration.status &&
+              intl.formatMessage(
+                StatusMapping[eventProgress.registration.status].labelDescriptor
+              )) ||
+            ''
+
+          let timeLoggedInProgress = 0
+          let timeLoggedDeclared = 0
+          let timeLoggedRejected = 0
+          let timeLoggedValidated = 0
+          let timeLoggedWaitingValidation = 0
+          let timeLoggedRegistered = 0
+
+          if (eventProgress.progressReport != null) {
+            const {
+              timeInProgress,
+              timeInReadyForReview,
+              timeInRequiresUpdates,
+              timeInWaitingForApproval,
+              timeInWaitingForBRIS,
+              timeInReadyToPrint
+            } = eventProgress.progressReport
+
+            timeLoggedInProgress = getTimeDuration(
+              timeInProgress as number,
+              'IN_PROGRESS',
+              eventProgress
+            )
+
+            timeLoggedDeclared = getTimeDuration(
+              timeInReadyForReview as number,
+              'DECLARED',
+              eventProgress
+            )
+
+            timeLoggedRejected = getTimeDuration(
+              timeInRequiresUpdates as number,
+              'REJECTED',
+              eventProgress
+            )
+
+            timeLoggedValidated = getTimeDuration(
+              timeInWaitingForApproval as number,
+              'VALIDATED',
+              eventProgress
+            )
+
+            timeLoggedWaitingValidation = getTimeDuration(
+              timeInWaitingForBRIS as number,
+              'WAITING_VALIDATION',
+              eventProgress
+            )
+
+            timeLoggedRegistered = getTimeDuration(
+              timeInReadyToPrint as number,
+              'REGISTERED',
+              eventProgress
+            )
+          }
+          return {
+            id:
+              eventProgress.registration &&
+              eventProgress.registration.trackingId,
+            status,
+            compositionId: eventProgress.id,
+            eventType: event,
+            dateOfEvent: eventProgress.dateOfEvent,
+            nameIntl,
+            nameLocal,
+            informant:
+              (eventProgress.registration &&
+                ((eventProgress.registration.contactRelationship &&
+                  conditioanllyFormatContactRelationship(
+                    eventProgress.registration.contactRelationship
+                  ) + ' ') ||
+                  '') + (eventProgress.registration.contactNumber || '')) ||
+              '',
+            declarationStartedOn: formateDateWithRelationalText(
+              eventProgress.startedAt
+            ),
+            declarationStartedOnTime:
+              eventProgress.registration &&
+              new Date(eventProgress.registration.dateOfDeclaration)
+                .getTime()
+                .toString(),
+            declarationStartedBy:
+              starterPractitionerRole !== ''
+                ? starterPractitionerName +
+                  '\n' +
+                  `(${starterPractitionerRole})`
+                : starterPractitionerName,
+            timeLoggedInProgress,
+            timeLoggedDeclared,
+            timeLoggedRejected,
+            timeLoggedValidated,
+            timeLoggedWaitingValidation,
+            timeLoggedRegistered
+          }
         }
+        return {}
       }
-      return {}
-    })
+    )
 
     return orderBy(
       content,
