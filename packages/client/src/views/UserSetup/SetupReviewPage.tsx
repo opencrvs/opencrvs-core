@@ -202,9 +202,16 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 ]}
               >
                 <GlobalError id="GlobalError">
-                  {submitError && (
+                  {submitError && navigator.onLine && (
                     <WarningMessage>
                       {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                    </WarningMessage>
+                  )}
+                </GlobalError>
+                <GlobalError id="no-internet">
+                  {!navigator.onLine && (
+                    <WarningMessage>
+                      {intl.formatMessage(errorMessages.noInternet)}
                     </WarningMessage>
                   )}
                 </GlobalError>

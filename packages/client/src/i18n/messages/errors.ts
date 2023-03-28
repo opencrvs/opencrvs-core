@@ -84,6 +84,11 @@ const messagesToDefine: IErrorMessages = {
       'The error message that displays if we want the user to try the action again',
     id: 'error.occurred'
   },
+  noInternet: {
+    defaultMessage: 'Unstable internet connectivity, please try again later',
+    description: 'The error message that displays if there is no internet',
+    id: 'error.noInternet'
+  },
   printQueryError: {
     defaultMessage:
       'An error occurred while querying for birth registration data',
