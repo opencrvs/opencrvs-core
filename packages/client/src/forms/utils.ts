@@ -647,21 +647,25 @@ export const hasFormError = (
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
-export const convertToMSISDN = (phone: string) => {
+export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    window.config.COUNTRY.toUpperCase() === 'FAR'
+    alpha3CountryCode === 'FAR'
       ? 'ZM'
-      : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
+      : callingCountries[alpha3CountryCode].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(phone, countryCode)
 
-  return phoneUtil
-    .format(number, PhoneNumberFormat.INTERNATIONAL)
-    .replaceAll(/[\s~`!@#$%^&*()_\-={[}\]|\\:;"'<,>.?/]+/g, '')
+  return (
+    phoneUtil
+      .format(number, PhoneNumberFormat.INTERNATIONAL)
+      // libphonenumber adds spaces and dashes to phone numbers,
+      // which we do not want to keep for now
+      .replace(/[\s-]/g, '')
+  )
 }
 
 export const isRadioGroupWithNestedField = (

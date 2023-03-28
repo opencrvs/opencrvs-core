@@ -13,7 +13,6 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
 export async function getUser(
   userId: string,
@@ -61,24 +60,6 @@ export async function getSystem(
   const body = await res.json()
 
   return body
-}
-
-export const convertToLocal = (
-  mobileWithCountryCode: string,
-  countryCode: string
-) => {
-  countryCode = countryCode.toUpperCase().slice(0, 2)
-
-  const phoneUtil = PhoneNumberUtil.getInstance()
-
-  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
-    return
-  }
-  const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
-
-  return phoneUtil
-    .format(number, PhoneNumberFormat.NATIONAL)
-    .replaceAll(/[^A-Z0-9]+/gi, '')
 }
 
 // @todo remove this as it's not used anywhere (other than tests)

@@ -231,15 +231,18 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (mobileWithCountryCode: string, country: string) => {
+export const convertToLocal = (
+  mobileWithCountryCode: string,
+  alpha3CountryCode: string
+) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
 
   const countryCode =
-    country.toUpperCase() === 'FAR'
+    alpha3CountryCode.toUpperCase() === 'FAR'
       ? 'ZM'
-      : callingCountries[window.config.COUNTRY.toUpperCase()].alpha2
+      : callingCountries[alpha3CountryCode].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -250,7 +253,7 @@ const convertToLocal = (mobileWithCountryCode: string, country: string) => {
 
   return phoneUtil
     .format(number, PhoneNumberFormat.NATIONAL)
-    .replaceAll(/[^A-Z0-9]+/gi, '')
+    .replace(/[^A-Z0-9]+/gi, '')
 }
 
 export const localPhoneTransformer =

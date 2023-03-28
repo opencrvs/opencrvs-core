@@ -87,7 +87,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     }
     try {
       const { nonce, securityQuestionKey } = await authApi.verifyUser(
-        convertToMSISDN(this.state.phone),
+        convertToMSISDN(this.state.phone, window.config.COUNTRY),
         this.props.location.state.forgottenItem
       )
       if (securityQuestionKey) {

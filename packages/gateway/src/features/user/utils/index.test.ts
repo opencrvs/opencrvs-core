@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { logger } from '@gateway/logger'
-import { getUserMobile, convertToLocal } from '@gateway/features/user/utils/'
+import { getUserMobile } from '@gateway/features/user/utils/'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any
 
@@ -27,8 +27,5 @@ describe('Verify utility functions', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to retrieve mobile for error : Error: Mock Error'
     )
-  })
-  it('replaces country code', async () => {
-    expect(convertToLocal('+8801711111111', 'ZM')).toBe('01711111111')
   })
 })

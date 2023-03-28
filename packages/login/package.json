@@ -7,6 +7,7 @@
   "dependencies": {
     "@opencrvs/components": "^1.3.0-beta",
     "@sentry/react": "^7.12.1",
+    "country-data": "^0.0.31",
     "@sentry/tracing": "^7.12.1",
     "@types/history": "^4.6.2",
     "@types/react-redux": "^7.1.5",

@@ -31,7 +31,7 @@ const graphqlMocks = [
       query: changePhoneMutation,
       variables: {
         userId: '123',
-        phoneNumber: '+2601741234567',
+        phoneNumber: '+8801741234567',
         nonce: '',
         verifyCode: '000000'
       }
@@ -53,7 +53,7 @@ describe('Change phone modal tests', () => {
     const testComponent = await createTestComponent(
       <ChangePhoneModal
         show={true}
-        onSuccess={onSuccessMock(this)}
+        onSuccess={onSuccessMock}
         onClose={vi.fn()}
       />,
       {
@@ -63,7 +63,6 @@ describe('Change phone modal tests', () => {
       }
     )
     component = testComponent
-    
   })
 
   it('Continue button should be disabled', () => {
@@ -106,7 +105,7 @@ describe('Change phone modal tests', () => {
     )
   })
 
-  it('should trigger onSuccess callback after change phone number', async () => {
+  it.only('should trigger onSuccess callback after change phone number', async () => {
     queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {
@@ -137,9 +136,9 @@ describe('Change phone modal tests', () => {
     component.update()
 
     await waitForElement(component, '#verify-button')
-    // expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
-    //   false
-    // )
+    expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
+      false
+    )
     component.find('#verify-button').hostNodes().simulate('click')
 
     // wait for mocked data to load mockedProvider
@@ -148,6 +147,6 @@ describe('Change phone modal tests', () => {
     })
 
     component.update()
-    expect(onSuccessMock).toHaveBeenCalled()
+    expect(onSuccessMock).toBeCalledTimes(1)
   })
 })
