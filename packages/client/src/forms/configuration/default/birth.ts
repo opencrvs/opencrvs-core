@@ -544,6 +544,10 @@ export const birthRegisterForms: ISerializedForm = {
             operation: 'registrationNumberTransformer'
           },
           {
+            fieldName: 'qrCode',
+            operation: 'QRCodeTransformerTransformer'
+          },
+          {
             fieldName: 'mosipAid',
             operation: 'mosipAidTransformer'
           },
