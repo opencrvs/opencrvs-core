@@ -589,6 +589,10 @@ export const deathRegisterForms: ISerializedForm = {
             operation: 'registrationNumberTransformer'
           },
           {
+            fieldName: 'qrCode',
+            operation: 'QRCodeTransformerTransformer'
+          },
+          {
             fieldName: 'certificateDate',
             operation: 'certificateDateTransformer',
             parameters: ['en', 'dd MMMM yyyy']

@@ -27,7 +27,8 @@ import {
   REJECTED_STATUS,
   VALIDATED_STATUS,
   REGISTERED_STATUS,
-  CERTIFIED_STATUS
+  CERTIFIED_STATUS,
+  ARCHIVED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -41,7 +42,8 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  addFlaggedAsPotentialDuplicate
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
@@ -136,7 +138,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
@@ -421,8 +424,14 @@ async function detectAndUpdateBirthDuplicates(
   logger.info(
     `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
 export async function updateCompositionWithDuplicates(
@@ -447,5 +456,8 @@ export async function updateCompositionWithDuplicates(
   )) as fhir.Composition
   addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
 
-  return updateInHearth(compositionFromFhir, compositionFromFhir.id)
+  return updateInHearth(
+    `/Composition/${compositionFromFhir.id}`,
+    compositionFromFhir
+  )
 }

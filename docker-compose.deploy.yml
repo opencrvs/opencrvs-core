@@ -243,6 +243,9 @@ services:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
     deploy:
+      resources:
+        limits:
+          memory: 8G
       replicas: 1
       labels:
         - 'traefik.enable=false'
