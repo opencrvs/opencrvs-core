@@ -505,3 +505,7 @@ export function capitalize(str: string) {
 export function isVerifiedAction(history: History) {
   return history.action === RegAction.Verified
 }
+
+export function isFlaggedAsPotentialDuplicate(history: History) {
+  return history.action === RegAction.FlaggedAsPotentialDuplicate
+}

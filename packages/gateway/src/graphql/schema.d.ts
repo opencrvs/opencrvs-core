@@ -864,6 +864,7 @@ export interface GQLHistory {
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
   duplicateOf?: string
+  potentialDuplicates?: Array<string>
 }
 
 export const enum GQLMannerOfDeath {
@@ -1468,7 +1469,8 @@ export const enum GQLRegAction {
   DOWNLOADED = 'DOWNLOADED',
   VIEWED = 'VIEWED',
   MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE',
-  MARKED_AS_NOT_DUPLICATE = 'MARKED_AS_NOT_DUPLICATE'
+  MARKED_AS_NOT_DUPLICATE = 'MARKED_AS_NOT_DUPLICATE',
+  FLAGGED_AS_POTENTIAL_DUPLICATE = 'FLAGGED_AS_POTENTIAL_DUPLICATE'
 }
 
 export interface GQLStatusReason {
@@ -7085,6 +7087,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
   duplicateOf?: HistoryToDuplicateOfResolver<TParent>
+  potentialDuplicates?: HistoryToPotentialDuplicatesResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -7271,6 +7274,13 @@ export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
+}
+
+export interface HistoryToPotentialDuplicatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface GQLMedicalPractitionerTypeResolver<TParent = any> {
