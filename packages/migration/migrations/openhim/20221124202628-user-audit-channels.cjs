@@ -83,6 +83,29 @@ const declarationUpdatedChannel = {
   urlPattern: '^/events/declaration-updated$'
 }
 
+
+const eventMarkAsDuplicateChannel = {
+  ...newChannelTemplate,
+  routes: [
+    {
+      name: 'Metrics -> Marked as duplicate',
+      secured: false,
+      host: 'metrics',
+      port: 1050,
+      path: '',
+      pathTransform: '',
+      primary: false,
+      username: '',
+      password: '',
+      forwardAuthHeader: true,
+      status: 'enabled',
+      type: 'http'
+    }
+  ],
+  name: 'Marked as duplicate',
+  urlPattern: '^/events/marked-as-duplicate'
+}
+
 exports.up = async (db, client) => {
   const session = client.startSession()
   try {
@@ -172,9 +195,26 @@ exports.up = async (db, client) => {
         password: ''
       })
 
+      await addRouteToChannel(db, 'Event Not Duplicate', {
+        type: 'http',
+        status: 'enabled',
+        forwardAuthHeader: true,
+        name: 'Metrics -> Marked as not duplicate',
+        secured: false,
+        host: 'metrics',
+        port: 1050,
+        path: '',
+        pathTransform: '',
+        primary: false,
+        username: '',
+        password: ''
+      })
+
       await upsertChannel(db, eventDownloadedChannel)
       await upsertChannel(db, eventViewedChannel)
       await upsertChannel(db, declarationUpdatedChannel)
+      await upsertChannel(db, eventMarkAsDuplicateChannel)
+
     })
   } finally {
     await session.endSession()

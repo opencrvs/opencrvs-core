@@ -7280,7 +7280,12 @@ export interface HistoryToPotentialDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLMedicalPractitionerTypeResolver<TParent = any> {
