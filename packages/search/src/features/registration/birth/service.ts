@@ -27,7 +27,8 @@ import {
   REJECTED_STATUS,
   VALIDATED_STATUS,
   REGISTERED_STATUS,
-  CERTIFIED_STATUS
+  CERTIFIED_STATUS,
+  ARCHIVED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -137,7 +138,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
