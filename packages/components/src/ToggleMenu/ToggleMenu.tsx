@@ -93,26 +93,29 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     this.state = {
       showSubmenu: false
     }
-    this.showMenu = this.showMenu.bind(this)
+    this.toggleMenu = this.toggleMenu.bind(this)
     this.closeMenu = this.closeMenu.bind(this)
     this.closeMenuOnEscape = this.closeMenuOnEscape.bind(this)
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeMenu)
-    document.removeEventListener('click', this.showMenu)
+    document.removeEventListener('click', this.toggleMenu)
     document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
-  showMenu() {
+  toggleMenu() {
     this.setState(() => ({
-      showSubmenu: true
+      showSubmenu: !this.state.showSubmenu
     }))
-    //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
-    setTimeout(() => document.addEventListener('click', this.closeMenu), 0)
-    setTimeout(
-      () => document.addEventListener('keyup', this.closeMenuOnEscape),
-      0
-    )
+
+    if (!this.state.showSubmenu) {
+      //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+      setTimeout(() => document.addEventListener('click', this.closeMenu), 0)
+      setTimeout(
+        () => document.addEventListener('keyup', this.closeMenuOnEscape),
+        0
+      )
+    }
   }
 
   closeMenu() {
@@ -137,7 +140,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer aria-expanded={this.state.showSubmenu}>
-          <CircleButton id={`${id}ToggleButton`} onClick={this.showMenu}>
+          <CircleButton id={`${id}ToggleButton`} onClick={this.toggleMenu}>
             {toggleButton}
           </CircleButton>
           {this.state.showSubmenu && (

@@ -14,7 +14,8 @@ import { createObjectCsvWriter as createCSV } from 'csv-writer'
 import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 import * as fs from 'fs'
-import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '@metrics/constants'
+// eslint-disable-next-line import/no-relative-parent-imports
+import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '../constants'
 
 const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
@@ -667,7 +668,7 @@ async function makeCompositionAndExportCSVReport(
 
         const businessStatus = task.businessStatus?.coding?.[0].code
 
-        if (businessStatus === 'CERTIFIED' || businessStatus === 'REGISTERED') {
+        if (businessStatus === 'CERTIFIED' || 'REGISTERED' || 'ISSUED') {
           composition.section = composition.section?.filter(
             (sec) =>
               sec.title &&
