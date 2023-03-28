@@ -258,6 +258,12 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.markedAsNotDuplicate',
     defaultMessage: 'Marked not a duplicate',
     description: 'Marked not a duplicate status message for record audit'
+  },
+  FLAGGED_AS_POTENTIAL_DUPLICATE: {
+    id: 'recordAudit.regAction.flaggedAsPotentialDuplicate',
+    defaultMessage: 'Flagged as potential duplicate',
+    description:
+      'Flagged as potential duplicate status message for record audit'
   }
 }
 
