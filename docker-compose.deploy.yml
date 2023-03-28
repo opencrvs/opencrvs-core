@@ -71,7 +71,7 @@ services:
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - BEATS_USERNAME=beats_system
       - BEATS_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
-    command: [ '--strict.perms=false', '-system.hostfs=/hostfs' ]
+    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
     deploy:
@@ -298,7 +298,7 @@ services:
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
-    entrypoint: [ 'bash', '/usr/app/setup.sh' ]
+    entrypoint: ['bash', '/usr/app/setup.sh']
     restart: on-failure
     depends_on:
       - elasticsearch
@@ -378,8 +378,8 @@ services:
     depends_on:
       - elasticsearch
       - kibana
-    cap_add: [ 'CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID' ]
-    cap_drop: [ 'ALL' ]
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
+    cap_drop: ['ALL']
     restart: always
     ports:
       - 8200:8200
@@ -696,7 +696,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=false'
-      replicas: 2
+      replicas: 1
     networks:
       - overlay_net
     logging:
