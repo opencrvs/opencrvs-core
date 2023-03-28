@@ -14,25 +14,45 @@ import { logger } from '@metrics/logger'
 import { subMinutes } from 'date-fns'
 import { MongoClient } from 'mongodb'
 
-let currentUpdate = false
+/*
+ * This creates new simplified data views in MongoDB for Metabase to read its data from.
+ * This is required because our FHIR schema is too complex for real-time aggregations
+ *
+ * There can only be one data update ongoing at one time. This is because
+ * - It takes significant processing to form these views
+ * - Views are created in two steps for which we do not use transaction for. Having two runs at the same time might cause inconsistency in the data.
+ *
+ * View refresher is controlled by two flags
+ * - One that tracks whether an update is in progress
+ * - One that tracks if an uodate has been requested after the first update run started
+ */
+
+let updateInProgress = false
+let nextUpdateRequested = false
 
 export async function refresh() {
-  if (currentUpdate) {
+  if (updateInProgress) {
     logger.info('Performance materialised views already being refreshed')
+    nextUpdateRequested = true
     return
   }
   logger.info('Refreshing performance materialised views')
   const client = new MongoClient(HEARTH_MONGO_URL)
   try {
-    currentUpdate = true
+    updateInProgress = true
     await client.connect()
     await refreshPerformanceMaterialisedViews(client)
     logger.info('Performance materialised views refreshed')
   } catch (error) {
     logger.error(`Error refreshing performances materialised views ${error}`)
   } finally {
-    currentUpdate = false
     await client.close()
+
+    updateInProgress = false
+    if (nextUpdateRequested) {
+      nextUpdateRequested = false
+      refresh()
+    }
   }
 }
 
