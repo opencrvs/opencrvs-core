@@ -42,7 +42,7 @@ elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
 fi
 
 if [ -z $WRITE ]; then
-  ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --write
+  $(yarn bin)/ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --write
   exit 0
 fi
 
