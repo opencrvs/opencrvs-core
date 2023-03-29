@@ -578,6 +578,17 @@ export const registerForms: IDefaultRegisterForms = {
               parameters: ['en', 'dd MMMM yyyy']
             },
             {
+              fieldName: 'registrar',
+              operation: 'userTransformer',
+              parameters: ['REGISTERED']
+            },
+            {
+              fieldName: 'registrationAgent',
+              operation: 'userTransformer',
+              parameters: ['VALIDATED']
+            },
+            // backward compatibility
+            {
               fieldName: 'registrarName',
               operation: 'registrarNameUserTransformer'
             },
@@ -3189,6 +3200,17 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
             },
+            {
+              fieldName: 'registrar',
+              operation: 'userTransformer',
+              parameters: ['REGISTERED']
+            },
+            {
+              fieldName: 'registrationAgent',
+              operation: 'userTransformer',
+              parameters: ['VALIDATED']
+            },
+            // backward compatibility
             {
               fieldName: 'registrarName',
               operation: 'registrarNameUserTransformer'
