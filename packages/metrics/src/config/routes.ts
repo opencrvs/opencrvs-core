@@ -72,6 +72,7 @@ import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
+import { refresh } from '@metrics/features/performance/viewRefresher'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -82,13 +83,30 @@ export enum EventType {
   MARRIAGE = 'marriage'
 }
 
+/*
+ * This route wrapper triggers a view update for materialised views
+ * we read data to Metabase from. If you are not seeing your data updated
+ * after a user action, you most likely need to add this wrapper to some
+ * new endpoint handler here.
+ */
+function analyticsDataRefreshingRoute<T extends Array<any>, U>(
+  handler: (...args: T) => U
+) {
+  // Do not use await for the refresh operation. This operation can take minutes or more.
+  // Consider triggering this a task that will be left to be run in the background.
+  return (...params: T) => {
+    refresh()
+    return handler(...params)
+  }
+}
+
 export const getRoutes = () => {
   const routes = [
     // In progress declaration
     {
       method: 'POST',
       path: '/events/{event}/in-progress-declaration',
-      handler: inProgressHandler,
+      handler: analyticsDataRefreshingRoute(inProgressHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -103,7 +121,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/new-declaration',
-      handler: newDeclarationHandler,
+      handler: analyticsDataRefreshingRoute(newDeclarationHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -118,7 +136,9 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/request-for-registrar-validation',
-      handler: requestForRegistrarValidationHandler,
+      handler: analyticsDataRefreshingRoute(
+        requestForRegistrarValidationHandler
+      ),
       config: {
         tags: ['api'],
         validate: {
@@ -160,7 +180,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/new-registration',
-      handler: newEventRegistrationHandler,
+      handler: analyticsDataRefreshingRoute(newEventRegistrationHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -175,7 +195,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-validated',
-      handler: markValidatedHandler,
+      handler: analyticsDataRefreshingRoute(markValidatedHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -190,7 +210,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-registered',
-      handler: markEventRegisteredHandler,
+      handler: analyticsDataRefreshingRoute(markEventRegisteredHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -204,7 +224,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-certified',
-      handler: markCertifiedHandler,
+      handler: analyticsDataRefreshingRoute(markCertifiedHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -219,7 +239,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-issued',
-      handler: markIssuedHandler,
+      handler: analyticsDataRefreshingRoute(markIssuedHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -234,7 +254,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-voided',
-      handler: markRejectedHandler,
+      handler: analyticsDataRefreshingRoute(markRejectedHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -270,7 +290,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/request-correction',
-      handler: requestCorrectionHandler,
+      handler: analyticsDataRefreshingRoute(requestCorrectionHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -309,7 +329,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-archived',
-      handler: declarationArchivedHandler,
+      handler: analyticsDataRefreshingRoute(declarationArchivedHandler),
       config: {
         tags: ['api'],
         validate: {
@@ -322,7 +342,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-reinstated',
-      handler: declarationReinstatedHandler,
+      handler: analyticsDataRefreshingRoute(declarationReinstatedHandler),
       config: {
         tags: ['api'],
         validate: {
