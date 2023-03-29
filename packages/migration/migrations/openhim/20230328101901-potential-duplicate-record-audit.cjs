@@ -40,7 +40,7 @@ const eventMarkAsDuplicateChannel = {
   urlPattern: '^/events/marked-as-duplicate'
 }
 
-export const up = async (db, client) => {
+exports.up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -65,7 +65,7 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {
+exports.down = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
