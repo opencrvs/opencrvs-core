@@ -323,9 +323,8 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    const data = testComponent.find(Workqueue).hostNodes()
-
-    expect(data).toBeTruthy()
+    const data = testComponent.find(Workqueue).prop('content')
+    expect(data.length).toEqual(6)
   })
 
   it('renders error text when an error occurs', async () => {

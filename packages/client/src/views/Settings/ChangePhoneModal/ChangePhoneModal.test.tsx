@@ -105,7 +105,7 @@ describe('Change phone modal tests', () => {
     )
   })
 
-  it.only('should trigger onSuccess callback after change phone number', async () => {
+  it('should trigger onSuccess callback after change phone number', async () => {
     queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {

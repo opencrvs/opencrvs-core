@@ -10,4 +10,3 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 declare module 'country-data'
-  
