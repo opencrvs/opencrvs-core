@@ -23,6 +23,7 @@ export const registerSystem = gql`
         shaSecret
         status
         type
+        integratingSystemType
         settings {
           webhook {
             event
