@@ -60,7 +60,7 @@ const StyledInput = styled.input<ITextInputProps>`
         error && touched
           ? theme.colors.negative
           : isDisabled
-          ? theme.colors.greyGrey
+          ? theme.colors.grey300
           : theme.colors.copy
       };
       &:focus {
@@ -148,6 +148,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
         autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
         disabled={isDisabled}
+        isDisabled={isDisabled}
         inputFieldWidth={inputFieldWidth}
       />
     )
