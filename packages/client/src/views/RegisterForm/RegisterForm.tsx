@@ -917,7 +917,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               messages.saveDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
-
           <ResponsiveModal
             id="delete_declaration_confirmation"
             title={intl.formatMessage(

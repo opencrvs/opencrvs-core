@@ -69,6 +69,7 @@ export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
+export const TIME = 'TIME'
 
 export enum Sort {
   ASC = 'asc',
@@ -680,6 +681,11 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
+export interface ITimeFormFIeld extends IFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -709,6 +715,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
+  | ITimeFormFIeld
 
 export interface IPreviewGroup {
   id: string
@@ -1219,6 +1226,10 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   networkErrorText: string
 }
 
+export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1245,6 +1256,7 @@ export type Ii18nFormField =
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
+  | Ii18nTimeFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1305,7 +1317,8 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
-    DYNAMIC_LIST: messages.dynamicList
+    DYNAMIC_LIST: messages.dynamicList,
+    TIME: messages.time
   }
 
   return labelDict[type]

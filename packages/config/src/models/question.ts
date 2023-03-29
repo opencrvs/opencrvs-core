@@ -143,7 +143,7 @@ const questionSchema = new Schema({
     }
   ],
   maxLength: { type: Number, default: 280 },
-  inputWidth: { type: Number, default: 100 },
+  inputWidth: { type: Number, default: 0 },
   fieldName: { type: String },
   fieldType: {
     type: String,
