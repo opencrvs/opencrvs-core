@@ -51,12 +51,14 @@ export interface ICorrection {
   oldValue: string
   newValue: string
 }
+
 export interface IAssignment {
   userId: string
   firstName: string
   lastName: string
   officeName: string
 }
+
 export interface IOperationHistory {
   operationType: string
   operatedOn: string
@@ -163,6 +165,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantDoB?: string
   informantIdentifier?: string
 }
+
 export interface IMarriageCompositionBody extends ICompositionBody {
   brideFirstNames?: string
   groomFirstNames?: string
@@ -191,9 +194,11 @@ type Label = {
   lang: string
   label: string
 }
+
 interface IUserRole {
   labels: Label[]
 }
+
 export interface IUserModelData {
   _id: string
   role: IUserRole
@@ -316,7 +321,10 @@ function findBirthDuplicateIds(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map((hit) => hit._id)
+    .map((hit) => ({
+      id: hit._id,
+      trackingId: hit._source.trackingId
+    }))
 }
 
 function findDeathDuplicateIds(
@@ -328,7 +336,10 @@ function findDeathDuplicateIds(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map((hit) => hit._id)
+    .map((hit) => ({
+      id: hit._id,
+      trackingId: hit._source.trackingId
+    }))
 }
 
 export async function getUser(practitionerId: string, authHeader: any) {

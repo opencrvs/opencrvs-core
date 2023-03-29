@@ -139,7 +139,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
-          authHeaderDeclare
+          { headers: authHeaderDeclare }
         )
       } catch (e) {
         expect(e.message).toBe('User does not have a register scope')
@@ -167,7 +167,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
-          authHeaderRegCert
+          { headers: authHeaderRegCert }
         )
 
       expect(result).toBeDefined()
@@ -181,7 +181,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
-          authHeaderDeclare
+          { headers: authHeaderDeclare }
         )
       } catch (e) {
         expect(e.message).toBe('User does not have a register scope')
@@ -222,7 +222,7 @@ describe('Correction root resolvers', () => {
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
           { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
-          authHeaderRegCert
+          { headers: authHeaderRegCert }
         )
 
       expect(result).toBeDefined()

@@ -249,6 +249,24 @@ export const ActionDetailsModalListTable = ({
     }
   ]
 
+  const matchedToColumn = [
+    {
+      key: 'potentialDuplicates',
+      label: intl.formatMessage(constantsMessages.matchedTo),
+      width: 100
+    }
+  ]
+
+  const potentialDuplicatesTransformer = (items: string[]) => {
+    return (
+      <>
+        {items.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </>
+    )
+  }
+
   const getItemName = (
     sectionName: MessageDescriptor,
     fieldLabel: MessageDescriptor
@@ -555,6 +573,22 @@ export const ActionDetailsModalListTable = ({
           onPageChange={pageChangeHandler}
         />
       )}
+
+      {/* Matched to */}
+      {actionDetailsData.potentialDuplicates &&
+        actionDetailsData.action === RegAction.FlaggedAsPotentialDuplicate && (
+          <Table
+            noResultText=" "
+            columns={matchedToColumn}
+            content={[
+              {
+                potentialDuplicates: potentialDuplicatesTransformer(
+                  actionDetailsData.potentialDuplicates
+                )
+              }
+            ]}
+          />
+        )}
     </>
   )
 }

@@ -25,7 +25,8 @@ import {
   mockSearchResponseWithoutCreatedBy,
   mockEncounterResponse,
   mockLocationResponse,
-  mockUserModelResponse
+  mockUserModelResponse,
+  mockTaskBundleWithExtensions
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -73,6 +74,7 @@ describe('Verify handlers', () => {
         ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
@@ -123,6 +125,7 @@ describe('Verify handlers', () => {
         ],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
+        [JSON.stringify(mockTaskBundleWithExtensions), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],

@@ -67,7 +67,8 @@ import {
   MARRIAGE_REG_NO,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
-  VERIFIED_EXTENSION_URL
+  VERIFIED_EXTENSION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -1027,6 +1028,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.MARKED_AS_DUPLICATE
   } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
     return GQLRegAction.MARKED_AS_NOT_DUPLICATE
+  } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
+    return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
   }
   return null
 }
@@ -1201,6 +1204,7 @@ type BirthDuplicateSearchBody = {
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
+  motherIdentifier?: string
 }
 
 export const findBirthDuplicates = (
