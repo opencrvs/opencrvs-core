@@ -17,13 +17,14 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { IntegratingSystemType } from '@client/utils/gateway'
 
 const nidIntegrationConditionals = {
   hideIfNidIntegrationEnabled: {
     action: 'hide',
     expression: `const nationalIdSystem =
     offlineCountryConfig &&
-    offlineCountryConfig.systems.find(s => s.integratingSystemType === 'NATIONAL_ID');
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
         nationalIdSystem &&
         nationalIdSystem.settings.openIdProviderBaseUrl &&
         nationalIdSystem.settings.openIdProviderClientId &&
@@ -34,7 +35,7 @@ const nidIntegrationConditionals = {
     action: 'hide',
     expression: `const nationalIdSystem =
     offlineCountryConfig &&
-    offlineCountryConfig.systems.find(s => s.integratingSystemType === 'NATIONAL_ID');
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
       !nationalIdSystem ||
       !nationalIdSystem.settings.openIdProviderBaseUrl ||
       !nationalIdSystem.settings.openIdProviderClientId ||
