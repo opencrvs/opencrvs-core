@@ -49,7 +49,7 @@ export function Hamburger() {
   return (
     <>
       <Button type="icon" onClick={toggleMenu}>
-        <Icon name="List"></Icon>
+        <Icon name="List" />
       </Button>
       <ExpandingMenu
         showMenu={showMenu}
