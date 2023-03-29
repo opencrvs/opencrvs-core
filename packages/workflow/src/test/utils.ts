@@ -2195,5 +2195,5 @@ export const mosipSuccessMock = JSON.stringify({
   }
 })
 export const mosipConfigMock = JSON.stringify([
-  { status: 'active', name: 'MOSIP' }
+  { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
 ])

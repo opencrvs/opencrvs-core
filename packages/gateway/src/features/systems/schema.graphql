@@ -29,6 +29,12 @@ enum SystemType {
   WEBHOOK
 }
 
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
+}
+
 type SystemSettings {
   dailyQuota: Int
   webhook: [WebhookPermission!]
@@ -44,6 +50,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  integratingSystemType: IntegratingSystemType
   settings: SystemSettings
 }
 
@@ -70,6 +77,7 @@ input SystemInput {
   name: String!
   type: SystemType!
   settings: SystemSettingsInput
+  integratingSystemType: IntegratingSystemType
 }
 
 input UpdatePermissionsInput {

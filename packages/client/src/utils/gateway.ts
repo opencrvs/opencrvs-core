@@ -1040,6 +1040,12 @@ export type InputOutput = {
   valueString?: Maybe<Scalars['String']>
 }
 
+export enum IntegratingSystemType {
+  Mosip = 'MOSIP',
+  Osia = 'OSIA',
+  Other = 'OTHER'
+}
+
 export type LabelInput = {
   label: Scalars['String']
   lang: Scalars['String']
@@ -2334,6 +2340,7 @@ export type System = {
   __typename?: 'System'
   _id: Scalars['ID']
   clientId: Scalars['ID']
+  integratingSystemType?: Maybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
@@ -2342,6 +2349,7 @@ export type System = {
 }
 
 export type SystemInput = {
+  integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType

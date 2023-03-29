@@ -455,6 +455,7 @@ export const reqUpdateSystemSchema = Joi.object({
 export const reqRegisterSystemSchema = Joi.object({
   type: Joi.string().required(),
   name: Joi.string().required(),
+  integratingSystemType: Joi.string(),
   settings: Joi.object({
     dailyQuota: Joi.number(),
     webhook: webHookSchema

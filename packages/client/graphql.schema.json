@@ -9026,6 +9026,35 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "IntegratingSystemType",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "MOSIP",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OSIA",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OTHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "LabelInput",
         "description": null,
@@ -19938,6 +19967,18 @@
             "deprecationReason": null
           },
           {
+            "name": "integratingSystemType",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegratingSystemType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": null,
             "args": [],
@@ -20025,6 +20066,18 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "integratingSystemType",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegratingSystemType",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "name",
             "description": null,
