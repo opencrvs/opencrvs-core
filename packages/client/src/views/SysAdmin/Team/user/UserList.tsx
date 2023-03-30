@@ -869,7 +869,7 @@ function UserListComponent(props: IProps) {
                     ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
-                size={ContentSize.LARGE}
+                size={ContentSize.NORMAL}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,
