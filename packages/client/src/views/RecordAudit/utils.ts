@@ -389,10 +389,13 @@ export const getWQDeclarationData = (
     workqueueDeclaration.brideName &&
     workqueueDeclaration.groomName
   ) {
-    name = `${getName(workqueueDeclaration.groomName, language)} & ${getName(
-      workqueueDeclaration.brideName,
-      language
-    )}`
+    const groomName = getName(workqueueDeclaration.groomName, language)
+    const brideName = getName(workqueueDeclaration.brideName, language)
+
+    name =
+      brideName && groomName
+        ? `${groomName} & ${brideName}`
+        : brideName || groomName || EMPTY_STRING
   }
   return {
     id: workqueueDeclaration?.id,
@@ -420,14 +423,14 @@ export const getGQLDeclaration = (
       ? getName(data.deceased.name, language)
       : EMPTY_STRING
   } else if (data.groom || data.bride) {
-    if (data.groom && data.bride) {
-      name = `${getName(data.bride.name, language)} & ${getName(
-        data.groom.name,
+    if (data.groom?.name && data.bride?.name) {
+      name = `${getName(data.groom.name, language)} & ${getName(
+        data.bride.name,
         language
       )}`
-    } else if (data.groom) {
+    } else if (data.groom?.name) {
       name = getName(data.groom.name, language)
-    } else if (data.bride) {
+    } else if (data.bride?.name) {
       name = getName(data.bride.name, language)
     } else {
       name = EMPTY_STRING
