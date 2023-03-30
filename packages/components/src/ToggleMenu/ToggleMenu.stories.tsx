@@ -11,6 +11,7 @@
  */
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
 import { SettingsBlack, LogoutBlack, VerticalThreeDots } from '../icons'
 import React from 'react'
@@ -47,15 +48,31 @@ export const ToggleMenuView = Template.bind({})
 ToggleMenuView.args = {
   id: 'birth',
   menuHeader: header,
-  toggleButton: <VerticalThreeDots />,
+  toggleButton: (
+    <Icon name="DotsThreeVertical" color="primary" size="large" weight="bold" />
+  ),
   menuItems: [
     {
-      icon: <SettingsBlack />,
+      icon: (
+        <Icon
+          name="DotsThreeVertical"
+          color="primary"
+          size="large"
+          weight="bold"
+        />
+      ),
       label: 'Settings',
       handler: () => alert('Settings')
     },
     {
-      icon: <LogoutBlack />,
+      icon: (
+        <Icon
+          name="DotsThreeVertical"
+          color="primary"
+          size="large"
+          weight="bold"
+        />
+      ),
       label: 'Logout',
       handler: () => alert('Logout')
     }

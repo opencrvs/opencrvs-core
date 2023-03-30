@@ -47,5 +47,6 @@ export {
   Activity,
   ChartLine,
   ChartBar,
+  DotsThreeVertical,
   PaperPlaneTilt
 } from 'phosphor-react'
