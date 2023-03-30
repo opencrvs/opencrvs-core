@@ -16,6 +16,7 @@ import {
   EventLocationAddressCases
 } from '@client/forms/configuration/administrative/addresses'
 import { IConditional, SerializedFormField } from '@client/forms/index'
+import { Address } from '@client/utils/gateway'
 
 export function getDependency(location: string, useCase: string) {
   switch (location) {
@@ -504,7 +505,7 @@ export function getPlaceOfEventLocationSelect(
         operation: 'eventLocationQueryTransformer',
         parameters: [
           locationIndex,
-          location,
+          location as keyof Address,
           {
             fieldsToIgnoreForLocalAddress: [
               'internationalDistrict',
