@@ -51,7 +51,11 @@ export function advancedQueryBuilder(
           'brideFirstNames',
           'brideFamilyName',
           'groomFirstNames',
-          'groomFamilyName'
+          'groomFamilyName',
+          'witnessOneFirstNames',
+          'witnessOneFamilyName',
+          'witnessTwoFirstNames',
+          'witnessTwoFamilyName'
         ],
         fuzziness: 'AUTO'
       }
