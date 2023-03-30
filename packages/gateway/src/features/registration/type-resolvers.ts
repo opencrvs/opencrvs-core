@@ -728,7 +728,10 @@ export const typeResolvers: GQLResolver = {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
     async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
-      const fileName = docRef.content[0].attachment.data
+      const fileName = docRef.content[0].attachment.data?.replace(
+        `/${MINIO_BUCKET}/`,
+        ''
+      )
       const response = (await fetchDocuments(
         '/presigned-url',
         authHeader,
