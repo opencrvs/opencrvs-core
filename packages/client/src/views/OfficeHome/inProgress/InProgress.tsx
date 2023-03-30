@@ -380,10 +380,13 @@ export class InProgressComponent extends React.Component<
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
+
       const eventTime =
         draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.data.deathEvent?.deathDate || ''
+          : draft.event === Event.Death
+          ? draft.data.deathEvent?.deathDate || ''
+          : draft.data.marriageEvent?.marriageDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
         <NameContainer
