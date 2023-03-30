@@ -2348,7 +2348,7 @@
           "port": 9090,
           "path": "",
           "pathTransform": "",
-          "primary": true,
+          "primary": false,
           "username": "",
           "password": ""
         }

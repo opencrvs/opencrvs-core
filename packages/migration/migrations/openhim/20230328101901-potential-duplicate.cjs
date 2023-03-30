@@ -14,7 +14,8 @@ const {
   removeRouteFromChannel,
   upsertChannel,
   removeChannel,
-  newChannelTemplate, routeTemplate
+  newChannelTemplate,
+  routeTemplate
 } = require('../../utils/openhim-helpers.cjs')
 
 
@@ -22,6 +23,7 @@ const eventMarkAsDuplicateChannel = {
   ...newChannelTemplate,
   routes: [
     {
+      ...routeTemplate,
       name: 'Metrics -> Marked as duplicate',
       host: 'metrics',
       port: 1050,
@@ -37,18 +39,12 @@ exports.up = async (db, client) => {
   try {
     await session.withTransaction(async () => {
       await addRouteToChannel(db, 'Event Not Duplicate', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
+        ...routeTemplate,
         name: 'Metrics -> Marked as not duplicate',
-        secured: false,
         host: 'metrics',
         port: 1050,
-        path: '',
-        pathTransform: '',
         primary: false,
-        username: '',
-        password: ''
+
       })
       await upsertChannel(db, eventMarkAsDuplicateChannel)
     })
