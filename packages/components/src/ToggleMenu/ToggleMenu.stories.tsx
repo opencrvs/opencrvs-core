@@ -13,7 +13,6 @@ import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
-import { SettingsBlack, LogoutBlack, VerticalThreeDots } from '../icons'
 import React from 'react'
 
 interface IProps {
@@ -53,27 +52,13 @@ ToggleMenuView.args = {
   ),
   menuItems: [
     {
-      icon: (
-        <Icon
-          name="DotsThreeVertical"
-          color="primary"
-          size="large"
-          weight="bold"
-        />
-      ),
-      label: 'Settings',
+      icon: <Icon name="Share" color="primary" size="large" weight="bold" />,
+      label: 'Share',
       handler: () => alert('Settings')
     },
     {
-      icon: (
-        <Icon
-          name="DotsThreeVertical"
-          color="primary"
-          size="large"
-          weight="bold"
-        />
-      ),
-      label: 'Logout',
+      icon: <Icon name="Star" color="primary" size="large" weight="bold" />,
+      label: 'Favourite',
       handler: () => alert('Logout')
     }
   ],
