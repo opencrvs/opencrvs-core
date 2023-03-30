@@ -1545,6 +1545,8 @@ export const enum GQLAttachmentSubject {
   CHILD = 'CHILD',
   OTHER = 'OTHER',
   PARENT = 'PARENT',
+  GROOM = 'GROOM',
+  BRIDE = 'BRIDE',
   CHILD_AGE = 'CHILD_AGE',
   DECEASED_ID_PROOF = 'DECEASED_ID_PROOF',
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
@@ -7280,7 +7282,12 @@ export interface HistoryToPotentialDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLMedicalPractitionerTypeResolver<TParent = any> {
