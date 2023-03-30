@@ -146,7 +146,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { VerificationButton } from '@client/../../components/lib/VerificationButton'
+import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   SignatureGenerator,

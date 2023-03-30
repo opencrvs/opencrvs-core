@@ -14,7 +14,7 @@ import { IDeclaration, IPrintableDeclaration } from '@client/declarations'
 import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import formatDate from '@client/utils/date-formatting'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 import { v4 as uuid } from 'uuid'
 import { OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY } from './OIDPVerificationCallback'
@@ -157,4 +157,46 @@ export function saveDraftAndRedirectToNidIntegration(
   url.searchParams.append('state', JSON.stringify(stateToBeSent))
   url.searchParams.append('claims', nidSystemSetting.openIdProviderClaims || '')
   window.location.href = url.toString()
+}
+
+export const useCheckNonce = () => {
+  const params = useQueryParams()
+  const [nonceOk, setNonceOk] = useState(false)
+
+  useEffect(() => {
+    if (!params.get('nonce')) {
+      throw new Error('No nonce provided from OIDP callback.')
+    }
+
+    const nonceMatches =
+      window.localStorage.getItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY) ===
+      params.get('nonce')
+
+    if (nonceMatches) {
+      window.localStorage.removeItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY)
+      setNonceOk(true)
+    } else {
+      throw new Error(
+        'Nonce did not match the one sent to the integration before callback'
+      )
+    }
+  }, [params])
+
+  return nonceOk
+}
+
+export const useExtractCallBackState = () => {
+  const params = useQueryParams()
+
+  useEffect(() => {
+    if (!params.get('state')) {
+      throw new Error('No state provided from OIDP callback.')
+    }
+  }, [params])
+
+  const { pathname, declarationId, section } = JSON.parse(
+    params.get('state') ?? '{}'
+  ) as INidCallbackState
+
+  return { pathname, declarationId, section }
 }

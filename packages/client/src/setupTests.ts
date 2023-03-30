@@ -245,3 +245,5 @@ vi.mock('react-router', async () => ({
     section: 'child'
   }))
 }))
+
+vi.mock('@client/views/OIDPVerificationCallback/utils')

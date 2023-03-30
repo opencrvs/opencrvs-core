@@ -16,7 +16,8 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   addNidUserInfoToDeclaration,
-  INidCallbackState,
+  useCheckNonce,
+  useExtractCallBackState,
   useQueryParams
 } from '@client/views/OIDPVerificationCallback/utils'
 import styled from 'styled-components'
@@ -61,48 +62,6 @@ const UserActionsContainer = styled.div`
 export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
   'oidp-verification-nonce'
 
-const useCheckNonce = () => {
-  const params = useQueryParams()
-  const [nonceOk, setNonceOk] = useState(false)
-
-  useEffect(() => {
-    if (!params.get('nonce')) {
-      throw new Error('No nonce provided from OIDP callback.')
-    }
-
-    const nonceMatches =
-      window.localStorage.getItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY) ===
-      params.get('nonce')
-
-    if (nonceMatches) {
-      window.localStorage.removeItem(OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY)
-      setNonceOk(true)
-    } else {
-      throw new Error(
-        'Nonce did not match the one sent to the integration before callback'
-      )
-    }
-  }, [params])
-
-  return nonceOk
-}
-
-const useExtractCallBackState = () => {
-  const params = useQueryParams()
-
-  useEffect(() => {
-    if (!params.get('state')) {
-      throw new Error('No state provided from OIDP callback.')
-    }
-  }, [params])
-
-  const { pathname, declarationId, section } = JSON.parse(
-    params.get('state') ?? '{}'
-  ) as INidCallbackState
-
-  return { pathname, declarationId, section }
-}
-
 export const OIDPVerificationCallback = () => {
   const params = useQueryParams()
   const { pathname, declarationId, section } = useExtractCallBackState()
@@ -132,7 +91,6 @@ export const OIDPVerificationCallback = () => {
       if (!declaration || !section) {
         return
       }
-
       addNidUserInfoToDeclaration(declaration, section, data.getOIDPUserInfo)
       dispatch(modifyDeclaration(declaration))
       dispatch(writeDeclaration(declaration))
@@ -153,7 +111,7 @@ export const OIDPVerificationCallback = () => {
 
   return (
     <Page>
-      <Container>
+      <Container id="callback-container">
         <Stack direction="column" alignItems="stretch" gap={24}>
           <LogoContainer>
             <CountryLogo size="small" src={logo} />
@@ -163,7 +121,12 @@ export const OIDPVerificationCallback = () => {
               {loading && (
                 <>
                   <Spinner id="Spinner" size={20} />
-                  <Text variant="bold16" element="h1" align="center">
+                  <Text
+                    variant="bold16"
+                    element="h1"
+                    align="center"
+                    id="authenticating-label"
+                  >
                     {intl.formatMessage(nidCallbackMessages.authenticatingNid)}
                   </Text>
                 </>
@@ -171,7 +134,12 @@ export const OIDPVerificationCallback = () => {
               {error && (
                 <>
                   <Icon name="WarningCircle" size="medium" color="red" />
-                  <Text variant="bold16" element="h1" align="center">
+                  <Text
+                    variant="bold16"
+                    element="h1"
+                    align="center"
+                    id="authentication-failed-label"
+                  >
                     {intl.formatMessage(
                       nidCallbackMessages.failedToAuthenticateNid
                     )}
