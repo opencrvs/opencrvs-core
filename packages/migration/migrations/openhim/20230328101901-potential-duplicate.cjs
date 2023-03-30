@@ -14,7 +14,7 @@ const {
   removeRouteFromChannel,
   upsertChannel,
   removeChannel,
-  newChannelTemplate
+  newChannelTemplate, routeTemplate
 } = require('../../utils/openhim-helpers.cjs')
 
 
@@ -23,17 +23,9 @@ const eventMarkAsDuplicateChannel = {
   routes: [
     {
       name: 'Metrics -> Marked as duplicate',
-      secured: false,
       host: 'metrics',
       port: 1050,
-      path: '',
-      pathTransform: '',
-      primary: false,
-      username: '',
-      password: '',
-      forwardAuthHeader: true,
-      status: 'enabled',
-      type: 'http'
+      primary: true,
     }
   ],
   name: 'Marked as duplicate',
