@@ -78,7 +78,7 @@ export const resolvers: GQLResolver = {
         sortColumn,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       const searchCriteria: ISearchCriteria = {
         sort,
@@ -189,7 +189,7 @@ export const resolvers: GQLResolver = {
         skip,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
         return await Promise.reject(

@@ -642,6 +642,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  integratingSystemType: IntegratingSystemType
   settings: SystemSettings
 }
 
@@ -862,6 +863,7 @@ input SystemInput {
   name: String!
   type: SystemType!
   settings: SystemSettingsInput
+  integratingSystemType: IntegratingSystemType
 }
 
 input UpdatePermissionsInput {
@@ -997,6 +999,7 @@ type History {
   certificates: [Certificate]
   signature: Signature
   duplicateOf: String
+  potentialDuplicates: [String!]
 }
 
 enum MannerOfDeath {
@@ -1274,6 +1277,12 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+}
+
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
 }
 
 type SystemSettings {
@@ -1605,6 +1614,7 @@ enum RegAction {
   VIEWED
   MARKED_AS_DUPLICATE
   MARKED_AS_NOT_DUPLICATE
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 }
 
 type StatusReason {

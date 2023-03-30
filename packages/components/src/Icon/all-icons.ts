@@ -20,6 +20,7 @@ export {
   CreditCard,
   Phone,
   User,
+  Users,
   ArrowLeft,
   ArrowRight,
   Share,
@@ -45,5 +46,8 @@ export {
   X,
   Activity,
   CircleWavyCheck,
-  CircleWavyQuestion
+  CircleWavyQuestion,
+  ChartLine,
+  ChartBar,
+  PaperPlaneTilt
 } from 'phosphor-react'

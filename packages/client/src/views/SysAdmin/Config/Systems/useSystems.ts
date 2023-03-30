@@ -29,7 +29,8 @@ import {
   WebhookPermission,
   Event,
   DeleteSystemMutation,
-  DeleteSystemMutationVariables
+  DeleteSystemMutationVariables,
+  IntegratingSystemType
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -42,6 +43,8 @@ function useNewSystemDraft() {
   const [newSystemType, setNewSystemType] = useState<SystemType>(
     SystemType.Health
   )
+  const [newIntegratingSystemType, setNewIntegratingSystemType] =
+    useState<IntegratingSystemType>(IntegratingSystemType.Mosip)
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
@@ -58,6 +61,8 @@ function useNewSystemDraft() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   }
@@ -117,6 +122,8 @@ export function useSystems() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
@@ -295,7 +302,11 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          ...(newSystemType === 'WEBHOOK' && {
+          integratingSystemType:
+            newSystemType === SystemType.NationalId
+              ? newIntegratingSystemType
+              : undefined,
+          ...(newSystemType === SystemType.Webhook && {
             settings: {
               dailyQuota: 0,
               webhook: [birthPermissions, deathPermissions]
@@ -381,6 +392,8 @@ export function useSystems() {
     refreshTokenError,
     resetRefreshTokenData,
     resetData,
-    shouldWarnAboutNationalId
+    shouldWarnAboutNationalId,
+    newIntegratingSystemType,
+    setNewIntegratingSystemType
   }
 }

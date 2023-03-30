@@ -946,6 +946,7 @@ export type History = {
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  potentialDuplicates?: Maybe<Array<Scalars['String']>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
@@ -1038,6 +1039,12 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export enum IntegratingSystemType {
+  Mosip = 'MOSIP',
+  Osia = 'OSIA',
+  Other = 'OTHER'
 }
 
 export type LabelInput = {
@@ -2064,6 +2071,7 @@ export type RecordDetails = BirthRegistration | DeathRegistration
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
+  FlaggedAsPotentialDuplicate = 'FLAGGED_AS_POTENTIAL_DUPLICATE',
   MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
   MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
@@ -2334,6 +2342,7 @@ export type System = {
   __typename?: 'System'
   _id: Scalars['ID']
   clientId: Scalars['ID']
+  integratingSystemType?: Maybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
@@ -2342,6 +2351,7 @@ export type System = {
 }
 
 export type SystemInput = {
+  integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
@@ -3770,6 +3780,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4078,6 +4089,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       reason?: string | null
       otherReason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4472,6 +4484,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4763,6 +4776,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null

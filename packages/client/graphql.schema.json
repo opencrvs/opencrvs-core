@@ -8379,6 +8379,26 @@
             "deprecationReason": null
           },
           {
+            "name": "potentialDuplicates",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "reason",
             "description": null,
             "args": [],
@@ -9023,6 +9043,35 @@
         "inputFields": null,
         "interfaces": null,
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "IntegratingSystemType",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "MOSIP",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OSIA",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OTHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -17555,6 +17604,12 @@
             "deprecationReason": null
           },
           {
+            "name": "FLAGGED_AS_POTENTIAL_DUPLICATE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "MARKED_AS_DUPLICATE",
             "description": null,
             "isDeprecated": false,
@@ -19938,6 +19993,18 @@
             "deprecationReason": null
           },
           {
+            "name": "integratingSystemType",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegratingSystemType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "name",
             "description": null,
             "args": [],
@@ -20025,6 +20092,18 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "integratingSystemType",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "IntegratingSystemType",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "name",
             "description": null,

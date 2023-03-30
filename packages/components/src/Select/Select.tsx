@@ -19,6 +19,7 @@ import { IndicatorProps } from 'react-select/lib/components/indicators'
 export interface ISelectOption {
   value: string
   label: string
+  disabled?: boolean
 }
 
 export interface IStyledSelectProps extends Props<ISelectOption> {
@@ -152,6 +153,11 @@ export class Select extends React.Component<ISelectProps> {
         onChange={this.change}
         isSearchable={this.props.options.length > length}
         value={getSelectedOption(this.props.value, this.props.options)}
+        isOptionDisabled={({ value }: { value: string }) =>
+          this.props.options.some(
+            (option: ISelectOption) => option.value === value && option.disabled
+          )
+        }
       />
     )
   }

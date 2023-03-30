@@ -184,11 +184,11 @@ export const searchForBirthDuplicates = async (
                                     childDoB: {
                                       gte: subYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString(),
                                       lte: addYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString()
                                     }
                                   }
@@ -282,6 +282,34 @@ export const searchForDeathDuplicates = async (
                         field: 'deathDate',
                         pivot: '5d', // 5 days
                         origin: new Date(body.deathDate).toISOString(),
+                        boost: 1
+                      }
+                    }
+                  ].filter(Boolean)
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    body.deceasedDoB && {
+                      range: {
+                        deceasedDoB: {
+                          gte: subDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString(),
+                          lte: addDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString()
+                        }
+                      }
+                    },
+                    body.deceasedDoB && {
+                      distance_feature: {
+                        field: 'deceasedDoB',
+                        pivot: '5d', // 5 days
+                        origin: new Date(body.deceasedDoB).toISOString(),
                         boost: 1
                       }
                     }
