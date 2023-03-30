@@ -28,7 +28,7 @@
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
     "joi": "^17.3.0",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.6.7",
     "node-verhoeff": "^0.0.11",
