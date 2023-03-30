@@ -18,7 +18,8 @@ import {
   ITimeLoggedResponse,
   getCertificatesFromTask,
   getActionFromTask,
-  fetchTaskByCompositionIdFromHearth
+  fetchTaskByCompositionIdFromHearth,
+  fetchDocuments
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -72,7 +73,7 @@ import {
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { MINIO_BUCKET, USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
@@ -726,8 +727,17 @@ export const typeResolvers: GQLResolver = {
     id(docRef: fhir.DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
-    data(docRef: fhir.DocumentReference) {
-      return docRef.content[0].attachment.data
+    async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
+      const fileName = docRef.content[0].attachment.data
+      const response = (await fetchDocuments(
+        '/presigned-url',
+        authHeader,
+        'POST',
+        JSON.stringify({ fileName: fileName })
+      )) as { presignedURL: string }
+      return `/${MINIO_BUCKET}${
+        response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+      }`
     },
     contentType(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.contentType
