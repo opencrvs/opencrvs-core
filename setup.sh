@@ -219,21 +219,21 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node 14.18.0 or v14.18.1 as this release has been tested on those versions."
+            echo "We recommend you install Node 16.13.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
             echo
-            echo "nvm install 14.18.0"
+            echo "nvm install 16.13.1"
             echo
             echo "When the version is installed, us it:"
             echo
-            echo "nvm use 14.18.1"
+            echo "nvm use 16.13.1"
             echo
             echo "Finally set the version to be the default:"
             echo
-            echo "nvm alias default 14.18.1"
+            echo "nvm alias default 16.13.1"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
@@ -295,13 +295,13 @@ echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED
 echo
 
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-versionTest=$(do_version_check $myNodeVersion 14.18.0)
+versionTest=$(do_version_check $myNodeVersion 16.13.1)
 if [ "$versionTest" == "LOWER" ] ; then
   echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
-  echo "We recommend you install Node v14.18.1 as this release has been tested on that version."
+  echo "We recommend you install Node v16.13.1 as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-  echo "nvm install 14.18.1"
+  echo "nvm install 16.13.1"
   exit 1
   else
     echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
