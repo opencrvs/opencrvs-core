@@ -59,7 +59,7 @@ describe('registration query mappings tests', () => {
 
 describe('phone number conversion from international format back to local format', () => {
   it('replaces country code', async () => {
-    expect(convertToLocal('+8801711111111', 'ZMB')).toBe('01711111111')
+    expect(convertToLocal('+260211000000', 'ZMB')).toBe('0211000000')
     expect(convertToLocal('+358504700715', 'FIN')).toBe('0504700715')
     expect(convertToLocal('+237666666666', 'CMR')).toBe('666666666')
   })
