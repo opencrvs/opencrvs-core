@@ -33,7 +33,6 @@ import {
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
