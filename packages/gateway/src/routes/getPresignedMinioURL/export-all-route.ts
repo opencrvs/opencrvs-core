@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const HOST = process.env.DOCUMENTS_HOST || '0.0.0.0'
-export const PORT = process.env.DOCUMENTS_PORT || 9050
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
-export const DEFAULT_TIMEOUT = 600000
-export const MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND = 3600
+
+import { getPresignedMinioURLHandler } from '@gateway/routes/getPresignedMinioURL/handler'
+
+export default {
+  method: 'GET',
+  path: '/document/{fileName}',
+  handler: getPresignedMinioURLHandler,
+  config: {
+    auth: false,
+    description: 'Get presigned url from minio',
+    notes: 'Pass the fileName as url param'
+  }
+}
