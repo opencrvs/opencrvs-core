@@ -78,12 +78,11 @@ type HOCProps = IConnectProps & IDispatchProps
 const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
+  height: 40px;
+  width: 40px;
   display: flex;
-  flex-grow: 0;
   align-items: center;
-  max-width: 152px;
-  justify-content: ${({ isLoading }) =>
-    isLoading ? `space-between` : `flex-end`};
+  justify-content: center;
 `
 const DownloadAction = styled(Button)`
   border-radius: 50%;
@@ -173,6 +172,11 @@ function getAssignModalOptions(
   }
 }
 const NoConnectionViewContainer = styled.div`
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .no-connection {
     ::after {
       display: none;

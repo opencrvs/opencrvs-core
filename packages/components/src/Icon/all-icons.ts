@@ -45,7 +45,9 @@ export {
   WarningCircle,
   X,
   Activity,
+  ArchiveTray,
   ChartLine,
   ChartBar,
+  Eye,
   PaperPlaneTilt
 } from 'phosphor-react'
