@@ -12,7 +12,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
-import { DeclarationIcon, Cross, VerticalThreeDots } from '../icons'
+import { DeclarationIcon, Cross } from '../icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { ToggleMenu } from '../ToggleMenu'
 
 const TopBar = styled.div`
@@ -108,7 +109,9 @@ export const EventTopBar = (props: IEventTopBarProps) => {
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"
-            toggleButton={<VerticalThreeDots />}
+            toggleButton={
+              <Icon name="DotsThreeVertical" color="primary" size="large" />
+            }
             menuItems={menuItems}
           />
         )}

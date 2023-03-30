@@ -16,7 +16,8 @@ import {
 } from './ListViewSimplified'
 import React from 'react'
 import { ToggleMenu } from '../ToggleMenu'
-import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../icons'
+import { AvatarSmall, AvatarLarge } from '../icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Pill } from '../Pill'
 import styled from 'styled-components'
 import { Link } from '../Link'
@@ -35,7 +36,9 @@ const toggleMenu = (
   <ToggleMenu
     id="toggleMenu"
     key="toggleMenu"
-    toggleButton={<VerticalThreeDots />}
+    toggleButton={
+      <Icon name="DotsThreeVertical" color="primary" size="large" />
+    }
     menuItems={[
       {
         label: 'Item 1',

@@ -46,12 +46,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  AddUser,
-  VerticalThreeDots,
-  SearchRed,
-  NoWifi
-} from '@opencrvs/components/lib/icons'
+import { AddUser, SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -547,12 +542,7 @@ function UserListComponent(props: IProps) {
             <ToggleMenu
               id={`user-item-${index}-menu`}
               toggleButton={
-                <Icon
-                  name="DotsThreeVertical"
-                  color="primary"
-                  size="large"
-                  weight="bold"
-                />
+                <Icon name="DotsThreeVertical" color="primary" size="large" />
               }
               menuItems={getMenuItems(user)}
             />
