@@ -17,7 +17,7 @@ import {
 import React from 'react'
 import { ToggleMenu } from '../ToggleMenu'
 import { AvatarSmall, AvatarLarge } from '../icons'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '../Icon'
 import { Pill } from '../Pill'
 import styled from 'styled-components'
 import { Link } from '../Link'

@@ -11,7 +11,7 @@
  */
 import styled from 'styled-components'
 import React from 'react'
-import { Button } from '@opencrvs/components/lib/Button'
+import { Button } from '../Button'
 import { noop } from 'lodash'
 
 const ToggleMenuContainer = styled.nav`

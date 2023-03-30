@@ -11,7 +11,7 @@
  */
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '../Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
 import React from 'react'
 

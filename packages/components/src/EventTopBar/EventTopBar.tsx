@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
 import { DeclarationIcon, Cross } from '../icons'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '../Icon'
 import { ToggleMenu } from '../ToggleMenu'
 
 const TopBar = styled.div`
