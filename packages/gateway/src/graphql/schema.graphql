@@ -1639,7 +1639,6 @@ enum IdentityIDType {
   OTHER
   NO_ID
   SOCIAL_SECURITY_NO
-  MOSIP_PSUT_TOKEN_ID
 }
 
 enum AddressType {
