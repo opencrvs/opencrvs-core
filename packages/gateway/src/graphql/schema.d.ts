@@ -267,6 +267,7 @@ export interface GQLUser {
   mobile: string
   systemRole: GQLSystemRoleType
   role: GQLRole
+  title: string
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -583,6 +584,7 @@ export interface GQLUserInput {
   mobile: string
   systemRole: GQLSystemRoleType
   role?: string
+  title: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
@@ -4080,6 +4082,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   mobile?: UserToMobileResolver<TParent>
   systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
+  title?: UserToTitleResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
@@ -4123,6 +4126,10 @@ export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToRoleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToTitleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

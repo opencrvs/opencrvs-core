@@ -128,6 +128,7 @@ export interface IUser {
   mobile: string
   passwordHash: string
   salt: string
+  title: string
   systemRole: string
   role: Types.ObjectId
   practitionerId: string
@@ -305,6 +306,7 @@ const userSchema = new Schema({
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], required: true },
+  title: { type: String, required: true },
   status: {
     type: String,
     enum: [

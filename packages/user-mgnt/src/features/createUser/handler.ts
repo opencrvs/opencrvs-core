@@ -59,6 +59,7 @@ export default async function createUser(
       user.primaryOfficeId,
       token
     )
+
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)

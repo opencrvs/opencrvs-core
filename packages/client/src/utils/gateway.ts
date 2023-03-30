@@ -624,8 +624,7 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA',
-  Time = 'TIME'
+  Textarea = 'TEXTAREA'
 }
 
 export type CustomSelectOption = {
@@ -1872,7 +1871,6 @@ export type QuestionInput = {
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
   unit?: InputMaybe<Array<MesssageInput>>
-  validateEmpty?: InputMaybe<Scalars['Boolean']>
   validator?: InputMaybe<Array<ValidatorInput>>
 }
 
@@ -2265,6 +2263,7 @@ export type User = {
   signature?: Maybe<Signature>
   status: Status
   systemRole: SystemRoleType
+  title: Scalars['String']
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2317,6 +2316,7 @@ export type UserInput = {
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
   systemRole: SystemRoleType
+  title: Scalars['String']
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2740,6 +2740,7 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile: string
     systemRole: SystemRoleType
+    title: string
     status: Status
     role: {
       __typename?: 'Role'
@@ -3073,6 +3074,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    title: string
     username?: string | null
     mobile: string
     systemRole: SystemRoleType
@@ -3496,7 +3498,16 @@ export type FetchBirthRegistrationForReviewQuery = {
         text?: string | null
       } | null
       location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name: string
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3795,7 +3806,16 @@ export type FetchBirthRegistrationForCertificateQuery = {
         text?: string | null
       } | null
       location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name: string
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4176,7 +4196,16 @@ export type FetchDeathRegistrationForReviewQuery = {
         text?: string | null
       } | null
       location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name: string
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4453,7 +4482,16 @@ export type FetchDeathRegistrationForCertificationQuery = {
         text?: string | null
       } | null
       location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name: string
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'

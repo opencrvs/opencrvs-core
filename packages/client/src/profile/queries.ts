@@ -28,6 +28,7 @@ export const FETCH_USER = gql`
       practitionerId
       mobile
       systemRole
+      title
       role {
         _id
         labels {

@@ -93,6 +93,7 @@ export interface IUserPayload
   identifiers: GQLUserIdentifierInput[]
   systemRole: string
   role: string
+  title: string
   signature?: GQLSignatureInput
 }
 

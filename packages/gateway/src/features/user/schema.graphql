@@ -50,6 +50,7 @@ input UserInput {
   mobile: String!
   systemRole: SystemRoleType!
   role: String
+  title: String!
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -89,6 +90,7 @@ type User {
   mobile: String!
   systemRole: SystemRoleType!
   role: Role!
+  title: String!
   email: String
   status: Status!
   underInvestigation: Boolean

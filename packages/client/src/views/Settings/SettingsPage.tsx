@@ -23,6 +23,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   Name,
   Role,
+  Title,
   Language,
   Password,
   PIN,
@@ -48,6 +49,7 @@ export function SettingsPage() {
           <Name />
           <PhoneNumber />
           <Role />
+          <Title />
           <Language />
           <Password />
           <PIN />
