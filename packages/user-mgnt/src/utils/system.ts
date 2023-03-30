@@ -26,6 +26,11 @@ export const types = {
   WEBHOOK: 'WEBHOOK'
 }
 
+export const integratingSystemTypes = {
+  OTHER: 'OTHER',
+  MOSIP: 'MOSIP'
+}
+
 type MongooseQueriedSystem = ISystemModel & { _id: Types.ObjectId }
 
 const pickSettings = (system: MongooseQueriedSystem) => {
@@ -60,7 +65,12 @@ const pickSettings = (system: MongooseQueriedSystem) => {
 
 /** Returns a curated `System` with only the params we want to expose */
 export const pickSystem = (system: MongooseQueriedSystem) => {
-  const directlyPassedParameters = pick(system, ['name', 'status', 'type'])
+  const directlyPassedParameters = pick(system, [
+    'name',
+    'status',
+    'type',
+    'integratingSystemType'
+  ])
 
   return {
     ...directlyPassedParameters,

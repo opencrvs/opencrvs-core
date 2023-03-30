@@ -11,7 +11,7 @@
  */
 import { model, Schema, Document } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { types } from '@user-mgnt/utils/system'
+import { integratingSystemTypes, types } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
@@ -80,6 +80,10 @@ const systemSchema = new Schema({
   type: {
     type: String,
     enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH, types.WEBHOOK]
+  },
+  integratingSystemType: {
+    type: String,
+    enum: [integratingSystemTypes.MOSIP, integratingSystemTypes.OTHER]
   }
 })
 

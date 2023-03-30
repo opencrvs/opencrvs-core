@@ -603,8 +603,7 @@ export function SystemList() {
                         label: intl.formatMessage(
                           integrationMessages.integratingSystemTypeOther
                         ),
-                        value: IntegratingSystemType.Other,
-                        disabled: true
+                        value: IntegratingSystemType.Other
                       }
                     ]}
                     id={'integrating-system-select'}
