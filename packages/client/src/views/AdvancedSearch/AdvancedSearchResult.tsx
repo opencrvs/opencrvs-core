@@ -88,7 +88,7 @@ import {
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 
-const SearchParamPillsContainer = styled.div`
+const SearchParamContainer = styled.div`
   margin: 16px 0px;
   display: flex;
   gap: 10px;
@@ -494,7 +494,7 @@ const SearchModifierComponent = () => {
 
   return (
     <>
-      <SearchParamPillsContainer>
+      <SearchParamContainer>
         {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
@@ -502,18 +502,19 @@ const SearchModifierComponent = () => {
                 advancedSearchResultMessages[pillKey as advancedSearchPillKey]
               )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
               type="default"
-              size="medium"
+              size="small"
             ></Pill>
           )
         })}
         <Link
+          font="bold14"
           onClick={() => {
             dispatch(goToAdvancedSearch())
           }}
         >
           {intl.formatMessage(buttonMessages.edit)}
         </Link>
-      </SearchParamPillsContainer>
+      </SearchParamContainer>
     </>
   )
 }
