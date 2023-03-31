@@ -516,13 +516,10 @@ export const isValidBengaliWord = (value: string): boolean => {
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
   const englishRe = XRegExp.cache(
-    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)',
+    `(^[\\p{Latin}0-9'._-]*\\([\\p{Latin}0-9'._-]+\\)[\\p{Latin}0-9'._-]*$)|(^[\\p{Latin}0-9'._-]+$)`,
     ''
   )
-
-  const englishApostrophe = XRegExp.cache(`[p{Nd}'_]+`, '')
-
-  return englishRe.test(value) || englishApostrophe.test(value)
+  return englishRe.test(value)
 }
 
 type Checker = (value: string) => boolean
