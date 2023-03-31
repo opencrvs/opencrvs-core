@@ -44,7 +44,7 @@ const Wrapper = styled.div`
 const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
   height: 40px;
-  border-radius: 4px !important;
+  border-radius: 4px;
   ${({ theme }) => theme.fonts.reg18};
   padding-left: 32px;
   border: 2px solid
