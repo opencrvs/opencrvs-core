@@ -11,13 +11,14 @@
  */
 import { goToHome, FORGOTTEN_ITEMS } from '@login/login/actions'
 import { storage } from '@login/storage'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Box } from '@opencrvs/components/lib/Box'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Text } from '@opencrvs/components/lib/Text'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import {
-  Container,
-  LogoContainer,
-  Page
-} from '@login/views/resetCredentialsForm/commons'
+import { LogoContainer } from '@login/views/resetCredentialsForm/commons'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -27,16 +28,11 @@ import { RouteComponentProps } from 'react-router'
 import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
 
-const TitleHolder = styled.div`
-  ${({ theme }) => theme.fonts.h1};
-  padding: 50px 65px 0px 65px;
-`
-const InstructionHolder = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  padding: 40px 60px 30px 60px;
-`
-const LoginButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
+const Container = styled(Box)`
+  position: relative;
+  height: auto;
+  margin: auto;
+  width: min(330px, 90%);
 `
 
 export class ResetCredentialsSuccessView extends React.Component<
@@ -54,24 +50,52 @@ export class ResetCredentialsSuccessView extends React.Component<
     const { intl, goToHome, logo } = this.props
     const { forgottenItem } = this.props.location.state
     return (
-      <Page>
-        <Container id="reset-credentials-success-page">
-          <LogoContainer>
-            <CountryLogo src={logo} />
-          </LogoContainer>
-          <TitleHolder>
-            {intl.formatMessage(messages.successPageTitle, { forgottenItem })}
-          </TitleHolder>
-          <InstructionHolder>
-            {intl.formatMessage(messages.successPageSubtitle, {
-              forgottenItem
-            })}
-          </InstructionHolder>
-          <LoginButton id="login-button" onClick={goToHome}>
-            {intl.formatMessage(messages.loginButtonLabel)}
-          </LoginButton>
-        </Container>
-      </Page>
+      <Frame
+        header={<AppBar title="OpenCRVS" />}
+        skipToContentText="Skip to main content"
+      >
+        <Frame.LayoutCentered>
+          <Container id="reset-credentials-success-page">
+            <Stack direction="column" alignItems="stretch" gap={24}>
+              <LogoContainer>
+                <CountryLogo src={logo} />
+              </LogoContainer>
+              <Stack direction="column" alignItems="center">
+                <Text
+                  variant="h2"
+                  element="h1"
+                  align="center"
+                  id="authenticating-label"
+                >
+                  {intl.formatMessage(messages.successPageTitle, {
+                    forgottenItem
+                  })}
+                </Text>
+                <Text
+                  variant="reg18"
+                  element="p"
+                  align="center"
+                  color="grey500"
+                  id="authenticating-label"
+                >
+                  {intl.formatMessage(messages.successPageSubtitle, {
+                    forgottenItem
+                  })}
+                </Text>
+              </Stack>
+
+              <Button
+                type="primary"
+                size="large"
+                id="login-button"
+                onClick={goToHome}
+              >
+                {intl.formatMessage(messages.loginButtonLabel)}
+              </Button>
+            </Stack>
+          </Container>
+        </Frame.LayoutCentered>
+      </Frame>
     )
   }
 }
