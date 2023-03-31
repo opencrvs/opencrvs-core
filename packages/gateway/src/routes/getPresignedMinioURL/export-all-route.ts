@@ -17,7 +17,6 @@ export default {
   path: '/document/{fileName}',
   handler: getPresignedMinioURLHandler,
   config: {
-    auth: false,
     description: 'Get presigned url from minio',
     notes: 'Pass the fileName as url param'
   }
