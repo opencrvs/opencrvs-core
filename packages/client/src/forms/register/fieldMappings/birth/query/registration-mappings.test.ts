@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { changeHirerchyQueryTransformer } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
+import {
+  changeHirerchyQueryTransformer,
+  convertToLocal
+} from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 import { IFormField } from '@client/forms'
 
 describe('registration query mappings tests', () => {
@@ -51,5 +54,13 @@ describe('registration query mappings tests', () => {
     )
 
     expect(transformedData).toEqual(expectedTransformedData)
+  })
+})
+
+describe('phone number conversion from international format back to local format', () => {
+  it('replaces country code', async () => {
+    expect(convertToLocal('+260211000000', 'ZMB')).toBe('0211000000')
+    expect(convertToLocal('+358504700715', 'FIN')).toBe('0504700715')
+    expect(convertToLocal('+237666666666', 'CMR')).toBe('666666666')
   })
 })
