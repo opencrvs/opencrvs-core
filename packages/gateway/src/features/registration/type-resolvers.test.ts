@@ -956,10 +956,18 @@ describe('Registration type resolvers', () => {
       expect(id).toBe('b9648bdf-fb4e-4216-905f-d7fc3930301d')
     })
 
-    it('returns base64 data', () => {
+    it('returns base64 data', async () => {
       // @ts-ignore
-      const data = typeResolvers.Attachment.data(mockDocumentReference)
-      expect(data).toBe('PGJhc2U2NEJpbmFyeT4K')
+      fetch.mockResponses([
+        JSON.stringify({ presignedURL: '/ocrvs/presignedurl' })
+      ])
+
+      const data = typeResolvers.Attachment.data(
+        mockDocumentReference,
+        undefined,
+        { headers: undefined }
+      )
+      expect(await data).toBe('/ocrvs/presignedurl')
     })
 
     it('returns originalFileName', () => {
