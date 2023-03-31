@@ -17,22 +17,24 @@ import {
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { phoneNumberFormat } from '@login/utils/validate'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Content } from '@opencrvs/components/lib/Content'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { Title } from './commons'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
 import { messages as validationMessages } from '@login/i18n/messages/validations'
 
 const Actions = styled.div`
-  padding: 32px 0;
   & > div {
     margin-bottom: 16px;
   }
@@ -121,62 +123,101 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <ActionPageLight
-          id="page-title"
-          title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: this.props.location.state.forgottenItem
-          })}
-          goBack={goToForgottenItemForm}
-        >
-          <form
-            id="phone-number-verification-form"
-            onSubmit={this.handleContinue}
-          >
-            <Title>
-              {intl.formatMessage(
-                messages.phoneNumberConfirmationFormBodyHeader
-              )}
-            </Title>
-
-            <Actions id="phone-number-verification">
-              <InputField
-                id="phone-number"
-                key="phoneNumberFieldContainer"
-                label={this.props.intl.formatMessage(
-                  messages.phoneNumberFieldLabel
-                )}
-                touched={this.state.touched}
-                error={
-                  validationError
-                    ? this.props.intl.formatMessage(
-                        validationError.message,
-                        validationError.props
-                      )
-                    : responseError
-                    ? errorMessage
-                    : ''
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={goToForgottenItemForm}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={goToForgottenItemForm}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem: this.props.location.state.forgottenItem
                 }
-                hideAsterisk={true}
+              )}
+              desktopTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem: this.props.location.state.forgottenItem
+                }
+              )}
+            />
+          }
+          skipToContentText="Skip to main content"
+        >
+          <Content
+            title={intl.formatMessage(
+              messages.phoneNumberConfirmationFormBodyHeader
+            )}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={this.handleContinue}
+                type="primary"
+                size="large"
               >
-                <TextInput
-                  id="phone-number-input"
-                  type="tel"
-                  key="phoneNumberInputField"
-                  name="phoneNumberInput"
-                  isSmallSized={true}
-                  value={this.state.phone}
-                  onChange={(e) => this.handleChange(e.target.value)}
+                {intl.formatMessage(messages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
+            <form
+              id="phone-number-verification-form"
+              onSubmit={this.handleContinue}
+            >
+              <Actions id="phone-number-verification">
+                <InputField
+                  id="phone-number"
+                  key="phoneNumberFieldContainer"
+                  label={this.props.intl.formatMessage(
+                    messages.phoneNumberFieldLabel
+                  )}
                   touched={this.state.touched}
-                  error={responseError}
-                />
-              </InputField>
-            </Actions>
-
-            <PrimaryButton id="continue">
-              {intl.formatMessage(messages.continueButtonLabel)}
-            </PrimaryButton>
-          </form>
-        </ActionPageLight>
+                  error={
+                    validationError
+                      ? this.props.intl.formatMessage(
+                          validationError.message,
+                          validationError.props
+                        )
+                      : responseError
+                      ? errorMessage
+                      : ''
+                  }
+                  hideAsterisk={true}
+                >
+                  <TextInput
+                    id="phone-number-input"
+                    type="tel"
+                    key="phoneNumberInputField"
+                    name="phoneNumberInput"
+                    isSmallSized={true}
+                    value={this.state.phone}
+                    onChange={(e) => this.handleChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={responseError}
+                  />
+                </InputField>
+              </Actions>
+            </form>
+          </Content>
+        </Frame>
       </>
     )
   }

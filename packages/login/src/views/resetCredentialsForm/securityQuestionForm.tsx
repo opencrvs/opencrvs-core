@@ -20,7 +20,6 @@ import {
   IVerifySecurityAnswerResponse,
   QUESTION_KEYS
 } from '@login/utils/authApi'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import * as React from 'react'
@@ -28,12 +27,14 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { Title } from './commons'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Content } from '@opencrvs/components/lib/Content'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const Actions = styled.div`
-  padding: 32px 0;
   & > div {
     margin-bottom: 16px;
   }
@@ -169,55 +170,94 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <ActionPageLight
-          id="page-title"
-          title={intl.formatMessage(sharedMessages.credentialsResetFormTitle, {
-            forgottenItem
-          })}
-          goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(
+                sharedMessages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+              desktopTitle={intl.formatMessage(
+                sharedMessages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+            />
+          }
+          skipToContentText="Skip to main content"
         >
-          <form id="security-question-form" onSubmit={this.handleContinue}>
-            <Title id="question">
-              {intl.formatMessage(messages[this.state.questionKey])}
-            </Title>
-            {intl.formatMessage(
+          <Content
+            title={intl.formatMessage(messages[this.state.questionKey])}
+            subtitle={intl.formatMessage(
               sharedMessages.securityQuestionFormBodySubheader
             )}
-
-            <Actions id="security-answer">
-              <InputField
-                id="security-answer"
-                key="securityAnswerFieldContainer"
-                label={this.props.intl.formatMessage(
-                  sharedMessages.answerFieldLabel
-                )}
-                touched={this.state.touched}
-                error={
-                  this.state.error
-                    ? this.props.intl.formatMessage(sharedMessages.error)
-                    : ''
-                }
-                hideAsterisk={true}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={this.handleContinue}
+                type="primary"
+                size="large"
               >
-                <TextInput
-                  id="security-answer-input"
-                  type="text"
-                  key="securityAnswerInputField"
-                  name="securityAnswerInput"
-                  isSmallSized={true}
-                  value={this.state.answer}
-                  onChange={(e) => this.handleChange(e.target.value)}
+                {intl.formatMessage(sharedMessages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
+            <form id="security-question-form" onSubmit={this.handleContinue}>
+              <Actions id="security-answer">
+                <InputField
+                  id="security-answer"
+                  key="securityAnswerFieldContainer"
+                  label={this.props.intl.formatMessage(
+                    sharedMessages.answerFieldLabel
+                  )}
                   touched={this.state.touched}
-                  error={this.state.error}
-                />
-              </InputField>
-            </Actions>
-
-            <PrimaryButton id="continue">
-              {intl.formatMessage(sharedMessages.continueButtonLabel)}
-            </PrimaryButton>
-          </form>
-        </ActionPageLight>
+                  error={
+                    this.state.error
+                      ? this.props.intl.formatMessage(sharedMessages.error)
+                      : ''
+                  }
+                  hideAsterisk={true}
+                >
+                  <TextInput
+                    id="security-answer-input"
+                    type="text"
+                    key="securityAnswerInputField"
+                    name="securityAnswerInput"
+                    isSmallSized={true}
+                    value={this.state.answer}
+                    onChange={(e) => this.handleChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={this.state.error}
+                  />
+                </InputField>
+              </Actions>
+            </form>
+          </Content>
+        </Frame>
       </>
     )
   }

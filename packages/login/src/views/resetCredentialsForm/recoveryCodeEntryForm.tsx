@@ -15,20 +15,24 @@ import {
   goToSecurityQuestionForm
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
-import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { Title } from './commons'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Content } from '@opencrvs/components/lib/Content'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Toast } from '@opencrvs/components/lib/Toast'
+
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Actions = styled.div`
-  padding: 32px 0;
   & > div {
     margin-bottom: 16px;
   }
@@ -107,71 +111,113 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <ActionPageLight
-          title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem
-          })}
-          goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+                >
+                  <Icon name="ArrowLeft" />
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+              desktopTitle={intl.formatMessage(
+                messages.credentialsResetFormTitle,
+                {
+                  forgottenItem
+                }
+              )}
+            />
+          }
+          skipToContentText="Skip to main content"
         >
-          <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
+          <Content
+            title={intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
+            subtitle={intl.formatMessage(
+              messages.recoveryCodeEntryFormBodySubheader,
+              {
+                link: (
+                  <Link
+                    onClick={this.resendSMS}
+                    id="retrieve-login-mobile-resend"
+                    font="bold16"
+                    type="button"
+                  >
+                    {intl.formatMessage(messages.resend)}
+                  </Link>
+                )
+              }
+            )}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={this.handleContinue}
+                type="primary"
+                size="large"
+              >
+                {intl.formatMessage(messages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
             {resentSMS && (
-              <>
-                <Title>{intl.formatMessage(messages.codeResentTitle)}</Title>
+              <Toast type="success">
                 {intl.formatMessage(messages.resentSMS, {
                   number: this.props.location.state.mobile
                 })}
-              </>
+              </Toast>
             )}
-            {!resentSMS && (
-              <>
-                <Title>
-                  {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
-                </Title>
-                {intl.formatMessage(
-                  messages.recoveryCodeEntryFormBodySubheader
-                )}
-              </>
-            )}{' '}
-            <LinkButton
-              onClick={this.resendSMS}
-              id="retrieve-login-mobile-resend"
-              type="button"
-            >
-              {intl.formatMessage(messages.resend)}
-            </LinkButton>
-            <Actions id="recovery-code-verification">
-              <InputField
-                id="recovery-code"
-                key="recoveryCodeFieldContainer"
-                label={this.props.intl.formatMessage(
-                  messages.verificationCodeFieldLabel
-                )}
-                touched={this.state.touched}
-                error={
-                  this.state.error
-                    ? this.props.intl.formatMessage(messages.error)
-                    : ''
-                }
-                hideAsterisk={true}
-              >
-                <TextInput
-                  id="recovery-code-input"
-                  type="number"
-                  key="recoveryCodeInputField"
-                  name="recoveryCodeInput"
-                  isSmallSized={true}
-                  value={this.state.recoveryCode}
-                  onChange={(e) => this.handleChange(e.target.value)}
+            <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
+              <Actions id="recovery-code-verification">
+                <InputField
+                  id="recovery-code"
+                  key="recoveryCodeFieldContainer"
+                  label={this.props.intl.formatMessage(
+                    messages.verificationCodeFieldLabel
+                  )}
                   touched={this.state.touched}
-                  error={this.state.error}
-                />
-              </InputField>
-            </Actions>
-            <PrimaryButton id="continue">
-              {intl.formatMessage(messages.continueButtonLabel)}
-            </PrimaryButton>
-          </form>
-        </ActionPageLight>
+                  error={
+                    this.state.error
+                      ? this.props.intl.formatMessage(messages.error)
+                      : ''
+                  }
+                  hideAsterisk={true}
+                >
+                  <TextInput
+                    id="recovery-code-input"
+                    type="number"
+                    key="recoveryCodeInputField"
+                    name="recoveryCodeInput"
+                    isSmallSized={true}
+                    value={this.state.recoveryCode}
+                    onChange={(e) => this.handleChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={this.state.error}
+                  />
+                </InputField>
+              </Actions>
+            </form>
+          </Content>
+        </Frame>
       </>
     )
   }
