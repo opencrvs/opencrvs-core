@@ -26,9 +26,10 @@ const AvatarImage = styled.img`
   &:hover {
     opacity: 0.8;
   }
-  &:focus:visible {
+  &:focus {
     outline: none;
-    box-shadow: 0 0px 0px 2px ${({ theme }) => theme.colors.yellow} inset;
+    box-shadow: 0 0px 0px 2px ${({ theme }) => theme.colors.yellow};
+  }
 `
 
 export function AvatarSmall({ name, avatar, ...props }: IProps) {
