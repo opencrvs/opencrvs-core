@@ -13,7 +13,8 @@ import * as React from 'react'
 import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
-import { ArrowDownBlue } from '../icons'
+import { Icon } from '../Icon'
+
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
 export interface ISelectOption {
@@ -36,7 +37,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <ArrowDownBlue />
+        <Icon name="CaretDown" size="small" color="grey600" />
       </components.DropdownIndicator>
     )
   )
@@ -44,14 +45,13 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
-  ${({ theme }) => theme.fonts.reg16};
   .react-select__control {
     background: ${({ theme }) => theme.colors.white};
     border-radius: 4px;
     height: 40px;
     box-shadow: none;
+    padding: 0 0 0 8px;
     ${({ theme }) => theme.fonts.reg16};
-    padding: 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -65,6 +65,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     }
   }
 
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.grey400};
+  }
+
   .react-select__indicator-separator {
     display: none;
   }
@@ -72,7 +76,6 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   .react-select__control--is-focused {
     box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
-    ${({ theme }) => theme.colors.copy};
   }
 
   ${({ ignoreMediaQuery, theme }) => {
