@@ -76,6 +76,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   .react-select__control--is-focused {
     box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
+    ${({ theme }) => theme.colors.copy};
   }
 
   ${({ ignoreMediaQuery, theme }) => {
