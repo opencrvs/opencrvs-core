@@ -101,7 +101,9 @@ const AuditDescriptionMapping: {
   REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction,
+  MARKED_AS_DUPLICATE: messages.markedAsDuplicate,
+  MARKED_AS_NOT_DUPLICATE: messages.markedAsNotDuplicate
 }
 
 export const getAddressName = (
