@@ -13,7 +13,11 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import {
+  generateBcryptHash,
+  generateBcryptSaltedHash,
+  generateHash
+} from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
@@ -38,7 +42,6 @@ export default async function changePasswordHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
   if (userUpdateData.existingPassword) {
     if (user.status !== statuses.ACTIVE) {
       logger.error(
@@ -48,50 +51,51 @@ export default async function changePasswordHandler(
       throw unauthorized()
     }
     if (
-      generateBcryptHash(userUpdateData.existingPassword, user.salt) !==
-      user.passwordHash
+      generateHash(userUpdateData.existingPassword, user.salt) ===
+        user.passwordHash ||
+      generateBcryptHash(userUpdateData.existingPassword, user.salt) ===
+        user.passwordHash
     ) {
-      logger.error(
-        `Password didn't match for given userid: ${userUpdateData.userId}`
-      )
-      // Don't return a 404 as this gives away that this user account exists
-      throw unauthorized()
-    }
-  }
-  user.passwordHash = generateBcryptHash(userUpdateData.password, user.salt)
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
+      const { hash, salt } = generateBcryptSaltedHash(userUpdateData.password)
+      user.salt = salt
+      user.passwordHash = hash
+      const remoteAddress =
+        request.headers['x-real-ip'] || request.info.remoteAddress
+      const userAgent =
+        request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  try {
-    await User.update({ _id: user._id }, user)
-  } catch (err) {
-    logger.error(err.message)
-    // return 400 if there is a validation error when updating to mongo
-    return h.response().code(400)
-  }
-  try {
-    if (!request.headers.authorization) {
-      await postUserActionToMetrics(
-        'PASSWORD_RESET',
-        request.headers.authorization,
-        remoteAddress,
-        userAgent,
-        user.practitionerId
-      )
-    } else {
-      await postUserActionToMetrics(
-        'PASSWORD_CHANGED',
-        request.headers.authorization,
-        remoteAddress,
-        userAgent
-      )
+      try {
+        await User.update({ _id: user._id }, user)
+      } catch (err) {
+        logger.error(err.message)
+        // return 400 if there is a validation error when updating to mongo
+        return h.response().code(400)
+      }
+      try {
+        if (!request.headers.authorization) {
+          await postUserActionToMetrics(
+            'PASSWORD_RESET',
+            request.headers.authorization,
+            remoteAddress,
+            userAgent,
+            user.practitionerId
+          )
+        } else {
+          await postUserActionToMetrics(
+            'PASSWORD_CHANGED',
+            request.headers.authorization,
+            remoteAddress,
+            userAgent
+          )
+        }
+      } catch (err) {
+        logger.error(err)
+      }
+      return h.response().code(200)
+      // Don't return a 404 as this gives away that this user account exists
     }
-  } catch (err) {
-    logger.error(err)
   }
-  return h.response().code(200)
+  throw unauthorized()
 }
 
 export const changePasswordRequestSchema = Joi.object({
