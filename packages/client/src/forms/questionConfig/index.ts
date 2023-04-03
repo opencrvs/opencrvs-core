@@ -54,7 +54,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   custom: boolean
   label: IMessage[]
-  required: boolean
+  required?: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
   unit?: IMessage[]
