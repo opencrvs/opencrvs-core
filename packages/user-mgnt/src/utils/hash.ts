@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createHash } from 'crypto'
-import * as uuid from 'uuid/v4'
+import * as bcrypt from 'bcryptjs'
 
 interface ISaltedHash {
   hash: string
@@ -34,15 +34,19 @@ export function generateRandomPassword(demoUser?: boolean) {
   return randomPassword
 }
 
-export function generateBcryptHash(content: string, salt: string): string {
+export function generateHash(content: string, salt: string): string {
   const hash = createHash('sha512')
   hash.update(salt)
   hash.update(content)
   return hash.digest('hex')
 }
 
+export function generateBcryptHash(content: string, salt: string): string {
+  return bcrypt.hashSync(content, salt)
+}
+
 export function generateBcryptSaltedHash(password: string): ISaltedHash {
-  const salt = uuid()
+  const salt = bcrypt.genSaltSync(10)
   return {
     hash: generateBcryptHash(password, salt),
     salt

@@ -14,7 +14,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import { generateBcryptHash, generateHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   username: string
@@ -42,18 +42,21 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
 
-  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
-    throw unauthorized()
-  }
-  const response: IVerifyResponse = {
-    mobile: user.mobile,
-    scope: user.scope,
-    status: user.status,
-    id: user.id,
-    practitionerId: user.practitionerId
+  if (
+    generateHash(password, user.salt) === user.passwordHash ||
+    generateBcryptHash(password, user.salt) === user.passwordHash
+  ) {
+    const response: IVerifyResponse = {
+      mobile: user.mobile,
+      scope: user.scope,
+      status: user.status,
+      id: user.id,
+      practitionerId: user.practitionerId
+    }
+    return response
   }
 
-  return response
+  throw unauthorized()
 }
 
 export const requestSchema = Joi.object({
