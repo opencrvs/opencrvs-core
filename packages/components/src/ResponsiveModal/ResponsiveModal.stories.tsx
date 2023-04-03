@@ -48,7 +48,7 @@ ResponsiveModalView.args = {
 }
 
 export default {
-  title: 'Layout/Dialog',
+  title: 'Depreciated/Dialog',
   component: ResponsiveModal,
   parameters: {
     docs: {
