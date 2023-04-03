@@ -203,4 +203,5 @@ services:
       dockerfile: ./packages/documents/Dockerfile
     restart: unless-stopped
     environment:
+      - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040

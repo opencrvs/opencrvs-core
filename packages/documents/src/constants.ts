@@ -16,4 +16,5 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const DEFAULT_TIMEOUT = 600000
-export const MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND = 3600
+export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND = PRODUCTION ? 3600 : 259200
