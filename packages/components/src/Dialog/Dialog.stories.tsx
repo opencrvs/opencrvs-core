@@ -55,6 +55,16 @@ SmallDialog.args = {
   ]
 }
 
+export const SmallDialogNoButtons = Template.bind({})
+SmallDialogNoButtons.args = {
+  title: 'Small dialog',
+  children: (
+    <>
+      <p>This is a small dialog</p>
+    </>
+  )
+}
+
 export const LargeDialog = Template.bind({})
 LargeDialog.args = {
   title: 'Large dialog',

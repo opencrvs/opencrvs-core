@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Text } from '../Text'
-
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 
@@ -37,6 +36,7 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
         max-width: 90%;
       `
       : `
+        height: 80vh;
         width: 80%;
             @media (max-width: 768px) and (orientation: portrait) {
              width: 100%;
@@ -92,6 +92,7 @@ export function Dialog({
 
   const [hasOverflow, setHasOverflow] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
+  const hasActions = actions && actions.length > 0
 
   useEffect(() => {
     if (contentRef.current) {
@@ -130,7 +131,7 @@ export function Dialog({
               </Button>
             </DialogHeader>
             <DialogContent ref={contentRef}>{children}</DialogContent>
-            {actions && <DialogFooter>{actions}</DialogFooter>}
+            {hasActions && <DialogFooter>{actions}</DialogFooter>}
           </DialogContainer>
         </DialogWrapper>
       )}
