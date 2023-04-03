@@ -52,6 +52,7 @@ function getQueriesToPrefetch(
     {
       query: PERFORMANCE_STATS,
       variables: {
+        event: 'birth',
         locationId,
         status: [
           'IN_PROGRESS',
