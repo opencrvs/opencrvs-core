@@ -38,6 +38,13 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
       `
       : `
         width: 80%;
+            @media (max-width: 768px) and (orientation: portrait) {
+             width: 100%;
+             height: 100%;
+             max-width: 100%;
+             max-height: 100%;
+             border-radius: 0;
+             }
       `}
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
@@ -45,14 +52,6 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
   display: flex;
   flex-direction: column;
   max-height: 80vh;
-
-  @media (max-width: 768px) and (orientation: portrait) {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 0;
-  }
 `
 const DialogHeader = styled.div<{ hasOverflow?: boolean }>`
   display: flex;
@@ -116,7 +115,6 @@ export function Dialog({
   }, [contentRef, isOpen])
 
   const headerHasBorder = hasOverflow && hasScrolled
-  // ...
 
   return (
     <>
