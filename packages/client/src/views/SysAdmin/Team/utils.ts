@@ -19,6 +19,7 @@ import { userMessages } from '@client/i18n/messages'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { SystemRoleType } from '@client/utils/gateway'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 
 export enum UserStatus {
   ACTIVE,
@@ -101,6 +102,16 @@ const AuditDescriptionMapping: {
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
   SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
+}
+
+export const getAddressName = (
+  offlineCountryConfig: IOfflineData,
+  { name, partOf }: ILocation
+): string => {
+  const parentLocationId = partOf.split('/')[1]
+  if (parentLocationId === '0') return name
+  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
+  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
 export function getUserAuditDescription(
