@@ -13,6 +13,7 @@
 import {
   BirthSection,
   DeathSection,
+  MarriageSection,
   FLEX_DIRECTION,
   SerializedFormField,
   ISerializedForm,
@@ -37,7 +38,8 @@ export enum AddressCases {
 
 export enum EventLocationAddressCases {
   PLACE_OF_BIRTH = 'placeOfBirth',
-  PLACE_OF_DEATH = 'placeOfDeath'
+  PLACE_OF_DEATH = 'placeOfDeath',
+  PLACE_OF_MARRIAGE = 'placeOfMarriage'
 }
 
 export enum AddressCopyConfigCases {
@@ -103,6 +105,11 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
   {
     precedingFieldId: 'death.deathEvent.death-event-details.deathLocation',
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_DEATH }]
+  },
+  {
+    precedingFieldId:
+      'marriage.marriageEvent.marriage-event-details.placeOfMarriageTitle',
+    configurations: [{ config: EventLocationAddressCases.PLACE_OF_MARRIAGE }]
   },
   {
     precedingFieldId: 'birth.informant.informant-view-group.familyNameEng',
@@ -231,6 +238,52 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         conditionalCase: secondaryAddressesDisabled
       }
     ]
+  },
+  {
+    precedingFieldId: 'marriage.groom.groom-view-group.marriedLastNameEng',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      }
+    ]
+  },
+  {
+    precedingFieldId: 'marriage.bride.bride-view-group.marriedLastNameEng',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
+        conditionalCase: `${secondaryAddressesDisabled}`
+      }
+    ]
   }
 ]
 
@@ -240,6 +293,7 @@ export function getAddressFields(
   switch (configuration.config) {
     case EventLocationAddressCases.PLACE_OF_BIRTH:
     case EventLocationAddressCases.PLACE_OF_DEATH:
+    case EventLocationAddressCases.PLACE_OF_MARRIAGE:
       return getPlaceOfEventAddressFields(configuration.config)
     case AddressCases.PRIMARY_ADDRESS:
       if (configuration.informant === undefined) {
@@ -322,6 +376,19 @@ export function getPreviewGroups(
             id: 'form.field.label.placeOfDeath'
           },
           fieldToRedirect: 'placeOfDeath'
+        }
+      ]
+    case EventLocationAddressCases.PLACE_OF_MARRIAGE:
+      return [
+        {
+          id: 'placeOfMarriage',
+          label: {
+            defaultMessage: 'Place of marriage',
+            description:
+              'Label for form field: Place of occurrence of marriage',
+            id: 'form.field.label.placeOfMarriage'
+          },
+          fieldToRedirect: 'placeOfMarriage'
         }
       ]
     case AddressCases.PRIMARY_ADDRESS:
@@ -1605,7 +1672,10 @@ export function getPlaceOfEventAddressFields(
       conditionals: [
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -1618,7 +1688,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: []
         },
         query: {
@@ -1668,7 +1740,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1680,7 +1755,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [6]
         },
         query: {
@@ -1710,7 +1787,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1731,7 +1811,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'city']
         },
         query: {
@@ -1761,7 +1843,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1782,7 +1867,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [3]
         },
         query: {
@@ -1812,7 +1899,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1833,7 +1923,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [2]
         },
         query: {
@@ -1863,7 +1955,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1884,7 +1979,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [1]
         },
         query: {
@@ -1914,7 +2011,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1935,7 +2035,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'postalCode']
         },
         query: {
@@ -1965,7 +2067,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         },
         {
           action: 'hide',
@@ -1986,7 +2091,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [5]
         },
         query: {
@@ -2016,7 +2123,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2029,7 +2139,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'state']
         },
         query: {
@@ -2069,7 +2181,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2082,7 +2197,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'district']
         },
         query: {
@@ -2122,7 +2239,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2130,7 +2250,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'city']
         },
         query: {
@@ -2160,7 +2282,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2173,7 +2298,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [7]
         },
         query: {
@@ -2203,7 +2330,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2216,7 +2346,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [8]
         },
         query: {
@@ -2246,7 +2378,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2259,7 +2394,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [9]
         },
         query: {
@@ -2289,7 +2426,10 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression:
+            configCase !== EventLocationAddressCases.PLACE_OF_MARRIAGE
+              ? `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+              : ''
         }
       ],
       mapping: {
@@ -2297,7 +2437,9 @@ export function getPlaceOfEventAddressFields(
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
+              : configCase === EventLocationAddressCases.PLACE_OF_DEATH
+              ? 'deathEventLocationMutationTransformer'
+              : 'marriageEventLocationMutationTransformer',
           parameters: [0, 'postalCode']
         },
         query: {

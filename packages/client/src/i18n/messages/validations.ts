@@ -118,6 +118,12 @@ const messagesToDefine = {
       'The error message appears when the informant is not old enough to register an event',
     id: 'validations.isInformantOfLegalAge'
   },
+  illegalMarriageAge: {
+    defaultMessage: 'Illegal age of marriage',
+    description:
+      'The error message appears when the birth date is not old enough to register for marriage',
+    id: 'validations.illegalMarriageAge'
+  },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',
     description:

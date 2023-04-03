@@ -139,8 +139,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        duplicates {
+          compositionId
+          trackingId
+        }
         informantsSignature
-        duplicates
         attachments {
           data
           type
@@ -280,6 +283,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -551,6 +555,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }

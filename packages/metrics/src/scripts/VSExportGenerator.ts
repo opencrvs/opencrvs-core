@@ -180,6 +180,9 @@ async function getCompositionCursor(startDate: string, endDate: string) {
       date: {
         $gte: startDate,
         $lte: endDate
+      },
+      'type.coding.code': {
+        $in: ['birth-declaration', 'death-declaration']
       }
     })
     .project({ id: 1, title: 1, section: 1, date: 1, _id: 0 })

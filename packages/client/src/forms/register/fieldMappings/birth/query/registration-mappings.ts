@@ -129,6 +129,62 @@ export function registrationNumberTransformer(
   }
 }
 
+export function groomSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].groomSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'groomSignature'
+    ] = queryData[sectionId].groomSignature
+  }
+}
+
+export function brideSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].brideSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'brideSignature'
+    ] = queryData[sectionId].brideSignature
+  }
+}
+
+export function witnessOneSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessOneSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessOneSignature'
+    ] = queryData[sectionId].witnessOneSignature
+  }
+}
+
+export function witnessTwoSignatureTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].witnessTwoSignature) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'witnessTwoSignature'
+    ] = queryData[sectionId].witnessTwoSignature
+  }
+}
+
 export function mosipAidTransformer(
   transformedData: IFormData,
   queryData: any,
@@ -368,9 +424,6 @@ export const userTransformer =
     targetFieldName?: string,
     __?: IOfflineData
   ) => {
-    if (!_.history) {
-      return
-    }
     const history: History = _.history
       .reverse()
       .find(
@@ -388,6 +441,32 @@ export const userTransformer =
         signature: getUserSignature(history)
       } as IFormSectionData
     }
+  }
+
+export const registrationDateTransformer =
+  (locale: string, dateFormat: string) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    if (!_.history) {
+      return
+    }
+    const history = _.history.find(
+      ({ action, regStatus }: History) =>
+        !action && regStatus === RegStatus.Registered
+    )
+
+    const prevLocale = window.__localeId__
+    window.__localeId__ = locale
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationDate'
+    ] = format(new Date(history?.date), dateFormat)
+    window.__localeId__ = prevLocale
   }
 
 export const QRCodeTransformerTransformer = async (

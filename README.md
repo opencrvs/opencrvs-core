@@ -107,47 +107,47 @@ Ilanga District in Sulaka Province is meant to demonstrate a provincial district
 
 A Social Worker in an urban district:
 
-Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **k.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 A Local Leader in a provincial district:
 
-Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **p.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registration Agent
 
-Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **f.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **j.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registrar
 
-Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **k.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **d.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Local System Admin
 
-Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **e.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **a.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### National System Admin
 
 Based in the country HQ Office:
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **j.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### National Registrar
 
 Based in the country HQ Office:
 
-Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **j.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### Performance Manager
 
 Based in the country HQ Office:
 
-Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **e.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 
@@ -170,7 +170,7 @@ To start and stop opencrvs-core and the country configuration server, use the fo
 
 5. Open a new terminal window
 6. Run `cd ../opencrvs-farajaland`
-7. Run `yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->` to start the country configuration server
+7. Run `yarn dev` to start the country configuration server
 
 ### Stopping
 

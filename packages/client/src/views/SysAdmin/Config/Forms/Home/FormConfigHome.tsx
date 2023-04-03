@@ -61,7 +61,7 @@ export function UnpublishedWarning({ compact }: { compact?: boolean }) {
   if (compact) {
     return (
       <>
-        {events.length && (
+        {events.length > 0 && (
           <Text color="negativeDark" variant="bold16" element="p">
             {intl.formatMessage(messages.publishedWarning, {
               events: events.join(', ')
