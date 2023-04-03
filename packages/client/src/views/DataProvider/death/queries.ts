@@ -129,6 +129,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         informantsSignature
         attachments {
           data
+          uri
           type
           contentType
           subject

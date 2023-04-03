@@ -742,6 +742,9 @@ export const typeResolvers: GQLResolver = {
         response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
       }`
     },
+    uri(docRef: fhir.DocumentReference) {
+      return docRef.content[0].attachment.data
+    },
     contentType(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.contentType
     },

@@ -58,19 +58,14 @@ async function getPreSignedURL(fileName: string) {
     `document/${fileName}`,
     window.config.API_GATEWAY_URL
   ).toString()
-  console.log(url)
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-    const resJSON = (await res.json()) as { presignedURL: string }
-    return resJSON.presignedURL
-  } catch (error) {
-    throw new Error('download_failed')
-  }
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+  const resJSON = (await res.json()) as { presignedURL: string }
+  return resJSON.presignedURL
 }
 
 async function downloadURI(uri: string, name: string) {

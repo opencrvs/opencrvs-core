@@ -11,7 +11,7 @@
  */
 import { documentUploadHandler } from '@documents/features/uploadDocument/handler'
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
-import { fetchDocumentHandler } from '@documents/features/getDocument/handler'
+import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -19,9 +19,8 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/presigned-url',
-      handler: fetchDocumentHandler,
+      handler: createPreSignedUrl,
       config: {
-        auth: false,
         tags: ['api']
       }
     },

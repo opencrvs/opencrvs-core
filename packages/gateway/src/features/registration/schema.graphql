@@ -513,7 +513,8 @@ input AttachmentInput {
   _fhirID: ID
   contentType: String
   # base64
-  data: String!
+  data: String
+  uri: String
   # approved/validated/deleted
   status: String
   originalFileName: String
@@ -535,6 +536,7 @@ type Attachment { # -> DocumentReference
   contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64
+  uri: String
   # approved/validated/deleted
   status: String # -> .status
   originalFileName: String # -> .identifier

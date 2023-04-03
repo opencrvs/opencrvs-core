@@ -15,7 +15,7 @@ import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 
-export async function fetchDocumentHandler(
+export async function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

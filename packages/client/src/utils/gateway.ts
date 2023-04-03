@@ -265,19 +265,21 @@ export type Attachment = {
   subject?: Maybe<AttachmentSubject>
   systemFileName?: Maybe<Scalars['String']>
   type?: Maybe<AttachmentType>
+  uri?: Maybe<Scalars['String']>
 }
 
 export type AttachmentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   contentType?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
-  data: Scalars['String']
+  data?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
   subject?: InputMaybe<AttachmentSubject>
   systemFileName?: InputMaybe<Scalars['String']>
   type?: InputMaybe<AttachmentType>
+  uri?: InputMaybe<Scalars['String']>
 }
 
 export enum AttachmentSubject {
@@ -3661,6 +3663,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -4365,6 +4368,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -5058,6 +5062,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -5357,6 +5362,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null

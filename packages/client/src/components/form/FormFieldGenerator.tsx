@@ -252,15 +252,20 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-    ;(value as IFileValue[]).forEach((file) => {
-      const isMinioUrl =
-        file.data.split('/').length > 1 &&
-        file.data.split('/')[1] === window.config.MINIO_BUCKET
-      if (isMinioUrl) {
-        file.data = `${window.config.MINIO_URL}${file.data}`
-      }
-      return value
-    })
+    value =
+      value &&
+      (value as IFileValue[]).map((file) => {
+        const isMinioUrl =
+          file.data.split('/').length > 1 &&
+          file.data.split('/')[1] === window.config.MINIO_BUCKET
+        if (isMinioUrl) {
+          return {
+            ...file,
+            data: `${window.config.MINIO_URL}${file.data}`
+          }
+        }
+        return file
+      })
 
     return (
       <DocumentUploaderWithOption
