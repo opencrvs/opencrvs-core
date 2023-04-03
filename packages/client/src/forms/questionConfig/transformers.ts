@@ -128,7 +128,7 @@ export function questionsTransformer(
           fieldName,
           fieldType,
           precedingFieldId,
-          required: required ?? false,
+          required,
           custom,
           conditionals,
           datasetId,
