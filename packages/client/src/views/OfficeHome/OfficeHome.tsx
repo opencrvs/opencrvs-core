@@ -39,7 +39,8 @@ import {
   FIELD_AGENT_ROLES,
   NATL_ADMIN_ROLES,
   SYS_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
+  PERFORMANCE_MANAGEMENT_ROLES,
+  NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -301,10 +302,11 @@ class OfficeHomeView extends React.Component<
     return (
       <>
         {this.role &&
-          (NATL_ADMIN_ROLES.includes(this.role) ||
-            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
-            <Redirect to={PERFORMANCE_DASHBOARD} />
-          )}
+          [
+            ...NATL_ADMIN_ROLES,
+            ...PERFORMANCE_MANAGEMENT_ROLES,
+            ...NATIONAL_REGISTRAR_ROLES
+          ].includes(this.role) && <Redirect to={PERFORMANCE_DASHBOARD} />}
         {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
           <Redirect
             to={{
