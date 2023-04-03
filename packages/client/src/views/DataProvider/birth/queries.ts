@@ -164,6 +164,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type

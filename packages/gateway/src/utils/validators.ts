@@ -19,15 +19,22 @@ import {
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
-  attachments: Array<{ data: string }>
+  attachments: Array<{ data?: string; uri?: string }>
 ) {
   for (const file of attachments) {
     const isMinioUrl =
-      file.data.split('/').length > 1 &&
-      file.data.split('/')[1] === MINIO_BUCKET
+      file.uri &&
+      file.uri.split('/').length > 1 &&
+      file.uri.split('/')[1] === MINIO_BUCKET
+
     if (isMinioUrl) {
       continue
     }
+
+    if (!file.data) {
+      throw new Error(`No attachment file found!`)
+    }
+
     const data = file.data.split('base64,')?.[1] || ''
     const mime = file.data.split(';')[0].replace('data:', '')
 
