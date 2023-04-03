@@ -61,6 +61,9 @@ const DialogHeader = styled.div<{ hasOverflow?: boolean }>`
   gap: 24px;
   ${({ hasOverflow }) => hasOverflow && `border-bottom: 1px solid #ccc`}
 `
+const DialogTitle = styled.div`
+  padding-top: 2px;
+`
 
 const DialogContent = styled.div`
   padding: 8px 24px 24px 24px;
@@ -123,9 +126,11 @@ export function Dialog({
         <DialogWrapper>
           <DialogContainer id={id} variant={variant}>
             <DialogHeader hasOverflow={headerHasBorder}>
-              <Text variant="h2" element="h2" color="grey600">
-                {title}
-              </Text>
+              <DialogTitle>
+                <Text variant="h2" element="h2" color="grey600">
+                  {title}
+                </Text>
+              </DialogTitle>
               <Button type="icon" size="small" onClick={handleClose}>
                 <Icon name="X" size="medium" weight="bold" />
               </Button>
