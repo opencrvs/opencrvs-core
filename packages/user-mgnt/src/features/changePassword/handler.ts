@@ -33,21 +33,20 @@ export default async function changePasswordHandler(
   h: Hapi.ResponseToolkit
 ) {
   const userUpdateData = request.payload as IChangePasswordPayload
-
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
+
   if (!user) {
     logger.error(
       `No user details found by given userid: ${userUpdateData.userId}`
     )
-    // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
+
   if (userUpdateData.existingPassword) {
     if (user.status !== statuses.ACTIVE) {
       logger.error(
         `User is not in active state for given userid: ${userUpdateData.userId}`
       )
-      // Don't return a 404 as this gives away that this user account exists
       throw unauthorized()
     }
     if (
@@ -56,46 +55,59 @@ export default async function changePasswordHandler(
       generateBcryptHash(userUpdateData.existingPassword, user.salt) ===
         user.passwordHash
     ) {
-      const { hash, salt } = generateBcryptSaltedHash(userUpdateData.password)
-      user.salt = salt
-      user.passwordHash = hash
-      const remoteAddress =
-        request.headers['x-real-ip'] || request.info.remoteAddress
-      const userAgent =
-        request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-      try {
-        await User.update({ _id: user._id }, user)
-      } catch (err) {
-        logger.error(err.message)
-        // return 400 if there is a validation error when updating to mongo
-        return h.response().code(400)
-      }
-      try {
-        if (!request.headers.authorization) {
-          await postUserActionToMetrics(
-            'PASSWORD_RESET',
-            request.headers.authorization,
-            remoteAddress,
-            userAgent,
-            user.practitionerId
-          )
-        } else {
-          await postUserActionToMetrics(
-            'PASSWORD_CHANGED',
-            request.headers.authorization,
-            remoteAddress,
-            userAgent
-          )
-        }
-      } catch (err) {
-        logger.error(err)
-      }
-      return h.response().code(200)
-      // Don't return a 404 as this gives away that this user account exists
+      return await changePassword(userUpdateData, user, request, h)
+    } else {
+      logger.error(
+        `Password didn't match for given userid: ${userUpdateData.userId}`
+      )
+      throw unauthorized()
     }
   }
-  throw unauthorized()
+  return await changePassword(userUpdateData, user, request, h)
+}
+
+async function changePassword(
+  userUpdateData: IChangePasswordPayload,
+  user: IUserModel,
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { hash, salt } = generateBcryptSaltedHash(userUpdateData.password)
+  user.salt = salt
+  user.passwordHash = hash
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
+  try {
+    await User.updateOne({ _id: user._id }, user)
+  } catch (err) {
+    logger.error(err.message)
+    // return 400 if there is a validation error when updating to mongo
+    return h.response().code(400)
+  }
+  try {
+    if (!request.headers.authorization) {
+      await postUserActionToMetrics(
+        'PASSWORD_RESET',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent,
+        user.practitionerId
+      )
+    } else {
+      await postUserActionToMetrics(
+        'PASSWORD_CHANGED',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
+      )
+    }
+  } catch (err) {
+    logger.error(err)
+  }
+  return h.response().code(200)
 }
 
 export const changePasswordRequestSchema = Joi.object({
