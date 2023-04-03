@@ -212,7 +212,7 @@ export function goToLeaderBoardsView() {
   return push(PERFORMANCE_LEADER_BOARDS)
 }
 export function goToDashboardView() {
-  return push(PERFORMANCE_DASHBOARD)
+  return push(PERFORMANCE_DASHBOARD, { isNavigatedInsideApp: true })
 }
 
 export function goToAdvancedSearch() {
