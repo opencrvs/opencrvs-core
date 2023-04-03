@@ -25,7 +25,6 @@
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
-    "crypto": "^1.0.1",
     "dotenv": "^6.1.0",
     "fp-ts": "^2.12.3",
     "hapi-pino": "^8.5.0",

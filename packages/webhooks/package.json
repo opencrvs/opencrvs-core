@@ -24,7 +24,6 @@
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
     "bullmq": "^1.9.0",
-    "crypto": "^1.0.1",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
