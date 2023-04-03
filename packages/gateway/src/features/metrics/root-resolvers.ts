@@ -33,13 +33,13 @@ export enum FILTER_BY {
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getTotalMetrics(_, variables, authHeader) {
+    async getTotalMetrics(_, variables, { headers: authHeader }) {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
     async getRegistrationsListByFilter(
       _,
       { filterBy, ...variables },
-      authHeader
+      { headers: authHeader }
     ) {
       let result
       if (filterBy === FILTER_BY.REGISTERER) {
@@ -59,7 +59,7 @@ export const resolvers: GQLResolver = {
       }
       return result
     },
-    async getVSExports(_, variables, authHeader) {
+    async getVSExports(_, variables, { headers: authHeader }) {
       let results
       if (inScope(authHeader, ['natlsysadmin', 'performance'])) {
         results = await getMetrics('/fetchVSExport', variables, authHeader)
@@ -75,7 +75,7 @@ export const resolvers: GQLResolver = {
     async getTotalPayments(
       _,
       { timeStart, timeEnd, locationId, event },
-      authHeader
+      { headers: authHeader }
     ) {
       return getMetrics(
         '/totalPayments',
@@ -91,7 +91,7 @@ export const resolvers: GQLResolver = {
     async getTotalCertifications(
       _,
       { timeStart, timeEnd, locationId },
-      authHeader
+      { headers: authHeader }
     ) {
       return getMetrics(
         '/totalCertifications',
@@ -106,7 +106,7 @@ export const resolvers: GQLResolver = {
     async getTotalCorrections(
       _,
       { timeStart, timeEnd, locationId, event },
-      authHeader
+      { headers: authHeader }
     ) {
       return getMetrics(
         '/totalCorrections',
@@ -122,7 +122,7 @@ export const resolvers: GQLResolver = {
     async getDeclarationsStartedMetrics(
       _,
       { timeStart, timeEnd, locationId },
-      authHeader
+      { headers: authHeader }
     ) {
       return getMetrics(
         '/declarationsStarted',
@@ -137,7 +137,7 @@ export const resolvers: GQLResolver = {
     async fetchMonthWiseEventMetrics(
       _,
       { timeStart, timeEnd, locationId, event },
-      authHeader
+      { headers: authHeader }
     ) {
       const metricsData = await getMetrics(
         '/monthWiseEventEstimations',
@@ -160,7 +160,7 @@ export const resolvers: GQLResolver = {
     async fetchLocationWiseEventMetrics(
       _,
       { timeStart, timeEnd, locationId, event },
-      authHeader
+      { headers: authHeader }
     ) {
       const metricsData = await getMetrics(
         '/locationWiseEventEstimations',
@@ -180,7 +180,7 @@ export const resolvers: GQLResolver = {
       )
       return metricsData
     },
-    async getUserAuditLog(_, params, authHeader) {
+    async getUserAuditLog(_, params, { headers: authHeader }) {
       return await getMetrics(
         '/audit/events',
         {
@@ -193,7 +193,11 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
-    async getLocationStatistics(_, { locationId, populationYear }, authHeader) {
+    async getLocationStatistics(
+      _,
+      { locationId, populationYear },
+      { headers: authHeader }
+    ) {
       return getMetrics(
         '/locationStatistics',
         locationId ? { locationId, populationYear } : { populationYear },

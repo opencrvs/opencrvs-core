@@ -71,6 +71,7 @@ import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -647,27 +648,25 @@ export const hasFormError = (
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
-export const convertToMSISDN = (phone: string) => {
+export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    window.config.COUNTRY.toUpperCase() === 'FAR'
-      ? 'ZMB'
-      : window.config.COUNTRY.toUpperCase()
+    alpha3CountryCode === 'FAR'
+      ? 'ZM'
+      : callingCountries[alpha3CountryCode].alpha2
 
-  const countryCallingCode =
-    callingCountries[countryCode].countryCallingCodes[0]
+  const phoneUtil = PhoneNumberUtil.getInstance()
+  const number = phoneUtil.parse(phone, countryCode)
 
-  if (
-    phone.startsWith(countryCallingCode) ||
-    `+${phone}`.startsWith(countryCallingCode)
-  ) {
-    return phone.startsWith('+') ? phone : `+${phone}`
-  }
-  return phone.startsWith('0')
-    ? `${countryCallingCode}${phone.substring(1)}`
-    : `${countryCallingCode}${phone}`
+  return (
+    phoneUtil
+      .format(number, PhoneNumberFormat.INTERNATIONAL)
+      // libphonenumber adds spaces and dashes to phone numbers,
+      // which we do not want to keep for now
+      .replace(/[\s-]/g, '')
+  )
 }
 
 export const isRadioGroupWithNestedField = (

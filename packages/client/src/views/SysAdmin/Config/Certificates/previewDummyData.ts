@@ -168,6 +168,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -189,6 +190,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -210,6 +212,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -231,6 +234,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -252,6 +256,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -273,6 +278,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -294,6 +300,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -315,6 +322,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -336,6 +344,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -357,6 +366,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1274,6 +1284,7 @@ const dummyDeathRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1295,6 +1306,7 @@ const dummyDeathRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1318,6 +1330,7 @@ const dummyDeathRegistrationResponse = {
           },
           __typename: 'Location'
         },
+        partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         __typename: 'RegWorkflow'
       }
     ],
@@ -1669,6 +1682,7 @@ const dummyMarriageRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1681,7 +1695,8 @@ const dummyMarriageRegistrationResponse = {
           name: 'Ibombo District Office',
           alias: ['Ibombo District Office'],
           address: null,
-          __typename: 'Location'
+          __typename: 'Location',
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
         },
         __typename: 'RegWorkflow'
       },
@@ -1693,7 +1708,8 @@ const dummyMarriageRegistrationResponse = {
           name: 'Ibombo District Office',
           alias: ['Ibombo District Office'],
           address: null,
-          __typename: 'Location'
+          __typename: 'Location',
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
         },
         __typename: 'RegWorkflow'
       }

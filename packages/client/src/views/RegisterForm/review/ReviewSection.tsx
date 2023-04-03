@@ -222,7 +222,7 @@ export const ZeroDocument = styled.div`
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   position: fixed;
-  width: fill-available;
+  width: calc(40% - 24px);
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -1691,7 +1691,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     const isDuplicate = Boolean(declaration.duplicates?.length)
     const formSections =
-      (viewRecord || isDuplicate) && !isCorrection(declaration)
+      viewRecord || isDuplicate
         ? this.getViewableSection(registerForm[event]).map((section) => {
             return {
               ...section,
@@ -1935,7 +1935,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 })}
                 {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                   this.getAllAttachmentInPreviewList(declaration)}
-                {!isCorrection(declaration) && (
+                {(!isCorrection(declaration) || viewRecord) && (
                   <InputWrapper>
                     <InputField
                       id="additional_comments"
@@ -2024,8 +2024,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {(viewRecord || isDuplicate) &&
-                  !isCorrection(declaration) ? null : (
+                  {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={

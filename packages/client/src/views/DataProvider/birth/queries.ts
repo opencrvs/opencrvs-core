@@ -163,6 +163,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -284,6 +285,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
         duplicateOf
+        potentialDuplicates
       }
     }
   }
@@ -556,6 +558,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           }
         }
         duplicateOf
+        potentialDuplicates
       }
     }
   }
