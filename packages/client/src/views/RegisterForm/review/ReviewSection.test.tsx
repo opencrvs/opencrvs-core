@@ -271,9 +271,6 @@ describe('when in device of large viewport', () => {
     })
   })
 
-<<<<<<< HEAD
-  describe('when user is in the review page to validator birth declaration', () => {
-=======
   describe('when user is in the review page for rejected marriage declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
@@ -298,7 +295,6 @@ describe('when in device of large viewport', () => {
   })
 
   describe('when user is in the review page to validate birth declaration', () => {
->>>>>>> develop
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])

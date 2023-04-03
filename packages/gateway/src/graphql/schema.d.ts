@@ -1385,7 +1385,6 @@ export interface GQLQuestionInput {
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
-  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
@@ -1867,8 +1866,7 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
-  TIME = 'TIME'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 }
 
 export interface GQLConditionalInput {
