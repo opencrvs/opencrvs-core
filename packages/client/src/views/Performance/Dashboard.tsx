@@ -22,7 +22,7 @@ import styled from '@client/styledComponents'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
 import { useLocation } from 'react-router'
-import { Location } from 'react-router-dom'
+
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -34,10 +34,14 @@ interface IdashboardView {
   icon?: JSX.Element
 }
 
+interface ILocationState {
+  isNavigatedInsideApp: boolean
+}
+
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const location: Location = useLocation()
+  const location = useLocation<ILocationState>()
   const handleCrossBar = () => {
     const navigatedFromInsideApp = Boolean(
       location.state && location.state.isNavigatedInsideApp

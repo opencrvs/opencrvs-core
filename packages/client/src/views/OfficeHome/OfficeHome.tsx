@@ -58,7 +58,7 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { PERFORMANCE_HOME } from '@client/navigation/routes'
+import { PERFORMANCE_DASHBOARD } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { constantsMessages } from '@client/i18n/messages'
@@ -68,7 +68,6 @@ import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
-import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -304,7 +303,7 @@ class OfficeHomeView extends React.Component<
         {this.role &&
           (NATL_ADMIN_ROLES.includes(this.role) ||
             PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
-            <Redirect to={PERFORMANCE_HOME} />
+            <Redirect to={PERFORMANCE_DASHBOARD} />
           )}
         {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
           <Redirect
