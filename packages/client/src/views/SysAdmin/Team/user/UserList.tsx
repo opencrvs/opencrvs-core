@@ -13,8 +13,7 @@ import { Query } from '@client/components/Query'
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
@@ -869,7 +868,7 @@ function UserListComponent(props: IProps) {
                     ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
-                size={ContentSize.LARGE}
+                size={ContentSize.NORMAL}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,

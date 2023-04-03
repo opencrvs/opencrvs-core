@@ -20,6 +20,7 @@ export {
   CreditCard,
   Phone,
   User,
+  Users,
   ArrowLeft,
   ArrowRight,
   Share,
@@ -43,5 +44,9 @@ export {
   CheckSquare,
   WarningCircle,
   X,
-  Activity
+  Activity,
+  ChartLine,
+  ChartBar,
+  MapPin,
+  PaperPlaneTilt
 } from 'phosphor-react'
