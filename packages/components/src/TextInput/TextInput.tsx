@@ -36,7 +36,7 @@ const StyledInput = styled.input<ITextInputProps>`
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
