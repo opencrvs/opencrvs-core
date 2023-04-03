@@ -314,7 +314,7 @@ class OfficeHomeView extends React.Component<
         {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
           <Redirect
             to={{
-              pathname: PERFORMANCE_HOME,
+              pathname: PERFORMANCE_DASHBOARD,
               search: `?locationId=${getDefaultPerformanceLocationId(
                 this.props.userDetails as UserDetails
               )}`
