@@ -21,7 +21,7 @@ import {
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
-  generateSaltedHash,
+  generateBcryptSaltedHash,
   generateRandomPassword
 } from '@user-mgnt/utils/hash'
 import {
@@ -89,7 +89,7 @@ export default async function createUser(
 
     autoGenPassword = generateRandomPassword(hasDemoScope(request))
 
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateBcryptSaltedHash(autoGenPassword)
     user.salt = salt
     user.passwordHash = hash
 

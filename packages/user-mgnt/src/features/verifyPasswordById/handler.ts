@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateHash } from '@user-mgnt/utils/hash'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   id: string
@@ -41,7 +41,7 @@ export default async function verifyPassByIdHandler(
     throw unauthorized()
   }
 
-  if (generateHash(password, user.salt) !== user.passwordHash) {
+  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
 

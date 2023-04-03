@@ -34,17 +34,17 @@ export function generateRandomPassword(demoUser?: boolean) {
   return randomPassword
 }
 
-export function generateHash(content: string, salt: string): string {
+export function generateBcryptHash(content: string, salt: string): string {
   const hash = createHash('sha512')
   hash.update(salt)
   hash.update(content)
   return hash.digest('hex')
 }
 
-export function generateSaltedHash(password: string): ISaltedHash {
+export function generateBcryptSaltedHash(password: string): ISaltedHash {
   const salt = uuid()
   return {
-    hash: generateHash(password, salt),
+    hash: generateBcryptHash(password, salt),
     salt
   }
 }

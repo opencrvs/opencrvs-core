@@ -15,7 +15,7 @@ import User from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import {
   generateRandomPassword,
-  generateSaltedHash
+  generateBcryptSaltedHash
 } from '@user-mgnt/utils/hash'
 import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
@@ -38,7 +38,7 @@ export default async function resendSMSInvite(
   }
 
   randomPassword = generateRandomPassword(hasDemoScope(request))
-  const { hash, salt } = generateSaltedHash(randomPassword)
+  const { hash, salt } = generateBcryptSaltedHash(randomPassword)
 
   user.passwordHash = hash
   user.salt = salt

@@ -13,7 +13,10 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
+import {
+  generateBcryptSaltedHash,
+  generateBcryptHash
+} from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
@@ -50,7 +53,7 @@ export default async function activateUser(
     throw unauthorized()
   }
 
-  const { hash, salt } = generateSaltedHash(userUpdateData.password)
+  const { hash, salt } = generateBcryptSaltedHash(userUpdateData.password)
   user.salt = salt
   user.passwordHash = hash
   user.status = statuses.ACTIVE
@@ -58,7 +61,7 @@ export default async function activateUser(
     (securityQNA) => {
       return {
         questionKey: securityQNA.questionKey,
-        answerHash: generateHash(securityQNA.answer.toLowerCase(), salt)
+        answerHash: generateBcryptHash(securityQNA.answer.toLowerCase(), salt)
       }
     }
   )

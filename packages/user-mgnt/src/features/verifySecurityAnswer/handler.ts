@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized, conflict } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateHash } from '@user-mgnt/utils/hash'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
 import { isNonEmptyArray } from '@user-mgnt/utils/non-empty-array'
@@ -42,7 +42,7 @@ export default async function verifySecurityAnswer(
   const isCorrect = questionAnswers.some(
     (securityQNA) =>
       securityQNA.questionKey === payload.questionKey &&
-      generateHash(payload.answer.toLowerCase(), user.salt) ===
+      generateBcryptHash(payload.answer.toLowerCase(), user.salt) ===
         securityQNA.answerHash
   )
 

@@ -15,7 +15,7 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import {
   generateRandomPassword,
-  generateSaltedHash
+  generateBcryptSaltedHash
 } from '@user-mgnt/utils/hash'
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
@@ -65,7 +65,7 @@ export default async function resetPasswordSMSHandler(
   }
 
   randomPassword = generateRandomPassword(hasDemoScope(request))
-  const { hash, salt } = generateSaltedHash(randomPassword)
+  const { hash, salt } = generateBcryptSaltedHash(randomPassword)
 
   user.passwordHash = hash
   user.salt = salt
