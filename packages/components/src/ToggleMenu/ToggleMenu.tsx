@@ -44,7 +44,6 @@ const MenuContainer = styled.ul`
 `
 
 const MenuHeader = styled.li`
-  ${({ theme }) => theme.fonts.bodyStyle};
   padding: 8px 16px;
   margin-bottom: 8px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};

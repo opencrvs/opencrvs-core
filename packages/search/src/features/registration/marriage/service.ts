@@ -202,8 +202,9 @@ async function createBrideIndex(
     brideNameLocal && brideNameLocal.given && brideNameLocal.given.join(' ')
   body.brideFamilyNameLocal =
     brideNameLocal && brideNameLocal.family && brideNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.brideIdentifier =
     bride.identifier &&
@@ -240,8 +241,10 @@ async function createGroomIndex(
     groomNameLocal && groomNameLocal.given && groomNameLocal.given.join(' ')
   body.groomFamilyNameLocal =
     groomNameLocal && groomNameLocal.family && groomNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.groomIdentifier =
     groom.identifier &&
