@@ -75,7 +75,7 @@ const fieldsForMarriage: IRadioGroupFormField[] = [
     hideHeader: true,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     options: [
       { value: 'GROOM', label: issueMessages.issueToGroom },
       { value: 'BRIDE', label: issueMessages.issueToBride },
