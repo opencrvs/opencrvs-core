@@ -9,46 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_MONGO_URL } from '@metrics/constants'
-import { logger } from '@metrics/logger'
-import { subMinutes } from 'date-fns'
-import { MongoClient } from 'mongodb'
-
-let currentUpdate: boolean = false
-
-export async function refresh() {
-  if (currentUpdate) {
-    logger.info('Analytics materialised views already being refreshed')
-    return
-  }
-  logger.info('Refreshing analytics materialised views')
-  const client = new MongoClient(HEARTH_MONGO_URL)
-  try {
-    currentUpdate = true
-    await client.connect()
-    await refreshAnalyticsMaterialisedViews(client)
-    logger.info('Analytics materialised views refreshed')
-  } catch (error) {
-    logger.error(`Error refreshing analytics materialised views ${error}`)
-  } finally {
-    currentUpdate = false
-    await client.close()
-  }
-}
-
-async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
-  const db = client.db(client.options.dbName)
-
-  const lastUpdatedAt = subMinutes(new Date(), 5).toISOString()
+export const up = async (db, client) => {
   await db
     .collection('Task')
     .aggregate(
       [
-        {
-          $match: {
-            'meta.lastUpdated': { $gte: lastUpdatedAt }
-          }
-        },
         { $unwind: '$businessStatus.coding' },
         {
           $match: {
@@ -597,11 +562,9 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
           }
         },
         {
-          $merge: {
-            into: { db: 'analytics', coll: 'registrations' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
+          $out: {
+            db: 'analytics',
+            coll: 'registrations'
           }
         }
       ],
@@ -618,7 +581,6 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
         },
         {
           $match: {
-            'meta.lastUpdated': { $gte: lastUpdatedAt },
             'extension.url':
               'http://opencrvs.org/specs/extension/requestCorrection'
           }
@@ -764,11 +726,9 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
           }
         },
         {
-          $merge: {
-            into: { db: 'analytics', coll: 'corrections' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
+          $out: {
+            db: 'analytics',
+            coll: 'corrections'
           }
         }
       ],
@@ -831,8 +791,8 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
                     {
                       $function: {
                         body: `function (jsonString) {
-                          return JSON.parse(jsonString)
-                        }`,
+                            return JSON.parse(jsonString)
+                          }`,
                         args: ['$$el.valueString'],
                         lang: 'js'
                       }
@@ -891,29 +851,29 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
             daysInYear: {
               $function: {
                 body: `function (row) {
-                  function daysInYear(year) {
-                    return (year % 4 === 0 && year % 100 > 0) || year % 400 == 0
-                      ? 366
-                      : 365
-                  }
-                  const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
-                  const population = row.populations.find(
-                    (p) => p.year === year
-                  )
-                  if (!population) {
-                    return []
-                  }
-                  const totalDays = daysInYear(year)
-                  return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
-                    return {
-                      date: date.toISOString(),
-                      estimatedNumberOfBirths:
-                        ((population.value / 1000) * row.cbr.cbr) / totalDays
+                    function daysInYear(year) {
+                      return (year % 4 === 0 && year % 100 > 0) || year % 400 == 0
+                        ? 366
+                        : 365
                     }
-                  })
-                }`,
+                    const year = row.cbr.year
+                    const date = new Date(row.cbr.year, 1, 1)
+                    const population = row.populations.find(
+                      (p) => p.year === year
+                    )
+                    if (!population) {
+                      return []
+                    }
+                    const totalDays = daysInYear(year)
+                    return Array.from({ length: totalDays }, (value, index) => {
+                      date.setDate(date.getDate() + 1)
+                      return {
+                        date: date.toISOString(),
+                        estimatedNumberOfBirths:
+                          ((population.value / 1000) * row.cbr.cbr) / totalDays
+                      }
+                    })
+                  }`,
                 args: ['$$ROOT'],
                 lang: 'js'
               }
@@ -934,11 +894,9 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
           }
         },
         {
-          $merge: {
-            into: { db: 'analytics', coll: 'populationEstimatesPerDay' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
+          $out: {
+            db: 'analytics',
+            coll: 'populationEstimatesPerDay'
           }
         }
       ],
@@ -946,3 +904,5 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
     )
     .toArray()
 }
+
+export const down = async (db, client) => {}

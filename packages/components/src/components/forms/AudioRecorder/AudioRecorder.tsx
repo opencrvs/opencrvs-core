@@ -127,7 +127,7 @@ export const AudioRecorder = ({
             <line x1="12" y1="19" x2="12" y2="22" />
           </PulsingSVG>
           <SecondsPassed>
-            00:{`${secondsPassed}`.padStart(2, '0')} / 00:10
+            00:{`${secondsPassed}`.padStart(2, '0')} / 00:20
           </SecondsPassed>
         </TextAlignCentered>
       </ResponsiveModal>
