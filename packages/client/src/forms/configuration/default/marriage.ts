@@ -23,6 +23,7 @@ export const marriageRegisterForms: ISerializedForm = {
     {
       id: MarriageSection.Registration,
       viewType: 'form',
+      hasDocumentSection: true,
       name: formMessageDescriptors.registrationName,
       title: formMessageDescriptors.registrationTitle,
       groups: [
@@ -41,7 +42,7 @@ export const marriageRegisterForms: ISerializedForm = {
               required: true,
               hideInPreview: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
@@ -69,7 +70,7 @@ export const marriageRegisterForms: ISerializedForm = {
                     placeholder: formMessageDescriptors.relationshipPlaceHolder,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'englishOnlyNameFormat'
                       }
@@ -125,7 +126,7 @@ export const marriageRegisterForms: ISerializedForm = {
               required: true,
               hideHeader: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
@@ -150,7 +151,7 @@ export const marriageRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -186,7 +187,7 @@ export const marriageRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -222,7 +223,7 @@ export const marriageRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -342,7 +343,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -367,7 +368,7 @@ export const marriageRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -405,7 +406,7 @@ export const marriageRegisterForms: ISerializedForm = {
               ],
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -447,7 +448,7 @@ export const marriageRegisterForms: ISerializedForm = {
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -475,7 +476,7 @@ export const marriageRegisterForms: ISerializedForm = {
                   expression: '!values.exactDateOfBirthUnknown'
                 }
               ],
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [18, 120]
@@ -496,7 +497,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -525,7 +526,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -554,7 +555,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               initialValue: '',
               required: false,
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -615,7 +616,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -640,7 +641,7 @@ export const marriageRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -678,7 +679,7 @@ export const marriageRegisterForms: ISerializedForm = {
               ],
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -720,7 +721,7 @@ export const marriageRegisterForms: ISerializedForm = {
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -748,7 +749,7 @@ export const marriageRegisterForms: ISerializedForm = {
                   expression: '!values.exactDateOfBirthUnknown'
                 }
               ],
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [18, 120]
@@ -770,7 +771,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -799,7 +800,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -828,7 +829,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               initialValue: '',
               required: false,
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -884,7 +885,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.marriageEventDate,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'checkMarriageDate',
                   parameters: [18]
@@ -918,7 +919,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.typeOfMarriage,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -952,7 +953,7 @@ export const marriageRegisterForms: ISerializedForm = {
               previewGroup: 'placeOfMarriage',
               ignoreBottomMargin: true,
               initialValue: '',
-              validate: []
+              validator: []
             }
           ]
         }
@@ -977,7 +978,7 @@ export const marriageRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: []
             },
             {
@@ -988,7 +989,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1030,7 +1031,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1071,7 +1072,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.relationshipToSpouses,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               mapping: {
                 template: {
@@ -1097,7 +1098,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1140,7 +1141,7 @@ export const marriageRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: []
             },
             {
@@ -1151,7 +1152,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1193,7 +1194,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1234,7 +1235,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.relationshipToSpouses,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -1254,7 +1255,7 @@ export const marriageRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1296,7 +1297,7 @@ export const marriageRegisterForms: ISerializedForm = {
               type: 'PARAGRAPH',
               label: formMessageDescriptors.documentsParagraph,
               initialValue: '',
-              validate: []
+              validator: []
             },
             {
               name: 'uploadDocForMarriageProof',
@@ -1307,7 +1308,7 @@ export const marriageRegisterForms: ISerializedForm = {
               extraValue:
                 marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: marriageDocumentTypeFhirMapping.MARRIAGE_NOTICE,
@@ -1331,7 +1332,7 @@ export const marriageRegisterForms: ISerializedForm = {
               extraValue: marriageDocumentForWhomFhirMapping.GROOM,
               hideAsterisk: true,
               required: false,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: marriageDocumentTypeFhirMapping.NATIONAL_ID,
@@ -1367,7 +1368,7 @@ export const marriageRegisterForms: ISerializedForm = {
               required: false,
               extraValue: marriageDocumentForWhomFhirMapping.BRIDE,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: marriageDocumentTypeFhirMapping.NATIONAL_ID,

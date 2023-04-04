@@ -50,7 +50,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     border-radius: 4px;
     height: 40px;
     box-shadow: none;
-    ${({ theme }) => theme.fonts.reg16};
+    ${({ theme }) => theme.fonts.reg18};
     padding: 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>

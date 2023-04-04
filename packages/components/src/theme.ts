@@ -23,3 +23,7 @@ export const getTheme = () => ({
 })
 
 export type ITheme = ReturnType<typeof getTheme>
+
+declare module 'styled-components' {
+  export interface DefaultTheme extends ITheme {}
+}
