@@ -33,6 +33,7 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import SignatureCanvas from 'react-signature-canvas'
 import { isBase64FileString } from '@client/utils/commonUtils'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const InputWrapper = styled.div`
   margin-top: 56px;
@@ -86,8 +87,8 @@ export function SignatureGenerator({
   isRequired
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
-  const [signatureValue, setSignatureValue] = useState('')
-  const [signatureError, setSignatureError] = useState('')
+  const [signatureValue, setSignatureValue] = useState(EMPTY_STRING)
+  const [signatureError, setSignatureError] = useState(EMPTY_STRING)
   const intl = useIntl()
   const allowedSignatureFormat = ['image/png']
 
@@ -123,6 +124,13 @@ export function SignatureGenerator({
                 id="signature-file-upload"
                 title="Upload"
                 handleFileChange={async (file) => {
+                  const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
+                  if (fileSizeMB > 2) {
+                    setSignatureError(
+                      intl.formatMessage(formMessages.fileSizeError)
+                    )
+                    return
+                  }
                   if (!allowedSignatureFormat.includes(file.type)) {
                     setSignatureError(
                       intl.formatMessage(formMessages.fileUploadError, {
