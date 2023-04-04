@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SerializedFormField, BirthSection } from '@client/forms/index'
+import {
+  SerializedFormField,
+  BirthSection,
+  IConditional
+} from '@client/forms/index'
 import {
   IMessage,
   ICustomQuestionConfig,
@@ -36,10 +40,19 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
 }
 
 function getOtherConditionalsAction(
-  conditionals: IConditionalConfig[] | undefined
+  conditionals: Array<IConditionalConfig | IConditional> | undefined
 ) {
+  const isConditional = (
+    condition: IConditionalConfig | IConditional
+  ): condition is IConditional => condition.hasOwnProperty('expression')
+
   if (!conditionals) return []
   return conditionals.map((condition) => {
+    // Allow country config to use normal way of defining conditionals
+    if (isConditional(condition)) {
+      return condition
+    }
+
     const escapeRegExpValue = escapeRegExp(condition.regexp)
     const { fieldName, sectionId } = getIdentifiersFromFieldId(
       condition.fieldId
@@ -148,6 +161,7 @@ export function createCustomField({
         }
       }) || []
   }
+
   return baseField
 }
 
