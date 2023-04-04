@@ -1,35 +1,16 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * OpenCRVS is also distributed under the terms of the Civil Registration
- * & Healthcare Disclaimer located at http://opencrvs.org/license.
- *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
- */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { BulletList } from './BulletList'
-
-interface IProps {
-  id?: string
-  items: string[]
-}
+import { Story, Meta } from '@storybook/react/types-6-0'
+import { BulletList, BulletListProps } from './BulletList'
 
 export default {
-  title: 'Typography/Bullet list',
+  title: 'Typography/Bullet List',
   component: BulletList
 } as Meta
 
-const Template: Story<IProps> = (args) => <BulletList {...args} />
+const Template: Story<BulletListProps> = (args) => <BulletList {...args} />
 
-export const BulletListView = Template.bind({})
-BulletListView.args = {
-  items: [
-    'Why not walk on keyboard trip on catnip, or my water bowl is clean',
-    'You there, with the hands fooled again thinking the dog likes me, so annoy owner',
-    "Nap all day sleep on my human's head instead of drinking water from the cat bowl, make sure to steal water from the toilet"
-  ]
+export const Default = Template.bind({})
+Default.args = {
+  items: ['Birth', 'Death', 'Marriage', 'Adoption', 'Divorce'],
+  font: 'reg18'
 }

@@ -134,7 +134,11 @@ function EventInfoComponet(props: IFullProps) {
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
         <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
-        <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
+        <BulletList
+          id={`${eventType}-info-bullet-list`}
+          items={listItems}
+          font="reg18"
+        />
         <PrimaryButton id="continue" onClick={handleContinue}>
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>

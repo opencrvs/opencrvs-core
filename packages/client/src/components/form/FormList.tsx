@@ -15,7 +15,7 @@ import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor
 } from 'react-intl'
-import { List } from '@opencrvs/components/lib/List'
+import { BulletList } from '@opencrvs/components/lib/BulletList'
 
 export interface IProps {
   list: MessageDescriptor[]
@@ -30,7 +30,7 @@ const FormListComponent = ({
     intl.formatMessage(item)
   )
 
-  return <List list={localizedList} {...otherProps} />
+  return <BulletList items={localizedList} font="reg16" />
 }
 
 export const FormList = injectIntl(FormListComponent)
