@@ -1886,6 +1886,7 @@ type OIDPUserAddress {
   locality: String
   region: String
   postal_code: String
+  city: String
   country: String
 }
 

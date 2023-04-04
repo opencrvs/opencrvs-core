@@ -23,6 +23,7 @@ export interface VerificationButtonProps {
   labelForVerified: string
   labelForUnverified: string
   labelForOffline: string
+  reviewLabelForUnverified?: string
   useAsReviewLabel?: boolean
 }
 
@@ -48,6 +49,7 @@ export const VerificationButton = ({
   labelForUnverified,
   labelForVerified,
   labelForOffline,
+  reviewLabelForUnverified,
   useAsReviewLabel
 }: VerificationButtonProps) => {
   return (
@@ -63,7 +65,7 @@ export const VerificationButton = ({
         <VerificationBadge>
           <Icon name="CircleWavyQuestion" color="red" weight="fill" />
           <Text variant="bold16" element="p" color="red">
-            Unauthenticated
+            {reviewLabelForUnverified}
           </Text>
         </VerificationBadge>
       )}

@@ -871,6 +871,7 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )
+    const sectionName = this.props.id.split('-')[0]
 
     return (
       <section>
@@ -885,7 +886,7 @@ class FormSectionComponent extends React.Component<Props> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            values,
+            { ...draftData?.[sectionName], ...values },
             offlineCountryConfig,
             draftData
           )

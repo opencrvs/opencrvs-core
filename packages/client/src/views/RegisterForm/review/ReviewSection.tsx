@@ -555,6 +555,9 @@ const renderValue = (
           formMessageDescriptors.nidNotVerified
         )}
         labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
+        reviewLabelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerifiedReviewSection
+        )}
         status={value ? 'verified' : 'unverified'}
         useAsReviewLabel={true}
       />

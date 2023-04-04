@@ -139,6 +139,17 @@ export const systems: System[] = [
     }
   },
   {
+    name: 'National Id',
+    status: SystemStatus.Active,
+    type: SystemType.NationalId,
+    _id: '613ddbbe4c0b86e9b9f114e8',
+    shaSecret: '22ea09c2-f964-4562-bdac-8e9ca9b9a81a',
+    clientId: '2f1047bb-af48-4f27-8ab8-993d7b960f92',
+    settings: {
+      openIdProviderClientId: '7b621732-6c1d-4808-81b2-fd67f05f3af3'
+    }
+  },
+  {
     _id: '63a01ffe607915acacc2f553',
     clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa',
     name: 'Health Deactivation',

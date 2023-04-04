@@ -1785,6 +1785,7 @@ export interface GQLOIDPUserAddress {
   locality?: string
   region?: string
   postal_code?: string
+  city?: string
   country?: string
 }
 
@@ -7494,7 +7495,12 @@ export interface IdentityTypeToFieldsModifiedByIdentityResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLHumanNameTypeResolver<TParent = any> {
@@ -11314,6 +11320,7 @@ export interface GQLOIDPUserAddressTypeResolver<TParent = any> {
   locality?: OIDPUserAddressToLocalityResolver<TParent>
   region?: OIDPUserAddressToRegionResolver<TParent>
   postal_code?: OIDPUserAddressToPostal_codeResolver<TParent>
+  city?: OIDPUserAddressToCityResolver<TParent>
   country?: OIDPUserAddressToCountryResolver<TParent>
 }
 
@@ -11366,6 +11373,15 @@ export interface OIDPUserAddressToPostal_codeResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToCityResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

@@ -59,9 +59,6 @@ const UserActionsContainer = styled.div`
   border-radius: 10px;
 `
 
-export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
-  'oidp-verification-nonce'
-
 export const OIDPVerificationCallback = () => {
   const params = useQueryParams()
   const { pathname, declarationId, section } = useExtractCallBackState()

@@ -11,13 +11,16 @@
  */
 
 import { IDeclaration, IPrintableDeclaration } from '@client/declarations'
+import { isDefaultCountry } from '@client/forms/utils'
 import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import formatDate from '@client/utils/date-formatting'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 import { v4 as uuid } from 'uuid'
-import { OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY } from './OIDPVerificationCallback'
+
+export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
+  'oidp-verification-nonce'
 
 interface OIDPUserAddress {
   formatted?: string
@@ -25,6 +28,7 @@ interface OIDPUserAddress {
   locality?: string
   region?: string
   postal_code?: string
+  city?: string
   country?: string
 }
 
@@ -94,6 +98,75 @@ export function addNidUserInfoToDeclaration(
   if (splitFullName.lastName) {
     declarationDataSection['familyNameEng'] = splitFullName.lastName
     fieldsModifiedByNidUserInfo.push('familyNameEng')
+  }
+
+  if (oidpUserInfo.address) {
+    const country = oidpUserInfo.address.country
+    if (!country) {
+      return
+    }
+
+    declarationDataSection['countryPrimary'] = country
+    fieldsModifiedByNidUserInfo.push('countryPrimary')
+
+    if (isDefaultCountry(country)) {
+      //populate default country specific address fields
+      if (nidUserInfo.stateFhirId) {
+        declarationDataSection['StatePrimary'] = nidUserInfo.stateFhirId
+        fieldsModifiedByNidUserInfo.push('StatePrimary')
+      }
+      if (nidUserInfo.districtFhirId) {
+        declarationDataSection['districtPrimary'] = nidUserInfo.districtFhirId
+        fieldsModifiedByNidUserInfo.push('districtPrimary')
+      }
+
+      if (oidpUserInfo.address.city) {
+        declarationDataSection['cityUrbanOptionPrimary'] =
+          oidpUserInfo.address.city
+        fieldsModifiedByNidUserInfo.push('cityUrbanOptionPrimary')
+      }
+      if (oidpUserInfo.address.street_address) {
+        declarationDataSection['addressLine2UrbanOptionPrimary'] =
+          oidpUserInfo.address.street_address
+        fieldsModifiedByNidUserInfo.push('addressLine2UrbanOptionPrimary')
+      }
+      if (oidpUserInfo.address.postal_code) {
+        declarationDataSection['postCodePrimary'] =
+          oidpUserInfo.address.postal_code
+        fieldsModifiedByNidUserInfo.push('postCodePrimary')
+      }
+    } else {
+      //populate international address fields
+      if (oidpUserInfo.address.region) {
+        declarationDataSection['internationalStatePrimary'] =
+          oidpUserInfo.address.region
+        fieldsModifiedByNidUserInfo.push('internationalStatePrimary')
+      }
+      if (oidpUserInfo.address.locality) {
+        declarationDataSection['internationalDistrictPrimary'] =
+          oidpUserInfo.address.locality
+        fieldsModifiedByNidUserInfo.push('internationalDistrictPrimary')
+      }
+      if (oidpUserInfo.address.city) {
+        declarationDataSection['internationalCityPrimary'] =
+          oidpUserInfo.address.city
+        fieldsModifiedByNidUserInfo.push('internationalCityPrimary')
+      }
+      if (oidpUserInfo.address.street_address) {
+        declarationDataSection['internationalAddressLine1Primary'] =
+          oidpUserInfo.address.street_address
+        fieldsModifiedByNidUserInfo.push('internationalAddressLine1Primary')
+      }
+      if (oidpUserInfo.address.postal_code) {
+        declarationDataSection['internationalPostcodePrimary'] =
+          oidpUserInfo.address.postal_code
+        fieldsModifiedByNidUserInfo.push('internationalPostcodePrimary')
+      }
+    }
+
+    if (section === 'father') {
+      declarationDataSection['primaryAddressSameAsOtherPrimary'] = false
+    }
   }
 
   declarationDataSection['fieldsModifiedByNidUserInfo'] =

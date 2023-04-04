@@ -17,21 +17,17 @@ import { createTestComponent, mockUserResponse } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { merge } from 'lodash'
 import * as React from 'react'
-
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 import { OIDPVerificationCallback } from './OIDPVerificationCallback'
 import { URLSearchParams } from 'url'
 import { useQueryParams, useExtractCallBackState, useCheckNonce } from './utils'
 import { GET_OIDP_USER_INFO } from './queries'
+import { createDeclaration, storeDeclaration } from '@client/declarations'
+import { Event } from '@client/utils/gateway'
 
-vi.mocked(useExtractCallBackState).mockReturnValue({
-  pathname: 'url',
-  section: 'mother',
-  declarationId: '1234'
-})
-vi.mocked(useQueryParams).mockReturnValue(new URLSearchParams({ code: '1234' }))
-vi.mocked(useCheckNonce).mockReturnValue(true)
+const draft = createDeclaration(Event.Birth)
+draft.data.mother = {}
 
 const mockFetchUserDetails = vi.fn()
 
@@ -77,9 +73,8 @@ const graphqlMocks = [
       query: GET_OIDP_USER_INFO,
       variables: {
         code: '1234',
-        clientId: '1234',
-        redirectUri: 'http://localhost:3000/mosip-callback',
-        grantTyps: 'code'
+        clientId: '7b621732-6c1d-4808-81b2-fd67f05f3af3',
+        redirectUri: 'http://localhost:3000/mosip-callback'
       }
     },
     result: {
@@ -129,11 +124,38 @@ beforeEach(async () => {
   client = createClient(store)
   getItem.mockReturnValue(registerScopeToken)
   getItem.mockReturnValue('ea02388')
+  ;(useExtractCallBackState as Mock).mockImplementation(() => ({
+    pathname: 'http://localhost:3000/mosip-callback',
+    section: 'mother',
+    declarationId: draft.id
+  }))
+  ;(useQueryParams as Mock).mockImplementation(
+    () => new URLSearchParams({ code: '1234' })
+  )
+  ;(useCheckNonce as Mock).mockImplementation(() => true)
 
   await store.dispatch(checkAuth())
+  await store.dispatch(storeDeclaration(draft))
 })
 
 describe('Nid Verfication Callback page', () => {
+  it('When nid user is successfully fetched', async () => {
+    const testComponent = await createTestComponent(
+      <OIDPVerificationCallback />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
+    await waitFor(() => testComponent.find('#authenticating-label').length > 0)
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+
+    const declaration = store
+      .getState()
+      .declarationsState.declarations.find((d) => d.id === draft.id)
+    expect(declaration?.data.mother.firstNamesEng).toBe('John')
+  })
+
   it('When nid user info fetch has failed', async () => {
     const testComponent = await createTestComponent(
       <OIDPVerificationCallback />,
@@ -141,18 +163,5 @@ describe('Nid Verfication Callback page', () => {
     )
 
     await waitForElement(testComponent, '#authentication-failed-label')
-  })
-
-  it('When nid user is successfully fetched', async () => {
-    const testComponent = await createTestComponent(
-      <OIDPVerificationCallback />,
-      { store, history, graphqlMocks: graphqlMocks }
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-    await waitForElement(testComponent, '#authenticating-label')
   })
 })

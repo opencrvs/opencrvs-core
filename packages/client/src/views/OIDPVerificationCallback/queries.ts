@@ -49,6 +49,7 @@ export const GET_OIDP_USER_INFO = gql`
           locality
           region
           postal_code
+          city
           country
         }
         updated_at

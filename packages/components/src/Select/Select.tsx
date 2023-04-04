@@ -151,6 +151,7 @@ export class Select extends React.Component<ISelectProps> {
         components={{ DropdownIndicator }}
         {...this.props}
         onChange={this.change}
+        isDisabled={this.props.disabled}
         isSearchable={this.props.options.length > length}
         value={getSelectedOption(this.props.value, this.props.options)}
         isOptionDisabled={({ value }: { value: string }) =>
