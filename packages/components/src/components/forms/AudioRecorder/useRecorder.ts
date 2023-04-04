@@ -72,7 +72,7 @@ export type Base64String = string
 
 export const useRecorder = (
   cb: (result: Base64String) => void,
-  MAX_SECONDS_PASSED = 10
+  MAX_SECONDS_PASSED = 20
 ) => {
   const [state, dispatch] = useReducer(reducer, initState)
 
