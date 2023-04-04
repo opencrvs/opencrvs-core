@@ -26,7 +26,7 @@ export function Title() {
   const intl = useIntl()
   const title = useSelector<IStoreState, string>((state) => {
     const userDetails = getUserDetails(state)
-    return userDetails && userDetails.title
+    return (userDetails && userDetails.title) || ''
   })
   return (
     <ListViewItemSimplified

@@ -1278,6 +1278,7 @@ export const userDetails: UserDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   systemRole: SystemRoleType.FieldAgent,
+  title: 'Test user',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
@@ -2344,6 +2345,7 @@ export function loginAsFieldAgent(store: AppStore) {
         getUser: {
           id: '5eba726866458970cf2e23c2',
           username: 'a.alhasan',
+          title: 'Test user',
           creationDate: '2022-10-03T10:42:46.920Z',
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
