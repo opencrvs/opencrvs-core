@@ -52,6 +52,7 @@ import {
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { getScope } from '@client/profile/profileSelectors'
 import { Spinner } from '@opencrvs/components/lib'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''
@@ -203,6 +204,31 @@ export function Outbox() {
             declaration.data?.deceased?.familyName as string
           )
         dateOfEvent = declaration.data?.deathEvent?.deathDate as string
+      } else if (declaration?.event?.toString() === 'marriage') {
+        const brideName =
+          getFullName(
+            declaration.data?.bride?.firstNamesEng as string,
+            declaration.data?.bride?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.bride?.firstNames as string,
+            declaration.data?.bride?.familyName as string
+          )
+        const groomName =
+          getFullName(
+            declaration.data?.groom?.firstNamesEng as string,
+            declaration.data?.groom?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.groom?.firstNames as string,
+            declaration.data?.groom?.familyName as string
+          )
+        name =
+          brideName && groomName
+            ? `${groomName} & ${brideName}`
+            : brideName || groomName || EMPTY_STRING
+
+        dateOfEvent = declaration.data?.marriageEvent?.marriageDate.toString()
       }
 
       const statusText = intl.formatMessage(

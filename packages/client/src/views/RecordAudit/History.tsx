@@ -19,6 +19,7 @@ import {
   getFormattedDate,
   getPageItems,
   getStatusLabel,
+  isFlaggedAsPotentialDuplicate,
   isSystemInitiated,
   isVerifiedAction
 } from './utils'
@@ -74,6 +75,16 @@ const HealthSystemLogo = styled.div`
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.grey200};
 `
+
+function SystemUser({ name }: { name?: string }) {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo />
+      <span>{name ?? intl.formatMessage(userMessages.system)}</span>
+    </NameAvatar>
+  )
+}
 
 function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
@@ -225,7 +236,9 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isVerifiedAction(item) ? (
+        {isFlaggedAsPotentialDuplicate(item) ? (
+          <SystemUser name={item.system?.name} />
+        ) : isVerifiedAction(item) ? (
           <div />
         ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
@@ -252,12 +265,14 @@ export const GetHistory = ({
         )}
       </>
     ),
-    role: isVerifiedAction(item) ? (
+    role: isFlaggedAsPotentialDuplicate(item) ? (
+      <div />
+    ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) || !item.user?.systemRole ? (
       intl.formatMessage(getSystemType(item.system?.type))
     ) : (
-      item.user.role.labels.find((label) => label.lang === 'en')?.label
+      getUserRole(currentLanguage, item.user?.role)
     ),
 
     location: isVerifiedAction(item) ? (

@@ -11,4 +11,7 @@
  */
 export interface IAuthHeader {
   Authorization: string
+  'x-correlation-id'?: string
+  'x-real-ip'?: string
+  'x-real-user-agent'?: string
 }

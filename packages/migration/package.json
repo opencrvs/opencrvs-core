@@ -11,6 +11,7 @@
     "start:prod": "./runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
+    "create:performance": "migrate-mongo create -f migrate-mongo-config-performance.js",
     "create:user-mgnt": "migrate-mongo create -f migrate-mongo-config-user-mgnt.js",
     "create:application-config": "migrate-mongo create -f migrate-mongo-config-application-config.js",
     "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",

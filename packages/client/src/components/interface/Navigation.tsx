@@ -35,13 +35,16 @@ import {
   goToApplicationConfig,
   goToAdvancedSearchResult,
   goToVSExport,
+  goToPerformanceStatistics,
+  goToLeaderBoardsView,
+  goToDashboardView,
   goToUserRolesConfig,
   goToOrganisationView,
   goToInformantNotification
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { User } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -67,7 +70,9 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
+import { Text } from '@opencrvs/components'
 import { UserDetails } from '@client/utils/userUtils'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -103,6 +108,7 @@ export const WORKQUEUE_TABS = {
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
+  analytics: 'analytics',
   menuGroup: 'menuGroup'
 }
 
@@ -164,24 +170,22 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
   LOCAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.organisation,
@@ -189,9 +193,10 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
     WORKQUEUE_TABS.informantNotification,
-    GROUP_ID.menuGroup
+    GROUP_ID.menuGroup,
+    GROUP_ID.analytics
   ],
-  PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
+  PERFORMANCE_MANAGEMENT: [GROUP_ID.menuGroup, GROUP_ID.analytics]
 }
 
 interface ICount {
@@ -236,6 +241,9 @@ interface IDispatchProps {
   goToOrganisationViewAction: typeof goToOrganisationView
   goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
+  goToLeaderBoardsView: typeof goToLeaderBoardsView
+  goToDashboardView: typeof goToDashboardView
+  goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
   goToInformantNotification: typeof goToInformantNotification
@@ -317,6 +325,9 @@ export const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
+    goToPerformanceStatistics,
+    goToDashboardView,
+    goToLeaderBoardsView,
     goToInformantNotification,
     className
   } = props
@@ -345,6 +356,11 @@ export const NavigationView = (props: IFullProps) => {
     storedDeclarations
   )
   const runningVer = String(localStorage.getItem('running-version'))
+
+  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
+    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+  })
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -447,7 +463,7 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <PaperPlane />}
+              icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.outbox}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.outbox]
@@ -574,7 +590,8 @@ export const NavigationView = (props: IFullProps) => {
                     />
                   )}
 
-                {userDetails?.systemRole &&
+                {isOnePrintInAdvanceOn &&
+                  userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyToIssue
                   ) && (
@@ -598,7 +615,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <PaperPlane />}
+                      icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]
@@ -621,7 +638,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
-                      icon={() => <Activity />}
+                      icon={() => <Icon name="Activity" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.performance}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.performance]
@@ -676,7 +693,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
-                      icon={() => <Users />}
+                      icon={() => <Icon name="Users" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.team}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.team]
@@ -831,6 +848,72 @@ export const NavigationView = (props: IFullProps) => {
                   )}
               </NavigationGroup>
             )}
+          {userDetails?.systemRole &&
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.analytics) && (
+              <NavigationGroup>
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    GROUP_ID.analytics
+                  ) && (
+                    <>
+                      <Text
+                        variant="bold14"
+                        style={{ marginLeft: 24 }}
+                        element="p"
+                        color="opacity24"
+                      >
+                        {intl.formatMessage(navigationMessages['analytic'])}
+                      </Text>
+                      <NavigationItem
+                        icon={() => <Icon name="ChartLine" size="medium" />}
+                        label={intl.formatMessage(
+                          navigationMessages['dashboard']
+                        )}
+                        onClick={goToDashboardView}
+                        id="navigation_dashboard"
+                        isSelected={
+                          enableMenuSelection && activeMenuItem === 'dashboard'
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Icon name="Activity" size="medium" />}
+                        label={intl.formatMessage(
+                          navigationMessages['statistics']
+                        )}
+                        onClick={goToPerformanceStatistics}
+                        id="navigation_statistics"
+                        isSelected={
+                          enableMenuSelection && activeMenuItem === 'statistics'
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Icon name="Medal" size="medium" />}
+                        label={intl.formatMessage(
+                          navigationMessages['leaderboards']
+                        )}
+                        onClick={goToLeaderBoardsView}
+                        id="navigation_leaderboards"
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === 'leaderboards'
+                        }
+                      />
+                      <NavigationItem
+                        icon={() => <Icon name="ChartBar" size="medium" />}
+                        label={intl.formatMessage(navigationMessages['report'])}
+                        onClick={() =>
+                          props.goToPerformanceViewAction(userDetails)
+                        }
+                        id="navigation_report"
+                        isSelected={
+                          enableMenuSelection &&
+                          activeMenuItem === WORKQUEUE_TABS.performance
+                        }
+                      />
+                    </>
+                  )}
+              </NavigationGroup>
+            )}
         </>
       )}
 
@@ -945,6 +1028,9 @@ export const Navigation = connect<
   goToSettings,
   updateRegistrarWorkqueue,
   setAdvancedSearchParam,
+  goToPerformanceStatistics,
+  goToLeaderBoardsView,
+  goToDashboardView,
   goToInformantNotification
 })(injectIntl(withRouter(NavigationView)))
 

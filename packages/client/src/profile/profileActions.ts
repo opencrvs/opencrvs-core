@@ -34,6 +34,9 @@ export const SEND_VERIFY_CODE_COMPLETED =
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
+  payload: {
+    redirectBack: boolean
+  }
 }
 
 type CheckAuthAction = {
@@ -122,8 +125,13 @@ export const getStorageUserDetailsFailed =
     type: GET_USER_DETAILS_FAILED
   })
 
-export const redirectToAuthentication = (): RedirectToAuthenticationAction => ({
-  type: REDIRECT_TO_AUTHENTICATION
+export const redirectToAuthentication = (
+  redirectBack = false
+): RedirectToAuthenticationAction => ({
+  type: REDIRECT_TO_AUTHENTICATION,
+  payload: {
+    redirectBack
+  }
 })
 
 export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {

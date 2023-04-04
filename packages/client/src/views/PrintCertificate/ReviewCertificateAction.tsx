@@ -224,6 +224,7 @@ class ReviewCertificateActionComponent extends React.Component<
   render = () => {
     const { intl, scope } = this.props
     const isPrintInAdvanced = isCertificateForPrintInAdvance(this.props.draft)
+    const isEventMarriage = this.props.draft.event === Event.Marriage
 
     /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
@@ -265,7 +266,7 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            {hasRegisterScope(scope) && (
+            {!isEventMarriage && hasRegisterScope(scope) && (
               <DangerButton
                 onClick={() =>
                   this.props.goToCertificateCorrection(
@@ -317,6 +318,8 @@ const getEvent = (eventType: string | undefined) => {
       return Event.Birth
     case 'death':
       return Event.Death
+    case 'marriage':
+      return Event.Marriage
   }
 }
 

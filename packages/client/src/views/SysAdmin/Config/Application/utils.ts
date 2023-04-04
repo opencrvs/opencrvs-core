@@ -15,7 +15,8 @@ import { orderBy, uniqBy } from 'lodash'
 import {
   BirthActionId,
   DeathActionId,
-  GeneralActionId
+  GeneralActionId,
+  MarriageActionId
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
@@ -29,6 +30,7 @@ export type IActionType =
   | keyof typeof GeneralActionId
   | keyof typeof BirthActionId
   | keyof typeof DeathActionId
+  | keyof typeof MarriageActionId
 interface ICurrencyOptions {
   [key: string]: string
 }
@@ -183,12 +185,9 @@ export const getFormattedFee = (value: string) => {
 }
 
 export const isWithinFileLength = (base64data: string) => {
-  const baseStr = base64data.substring(22)
+  const baseStr = base64data.split(',')[1]
   const decoded = window.atob(baseStr)
-  if (decoded.length >= 2000000) {
-    return false
-  }
-  return true
+  return decoded.length < 2000000
 }
 
 const isGeneralOrConfigAction = (
@@ -220,7 +219,9 @@ export async function callApplicationConfigMutation(
           }
         : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
-        : { DEATH: appConfig.DEATH }
+        : configProperty in DeathActionId
+        ? { DEATH: appConfig.DEATH }
+        : { MARRIAGE: appConfig.MARRIAGE }
     )
     if (res && res.data) {
       const updatedConfigs = res.data.updateApplicationConfig

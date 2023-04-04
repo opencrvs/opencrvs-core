@@ -59,7 +59,7 @@ export interface IVerifyIDCertificateCollectorDefinition {
   [event: string]: IVerifyIDCertificateCollector
 }
 
-export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
   {
     birth: {
       mother: {
@@ -112,6 +112,34 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
             familyNameField: 'familyNameEng'
           }
         },
+        nationalityField: 'nationality'
+      }
+    },
+    marriage: {
+      groom: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'groomBirthDate',
+        nationalityField: 'nationality'
+      },
+      bride: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'brideBirthDate',
         nationalityField: 'nationality'
       }
     }
@@ -568,6 +596,201 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: false,
           initialValue: [],
           validator: [],
+          options: [
+            {
+              value: 'AFFIDAVIT',
+              label: certificateMessages.noSignedAffidavitAvailable
+            }
+          ],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+export const collectMarriageCertificateFormSection: IFormSection = {
+  id: CertificateSection.Collector,
+  viewType: 'form',
+  name: certificateMessages.printCertificate,
+  title: certificateMessages.certificateCollectionTitle,
+  groups: [
+    {
+      id: 'certCollector',
+      title: certificateMessages.whoToCollect,
+      conditionals: [conditionals.certCollectorOther],
+      error: certificateMessages.certificateCollectorError,
+      fields: [
+        {
+          name: 'type',
+          type: RADIO_GROUP,
+          size: RadioSize.LARGE,
+          label: certificateMessages.whoToCollect,
+          hideHeader: true,
+          required: true,
+          initialValue: true,
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          options: [
+            { value: 'BRIDE', label: formMessages.brideName },
+            { value: 'GROOM', label: formMessages.groomName },
+            { value: 'OTHER', label: formMessages.someoneElseCollector },
+            {
+              value: 'PRINT_IN_ADVANCE',
+              label: formMessages.certificatePrintInAdvance
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'otherCertCollector',
+      conditionals: [conditionals.certCollectorOther],
+      title: certificateMessages.otherCollectorFormTitle,
+      error: certificateMessages.certificateOtherCollectorInfoError,
+      fields: [
+        {
+          name: 'iDType',
+          type: SELECT_WITH_OPTIONS,
+          label: formMessages.typeOfId,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          placeholder: formMessages.select,
+          options: identityOptions
+        },
+        {
+          name: 'iDTypeOther',
+          type: TEXT,
+          label: formMessages.iDTypeOtherLabel,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDType]
+        },
+        {
+          name: 'iD',
+          type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+          dynamicDefinitions: {
+            label: {
+              dependency: 'iDType',
+              labelMapper: identityNameMapper
+            },
+            type: {
+              kind: 'dynamic',
+              dependency: 'iDType',
+              typeMapper: identityTypeMapper
+            },
+            validate: [
+              {
+                validator: validIDNumber,
+                dependencies: ['iDType']
+              }
+            ]
+          },
+          label: formMessages.iD,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDAvailable]
+        },
+        {
+          name: 'firstName',
+          type: TEXT,
+          label: formMessages.firstName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'lastName',
+          type: TEXT,
+          label: formMessages.lastName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'relationship',
+          type: TEXT,
+          label: formMessages.informantsRelationWithDeceased,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        }
+      ]
+    },
+    {
+      id: 'affidavit',
+      conditionals: [conditionals.certCollectorOther],
+      title: certificateMessages.certificateOtherCollectorAffidavitFormTitle,
+      error: certificateMessages.certificateOtherCollectorAffidavitError,
+      fields: [
+        {
+          name: 'paragraph',
+          type: PARAGRAPH,
+          label:
+            certificateMessages.certificateOtherCollectorAffidavitFormParagraph,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'affidavitFile',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: certificateMessages.signedAffidavitFileLabel,
+          description: certificateMessages.noLabel,
+          initialValue: '',
+          required: false,
+          allowedDocType: ['image/png', 'image/jpeg'],
+          validate: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+            }
+          ]
+        },
+        {
+          name: 'noAffidavitAgreement',
+          type: CHECKBOX_GROUP,
+          label: certificateMessages.noLabel,
+          required: false,
+          initialValue: [],
+          validate: [],
           options: [
             {
               value: 'AFFIDAVIT',

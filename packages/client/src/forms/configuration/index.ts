@@ -26,7 +26,7 @@ import {
 } from '@client/forms/questionConfig'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
-import { registerForms } from './default'
+import { registerForms } from './default/index'
 import { DraftStatus, Event } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 import { deserializeForm } from '@client/forms/mappings/deserializer'

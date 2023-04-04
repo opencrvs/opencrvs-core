@@ -13,8 +13,7 @@ import { Query } from '@client/components/Query'
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
@@ -39,6 +38,7 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
+  getAddressName,
   getUserRoleIntlKey,
   UserStatus
 } from '@client/views/SysAdmin/Team/utils'
@@ -319,13 +319,6 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
-
-  const getAddressName = ({ name, partOf }: ILocation): string => {
-    const parentLocationId = partOf.split('/')[1]
-    if (parentLocationId === '0') return name
-    const parentLocation = offlineCountryConfig.locations[parentLocationId]
-    return `${name}, ${getAddressName(parentLocation)}`
-  }
 
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
@@ -875,7 +868,7 @@ function UserListComponent(props: IProps) {
                     ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
-                size={ContentSize.LARGE}
+                size={ContentSize.NORMAL}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,
@@ -903,7 +896,10 @@ function UserListComponent(props: IProps) {
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressName(getParentLocation(searchedLocation))}
+                          {getAddressName(
+                            offlineCountryConfig,
+                            getParentLocation(searchedLocation)
+                          )}
                         </LocationInfoValue>
                       )}
                     </LocationInfo>
