@@ -26,7 +26,6 @@ import System, {
 import User, { IUserModel } from '@user-mgnt/model/user'
 import {
   generateBcryptHash,
-  // generateBcryptHash,
   generateBcryptSaltedHash,
   generateHash
 } from '@user-mgnt/utils/hash'

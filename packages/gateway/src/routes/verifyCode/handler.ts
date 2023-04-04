@@ -18,7 +18,7 @@ import {
   PRODUCTION,
   QA_ENV
 } from '@gateway/constants'
-import { set, get, del } from '@gateway/features/user/database'
+import { del, get, set } from '@gateway/features/user/database'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -26,10 +26,11 @@ import * as jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import { unauthorized } from '@hapi/boom'
 import { logger } from '@gateway/logger'
-const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 import * as t from 'io-ts'
 import { pipe } from 'fp-ts/function'
 import { chainW, tryCatch } from 'fp-ts/Either'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 interface ICodeDetails {
   code: string
@@ -62,8 +63,7 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
-
+  const code = crypto.randomInt(6).toString()
   await storeVerificationCode(nonce, code)
   return code
 }

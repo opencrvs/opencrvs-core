@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { set, get, del } from '@auth/database'
+import { del, get, set } from '@auth/database'
 import {
-  NOTIFICATION_SERVICE_URL,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  JWT_ISSUER
+  JWT_ISSUER,
+  NOTIFICATION_SERVICE_URL
 } from '@auth/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
@@ -40,8 +40,7 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
-
+  const code = crypto.randomInt(6).toString()
   await storeVerificationCode(nonce, code)
   return code
 }
