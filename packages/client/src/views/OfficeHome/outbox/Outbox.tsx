@@ -52,6 +52,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { Spinner } from '@opencrvs/components/lib'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''
@@ -215,14 +216,18 @@ export function Outbox() {
           )
         const groomName =
           getFullName(
-            declaration.data?.bride?.firstNamesEng as string,
-            declaration.data?.bride?.familyNameEng as string
+            declaration.data?.groom?.firstNamesEng as string,
+            declaration.data?.groom?.familyNameEng as string
           ) ||
           getFullName(
-            declaration.data?.bride?.firstNames as string,
-            declaration.data?.bride?.familyName as string
+            declaration.data?.groom?.firstNames as string,
+            declaration.data?.groom?.familyName as string
           )
-        name = groomName + (brideName ? ` & ${brideName}` : '')
+        name =
+          brideName && groomName
+            ? `${groomName} & ${brideName}`
+            : brideName || groomName || EMPTY_STRING
+
         dateOfEvent = declaration.data?.marriageEvent?.marriageDate.toString()
       }
 

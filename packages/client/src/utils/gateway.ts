@@ -281,12 +281,14 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
+  Bride = 'BRIDE',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
   Father = 'FATHER',
+  Groom = 'GROOM',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
   MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
@@ -4192,6 +4194,7 @@ export type CreateDeathRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -8137,6 +8140,15 @@ export type GetEventsWithProgressQuery = {
           firstNames?: string | null
           familyName?: string | null
         }>
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
       } | null
       progressReport?: {
         __typename?: 'EventProgressData'
@@ -8189,6 +8201,15 @@ export type GetRegistrationsListByFilterQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
