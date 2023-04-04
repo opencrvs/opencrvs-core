@@ -635,7 +635,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           hideHeader: true,
           required: true,
           initialValue: true,
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -664,7 +664,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.typeOfId,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -678,7 +678,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.iDTypeOtherLabel,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -698,7 +698,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
               dependency: 'iDType',
               typeMapper: identityTypeMapper
             },
-            validate: [
+            validator: [
               {
                 validator: validIDNumber,
                 dependencies: ['iDType']
@@ -708,7 +708,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -721,7 +721,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.firstName,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -733,7 +733,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.lastName,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -745,7 +745,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: formMessages.informantsRelationWithDeceased,
           required: true,
           initialValue: '',
-          validate: [
+          validator: [
             fieldValidationDescriptorToValidationFunction({
               operation: 'requiredBasic'
             })
@@ -765,7 +765,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label:
             certificateMessages.certificateOtherCollectorAffidavitFormParagraph,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'affidavitFile',
@@ -775,7 +775,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           initialValue: '',
           required: false,
           allowedDocType: ['image/png', 'image/jpeg'],
-          validate: [],
+          validator: [],
           conditionals: [
             {
               action: 'hide',
@@ -790,7 +790,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           label: certificateMessages.noLabel,
           required: false,
           initialValue: [],
-          validate: [],
+          validator: [],
           options: [
             {
               value: 'AFFIDAVIT',
