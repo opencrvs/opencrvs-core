@@ -89,6 +89,7 @@ export function Dialog({
   variant = 'small'
 }: IDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
     onClose && onClose()
   }
@@ -96,6 +97,12 @@ export function Dialog({
   const [hasOverflow, setHasOverflow] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
   const hasActions = actions && actions.length > 0
+  
+  const handleClickOutside = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+      handleClose()
+    }
+  }
 
   useEffect(() => {
     if (contentRef.current) {
@@ -123,8 +130,8 @@ export function Dialog({
   return (
     <>
       {isOpen && (
-        <DialogWrapper>
-          <DialogContainer id={id} variant={variant}>
+        <DialogWrapper onClick={handleClickOutside}>
+          <DialogContainer id={id} variant={variant} ref={dialogRef}>
             <DialogHeader hasOverflow={headerHasBorder}>
               <DialogTitle>
                 <Text variant="h2" element="h2" color="grey600">
