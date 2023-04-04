@@ -48,13 +48,15 @@ interface IRegisterSystemPayload {
     webhook: WebHookPayload[]
   }
   type: string
+  integratingSystemType: string
 }
 
 export async function registerSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { name, type } = request.payload as IRegisterSystemPayload
+  const { name, type, integratingSystemType } =
+    request.payload as IRegisterSystemPayload
   let { settings } = request.payload as IRegisterSystemPayload
   try {
     if (type === types.WEBHOOK && !settings) {
@@ -164,7 +166,8 @@ export async function registerSystem(
       secretHash: hash,
       salt,
       sha_secret,
-      type
+      type,
+      integratingSystemType
     }
     const newSystem = await System.create(systemDetails)
 
@@ -401,6 +404,7 @@ export const SystemSchema = Joi.object({
   name: Joi.string(),
   status: Joi.string(),
   type: Joi.string(),
+  integratingSystemType: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
   settings: settingsSchema
