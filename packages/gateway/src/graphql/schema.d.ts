@@ -1387,6 +1387,7 @@ export interface GQLQuestionInput {
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
+  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
@@ -1868,7 +1869,8 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  TIME = 'TIME'
 }
 
 export interface GQLConditionalInput {
@@ -5072,7 +5074,12 @@ export interface UserToRoleResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToTitleResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface UserToEmailResolver<TParent = any, TResult = any> {

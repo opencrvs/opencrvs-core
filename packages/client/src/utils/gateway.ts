@@ -627,7 +627,8 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Time = 'TIME'
 }
 
 export type CustomSelectOption = {
@@ -2009,6 +2010,7 @@ export type QuestionInput = {
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
   unit?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
   validator?: InputMaybe<Array<ValidatorInput>>
 }
 
