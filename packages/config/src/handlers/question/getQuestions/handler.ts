@@ -9,37 +9,92 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDataSetModel } from '@config/models/formDataset'
-import Question from '@config/models/question'
-import { resolveFormDatasetOptions } from '@config/services/formDatasetService'
-import { internal } from '@hapi/boom'
+import { COUNTRY_CONFIG_URL } from '@config/config/constants'
+import FormDataset, {
+  IDataSetModel,
+  IDataset
+} from '@config/models/formDataset'
+import Question, { IQuestion } from '@config/models/question'
+
 import * as Hapi from '@hapi/hapi'
+import fetch from 'node-fetch'
+
+async function getQuestionsFromCountryConfig(): Promise<IQuestion[]> {
+  try {
+    const response = await fetch(`${COUNTRY_CONFIG_URL}/forms/questions`)
+
+    if (response.status !== 200) {
+      return []
+    }
+
+    return response.json()
+  } catch (err) {
+    return []
+  }
+}
+
+type IQuestionFromCountryConfig = IQuestion & { datasetName?: string }
+
+function getOptionsForQuestion(
+  question: IQuestionFromCountryConfig,
+  datasets: IDataSetModel[]
+): IDataset['options'] {
+  if (!question.datasetId || !question.datasetName) {
+    return []
+  }
+
+  const dataset = datasets.find(
+    (dataset) =>
+      dataset._id === question.datasetId ||
+      dataset.fileName === question.datasetName
+  )
+
+  if (!dataset) {
+    return []
+  }
+
+  return dataset.options
+}
 
 export default async function getQuestions(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  try {
-    const populatedQuestions = await Question.find()
-      .populate<{ datasetId: IDataSetModel }>('datasetId')
-      .exec()
+  const datasets = await FormDataset.find().exec()
 
-    const questions = populatedQuestions.map(async (populatedQuestion) => {
-      if (populatedQuestion.datasetId) {
-        const options = await resolveFormDatasetOptions(
-          populatedQuestion.datasetId
-        )
-        return {
-          ...populatedQuestion.toObject(),
-          options,
-          datasetId: populatedQuestion.datasetId._id
-        }
+  const allQuestionsFromCountryConfig = await getQuestionsFromCountryConfig()
+
+  type QuestionWithDatasetPopulated = IQuestion & {
+    options: IDataset['options']
+  }
+
+  /*
+   * Manually populate datasets for questions from country config
+   */
+
+  const questionsFromCountryConfig: QuestionWithDatasetPopulated[] =
+    allQuestionsFromCountryConfig.map((question) => {
+      return {
+        ...question,
+        options: getOptionsForQuestion(question, datasets)
       }
-      return populatedQuestion
     })
 
-    return Promise.all(questions)
-  } catch (error) {
-    throw internal(error.message)
-  }
+  /*
+   * Get all questions from form wizard and populate datasets
+   */
+  const questionsSavedInFormWizard = (await Question.find().exec()).map(
+    (question) => {
+      return {
+        ...question.toObject<IQuestion>(),
+        options: getOptionsForQuestion(question, datasets)
+      }
+    }
+  )
+
+  const allQuestions = questionsFromCountryConfig.concat(
+    questionsSavedInFormWizard
+  )
+
+  return Promise.all(allQuestions)
 }
