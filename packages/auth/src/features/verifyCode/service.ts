@@ -40,7 +40,7 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  const code = crypto.randomInt(6).toString()
+  const code = crypto.randomInt(100000, 999999).toString()
   await storeVerificationCode(nonce, code)
   return code
 }
