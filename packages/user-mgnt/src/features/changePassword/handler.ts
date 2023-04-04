@@ -41,29 +41,35 @@ export default async function changePasswordHandler(
     )
     throw unauthorized()
   }
-
-  if (userUpdateData.existingPassword) {
-    if (user.status !== statuses.ACTIVE) {
-      logger.error(
-        `User is not in active state for given userid: ${userUpdateData.userId}`
-      )
-      throw unauthorized()
-    }
-    if (
-      generateHash(userUpdateData.existingPassword, user.salt) ===
-        user.passwordHash ||
-      generateBcryptHash(userUpdateData.existingPassword, user.salt) ===
-        user.passwordHash
-    ) {
-      return await changePassword(userUpdateData, user, request, h)
-    } else {
-      logger.error(
-        `Password didn't match for given userid: ${userUpdateData.userId}`
-      )
-      throw unauthorized()
-    }
+  if (
+    userUpdateData.existingPassword &&
+    user.status !== statuses.ACTIVE &&
+    validatePasswordHash(userUpdateData.existingPassword, user)
+  ) {
+    return await changePassword(userUpdateData, user, request, h)
   }
-  return await changePassword(userUpdateData, user, request, h)
+  if (
+    userUpdateData.password &&
+    validatePasswordHash(userUpdateData.password, user)
+  ) {
+    return await changePassword(userUpdateData, user, request, h)
+  }
+
+  return h.response().code(400)
+}
+
+function validatePasswordHash(existingPassword: string, user: IUserModel) {
+  try {
+    if (
+      generateHash(existingPassword!, user.salt) === user.passwordHash ||
+      generateBcryptHash(existingPassword!, user.salt) === user.passwordHash
+    ) {
+      return true
+    }
+  } catch (ex) {
+    logger.error(`Invalid salt!`)
+  }
+  return false
 }
 
 async function changePassword(

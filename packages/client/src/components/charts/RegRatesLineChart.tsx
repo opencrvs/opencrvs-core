@@ -59,7 +59,6 @@ const CustomLegendContainer = styled.div<{
 const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
   ${({ theme }) => theme.fonts.bold16};
 `
 

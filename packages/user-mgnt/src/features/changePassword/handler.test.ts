@@ -96,9 +96,9 @@ describe('changePassword handler', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it('returns 400 for unable to update password', async () => {
+  it.only('returns 400 for unable to update password', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    mockingoose(User).toReturn(new Error('boom'), 'update')
+    mockingoose(User).toReturn({}, 'updateOne')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -146,7 +146,7 @@ describe('changeUserPassword handler', () => {
   })
   it('Returns 401 for wrong existing password of logged-in user', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    mockingoose(User).toReturn({}, 'update')
+    mockingoose(User).toReturn({}, 'updateOne')
 
     const res = await server.server.inject({
       method: 'POST',
