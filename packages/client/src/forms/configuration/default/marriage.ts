@@ -23,6 +23,7 @@ export const marriageRegisterForms: ISerializedForm = {
     {
       id: MarriageSection.Registration,
       viewType: 'form',
+      hasDocumentSection: true,
       name: formMessageDescriptors.registrationName,
       title: formMessageDescriptors.registrationTitle,
       groups: [
