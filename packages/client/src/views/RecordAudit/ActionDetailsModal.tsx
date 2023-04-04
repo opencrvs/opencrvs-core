@@ -50,6 +50,8 @@ import { certificateCollectorRelationLabelArray } from '@client/forms/certificat
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
 import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -126,7 +128,11 @@ function prepareComments(
       ? currentHistoryItemIndex
       : currentHistoryItemIndex - 1
 
-  if (actionDetailsData.regStatus === RegStatus.Rejected) {
+  if (
+    [RegStatus.Rejected, RegStatus.Archived].includes(
+      actionDetailsData.regStatus as RegStatus
+    )
+  ) {
     return actionDetailsData.statusReason?.text
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
@@ -235,6 +241,31 @@ export const ActionDetailsModalListTable = ({
       width: 100
     }
   ]
+  const duplicateOfColumn = [
+    {
+      key: 'duplicateOf',
+      label: intl.formatMessage(constantsMessages.duplicateOf),
+      width: 100
+    }
+  ]
+
+  const matchedToColumn = [
+    {
+      key: 'potentialDuplicates',
+      label: intl.formatMessage(constantsMessages.matchedTo),
+      width: 100
+    }
+  ]
+
+  const potentialDuplicatesTransformer = (items: string[]) => {
+    return (
+      <>
+        {items.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </>
+    )
+  }
 
   const getItemName = (
     sectionName: MessageDescriptor,
@@ -477,10 +508,32 @@ export const ActionDetailsModalListTable = ({
           />
         )}
 
+      {/* Duplicate of */}
+      {actionDetailsData.duplicateOf && (
+        <Table
+          noResultText=" "
+          columns={duplicateOfColumn}
+          content={[{ duplicateOf: actionDetailsData.duplicateOf }]}
+        />
+      )}
+
       {/* For Comments */}
       {content.length > 0 && (
         <Table noResultText=" " columns={commentsColumn} content={content} />
       )}
+
+      {/* Show Duplicate pill for Archived declarations */}
+      {actionDetailsData.reason === 'duplicate' &&
+        !actionDetailsData.action &&
+        actionDetailsData.regStatus === RegStatus.Archived && (
+          <p>
+            <Pill
+              label={intl.formatMessage(recordAuditMessages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
@@ -520,6 +573,22 @@ export const ActionDetailsModalListTable = ({
           onPageChange={pageChangeHandler}
         />
       )}
+
+      {/* Matched to */}
+      {actionDetailsData.potentialDuplicates &&
+        actionDetailsData.action === RegAction.FlaggedAsPotentialDuplicate && (
+          <Table
+            noResultText=" "
+            columns={matchedToColumn}
+            content={[
+              {
+                potentialDuplicates: potentialDuplicatesTransformer(
+                  actionDetailsData.potentialDuplicates
+                )
+              }
+            ]}
+          />
+        )}
     </>
   )
 }

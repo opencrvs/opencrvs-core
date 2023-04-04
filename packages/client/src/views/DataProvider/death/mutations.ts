@@ -18,6 +18,7 @@ export const SUBMIT_DEATH_DECLARATION = gql`
     createDeathRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `
@@ -77,8 +78,18 @@ export const REJECT_DEATH_DECLARATION = gql`
 `
 
 export const ARCHIVE_DEATH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 

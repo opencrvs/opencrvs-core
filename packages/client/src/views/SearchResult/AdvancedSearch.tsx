@@ -21,10 +21,10 @@ import { messages } from '@client/i18n/messages/views/config'
 
 import { Content, FormTabs, Text } from '@client/../../components/lib'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { ICON_ALIGNMENT, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
@@ -43,13 +43,14 @@ import {
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-const StyledPrimaryButton = styled(PrimaryButton)`
+const SearchButton = styled(Button)`
   margin-top: 32px;
 `
 
@@ -126,9 +127,6 @@ const BirthSection = () => {
 
   return (
     <>
-      <Text element={'p'} variant={'reg18'}>
-        {intl.formatMessage(messages.advancedSearchInstruction)}
-      </Text>
       <Accordion
         name={birthSearchRegistrationSection.id}
         label={intl.formatMessage(
@@ -278,11 +276,11 @@ const BirthSection = () => {
         />
       </Accordion>
 
-      <StyledPrimaryButton
-        icon={() => <Icon name={'MagnifyingGlass'} />}
-        align={ICON_ALIGNMENT.LEFT}
+      <SearchButton
         id="search"
         key="search"
+        type="primary"
+        size="large"
         disabled={isDisabled}
         onClick={() => {
           dispatch(
@@ -297,8 +295,10 @@ const BirthSection = () => {
           dispatch(goToAdvancedSearchResult())
         }}
       >
+        {' '}
+        <Icon name={'MagnifyingGlass'} />
         {intl.formatMessage(buttonMessages.search)}
-      </StyledPrimaryButton>
+      </SearchButton>
     </>
   )
 }
@@ -329,9 +329,6 @@ const DeathSection = () => {
 
   return (
     <>
-      <Text element={'p'} variant={'reg18'}>
-        {intl.formatMessage(messages.advancedSearchInstruction)}
-      </Text>
       <Accordion
         name={deathSearchRegistrationSection.id}
         label={intl.formatMessage(
@@ -438,11 +435,11 @@ const DeathSection = () => {
         />
       </Accordion>
 
-      <StyledPrimaryButton
-        icon={() => <Icon name={'MagnifyingGlass'} />}
-        align={ICON_ALIGNMENT.LEFT}
+      <SearchButton
         id="search"
         key="search"
+        type="primary"
+        size="large"
         disabled={isDisable}
         onClick={() => {
           dispatch(
@@ -457,8 +454,10 @@ const DeathSection = () => {
           dispatch(goToAdvancedSearchResult())
         }}
       >
+        {' '}
+        <Icon name={'MagnifyingGlass'} />
         {intl.formatMessage(buttonMessages.search)}
-      </StyledPrimaryButton>
+      </SearchButton>
     </>
   )
 }
@@ -495,13 +494,14 @@ const AdvancedSearch = () => {
               onTabClick={(id: TabId) => {
                 dispatch(
                   setAdvancedSearchParam({
-                    ...advancedSearchParamState,
+                    ...advancedSearchInitialState,
                     event: id
                   })
                 )
               }}
             />
           }
+          subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
         >
           {activeTabId === TabId.BIRTH && <BirthSection />}
           {activeTabId === TabId.DEATH && <DeathSection />}

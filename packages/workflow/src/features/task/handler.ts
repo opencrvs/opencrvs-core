@@ -20,7 +20,7 @@ import {
 import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,

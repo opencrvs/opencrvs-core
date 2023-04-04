@@ -13,18 +13,21 @@
 export * from './custom-icons'
 export {
   GitBranch,
+  Archive,
   List,
   Target,
   Medal,
   CreditCard,
   Phone,
   User,
+  Users,
   ArrowLeft,
   ArrowRight,
   Share,
   Lock,
   ListBullets,
   Compass,
+  NotePencil,
   ChatCircle,
   Star,
   MagnifyingGlass,
@@ -39,6 +42,11 @@ export {
   TextT,
   Database,
   CheckSquare,
+  WarningCircle,
   X,
-  Activity
+  Activity,
+  ChartLine,
+  ChartBar,
+  MapPin,
+  PaperPlaneTilt
 } from 'phosphor-react'

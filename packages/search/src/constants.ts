@@ -20,6 +20,8 @@ export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const MATCH_SCORE_THRESHOLD = 1.0
 export const SENTRY_DSN = process.env.SENTRY_DSN
-
 export const OPENCRVS_INDEX_NAME = 'ocrvs'
 export const DEFAULT_TIMEOUT = 600000
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+
+export const FLAGGED_AS_POTENTIAL_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/flaggedAsPotentialDuplicate`

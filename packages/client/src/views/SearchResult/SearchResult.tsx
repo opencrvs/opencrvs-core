@@ -357,7 +357,7 @@ export class SearchResultView extends React.Component<
                           searchType === BRN_DRN_TEXT ? searchText : '',
                         contactNumber:
                           searchType === PHONE_TEXT
-                            ? convertToMSISDN(searchText)
+                            ? convertToMSISDN(searchText, window.config.COUNTRY)
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
                         declarationLocationId:
@@ -484,7 +484,9 @@ export class SearchResultView extends React.Component<
                 registrationNumber:
                   searchType === BRN_DRN_TEXT ? searchText : '',
                 contactNumber:
-                  searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',
+                  searchType === PHONE_TEXT
+                    ? convertToMSISDN(searchText, window.config.COUNTRY)
+                    : '',
                 name: searchType === NAME_TEXT ? searchText : ''
               },
               sort: SEARCH_RESULT_SORT

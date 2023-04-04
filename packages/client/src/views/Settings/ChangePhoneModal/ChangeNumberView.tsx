@@ -54,11 +54,13 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (phoneNumber: string) => {
     const userData = await queriesForUser.fetchUserDetails(
-      convertToMSISDN(phoneNumber)
+      convertToMSISDN(phoneNumber, window.config.COUNTRY)
     )
     const userDetails = userData.data.getUserByMobile
     if (isNull(userDetails.id)) {
-      dispatch(sendVerifyCode(convertToMSISDN(phoneNumber)))
+      dispatch(
+        sendVerifyCode(convertToMSISDN(phoneNumber, window.config.COUNTRY))
+      )
       onSuccess(phoneNumber)
     } else {
       toggleDuplicateMobileErrorNotification()

@@ -25,6 +25,10 @@ export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Dea
 export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
 export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Death}/:pageId/group/:groupId`
+export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${Event.Marriage}/registration/informantType`
+export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${Event.Marriage}`
+export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${Event.Marriage}/:pageId`
+export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Marriage}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
@@ -91,6 +95,10 @@ export const EVENT_COMPLETENESS_RATES =
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
 export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 export const PERFORMANCE_REGISTRATIONS_LIST = '/performance/registrations'
+
+export const PERFORMANCE_DASHBOARD = '/performance/dashboard'
+export const PERFORMANCE_LEADER_BOARDS = '/performance/leaderboards'
+export const PERFORMANCE_STATISTICS = '/performance/statistics'
 
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'

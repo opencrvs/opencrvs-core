@@ -30,8 +30,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-    @auth(requires: ANONYMOUS)
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -176,8 +176,13 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
-  markEventAsArchived(id: String!): ID!
-  notADuplicate(id: String!, duplicateId: String!): ID!
+  markEventAsNotDuplicate(id: String!): ID!
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
@@ -196,6 +201,24 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
+  markMarriageAsRegistered(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): MarriageRegistration!
+  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
+  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
+  requestMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -356,24 +379,34 @@ type RegistrationCountResult {
   total: Int!
 }
 
-union RecordDetails = BirthRegistration | DeathRegistration
-
-enum AuthorizationStatus {
-  ANONYMOUS
+type MarriageRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  bride: Person
+  groom: Person
+  witnessOne: RelatedPerson
+  witnessTwo: RelatedPerson
+  eventLocation: Location
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestion]
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
+union RecordDetails = BirthRegistration | DeathRegistration
 
 type Location {
   id: ID!
   _fhirID: ID
   identifier: [Identifier!]
-  status: String!
-  name: String!
-  alias: [String!]!
+  status: String
+  name: String
+  alias: [String!]
   description: String
-  partOf: String!
-  type: LocationType!
+  partOf: String
+  type: LocationType
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -637,6 +670,7 @@ type CreatedIds {
   compositionId: String
   trackingId: String
   registrationNumber: String
+  isPotentiallyDuplicate: Boolean
 }
 
 input BirthRegistrationInput {
@@ -683,6 +717,20 @@ input DeathRegistrationInput {
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
   medicalPractitioner: MedicalPractitionerInput
+  createdAt: Date
+  updatedAt: Date
+}
+
+input MarriageRegistrationInput {
+  _fhirIDMap: Map
+  registration: RegistrationInput
+  bride: PersonInput
+  groom: PersonInput
+  witnessOne: RelatedPersonInput
+  witnessTwo: RelatedPersonInput
+  eventLocation: LocationInput
+  typeOfMarriage: MarriageType
+  questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
 }
@@ -746,6 +794,7 @@ type ApplicationConfiguration {
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   DEATH: Death
+  MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -765,6 +814,7 @@ input ApplicationConfigurationInput {
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   DEATH: DeathInput
+  MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
@@ -859,13 +909,17 @@ type Registration {
   contact: String
   contactRelationship: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
   inCompleteFields: String
   attachments: [Attachment]
   certificates: [Certificate]
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 type RelatedPerson {
@@ -932,6 +986,8 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
+  potentialDuplicates: [String!]
 }
 
 enum MannerOfDeath {
@@ -965,6 +1021,7 @@ type HumanName {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 type ContactPoint {
@@ -1032,6 +1089,11 @@ enum EducationType {
 type StatusWiseRegistrationCount {
   status: String!
   count: Int!
+}
+
+enum MarriageType {
+  POLYGAMY
+  MONOGAMY
 }
 
 type Identifier {
@@ -1163,6 +1225,7 @@ interface EventSearchSet {
 enum Event {
   birth
   death
+  marriage
 }
 
 type EventProgressSet {
@@ -1262,6 +1325,10 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String
+  groomSignature: String
+  brideSignature: String
+  witnessOneSignature: String
+  witnessTwoSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
@@ -1315,6 +1382,7 @@ input HumanNameInput {
   use: String
   firstNames: String
   familyName: String
+  marriedLastName: String
 }
 
 input UserIdentifierInput {
@@ -1356,6 +1424,12 @@ type Death {
   PRINT_IN_ADVANCE: Boolean
 }
 
+type Marriage {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFee
+  PRINT_IN_ADVANCE: Boolean
+}
+
 type LoginBackground {
   backgroundColor: String
   backgroundImage: String
@@ -1382,6 +1456,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+  PRINT_IN_ADVANCE: Boolean
+}
+
+input MarriageInput {
+  REGISTRATION_TARGET: Int
+  FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -1440,6 +1520,8 @@ enum InformantType {
   DAUGHTER_IN_LAW
   GRANDSON
   GRANDDAUGHTER
+  BRIDE
+  GROOM
   OTHER
 }
 
@@ -1465,6 +1547,7 @@ type RegWorkflow {
 enum RegistrationType {
   BIRTH
   DEATH
+  MARRIAGE
 }
 
 type Certificate {
@@ -1472,6 +1555,11 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
+}
+
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
 }
 
 enum RegAction {
@@ -1482,6 +1570,9 @@ enum RegAction {
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 }
 
 type StatusReason {
@@ -1510,6 +1601,7 @@ enum IdentityIDType {
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER
@@ -1545,6 +1637,7 @@ enum AttachmentType {
   MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
+  MARRIAGE_NOTICE
   OTHER
 }
 
@@ -1554,12 +1647,15 @@ enum AttachmentSubject {
   CHILD
   OTHER
   PARENT
+  GROOM
+  BRIDE
   CHILD_AGE
   DECEASED_ID_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+  MARRIAGE_NOTICE_PROOF
 }
 
 type RoleLabel {
@@ -1715,6 +1811,16 @@ type DeathEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
+type MarriageEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  brideName: [HumanName]
+  groomName: [HumanName]
+  dateOfMarriage: Date
+  registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
 type EventProgressData {
   timeInProgress: Int
   timeInReadyForReview: Int
@@ -1820,6 +1926,11 @@ type DeathFee {
   DELAYED: Float
 }
 
+type MarriageFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
 enum ImageFit {
   FILL
   TILE
@@ -1832,6 +1943,11 @@ input BirthFeeInput {
 }
 
 input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input MarriageFeeInput {
   ON_TIME: Float
   DELAYED: Float
 }

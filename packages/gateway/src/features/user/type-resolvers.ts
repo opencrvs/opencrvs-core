@@ -171,20 +171,21 @@ export const userTypeResolvers: GQLResolver = {
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]
     },
-    async primaryOffice(userModel: IUserModelData, _, authHeader) {
-      return await fetchFHIR(
-        `/Location/${userModel.primaryOfficeId}`,
-        authHeader
-      )
+    async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
+      return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },
-    async catchmentArea(userModel: IUserModelData, _, authHeader) {
+    async catchmentArea(userModel: IUserModelData, _, { dataSources }) {
       return await Promise.all(
         userModel.catchmentAreaIds.map((areaId: string) => {
-          return fetchFHIR(`/Location/${areaId}`, authHeader)
+          return dataSources.locationsAPI.getLocation(areaId)
         })
       )
     },
-    async localRegistrar(userModel: IUserModelData, _, authHeader) {
+    async localRegistrar(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader }
+    ) {
       const scope = userModel.scope
 
       if (!scope) {
@@ -227,7 +228,7 @@ export const userTypeResolvers: GQLResolver = {
         }
       }
     },
-    async signature(userModel: IUserModelData, _, authHeader) {
+    async signature(userModel: IUserModelData, _, { headers: authHeader }) {
       const practitioner: fhir.Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader

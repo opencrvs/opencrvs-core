@@ -941,6 +941,17 @@ export enum DeathSection {
   Preview = 'preview'
 }
 
+export enum MarriageSection {
+  Registration = 'registration',
+  Groom = 'groom',
+  Bride = 'bride',
+  Event = 'marriageEvent',
+  WitnessOne = 'witnessOne',
+  WitnessTwo = 'witnessTwo',
+  Documents = 'documents',
+  Preview = 'preview'
+}
+
 export type WizardSection = BirthSection | DeathSection | 'settings'
 
 export enum UserSection {
@@ -988,6 +999,7 @@ export type Section =
   | CertificateSection
   | CorrectionSection
   | InformantSection
+  | MarriageSection
 
 export interface IFormSection {
   id: Section

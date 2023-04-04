@@ -28,15 +28,14 @@ const AccordionHeader = styled.div`
     cursor: pointer;
   }
 
-  h3 {
+  h2 {
     margin-top: 0;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
   }
 `
 const Content = styled.div`
-  margin-top: 15px;
+  margin: 16px 0;
   padding-top: 0px !important;
-  padding-bottom: 15px;
 `
 
 export interface IAccordionProps {
@@ -64,19 +63,19 @@ export const Accordion = ({
         id={`${name}-accordion-header`}
         onClick={() => setIsActive(!isActive)}
       >
-        <Text element={'h3'} variant={'h3'}>
+        <Text element={'h2'} variant={'h3'}>
           {label}
         </Text>
         {!isActive && (
-          <Stack>
-            <Icon name={'CaretRight'} color={'primary'} size={'large'} />
-            <Link>{labelForShowAction}</Link>
+          <Stack gap={4}>
+            <Icon name={'CaretRight'} color={'primary'} size={'small'} />
+            <Link font="bold14">{labelForShowAction}</Link>
           </Stack>
         )}
         {isActive && (
-          <Stack>
-            <Icon name={'CaretDown'} color={'primary'} size={'large'} />
-            <Link>{labelForHideAction}</Link>
+          <Stack gap={4}>
+            <Icon name={'CaretDown'} color={'primary'} size={'small'} />
+            <Link font="bold14">{labelForHideAction}</Link>
           </Stack>
         )}
       </AccordionHeader>

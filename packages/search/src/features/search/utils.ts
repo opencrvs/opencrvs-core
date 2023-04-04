@@ -47,20 +47,31 @@ export function advancedQueryBuilder(
           'deceasedFirstNames',
           'deceasedFamilyName',
           'spouseFirstNames',
-          'spouseFamilyName'
+          'spouseFamilyName',
+          'brideFirstNames',
+          'brideFamilyName',
+          'groomFirstNames',
+          'groomFamilyName',
+          'witnessOneFirstNames',
+          'witnessOneFamilyName',
+          'witnessTwoFirstNames',
+          'witnessTwoFamilyName'
         ],
         fuzziness: 'AUTO'
       }
     })
   }
 
-  if (params.registrationStatuses) {
+  if (
+    (params.registrationStatuses && params.registrationStatuses.length > 0) ||
+    isExternalSearch
+  ) {
     must.push({
       query_string: {
         default_field: 'type',
         query: isExternalSearch
           ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
-          : `(${params.registrationStatuses.join(') OR (')})`
+          : `(${params.registrationStatuses!.join(') OR (')})`
       }
     })
   }
@@ -530,6 +541,16 @@ export function advancedQueryBuilder(
           {
             match: {
               deceasedIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              brideIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              groomIdentifier: params.nationalId
             }
           }
         ]

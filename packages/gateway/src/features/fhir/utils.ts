@@ -35,7 +35,9 @@ import {
   DEATH_CORRECTION_ENCOUNTER_CODE,
   CORRECTION_CERTIFICATE_DOCS_CODE,
   CORRECTION_CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -62,7 +64,11 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL
+  MARRIAGE_REG_NO,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  VERIFIED_EXTENSION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -71,6 +77,7 @@ import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
@@ -154,6 +161,10 @@ export function selectOrCreateEncounterResource(
     sectionCode = isCorrection
       ? DEATH_CORRECTION_ENCOUNTER_CODE
       : DEATH_ENCOUNTER_CODE
+  } else if (context.event === EVENT_TYPE.MARRIAGE) {
+    sectionCode = isCorrection
+      ? MARRIAGE_CORRECTION_ENCOUNTER_CODE
+      : MARRIAGE_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -606,6 +617,38 @@ export function selectOrCreateInformantResource(
   }
 }
 
+export function selectOrCreateWitnessResource(
+  fhirBundle: ITemplatedBundle,
+  code: string,
+  title: string
+): fhir.Patient {
+  const relatedPersonResource = selectOrCreateInformantSection(
+    code,
+    title,
+    fhirBundle
+  )
+  const patientRef =
+    relatedPersonResource.patient && relatedPersonResource.patient.reference
+  if (!patientRef) {
+    const personEntry = createPersonEntryTemplate(uuid())
+    fhirBundle.entry.push(personEntry)
+    relatedPersonResource.patient = {
+      reference: personEntry.fullUrl
+    }
+    return personEntry.resource as fhir.Patient
+  } else {
+    const personEntry = fhirBundle.entry.find(
+      (entry) => entry.fullUrl === patientRef
+    )
+    if (!personEntry) {
+      throw new Error(
+        'No related informant person entry not found on fhir bundle'
+      )
+    }
+    return personEntry.resource as fhir.Patient
+  }
+}
+
 export function selectOrCreateRelatedPersonResource(
   fhirBundle: ITemplatedBundle,
   context: any,
@@ -900,7 +943,10 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
   return extension?.valueString
 }
 export async function setCertificateCollector(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader
 ) {
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
@@ -978,6 +1024,12 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VIEWED
+  } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_DUPLICATE
+  } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_NOT_DUPLICATE
+  } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
+    return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
   }
   return null
 }
@@ -1007,24 +1059,30 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function removeDuplicatesFromComposition(
+export async function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
-  duplicateId: string
+  duplicateId?: string
 ) {
-  const removeAllDuplicates = compositionId === duplicateId
-  const updatedRelatesTo =
-    composition.relatesTo &&
-    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
-      return (
-        relatesTo.code !== 'duplicate' ||
-        (!removeAllDuplicates &&
-          relatesTo.targetReference &&
-          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
-      )
-    })
-  composition.relatesTo = updatedRelatesTo
-  return composition
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
 }
 
 export const fetchFHIR = <T = any>(
@@ -1122,6 +1180,67 @@ export const postAdvancedSearch = (
   criteria: ISearchCriteria
 ) => {
   return fetch(`${SEARCH_URL}advancedRecordSearch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type BirthDuplicateSearchBody = {
+  childFirstNames?: string
+  childFamilyName?: string
+  childDoB?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+}
+
+export const findBirthDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: BirthDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/birth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+type DeathDuplicateSearchBody = {
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedIdentifier?: string
+  deceasedDoB?: string
+  deathDate?: string
+}
+export const findDeathDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: DeathDuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates/death`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1285,7 +1404,10 @@ export async function getRegistrationIds(
     registrationNumber = BIRTH_REG_NO
   } else if (eventType === EVENT_TYPE.DEATH) {
     registrationNumber = DEATH_REG_NO
+  } else if (eventType === EVENT_TYPE.MARRIAGE) {
+    registrationNumber = MARRIAGE_REG_NO
   }
+
   let path
   if (isTask) {
     path = `/Task/${compositionId}`
@@ -1421,4 +1543,9 @@ export function isBase64FileString(str: string) {
   }
   const strSplit = str.split(':')
   return strSplit.length > 0 && strSplit[0] === 'data'
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }
