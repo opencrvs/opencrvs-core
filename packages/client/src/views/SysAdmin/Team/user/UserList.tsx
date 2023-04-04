@@ -881,7 +881,6 @@ function UserListComponent(props: IProps) {
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
-                subtitle={(searchedLocation && searchedLocation.name) || ''}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,
