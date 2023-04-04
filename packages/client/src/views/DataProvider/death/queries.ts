@@ -122,8 +122,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        duplicates {
+          compositionId
+          trackingId
+        }
         informantsSignature
-        duplicates
         attachments {
           data
           type
@@ -143,6 +146,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -193,6 +197,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -263,6 +271,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
+        potentialDuplicates
       }
     }
   }
@@ -377,6 +387,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactRelationship
         contactPhoneNumber
         informantsSignature
+        duplicates {
+          compositionId
+          trackingId
+        }
         status {
           comments {
             comment
@@ -442,6 +456,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -512,6 +530,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
         }
+        duplicateOf
+        potentialDuplicates
       }
     }
   }

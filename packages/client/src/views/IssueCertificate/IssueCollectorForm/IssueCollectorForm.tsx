@@ -49,7 +49,7 @@ const fields: IRadioGroupFormField[] = [
   }
 ]
 
-const commonFields: IRadioGroupFormField[] = [
+const commonFieldsForBirthAndDeath: IRadioGroupFormField[] = [
   {
     name: 'type',
     type: RADIO_GROUP,
@@ -61,6 +61,24 @@ const commonFields: IRadioGroupFormField[] = [
     validator: [],
     options: [
       { value: 'INFORMANT', label: issueMessages.issueToInformant },
+      { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
+    ]
+  }
+]
+
+const fieldsForMarriage: IRadioGroupFormField[] = [
+  {
+    name: 'type',
+    type: RADIO_GROUP,
+    size: RadioSize.LARGE,
+    label: issueMessages.issueCertificate,
+    hideHeader: true,
+    required: true,
+    initialValue: '',
+    validator: [],
+    options: [
+      { value: 'GROOM', label: issueMessages.issueToGroom },
+      { value: 'BRIDE', label: issueMessages.issueToBride },
       { value: 'OTHER', label: issueMessages.issueToSomeoneElse }
     ]
   }
@@ -103,7 +121,9 @@ export function IssueCollectorForm({
 
   const finalFields = (): IRadioGroupFormField[] => {
     if (declaration.event === Event.Death) {
-      return commonFields
+      return commonFieldsForBirthAndDeath
+    } else if (declaration.event === Event.Marriage) {
+      return fieldsForMarriage
     }
     const declarationData = declaration.data
     const filteredData = [{ ...fields[0] }]
@@ -118,7 +138,8 @@ export function IssueCollectorForm({
       declarationData.father &&
       declarationData.father.detailsExist
 
-    if (!fatherDataExists && !motherDataExists) return commonFields
+    if (!fatherDataExists && !motherDataExists)
+      return commonFieldsForBirthAndDeath
 
     if (!fatherDataExists) {
       filteredData[0].options = filteredData[0].options.filter(

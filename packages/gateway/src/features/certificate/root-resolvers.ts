@@ -20,7 +20,11 @@ import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getCertificateSVG(_, { status = null, event = null }, authHeader) {
+    async getCertificateSVG(
+      _,
+      { status = null, event = null },
+      { headers: authHeader }
+    ) {
       let payload: IGetCertificatePayload = {}
       if (status) {
         payload = { ...payload, status }
@@ -38,7 +42,7 @@ export const resolvers: GQLResolver = {
       })
       return await res.json()
     },
-    async getActiveCertificatesSVG(_, {}, authHeader) {
+    async getActiveCertificatesSVG(_, {}, { headers: authHeader }) {
       const res = await fetch(
         `${APPLICATION_CONFIG_URL}getActiveCertificates`,
         {
@@ -54,7 +58,11 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createOrUpdateCertificateSVG(_, { certificateSVG = {} }, authHeader) {
+    async createOrUpdateCertificateSVG(
+      _,
+      { certificateSVG = {} },
+      { headers: authHeader }
+    ) {
       // Only natlsysadmin should be able to create certificate
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(

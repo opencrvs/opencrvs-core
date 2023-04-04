@@ -56,9 +56,13 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS,
+  PERFORMANCE_DASHBOARD,
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
+  SELECT_MARRIAGE_INFORMANT,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT
@@ -157,6 +161,14 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(SELECT_MARRIAGE_INFORMANT, {
+      declarationId
+    })
+  )
+}
+
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
 }
@@ -191,6 +203,16 @@ export function goToInformantNotification() {
 
 export function goToVSExport() {
   return push(VS_EXPORTS)
+}
+
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS)
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS)
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD)
 }
 
 export function goToAdvancedSearch() {

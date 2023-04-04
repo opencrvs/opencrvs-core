@@ -26,6 +26,7 @@ export type IRegisterFormState =
       registerForm: {
         birth: IForm
         death: IForm
+        marriage: IForm
       }
     }
 
@@ -51,6 +52,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 
       const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
       const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
+      const marriage = getConfiguredOrDefaultForm(formConfig, Event.Marriage)
 
       const preview = {
         viewType: 'preview' as const,
@@ -79,6 +81,13 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             ...death,
             sections: [
               ...death.sections,
+              { ...preview, id: DeathSection.Preview }
+            ]
+          },
+          marriage: {
+            ...marriage,
+            sections: [
+              ...marriage.sections,
               { ...preview, id: DeathSection.Preview }
             ]
           }

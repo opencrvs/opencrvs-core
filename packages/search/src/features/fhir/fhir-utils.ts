@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL } from '@search/constants'
+import { FLAGGED_AS_POTENTIAL_DUPLICATE, HEARTH_URL } from '@search/constants'
 import {
   IBirthCompositionBody,
   IDeathCompositionBody
@@ -59,6 +59,18 @@ export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
       (extension) => extension && extension.url === extensionUrl
     )
   )
+}
+
+export function findExtension(
+  url: string,
+  extensions: fhir.Extension[]
+): fhir.Extension | undefined {
+  const extension =
+    extensions &&
+    extensions.find((obj: fhir.Extension) => {
+      return obj.url === url
+    })
+  return extension
 }
 
 export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
@@ -239,8 +251,8 @@ export const getFromFhir = (suffix: string) => {
     })
 }
 
-export async function updateInHearth(payload: any, id?: string) {
-  const res = await fetch(`${HEARTH_URL}/Composition/${id}`, {
+export async function updateInHearth(suffix: string, payload: any) {
+  const res = await fetch(`${HEARTH_URL}${suffix}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
     headers: {
@@ -300,4 +312,49 @@ export async function getdeclarationJurisdictionIds(
     locationHirarchyIds.push(locationId.split('/')[1])
   }
   return locationHirarchyIds
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const taskBundle: fhir.Bundle = await fetchHearth(
+    `/Task?focus=Composition/${id}`
+  )
+  return taskBundle.entry?.[0]?.resource as fhir.Task
+}
+
+export async function addFlaggedAsPotentialDuplicate(
+  duplicatesIds: string,
+  compositionId: string
+) {
+  const task = await fetchTaskByCompositionIdFromHearth(compositionId)
+
+  const extension = {
+    url: FLAGGED_AS_POTENTIAL_DUPLICATE,
+    valueString: duplicatesIds
+  }
+
+  task.lastModified = new Date().toISOString()
+  task.extension = [...(task.extension ?? []), extension]
+
+  await updateInHearth(`/Task/${task.id}`, task)
+}
+
+export const fetchHearth = async <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+    method: method,
+    body,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `FHIR get to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+  return res.json()
 }

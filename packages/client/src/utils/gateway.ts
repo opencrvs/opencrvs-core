@@ -219,6 +219,7 @@ export type ApplicationConfiguration = {
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
+  MARRIAGE?: Maybe<Marriage>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -238,6 +239,7 @@ export type ApplicationConfigurationInput = {
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
+  MARRIAGE?: InputMaybe<MarriageInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -279,14 +281,17 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
+  Bride = 'BRIDE',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
   Father = 'FATHER',
+  Groom = 'GROOM',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
+  MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
   Mother = 'MOTHER',
   Other = 'OTHER',
   Parent = 'PARENT'
@@ -298,6 +303,7 @@ export enum AttachmentType {
   BurialReceipt = 'BURIAL_RECEIPT',
   CoronersReport = 'CORONERS_REPORT',
   HospitalCertificateOfDeath = 'HOSPITAL_CERTIFICATE_OF_DEATH',
+  MarriageNotice = 'MARRIAGE_NOTICE',
   MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   NationalId = 'NATIONAL_ID',
   NotificationOfBirth = 'NOTIFICATION_OF_BIRTH',
@@ -327,10 +333,6 @@ export type AuditLogItemBase = {
   practitionerId: Scalars['String']
   time: Scalars['String']
   userAgent: Scalars['String']
-}
-
-export enum AuthorizationStatus {
-  Anonymous = 'ANONYMOUS'
 }
 
 export type Avatar = {
@@ -602,6 +604,7 @@ export type CountryLogoInput = {
 export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
+  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
   registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
@@ -756,6 +759,12 @@ export type Dummy = {
   dummy: Scalars['String']
 }
 
+export type DuplicatesInfo = {
+  __typename?: 'DuplicatesInfo'
+  compositionId?: Maybe<Scalars['ID']>
+  trackingId?: Maybe<Scalars['String']>
+}
+
 export enum EducationType {
   FirstStageTertiaryIsced_5 = 'FIRST_STAGE_TERTIARY_ISCED_5',
   LowerSecondaryIsced_2 = 'LOWER_SECONDARY_ISCED_2',
@@ -779,7 +788,8 @@ export type Estimation = {
 
 export enum Event {
   Birth = 'birth',
-  Death = 'death'
+  Death = 'death',
+  Marriage = 'marriage'
 }
 
 export type EventMetrics = {
@@ -931,6 +941,7 @@ export type History = {
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  duplicateOf?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   ipAddress?: Maybe<Scalars['String']>
@@ -938,6 +949,7 @@ export type History = {
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  potentialDuplicates?: Maybe<Array<Scalars['String']>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
@@ -951,12 +963,14 @@ export type HumanName = {
   __typename?: 'HumanName'
   familyName?: Maybe<Scalars['String']>
   firstNames?: Maybe<Scalars['String']>
+  marriedLastName?: Maybe<Scalars['String']>
   use?: Maybe<Scalars['String']>
 }
 
 export type HumanNameInput = {
   familyName?: InputMaybe<Scalars['String']>
   firstNames?: InputMaybe<Scalars['String']>
+  marriedLastName?: InputMaybe<Scalars['String']>
   use?: InputMaybe<Scalars['String']>
 }
 
@@ -973,6 +987,7 @@ export enum IdentityIdType {
   DeathRegistrationNumber = 'DEATH_REGISTRATION_NUMBER',
   DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
+  MarriageRegistrationNumber = 'MARRIAGE_REGISTRATION_NUMBER',
   MosipUintoken = 'MOSIP_UINTOKEN',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
@@ -1001,6 +1016,7 @@ export enum ImageFit {
 }
 
 export enum InformantType {
+  Bride = 'BRIDE',
   Brother = 'BROTHER',
   Daughter = 'DAUGHTER',
   DaughterInLaw = 'DAUGHTER_IN_LAW',
@@ -1009,6 +1025,7 @@ export enum InformantType {
   Grandfather = 'GRANDFATHER',
   Grandmother = 'GRANDMOTHER',
   Grandson = 'GRANDSON',
+  Groom = 'GROOM',
   Informant = 'INFORMANT',
   LegalGuardian = 'LEGAL_GUARDIAN',
   Mother = 'MOTHER',
@@ -1043,7 +1060,7 @@ export type Location = {
   __typename?: 'Location'
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Address>
-  alias: Array<Scalars['String']>
+  alias?: Maybe<Array<Scalars['String']>>
   altitude?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
   geoData?: Maybe<Scalars['String']>
@@ -1051,11 +1068,11 @@ export type Location = {
   identifier?: Maybe<Array<Identifier>>
   latitude?: Maybe<Scalars['Float']>
   longitude?: Maybe<Scalars['Float']>
-  name: Scalars['String']
-  partOf: Scalars['String']
-  status: Scalars['String']
+  name?: Maybe<Scalars['String']>
+  partOf?: Maybe<Scalars['String']>
+  status?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
-  type: LocationType
+  type?: Maybe<LocationType>
 }
 
 export type LocationInput = {
@@ -1139,6 +1156,77 @@ export enum MaritalStatusType {
   Widowed = 'WIDOWED'
 }
 
+export type Marriage = {
+  __typename?: 'Marriage'
+  FEE?: Maybe<MarriageFee>
+  PRINT_IN_ADVANCE?: Maybe<Scalars['Boolean']>
+  REGISTRATION_TARGET?: Maybe<Scalars['Int']>
+}
+
+export type MarriageEventSearchSet = EventSearchSet & {
+  __typename?: 'MarriageEventSearchSet'
+  brideName?: Maybe<Array<Maybe<HumanName>>>
+  dateOfMarriage?: Maybe<Scalars['Date']>
+  groomName?: Maybe<Array<Maybe<HumanName>>>
+  id: Scalars['ID']
+  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
+  registration?: Maybe<RegistrationSearchSet>
+  type?: Maybe<Scalars['String']>
+}
+
+export type MarriageFee = {
+  __typename?: 'MarriageFee'
+  DELAYED?: Maybe<Scalars['Float']>
+  ON_TIME?: Maybe<Scalars['Float']>
+}
+
+export type MarriageFeeInput = {
+  DELAYED?: InputMaybe<Scalars['Float']>
+  ON_TIME?: InputMaybe<Scalars['Float']>
+}
+
+export type MarriageInput = {
+  FEE?: InputMaybe<MarriageFeeInput>
+  PRINT_IN_ADVANCE?: InputMaybe<Scalars['Boolean']>
+  REGISTRATION_TARGET?: InputMaybe<Scalars['Int']>
+}
+
+export type MarriageRegistration = EventRegistration & {
+  __typename?: 'MarriageRegistration'
+  _fhirIDMap?: Maybe<Scalars['Map']>
+  bride?: Maybe<Person>
+  createdAt?: Maybe<Scalars['Date']>
+  eventLocation?: Maybe<Location>
+  groom?: Maybe<Person>
+  history?: Maybe<Array<Maybe<History>>>
+  id: Scalars['ID']
+  questionnaire?: Maybe<Array<Maybe<QuestionnaireQuestion>>>
+  registration?: Maybe<Registration>
+  typeOfMarriage?: Maybe<MarriageType>
+  updatedAt?: Maybe<Scalars['Date']>
+  witnessOne?: Maybe<RelatedPerson>
+  witnessTwo?: Maybe<RelatedPerson>
+}
+
+export type MarriageRegistrationInput = {
+  _fhirIDMap?: InputMaybe<Scalars['Map']>
+  bride?: InputMaybe<PersonInput>
+  createdAt?: InputMaybe<Scalars['Date']>
+  eventLocation?: InputMaybe<LocationInput>
+  groom?: InputMaybe<PersonInput>
+  questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
+  registration?: InputMaybe<RegistrationInput>
+  typeOfMarriage?: InputMaybe<MarriageType>
+  updatedAt?: InputMaybe<Scalars['Date']>
+  witnessOne?: InputMaybe<RelatedPersonInput>
+  witnessTwo?: InputMaybe<RelatedPersonInput>
+}
+
+export enum MarriageType {
+  Monogamy = 'MONOGAMY',
+  Polygamy = 'POLYGAMY'
+}
+
 export type MedicalPractitioner = {
   __typename?: 'MedicalPractitioner'
   lastVisitDate?: Maybe<Scalars['Date']>
@@ -1198,6 +1286,7 @@ export type Mutation = {
   createDeathRegistration: CreatedIds
   createFormDataset?: Maybe<FormDatasetResponse>
   createFormDraft?: Maybe<FormDraft>
+  createMarriageRegistration: CreatedIds
   createNotification: Notification
   createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
   createOrUpdateUser: User
@@ -1215,17 +1304,23 @@ export type Mutation = {
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
+  markEventAsDuplicate: Scalars['ID']
+  markEventAsNotDuplicate: Scalars['ID']
   markEventAsReinstated?: Maybe<Reinstated>
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
+  markMarriageAsCertified: Scalars['ID']
+  markMarriageAsIssued: Scalars['ID']
+  markMarriageAsRegistered: MarriageRegistration
+  markMarriageAsValidated?: Maybe<Scalars['ID']>
   modifyDraftStatus?: Maybe<FormDraft>
-  notADuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
+  requestMarriageRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
   resetPasswordSMS?: Maybe<Scalars['String']>
   toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
@@ -1287,6 +1382,10 @@ export type MutationCreateFormDatasetArgs = {
 
 export type MutationCreateFormDraftArgs = {
   formDraft: FormDraftInput
+}
+
+export type MutationCreateMarriageRegistrationArgs = {
+  details: MarriageRegistrationInput
 }
 
 export type MutationCreateNotificationArgs = {
@@ -1364,6 +1463,20 @@ export type MutationMarkDeathAsVerifiedArgs = {
 }
 
 export type MutationMarkEventAsArchivedArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+}
+
+export type MutationMarkEventAsDuplicateArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  reason: Scalars['String']
+}
+
+export type MutationMarkEventAsNotDuplicateArgs = {
   id: Scalars['String']
 }
 
@@ -1381,13 +1494,28 @@ export type MutationMarkEventAsVoidedArgs = {
   reason: Scalars['String']
 }
 
-export type MutationModifyDraftStatusArgs = {
-  formDraft: FormDraftStatusModifyInput
+export type MutationMarkMarriageAsCertifiedArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
 }
 
-export type MutationNotADuplicateArgs = {
-  duplicateId: Scalars['String']
-  id: Scalars['String']
+export type MutationMarkMarriageAsIssuedArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkMarriageAsRegisteredArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationMarkMarriageAsValidatedArgs = {
+  details?: InputMaybe<MarriageRegistrationInput>
+  id: Scalars['ID']
+}
+
+export type MutationModifyDraftStatusArgs = {
+  formDraft: FormDraftStatusModifyInput
 }
 
 export type MutationReactivateSystemArgs = {
@@ -1413,6 +1541,11 @@ export type MutationRequestBirthRegistrationCorrectionArgs = {
 
 export type MutationRequestDeathRegistrationCorrectionArgs = {
   details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationRequestMarriageRegistrationCorrectionArgs = {
+  details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
@@ -1584,6 +1717,7 @@ export type Query = {
   fetchDeathRegistration?: Maybe<DeathRegistration>
   fetchEventRegistration?: Maybe<EventRegistration>
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
+  fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
@@ -1641,6 +1775,10 @@ export type QueryFetchLocationWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QueryFetchMarriageRegistrationArgs = {
+  id: Scalars['ID']
 }
 
 export type QueryFetchMonthWiseEventMetricsArgs = {
@@ -1892,6 +2030,9 @@ export type RecordDetails = BirthRegistration | DeathRegistration
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
+  FlaggedAsPotentialDuplicate = 'FLAGGED_AS_POTENTIAL_DUPLICATE',
+  MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
+  MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
@@ -1941,12 +2082,14 @@ export type Registration = {
   assignment?: Maybe<AssignmentData>
   attachments?: Maybe<Array<Maybe<Attachment>>>
   book?: Maybe<Scalars['String']>
+  brideSignature?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   contact?: Maybe<Scalars['String']>
   contactPhoneNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   draftId?: Maybe<Scalars['String']>
-  duplicates?: Maybe<Array<Maybe<Scalars['ID']>>>
+  duplicates?: Maybe<Array<Maybe<DuplicatesInfo>>>
+  groomSignature?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
@@ -1959,6 +2102,8 @@ export type Registration = {
   status?: Maybe<Array<Maybe<RegWorkflow>>>
   trackingId?: Maybe<Scalars['String']>
   type?: Maybe<RegistrationType>
+  witnessOneSignature?: Maybe<Scalars['String']>
+  witnessTwoSignature?: Maybe<Scalars['String']>
 }
 
 export type RegistrationCountResult = {
@@ -1971,12 +2116,14 @@ export type RegistrationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   attachments?: InputMaybe<Array<AttachmentInput>>
   book?: InputMaybe<Scalars['String']>
+  brideSignature?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
   contact?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
   contactRelationship?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
   draftId?: InputMaybe<Scalars['String']>
+  groomSignature?: InputMaybe<Scalars['String']>
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
   informantsSignature?: InputMaybe<Scalars['String']>
@@ -1989,6 +2136,8 @@ export type RegistrationInput = {
   status?: InputMaybe<Array<InputMaybe<RegWorkflowInput>>>
   trackingId?: InputMaybe<Scalars['String']>
   type?: InputMaybe<RegistrationType>
+  witnessOneSignature?: InputMaybe<Scalars['String']>
+  witnessTwoSignature?: InputMaybe<Scalars['String']>
 }
 
 export type RegistrationSearchSet = {
@@ -2011,7 +2160,8 @@ export type RegistrationSearchSet = {
 
 export enum RegistrationType {
   Birth = 'BIRTH',
-  Death = 'DEATH'
+  Death = 'DEATH',
+  Marriage = 'MARRIAGE'
 }
 
 export type Reinstated = {
@@ -2411,6 +2561,16 @@ export type RequestDeathRegistrationCorrectionMutation = {
   requestDeathRegistrationCorrection: string
 }
 
+export type RequestMarriageRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type RequestMarriageRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  requestMarriageRegistrationCorrection: string
+}
+
 export type FetchPersonQueryVariables = Exact<{
   identifier: Scalars['ID']
 }>
@@ -2755,9 +2915,9 @@ export type FetchUserQuery = {
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -2767,9 +2927,9 @@ export type FetchUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
-      status: string
+      name?: string | null
+      alias?: Array<string> | null
+      status?: string | null
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
@@ -2961,6 +3121,60 @@ export type SearchEventsQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -3100,14 +3314,14 @@ export type GetUserQuery = {
     primaryOffice?: {
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
     } | null
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
-      name: string
-      alias: Array<string>
+      name?: string | null
+      alias?: Array<string> | null
       identifier?: Array<{
         __typename?: 'Identifier'
         system?: string | null
@@ -3159,6 +3373,7 @@ export type CreateBirthRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -3204,13 +3419,13 @@ export type MarkBirthAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3239,6 +3454,9 @@ export type MarkEventAsVoidedMutation = {
 
 export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
 export type MarkEventAsArchivedMutation = {
@@ -3273,6 +3491,18 @@ export type SubmitMutationMutationVariables = Exact<{
 export type SubmitMutationMutation = {
   __typename?: 'Mutation'
   markEventAsUnassigned: string
+}
+
+export type MarkEventAsDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+  reason: Scalars['String']
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+}>
+
+export type MarkEventAsDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsDuplicate: string
 }
 
 export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
@@ -3429,11 +3659,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -3451,8 +3685,8 @@ export type FetchBirthRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3464,7 +3698,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3491,12 +3725,22 @@ export type FetchBirthRegistrationForReviewQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       reason?: string | null
+      duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3747,13 +3991,13 @@ export type FetchBirthRegistrationForCertificateQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3770,7 +4014,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3790,12 +4034,22 @@ export type FetchBirthRegistrationForCertificateQuery = {
       ipAddress?: string | null
       reason?: string | null
       otherReason?: string | null
+      duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -3884,6 +4138,7 @@ export type CreateDeathRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -3929,13 +4184,13 @@ export type MarkDeathAsRegisteredMutation = {
         location?: {
           __typename?: 'Location'
           id: string
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4109,10 +4364,14 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -4130,8 +4389,8 @@ export type FetchDeathRegistrationForReviewQuery = {
         } | null> | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4143,7 +4402,7 @@ export type FetchDeathRegistrationForReviewQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4171,12 +4430,22 @@ export type FetchDeathRegistrationForReviewQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       reason?: string | null
+      duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4394,6 +4663,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
@@ -4404,13 +4678,13 @@ export type FetchDeathRegistrationForCertificationQuery = {
         } | null> | null
         location?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
         } | null
         office?: {
           __typename?: 'Location'
-          name: string
-          alias: Array<string>
+          name?: string | null
+          alias?: Array<string> | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4427,7 +4701,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
     eventLocation?: {
       __typename?: 'Location'
       id: string
-      type: LocationType
+      type?: LocationType | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -4448,12 +4722,22 @@ export type FetchDeathRegistrationForCertificationQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
+      duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
       } | null
-      location?: { __typename?: 'Location'; id: string; name: string } | null
-      office?: { __typename?: 'Location'; id: string; name: string } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
@@ -4530,6 +4814,710 @@ export type FetchDeathRegistrationForCertificationQuery = {
       } | null> | null
     } | null> | null
   } | null
+}
+
+export type CreateMarriageRegistrationMutationVariables = Exact<{
+  details: MarriageRegistrationInput
+}>
+
+export type CreateMarriageRegistrationMutation = {
+  __typename?: 'Mutation'
+  createMarriageRegistration: {
+    __typename?: 'CreatedIds'
+    trackingId?: string | null
+    compositionId?: string | null
+  }
+}
+
+export type MarkMarriageAsValidatedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsValidatedMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsValidated?: string | null
+}
+
+export type MarkMarriageAsRegisteredMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsRegisteredMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsRegistered: {
+    __typename?: 'MarriageRegistration'
+    id: string
+    registration?: {
+      __typename?: 'Registration'
+      id?: string | null
+      status?: Array<{
+        __typename?: 'RegWorkflow'
+        id: string
+        type?: RegStatus | null
+        timestamp?: any | null
+        user?: {
+          __typename?: 'User'
+          id: string
+          systemRole: SystemRoleType
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+        } | null
+        location?: {
+          __typename?: 'Location'
+          id: string
+          name?: string | null
+          alias?: Array<string> | null
+        } | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+      } | null> | null
+    } | null
+  }
+}
+
+export type MarkMarriageAsCertifiedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsCertifiedMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsCertified: string
+}
+
+export type MarkMarriageAsIssuedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: MarriageRegistrationInput
+}>
+
+export type MarkMarriageAsIssuedMutation = {
+  __typename?: 'Mutation'
+  markMarriageAsIssued: string
+}
+
+export type FetchMarriageRegistrationForReviewQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type FetchMarriageRegistrationForReviewQuery = {
+  __typename?: 'Query'
+  fetchMarriageRegistration?: {
+    __typename?: 'MarriageRegistration'
+    _fhirIDMap?: any | null
+    id: string
+    typeOfMarriage?: MarriageType | null
+    bride?: {
+      __typename?: 'Person'
+      id?: string | null
+      birthDate?: string | null
+      maritalStatus?: MaritalStatusType | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      nationality?: Array<string | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+        marriedLastName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: AddressType | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
+      } | null> | null
+    } | null
+    groom?: {
+      __typename?: 'Person'
+      id?: string | null
+      birthDate?: string | null
+      maritalStatus?: MaritalStatusType | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      nationality?: Array<string | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+        marriedLastName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: AddressType | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
+      } | null> | null
+    } | null
+    witnessOne?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      individual?: {
+        __typename?: 'Person'
+        id?: string | null
+        identifier?: Array<{
+          __typename?: 'IdentityType'
+          id?: string | null
+          type?: IdentityIdType | null
+          otherType?: string | null
+        } | null> | null
+        name?: Array<{
+          __typename?: 'HumanName'
+          use?: string | null
+          firstNames?: string | null
+          familyName?: string | null
+        } | null> | null
+      } | null
+    } | null
+    witnessTwo?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      individual?: {
+        __typename?: 'Person'
+        id?: string | null
+        identifier?: Array<{
+          __typename?: 'IdentityType'
+          id?: string | null
+          type?: IdentityIdType | null
+          otherType?: string | null
+        } | null> | null
+        name?: Array<{
+          __typename?: 'HumanName'
+          use?: string | null
+          firstNames?: string | null
+          familyName?: string | null
+        } | null> | null
+      } | null
+    } | null
+    registration?: {
+      __typename?: 'Registration'
+      id?: string | null
+      informantType?: InformantType | null
+      otherInformantType?: string | null
+      contact?: string | null
+      contactRelationship?: string | null
+      contactPhoneNumber?: string | null
+      groomSignature?: string | null
+      brideSignature?: string | null
+      witnessOneSignature?: string | null
+      witnessTwoSignature?: string | null
+      type?: RegistrationType | null
+      trackingId?: string | null
+      registrationNumber?: string | null
+      mosipAid?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
+      attachments?: Array<{
+        __typename?: 'Attachment'
+        data?: string | null
+        type?: AttachmentType | null
+        contentType?: string | null
+        subject?: AttachmentSubject | null
+      } | null> | null
+      status?: Array<{
+        __typename?: 'RegWorkflow'
+        type?: RegStatus | null
+        timestamp?: any | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
+      } | null> | null
+    } | null
+    eventLocation?: {
+      __typename?: 'Location'
+      id: string
+      address?: {
+        __typename?: 'Address'
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null
+    } | null
+    questionnaire?: Array<{
+      __typename?: 'QuestionnaireQuestion'
+      fieldId?: string | null
+      value?: string | null
+    } | null> | null
+    history?: Array<{
+      __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
+      date?: any | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
+      statusReason?: {
+        __typename?: 'StatusReason'
+        text?: string | null
+      } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      user?: {
+        __typename?: 'User'
+        id: string
+        systemRole: SystemRoleType
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
+        name: Array<{
+          __typename?: 'HumanName'
+          firstNames?: string | null
+          familyName?: string | null
+          use?: string | null
+        }>
+        avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+      } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
+      } | null
+      comments?: Array<{
+        __typename?: 'Comment'
+        comment?: string | null
+        createdAt?: any | null
+        user?: {
+          __typename?: 'User'
+          id: string
+          username?: string | null
+          avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+        } | null
+      } | null> | null
+      input?: Array<{
+        __typename?: 'InputOutput'
+        valueCode?: string | null
+        valueId?: string | null
+        valueString?: string | null
+      } | null> | null
+      output?: Array<{
+        __typename?: 'InputOutput'
+        valueCode?: string | null
+        valueId?: string | null
+        valueString?: string | null
+      } | null> | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          individual?: {
+            __typename?: 'Person'
+            name?: Array<{
+              __typename?: 'HumanName'
+              use?: string | null
+              firstNames?: string | null
+              familyName?: string | null
+            } | null> | null
+            telecom?: Array<{
+              __typename?: 'ContactPoint'
+              system?: string | null
+              value?: string | null
+              use?: string | null
+            } | null> | null
+          } | null
+        } | null
+      } | null> | null
+    } | null> | null
+  } | null
+}
+
+export type FetchMarriageRegistrationForCertificateQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type FetchMarriageRegistrationForCertificateQuery = {
+  __typename?: 'Query'
+  fetchMarriageRegistration?: {
+    __typename?: 'MarriageRegistration'
+    _fhirIDMap?: any | null
+    id: string
+    typeOfMarriage?: MarriageType | null
+    bride?: {
+      __typename?: 'Person'
+      id?: string | null
+      birthDate?: string | null
+      maritalStatus?: MaritalStatusType | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      nationality?: Array<string | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+        marriedLastName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: AddressType | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
+      } | null> | null
+    } | null
+    groom?: {
+      __typename?: 'Person'
+      id?: string | null
+      birthDate?: string | null
+      maritalStatus?: MaritalStatusType | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      dateOfMarriage?: any | null
+      nationality?: Array<string | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+        marriedLastName?: string | null
+      } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: AddressType | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+      telecom?: Array<{
+        __typename?: 'ContactPoint'
+        system?: string | null
+        value?: string | null
+      } | null> | null
+    } | null
+    witnessOne?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      individual?: {
+        __typename?: 'Person'
+        id?: string | null
+        identifier?: Array<{
+          __typename?: 'IdentityType'
+          id?: string | null
+          type?: IdentityIdType | null
+          otherType?: string | null
+        } | null> | null
+        name?: Array<{
+          __typename?: 'HumanName'
+          use?: string | null
+          firstNames?: string | null
+          familyName?: string | null
+        } | null> | null
+      } | null
+    } | null
+    witnessTwo?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      individual?: {
+        __typename?: 'Person'
+        id?: string | null
+        identifier?: Array<{
+          __typename?: 'IdentityType'
+          id?: string | null
+          type?: IdentityIdType | null
+          otherType?: string | null
+        } | null> | null
+        name?: Array<{
+          __typename?: 'HumanName'
+          use?: string | null
+          firstNames?: string | null
+          familyName?: string | null
+        } | null> | null
+      } | null
+    } | null
+    registration?: {
+      __typename?: 'Registration'
+      id?: string | null
+      informantType?: InformantType | null
+      otherInformantType?: string | null
+      contact?: string | null
+      contactRelationship?: string | null
+      contactPhoneNumber?: string | null
+      groomSignature?: string | null
+      brideSignature?: string | null
+      witnessOneSignature?: string | null
+      witnessTwoSignature?: string | null
+      type?: RegistrationType | null
+      trackingId?: string | null
+      registrationNumber?: string | null
+      mosipAid?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
+      attachments?: Array<{
+        __typename?: 'Attachment'
+        data?: string | null
+        type?: AttachmentType | null
+        contentType?: string | null
+        subject?: AttachmentSubject | null
+      } | null> | null
+      status?: Array<{
+        __typename?: 'RegWorkflow'
+        type?: RegStatus | null
+        timestamp?: any | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
+      } | null> | null
+    } | null
+    eventLocation?: {
+      __typename?: 'Location'
+      id: string
+      address?: {
+        __typename?: 'Address'
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null
+    } | null
+    questionnaire?: Array<{
+      __typename?: 'QuestionnaireQuestion'
+      fieldId?: string | null
+      value?: string | null
+    } | null> | null
+    history?: Array<{
+      __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
+      date?: any | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
+      statusReason?: {
+        __typename?: 'StatusReason'
+        text?: string | null
+      } | null
+      location?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      office?: {
+        __typename?: 'Location'
+        id: string
+        name?: string | null
+      } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      user?: {
+        __typename?: 'User'
+        id: string
+        systemRole: SystemRoleType
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
+        name: Array<{
+          __typename?: 'HumanName'
+          firstNames?: string | null
+          familyName?: string | null
+          use?: string | null
+        }>
+        avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+      } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
+      } | null
+      comments?: Array<{
+        __typename?: 'Comment'
+        comment?: string | null
+        createdAt?: any | null
+        user?: {
+          __typename?: 'User'
+          id: string
+          username?: string | null
+          avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+        } | null
+      } | null> | null
+      input?: Array<{
+        __typename?: 'InputOutput'
+        valueCode?: string | null
+        valueId?: string | null
+        valueString?: string | null
+      } | null> | null
+      output?: Array<{
+        __typename?: 'InputOutput'
+        valueCode?: string | null
+        valueId?: string | null
+        valueString?: string | null
+      } | null> | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          individual?: {
+            __typename?: 'Person'
+            name?: Array<{
+              __typename?: 'HumanName'
+              use?: string | null
+              firstNames?: string | null
+              familyName?: string | null
+            } | null> | null
+            telecom?: Array<{
+              __typename?: 'ContactPoint'
+              system?: string | null
+              value?: string | null
+              use?: string | null
+            } | null> | null
+          } | null
+        } | null
+      } | null> | null
+    } | null> | null
+  } | null
+}
+
+export type MarkEventAsNotDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsNotDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsNotDuplicate: string
 }
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {
@@ -4634,9 +5622,67 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
   } | null> | null
 }
 
+type EventSearchFields_MarriageEventSearchSet_Fragment = {
+  __typename?: 'MarriageEventSearchSet'
+  dateOfMarriage?: any | null
+  id: string
+  type?: string | null
+  brideName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  groomName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  registration?: {
+    __typename?: 'RegistrationSearchSet'
+    status?: string | null
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates?: Array<string | null> | null
+    createdAt?: string | null
+    modifiedAt?: string | null
+    assignment?: {
+      __typename?: 'AssignmentData'
+      userId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+    } | null
+  } | null
+  operationHistories?: Array<{
+    __typename?: 'OperationHistorySearchSet'
+    operationType?: string | null
+    operatedOn?: any | null
+    operatorRole?: string | null
+    operatorOfficeName?: string | null
+    operatorOfficeAlias?: Array<string | null> | null
+    notificationFacilityName?: string | null
+    notificationFacilityAlias?: Array<string | null> | null
+    rejectReason?: string | null
+    rejectComment?: string | null
+    operatorName?: Array<{
+      __typename?: 'HumanName'
+      firstNames?: string | null
+      familyName?: string | null
+      use?: string | null
+    } | null> | null
+  } | null> | null
+}
+
 export type EventSearchFieldsFragment =
   | EventSearchFields_BirthEventSearchSet_Fragment
   | EventSearchFields_DeathEventSearchSet_Fragment
+  | EventSearchFields_MarriageEventSearchSet_Fragment
 
 export type RegistrationHomeQueryVariables = Exact<{
   declarationLocationId: Scalars['String']
@@ -4716,6 +5762,62 @@ export type RegistrationHomeQuery = {
           id: string
           type?: string | null
           deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
             familyName?: string | null
@@ -4867,6 +5969,62 @@ export type RegistrationHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -4930,6 +6088,62 @@ export type RegistrationHomeQuery = {
           id: string
           type?: string | null
           deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
             familyName?: string | null
@@ -5081,6 +6295,62 @@ export type RegistrationHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -5144,6 +6414,62 @@ export type RegistrationHomeQuery = {
           id: string
           type?: string | null
           deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
             familyName?: string | null
@@ -5295,6 +6621,62 @@ export type RegistrationHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -5402,6 +6784,62 @@ export type RegistrationHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -5465,6 +6903,62 @@ export type RegistrationHomeQuery = {
           id: string
           type?: string | null
           deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
             familyName?: string | null
@@ -5628,6 +7122,62 @@ export type FieldAgentHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -5735,6 +7285,62 @@ export type FieldAgentHomeQuery = {
             } | null> | null
           } | null> | null
         }
+      | {
+          __typename?: 'MarriageEventSearchSet'
+          dateOfMarriage?: any | null
+          id: string
+          type?: string | null
+          brideName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          groomName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
       | null
     > | null
   } | null
@@ -5778,10 +7384,14 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -5810,10 +7420,60 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
+          assignment?: {
+            __typename?: 'AssignmentData'
+            userId?: string | null
+            firstName?: string | null
+            lastName?: string | null
+            officeName?: string | null
+          } | null
+        } | null
+      }
+    | {
+        __typename?: 'MarriageRegistration'
+        id: string
+        bride?: {
+          __typename?: 'Person'
+          id?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        groom?: {
+          __typename?: 'Person'
+          id?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        registration?: {
+          __typename?: 'Registration'
+          id?: string | null
+          type?: RegistrationType | null
+          trackingId?: string | null
+          status?: Array<{
+            __typename?: 'RegWorkflow'
+            type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -5928,6 +7588,16 @@ export type UpdateApplicationConfigMutation = {
       PRINT_IN_ADVANCE?: boolean | null
       FEE?: {
         __typename?: 'DeathFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+    MARRIAGE?: {
+      __typename?: 'Marriage'
+      REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
+      FEE?: {
+        __typename?: 'MarriageFee'
         ON_TIME?: number | null
         DELAYED?: number | null
       } | null
@@ -6301,7 +7971,7 @@ export type HasChildLocationQuery = {
   hasChildLocation?: {
     __typename?: 'Location'
     id: string
-    type: LocationType
+    type?: LocationType | null
     identifier?: Array<{
       __typename?: 'Identifier'
       system?: string | null
@@ -6402,6 +8072,15 @@ export type GetEventsWithProgressQuery = {
           firstNames?: string | null
           familyName?: string | null
         }>
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
       } | null
       progressReport?: {
         __typename?: 'EventProgressData'
@@ -6439,7 +8118,7 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           home: number
           healthFacility: number
-          location: { __typename?: 'Location'; name: string }
+          location: { __typename?: 'Location'; name?: string | null }
         }>
       }
     | {
@@ -6454,9 +8133,18 @@ export type GetRegistrationsListByFilterQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
             primaryOffice?: {
               __typename?: 'Location'
-              name: string
+              name?: string | null
               id: string
             } | null
             name: Array<{
@@ -6608,9 +8296,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -6637,7 +8325,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -6662,9 +8350,9 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
-          name: string
+          name?: string | null
           description?: string | null
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             city?: string | null
@@ -6691,7 +8379,7 @@ export type FetchRecordDetailsForVerificationQuery = {
             }>
             catchmentArea?: Array<{
               __typename?: 'Location'
-              name: string
+              name?: string | null
             }> | null
           } | null
         } | null> | null
@@ -6848,7 +8536,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             line?: Array<string | null> | null
@@ -6872,11 +8560,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null
@@ -6894,8 +8586,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -6919,9 +8611,13 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string
@@ -7126,7 +8822,7 @@ export type FetchViewRecordByCompositionQuery = {
         eventLocation?: {
           __typename?: 'Location'
           id: string
-          type: LocationType
+          type?: LocationType | null
           address?: {
             __typename?: 'Address'
             type?: AddressType | null
@@ -7151,11 +8847,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null
@@ -7173,8 +8873,8 @@ export type FetchViewRecordByCompositionQuery = {
             } | null> | null
             office?: {
               __typename?: 'Location'
-              name: string
-              alias: Array<string>
+              name?: string | null
+              alias?: Array<string> | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -7198,9 +8898,297 @@ export type FetchViewRecordByCompositionQuery = {
           location?: {
             __typename?: 'Location'
             id: string
-            name: string
+            name?: string | null
           } | null
-          office?: { __typename?: 'Location'; id: string; name: string } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
+          user?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: { __typename?: 'Role'; _id: string }
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              data: string
+              type: string
+            } | null
+          } | null
+          signature?: {
+            __typename?: 'Signature'
+            data?: string | null
+            type?: string | null
+          } | null
+          comments?: Array<{
+            __typename?: 'Comment'
+            comment?: string | null
+            createdAt?: any | null
+            user?: {
+              __typename?: 'User'
+              id: string
+              username?: string | null
+              avatar?: {
+                __typename?: 'Avatar'
+                data: string
+                type: string
+              } | null
+            } | null
+          } | null> | null
+          input?: Array<{
+            __typename?: 'InputOutput'
+            valueCode?: string | null
+            valueId?: string | null
+            valueString?: string | null
+          } | null> | null
+          output?: Array<{
+            __typename?: 'InputOutput'
+            valueCode?: string | null
+            valueId?: string | null
+            valueString?: string | null
+          } | null> | null
+          certificates?: Array<{
+            __typename?: 'Certificate'
+            hasShowedVerifiedDocument?: boolean | null
+            collector?: {
+              __typename?: 'RelatedPerson'
+              relationship?: string | null
+              otherRelationship?: string | null
+              individual?: {
+                __typename?: 'Person'
+                name?: Array<{
+                  __typename?: 'HumanName'
+                  use?: string | null
+                  firstNames?: string | null
+                  familyName?: string | null
+                } | null> | null
+                telecom?: Array<{
+                  __typename?: 'ContactPoint'
+                  system?: string | null
+                  value?: string | null
+                  use?: string | null
+                } | null> | null
+              } | null
+            } | null
+          } | null> | null
+        } | null> | null
+      }
+    | {
+        __typename: 'MarriageRegistration'
+        _fhirIDMap?: any | null
+        id: string
+        typeOfMarriage?: MarriageType | null
+        bride?: {
+          __typename?: 'Person'
+          id?: string | null
+          birthDate?: string | null
+          maritalStatus?: MaritalStatusType | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          dateOfMarriage?: any | null
+          nationality?: Array<string | null> | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+            marriedLastName?: string | null
+          } | null> | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: IdentityIdType | null
+            otherType?: string | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: AddressType | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+          } | null> | null
+        } | null
+        groom?: {
+          __typename?: 'Person'
+          id?: string | null
+          birthDate?: string | null
+          maritalStatus?: MaritalStatusType | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          dateOfMarriage?: any | null
+          nationality?: Array<string | null> | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+            marriedLastName?: string | null
+          } | null> | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: IdentityIdType | null
+            otherType?: string | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: AddressType | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+          } | null> | null
+        } | null
+        witnessOne?: {
+          __typename?: 'RelatedPerson'
+          id?: string | null
+          relationship?: string | null
+          otherRelationship?: string | null
+          individual?: {
+            __typename?: 'Person'
+            id?: string | null
+            identifier?: Array<{
+              __typename?: 'IdentityType'
+              id?: string | null
+              type?: IdentityIdType | null
+              otherType?: string | null
+            } | null> | null
+            name?: Array<{
+              __typename?: 'HumanName'
+              use?: string | null
+              firstNames?: string | null
+              familyName?: string | null
+            } | null> | null
+          } | null
+        } | null
+        witnessTwo?: {
+          __typename?: 'RelatedPerson'
+          id?: string | null
+          relationship?: string | null
+          otherRelationship?: string | null
+          individual?: {
+            __typename?: 'Person'
+            id?: string | null
+            identifier?: Array<{
+              __typename?: 'IdentityType'
+              id?: string | null
+              type?: IdentityIdType | null
+              otherType?: string | null
+            } | null> | null
+            name?: Array<{
+              __typename?: 'HumanName'
+              use?: string | null
+              firstNames?: string | null
+              familyName?: string | null
+            } | null> | null
+          } | null
+        } | null
+        eventLocation?: {
+          __typename?: 'Location'
+          id: string
+          address?: {
+            __typename?: 'Address'
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null
+        } | null
+        questionnaire?: Array<{
+          __typename?: 'QuestionnaireQuestion'
+          fieldId?: string | null
+          value?: string | null
+        } | null> | null
+        registration?: {
+          __typename?: 'Registration'
+          id?: string | null
+          informantType?: InformantType | null
+          otherInformantType?: string | null
+          contact?: string | null
+          contactRelationship?: string | null
+          contactPhoneNumber?: string | null
+          type?: RegistrationType | null
+          trackingId?: string | null
+          registrationNumber?: string | null
+          mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
+          attachments?: Array<{
+            __typename?: 'Attachment'
+            data?: string | null
+            type?: AttachmentType | null
+            contentType?: string | null
+            subject?: AttachmentSubject | null
+          } | null> | null
+          status?: Array<{
+            __typename?: 'RegWorkflow'
+            type?: RegStatus | null
+            timestamp?: any | null
+            comments?: Array<{
+              __typename?: 'Comment'
+              comment?: string | null
+            } | null> | null
+            office?: {
+              __typename?: 'Location'
+              name?: string | null
+              alias?: Array<string> | null
+              address?: {
+                __typename?: 'Address'
+                district?: string | null
+                state?: string | null
+              } | null
+            } | null
+          } | null> | null
+        } | null
+        history?: Array<{
+          __typename?: 'History'
+          date?: any | null
+          action?: RegAction | null
+          regStatus?: RegStatus | null
+          dhis2Notification?: boolean | null
+          ipAddress?: string | null
+          reason?: string | null
+          statusReason?: {
+            __typename?: 'StatusReason'
+            text?: string | null
+          } | null
+          location?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
+          office?: {
+            __typename?: 'Location'
+            id: string
+            name?: string | null
+          } | null
           user?: {
             __typename?: 'User'
             id: string

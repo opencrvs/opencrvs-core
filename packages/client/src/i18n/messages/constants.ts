@@ -52,6 +52,7 @@ interface IConstantsMessages
   dateOfDeclaration: MessageDescriptor
   death: MessageDescriptor
   deaths: MessageDescriptor
+  marriage: MessageDescriptor
   declared: MessageDescriptor
   dob: MessageDescriptor
   dod: MessageDescriptor
@@ -59,6 +60,8 @@ interface IConstantsMessages
   downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
+  registeredAt: MessageDescriptor
+  registeredBy: MessageDescriptor
   lastUpdated: MessageDescriptor
   startedAt: MessageDescriptor
   startedBy: MessageDescriptor
@@ -81,6 +84,7 @@ interface IConstantsMessages
   name: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
+  newMarriageRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
   noResults: MessageDescriptor
   pendingConnection: MessageDescriptor
@@ -158,6 +162,8 @@ interface IConstantsMessages
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
+  duplicateOf: MessageDescriptor
+  matchedTo: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -379,6 +385,16 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the deaths event',
     id: 'constants.deaths'
   },
+  marriage: {
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event',
+    id: 'constants.marriage'
+  },
+  marriages: {
+    defaultMessage: 'Marriages',
+    description: 'A label from the marriages event',
+    id: 'constants.marriages'
+  },
   declared: {
     defaultMessage: 'submitted',
     description: 'A label for submitted',
@@ -413,6 +429,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Event',
     description: 'Label for table header column Event type',
     id: 'constants.eventType'
+  },
+  registeredAt: {
+    defaultMessage: 'Registered at',
+    description: 'Label for comparison row registeredAt type',
+    id: 'constants.registeredAt'
+  },
+  registeredBy: {
+    defaultMessage: 'Registered by',
+    description: 'Label for comparison row registeredBy type',
+    id: 'constants.registeredBy'
   },
   lastUpdated: {
     defaultMessage: 'Last updated',
@@ -523,6 +549,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'register.selectInformant.newDeathRegistration',
     defaultMessage: 'New death declaration',
     description: 'The title that appears for new death registrations'
+  },
+  newMarriageRegistration: {
+    id: 'register.selectInformant.newMarriageRegistration',
+    defaultMessage: 'New marriage declaration',
+    description: 'The title that appears for new marriage registrations'
   },
   noNameProvided: {
     defaultMessage: 'No name provided',
@@ -924,6 +955,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Refresh',
     description: 'label for refresh',
     id: 'constants.refresh'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'constants.duplicateOf'
+  },
+  matchedTo: {
+    defaultMessage: 'Matched to',
+    description: 'table header for `Matched to` in record audit',
+    id: 'constants.matchedTo'
   }
 }
 
@@ -1010,6 +1051,11 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.death',
     defaultMessage: 'Death',
     description: 'A label from the death event'
+  },
+  marriage: {
+    id: 'constants.marriage',
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event'
   },
   father: {
     id: 'form.field.label.informantRelation.father',

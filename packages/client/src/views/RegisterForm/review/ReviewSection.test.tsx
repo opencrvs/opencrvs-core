@@ -23,7 +23,8 @@ import {
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
@@ -87,6 +88,12 @@ const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Death,
+  REJECTED
+)
+const rejectedDraftMarriage = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.Marriage,
   REJECTED
 )
 
@@ -264,7 +271,30 @@ describe('when in device of large viewport', () => {
     })
   })
 
-  describe('when user is in the review page to validator birth declaration', () => {
+  describe('when user is in the review page for rejected marriage declaration', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={rejectedDraftMarriage}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('Should not click the Reject Declaration', async () => {
+      const rejectButton = reviewSectionComponent.find(
+        '#rejectDeclarationBtn'
+      ).length
+      expect(rejectButton).toEqual(0)
+    })
+  })
+
+  describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
@@ -455,6 +485,17 @@ describe('when in device of large viewport', () => {
               ]
             }
           ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: MarriageSection.Groom,
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
+              viewType: 'form' as ViewType,
+              groups: []
+            }
+          ]
         }
       })
 
@@ -556,6 +597,17 @@ describe('when in device of large viewport', () => {
               id: DeathSection.Deceased,
               name: formMessages.deceasedTitle,
               title: formMessages.deceasedTitle,
+              viewType: 'form' as ViewType,
+              groups: []
+            }
+          ]
+        },
+        marriage: {
+          sections: [
+            {
+              id: MarriageSection.Groom,
+              name: formMessages.groomName,
+              title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
               groups: []
             }
@@ -668,6 +720,17 @@ describe('when in device of small viewport', () => {
             id: DeathSection.Deceased,
             name: formMessages.deceasedTitle,
             title: formMessages.deceasedTitle,
+            viewType: 'form' as ViewType,
+            groups: []
+          }
+        ]
+      },
+      marriage: {
+        sections: [
+          {
+            id: MarriageSection.Groom,
+            name: formMessages.groomName,
+            title: formMessages.groomTitle,
             viewType: 'form' as ViewType,
             groups: []
           }

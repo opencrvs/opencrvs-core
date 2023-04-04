@@ -253,7 +253,6 @@ export const minAgeGapExist = (
     (new Date(first).getTime() - new Date(second).getTime()) /
     (1000 * 60 * 60 * 24) /
     365
-
   return diff >= minAgeGap
 }
 
@@ -343,8 +342,8 @@ export const checkBirthDate =
   }
 
 export const checkMarriageDate =
-  (birthDate: string): Validation =>
-  (value: IFormFieldValue) => {
+  (minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
     const cast = value as string
     if (!isAValidDateFormat(cast)) {
       return {
@@ -359,16 +358,62 @@ export const checkMarriageDate =
         message: messages.dateFormat
       }
     }
+    const groomDOB =
+      drafts && drafts.groom && String(drafts.groom.groomBirthDate)
+    const brideDOB =
+      drafts && drafts.bride && String(drafts.bride.brideBirthDate)
 
-    if (!birthDate || !isAValidDateFormat(birthDate)) {
+    if (!groomDOB || !brideDOB) {
       return undefined
-    }
-
-    return mDate > new Date(birthDate)
-      ? undefined
-      : {
+    } else {
+      if (
+        !minAgeGapExist(cast, groomDOB, minAge) ||
+        !minAgeGapExist(cast, brideDOB, minAge)
+      ) {
+        return {
+          message: messages.illegalMarriageAge
+        }
+      } else if (mDate < new Date(groomDOB) && mDate < new Date(brideDOB)) {
+        return {
           message: messages.domLaterThanDob
         }
+      } else {
+        return undefined
+      }
+    }
+  }
+
+export const isValidDateOfBirthForMarriage =
+  (sectionName: string, minAge: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const isExactDateOfBirthUnknown =
+      drafts &&
+      drafts[sectionName] &&
+      drafts[sectionName].exactDateOfBirthUnknown
+    const cast = isExactDateOfBirthUnknown
+      ? convertAgeToDate(value as string)
+      : (value as string)
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
+      }
+    } else if (!isDateNotInFuture(cast)) {
+      return { message: messages.isValidBirthDate }
+    }
+
+    if (
+      !minAgeGapExist(
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
+        String(value),
+        minAge
+      )
+    ) {
+      return {
+        message: messages.illegalMarriageAge
+      }
+    } else {
+      return undefined
+    }
   }
 
 export const dateGreaterThan =
@@ -468,13 +513,10 @@ export const isValidBengaliWord = (value: string): boolean => {
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
   const englishRe = XRegExp.cache(
-    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)',
+    `(^[\\p{Latin}0-9'._-]*\\([\\p{Latin}0-9'._-]+\\)[\\p{Latin}0-9'._-]*$)|(^[\\p{Latin}0-9'._-]+$)`,
     ''
   )
-
-  const englishApostrophe = XRegExp.cache(`[p{Nd}'_]+`, '')
-
-  return englishRe.test(value) || englishApostrophe.test(value)
+  return englishRe.test(value)
 }
 
 type Checker = (value: string) => boolean

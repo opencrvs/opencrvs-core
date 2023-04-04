@@ -53,9 +53,10 @@ const messagesToDefine = {
     id: 'validations.emailAddressFormat'
   },
   englishOnlyNameFormat: {
-    defaultMessage: 'Must contain only English characters',
+    defaultMessage:
+      'Input contains invalid characters. Please use only letters (a-z), numbers (0-9), hyphens (-), and underscores (_)',
     description:
-      'The error message that appears when a non English character is used in an English name',
+      'The error message that appears when a non English character except numbers, hyphens and underscores is used in an English name',
     id: 'validations.englishOnlyNameFormat'
   },
   facilityMustBeSelected: {
@@ -117,6 +118,12 @@ const messagesToDefine = {
     description:
       'The error message appears when the informant is not old enough to register an event',
     id: 'validations.isInformantOfLegalAge'
+  },
+  illegalMarriageAge: {
+    defaultMessage: 'Illegal age of marriage',
+    description:
+      'The error message appears when the birth date is not old enough to register for marriage',
+    id: 'validations.illegalMarriageAge'
   },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',

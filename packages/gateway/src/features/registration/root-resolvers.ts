@@ -18,7 +18,12 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID,
+  VERIFIED_EXTENSION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -42,22 +47,19 @@ import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
   GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import {
-  AUTH_URL,
-  COUNTRY_CONFIG_URL,
-  FHIR_URL,
-  SEARCH_URL
-} from '@gateway/constants'
+import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
   validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments
+  validateDeathDeclarationAttachments,
+  validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 
 async function getAnonymousToken() {
@@ -75,7 +77,11 @@ export const resolvers: GQLResolver = {
     }
   },
   Query: {
-    async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
+    async searchBirthRegistrations(
+      _,
+      { fromDate, toDate },
+      { headers: authHeader }
+    ) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('User does not have a sysadmin scope')
@@ -94,7 +100,11 @@ export const resolvers: GQLResolver = {
         type.coding?.some(({ code }) => code === 'birth-declaration')
       )
     },
-    async searchDeathRegistrations(_, { fromDate, toDate }, authHeader) {
+    async searchDeathRegistrations(
+      _,
+      { fromDate, toDate },
+      { headers: authHeader }
+    ) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('User does not have a sysadmin scope')
@@ -113,7 +123,7 @@ export const resolvers: GQLResolver = {
         type.coding?.some(({ code }) => code === 'death-declaration')
       )
     },
-    async fetchBirthRegistration(_, { id }, authHeader) {
+    async fetchBirthRegistration(_, { id }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -126,7 +136,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchDeathRegistration(_, { id }, authHeader) {
+    async fetchDeathRegistration(_, { id }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -139,7 +149,24 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
+    async fetchMarriageRegistration(_, { id }, { headers: authHeader }) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare')
+      ) {
+        return await markRecordAsDownloadedOrAssigned(id, authHeader)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
+    async queryRegistrationByIdentifier(
+      _,
+      { identifier },
+      { headers: authHeader }
+    ) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -165,10 +192,10 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRegistration(_, { id }, authHeader) {
+    async fetchRegistration(_, { id }, { headers: authHeader }) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
-    async fetchRegistrationForViewing(_, { id }, authHeader) {
+    async fetchRegistrationForViewing(_, { id }, { headers: authHeader }) {
       const taskEntry = await getTaskEntry(id, authHeader)
       const extension = { url: VIEWED_EXTENSION_URL }
       const taskBundle = taskBundleWithExtension(taskEntry, extension)
@@ -176,7 +203,7 @@ export const resolvers: GQLResolver = {
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return fetchFHIR(`/Composition/${id}`, authHeader)
     },
-    async queryPersonByIdentifier(_, { identifier }, authHeader) {
+    async queryPersonByIdentifier(_, { identifier }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -198,7 +225,11 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async queryPersonByNidIdentifier(_, { dob, nid, country }, authHeader) {
+    async queryPersonByNidIdentifier(
+      _,
+      { dob, nid, country },
+      { headers: authHeader }
+    ) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -230,7 +261,7 @@ export const resolvers: GQLResolver = {
     async fetchRegistrationCountByStatus(
       _,
       { locationId, status, event },
-      authHeader
+      { headers: authHeader }
     ) {
       if (
         hasScope(authHeader, 'register') ||
@@ -282,18 +313,18 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordDetailsForVerification(_, { id }, context) {
+    async fetchRecordDetailsForVerification(_, { id }, { headers }) {
       try {
         const token = await getAnonymousToken()
-        context.Authorization = `Bearer ${token}`
+        headers.Authorization = `Bearer ${token}`
         const authHeader = {
-          Authorization: context.Authorization
+          Authorization: headers.Authorization
         }
         const taskEntry = await getTaskEntry(id, authHeader)
 
         const taskBundle = taskBundleWithExtension(taskEntry, {
           url: VERIFIED_EXTENSION_URL,
-          valueString: context['x-real-ip']
+          valueString: headers['x-real-ip']
         })
         await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
@@ -309,7 +340,7 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createBirthRegistration(_, { details }, authHeader) {
+    async createBirthRegistration(_, { details }, { headers: authHeader }) {
       try {
         await validateBirthDeclarationAttachments(details)
       } catch (error) {
@@ -318,7 +349,7 @@ export const resolvers: GQLResolver = {
 
       return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
     },
-    async createDeathRegistration(_, { details }, authHeader) {
+    async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
         await validateDeathDeclarationAttachments(details)
       } catch (error) {
@@ -327,7 +358,16 @@ export const resolvers: GQLResolver = {
 
       return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
     },
-    async updateBirthRegistration(_, { details }, authHeader) {
+    async createMarriageRegistration(_, { details }, { headers: authHeader }) {
+      try {
+        await validateMarriageDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.MARRIAGE)
+    },
+    async updateBirthRegistration(_, { details }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -343,7 +383,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markBirthAsValidated(_, { id, details }, authHeader) {
+    async markBirthAsValidated(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -361,7 +401,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markDeathAsValidated(_, { id, details }, authHeader) {
+    async markDeathAsValidated(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -378,7 +418,25 @@ export const resolvers: GQLResolver = {
         details
       )
     },
-    async markBirthAsRegistered(_, { id, details }, authHeader) {
+    async markMarriageAsValidated(_, { id, details }, { headers: authHeader }) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
+      } else {
+        return await markEventAsValidated(
+          id,
+          authHeader,
+          EVENT_TYPE.MARRIAGE,
+          details
+        )
+      }
+    },
+    async markBirthAsRegistered(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -391,7 +449,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markDeathAsRegistered(_, { id, details }, authHeader) {
+    async markDeathAsRegistered(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -409,7 +467,33 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markEventAsVoided(_, { id, reason, comment }, authHeader) {
+    async markMarriageAsRegistered(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (hasScope(authHeader, 'register')) {
+        return markEventAsRegistered(
+          id,
+          authHeader,
+          EVENT_TYPE.MARRIAGE,
+          details
+        )
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register scope')
+        )
+      }
+    },
+    async markEventAsVoided(
+      _,
+      { id, reason, comment },
+      { headers: authHeader }
+    ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -428,10 +512,15 @@ export const resolvers: GQLResolver = {
       )
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsArchived(_, { id }, authHeader) {
+    async markEventAsArchived(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      { headers: authHeader }
+    ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -444,13 +533,16 @@ export const resolvers: GQLResolver = {
       const taskEntry = await getTaskEntry(id, authHeader)
       const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
-        GQLRegStatus.ARCHIVED
+        GQLRegStatus.ARCHIVED,
+        reason,
+        comment,
+        duplicateTrackingId
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsReinstated(_, { id }, authHeader) {
+    async markEventAsReinstated(_, { id }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -484,21 +576,21 @@ export const resolvers: GQLResolver = {
         registrationStatus: prevRegStatus
       }
     },
-    async markBirthAsCertified(_, { id, details }, authHeader) {
+    async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markBirthAsIssued(_, { id, details }, authHeader) {
+    async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsIssued(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markDeathAsCertified(_, { id, details }, authHeader) {
+    async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -507,7 +599,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markDeathAsIssued(_, { id, details }, authHeader) {
+    async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsIssued(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -516,44 +608,55 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async notADuplicate(_, { id, duplicateId }, authHeader) {
+    async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsCertified(
+          details,
+          authHeader,
+          EVENT_TYPE.MARRIAGE
+        )
+      } else {
+        return Promise.reject(new Error('User does not have a certify scope'))
+      }
+    },
+    async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
+      if (hasScope(authHeader, 'certify')) {
+        return await markEventAsIssued(details, authHeader, EVENT_TYPE.MARRIAGE)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a certify scope')
+        )
+      }
+    },
+    async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition = await fetchFHIR(
+        const composition: fhir.Composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
           'GET'
         )
-        removeDuplicatesFromComposition(composition, id, duplicateId)
+        await removeDuplicatesFromComposition(composition, id)
+        const compositionEntry: fhir.BundleEntry = {
+          resource: composition
+        }
 
-        await fetch(`${SEARCH_URL}/events/not-duplicate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`Search request failed: ${error.message}`)
-          )
-        })
+        const taskEntry = await getTaskEntry(id, authHeader)
 
-        await fetch(`${FHIR_URL}/Composition/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`FHIR request failed: ${error.message}`)
-          )
-        })
-
+        const extension: fhir.Extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const taskBundle = taskBundleWithExtension(taskEntry, extension)
+        const payloadBundle: fhir.Bundle = {
+          ...taskBundle,
+          entry: [compositionEntry, ...taskBundle.entry]
+        }
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(payloadBundle)
+        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -561,7 +664,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markEventAsUnassigned(_, { id }, authHeader) {
+    async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
       if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -574,12 +677,55 @@ export const resolvers: GQLResolver = {
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       // return the taskId
       return taskEntry.resource.id
+    },
+    async markEventAsDuplicate(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      { headers: authHeader }
+    ) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const extension: fhir.Extension = { url: MARKED_AS_DUPLICATE }
+
+      if (comment || reason) {
+        if (!taskEntry.resource.reason) {
+          taskEntry.resource.reason = {
+            text: ''
+          }
+        }
+
+        taskEntry.resource.reason.text = reason || ''
+        const statusReason: fhir.CodeableConcept = {
+          text: comment
+        }
+        taskEntry.resource.statusReason = statusReason
+      }
+
+      if (duplicateTrackingId) {
+        extension.valueString = duplicateTrackingId
+      }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      return taskEntry.resource.id
     }
   }
 }
 
 async function createEventRegistration(
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
@@ -587,33 +733,53 @@ async function createEventRegistration(
   const draftId =
     details && details.registration && details.registration.draftId
 
-  const duplicateCompostion =
-    draftId && (await lookForDuplicate(draftId, authHeader))
+  const existingComposition =
+    draftId && (await lookForComposition(draftId, authHeader))
 
-  if (duplicateCompostion) {
+  if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
-        duplicateCompostion,
+        existingComposition,
         event,
         false,
         authHeader
       )
     } else {
       // return tracking-id
-      return await getDeclarationIds(duplicateCompostion, authHeader)
+      return await getDeclarationIds(existingComposition, authHeader)
     }
   }
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  if (hasScope(authHeader, 'register')) {
+
+  /*
+   * Some custom logic added here. If you are a registar and
+   * we flagged the declaration as a duplicate, we push the declaration into
+   * "Ready for review" queue and not ready to print.
+   */
+  const hasDuplicates = Boolean(
+    doc.entry
+      .find((entry) => entry.resource.resourceType === 'Composition')
+      ?.resource?.extension?.find(
+        (ext) =>
+          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+          ext.valueBoolean
+      )
+  )
+
+  if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
-    // return tracking-id
-    return await getDeclarationIdsFromResponse(res, authHeader)
+    // return tracking-id and potential duplicates
+    const ids = await getDeclarationIdsFromResponse(res, authHeader)
+    return {
+      ...ids,
+      isPotentiallyDuplicate: hasDuplicates
+    }
   }
 }
 
-export async function lookForDuplicate(
+export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {
@@ -662,15 +828,18 @@ async function markEventAsRegistered(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
 
-  return res
+  return composition
 }
 
 async function markEventAsCertified(
@@ -703,7 +872,11 @@ const ACTION_EXTENSIONS = [
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  DUPLICATE_TRACKING_ID,
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {

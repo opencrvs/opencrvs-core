@@ -149,10 +149,6 @@ const LocationSearchFormField = styled(LocationSearch)`
   ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
     width: 344px;
   }`}
-
-  & > input {
-    border-radius: 0;
-  }
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -233,7 +229,8 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled ?? disabled,
     error: Boolean(error),
     touched: Boolean(touched),
-    placeholder: fieldDefinition.placeholder
+    placeholder: fieldDefinition.placeholder,
+    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
   }
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (

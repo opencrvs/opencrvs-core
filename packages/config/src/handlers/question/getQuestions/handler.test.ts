@@ -11,10 +11,11 @@
  */
 import { createServer } from '@config/server'
 import Question, { IQuestion } from '@config/models/question'
+import FormDataset from '@config/models/formDataset'
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
+import fetch from 'node-fetch'
 import { readFileSync } from 'fs'
-
 const token = jwt.sign(
   { scope: ['natlsysadmin'] },
   readFileSync('../auth/test/cert.key'),
@@ -99,11 +100,13 @@ describe('getQuestions', () => {
 
   beforeEach(async () => {
     mockingoose.resetAll()
+    ;(fetch as unknown as jest.Mock).mockResolvedValue([])
     server = await createServer()
   })
 
   it('get question using mongoose', async () => {
     mockingoose(Question).toReturn(mockQuestions, 'find')
+    mockingoose(FormDataset).toReturn([], 'find')
 
     const res = await server.server.inject({
       method: 'GET',

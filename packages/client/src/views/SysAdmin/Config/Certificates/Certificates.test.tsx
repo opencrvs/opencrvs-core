@@ -101,9 +101,12 @@ describe('ConfigHome page when already has uploaded certificate template', async
   })
 
   describe('certificate page test', () => {
-    it('should show birth, and death tab button', async () => {
+    it('should show birth, death and marriage tab button', async () => {
       expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Births')
       expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Deaths')
+      expect(testComponent.find('#tab_marriage').hostNodes().text()).toBe(
+        'Marriages'
+      )
     })
 
     it('shows default birth certificate template text', () => {
@@ -231,6 +234,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
     it('should render preview certificate template when clicked on preview', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+
       await waitForElement(testComponent, '#preview_image_field')
 
       expect(
@@ -255,6 +259,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
+
       expect(printCertificateSpy).toBeCalledTimes(1)
     })
 

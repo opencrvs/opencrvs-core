@@ -93,7 +93,7 @@ import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
-const DEFAULT_INPUT_WIDTH = 100
+const DEFAULT_INPUT_WIDTH = 0
 
 const CInputField = styled(InputField)`
   label {

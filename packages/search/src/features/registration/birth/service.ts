@@ -16,7 +16,7 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  detectDuplicates,
+  detectBirthDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
@@ -27,7 +27,8 @@ import {
   REJECTED_STATUS,
   VALIDATED_STATUS,
   REGISTERED_STATUS,
-  CERTIFIED_STATUS
+  CERTIFIED_STATUS,
+  ARCHIVED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -41,10 +42,12 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   addEventLocation,
-  getdeclarationJurisdictionIds
+  getdeclarationJurisdictionIds,
+  addFlaggedAsPotentialDuplicate
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -135,13 +138,14 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexAndSearchComposition(
@@ -150,7 +154,7 @@ async function indexAndSearchComposition(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
     createdAt:
@@ -162,9 +166,13 @@ async function indexAndSearchComposition(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
-  if (body.type !== 'IN_PROGRESS') {
-    await detectAndUpdateDuplicates(compositionId, composition, body)
+  await indexComposition(compositionId, body, client)
+  if (
+    body.type !== 'IN_PROGRESS' &&
+    body.type !== 'WAITING_VALIDATION' &&
+    body.type !== 'VALIDATED'
+  ) {
+    await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }
 
@@ -404,23 +412,29 @@ async function createDeclarationIndex(
   body.updatedBy = regLastUser
 }
 
-async function detectAndUpdateDuplicates(
+async function detectAndUpdateBirthDuplicates(
   compositionId: string,
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionId, body)
+  const duplicates = await detectBirthDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }
   logger.info(
-    `Search/service: ${duplicates.length} duplicate composition(s) found`
+    `Search/service:birth: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
-async function updateCompositionWithDuplicates(
+export async function updateCompositionWithDuplicates(
   composition: fhir.Composition,
   duplicates: string[]
 ) {
@@ -435,12 +449,15 @@ async function updateCompositionWithDuplicates(
   if (composition && composition.id) {
     const body: ICompositionBody = {}
     body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body)
+    await updateComposition(composition.id, body, client)
   }
   const compositionFromFhir = (await getCompositionById(
     composition.id as string
   )) as fhir.Composition
   addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
 
-  return updateInHearth(compositionFromFhir, compositionFromFhir.id)
+  return updateInHearth(
+    `/Composition/${compositionFromFhir.id}`,
+    compositionFromFhir
+  )
 }

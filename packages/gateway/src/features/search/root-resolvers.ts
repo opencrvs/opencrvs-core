@@ -78,7 +78,7 @@ export const resolvers: GQLResolver = {
         sortColumn,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       const searchCriteria: ISearchCriteria = {
         sort,
@@ -174,16 +174,8 @@ export const resolvers: GQLResolver = {
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
         return {
-          totalItems:
-            (searchResult &&
-              searchResult.body.hits &&
-              searchResult.body.hits.total.value) ||
-            0,
-          results:
-            (searchResult &&
-              searchResult.body.hits &&
-              searchResult.body.hits.hits) ||
-            []
+          totalItems: searchResult?.body?.hits?.total?.value || 0,
+          results: searchResult?.body?.hits?.hits || []
         }
       }
     },
@@ -197,7 +189,7 @@ export const resolvers: GQLResolver = {
         skip,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
         return await Promise.reject(
@@ -226,18 +218,8 @@ export const resolvers: GQLResolver = {
       const searchResult: ApiResponse<ISearchResponse<any>> =
         await postAdvancedSearch(authHeader, searchCriteria)
       return {
-        totalItems:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.total.value) ||
-          0,
-        results:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.hits) ||
-          []
+        totalItems: searchResult?.body?.hits?.total?.value || 0,
+        results: searchResult?.body?.hits?.hits || []
       }
     }
   }

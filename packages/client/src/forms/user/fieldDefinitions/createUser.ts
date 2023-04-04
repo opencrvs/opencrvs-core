@@ -216,13 +216,7 @@ export const userSectionFormType: ISerializedFormSection = {
     {
       id: 'signature-attachment',
       title: userFormMessages.userSignatureAttachmentTitle,
-      conditionals: [
-        {
-          action: 'hide',
-          expression:
-            'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
-        }
-      ],
+      conditionals: [],
       fields: [
         {
           name: 'attachmentTitle',
@@ -240,7 +234,7 @@ export const userSectionFormType: ISerializedFormSection = {
           description: userFormMessages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
-          required: true,
+          required: false,
           validator: []
         }
       ]
