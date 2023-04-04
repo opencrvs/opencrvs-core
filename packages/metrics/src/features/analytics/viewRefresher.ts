@@ -458,6 +458,62 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
         },
         {
           $lookup: {
+            from: 'Practitioner',
+            localField: 'firstTask.extensionsObject.regLastUser',
+            foreignField: 'id',
+            as: 'declaredPerson'
+          }
+        },
+        { $unwind: '$declaredPerson' },
+        { $unwind: '$declaredPerson.name' },
+        {
+          $addFields: {
+            practitionerRoleForJoining: {
+              $concat: ['Practitioner/', '$declaredPerson.id']
+            },
+            declaredPersonFirstname: {
+              $reduce: {
+                input: '$declaredPerson.name.given',
+                initialValue: '',
+                in: { $concat: ['$$value', ' ', '$$this'] }
+              }
+            },
+            declaredPersonFamilyname: {
+              $cond: {
+                if: {
+                  $isArray: '$declaredPerson.name.family'
+                },
+                then: {
+                  $reduce: {
+                    input: '$declaredPerson.name.family',
+                    initialValue: '',
+                    in: { $concat: ['$$value', ' ', '$$this'] }
+                  }
+                },
+                else: '$declaredPerson.name.family'
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'PractitionerRole',
+            localField: 'practitionerRoleForJoining',
+            foreignField: 'practitioner.reference',
+            as: 'declarationPersonRole'
+          }
+        },
+        { $unwind: '$declarationPersonRole' },
+        { $unwind: '$declarationPersonRole.code' },
+        { $unwind: '$declarationPersonRole.code.coding' },
+        {
+          $match: {
+            'declarationPersonRole.code.coding.system':
+              'http://opencrvs.org/specs/titles'
+          }
+        },
+        {
+          $lookup: {
             from: 'Location',
             localField: 'firstTask.extensionsObject.regLastOffice',
             foreignField: 'id',
@@ -528,6 +584,14 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
                 '$practitionerFamilyname',
                 ', ',
                 '$practitionerFirstname'
+              ]
+            },
+            declaredRole: '$declarationPersonRole.code.coding.code',
+            declaredName: {
+              $concat: [
+                '$declaredPersonFamilyname',
+                ', ',
+                '$declaredPersonFirstname'
               ]
             }
           }
@@ -716,7 +780,39 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
     .collection('Location')
     .aggregate(
       [
-        { $match: { 'identifier.1.value': 'STATE' } },
+        { $match: { 'identifier.1.value': 'DISTRICT' } },
+        {
+          $lookup: {
+            from: 'Location',
+            localField: 'partOf.reference',
+            foreignField: '_id',
+            as: 'state'
+          }
+        },
+        {
+          $addFields: {
+            stateId: {
+              $arrayElemAt: [{ $split: ['$partOf.reference', '/'] }, 1]
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'Location',
+            localField: 'stateId',
+            foreignField: 'id',
+            as: 'stateData'
+          }
+        },
+        {
+          $unwind: '$stateData'
+        },
+        {
+          $addFields: {
+            districtName: '$name',
+            stateName: '$stateData.name'
+          }
+        },
         {
           $addFields: {
             extensionsObject: {
@@ -750,8 +846,8 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
         { $unwind: '$extensionsObject.statistics-crude-birth-rates' },
         {
           $project: {
-            name: 1,
-
+            districtName: 1,
+            stateName: 1,
             populations: {
               $reduce: {
                 input: {
@@ -827,8 +923,11 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
         { $unwind: '$daysInYear' },
         {
           $project: {
-            _id: { $concat: [{ $toString: '$name' }, '$daysInYear.date'] },
-            name: 1,
+            _id: {
+              $concat: [{ $toString: '$districtName' }, '$daysInYear.date']
+            },
+            name: '$districtName',
+            stateName: '$stateName',
             date: { $dateFromString: { dateString: '$daysInYear.date' } },
             estimatedNumberOfBirths: '$daysInYear.estimatedNumberOfBirths',
             event: 'Birth'
