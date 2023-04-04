@@ -127,9 +127,13 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         groomSignature
+        groomSignatureURI
         brideSignature
+        brideSignatureURI
         witnessOneSignature
+        witnessOneSignatureURI
         witnessTwoSignature
+        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId
@@ -387,9 +391,13 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contactRelationship
         contactPhoneNumber
         groomSignature
+        groomSignatureURI
         brideSignature
+        brideSignatureURI
         witnessOneSignature
+        witnessOneSignatureURI
         witnessTwoSignature
+        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId

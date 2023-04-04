@@ -120,4 +120,9 @@ export function getDeathRegistrationSectionTransformer(
     transformedData[sectionId].informantsSignature =
       queryData[sectionId].informantsSignature
   }
+
+  if (queryData[sectionId].informantsSignatureURI) {
+    transformedData[sectionId].informantsSignatureURI =
+      queryData[sectionId].informantsSignatureURI
+  }
 }

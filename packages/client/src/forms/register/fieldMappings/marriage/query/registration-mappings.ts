@@ -40,17 +40,36 @@ export function getMarriageRegistrationSectionTransformer(
     transformedData[sectionId].groomSignature =
       queryData[sectionId].groomSignature
   }
+  if (queryData[sectionId].groomSignatureURI) {
+    transformedData[sectionId].groomSignatureURI =
+      queryData[sectionId].groomSignatureURI
+  }
+
   if (queryData[sectionId].brideSignature) {
     transformedData[sectionId].brideSignature =
       queryData[sectionId].brideSignature
   }
+  if (queryData[sectionId].brideSignatureURI) {
+    transformedData[sectionId].brideSignatureURI =
+      queryData[sectionId].brideSignatureURI
+  }
+
   if (queryData[sectionId].witnessOneSignature) {
     transformedData[sectionId].witnessOneSignature =
       queryData[sectionId].witnessOneSignature
   }
+  if (queryData[sectionId].witnessOneSignatureURI) {
+    transformedData[sectionId].witnessOneSignatureURI =
+      queryData[sectionId].witnessOneSignatureURI
+  }
+
   if (queryData[sectionId].witnessTwoSignature) {
     transformedData[sectionId].witnessTwoSignature =
       queryData[sectionId].witnessTwoSignature
+  }
+  if (queryData[sectionId].witnessTwoSignatureURI) {
+    transformedData[sectionId].witnessTwoSignatureURI =
+      queryData[sectionId].witnessTwoSignatureURI
   }
 
   if (queryData[sectionId].status) {

@@ -17613,6 +17613,18 @@
             "deprecationReason": null
           },
           {
+            "name": "brideSignatureURI",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "certificates",
             "description": null,
             "args": [],
@@ -17705,6 +17717,18 @@
             "deprecationReason": null
           },
           {
+            "name": "groomSignatureURI",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "id",
             "description": null,
             "args": [],
@@ -17742,6 +17766,18 @@
           },
           {
             "name": "informantsSignature",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "informantsSignatureURI",
             "description": null,
             "args": [],
             "type": {
@@ -17865,7 +17901,31 @@
             "deprecationReason": null
           },
           {
+            "name": "witnessOneSignatureURI",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "witnessTwoSignature",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "witnessTwoSignatureURI",
             "description": null,
             "args": [],
             "type": {

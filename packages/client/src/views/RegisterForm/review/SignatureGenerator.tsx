@@ -32,6 +32,7 @@ import {
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import SignatureCanvas from 'react-signature-canvas'
+import { isBase64FileString } from '@client/utils/commonUtils'
 
 const InputWrapper = styled.div`
   margin-top: 56px;
@@ -90,6 +91,11 @@ export function SignatureGenerator({
   const intl = useIntl()
   const allowedSignatureFormat = ['image/png']
 
+  const signatureData =
+    value && !isBase64FileString(value)
+      ? `${window.config.MINIO_URL}${value}`
+      : value
+
   function apply() {
     setSignatureDialogOpen(false)
     onChange(signatureValue)
@@ -105,7 +111,7 @@ export function SignatureGenerator({
           <ErrorMessage id="signature-upload-error">
             {signatureError && <ErrorText>{signatureError}</ErrorText>}
           </ErrorMessage>
-          {!value && (
+          {!signatureData && (
             <>
               <SecondaryButton
                 onClick={() => setSignatureDialogOpen(true)}
@@ -136,8 +142,10 @@ export function SignatureGenerator({
               />
             </>
           )}
-          {value && <SignaturePreview alt={label} src={value} />}
-          {value && (
+          {signatureData && (
+            <SignaturePreview alt={label} src={signatureData} />
+          )}
+          {signatureData && (
             <TertiaryButton onClick={() => onChange('')}>
               {intl.formatMessage(messages.signatureDelete)}
             </TertiaryButton>

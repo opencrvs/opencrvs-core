@@ -451,35 +451,135 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
-    informantsSignature: (task) => {
+    informantsSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        const fileName =
+          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
+        const response = (await fetchDocuments(
+          '/presigned-url',
+          authHeader,
+          'POST',
+          JSON.stringify({ fileName: fileName })
+        )) as { presignedURL: string }
+        return `/${MINIO_BUCKET}${
+          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+        }`
+      }
+      return null
+    },
+    informantsSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    groomSignature: (task) => {
+    groomSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        const fileName =
+          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
+        const response = (await fetchDocuments(
+          '/presigned-url',
+          authHeader,
+          'POST',
+          JSON.stringify({ fileName: fileName })
+        )) as { presignedURL: string }
+        return `/${MINIO_BUCKET}${
+          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+        }`
+      }
+      return null
+    },
+    groomSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    brideSignature: (task) => {
+    brideSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        const fileName =
+          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
+        const response = (await fetchDocuments(
+          '/presigned-url',
+          authHeader,
+          'POST',
+          JSON.stringify({ fileName: fileName })
+        )) as { presignedURL: string }
+        return `/${MINIO_BUCKET}${
+          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+        }`
+      }
+      return null
+    },
+    brideSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    witnessOneSignature: (task) => {
+    witnessOneSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        const fileName =
+          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
+        const response = (await fetchDocuments(
+          '/presigned-url',
+          authHeader,
+          'POST',
+          JSON.stringify({ fileName: fileName })
+        )) as { presignedURL: string }
+        return `/${MINIO_BUCKET}${
+          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+        }`
+      }
+      return null
+    },
+    witnessOneSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    witnessTwoSignature: (task) => {
+    witnessTwoSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        const fileName =
+          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
+        const response = (await fetchDocuments(
+          '/presigned-url',
+          authHeader,
+          'POST',
+          JSON.stringify({ fileName: fileName })
+        )) as { presignedURL: string }
+        return `/${MINIO_BUCKET}${
+          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
+        }`
+      }
+      return null
+    },
+    witnessTwoSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
         task.extension

@@ -34,20 +34,62 @@ export function setMarriageRegistrationSectionTransformer(
     }
 
     if (draftData[sectionId].groomSignature) {
-      transformedData[sectionId].groomSignature =
-        draftData[sectionId].groomSignature
+      const isMinioUrl =
+        String(draftData[sectionId].groomSignature).split('/').length > 1 &&
+        String(draftData[sectionId].groomSignature).split('/')[1] ===
+          window.config.MINIO_BUCKET
+
+      if (isMinioUrl) {
+        transformedData[sectionId].groomSignature =
+          draftData[sectionId].groomSignatureURI
+      } else {
+        transformedData[sectionId].groomSignature =
+          draftData[sectionId].groomSignature
+      }
     }
     if (draftData[sectionId].brideSignature) {
-      transformedData[sectionId].brideSignature =
-        draftData[sectionId].brideSignature
+      const isMinioUrl =
+        String(draftData[sectionId].brideSignature).split('/').length > 1 &&
+        String(draftData[sectionId].brideSignature).split('/')[1] ===
+          window.config.MINIO_BUCKET
+
+      if (isMinioUrl) {
+        transformedData[sectionId].brideSignature =
+          draftData[sectionId].brideSignatureURI
+      } else {
+        transformedData[sectionId].brideSignature =
+          draftData[sectionId].brideSignature
+      }
     }
     if (draftData[sectionId].witnessOneSignature) {
-      transformedData[sectionId].witnessOneSignature =
-        draftData[sectionId].witnessOneSignature
+      const isMinioUrl =
+        String(draftData[sectionId].witnessOneSignature).split('/').length >
+          1 &&
+        String(draftData[sectionId].witnessOneSignature).split('/')[1] ===
+          window.config.MINIO_BUCKET
+
+      if (isMinioUrl) {
+        transformedData[sectionId].witnessOneSignature =
+          draftData[sectionId].witnessOneSignatureURI
+      } else {
+        transformedData[sectionId].witnessOneSignature =
+          draftData[sectionId].witnessOneSignature
+      }
     }
     if (draftData[sectionId].witnessTwoSignature) {
-      transformedData[sectionId].witnessTwoSignature =
-        draftData[sectionId].witnessTwoSignature
+      const isMinioUrl =
+        String(draftData[sectionId].witnessTwoSignature).split('/').length >
+          1 &&
+        String(draftData[sectionId].witnessTwoSignature).split('/')[1] ===
+          window.config.MINIO_BUCKET
+
+      if (isMinioUrl) {
+        transformedData[sectionId].witnessTwoSignature =
+          draftData[sectionId].witnessTwoSignatureURI
+      } else {
+        transformedData[sectionId].witnessTwoSignature =
+          draftData[sectionId].witnessTwoSignature
+      }
     }
 
     if (!transformedData[sectionId].status) {
