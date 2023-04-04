@@ -219,7 +219,7 @@ const marriageRejectionChannel = {
     }
   ],
   name: 'Marriage Rejection',
-  urlPattern: '^/events/marriage/mark-void$'
+  urlPattern: '^/events/marriage/mark-voided$'
 }
 
 const marriageArchiveChannel = {

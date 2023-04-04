@@ -49,5 +49,6 @@ export {
   ChartLine,
   ChartBar,
   Eye,
+  MapPin,
   PaperPlaneTilt
 } from 'phosphor-react'

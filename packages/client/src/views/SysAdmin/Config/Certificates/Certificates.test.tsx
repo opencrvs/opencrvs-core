@@ -234,6 +234,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
     it('should render preview certificate template when clicked on preview', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+
       await waitForElement(testComponent, '#preview_image_field')
 
       expect(
@@ -258,6 +259,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
+
       expect(printCertificateSpy).toBeCalledTimes(1)
     })
 
