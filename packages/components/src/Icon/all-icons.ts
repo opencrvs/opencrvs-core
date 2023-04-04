@@ -49,5 +49,6 @@ export {
   CircleWavyQuestion,
   ChartLine,
   ChartBar,
+  MapPin,
   PaperPlaneTilt
 } from 'phosphor-react'

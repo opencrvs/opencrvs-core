@@ -184,7 +184,7 @@ export async function fhirWorkflowEventHandler(
     return h.response().code(401)
   }
 
-  if (event != Events.UNKNOWN && event != Events.EVENT_NOT_DUPLICATE) {
+  if (event !== Events.UNKNOWN && event !== Events.EVENT_NOT_DUPLICATE) {
     setupSystemIdentifier(request)
   }
 

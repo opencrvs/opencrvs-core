@@ -814,7 +814,7 @@ export const typeResolvers: GQLResolver = {
     latitude: (location) => location.position.latitude,
     alias: (location) => location.alias,
     description: (location) => location.description,
-    partOf: (location) => location.partOf,
+    partOf: (location) => location.partOf.reference,
     type: (location: fhir.Location) => {
       return (
         (location.type &&

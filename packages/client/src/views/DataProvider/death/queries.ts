@@ -146,6 +146,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type

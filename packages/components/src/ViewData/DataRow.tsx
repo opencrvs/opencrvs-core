@@ -24,7 +24,6 @@ const Container = styled.div`
   }
 `
 const DataContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBody};
   display: flex;
   flex-grow: 1;
   max-width: 90%;
@@ -35,7 +34,6 @@ const DataContainer = styled.div`
   }
 `
 const ValueContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBody};
   width: 100%;
 `
 const Label = styled.label`
