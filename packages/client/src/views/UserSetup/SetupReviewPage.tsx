@@ -46,6 +46,7 @@ import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -160,6 +161,8 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const onError = () => {
     setSubmitError(true)
   }
+  const isOnline = useOnlineStatus()
+
   return (
     <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
       mutation={activateUserMutation}
@@ -202,9 +205,16 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 ]}
               >
                 <GlobalError id="GlobalError">
-                  {submitError && (
+                  {submitError && isOnline && (
                     <WarningMessage>
                       {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                    </WarningMessage>
+                  )}
+                </GlobalError>
+                <GlobalError id="no-internet">
+                  {!isOnline && (
+                    <WarningMessage>
+                      {intl.formatMessage(errorMessages.noInternet)}
                     </WarningMessage>
                   )}
                 </GlobalError>
