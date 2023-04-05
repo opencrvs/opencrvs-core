@@ -42,6 +42,7 @@ export function generateHash(content: string, salt: string): string {
 }
 
 export function generateBcryptHash(content: string, salt: string): string {
+  //Beware, it will throw exceptions if salt version is not matched
   return bcrypt.hashSync(content, salt)
 }
 
