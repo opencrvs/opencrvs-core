@@ -12,7 +12,7 @@
 import { createServer } from '@user-mgnt/server'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-import { generateHash } from '@user-mgnt/utils/hash'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 
 import * as mockingoose from 'mockingoose'
 
@@ -38,22 +38,30 @@ const mockUser: Partial<IUser & { _id: string }> = {
   securityQuestionAnswers: [
     {
       questionKey: 'TEST_QUESTION_1',
-      answerHash: generateHash('correct answer for q1', '12345')
+      answerHash: generateBcryptHash(
+        'correct answer for q1',
+        '$2a$10$fyVfYYctO8oqs9euSvtgVe'
+      )
     },
     {
       questionKey: 'TEST_QUESTION_2',
-      answerHash: generateHash('correct answer for q2', '12345')
+      answerHash: generateBcryptHash(
+        'correct answer for q2',
+        '$2a$10$fyVfYYctO8oqs9euSvtgVe'
+      )
     },
     {
       questionKey: 'TEST_QUESTION_3',
-      answerHash: generateHash('correct answer for q3', '12345')
+      answerHash: generateBcryptHash(
+        'correct answer for q3',
+        '$2a$10$fyVfYYctO8oqs9euSvtgVe'
+      )
     }
   ],
   scope: ['register'],
   device: 'D444',
-  passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345'
+  passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+  salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
 }
 
 let server: any
