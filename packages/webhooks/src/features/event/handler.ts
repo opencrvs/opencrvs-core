@@ -270,7 +270,7 @@ export async function birthCertifiedHandler(
       for (const webhookToNotify of webhooks) {
         logger.info(
           `Queueing webhook ${webhookToNotify.trigger} ${
-            TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+            TRIGGERS[TRIGGERS.BIRTH_CERTIFIED]
           }`
         )
         const permissions = await fetchSystemPermissions(
