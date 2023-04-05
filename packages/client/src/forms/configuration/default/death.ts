@@ -735,7 +735,11 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               validate: [],
               conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
               ],
               mapping: {
                 mutation: {

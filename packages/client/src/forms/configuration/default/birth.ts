@@ -1116,7 +1116,11 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               validate: [],
               conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
               ],
               mapping: {
                 mutation: {
@@ -1527,6 +1531,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `values.motherNidVerification`
                 }
               ],
               mapping: {
@@ -2121,6 +2129,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `values.fatherNidVerification`
                 }
               ],
               mapping: {

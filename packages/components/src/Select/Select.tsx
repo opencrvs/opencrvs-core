@@ -53,7 +53,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     box-shadow: none;
     ${({ theme }) => theme.fonts.reg18};
     padding: 0 8px;
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
+    border: solid
+      ${({ theme, isDisabled }) =>
+        isDisabled ? theme.colors.grey300 : theme.colors.copy}
+      ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
     &:hover {
@@ -108,6 +111,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
       background: ${({ theme }) => theme.colors.primaryDark};
       color: ${({ theme }) => theme.colors.white};
     }
+  }
+
+  .react-select__single-value--is-disabled {
+    color: ${({ theme }) => theme.colors.copy};
   }
 
   .react-select__menu {
