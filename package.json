@@ -63,6 +63,6 @@
     "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
-    "@types/react": "^18.0.26"
+    "@types/react": "18.0.26"
   }
 }

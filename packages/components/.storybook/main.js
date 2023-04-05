@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-const { mergeConfig } = require('vite')
+const { mergeConfig } = require('vite');
+const remarkGfm = require('remark-gfm')
 
 const BRAND_BLUE =
   '#0058E0' /* See `theme.js`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
@@ -30,22 +31,32 @@ const viteFinal = async (config) => {
     }
   })
 }
-
 module.exports = {
   viteFinal,
   stories: [
     '../@(src|stories)/**/*.stories.mdx',
     '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
   ],
-  core: { builder: '@storybook/builder-vite' },
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
-    '@storybook/addon-a11y'
+    '@storybook/addon-a11y',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          }
+        }
+      }
+    }
   ],
   staticDirs: ['../public'],
-  framework: '@storybook/react',
-
+  framework: {
+    name: '@storybook/react-vite',
+    options: {}
+  },
   managerHead: (head) => {
     return `${head}
     <link rel="icon" href="favicon.png" />
@@ -55,5 +66,8 @@ module.exports = {
       }
     </style>
     `
+  },
+  docs: {
+    autodocs: true
   }
 }
