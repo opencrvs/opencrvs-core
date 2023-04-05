@@ -43,7 +43,7 @@ export default async function changePasswordHandler(
   }
   if (
     userUpdateData.existingPassword &&
-    user.status !== statuses.ACTIVE &&
+    user.status === statuses.ACTIVE &&
     validatePasswordHash(userUpdateData.existingPassword, user)
   ) {
     return await changePassword(userUpdateData, user, request, h)
@@ -55,21 +55,19 @@ export default async function changePasswordHandler(
     return await changePassword(userUpdateData, user, request, h)
   }
 
-  return h.response().code(400)
+  return h.response().code(401)
 }
 
 function validatePasswordHash(existingPassword: string, user: IUserModel) {
   try {
-    if (
-      generateHash(existingPassword!, user.salt) === user.passwordHash ||
-      generateBcryptHash(existingPassword!, user.salt) === user.passwordHash
-    ) {
-      return true
-    }
+    return (
+      generateHash(existingPassword, user.salt) === user.passwordHash ||
+      generateBcryptHash(existingPassword, user.salt) === user.passwordHash
+    )
   } catch (ex) {
     logger.error(`Invalid salt!`)
+    throw unauthorized()
   }
-  return false
 }
 
 async function changePassword(

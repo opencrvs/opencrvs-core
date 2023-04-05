@@ -55,8 +55,8 @@ test('verifyPassHandler should return 200 and the user scope when the user exist
   const entry = {
     mobile: '27555555555',
     passwordHash:
-      'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-    salt: '12345',
+      '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+    salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe',
     scope: ['test']
   }
   mockingoose(User).toReturn(entry, 'findOne')

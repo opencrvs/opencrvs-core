@@ -40,8 +40,11 @@ export default async function verifyPassByIdHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
-  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
+  try {
+    if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
+      throw unauthorized()
+    }
+  } catch (e) {
     throw unauthorized()
   }
 

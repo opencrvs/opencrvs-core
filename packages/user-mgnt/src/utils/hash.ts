@@ -42,7 +42,10 @@ export function generateHash(content: string, salt: string): string {
 }
 
 export function generateBcryptHash(content: string, salt: string): string {
-  return bcrypt.hashSync(content, salt)
+  console.log(salt)
+  const s = bcrypt.hashSync(content, salt)
+  console.log(s)
+  return s
 }
 
 export function generateBcryptSaltedHash(password: string): ISaltedHash {

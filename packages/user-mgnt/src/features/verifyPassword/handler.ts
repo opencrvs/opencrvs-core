@@ -15,6 +15,7 @@ import { unauthorized } from '@hapi/boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateBcryptHash, generateHash } from '@user-mgnt/utils/hash'
+import { logger } from '@user-mgnt/logger'
 
 interface IVerifyPayload {
   username: string
@@ -41,19 +42,22 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
-  if (
-    generateHash(password, user.salt) === user.passwordHash ||
-    generateBcryptHash(password, user.salt) === user.passwordHash
-  ) {
-    const response: IVerifyResponse = {
-      mobile: user.mobile,
-      scope: user.scope,
-      status: user.status,
-      id: user.id,
-      practitionerId: user.practitionerId
+  try {
+    if (
+      generateHash(password, user.salt) === user.passwordHash ||
+      generateBcryptHash(password, user.salt) === user.passwordHash
+    ) {
+      const response: IVerifyResponse = {
+        mobile: user.mobile,
+        scope: user.scope,
+        status: user.status,
+        id: user.id,
+        practitionerId: user.practitionerId
+      }
+      return response
     }
-    return response
+  } catch (err) {
+    logger.error(`Invalid salt!`)
   }
 
   throw unauthorized()

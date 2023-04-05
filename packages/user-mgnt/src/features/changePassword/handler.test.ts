@@ -47,9 +47,31 @@ const mockUser: Partial<IUser & { _id: string }> = {
   catchmentAreaIds: [],
   scope: ['register'],
   device: 'D444',
-  passwordHash:
-    'c6fdf98bdbb45fb987392b9c2e398cb1dc2915ccbfc7a7d48f9fa7d6b3f1844385517231e98662fbfee5806dcc7a2b0edd7b63cbcfb87efe7e51875ec3e41006',
-  salt: '17cbf362-6a16-4728-adda-6bc700af13b6'
+  passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+  salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
+}
+
+const mockExistingUser: Partial<IUser & { _id: string }> = {
+  _id: '5d10885374be318fa7689f0b',
+  name: [
+    {
+      use: 'en',
+      given: ['John', 'William'],
+      family: 'Doe'
+    }
+  ],
+  username: 'j.doe1',
+  identifiers: [{ system: 'NID', value: '1234' }],
+  email: 'j.doe@gmail.com',
+  mobile: '+880123445568',
+  systemRole: 'LOCAL_REGISTRAR',
+  status: 'active',
+  primaryOfficeId: '321',
+  catchmentAreaIds: [],
+  scope: ['register'],
+  device: 'D444',
+  passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+  salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
 }
 
 describe('changePassword handler', () => {
@@ -63,14 +85,14 @@ describe('changePassword handler', () => {
 
   it('change password for new users', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    mockingoose(User).toReturn({}, 'update')
+    mockingoose(User).toReturn({}, 'updateOne')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/changePassword',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        password: 'new_password'
+        password: 'test'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -96,7 +118,7 @@ describe('changePassword handler', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it.only('returns 400 for unable to update password', async () => {
+  it('returns 401 for unable to update password', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(User).toReturn({}, 'updateOne')
 
@@ -112,7 +134,7 @@ describe('changePassword handler', () => {
       }
     })
 
-    expect(res.statusCode).toBe(400)
+    expect(res.statusCode).toBe(401)
   })
 })
 
@@ -126,8 +148,8 @@ describe('changeUserPassword handler', () => {
   })
 
   it('Change password for logged-in user', async () => {
-    mockingoose(User).toReturn(mockUser, 'findOne')
-    mockingoose(User).toReturn({}, 'update')
+    mockingoose(User).toReturn(mockExistingUser, 'findOne')
+    mockingoose(User).toReturn({}, 'updateOne')
 
     const res = await server.server.inject({
       method: 'POST',
