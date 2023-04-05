@@ -21,7 +21,7 @@
     "react-select": "^2.0.0",
     "react-stickynode": "^2.1.1",
     "react-tooltip": "^4.2.21",
-    "recharts": "^1.4.0",
+    "recharts": "^2.5.0",
     "styled-components": "^5.2.0",
     "ts-jest": "26.4.4",
     "vite": "^3.0.0",
