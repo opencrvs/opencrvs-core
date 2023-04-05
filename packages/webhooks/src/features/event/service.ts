@@ -11,10 +11,11 @@
  */
 
 import * as crypto from 'crypto'
-import { FHIR_URL } from '@webhooks/constants'
+import { FHIR_URL, MINIO_URL } from '@webhooks/constants'
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { IAuthHeader } from '@webhooks/features/event/handler'
+import { fromBuffer } from 'file-type'
 
 export function createRequestSignature(
   requestSigningVersion: string,
@@ -179,9 +180,38 @@ async function getResourceBySection(
   // and searched to find which document is the visual identity MOSIP requires.
   const resource = resourceSection.entry[0].reference
   try {
-    return await getFromFhir(`/${resource}`, authHeader)
+    if (sectionCode === 'certificates') {
+      const fhirResponse = (await getFromFhir(
+        `/${resource}`,
+        authHeader
+      )) as fhir.DocumentReference
+      const minioObjectName = fhirResponse.content[0].attachment.data || ''
+      const base64Certificate = await getBase64DocumentFromMinio(
+        minioObjectName
+      )
+      fhirResponse.content[0].attachment.data = base64Certificate
+      return fhirResponse
+    } else {
+      return await getFromFhir(`/${resource}`, authHeader)
+    }
   } catch (error) {
     logger.error(`getting resource by identifer failed with error: ${error}`)
     throw new Error(error)
   }
+}
+
+async function getBase64DocumentFromMinio(minioDocumentName: string) {
+  const minioDocumentURL = new URL(`${minioDocumentName}`, MINIO_URL).toString()
+  const response = await fetch(minioDocumentURL)
+  const fileBuffer = await response.buffer()
+
+  // convert buffer to base64 string
+  const base64String = fileBuffer.toString('base64')
+
+  // get file type from buffer
+  const fileType = await fromBuffer(fileBuffer)
+  if (fileType) {
+    return `data:${fileType.mime};base64,${base64String}`
+  }
+  return `data:application/pdf;base64,${base64String}`
 }

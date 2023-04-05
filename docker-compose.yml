@@ -149,6 +149,7 @@ services:
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - MINIO_URL=http://minio:9000
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
