@@ -290,6 +290,7 @@ export interface GQLUser {
   mobile: string
   systemRole: GQLSystemRoleType
   role: GQLRole
+  title: string
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -621,6 +622,7 @@ export interface GQLUserInput {
   mobile: string
   systemRole: GQLSystemRoleType
   role?: string
+  title: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
@@ -1385,6 +1387,7 @@ export interface GQLQuestionInput {
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
+  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
@@ -1866,7 +1869,8 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  TIME = 'TIME'
 }
 
 export interface GQLConditionalInput {
@@ -4982,6 +4986,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   mobile?: UserToMobileResolver<TParent>
   systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
+  title?: UserToTitleResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
@@ -5060,6 +5065,15 @@ export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToRoleResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserToTitleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

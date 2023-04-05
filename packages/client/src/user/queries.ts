@@ -89,6 +89,7 @@ export const GET_USER = gql`
         firstNames
         familyName
       }
+      title
       username
       mobile
       identifier {

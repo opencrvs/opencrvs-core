@@ -44,6 +44,7 @@ const mockUser: IUser & { _id: string } = {
   status: 'pending',
   primaryOfficeId: '321',
   practitionerId: '123',
+  title: 'Test user',
   signature: {
     type: 'image/png',
     data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'

@@ -11,161 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IConstantsMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  countryName: MessageDescriptor
-  address: MessageDescriptor
-  allEvents: MessageDescriptor
-  allStatuses: MessageDescriptor
-  informantContactNumber: MessageDescriptor
-  declaration: MessageDescriptor
-  declarations: MessageDescriptor
-  declarationArchivedOn: MessageDescriptor
-  declarationCollectedOn: MessageDescriptor
-  declarationFailedOn: MessageDescriptor
-  declarationInformantLabel: MessageDescriptor
-  applicationName: MessageDescriptor
-  declarationRegisteredOn: MessageDescriptor
-  declarationRejectedOn: MessageDescriptor
-  declarationRequestedCorrectionOn: MessageDescriptor
-  declarationStarted: MessageDescriptor
-  declarationStartedBy: MessageDescriptor
-  declarationStartedOn: MessageDescriptor
-  declarationState: MessageDescriptor
-  declarationSubmittedOn: MessageDescriptor
-  declarationTitle: MessageDescriptor
-  declarationUpdatedOn: MessageDescriptor
-  declarationValidatedOn: MessageDescriptor
-  declarationSentForExternalValidationOn: MessageDescriptor
-  birth: MessageDescriptor
-  births: MessageDescriptor
-  by: MessageDescriptor
-  certificationPaymentTitle: MessageDescriptor
-  certified: MessageDescriptor
-  collected: MessageDescriptor
-  collectedBy: MessageDescriptor
-  comment: MessageDescriptor
-  certificateTitle: MessageDescriptor
-  applicationTitle: MessageDescriptor
-  formDeclarationTitle: MessageDescriptor
-  customTimePeriod: MessageDescriptor
-  dateOfDeclaration: MessageDescriptor
-  death: MessageDescriptor
-  deaths: MessageDescriptor
-  marriage: MessageDescriptor
-  declared: MessageDescriptor
-  dob: MessageDescriptor
-  dod: MessageDescriptor
-  downloading: MessageDescriptor
-  downloaded: MessageDescriptor
-  eventDate: MessageDescriptor
-  eventType: MessageDescriptor
-  registeredAt: MessageDescriptor
-  registeredBy: MessageDescriptor
-  lastUpdated: MessageDescriptor
-  startedAt: MessageDescriptor
-  startedBy: MessageDescriptor
-  export: MessageDescriptor
-  failedToSend: MessageDescriptor
-  from: MessageDescriptor
-  gender: MessageDescriptor
-  id: MessageDescriptor
-  issuedBy: MessageDescriptor
-  labelLanguage: MessageDescriptor
-  labelPassword: MessageDescriptor
-  labelPhone: MessageDescriptor
-  labelPin: MessageDescriptor
-  labelRole: MessageDescriptor
-  labelSystemRole: MessageDescriptor
-  last30Days: MessageDescriptor
-  last12Months: MessageDescriptor
-  lastEdited: MessageDescriptor
-  month: MessageDescriptor
-  name: MessageDescriptor
-  newBirthRegistration: MessageDescriptor
-  newDeathRegistration: MessageDescriptor
-  newMarriageRegistration: MessageDescriptor
-  noNameProvided: MessageDescriptor
-  noResults: MessageDescriptor
-  pendingConnection: MessageDescriptor
-  performanceTitle: MessageDescriptor
-  reason: MessageDescriptor
-  requestReason: MessageDescriptor
-  registered: MessageDescriptor
-  inReviewStatus: MessageDescriptor
-  incompleteStatus: MessageDescriptor
-  requiresUpdatesStatus: MessageDescriptor
-  registeredStatus: MessageDescriptor
-  rejected: MessageDescriptor
-  rejectedDays: MessageDescriptor
-  relationship: MessageDescriptor
-  requestedCorrection: MessageDescriptor
-  review: MessageDescriptor
-  search: MessageDescriptor
-  sending: MessageDescriptor
-  sentForUpdatesOn: MessageDescriptor
-  sentOn: MessageDescriptor
-  status: MessageDescriptor
-  submissionStatus: MessageDescriptor
-  timeFramesTitle: MessageDescriptor
-  timeInProgress: MessageDescriptor
-  timeReadyForReview: MessageDescriptor
-  timeRequireUpdates: MessageDescriptor
-  timeWatingApproval: MessageDescriptor
-  timeWaitingExternalValidation: MessageDescriptor
-  timeReadyToPrint: MessageDescriptor
-  to: MessageDescriptor
-  toCapitalized: MessageDescriptor
-  trackingId: MessageDescriptor
-  notificationSent: MessageDescriptor
-  sentForReview: MessageDescriptor
-  sentForValidation: MessageDescriptor
-  sentForUpdates: MessageDescriptor
-  sentForApproval: MessageDescriptor
-  type: MessageDescriptor
-  event: MessageDescriptor
-  update: MessageDescriptor
-  user: MessageDescriptor
-  username: MessageDescriptor
-  waitingToSend: MessageDescriptor
-  week: MessageDescriptor
-  location: MessageDescriptor
-  maleUnder18: MessageDescriptor
-  femaleUnder18: MessageDescriptor
-  maleOver18: MessageDescriptor
-  femaleOver18: MessageDescriptor
-  total: MessageDescriptor
-  registrationTitle: MessageDescriptor
-  withinTargetDays: MessageDescriptor
-  withinTargetDaysTo1Year: MessageDescriptor
-  within1YearTo5Years: MessageDescriptor
-  over5Years: MessageDescriptor
-  waitingValidated: MessageDescriptor
-  validated: MessageDescriptor
-  loadMore: MessageDescriptor
-  showMore: MessageDescriptor
-  estimatedTargetDaysRegistrationTitle: MessageDescriptor
-  estimatedNumberOfRegistartion: MessageDescriptor
-  totalRegisteredInTargetDays: MessageDescriptor
-  percentageOfEstimation: MessageDescriptor
-  averageRateOfRegistrations: MessageDescriptor
-  estimatedNumberOfEvents: MessageDescriptor
-  registeredWithinTargetd: MessageDescriptor
-  registeredInTargetd: MessageDescriptor
-  timePeriod: MessageDescriptor
-  totalRegistered: MessageDescriptor
-  viewAll: MessageDescriptor
-  history: MessageDescriptor
-  requireUpdatesLoading: MessageDescriptor
-  noConnection: MessageDescriptor
-  action: MessageDescriptor
-  date: MessageDescriptor
-  totalFileSizeExceed: MessageDescriptor
-  refresh: MessageDescriptor
-  duplicateOf: MessageDescriptor
-  matchedTo: MessageDescriptor
-}
-const messagesToDefine: IConstantsMessages = {
+const messagesToDefine = {
   countryName: {
     defaultMessage: 'Farajaland',
     description: 'Name of the OpenCRVS implementation country',
@@ -509,6 +355,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Role',
     description: 'Role label',
     id: 'constants.role'
+  },
+  labelTitle: {
+    defaultMessage: 'Title',
+    description: 'The title of this user',
+    id: 'constants.title'
   },
   labelSystemRole: {
     defaultMessage: 'System Role',
@@ -968,10 +819,7 @@ const messagesToDefine: IConstantsMessages = {
   }
 }
 
-export const constantsMessages: Record<
-  string | number | symbol,
-  MessageDescriptor
-> = defineMessages(messagesToDefine)
+export const constantsMessages = defineMessages(messagesToDefine)
 
 const dynamicMessagesToDefine: Record<
   string | number | symbol,

@@ -343,6 +343,7 @@ describe('edit user tests', () => {
             systemRole: 'API_USER',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',
+            title: 'Test user',
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {

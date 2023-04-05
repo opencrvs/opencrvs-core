@@ -48,6 +48,7 @@ describe('ForgotPIN tests', () => {
             userMgntUserID: '5eba726866458970cf2e23c2',
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',
+            title: 'Test user',
             systemRole: SystemRoleType.FieldAgent,
             role: {
               _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
