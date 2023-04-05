@@ -240,3 +240,181 @@ const fetchSystemPermissions = async (
     throw new Error(error)
   }
 }
+
+export async function birthCertifiedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+
+  let webhookQueue: Queue
+
+  try {
+    webhookQueue = getQueue()
+  } catch (error) {
+    logger.error(`Can't get webhook queue: ${error}`)
+    return internal(error)
+  }
+
+  try {
+    const webhooks: IWebhookModel[] | null = await Webhook.find()
+    if (!webhooks) {
+      throw internal('Failed to find webhooks')
+    }
+    logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
+    if (webhooks) {
+      for (const webhookToNotify of webhooks) {
+        logger.info(
+          `Queueing webhook ${webhookToNotify.trigger} ${
+            TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+          }`
+        )
+        const permissions = await fetchSystemPermissions(
+          webhookToNotify,
+          authHeader,
+          EventType.Birth
+        )
+        permissions.push('certificates')
+        const transformedBundle = await transformBirthBundle(
+          bundle,
+          webhookToNotify.createdBy.type,
+          authHeader,
+          permissions
+        )
+        if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_CERTIFIED]) {
+          const payload = {
+            timestamp: new Date().toISOString(),
+            id: webhookToNotify.webhookId,
+            event: {
+              hub: {
+                topic: TRIGGERS[TRIGGERS.BIRTH_CERTIFIED]
+              },
+              context: [transformedBundle]
+            }
+          }
+          const hmac = createRequestSignature(
+            'sha256',
+            webhookToNotify.sha_secret,
+            JSON.stringify(payload)
+          )
+          webhookQueue.add(
+            `${webhookToNotify.webhookId}_${
+              TRIGGERS[TRIGGERS.BIRTH_CERTIFIED]
+            }`,
+            {
+              payload,
+              url: webhookToNotify.address,
+              hmac
+            },
+            {
+              jobId: `WEBHOOK_${new ShortUIDGen().randomUUID().toUpperCase()}_${
+                webhookToNotify.webhookId
+              }`,
+              attempts: 3
+            }
+          )
+        }
+      }
+    } else {
+      logger.info(`No webhooks subscribed to birth certification trigger`)
+    }
+  } catch (error) {
+    logger.error(`Webhooks/birthCertifiedHandler: error: ${error}`)
+    return internal(error)
+  }
+
+  return h.response().code(200)
+}
+
+export async function deathCertifiedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+
+  let webhookQueue: Queue
+
+  try {
+    webhookQueue = getQueue()
+  } catch (error) {
+    logger.error(`Can't get webhook queue: ${error}`)
+    return internal(error)
+  }
+
+  try {
+    const webhooks: IWebhookModel[] | null = await Webhook.find()
+    if (!webhooks) {
+      throw internal('Failed to find webhooks')
+    }
+    logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
+    if (webhooks) {
+      for (const webhookToNotify of webhooks) {
+        logger.info(
+          `Queueing webhook ${webhookToNotify.trigger} ${
+            TRIGGERS[TRIGGERS.DEATH_CERTIFIED]
+          }`
+        )
+        const permissions = await fetchSystemPermissions(
+          webhookToNotify,
+          authHeader,
+          EventType.Death
+        )
+        permissions.push('Certificates')
+        const transformedBundle = await transformDeathBundle(
+          bundle,
+          webhookToNotify.createdBy.type,
+          authHeader,
+          permissions
+        )
+        if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.DEATH_CERTIFIED]) {
+          const payload = {
+            timestamp: new Date().toISOString(),
+            id: webhookToNotify.webhookId,
+            event: {
+              hub: {
+                topic: TRIGGERS[TRIGGERS.DEATH_CERTIFIED]
+              },
+              context: [transformedBundle]
+            }
+          }
+          const hmac = createRequestSignature(
+            'sha256',
+            webhookToNotify.sha_secret,
+            JSON.stringify(payload)
+          )
+          webhookQueue.add(
+            `${webhookToNotify.webhookId}_${
+              TRIGGERS[TRIGGERS.DEATH_CERTIFIED]
+            }`,
+            {
+              payload,
+              url: webhookToNotify.address,
+              hmac
+            },
+            {
+              jobId: `WEBHOOK_${new ShortUIDGen().randomUUID().toUpperCase()}_${
+                webhookToNotify.webhookId
+              }`,
+              attempts: 3
+            }
+          )
+        }
+      }
+    } else {
+      logger.info(`No webhooks subscribed to death certification trigger`)
+    }
+  } catch (error) {
+    logger.error(`Webhooks/deathCertifiedHandler: error: ${error}`)
+    return internal(error)
+  }
+
+  return h.response().code(200)
+}

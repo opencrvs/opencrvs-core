@@ -17,7 +17,9 @@ import {
   deleteWebhookHandler
 } from '@webhooks/features/manage/handler'
 import {
+  birthCertifiedHandler,
   birthRegisteredHandler,
+  deathCertifiedHandler,
   deathRegisteredHandler,
   marriageRegisteredHandler
 } from '@webhooks/features/event/handler'
@@ -95,6 +97,24 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Dispatches a webhook for the marriage registration event'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-certified',
+      handler: birthCertifiedHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the birth certified event'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-certified',
+      handler: deathCertifiedHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the death certified event'
       }
     }
   ]
