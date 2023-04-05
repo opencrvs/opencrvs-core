@@ -9,14 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { mergeConfig } from 'vite';
+import remarkGfm from 'remark-gfm';
+import type { StorybookConfig } from '@storybook/react-vite';
+import BRAND_BLUE from './theme'
 
-const { mergeConfig } = require('vite');
-const remarkGfm = require('remark-gfm')
-
-const BRAND_BLUE =
-  '#0058E0' /* See `theme.js`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
-
-const viteFinal = async (config) => {
+const viteFinal = async (config: Record<string, any>) => {
   // return the customized config
   return mergeConfig(config, {
     // customize the Vite config here
@@ -31,7 +29,7 @@ const viteFinal = async (config) => {
     }
   })
 }
-module.exports = {
+const config: StorybookConfig = {
   viteFinal,
   stories: [
     '../@(src|stories)/**/*.stories.mdx',
@@ -57,7 +55,8 @@ module.exports = {
     name: '@storybook/react-vite',
     options: {}
   },
-  managerHead: (head) => {
+  // @ts-ignore
+  managerHead: (head: string) => {
     return `${head}
     <link rel="icon" href="favicon.png" />
     <style type="text/css">
@@ -71,3 +70,4 @@ module.exports = {
     autodocs: true
   }
 }
+export default config

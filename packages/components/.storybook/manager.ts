@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { addons } from '@storybook/addons'
+import { addons } from '@storybook/manager-api'
 import theme from './theme'
 import WebFont from 'webfontloader'
 
