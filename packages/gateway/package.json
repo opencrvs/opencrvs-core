@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
-    "@graphql-tools/graphql-file-loader": "^6.0.9",
-    "@graphql-tools/load": "^6.0.9",
-    "@graphql-tools/schema": "^6.0.9",
+    "@graphql-tools/graphql-file-loader": "^7.5.16",
+    "@graphql-tools/load": "^7.8.13",
+    "@graphql-tools/schema": "^9.0.17",
     "@graphql-tools/utils": "^9.2.1",
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^7.0.0",
