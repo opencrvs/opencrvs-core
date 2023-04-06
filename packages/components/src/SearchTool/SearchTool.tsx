@@ -121,6 +121,7 @@ const DropDownItem = styled.li`
 
   &:focus-visible {
     background-color: ${({ theme }) => theme.colors.yellow};
+  }
 `
 
 const AdvancedSearchWrapper = styled.div`
