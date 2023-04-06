@@ -112,11 +112,11 @@ const DropDownItem = styled.li`
   padding: 8px 12px;
   &:hover {
     color: ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
   }
   &:active {
     color: ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${({ theme }) => theme.colors.grey200};
   }
 
   &:focus-visible {

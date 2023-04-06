@@ -60,11 +60,11 @@ const MenuItem = styled.li`
   border-radius: 4px;
   padding: 8px 12px;
   &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.grey600};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.grey600};
   }
   &:focus-visible {
