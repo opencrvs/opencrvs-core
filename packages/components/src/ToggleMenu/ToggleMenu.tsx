@@ -29,7 +29,7 @@ const MenuContainer = styled.ul`
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.light};
   text-align: left;
-  min-width: 240px;
+  min-width: 200px;
   width: auto;
   white-space: nowrap;
   position: absolute;
@@ -45,27 +45,32 @@ const MenuContainer = styled.ul`
 
 const MenuHeader = styled.li`
   padding: 8px 16px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  font-feature-settings: 'pnum' on, 'lnum' on;
 `
 const MenuItem = styled.li`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
-  display: flex;
-  flex-direction: row;
-  cursor: pointer;
-  align-items: center;
-  font-feature-settings: 'pnum' on, 'lnum' on;
-  padding: 16px 16px;
-  height: 40px;
-  gap: 12px;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
-  }
-  &:last-child {
-    border: 0;
-  }
+${({ theme }) => theme.fonts.bold14};
+color: ${({ theme }) => theme.colors.grey500};
+display: flex;
+align-items: center;
+gap: 8px;
+outline: none;
+cursor: pointer;
+margin: 0 6px;
+border-radius: 4px;
+padding: 8px 12px;
+&:hover {
+  background: ${({ theme }) => theme.colors.grey200};
+  color: ${({ theme }) => theme.colors.grey600};
+}
+&:active {
+  background: ${({ theme }) => theme.colors.grey100};
+  color: ${({ theme }) => theme.colors.grey600};
+
+}
+
+&:focus-visible {
+  background-color: ${({ theme }) => theme.colors.yellow};
 `
 
 export interface IToggleMenuItem {

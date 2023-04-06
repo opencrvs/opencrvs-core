@@ -14,10 +14,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AppBar } from './AppBar'
 import { Button } from '../Button'
 import {
-  BackArrow,
-  ForwardArrowDeepBlue,
   Hamburger,
-  HelpBlue,
   DeclarationIcon,
   SearchBlue,
   Phone,
@@ -27,6 +24,7 @@ import {
 import { Stack } from '../Stack'
 import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
+import { Icon } from '../Icon'
 
 export default {
   title: 'Layout/AppBar',
@@ -52,21 +50,25 @@ Default.args = {
   mobileTitle: 'OpenCRVS',
   desktopLeft: (
     <Button type="icon" size="medium" aria-label="Go back">
-      <BackArrow />
+      <Icon name="ArrowLeft" size="medium" />
     </Button>
   ),
   mobileLeft: (
     <Button type="icon" size="medium" aria-label="Go back">
-      <BackArrow />
+      <Icon name="ArrowLeft" size="medium" />
     </Button>
   ),
   desktopRight: (
     <Stack gap={8}>
-      <Button type="icon">
-        <HelpBlue>Button</HelpBlue>
+      <Button type="icon" size="medium">
+        <Icon name="Target" size="medium" />
       </Button>
-      <Button type="secondary">Button</Button>
-      <Button type="secondary">Button</Button>
+      <Button type="secondary" size="medium">
+        Exit
+      </Button>
+      <Button type="primary" size="medium">
+        Save
+      </Button>
     </Stack>
   ),
   mobileRight: <Button type="secondary">Button</Button>
@@ -79,18 +81,18 @@ export const Home = Template.bind({}) as ComponentStory<typeof AppBar>
 Home.args = {
   mobileLeft: (
     <Button type="icon" aria-label="Go back">
-      <Hamburger />
+      <Icon name="List" size="medium" />
     </Button>
   ),
   mobileTitle: 'Search',
-  mobileRight: <SearchBlue />,
+  mobileRight: <Icon name="MagnifyingGlass" size="medium" />,
   desktopLeft: (
     <Stack gap={4}>
       <Button type="icon" size="medium" aria-label="Go back">
-        <BackArrow />
+        <Icon name="ArrowLeft" size="medium" />
       </Button>
       <Button type="icon" size="medium" aria-label="Go forward">
-        <ForwardArrowDeepBlue />
+        <Icon name="ArrowRight" size="medium" />
       </Button>
     </Stack>
   ),
@@ -101,22 +103,19 @@ Home.args = {
       searchHandler={noop}
       searchTypeList={[
         {
-          icon: <TrackingID />,
-          invertIcon: <TrackingID />,
+          icon: <Icon name="Target" size="medium" color="grey600" />,
           label: 'Tracking ID',
           placeHolderText: 'Search',
           value: 'Tracking ID'
         },
         {
-          icon: <BRN />,
-          invertIcon: <BRN />,
-          label: 'BRN/DRN',
+          icon: <Icon name="Medal" size="medium" color="grey600" />,
+          label: 'Registration No.',
           placeHolderText: 'Search',
-          value: 'BRN/DRN'
+          value: 'Registration No.'
         },
         {
-          icon: <Phone />,
-          invertIcon: <Phone />,
+          icon: <Icon name="Phone" size="medium" color="grey600" />,
           label: 'Phone no.',
           placeHolderText: 'Search',
           value: 'Phone no.'
@@ -124,7 +123,11 @@ Home.args = {
       ]}
     />
   ),
-  desktopRight: <Button type="secondary">Button</Button>
+  desktopRight: (
+    <Button type="secondary" size="medium">
+      Exit
+    </Button>
+  )
 }
 
 Home.parameters = {
@@ -141,8 +144,12 @@ Declaration.args = {
   mobileRight: <Hamburger />,
   desktopRight: (
     <Stack gap={8}>
-      <Button type="secondary">Save</Button>
-      <Button type="secondary">Exit</Button>
+      <Button type="secondary" size="medium">
+        Save
+      </Button>
+      <Button type="primary" size="medium">
+        Exit
+      </Button>
     </Stack>
   )
 }

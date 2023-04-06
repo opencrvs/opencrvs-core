@@ -14,7 +14,6 @@ import { css } from 'styled-components'
 
 export const base = css`
   ${({ theme }) => theme.fonts.bold16};
-
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -155,9 +154,26 @@ export const icon = css`
   }
 `
 
+export const iconPrimary = css`
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.primary};
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+
+  &:hover:not(:focus-visible) {
+    background: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  svg {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+`
+
 export const small = ({ loading }: { loading?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
-
   height: 32px;
   padding: 8px;
 
@@ -178,6 +194,7 @@ export const small = ({ loading }: { loading?: boolean }) => css`
 `
 
 export const medium = css`
+  ${({ theme }) => theme.fonts.bold16};
   height: 40px;
   padding: 0 12px;
 
@@ -188,6 +205,7 @@ export const medium = css`
 `
 
 export const large = css`
+  ${({ theme }) => theme.fonts.bold18};
   height: 48px;
   padding: 0 16px;
 
