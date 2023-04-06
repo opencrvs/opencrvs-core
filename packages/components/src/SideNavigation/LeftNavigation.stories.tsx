@@ -14,24 +14,66 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { LeftNavigation, ILeftNavigationProps } from './LeftNavigation'
 import { NavigationGroup } from './NavigationGroup'
-import { groupDeclaration, groupSetting } from './NavigationGroup.stories'
+import { NavigationItem } from './NavigationItem'
+import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
+import { Icon } from '../Icon'
 
-const Template: Story<ILeftNavigationProps> = (args) => (
-  <LeftNavigation {...args}>
-    <NavigationGroup {...groupDeclaration.args} />
-    <NavigationGroup {...groupSetting.args} />
+export const SideNav = () => (
+  <LeftNavigation
+    applicationName="OpenCRVS"
+    applicationVersion="1.1.0"
+    buildVersion="Development"
+  >
+    <NavigationGroup>
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'purple'} />}
+        label="In progress"
+      />
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'orange'} />}
+        label="Ready for review"
+      />
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'red'} />}
+        label="Requires updates"
+      />
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'grey'} />}
+        label="Sent for approval"
+      />
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'green'} />}
+        label="Ready to print"
+      />
+      <NavigationItem
+        icon={() => <DeclarationIconSmall color={'blue'} />}
+        label="Ready to issue"
+      />
+    </NavigationGroup>
+    <NavigationGroup>
+      <NavigationItem
+        icon={() => <Icon name="Buildings" size="medium" />}
+        label="Organisation"
+      />
+      <NavigationItem
+        icon={() => <Icon name="Users" size="medium" />}
+        label="Team"
+      />
+      <NavigationItem
+        icon={() => <Icon name="Activity" size="medium" />}
+        label="Performance"
+      />
+    </NavigationGroup>
   </LeftNavigation>
 )
 
-export const leftNavigationView = Template.bind({})
-
-leftNavigationView.args = {
+SideNav.args = {
   applicationName: 'OpenCRVS',
   applicationVersion: '1.1.0',
   buildVersion: 'Development'
 }
 
 export default {
-  title: 'Layout/Side navigation/Side navigation',
+  title: 'Layout/Side Nav',
   component: LeftNavigation
 } as Meta

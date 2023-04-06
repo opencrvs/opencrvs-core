@@ -45,7 +45,6 @@ import {
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Event, User } from '@client/utils/gateway'
-import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
@@ -70,7 +69,6 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
-import { Text } from '@opencrvs/components'
 import { UserDetails } from '@client/utils/userUtils'
 import { IApplicationConfig } from '@client/utils/referenceApi'
 
@@ -654,27 +652,10 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
-                    WORKQUEUE_TABS.vsexports
-                  ) && (
-                    <NavigationItem
-                      icon={() => <Icon name="Share" size="small" />}
-                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.vsexports]
-                      )}
-                      onClick={goToVSExportsAction}
-                      isSelected={
-                        enableMenuSelection &&
-                        activeMenuItem === WORKQUEUE_TABS.vsexports
-                      }
-                    />
-                  )}
-                {userDetails?.systemRole &&
-                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.organisation
                   ) && (
                     <NavigationItem
-                      icon={() => <Icon name="List" size="small" />}
+                      icon={() => <Icon name="Buildings" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.organisation}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.organisation]
@@ -712,7 +693,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="Compass" size="small" />}
+                        icon={() => <Icon name="Compass" size="medium" />}
                         id={`navigation_${WORKQUEUE_TABS.config}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.config]
@@ -804,7 +785,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="ChatCircle" size="small" />}
+                        icon={() => <Icon name="ChatCircle" size="medium" />}
                         id={`navigation_${WORKQUEUE_TABS.communications}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.communications]
@@ -856,14 +837,6 @@ export const NavigationView = (props: IFullProps) => {
                     GROUP_ID.analytics
                   ) && (
                     <>
-                      <Text
-                        variant="bold14"
-                        style={{ marginLeft: 24 }}
-                        element="p"
-                        color="opacity24"
-                      >
-                        {intl.formatMessage(navigationMessages['analytic'])}
-                      </Text>
                       <NavigationItem
                         icon={() => <Icon name="ChartLine" size="medium" />}
                         label={intl.formatMessage(
@@ -912,6 +885,23 @@ export const NavigationView = (props: IFullProps) => {
                       />
                     </>
                   )}
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    WORKQUEUE_TABS.vsexports
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Icon name="Export" size="medium" />}
+                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.vsexports]
+                      )}
+                      onClick={goToVSExportsAction}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.vsexports
+                      }
+                    />
+                  )}
               </NavigationGroup>
             )}
         </>
@@ -923,7 +913,12 @@ export const NavigationView = (props: IFullProps) => {
             return (
               <NavigationItem
                 icon={() => (
-                  <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
+                  <Icon
+                    name="Star"
+                    color="yellow"
+                    size="medium"
+                    weight="fill"
+                  ></Icon>
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}
@@ -983,12 +978,14 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     advancedSearchParams: getAdvancedSearchParamsState(state),
-    activeMenuItem: window.location.href.endsWith(WORKQUEUE_TABS.performance)
+    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.endsWith(WORKQUEUE_TABS.team)
-      ? WORKQUEUE_TABS.team
       : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
       ? WORKQUEUE_TABS.vsexports
+      : window.location.href.includes(WORKQUEUE_TABS.organisation)
+      ? WORKQUEUE_TABS.organisation
+      : window.location.href.includes(WORKQUEUE_TABS.team)
+      ? WORKQUEUE_TABS.team
       : window.location.href.endsWith(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
       : window.location.href.endsWith(WORKQUEUE_TABS.settings)
