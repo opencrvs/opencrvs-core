@@ -48,6 +48,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
               district
               state
             }
+            partOf
           }
         }
         type
