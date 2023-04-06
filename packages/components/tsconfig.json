@@ -23,23 +23,16 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
-    // Required for using `react-primitives` types, but
-    // also makes typechecking faster in general.
-    //
-    // The problem actually stems from this project using
-    // `@types/react-native` to fake types for `react-primitives`.
-    // React Native and Webpack both define a global `require`
-    // differently, so there's a conflict.
     "skipLibCheck": true
   },
   "include": [
     "src/**/*.tsx",
     "src/**/*.ts",
+    ".storybook",
     "typings"
   ],
   "exclude": [
     "node_modules",
-    ".storybook",
     "lib"
   ]
 }
