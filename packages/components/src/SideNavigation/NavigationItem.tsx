@@ -23,27 +23,29 @@ export interface INavigationItemProps
 }
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
+  margin-top: 2px;
   width: 100%;
-  height: 36px;
+  height: 34px;
   cursor: pointer;
   border: 0;
   outline: none;
   border-radius: 4px;
   padding: 0 8px;
   background-color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.grey100 : theme.colors.white};
+    isSelected ? theme.colors.grey200 : theme.colors.white};
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme, isSelected }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
+
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.grey600};
   }
 
   &:active {
+    background-color: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.grey600};
   }
-
   &:focus-visible {
     ${({ theme }) => theme.fonts.bold14};
     background-color: ${({ theme }) => theme.colors.yellow};

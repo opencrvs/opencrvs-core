@@ -17,8 +17,8 @@ export interface INavigationGroup
   extends React.HTMLAttributes<HTMLDivElement> {}
 
 const NavigationGroupContainer = styled.div`
-  padding: 8px;
-  box-shadow: 0px 8px 1px -8px ${({ theme }) => theme.colors.grey300};
+  padding: 6px;
+  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
 `
 
 interface IProps {
