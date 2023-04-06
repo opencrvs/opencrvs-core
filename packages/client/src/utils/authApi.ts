@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { resolve } from 'url'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 
@@ -40,7 +39,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const invalidateToken = (token: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_URL, 'invalidateToken'),
+    url: new URL('invalidateToken', window.config.AUTH_URL).toString(),
     method: 'POST',
     data: { token }
   })
