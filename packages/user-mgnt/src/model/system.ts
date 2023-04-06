@@ -30,6 +30,7 @@ export interface ISystem {
   }
   creationDate?: number
   type: keyof typeof types
+  integratingSystemType: keyof typeof integratingSystemTypes
 }
 
 export enum EventType {
