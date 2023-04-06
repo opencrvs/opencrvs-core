@@ -158,6 +158,7 @@ type Query {
     redirectUri: String!
     grantType: String
   ): UserInfo
+  getOSIAUserInfo(nationalId: String!): UserInfo
 }
 
 type Mutation {

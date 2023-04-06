@@ -57,6 +57,7 @@ export interface GQLQuery {
   getFormDataset?: Array<GQLFormDataset>
   informantSMSNotifications?: Array<GQLSMSNotification>
   getOIDPUserInfo?: GQLUserInfo
+  getOSIAUserInfo?: GQLUserInfo
 }
 
 export interface GQLMutation {
@@ -2201,6 +2202,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getFormDataset?: QueryToGetFormDatasetResolver<TParent>
   informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
+  getOSIAUserInfo?: QueryToGetOSIAUserInfoResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2882,6 +2884,18 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetOIDPUserInfoArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetOSIAUserInfoArgs {
+  nationalId: string
+}
+export interface QueryToGetOSIAUserInfoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetOSIAUserInfoArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
