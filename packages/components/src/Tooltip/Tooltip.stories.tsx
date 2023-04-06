@@ -37,7 +37,7 @@ const Template: Story<TooltipProps> = (args) => (
   <ButtonContainer>
     <Tooltip {...args}>
       <Button type="icon" onClick={() => alert('Button clicked')}>
-        <Icon name="Target" size="medium" />
+        <Icon name="Activity" size="medium" />
       </Button>
     </Tooltip>
   </ButtonContainer>
@@ -45,44 +45,41 @@ const Template: Story<TooltipProps> = (args) => (
 
 export const Default = Template.bind({})
 Default.args = {
-  content: 'Create user'
+  content: 'View performance'
 }
 
 export const Right = Template.bind({})
 Right.args = {
-  content: 'Create user',
+  content: 'View performance',
   position: 'right'
 }
 
 export const Bottom = Template.bind({})
 Bottom.args = {
-  content: (
-    <Text variant="bold14" element="p" color="white">
-      Create userCreate userCreate userCreate userCreate userCreate userCreate
-      user
-    </Text>
-  ),
+  content: 'View performance',
   position: 'bottom'
+}
+
+export const BottomLeft = Template.bind({})
+BottomLeft.args = {
+  content: 'View performance',
+  position: 'bottomLeft'
 }
 
 export const BottomRight = Template.bind({})
 BottomRight.args = {
-  content: (
-    <Button type="icon" onClick={() => alert('Button clicked')}>
-      <Icon name="Target" size="medium" color="white" />
-    </Button>
-  ),
+  content: 'View performance',
   position: 'bottomRight'
 }
 
 export const Left = Template.bind({})
 Left.args = {
-  content: 'Create user',
+  content: 'View performance',
   position: 'left'
 }
 
 export const Top = Template.bind({})
 Top.args = {
-  content: 'Create user',
+  content: 'View performance',
   position: 'top'
 }

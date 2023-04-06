@@ -53,7 +53,7 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
             border-color: transparent transparent #222 transparent;
           }
         `
-      case 'bottomRight':
+      case 'bottomLeft':
         return `
             top: 125%;
             left: 50%;
@@ -85,6 +85,22 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
             border-color: transparent transparent transparent #222;
           }
         `
+      case 'bottomRight':
+        return `
+              top: 125%;
+              left: 50%;
+              transform: translateX(-20%);
+              &::after {
+                content: '';
+                position: absolute;
+                bottom: 100%;
+                right: 80%;
+                margin-right: -4px;
+                border-width: 4px;
+                border-style: solid;
+                border-color: transparent transparent #222 transparent;
+              }
+            `
       case 'right':
         return `
           top: 50%;
