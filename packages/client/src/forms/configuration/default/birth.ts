@@ -1109,7 +1109,7 @@ export const birthRegisterForms: ISerializedForm = {
             },
             {
               name: 'informantNidVerification',
-              type: 'NID_VERIFICATION_BUTTON',
+              type: 'NID_VERIFICATION_REDIRECT_BUTTON',
               label: formMessageDescriptors.iDTypeNationalID,
               required: true,
               customisable: true,
@@ -1519,7 +1519,7 @@ export const birthRegisterForms: ISerializedForm = {
             },
             {
               name: 'motherNidVerification',
-              type: 'NID_VERIFICATION_BUTTON',
+              type: 'NID_VERIFICATION_REDIRECT_BUTTON',
               label: formMessageDescriptors.iDTypeNationalID,
               required: true,
               customisable: true,
@@ -2117,7 +2117,7 @@ export const birthRegisterForms: ISerializedForm = {
             },
             {
               name: 'fatherNidVerification',
-              type: 'NID_VERIFICATION_BUTTON',
+              type: 'NID_VERIFICATION_REDIRECT_BUTTON',
               label: formMessageDescriptors.iDTypeNationalID,
               required: true,
               customisable: true,

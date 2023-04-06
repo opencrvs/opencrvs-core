@@ -71,7 +71,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
-  NID_VERIFICATION_BUTTON,
+  NID_VERIFICATION_REDIRECT_BUTTON,
   SUBSECTION,
   WARNING
 } from '@client/forms'
@@ -550,7 +550,7 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
-  if (field.type === NID_VERIFICATION_BUTTON) {
+  if (field.type === NID_VERIFICATION_REDIRECT_BUTTON) {
     return (
       <VerificationButton
         onClick={() => {}}

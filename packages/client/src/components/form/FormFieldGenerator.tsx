@@ -82,8 +82,8 @@ import {
   TEXT,
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  NID_VERIFICATION_REDIRECT_BUTTON,
+  INidVerificationRedirectButton
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -576,7 +576,7 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
+  if (fieldDefinition.type === NID_VERIFICATION_REDIRECT_BUTTON) {
     return (
       <InputField {...inputFieldProps}>
         <VerificationButton
@@ -994,7 +994,7 @@ class FormSectionComponent extends React.Component<Props> {
                     field.searchableType as LocationType[]
                   )
                 }
-              : field.type === NID_VERIFICATION_BUTTON
+              : field.type === NID_VERIFICATION_REDIRECT_BUTTON
               ? ({
                   ...field,
                   onClick: () => {
@@ -1019,15 +1019,14 @@ class FormSectionComponent extends React.Component<Props> {
                       this.props.match.url
                     )
                   }
-                  //TODO: HANDLE FETCH FOR NID
-                } as INidVerificationButton)
+                } as INidVerificationRedirectButton)
               : field
 
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON
+            field.type === NID_VERIFICATION_REDIRECT_BUTTON
           ) {
             return (
               <FormItem

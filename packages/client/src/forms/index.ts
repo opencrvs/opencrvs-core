@@ -69,7 +69,8 @@ export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
-export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
+export const NID_VERIFICATION_REDIRECT_BUTTON =
+  'NID_VERIFICATION_REDIRECT_BUTTON'
 
 export enum Sort {
   ASC = 'asc',
@@ -662,8 +663,8 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
-export interface INidVerificationButton extends IFormFieldBase {
-  type: typeof NID_VERIFICATION_BUTTON
+export interface INidVerificationRedirectButton extends IFormFieldBase {
+  type: typeof NID_VERIFICATION_REDIRECT_BUTTON
   labelForVerified: MessageDescriptor
   labelForUnverified: MessageDescriptor
   labelForOffline: MessageDescriptor
@@ -698,7 +699,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
-  | INidVerificationButton
+  | INidVerificationRedirectButton
 
 export interface IPreviewGroup {
   id: string
@@ -1219,7 +1220,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   networkErrorText: string
 }
 export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
-  type: typeof NID_VERIFICATION_BUTTON
+  type: typeof NID_VERIFICATION_REDIRECT_BUTTON
   onClick: () => void
   labelForVerified: string
   labelForUnverified: string
@@ -1314,7 +1315,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList,
-    NID_VERIFICATION_BUTTON: messages.nidVerificationButton
+    NID_VERIFICATION_REDIRECT_BUTTON: messages.nidVerificationButton
   }
 
   return labelDict[type]

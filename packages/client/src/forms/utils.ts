@@ -45,8 +45,8 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
   IContactPoint,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  NID_VERIFICATION_REDIRECT_BUTTON,
+  INidVerificationRedirectButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -159,15 +159,15 @@ export const internationaliseFieldObject = (
     )
   }
 
-  if (base.type === NID_VERIFICATION_BUTTON) {
+  if (base.type === NID_VERIFICATION_REDIRECT_BUTTON) {
     ;(base as any).labelForVerified = intl.formatMessage(
-      (field as INidVerificationButton).labelForVerified
+      (field as INidVerificationRedirectButton).labelForVerified
     )
     ;(base as any).labelForUnverified = intl.formatMessage(
-      (field as INidVerificationButton).labelForUnverified
+      (field as INidVerificationRedirectButton).labelForUnverified
     )
     ;(base as any).labelForOffline = intl.formatMessage(
-      (field as INidVerificationButton).labelForOffline
+      (field as INidVerificationRedirectButton).labelForOffline
     )
   }
 
