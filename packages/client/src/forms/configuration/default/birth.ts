@@ -978,13 +978,13 @@ export const birthRegisterForms: ISerializedForm = {
       groups: [
         {
           id: 'informant-view-group',
-          conditionals: [
-            {
-              action: 'hide',
-              expression:
-                "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
-            }
-          ],
+          // conditionals: [
+          //   {
+          //     action: 'hide',
+          //     expression:
+          //       "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+          //   }
+          // ],
           fields: [
             {
               name: 'nationality',
@@ -1204,7 +1204,7 @@ export const birthRegisterForms: ISerializedForm = {
               name: 'firstNamesEng',
               previewGroup: 'informantNameInEnglish',
               type: 'TEXT',
-              label: formMessageDescriptors.firstNames,
+              label: formMessageDescriptors.informantFirstNames,
               maxLength: 32,
               required: true,
               initialValue: '',
