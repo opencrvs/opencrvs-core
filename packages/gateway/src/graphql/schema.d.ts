@@ -2891,6 +2891,9 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
 
 export interface QueryToGetOSIAUserInfoArgs {
   nationalId: string
+  firstName: string
+  lastName: string
+  dateOfBirth: string
 }
 export interface QueryToGetOSIAUserInfoResolver<TParent = any, TResult = any> {
   (

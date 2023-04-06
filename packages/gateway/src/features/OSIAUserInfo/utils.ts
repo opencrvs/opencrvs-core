@@ -11,36 +11,53 @@
  */
 
 import { OSIA_REST_URL, UNSAFE__OSIA_PERSISTENT_JWT } from '@gateway/constants'
-import { OIDPUserInfo } from '@gateway/features/OIDPUserInfo/oidp-types'
+import { logger } from '@gateway/logger'
 
 const OSIA_USERINFO_ENDPOINT = (nationalId: string) =>
   OSIA_REST_URL &&
-  new URL(
-    `v1/persons/${nationalId}&attributeNames=uin&attributeNames=firstName&attributeNames=lastName&attributeNames=dateOfBirth`,
-    OSIA_REST_URL
-  ).toString()
+  new URL(`v1/persons/${nationalId}/match`, OSIA_REST_URL).toString()
 
-const convertOSIAUserInfoToOIDPUserInfo = (
-  osiaUserInfo: Pick<
-    OSIAUserInfo,
-    'uin' | 'firstName' | 'lastName' | 'dateOfBirth'
-  >
-): OIDPUserInfo => {
-  return {
-    sub: osiaUserInfo.uin,
-    name: `${osiaUserInfo.firstName} ${osiaUserInfo.lastName}`,
-    birthdate: osiaUserInfo.dateOfBirth
-  }
-}
-
-export const fetchUserInfo = async (nationalId: string) => {
+export const verifyUserInfo = async ({
+  nationalId,
+  firstName,
+  lastName,
+  dateOfBirth
+}: {
+  nationalId: string
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+}) => {
   const request = await fetch(OSIA_USERINFO_ENDPOINT(nationalId)!, {
-    method: 'GET',
+    method: 'POST',
     headers: {
-      Authorization: `Bearer ${UNSAFE__OSIA_PERSISTENT_JWT}`
-    }
+      Authorization: `Bearer ${UNSAFE__OSIA_PERSISTENT_JWT}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      dateOfBirth
+    })
   })
 
+  if (!request.ok) {
+    throw new Error(
+      `Couldn't verify user info with OSIA: ${JSON.stringify(
+        await request.text(),
+        null,
+        4
+      )}`
+    )
+  }
+
+  /** Response is information about non matching attributes. Returns a list of matching result. An empty list indicates all attributes were matching. */
   const response = await request.json()
-  return convertOSIAUserInfoToOIDPUserInfo(response)
+
+  if (response.length === 0) {
+    return { nationalId, verified: true }
+  } else {
+    logger.warn("Couldn't verify user info with OSIA", response)
+    return { nationalId, verified: false }
+  }
 }
