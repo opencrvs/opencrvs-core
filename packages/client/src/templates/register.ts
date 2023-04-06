@@ -21,7 +21,9 @@ export const certificateBaseTemplate = {
     en: {
       notosans: {
         normal: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf'
+        bold: 'NotoSans-Regular.ttf',
+        italics: 'NotoSans-Light.ttf',
+        bolditalics: 'NotoSans-Regular.ttf'
       }
     }
   }
