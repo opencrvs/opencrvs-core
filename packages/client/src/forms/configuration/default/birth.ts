@@ -978,13 +978,6 @@ export const birthRegisterForms: ISerializedForm = {
       groups: [
         {
           id: 'informant-view-group',
-          // conditionals: [
-          //   {
-          //     action: 'hide',
-          //     expression:
-          //       "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
-          //   }
-          // ],
           fields: [
             {
               name: 'nationality',
@@ -1000,6 +993,13 @@ export const birthRegisterForms: ISerializedForm = {
               options: {
                 resource: 'countries'
               },
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1050,7 +1050,13 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['father.iD']
                 }
               ],
-              conditionals: [],
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1100,6 +1106,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               mapping: {
@@ -1148,6 +1159,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               mapping: {
@@ -1185,6 +1201,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: '!values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               postfix: 'years',
@@ -1208,6 +1229,13 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               validator: [
                 {
                   operation: 'englishOnlyNameFormat'
@@ -1250,6 +1278,13 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               validator: [
                 {
                   operation: 'englishOnlyNameFormat'

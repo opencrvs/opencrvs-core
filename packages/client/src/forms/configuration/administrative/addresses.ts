@@ -97,6 +97,9 @@ export type AllowedAddressConfigurations = {
   informant?: boolean
 }
 
+const HIDE_IF_MOTHER_OR_FATHER_THE_INFORMANT =
+  "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
   {
     precedingFieldId: 'birth.child.child-view-group.birthLocation',
@@ -116,17 +119,28 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress
+        label: formMessageDescriptors.primaryAddress,
+        conditionalCase: HIDE_IF_MOTHER_OR_FATHER_THE_INFORMANT
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: true,
+        conditionalCase: HIDE_IF_MOTHER_OR_FATHER_THE_INFORMANT
+      },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.informantSecondaryAddress,
-        conditionalCase: secondaryAddressesDisabled
+        conditionalCase: [
+          secondaryAddressesDisabled,
+          HIDE_IF_MOTHER_OR_FATHER_THE_INFORMANT
+        ].join(' && ')
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
-        conditionalCase: secondaryAddressesDisabled,
+        conditionalCase: [
+          secondaryAddressesDisabled,
+          HIDE_IF_MOTHER_OR_FATHER_THE_INFORMANT
+        ].join(' && '),
         informant: true
       }
     ]
