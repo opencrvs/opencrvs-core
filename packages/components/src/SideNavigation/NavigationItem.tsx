@@ -60,7 +60,6 @@ const ItemContentContainer = styled.div`
   align-items: center;
 `
 const LabelContainer = styled.span`
-  align-text: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
