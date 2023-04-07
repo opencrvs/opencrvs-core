@@ -561,6 +561,17 @@ export const birthRegisterForms: ISerializedForm = {
             parameters: ['en', 'dd MMMM yyyy']
           },
           {
+            fieldName: 'registrar',
+            operation: 'userTransformer',
+            parameters: ['REGISTERED']
+          },
+          {
+            fieldName: 'registrationAgent',
+            operation: 'userTransformer',
+            parameters: ['VALIDATED']
+          },
+          // backward compatibility
+          {
             fieldName: 'registrarName',
             operation: 'registrarNameUserTransformer'
           },

@@ -321,13 +321,6 @@ const getUserRole = (history: History): MessageDescriptor => {
   )
 }
 
-const getUserOfficeName = (history: History): string => {
-  const officeName = history?.office?.name || ''
-  const officeAddressLevel3 = history?.office?.address?.district || ''
-  const officeAddressLevel4 = history?.office?.address?.state || ''
-  return [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
-}
-
 const getUserSignature = (history: History): string => {
   return history?.signature?.data as string
 }
@@ -451,7 +444,7 @@ export const userTransformer =
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
-        office: getUserOfficeName(history),
+        office: history?.office,
         signature: getUserSignature(history)
       } as IFormSectionData
     }

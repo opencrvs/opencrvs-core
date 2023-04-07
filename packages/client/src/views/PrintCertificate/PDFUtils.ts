@@ -28,6 +28,7 @@ function isMessageDescriptor(
   obj: Record<string, unknown>
 ): obj is MessageDescriptor & Record<string, string> {
   return (
+    obj !== null &&
     obj.hasOwnProperty('id') &&
     obj.hasOwnProperty('defaultMessage') &&
     typeof (obj as MessageDescriptor).id === 'string' &&
@@ -58,7 +59,10 @@ export function formatAllNonStringValues(
             : item
         )
         .join(', ')
-    } else if (typeof templateData[key] === 'object') {
+    } else if (
+      typeof templateData[key] === 'object' &&
+      templateData[key] !== null
+    ) {
       templateData[key] = formatAllNonStringValues(
         templateData[key] as Record<string, TemplateDataType>
       )
