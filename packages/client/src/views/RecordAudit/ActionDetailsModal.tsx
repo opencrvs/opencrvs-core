@@ -394,14 +394,25 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
+        // const otherRelation = certificateCollectorRelationLabelArray.find(
+        //   (labelItem) =>
+        //     labelItem.value === certificate.collector?.otherRelationship
+        // )
+        // const otherRelationLabel = otherRelation
+        //   ? intl.formatMessage(otherRelation.label)
+        //   : ''
+        // return `${collectorName} (${otherRelationLabel})`
+        const nameObj = actionDetailsData?.user?.name
+          ? getIndividualNameObj(
+              actionDetailsData.user.name as GQLHumanName[],
+              window.config.LANGUAGES
+            )
+          : null
+        const userName = nameObj
+          ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
           : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return userName
+        // collector is not available when printed in advance
       }
       return collectorName
     }
