@@ -28,6 +28,8 @@ export enum CorrectorRelationship {
   FATHER = 'FATHER',
   CHILD = 'CHILD',
   LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  BRIDE = 'BRIDE',
+  GROOM = 'GROOM',
   //common
   ANOTHER_AGENT = 'ANOTHER_AGENT',
   REGISTRAR = 'REGISTRAR',
@@ -88,7 +90,9 @@ export const CollectorRelationLabelArray = [
   {
     value: CorrectorRelationship.OTHER,
     label: messages.others
-  }
+  },
+  { value: CorrectorRelationship.BRIDE, label: messages.bride },
+  { value: CorrectorRelationship.GROOM, label: messages.groom }
 ]
 
 const birthCorrectorRelationGroup: IFormSectionGroup = {

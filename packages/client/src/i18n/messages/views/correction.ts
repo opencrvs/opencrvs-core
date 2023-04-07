@@ -19,6 +19,8 @@ interface ICorrectionMessages
   correctorError: MessageDescriptor
   mother: MessageDescriptor
   father: MessageDescriptor
+  bride: MessageDescriptor
+  groom: MessageDescriptor
   child: MessageDescriptor
   legalGuardian: MessageDescriptor
   anotherRegOrFieldAgent: MessageDescriptor
@@ -101,6 +103,16 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.father',
     defaultMessage: 'Father',
     description: 'Label for father option in certificate correction form'
+  },
+  bride: {
+    id: 'correction.corrector.bride',
+    defaultMessage: 'Bride',
+    description: 'Label for bride option in certificate correction form'
+  },
+  groom: {
+    id: 'correction.corrector.groom',
+    defaultMessage: 'Groom',
+    description: 'Label for groom option in certificate correction form'
   },
   child: {
     id: 'correction.corrector.child',

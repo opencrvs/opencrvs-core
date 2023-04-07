@@ -3416,6 +3416,20 @@ export const builders: IFieldBuilders = {
               fhirBundle,
               context
             )
+          } else if (fieldValue === 'BRIDE') {
+            await setCertificateCollectorReference(
+              BRIDE_CODE,
+              relatedPersonResource,
+              fhirBundle,
+              context
+            )
+          } else if (fieldValue === 'GROOM') {
+            await setCertificateCollectorReference(
+              GROOM_CODE,
+              relatedPersonResource,
+              fhirBundle,
+              context
+            )
           }
         },
         otherRelationship: async (
