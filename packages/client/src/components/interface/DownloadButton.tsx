@@ -33,7 +33,7 @@ import {
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
-import { AvatarVerySmall } from '@client/components/Avatar'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
@@ -343,7 +343,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
         ) : assignment && assignment.userId !== userId ? (
-          <AvatarVerySmall
+          <AvatarSmall
             avatar={{
               data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
               type: 'image/jpeg'

@@ -102,7 +102,8 @@ export const LOADER_MIN_DISPLAY_TIME =
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   import.meta.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
-export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const AVATAR_API =
+  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
 export const ACCUMULATED_FILE_SIZE = 20480000
 
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
