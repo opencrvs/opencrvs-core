@@ -348,6 +348,10 @@ export function VerifyCertificatePage() {
   const getLocation = (data: any) => {
     const location = data.eventLocation
     if (location?.type === 'HEALTH_FACILITY') return location?.name
+    else if (location.type === 'DECEASED_USUAL_RESIDENCE')
+      return (
+        location?.address?.districtName + ', ' + location?.address?.stateName
+      )
     const city = location?.address?.city && location?.address?.city + ', '
     return (
       city +
