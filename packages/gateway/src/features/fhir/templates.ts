@@ -241,19 +241,18 @@ export function updateTaskTemplate(
     throw new Error('Task has no businessStatus code')
   }
   task.businessStatus.coding[0].code = status
-  if (comment || reason) {
+  if (reason) {
     if (!task.reason) {
       task.reason = {
         text: ''
       }
     }
-
     task.reason.text = reason || ''
-    const statusReason: fhir.CodeableConcept = {
-      text: comment
-    }
-    task.statusReason = statusReason
   }
+  const statusReason: fhir.CodeableConcept = {
+    text: comment || ''
+  }
+  task.statusReason = statusReason
   if (duplicateTrackingId) {
     task.extension = task.extension || []
     task.extension.push({
