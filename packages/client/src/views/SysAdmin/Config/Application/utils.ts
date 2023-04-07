@@ -20,11 +20,11 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { IOfflineData } from '@client/offline/reducer'
 import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
+import { nationalityMessages } from '@client/i18n/messages/nationalities'
 
 export type IActionType =
   | keyof typeof GeneralActionId
@@ -87,6 +87,12 @@ export const getCurrencyObject = (value: string) => {
 export const getCountryName = (isoCode: string) => {
   const countryName = lookup.countries({ alpha3: isoCode })[0]
   return countryName && countryName.name
+}
+
+export const getNationalityName = (isoCode: string) => {
+  const alpha2 = lookup.countries({ alpha3: isoCode })[0]
+    ?.alpha2 as keyof typeof nationalityMessages
+  return nationalityMessages[alpha2]
 }
 
 export function isValidRegEx(pattern: string): boolean {

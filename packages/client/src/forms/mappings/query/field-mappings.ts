@@ -38,10 +38,10 @@ import {
 } from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
-import { MessageDescriptor } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
+import { getNationalityName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
@@ -661,7 +661,8 @@ export const sectionTransformer =
     sectionId: string,
     field: IFormField,
     _?: IFormField,
-    offlineData?: IOfflineData
+    offlineData?: IOfflineData,
+    intl?: IntlShape
   ): void => {
     const targetNameKey = targetFieldName || field.name
 
@@ -677,7 +678,8 @@ export const sectionTransformer =
         sectionId,
         field,
         _,
-        offlineData
+        offlineData,
+        intl
       )
       if (!localTransformedData[sectionId]) {
         return
@@ -921,7 +923,7 @@ export const eventLocationAddressLineTemplateTransformer =
   ) => {
     if (
       queryData.eventLocation?.type &&
-      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
     ) {
       return
     }
@@ -1002,25 +1004,30 @@ export const nationalityTransformer = (
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
-  field: IFormField
+  field: IFormField,
+  _?: IFormField,
+  __?: IOfflineData,
+  intl?: IntlShape
 ) => {
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = getNationalityName(
       queryData[sectionId][field.name] && queryData[sectionId][field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] =
+      intl?.formatMessage(nationalityName) || ''
   } else if (queryData[sectionId]?.individual) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = getNationalityName(
       queryData[sectionId].individual[field.name] &&
         queryData[sectionId].individual[field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] =
+      intl?.formatMessage(nationalityName) || ''
   }
 }
 
