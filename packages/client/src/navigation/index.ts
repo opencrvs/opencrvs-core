@@ -56,6 +56,9 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS,
+  PERFORMANCE_DASHBOARD,
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
@@ -200,6 +203,16 @@ export function goToInformantNotification() {
 
 export function goToVSExport() {
   return push(VS_EXPORTS)
+}
+
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS)
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS)
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD, { isNavigatedInsideApp: true })
 }
 
 export function goToAdvancedSearch() {

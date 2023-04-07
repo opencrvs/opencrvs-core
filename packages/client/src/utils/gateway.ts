@@ -281,12 +281,14 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
+  Bride = 'BRIDE',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
   Father = 'FATHER',
+  Groom = 'GROOM',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
   MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
@@ -946,6 +948,7 @@ export type History = {
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  potentialDuplicates?: Maybe<Array<Scalars['String']>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
@@ -2022,6 +2025,7 @@ export type RecordDetails = BirthRegistration | DeathRegistration
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
+  FlaggedAsPotentialDuplicate = 'FLAGGED_AS_POTENTIAL_DUPLICATE',
   MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
   MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
@@ -3673,6 +3677,7 @@ export type FetchBirthRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -3712,6 +3717,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4020,6 +4026,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       reason?: string | null
       otherReason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4122,6 +4129,7 @@ export type CreateDeathRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -4374,6 +4382,7 @@ export type FetchDeathRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4414,6 +4423,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       ipAddress?: string | null
       reason?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4705,6 +4715,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       dhis2Notification?: boolean | null
       ipAddress?: string | null
       duplicateOf?: string | null
+      potentialDuplicates?: Array<string> | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -5065,6 +5076,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -8053,6 +8065,15 @@ export type GetEventsWithProgressQuery = {
           firstNames?: string | null
           familyName?: string | null
         }>
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
       } | null
       progressReport?: {
         __typename?: 'EventProgressData'
@@ -8105,6 +8126,15 @@ export type GetRegistrationsListByFilterQuery = {
             __typename?: 'User'
             id: string
             systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
@@ -8551,6 +8581,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -8838,6 +8869,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -9122,6 +9154,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null

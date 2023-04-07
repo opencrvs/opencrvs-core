@@ -101,3 +101,7 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 #-----------------------------
 rm -rf /data/minio/ocrvs
 mkdir -p /data/minio/ocrvs
+
+# Delete all data from metabase
+#-----------------------------
+rm -rf /data/metabase/*

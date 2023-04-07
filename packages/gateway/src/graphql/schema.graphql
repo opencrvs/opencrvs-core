@@ -985,6 +985,7 @@ type History {
   certificates: [Certificate]
   signature: Signature
   duplicateOf: String
+  potentialDuplicates: [String!]
 }
 
 enum MannerOfDeath {
@@ -1566,6 +1567,7 @@ enum RegAction {
   VIEWED
   MARKED_AS_DUPLICATE
   MARKED_AS_NOT_DUPLICATE
+  FLAGGED_AS_POTENTIAL_DUPLICATE
 }
 
 type StatusReason {
@@ -1640,6 +1642,8 @@ enum AttachmentSubject {
   CHILD
   OTHER
   PARENT
+  GROOM
+  BRIDE
   CHILD_AGE
   DECEASED_ID_PROOF
   DECEASED_DEATH_PROOF

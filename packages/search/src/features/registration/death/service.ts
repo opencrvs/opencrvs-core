@@ -15,6 +15,7 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
   detectDeathDuplicates,
@@ -30,15 +31,16 @@ import {
   VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
+  addEventLocation,
+  addFlaggedAsPotentialDuplicate,
   findEntry,
+  findEntryResourceByUrl,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
-  getdeclarationJurisdictionIds,
-  addEventLocation
+  getdeclarationJurisdictionIds
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
@@ -128,7 +130,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
@@ -177,8 +180,14 @@ async function detectAndUpdateDeathDuplicates(
   logger.info(
     `Search/service:death: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
 async function createIndexBody(

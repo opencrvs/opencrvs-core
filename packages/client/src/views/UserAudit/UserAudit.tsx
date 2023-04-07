@@ -33,7 +33,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
 import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { VerticalThreeDots } from '@client/../../components/lib/icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
@@ -56,6 +56,7 @@ import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { UserDetails } from '@client/utils/userUtils'
+import { Scope } from '@client/utils/authUtils'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -110,6 +111,33 @@ const transformUserQueryResult = (
     avatar: userData.avatar || undefined,
     device: userData.device
   }
+}
+
+function canEditUserDetails(
+  targetUser: Pick<User, 'systemRole'> & {
+    primaryOffice?: { id: string } | null
+  },
+  loggedInUser: Pick<User, 'systemRole'> & {
+    primaryOffice?: { id: string } | null
+  },
+  scopes: Scope
+) {
+  if (!scopes.includes('sysadmin')) {
+    return false
+  }
+  if (loggedInUser.systemRole === SystemRoleType.NationalSystemAdmin) {
+    return true
+  }
+  const usersInTheSameOffice =
+    loggedInUser.primaryOffice?.id === targetUser?.primaryOffice?.id
+
+  if (
+    loggedInUser.systemRole === SystemRoleType.LocalSystemAdmin &&
+    usersInTheSameOffice
+  ) {
+    return true
+  }
+  return false
 }
 
 export const UserAudit = () => {
@@ -266,17 +294,25 @@ export const UserAudit = () => {
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<HistoryNavigator hideForward />}
           mobileRight={
+            userDetails &&
+            scope &&
             user && (
               <>
                 <Status status={user.status || 'pending'} />
                 <ToggleMenu
                   id={`sub-page-header-munu-button`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={getMenuItems(
                     user.id as string,
                     user.status as string
                   )}
-                  hide={(scope && !scope.includes('sysadmin')) || false}
+                  hide={!canEditUserDetails(user, userDetails, scope)}
                 />
               </>
             )
@@ -297,20 +333,26 @@ export const UserAudit = () => {
           title={user.name}
           icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
           topActionButtons={
-            user.systemRole === SystemRoleType.LocalSystemAdmin
-              ? [<Status status={user.status || 'pending'} />]
-              : [
+            userDetails && scope
+              ? [
                   <Status status={user.status || 'pending'} />,
                   <ToggleMenu
                     id={`sub-page-header-munu-button`}
-                    toggleButton={<VerticalThreeDots />}
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
                     menuItems={getMenuItems(
                       user.id as string,
                       user.status as string
                     )}
-                    hide={(scope && !scope.includes('sysadmin')) || false}
+                    hide={!canEditUserDetails(user, userDetails, scope)}
                   />
                 ]
+              : []
           }
           size={ContentSize.LARGE}
         >

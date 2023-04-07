@@ -75,7 +75,7 @@ describe('getFormDraft()', () => {
     const response = await resolvers.Query.getFormDraft(
       {},
       {},
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response.totalItems).toBe(2)
@@ -139,7 +139,7 @@ describe('createFormDraft mutation', () => {
     const response = await resolvers.Mutation.createFormDraft(
       {},
       { formDraft },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual({
@@ -163,7 +163,7 @@ describe('createFormDraft mutation', () => {
           status: 'PUBLISHED'
         }
       },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual({
@@ -195,7 +195,11 @@ describe('createFormDraft mutation', () => {
     )
 
     expect(
-      resolvers.Mutation.createFormDraft({}, { formDraft }, authHeaderSysAdmin)
+      resolvers.Mutation.createFormDraft(
+        {},
+        { formDraft },
+        { headers: authHeaderSysAdmin }
+      )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't mofify form draft"
     )
@@ -246,7 +250,7 @@ describe('modifyDraftStatus mutation', () => {
     const response = await resolvers.Mutation.modifyDraftStatus(
       {},
       { formDraft: modifyPayload },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual({
@@ -276,7 +280,7 @@ describe('modifyDraftStatus mutation', () => {
       resolvers.Mutation.modifyDraftStatus(
         {},
         { formDraft: modifyPayload },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't update form draft status"

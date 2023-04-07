@@ -71,7 +71,6 @@ const ApplicationNameContainer = styled.div`
   }
 `
 const ApplicationName = styled.div`
-  color: ${({ theme }) => theme.colors.grey};
   ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;

@@ -13,8 +13,7 @@ import { Query } from '@client/components/Query'
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages,
-  userMessages
+  errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
@@ -39,18 +38,16 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
+  getAddressName,
   getUserRoleIntlKey,
   UserStatus
 } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  AddUser,
-  VerticalThreeDots,
-  SearchRed,
-  NoWifi
-} from '@opencrvs/components/lib/icons'
+import { AddUser, SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -75,6 +72,7 @@ import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -119,27 +117,6 @@ const Loading = styled.div`
   }
 `
 
-const StatusBox = styled.div`
-  padding: 4px 8px;
-  ${({ theme }) => theme.fonts.bold12};
-  border-radius: 100px;
-  height: 30px;
-  text-align: center;
-  margin-left: 4px;
-`
-const ActiveStatusBox = styled(StatusBox)`
-  background: rgba(73, 183, 141, 0.3);
-`
-const DeactivatedStatusBox = styled(StatusBox)`
-  background: rgba(245, 209, 209, 1);
-`
-const PendingStatusBox = styled(StatusBox)`
-  background: rgba(252, 236, 217, 1);
-`
-const DisabledStatusBox = styled(StatusBox)`
-  background: rgba(206, 206, 206, 0.3);
-`
-
 const AddUserIcon = styled(AddUser)`
   cursor: pointer;
 `
@@ -162,17 +139,8 @@ const LocationInfoValue = styled.div`
   ${({ theme }) => theme.fonts.reg18};
 `
 
-const StatusMenuContainer = styled.div`
-  display: flex;
-  align-items: center;
-`
-
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-const Name = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
@@ -245,27 +213,22 @@ export const Status = (statusProps: IStatusProps) => {
   const intl = useIntl()
   switch (status) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
-      return (
-        <ActiveStatusBox>{intl.formatMessage(messages.active)}</ActiveStatusBox>
-      )
+      return <Pill type="active" label={intl.formatMessage(messages.active)} />
     case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
       return (
-        <DeactivatedStatusBox>
-          {intl.formatMessage(messages.deactivated)}
-        </DeactivatedStatusBox>
+        <Pill
+          type="inactive"
+          label={intl.formatMessage(messages.deactivated)}
+        />
       )
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return (
-        <DisabledStatusBox>
-          {intl.formatMessage(messages.disabled)}
-        </DisabledStatusBox>
+        <Pill type="default" label={intl.formatMessage(messages.disabled)} />
       )
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
       return (
-        <PendingStatusBox>
-          {intl.formatMessage(messages.pending)}
-        </PendingStatusBox>
+        <Pill type="pending" label={intl.formatMessage(messages.pending)} />
       )
   }
 }
@@ -319,13 +282,6 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
-
-  const getAddressName = ({ name, partOf }: ILocation): string => {
-    const parentLocationId = partOf.split('/')[1]
-    if (parentLocationId === '0') return name
-    const parentLocation = offlineCountryConfig.locations[parentLocationId]
-    return `${name}, ${getAddressName(parentLocation)}`
-  }
 
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
@@ -568,18 +524,24 @@ function UserListComponent(props: IProps) {
           ? true
           : false
       return (
-        // TODO use Pill Component from #2780
-        <StatusMenuContainer>
+        <Stack
+          alignItems="center"
+          direction="row"
+          gap={8}
+          justifyContent="flex-start"
+        >
           {underInvestigation && <SearchRed />}
           <Status status={status || 'pending'} />
           {canEditUserDetails && (
             <ToggleMenu
               id={`user-item-${index}-menu`}
-              toggleButton={<VerticalThreeDots />}
+              toggleButton={
+                <Icon name="DotsThreeVertical" color="primary" size="large" />
+              }
               menuItems={getMenuItems(user)}
             />
           )}
-        </StatusMenuContainer>
+        </Stack>
       )
     },
     [getMenuItems]
@@ -614,7 +576,13 @@ function UserListComponent(props: IProps) {
             const avatar = user.avatar
 
             return {
-              image: <AvatarSmall name={name} avatar={avatar || undefined} />,
+              image: (
+                <AvatarSmall
+                  name={name}
+                  avatar={avatar || undefined}
+                  onClick={() => goToUserProfile(String(user.id))}
+                />
+              ),
               label: (
                 <Link
                   id="profile-link"
@@ -875,7 +843,7 @@ function UserListComponent(props: IProps) {
                     ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
-                size={ContentSize.LARGE}
+                size={ContentSize.NORMAL}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,
@@ -903,7 +871,10 @@ function UserListComponent(props: IProps) {
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressName(getParentLocation(searchedLocation))}
+                          {getAddressName(
+                            offlineCountryConfig,
+                            getParentLocation(searchedLocation)
+                          )}
                         </LocationInfoValue>
                       )}
                     </LocationInfo>
@@ -921,7 +892,7 @@ function UserListComponent(props: IProps) {
       ) : (
         <Content
           title={intl.formatMessage(headerMessages.teamTitle)}
-          size={ContentSize.LARGE}
+          size={ContentSize.NORMAL}
         >
           <ConnectivityContainer>
             <NoConnectivity />

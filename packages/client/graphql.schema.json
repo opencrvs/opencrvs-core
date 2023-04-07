@@ -2576,6 +2576,12 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "BRIDE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "CHILD",
             "description": null,
             "isDeprecated": false,
@@ -2607,6 +2613,12 @@
           },
           {
             "name": "FATHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GROOM",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -8373,6 +8385,26 @@
                 "kind": "OBJECT",
                 "name": "InputOutput",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "potentialDuplicates",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               }
             },
             "isDeprecated": false,
@@ -17139,6 +17171,12 @@
           },
           {
             "name": "DOWNLOADED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FLAGGED_AS_POTENTIAL_DUPLICATE",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

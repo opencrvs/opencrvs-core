@@ -15,7 +15,8 @@ import {
   fetchEstimateForTargetDaysByLocationId,
   getDistrictLocation,
   fillEmptyDataArrayByKey,
-  EVENT_TYPE
+  EVENT_TYPE,
+  getMonthRangeFilterListFromTimeRage
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 import { cloneDeep } from 'lodash'
@@ -384,6 +385,36 @@ describe('verify metrics util', () => {
       )
 
       expect(output).toEqual(expectedOutput)
+    })
+  })
+  describe('check for the list of months in a range', () => {
+    it('Returns set of months from a range when start date is 29th of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-04-29T18:00:00.000Z',
+        '2023-04-05T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3])
+    })
+    it('Returns set of months from a range when start date is 1st of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-01-29T18:00:00.000Z',
+        '2023-04-05T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
+      ])
+    })
+    it('Returns set of months from a range when start date is middle of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-01-14T18:00:00.000Z',
+        '2023-04-15T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
+      ])
     })
   })
 })

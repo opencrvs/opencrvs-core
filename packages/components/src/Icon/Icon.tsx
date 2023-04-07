@@ -34,7 +34,7 @@ export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  weight = 'regular',
+  weight = 'bold',
   ...rest
 }: IconProps) {
   const IconComponent = icons['' + name]
