@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { Button } from '@opencrvs/components/lib/Button'
 import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
 import { Box } from '@opencrvs/components/lib/Box'
@@ -27,6 +27,7 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  getOfflineData,
   selectApplicationName,
   selectCountryLogo
 } from '@client/offline/selectors'
@@ -45,6 +46,7 @@ import {
 } from '@client/utils/gateway'
 import { useTimeout } from '@client/hooks/useTimeout'
 import { goToHome } from '@client/navigation'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -122,13 +124,15 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           gender
         }
         eventLocation {
+          id
           name
           description
           type
           address {
+            district
+            state
             city
-            districtName
-            stateName
+            country
           }
         }
         registration {
@@ -165,13 +169,15 @@ const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
           }
         }
         eventLocation {
+          id
           name
           description
           type
           address {
+            district
+            state
             city
-            districtName
-            stateName
+            country
           }
         }
         registration {
@@ -256,6 +262,7 @@ export function VerifyCertificatePage() {
 
   const logo = useSelector(selectCountryLogo)
   const appName = useSelector(selectApplicationName)
+  const offlineData = useSelector(getOfflineData)
 
   const [closeWindow, setCloseWindow] = React.useState(false)
   const [timeOut, setTimeOut] = React.useState(false)
@@ -348,13 +355,33 @@ export function VerifyCertificatePage() {
   const getLocation = (data: any) => {
     const location = data.eventLocation
     if (location?.type === 'HEALTH_FACILITY') return location?.name
-    const city = location?.address?.city && location?.address?.city + ', '
-    return (
-      city +
-      location?.address?.districtName +
-      ', ' +
-      location?.address?.stateName
-    )
+
+    const countryName =
+      location?.address?.country &&
+      intl.formatMessage(countryMessages[location?.address?.country])
+    const city = location?.address?.city
+      ? location?.address?.city + ', '
+      : EMPTY_STRING
+
+    if (location?.address?.country === window.config.COUNTRY) {
+      return (
+        city +
+        offlineData.locations[location?.address?.district].name +
+        ', ' +
+        offlineData.locations[location?.address?.state].name +
+        ', ' +
+        countryName
+      )
+    } else {
+      return (
+        city +
+        location?.address?.district +
+        ', ' +
+        location?.address?.state +
+        ', ' +
+        countryName
+      )
+    }
   }
 
   const getRegistarData = (data: any) => {
