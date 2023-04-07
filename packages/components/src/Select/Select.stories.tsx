@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Select, ISelectProps } from './Select'
+import { action } from '@storybook/addon-actions'
+import { Select } from './Select'
 
 export default {
   title: 'Input/Select',
@@ -24,19 +24,34 @@ export default {
       }
     },
     storyCss: {
-      height: '170px'
+      height: '240px'
     }
   }
-} as Meta
+}
 
-const Template: Story<ISelectProps> = (args) => <Select {...args} />
+const options = [
+  { value: 'birth', label: 'Birth' },
+  { value: 'death', label: 'Death' },
+  { value: 'marriage', label: 'Marriage' },
+  { value: 'adoption', label: 'Adoption' },
+  { value: 'divorce', label: 'Divorce' }
+]
 
-export const Default = Template.bind({})
-Default.args = {
-  options: [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ],
-  placeholder: 'Select a flavour'
+export const Default = () => {
+  const [value, setValue] = React.useState('')
+
+  const handleChange = (value: string) => {
+    action('Selected value')(value)
+    setValue(value)
+  }
+
+  return (
+    <Select
+      id="basic-select"
+      options={options}
+      onChange={handleChange}
+      value={value}
+      placeholder="Select"
+    />
+  )
 }
