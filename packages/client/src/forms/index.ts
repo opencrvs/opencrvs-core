@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/components/lib/Radio'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { MessageDescriptor } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
@@ -322,7 +322,8 @@ export type IFormFieldQueryMapFunction = (
   sectionId: string,
   fieldDefinition: IFormField,
   nestedFieldDefinition?: IFormField,
-  offlineData?: IOfflineData
+  offlineData?: IOfflineData,
+  intl?: IntlShape
 ) => void
 
 export type IFormFieldTemplateMapOperation =

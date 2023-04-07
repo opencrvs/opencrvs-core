@@ -75,6 +75,7 @@ import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
+import { IntlShape } from 'react-intl'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -380,6 +381,7 @@ interface IDownloadDeclaration {
   payload: {
     declaration: IDeclaration
     client: ApolloClient<{}>
+    intl: IntlShape
   }
 }
 
@@ -393,6 +395,7 @@ interface IDownloadDeclarationSuccess {
     client: ApolloClient<{}>
     offlineData?: IOfflineData
     userDetails?: UserDetails
+    intl: IntlShape
   }
 }
 
@@ -975,7 +978,8 @@ export function downloadDeclaration(
   event: Event,
   compositionId: string,
   action: DeclarationAction,
-  client: ApolloClient<{}>
+  client: ApolloClient<{}>,
+  intl: IntlShape
 ): IDownloadDeclaration {
   const declaration = makeDeclarationReadyToDownload(
     event,
@@ -986,7 +990,8 @@ export function downloadDeclaration(
     type: ENQUEUE_DOWNLOAD_DECLARATION,
     payload: {
       declaration,
-      client
+      client,
+      intl
     }
   }
 }
@@ -1016,7 +1021,8 @@ function createRequestForDeclaration(
 function requestWithStateWrapper(
   mainRequest: Promise<ApolloQueryResult<any>>,
   getState: () => IStoreState,
-  client: ApolloClient<{}>
+  client: ApolloClient<{}>,
+  intl: IntlShape
 ) {
   const store = getState()
   return new Promise(async (resolve, reject) => {
@@ -1029,7 +1035,7 @@ function requestWithStateWrapper(
         await fetchAllDuplicateDeclarations(data.data as Query)
       }
       await fetchAllMinioUrlsInAttachment(data.data as Query)
-      resolve({ data, store, client })
+      resolve({ data, store, client, intl })
     } catch (error) {
       reject(error)
     }
@@ -1086,11 +1092,13 @@ function getDataKey(declaration: IDeclaration) {
 function downloadDeclarationSuccess({
   data,
   store,
-  client
+  client,
+  intl
 }: {
   data: any
   store: IStoreState
   client: ApolloClient<{}>
+  intl: IntlShape
 }): IDownloadDeclarationSuccess {
   const form = getRegisterForm(store)
 
@@ -1101,7 +1109,8 @@ function downloadDeclarationSuccess({
       form,
       client,
       offlineData: getOfflineData(store),
-      userDetails: getUserDetails(store) as UserDetails
+      userDetails: getUserDetails(store) as UserDetails,
+      intl
     }
   }
 }
@@ -1335,9 +1344,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ...state,
         initialDeclarationsLoaded: true
       }
-    case ENQUEUE_DOWNLOAD_DECLARATION:
+    case ENQUEUE_DOWNLOAD_DECLARATION: {
       const { declarations } = state
-      const { declaration, client } = action.payload
+      const { declaration, client, intl } = action.payload
       const downloadIsRunning = declarations.some(
         (declaration) =>
           declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
@@ -1404,7 +1413,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             args: [
               request({ ...requestArgs, fetchPolicy: 'no-cache' }),
               Cmd.getState,
-              client
+              client,
+              intl
             ],
             successActionCreator: downloadDeclarationSuccess,
             failActionCreator: (err) =>
@@ -1419,15 +1429,16 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           }
         )
       )
+    }
     case DOWNLOAD_DECLARATION_SUCCESS:
       const {
         queryData,
         form,
         client: clientFromSuccess,
         offlineData,
-        userDetails
+        userDetails,
+        intl
       } = action.payload
-
       const downloadingDeclarationIndex = state.declarations.findIndex(
         (declaration) =>
           declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
@@ -1442,7 +1453,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         form[downloadingDeclaration.event],
         eventData,
         offlineData,
-        userDetails
+        userDetails,
+        intl
       )
       const downloadedAppStatus: string =
         (eventData &&

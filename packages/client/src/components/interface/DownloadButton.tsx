@@ -230,9 +230,10 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       event.toLowerCase() as unknown as Event,
       compositionId,
       action,
-      client
+      client,
+      intl
     )
-  }, [downloadConfigs, client, downloadDeclaration])
+  }, [downloadConfigs, client, downloadDeclaration, intl])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
     if (assignment) {
@@ -382,8 +383,10 @@ const mapDispatchToProps = (
     event: Event,
     compositionId: string,
     action: Action,
-    client: ApolloClient<any>
-  ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
+    client: ApolloClient<any>,
+    intl: IntlShape
+  ) =>
+    dispatch(downloadDeclaration(event, compositionId, action, client, intl)),
   deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
