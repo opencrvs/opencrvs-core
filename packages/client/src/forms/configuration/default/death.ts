@@ -860,10 +860,6 @@ export const deathRegisterForms: ISerializedForm = {
                 {
                   value: 'female',
                   label: formMessageDescriptors.sexFemale
-                },
-                {
-                  value: 'unknown',
-                  label: formMessageDescriptors.sexUnknown
                 }
               ]
             },
