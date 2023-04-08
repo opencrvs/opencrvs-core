@@ -134,10 +134,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
         {
           value: 'female',
           label: formMessageDescriptors.sexFemale
-        },
-        {
-          value: 'unknown',
-          label: formMessageDescriptors.sexUnknown
         }
       ]
     },
