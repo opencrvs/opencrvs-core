@@ -431,6 +431,9 @@ export const userTransformer =
     targetFieldName?: string,
     __?: IOfflineData
   ) => {
+    if (!_.history) {
+      return
+    }
     const history: History = _.history
       .reverse()
       .find(
