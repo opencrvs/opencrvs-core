@@ -162,7 +162,8 @@ async function indexDeclaration(
   if (
     body.type !== 'IN_PROGRESS' &&
     body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED'
+    body.type !== 'VALIDATED' &&
+    body.type !== 'ISSUED'
   ) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
