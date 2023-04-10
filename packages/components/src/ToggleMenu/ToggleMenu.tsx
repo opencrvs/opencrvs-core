@@ -11,7 +11,7 @@
  */
 import styled from 'styled-components'
 import React from 'react'
-import { CircleButton } from '../buttons'
+import { Button } from '../Button'
 import { noop } from 'lodash'
 
 const ToggleMenuContainer = styled.nav`
@@ -139,9 +139,14 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer aria-expanded={this.state.showSubmenu}>
-          <CircleButton id={`${id}ToggleButton`} onClick={this.toggleMenu}>
+          <Button
+            type="icon"
+            size="large"
+            id={`${id}ToggleButton`}
+            onClick={this.toggleMenu}
+          >
             {toggleButton}
-          </CircleButton>
+          </Button>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}

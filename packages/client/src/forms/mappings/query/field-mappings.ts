@@ -725,7 +725,11 @@ export const dateFormatTransformer =
   ): void => {
     let queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
-    if (nestedField && queryData[sectionId][nestedField]) {
+    if (
+      nestedField &&
+      queryData[sectionId] &&
+      queryData[sectionId][nestedField]
+    ) {
       queryValue = String(
         (queryData[sectionId][nestedField] as IFormSectionData)[
           transformedFieldName
