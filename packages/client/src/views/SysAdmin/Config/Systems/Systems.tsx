@@ -44,10 +44,8 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
-
 import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -275,7 +273,13 @@ export function SystemList() {
                   <ToggleMenu
                     id="toggleMenu"
                     menuItems={getMenuItems(system)}
-                    toggleButton={<VerticalThreeDots />}
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
                   />
                 </>
               }
