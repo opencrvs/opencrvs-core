@@ -90,8 +90,12 @@ export const getCountryName = (isoCode: string) => {
 }
 
 export const getNationalityName = (isoCode: string) => {
-  const alpha2 = lookup.countries({ alpha3: isoCode })[0]
-    ?.alpha2 as keyof typeof nationalityMessages
+  const alpha2 =
+    isoCode === 'FAR'
+      ? 'FA'
+      : (lookup.countries({ alpha3: isoCode })[0]
+          ?.alpha2 as keyof typeof nationalityMessages)
+
   return nationalityMessages[alpha2]
 }
 

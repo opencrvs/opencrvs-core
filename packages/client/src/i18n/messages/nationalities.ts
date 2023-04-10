@@ -268,6 +268,10 @@ const messagesToDefine = {
     id: 'nationality.ET',
     defaultMessage: 'Ethiopian'
   },
+  FA: {
+    id: 'nationality.FA',
+    defaultMessage: 'Farajaland'
+  },
   FK: {
     id: 'nationality.FK',
     defaultMessage: 'Falkland Islands (Malvinas)'
