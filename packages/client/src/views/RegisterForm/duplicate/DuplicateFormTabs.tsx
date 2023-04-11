@@ -82,6 +82,7 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const SupportingDocumentWrapper = styled(Stack)`
+  position: sticky;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column;
     align-items: flex-start;
