@@ -360,6 +360,7 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
+          informantType: draft.data.informant.relationship,
           [signatureKey]:
             !draft.data.template?.[signatureKey] ||
             isCertificateForPrintInAdvance(draft)
