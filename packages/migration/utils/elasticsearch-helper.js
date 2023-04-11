@@ -66,3 +66,22 @@ export const updateFieldNameByCompositionId = async (
     return null
   }
 }
+
+export const searchByCompositionId = async (compositionId) => {
+  try {
+    return await client.search({
+      index: ELASTICSEARCH_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: {
+          match: {
+            _id: compositionId
+          }
+        }
+      }
+    })
+  } catch (err) {
+    console.error(`searchByCompositionId: error: ${err}`)
+    return null
+  }
+}

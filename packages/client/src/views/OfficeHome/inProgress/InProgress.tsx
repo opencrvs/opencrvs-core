@@ -41,7 +41,7 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { ITheme, withTheme } from '@client/styledComponents'
-import { LANG_EN } from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -209,11 +209,14 @@ export class InProgressComponent extends React.Component<
           marriageReg && (marriageReg.groomName as GQLHumanName[])
         const groomNamesMap = createNamesMap(groomNames)
         const brideNames =
-          marriageReg && (marriageReg.groomName as GQLHumanName[])
+          marriageReg && (marriageReg.brideName as GQLHumanName[])
         const brideNamesMap = createNamesMap(brideNames)
         const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
         const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
-        name = groomName + (brideName ? ` & ${brideName}` : '')
+        name =
+          brideName && groomName
+            ? `${groomName} & ${brideName}`
+            : brideName || groomName || EMPTY_STRING
         const date = (reg as GQLMarriageEventSearchSet).dateOfMarriage
         eventDate = date && date
       }
