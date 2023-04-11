@@ -55,17 +55,6 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {}
   },
-  // @ts-ignore
-  managerHead: (head: string) => {
-    return `${head}
-    <link rel="icon" href="favicon.png" />
-    <style type="text/css">
-      #storybook-explorer-tree .sidebar-item[data-selected=false] svg {
-        color: ${BRAND_BLUE};
-      }
-    </style>
-    `
-  },
   docs: {
     autodocs: true
   }
