@@ -884,7 +884,13 @@ export const up = async (db, client) => {
         {
           $project: {
             _id: {
-              $concat: [{ $toString: '$districtName' }, '$daysInYear.date']
+              $concat: [
+                { $toString: '$districtName' },
+                '-',
+                { $toString: '$stateName' },
+                '-',
+                '$daysInYear.date'
+              ]
             },
             name: '$districtName',
             stateName: '$stateName',
