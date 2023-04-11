@@ -23,48 +23,15 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const GlobalStyle = createGlobalStyle`
-html,
-body,
-#__next,
-#__layout,
-#default-layout {
-font-family: ${theme.fontFamily};
-width: 100%;
-height: 100%;
-overflow-x: hidden;
-.page-content {
-position: relative;
-height: 100%;
-.table-container {
-height: 100%;
-}
-}
-.os-padding {
-z-index: 0;
-}
-}
-
-body,
-h1, h2, h3, h4, h5, h6,
-blockquote, p, pre, code,
-dl, dd, ol, ul,
-figure,
-hr,
-fieldset, legend
-{
-margin:   0;
-padding:  0;
-}
-* {
-box-sizing: border-box;
+const FontStyle = createGlobalStyle`
+.sbdocs:not(.docs-story) * {
+  font-family: ${theme.fontFamily} !important;
 }
 `
 const preview: Preview = {
-  decorators : [
+  decorators: [
     (Story, context) => (
       <ThemeProvider theme={theme}>
-        <GlobalStyle />
         {
           // Allows adding { parameters: { storyCss: { ... } }} inside stories
           context?.parameters?.storyCss ? (
@@ -90,7 +57,19 @@ const preview: Preview = {
     docs: {
       container: ({ children, context }) => (
         <DocsContainer context={context}>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <FontStyle />
+            {
+              // Allows adding { parameters: { docsCss: { ... } }} inside stories
+              context?.attachedCSFFile?.meta?.parameters?.docsCss ? (
+                <div style={context.attachedCSFFile.meta.parameters.docsCss}>
+                  {children}
+                </div>
+              ) : (
+                children
+              )
+            }
+          </ThemeProvider>
         </DocsContainer>
       )
     },

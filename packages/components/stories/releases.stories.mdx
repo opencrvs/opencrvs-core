@@ -29,18 +29,9 @@ export const ReleasePill = ({ date, version }) => (
 
 <Meta
   title="Releases"
-  parameters={{
-    docs: {
-      container: ({ children, context }) => {
-        const theme = getTheme()
-        return (
-          <DocsContainer context={context}>
-            <ThemeProvider theme={theme}>
-              <div style={{ maxWidth: '640px' }}>{children}</div>
-            </ThemeProvider>
-          </DocsContainer>
-        )
-      }
+   parameters={{
+    docsCss: {
+      maxWidth: '640px'
     }
   }}
 />
