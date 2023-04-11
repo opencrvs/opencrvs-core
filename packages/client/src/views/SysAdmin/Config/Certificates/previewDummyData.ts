@@ -1949,6 +1949,7 @@ const mockOfflineData: Partial<IOfflineData> = {
 const mockUserDetails: UserDetails = {
   id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
   creationDate: '2022-03-25T12:30:34.597+00:00',
+  title: 'Test user',
   localRegistrar: {
     name: [
       {
