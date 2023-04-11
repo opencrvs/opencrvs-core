@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import { validatePasswordHash } from '@user-mgnt/features/changePassword/handler'
 
 interface IVerifyPayload {
   id: string
@@ -40,23 +40,18 @@ export default async function verifyPassByIdHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  try {
-    if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
-      throw unauthorized()
+
+  if (validatePasswordHash(password, user)) {
+    const response: IVerifyResponse = {
+      mobile: user.mobile,
+      scope: user.scope,
+      status: user.status,
+      username: user.username,
+      id: user.id
     }
-  } catch (e) {
-    throw unauthorized()
+    return response
   }
-
-  const response: IVerifyResponse = {
-    mobile: user.mobile,
-    scope: user.scope,
-    status: user.status,
-    username: user.username,
-    id: user.id
-  }
-
-  return response
+  throw unauthorized()
 }
 
 export const requestSchema = Joi.object({

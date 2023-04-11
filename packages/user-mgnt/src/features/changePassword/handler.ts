@@ -58,7 +58,10 @@ export default async function changePasswordHandler(
   return h.response().code(401)
 }
 
-function validatePasswordHash(existingPassword: string, user: IUserModel) {
+export function validatePasswordHash(
+  existingPassword: string,
+  user: IUserModel
+) {
   try {
     return (
       generateHash(existingPassword, user.salt) === user.passwordHash ||
