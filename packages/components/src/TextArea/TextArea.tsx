@@ -29,7 +29,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
     outline: 0;
   }
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {

@@ -45,6 +45,20 @@ export async function getBirthEncounterCompositionCount(db) {
 export async function getCompositionCursor(db, limit = 50, skip = 0) {
   return db.collection(COLLECTION_NAMES.COMPOSITION).find({}, { limit, skip })
 }
+
+export async function getCertifiedTaskCursor(db, limit = 50, skip = 0) {
+  return db
+    .collection(COLLECTION_NAMES.TASK)
+    .find({ 'businessStatus.coding.code': 'CERTIFIED' }, { limit, skip })
+}
+
+export async function getTotalCertifiedTaskCount(db) {
+  return db
+    .collection(COLLECTION_NAMES.TASK)
+    .find({ 'businessStatus.coding.code': 'CERTIFIED' })
+    .count()
+}
+
 export async function getTotalDocCountByCollectionName(db, collectionName) {
   return await db.collection(collectionName).count()
 }

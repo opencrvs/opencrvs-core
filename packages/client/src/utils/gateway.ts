@@ -3687,6 +3687,7 @@ export type FetchBirthRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4391,6 +4392,7 @@ export type FetchDeathRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -5084,6 +5086,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -8588,6 +8591,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -8875,6 +8879,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -9159,6 +9164,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null

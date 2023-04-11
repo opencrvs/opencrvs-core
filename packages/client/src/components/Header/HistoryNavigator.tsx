@@ -58,7 +58,7 @@ export function HistoryNavigator({
       <Button
         id="header-go-back-button"
         type="icon"
-        size="large"
+        size="medium"
         disabled={
           (history.action === 'POP' || history.action === 'REPLACE') &&
           isLandingPage()
@@ -70,7 +70,7 @@ export function HistoryNavigator({
       {!hideForward && (
         <Button
           type="icon"
-          size="large"
+          size="medium"
           disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
           onClick={() => dispatch(goForward())}
         >
