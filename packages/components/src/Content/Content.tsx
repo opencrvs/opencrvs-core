@@ -51,7 +51,7 @@ const Header = styled.div`
 const TopActionBar = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 `
 export const SubHeader = styled.div`
   padding-bottom: 16px;

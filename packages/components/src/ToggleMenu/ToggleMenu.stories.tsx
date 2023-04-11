@@ -11,8 +11,8 @@
  */
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
+import { Icon } from '../Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
-import { SettingsBlack, LogoutBlack, VerticalThreeDots } from '../icons'
 import React from 'react'
 
 interface IProps {
@@ -47,16 +47,18 @@ export const ToggleMenuView = Template.bind({})
 ToggleMenuView.args = {
   id: 'birth',
   menuHeader: header,
-  toggleButton: <VerticalThreeDots />,
+  toggleButton: (
+    <Icon name="DotsThreeVertical" color="primary" size="large" weight="bold" />
+  ),
   menuItems: [
     {
-      icon: <SettingsBlack />,
-      label: 'Settings',
+      icon: <Icon name="Share" color="primary" size="large" weight="bold" />,
+      label: 'Share',
       handler: () => alert('Settings')
     },
     {
-      icon: <LogoutBlack />,
-      label: 'Logout',
+      icon: <Icon name="Star" color="primary" size="large" weight="bold" />,
+      label: 'Favourite',
       handler: () => alert('Logout')
     }
   ],
