@@ -269,7 +269,7 @@ const messagesToDefine = {
     defaultMessage: 'Ethiopian'
   },
   FA: {
-    id: 'nationality.FA',
+    id: 'countries.FAR',
     defaultMessage: 'Farajaland'
   },
   FK: {
@@ -650,7 +650,7 @@ const messagesToDefine = {
   },
   PS: {
     id: 'nationality.PS',
-    defaultMessage: 'Palestinian Territory, Occupied'
+    defaultMessage: 'Palestinian'
   },
   PA: {
     id: 'nationality.PA',
@@ -998,7 +998,7 @@ const messagesToDefine = {
   },
   XK: {
     id: 'nationality.XK',
-    defaultMessage: 'Kosovo'
+    defaultMessage: 'Kosovar'
   }
 }
 
