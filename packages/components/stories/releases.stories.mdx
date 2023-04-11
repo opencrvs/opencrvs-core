@@ -19,7 +19,7 @@ export const ReleasePill = ({ date, version }) => (
   <>
     <br />
     <Stack gap={16}>
-      <Text variant="bold16" element="bold16">
+      <Text variant="bold16" element="span">
         {date}
       </Text>
       <Pill label={'v ' + version} type="default" size="small" />
@@ -29,7 +29,7 @@ export const ReleasePill = ({ date, version }) => (
 
 <Meta
   title="Releases"
-   parameters={{
+  parameters={{
     docsCss: {
       maxWidth: '640px'
     }
