@@ -304,6 +304,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}
+          isDisabled={this.state.filesBeingProcessed.length > 0}
         />
 
         <ImageUploader
