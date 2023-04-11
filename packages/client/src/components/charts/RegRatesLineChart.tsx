@@ -18,7 +18,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
-import type { LayoutType } from 'recharts'
+import type { LegendProps } from 'recharts'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -40,7 +40,7 @@ interface IState {
   chartBottom: number
   chartLeft: number
   maximizeXAxisInterval?: boolean
-  legendLayout: LayoutType
+  legendLayout: LegendProps['layout']
   activeLabel: string
   activeRegisteredInTargetDays: IActiveState
   activeTotalRegistered: IActiveState
