@@ -924,7 +924,13 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
         {
           $project: {
             _id: {
-              $concat: [{ $toString: '$districtName' }, '$daysInYear.date']
+              $concat: [
+                { $toString: '$districtName' },
+                '-',
+                { $toString: '$stateName' },
+                '-',
+                '$daysInYear.date'
+              ]
             },
             name: '$districtName',
             stateName: '$stateName',
