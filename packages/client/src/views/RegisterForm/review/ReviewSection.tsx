@@ -1719,9 +1719,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           )
         } else if (event === Event.Marriage) {
           return (
-            !declaration.data.registration?.groomSignature &&
-            !declaration.data.registration?.brideSignature &&
-            !declaration.data.registration?.witnessOneSignature &&
+            !declaration.data.registration?.groomSignature ||
+            !declaration.data.registration?.brideSignature ||
+            !declaration.data.registration?.witnessOneSignature ||
             !declaration.data.registration?.witnessTwoSignature
           )
         }
