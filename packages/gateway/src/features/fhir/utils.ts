@@ -957,13 +957,15 @@ export async function setCertificateCollector(
     familyName: nameItem.family,
     firstNames: nameItem.given.join(' ')
   }))
+  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
 
-  ;(details?.registration?.certificates || []).map((certificate: any) => {
-    if (!certificate?.collector) {
+  details?.registration?.certificates?.forEach((certificate) => {
+    if (!certificate) return
+    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
       certificate.collector = {
         individual: { name },
         relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: userDetails.role
+        otherRelationship: role
       }
     }
     return certificate
