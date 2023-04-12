@@ -35,7 +35,7 @@ interface IFetchButtonProps {
   modalTitle: string
   successTitle: string
   errorTitle: string
-  onFetch?: (response: any) => void
+  handleFetch?: (response: any) => void
   isDisabled?: boolean
 }
 
@@ -155,6 +155,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     })
   }
   performQuery = async (client: any) => {
+    console.log(this.props)
     const { query, variables, responseTransformer } = this.props
       .queryData as IQuery
     try {
@@ -164,9 +165,9 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
         variables
       })
       this.setState({ success: true, loading: false, error: false })
-      if (responseTransformer && this.props.onFetch) {
+      if (responseTransformer && this.props.handleFetch) {
         const transformedResponse = responseTransformer(response)
-        this.props.onFetch(transformedResponse)
+        this.props.handleFetch(transformedResponse)
       }
     } catch (error) {
       Sentry.captureException(error)
