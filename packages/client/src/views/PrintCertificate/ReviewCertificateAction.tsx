@@ -350,8 +350,6 @@ function mapStatetoProps(
     event
   )
 
-  console.log(draft.data.template)
-
   return {
     event,
     registrationId,

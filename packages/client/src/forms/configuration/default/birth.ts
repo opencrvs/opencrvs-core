@@ -119,6 +119,10 @@ export const birthRegisterForms: ISerializedForm = {
                 ]
               },
               mapping: {
+                template: {
+                  fieldName: 'informantType',
+                  operation: 'plainInputTransformer'
+                },
                 mutation: {
                   operation: 'nestedRadioFieldToBundleFieldTransformer',
                   parameters: ['registration.informantType']
@@ -126,10 +130,6 @@ export const birthRegisterForms: ISerializedForm = {
                 query: {
                   operation: 'bundleFieldToNestedRadioFieldTransformer',
                   parameters: ['registration.informantType']
-                },
-                template: {
-                  fieldName: 'informantType',
-                  operation: 'plainInputTransformer'
                 }
               }
             }
