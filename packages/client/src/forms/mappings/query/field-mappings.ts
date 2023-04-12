@@ -38,11 +38,12 @@ import {
 } from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getNationalityName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { intl } from '@client/i18n/components/I18nContainer'
 
 interface IName {
   [key: string]: any
@@ -661,8 +662,7 @@ export const sectionTransformer =
     sectionId: string,
     field: IFormField,
     _?: IFormField,
-    offlineData?: IOfflineData,
-    intl?: IntlShape
+    offlineData?: IOfflineData
   ): void => {
     const targetNameKey = targetFieldName || field.name
 
@@ -678,8 +678,7 @@ export const sectionTransformer =
         sectionId,
         field,
         _,
-        offlineData,
-        intl
+        offlineData
       )
       if (!localTransformedData[sectionId]) {
         return
@@ -1006,8 +1005,7 @@ export const nationalityTransformer = (
   sectionId: string,
   field: IFormField,
   _?: IFormField,
-  __?: IOfflineData,
-  intl?: IntlShape
+  __?: IOfflineData
 ) => {
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
@@ -1017,7 +1015,7 @@ export const nationalityTransformer = (
       queryData[sectionId][field.name] && queryData[sectionId][field.name][0]
     )
     transformedData[sectionId][field.name] =
-      intl?.formatMessage(nationalityName) || ''
+      intl.formatMessage(nationalityName) || ''
   } else if (queryData[sectionId]?.individual) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
@@ -1027,7 +1025,7 @@ export const nationalityTransformer = (
         queryData[sectionId].individual[field.name][0]
     )
     transformedData[sectionId][field.name] =
-      intl?.formatMessage(nationalityName) || ''
+      intl.formatMessage(nationalityName) || ''
   }
 }
 

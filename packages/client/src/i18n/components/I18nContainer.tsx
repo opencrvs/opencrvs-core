@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { connect } from 'react-redux'
-import { IntlProvider } from 'react-intl'
+import {
+  createIntl,
+  createIntlCache,
+  IntlProvider,
+  IntlShape
+} from 'react-intl'
 
 import { getLanguage, getMessages } from '@client/i18n/selectors'
 import { IStoreState } from '@client/store'
@@ -21,9 +26,18 @@ type StateProps = {
   messages: IntlMessages
 }
 
+const cache = createIntlCache()
+
+export let intl: IntlShape
 const mapStateToProps = (state: IStoreState): StateProps => {
   const locale = getLanguage(state)
-
+  intl = createIntl(
+    {
+      locale,
+      messages: getMessages(state)
+    },
+    cache
+  )
   return {
     locale,
     messages: getMessages(state)
