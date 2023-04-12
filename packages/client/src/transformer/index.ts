@@ -38,7 +38,6 @@ import {
   DuplicatesInfo
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { IntlShape } from 'react-intl'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -304,8 +303,7 @@ export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any,
   offlineData?: IOfflineData,
-  userDetails?: UserDetails,
-  intl?: IntlShape
+  userDetails?: UserDetails
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -343,8 +341,7 @@ export const gqlToDraftTransformer = (
             section.id,
             fieldDef,
             undefined,
-            offlineData,
-            intl
+            offlineData
           )
         }
         if (fieldDef.mapping && fieldDef.mapping.query) {
