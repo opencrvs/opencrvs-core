@@ -29,7 +29,6 @@ import {
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
