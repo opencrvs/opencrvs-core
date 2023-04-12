@@ -24,7 +24,7 @@
     "@types/pino": "^6.3.12",
     "fast-csv": "^4.3.6",
     "fp-ts": "^2.12.3",
-    "hapi-auth-jwt2": "10.2.0",
+    "hapi-auth-jwt2": "10.4.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.2.0",
     "io-ts": "^2.2.18",
