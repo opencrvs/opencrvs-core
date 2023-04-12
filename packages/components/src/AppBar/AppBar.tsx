@@ -53,7 +53,7 @@ const Title = styled(Text)`
   height: 25px;
 `
 
-interface IProps {
+type IProps = {
   mobileLeft?: React.ReactNode
   mobileTitle?: React.ReactNode
   mobileRight?: React.ReactNode
