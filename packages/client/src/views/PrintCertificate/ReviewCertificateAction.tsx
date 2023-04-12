@@ -350,6 +350,8 @@ function mapStatetoProps(
     event
   )
 
+  console.log(draft.data.template)
+
   return {
     event,
     registrationId,
@@ -359,7 +361,6 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
-          informantType: draft.data.informant.relationship,
           [signatureKey]:
             !draft.data.template?.[signatureKey] ||
             isCertificateForPrintInAdvance(draft)
