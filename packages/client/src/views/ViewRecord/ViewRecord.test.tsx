@@ -60,6 +60,7 @@ describe('View Record for loading and success state', () => {
                         state: 'Central Province',
                         __typename: 'Address'
                       },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c',
                       __typename: 'Location'
                     },
                     __typename: 'RegWorkflow'
