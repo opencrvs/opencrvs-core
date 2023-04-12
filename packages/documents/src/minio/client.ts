@@ -15,12 +15,14 @@ import {
   MINIO_HOST,
   MINIO_PORT
 } from '@documents/minio/constants'
+import { PRODUCTION } from '@documents/constants'
 import * as Minio from 'minio'
 
 export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
-  port: Number(MINIO_PORT),
-  useSSL: false,
+  ...(!PRODUCTION
+    ? { port: Number(MINIO_PORT), useSSL: false }
+    : { useSSL: true }),
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin'
 })

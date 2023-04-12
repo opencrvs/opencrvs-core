@@ -40,8 +40,13 @@ export function setMarriageRegistrationSectionTransformer(
           window.config.MINIO_BUCKET
 
       if (isMinioUrl) {
-        transformedData[sectionId].groomSignature =
-          draftData[sectionId].groomSignatureURI
+        transformedData[sectionId].groomSignature = `/${
+          window.config.MINIO_BUCKET
+        }${
+          String(draftData[sectionId].groomSignatureURI).split(
+            `/${window.config.MINIO_BUCKET}`
+          )[1]
+        }`
       } else {
         transformedData[sectionId].groomSignature =
           draftData[sectionId].groomSignature
@@ -54,8 +59,13 @@ export function setMarriageRegistrationSectionTransformer(
           window.config.MINIO_BUCKET
 
       if (isMinioUrl) {
-        transformedData[sectionId].brideSignature =
-          draftData[sectionId].brideSignatureURI
+        transformedData[sectionId].brideSignature = `/${
+          window.config.MINIO_BUCKET
+        }${
+          String(draftData[sectionId].brideSignatureURI).split(
+            `/${window.config.MINIO_BUCKET}`
+          )[1]
+        }`
       } else {
         transformedData[sectionId].brideSignature =
           draftData[sectionId].brideSignature
@@ -69,8 +79,13 @@ export function setMarriageRegistrationSectionTransformer(
           window.config.MINIO_BUCKET
 
       if (isMinioUrl) {
-        transformedData[sectionId].witnessOneSignature =
-          draftData[sectionId].witnessOneSignatureURI
+        transformedData[sectionId].witnessOneSignature = `/${
+          window.config.MINIO_BUCKET
+        }${
+          String(draftData[sectionId].witnessOneSignatureURI).split(
+            `/${window.config.MINIO_BUCKET}`
+          )[1]
+        }`
       } else {
         transformedData[sectionId].witnessOneSignature =
           draftData[sectionId].witnessOneSignature
@@ -84,8 +99,13 @@ export function setMarriageRegistrationSectionTransformer(
           window.config.MINIO_BUCKET
 
       if (isMinioUrl) {
-        transformedData[sectionId].witnessTwoSignature =
-          draftData[sectionId].witnessTwoSignatureURI
+        transformedData[sectionId].witnessTwoSignature = `/${
+          window.config.MINIO_BUCKET
+        }${
+          String(draftData[sectionId].witnessTwoSignatureURI).split(
+            `/${window.config.MINIO_BUCKET}`
+          )[1]
+        }`
       } else {
         transformedData[sectionId].witnessTwoSignature =
           draftData[sectionId].witnessTwoSignature

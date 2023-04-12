@@ -471,9 +471,7 @@ export const typeResolvers: GQLResolver = {
           'POST',
           JSON.stringify({ fileName: fileName })
         )) as { presignedURL: string }
-        return `/${MINIO_BUCKET}${
-          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-        }`
+        return response.presignedURL
       }
       return null
     },
@@ -498,9 +496,7 @@ export const typeResolvers: GQLResolver = {
           'POST',
           JSON.stringify({ fileName: fileName })
         )) as { presignedURL: string }
-        return `/${MINIO_BUCKET}${
-          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-        }`
+        return response.presignedURL
       }
       return null
     },
@@ -525,9 +521,7 @@ export const typeResolvers: GQLResolver = {
           'POST',
           JSON.stringify({ fileName: fileName })
         )) as { presignedURL: string }
-        return `/${MINIO_BUCKET}${
-          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-        }`
+        return response.presignedURL
       }
       return null
     },
@@ -552,9 +546,7 @@ export const typeResolvers: GQLResolver = {
           'POST',
           JSON.stringify({ fileName: fileName })
         )) as { presignedURL: string }
-        return `/${MINIO_BUCKET}${
-          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-        }`
+        return response.presignedURL
       }
       return null
     },
@@ -579,9 +571,7 @@ export const typeResolvers: GQLResolver = {
           'POST',
           JSON.stringify({ fileName: fileName })
         )) as { presignedURL: string }
-        return `/${MINIO_BUCKET}${
-          response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-        }`
+        return response.presignedURL
       }
       return null
     },
@@ -844,9 +834,7 @@ export const typeResolvers: GQLResolver = {
         'POST',
         JSON.stringify({ fileName: fileName })
       )) as { presignedURL: string }
-      return `/${MINIO_BUCKET}${
-        response.presignedURL.split(`/${MINIO_BUCKET}`)[1]
-      }`
+      return response.presignedURL
     },
     uri(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data

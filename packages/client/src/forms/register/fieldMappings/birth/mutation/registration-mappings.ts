@@ -107,8 +107,13 @@ export function setBirthRegistrationSectionTransformer(
         window.config.MINIO_BUCKET
 
     if (isMinioUrl) {
-      transformedData[sectionId].informantsSignature =
-        draftData[sectionId].informantsSignatureURI
+      transformedData[sectionId].informantsSignature = `/${
+        window.config.MINIO_BUCKET
+      }${
+        String(draftData[sectionId].informantsSignatureURI).split(
+          `/${window.config.MINIO_BUCKET}`
+        )[1]
+      }`
     } else {
       transformedData[sectionId].informantsSignature =
         draftData[sectionId].informantsSignature

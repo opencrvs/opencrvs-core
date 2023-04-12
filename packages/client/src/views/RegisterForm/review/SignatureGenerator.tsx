@@ -92,11 +92,7 @@ export function SignatureGenerator({
   const intl = useIntl()
   const allowedSignatureFormat = ['image/png']
 
-  const signatureData =
-    value && !isBase64FileString(value)
-      ? `${window.config.MINIO_URL}${value}`
-      : value
-
+  const signatureData = value
   function apply() {
     setSignatureDialogOpen(false)
     onChange(signatureValue)
