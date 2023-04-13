@@ -150,7 +150,7 @@ const DEFAULT_SYSTEM_ROLES = [
   {
     title: 'Field Agent',
     value: 'FIELD_AGENT',
-    types: [
+    roles: [
       'HEALTHCARE_WORKER',
       'POLICE_OFFICER',
       'SOCIAL_WORKER',
@@ -162,42 +162,42 @@ const DEFAULT_SYSTEM_ROLES = [
   {
     title: 'Registration Agent',
     value: 'REGISTRATION_AGENT',
-    types: [],
+    roles: [],
     active: true
   },
 
   {
     title: 'Registrar',
     value: 'LOCAL_REGISTRAR',
-    types: [],
+    roles: [],
     active: true
   },
 
   {
     title: 'System admin (local)',
     value: 'LOCAL_SYSTEM_ADMIN',
-    types: [],
+    roles: [],
     active: true
   },
 
   {
     title: 'System admin (national)',
     value: 'NATIONAL_SYSTEM_ADMIN',
-    types: [],
+    roles: [],
     active: true
   },
 
   {
     title: 'Performance Management',
     value: 'PERFORMANCE_MANAGEMENT',
-    types: [],
+    roles: [],
     active: true
   },
 
   {
     title: 'National Registrar',
     value: 'NATIONAL_REGISTRAR',
-    types: [],
+    roles: [],
     active: true
   }
 ]
@@ -305,8 +305,8 @@ export const up = async (db, client) => {
       await db.collection('systemroles').insertMany(
         DEFAULT_SYSTEM_ROLES.map((systemRole) => ({
           ...systemRole,
-          types: systemRole.types.map(
-            (type) => userRolesResult.insertedIds[UserRolesIndex[type]]
+          roles: systemRole.roles.map(
+            (role) => userRolesResult.insertedIds[UserRolesIndex[role]]
           ),
           createdAt: Date.now().toString(),
           updatedAt: Date.now().toString()
