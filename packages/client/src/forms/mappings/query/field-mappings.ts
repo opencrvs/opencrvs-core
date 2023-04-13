@@ -43,6 +43,7 @@ import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import isValid from 'date-fns/isValid'
 
 interface IName {
   [key: string]: any
@@ -1045,5 +1046,23 @@ export const plainInputTransformer = (
       transformedData[sectionId] = {}
     }
     transformedData[sectionId][field.name] = queryData[field.name] || ''
+  }
+}
+
+export const dateInWords = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (queryData[sectionId]?.[field.name]) {
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    if (isValid(new Date(queryData[sectionId][field.name]))) {
+      transformedData[sectionId][field.name] =
+        queryData[sectionId][field.name] || ''
+    }
   }
 }

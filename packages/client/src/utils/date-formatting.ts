@@ -68,3 +68,7 @@ export default function formatDate(date: Date | number, formatStr = 'PP') {
     locale: locales[window.__localeId__]
   })
 }
+
+export const dateInWords = (dateYMD: string) => {
+  const [year, month, dayInMonth] = dateYMD.split('-')
+}
