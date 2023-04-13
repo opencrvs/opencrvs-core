@@ -67,3 +67,4 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   : 600
 export const DEFAULT_TIMEOUT = 600000
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
+export const OSIA_SERVICE_VERSION = process.env.OSIA_SERVICE_VERSION || 'v1'

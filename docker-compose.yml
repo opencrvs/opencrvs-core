@@ -59,6 +59,7 @@ services:
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
+      - OSIA_SERVICE_VERSION=v1
       - DOCUMENTS_URL=http://documents:9050
   # User facing services
   workflow:

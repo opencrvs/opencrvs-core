@@ -130,7 +130,12 @@ export const getRoutes = () => {
   // with suffix as -routes.ts
   glob.sync(join(__dirname, '../routes/**/*-route.[t|j]s')).forEach((file) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    routes.push(require(resolve(file)).default)
+    const otherRoutes = require(resolve(file)).default
+    if (Array.isArray(otherRoutes)) {
+      routes.push(...otherRoutes)
+    } else {
+      routes.push(otherRoutes)
+    }
   })
   return routes
 }
