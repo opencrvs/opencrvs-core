@@ -28,6 +28,11 @@ import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
+import {
+  isValidDayOfMonth,
+  isValidMonth,
+  isValidYear
+} from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -78,6 +83,39 @@ export function formatAllNonStringValues(
 }
 
 const cache = createIntlCache()
+/**
+ *
+ * Formats message with a fallback if key not found
+ * @param intl
+ * @param key
+ */
+function formatMessage(intl: IntlShape, key: string) {
+  return intl.formatMessage({
+    id: key,
+    defaultMessage: 'Missing translation for ' + key
+  })
+}
+export const getNumberInWords = (
+  n: number,
+  tenthKey: string,
+  unitKey: string,
+  intl: IntlShape
+) => {
+  let word = ''
+  let remainder
+  if (n < 20) {
+    remainder = 0
+    word = formatMessage(intl, [unitKey, n].join('.'))
+  } else if (n < 100) {
+    remainder = n % 10
+    word = formatMessage(intl, [tenthKey, Math.floor(n / 10)].join('.'))
+    // In case of remainder, we need to handle it here to be able to add the “-”
+    if (remainder) {
+      word += '-' + formatMessage(intl, [unitKey, remainder].join('.'))
+    }
+  }
+  return word
+}
 
 export function executeHandlebarsTemplate(
   templateString: string,
@@ -141,6 +179,57 @@ export function executeHandlebarsTemplate(
       }
     }
   )
+
+  Handlebars.registerHelper(
+    'dateToWords',
+    function (
+      this: any,
+      keys: {
+        century: string
+        tenth: string
+        number: string
+        ordinal: string
+      },
+      date: string,
+      options: Handlebars.HelperOptions
+    ) {
+      const { century, tenth, number, ordinal } = keys
+
+      if (!century || !tenth || !number || !ordinal || !date) return ''
+      const [year, month, dayOfMonth] = date.split('-')
+      if (
+        !isValidYear(year) ||
+        !isValidMonth(month) ||
+        !isValidDayOfMonth(dayOfMonth)
+      )
+        return ''
+      const centuryValue = Number(year.slice(0, 2)) * 100
+      const centuryYear = Number(year.slice(2))
+      const yearMessage = `${formatMessage(
+        intl,
+        [century, centuryValue].join('.')
+      )} ${getNumberInWords(centuryYear, tenth, number, intl)}`
+      const monthMessage = new Date(1970, Number(month) - 1).toLocaleString(
+        intl.locale,
+        {
+          month: 'long'
+        }
+      )
+      const dayOfMonthMessage = formatMessage(
+        intl,
+        [ordinal, dayOfMonth].join('.')
+      )
+      return [dayOfMonthMessage, monthMessage, yearMessage].join(' ')
+    }
+  )
+
+  Handlebars.registerHelper(
+    'keys',
+    function (this: any, options: Handlebars.HelperOptions) {
+      return options.hash
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data)
   const output = template(formattedTemplateData)
