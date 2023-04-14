@@ -34,6 +34,7 @@ import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -241,10 +242,11 @@ export const convertToLocal = (
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
 
-  const countryCode =
-    alpha3CountryCode.toUpperCase() === 'FAR'
-      ? 'ZM'
-      : callingCountries[alpha3CountryCode].alpha2
+  const countryCode = countryAlpha3toAlpha2(alpha3CountryCode)
+
+  if (!countryCode) {
+    return
+  }
 
   const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -319,13 +321,6 @@ const getUserRole = (history: History): MessageDescriptor => {
       id: 'form.field.label.empty'
     }
   )
-}
-
-const getUserOfficeName = (history: History): string => {
-  const officeName = history?.office?.name || ''
-  const officeAddressLevel3 = history?.office?.address?.district || ''
-  const officeAddressLevel4 = history?.office?.address?.state || ''
-  return [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
 }
 
 const getUserSignature = (history: History): string => {
@@ -438,6 +433,9 @@ export const userTransformer =
     targetFieldName?: string,
     __?: IOfflineData
   ) => {
+    if (!_.history) {
+      return
+    }
     const history: History = _.history
       .reverse()
       .find(
@@ -451,7 +449,7 @@ export const userTransformer =
       ] = {
         name: getUserFullName(history),
         role: getUserRole(history),
-        office: getUserOfficeName(history),
+        office: history?.office,
         signature: getUserSignature(history)
       } as IFormSectionData
     }
