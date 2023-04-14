@@ -371,8 +371,7 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
     ? underYears(childBirthDate, 18)
       ? undefined
       : {
-          message: messages.isValidBirthDateWithinRange,
-          props: { min: 0, max: 17 }
+          message: messages.isValidBirthDateWithinRange
         }
     : {
         message: messages.isValidBirthDate
