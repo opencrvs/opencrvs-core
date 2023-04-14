@@ -18,6 +18,7 @@ import { resolvers as registrationRootResolvers } from '@gateway/features/regist
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
 import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
+import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolver'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
@@ -62,6 +63,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,
+  metricsTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
   roleTypeResolvers as IResolvers,
   certificateResolvers as IResolvers,

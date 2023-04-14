@@ -416,6 +416,7 @@ export async function fetchDeclarationsBeginnerRole(
   authHeader: IAuthHeader
 ) {
   let startedByRole = ''
+  let practitionerId = ''
   const currentTask = getTask(fhirBundle)
 
   if (currentTask) {
@@ -431,7 +432,7 @@ export async function fetchDeclarationsBeginnerRole(
 
     if (task && length > 0) {
       const startedTask = task[length - 1] //the last task in the entries of history bundle
-      const practitionerId = getPractionerIdFromTask(startedTask)
+      practitionerId = getPractionerIdFromTask(startedTask) ?? ''
       if (!practitionerId) {
         throw new Error('Practitioner id not found')
       }
@@ -440,5 +441,5 @@ export async function fetchDeclarationsBeginnerRole(
         (await fetchPractitionerRole(practitionerId, authHeader))
     }
   }
-  return startedByRole
+  return [startedByRole, practitionerId]
 }

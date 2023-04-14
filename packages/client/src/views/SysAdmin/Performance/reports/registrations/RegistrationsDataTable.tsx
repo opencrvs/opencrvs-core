@@ -13,21 +13,30 @@ import { constantsMessages } from '@client/i18n/messages'
 import { ListTable } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { GQLOfficewiseRegistration } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLMixedTotalMetricsResult,
+  GQLOfficewiseRegistration
+} from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import { orderBy } from 'lodash'
+import { concat, orderBy } from 'lodash'
+import { REGISTRATION_REPORT_BASE } from '@client/views/SysAdmin/Performance/Registrations'
+import { AvatarSmall } from '@client/components/Avatar'
+import { IDynamicValues } from '@client/navigation'
+import { getPercentage } from '@client/utils/data-formatting'
+import { getName } from '@client/views/RecordAudit/utils'
 
 interface Props {
   loading: boolean
-  data?: GQLOfficewiseRegistration[]
+  base?: string
+  data?: any
   extraData: { days: number }
 }
 
 export function RegistrationsDataTable(props: Props) {
-  const { loading, extraData } = props
+  const { data, loading, extraData } = props
   const intl = useIntl()
   const offlineData = useSelector(getOfflineData)
   const [sort, setSort] = React.useState({ by: 'total', order: 'desc' })
@@ -42,20 +51,46 @@ export function RegistrationsDataTable(props: Props) {
       else return { by: col, order: 'desc' }
     })
 
-  const content =
-    props.data?.map((r) => ({
-      total: r.total.toString(),
-      officeLocation: offlineData.offices[r.officeLocation]?.name ?? '',
-      avgPerDay: Number(r.total / (extraData.days || 1)).toFixed(2)
-    })) || []
+  enum BASE_TYPE {
+    by_registrar = 'REGISTRAR',
+    by_location = 'LOCATION'
+  }
 
-  const sortedContent = orderBy(content, sort.by, sort.order as 'asc' | 'desc')
+  function getRegistrarAvgPerDay(registrarPractitionerId: string) {
+    const filterPractitioner = data.results?.filter(
+      (r: { registrarPractitioner: { id: string } }) => {
+        return r.registrarPractitioner?.id === registrarPractitionerId
+      }
+    )
 
-  return (
-    <ListTable
-      noResultText={intl.formatMessage(constantsMessages.noResults)}
-      isLoading={loading}
-      columns={[
+    return Number(filterPractitioner[0].total / (extraData.days || 1)).toFixed(
+      2
+    )
+  }
+
+  function getColumns() {
+    const commonColumns = [
+      {
+        key: 'total',
+        label: intl.formatMessage(messages.performanceTotalRegitrationsHeader),
+        isSorted: sort.by === 'total',
+        sortFunction: handleSort,
+        icon: <SortArrow active={sort.by === 'total'} />,
+        isSortable: true,
+        width: 25
+      },
+      {
+        key: 'avgPerDay',
+        isSortable: true,
+        isSorted: sort.by === 'avgPerDay',
+        sortFunction: handleSort,
+        icon: <SortArrow active={sort.by === 'avgPerDay'} />,
+        label: intl.formatMessage(messages.performanceAvgPerDayHeader),
+        width: 25
+      }
+    ]
+    if (props.base === REGISTRATION_REPORT_BASE.LOCATION)
+      return [
         {
           key: 'officeLocation',
           label: intl.formatMessage(messages.locationTitle),
@@ -65,29 +100,73 @@ export function RegistrationsDataTable(props: Props) {
           icon: <SortArrow active={sort.by === 'officeLocation'} />,
           width: 50
         },
+        ...commonColumns
+      ]
+    if (props.base === REGISTRATION_REPORT_BASE.REGISTRAR)
+      return [
         {
-          key: 'total',
-          label: intl.formatMessage(
-            messages.performanceTotalRegitrationsHeader
-          ),
-          isSorted: sort.by === 'total',
-          sortFunction: handleSort,
-          icon: <SortArrow active={sort.by === 'total'} />,
+          key: 'name',
+          label: intl.formatMessage(messages.registrar),
           isSortable: true,
-          width: 25
+          isSorted: sort.by === 'name',
+          sortFunction: handleSort,
+          icon: <SortArrow active={sort.by === 'name'} />,
+          width: 30
         },
         {
-          key: 'avgPerDay',
+          key: 'officeLocation',
+          label: intl.formatMessage(messages.officeColumnHeader),
           isSortable: true,
-          isSorted: sort.by === 'avgPerDay',
+          isSorted: sort.by === 'officeLocation',
           sortFunction: handleSort,
-          icon: <SortArrow active={sort.by === 'avgPerDay'} />,
-          label: intl.formatMessage(messages.performanceAvgPerDayHeader),
-          width: 25
-        }
-      ]}
-      pageSize={sortedContent.length}
-      content={sortedContent}
+          icon: <SortArrow active={sort.by === 'officeLocation'} />,
+          width: 50
+        },
+        ...commonColumns
+      ]
+    throw new Error('Invalid Filter')
+  }
+
+  function getContent(data?: any) {
+    const content = { ...data } as IDynamicValues
+    let finalContent: IDynamicValues[] = []
+
+    if (content.base === BASE_TYPE.by_location) {
+      finalContent = content?.data?.results?.map(
+        (result: IDynamicValues, index: number) => ({
+          total: String(result.total),
+          officeLocation:
+            offlineData.offices[result.officeLocation]?.name ?? '',
+          avgPerDay: Number(result.total / (extraData.days || 1)).toFixed(2)
+        })
+      )
+    } else if (content.base === BASE_TYPE.by_registrar) {
+      finalContent = content?.data?.results
+        ?.filter((result: IDynamicValues) => {
+          return result?.registrarPractitioner?.role === 'REGISTRATION_AGENT'
+        })
+        .map((result: IDynamicValues, index: number) => ({
+          total: String(result?.total),
+          name:
+            result?.registrarPractitioner?.name?.[0].firstNames +
+            ' ' +
+            result?.registrarPractitioner?.name?.[0].familyName,
+          officeLocation:
+            result?.registrarPractitioner?.primaryOffice?.name ?? '',
+          avgPerDay: getRegistrarAvgPerDay(result?.registrarPractitioner?.id)
+        }))
+    }
+
+    return orderBy(finalContent, sort.by, sort.order as 'asc' | 'desc')
+  }
+
+  return (
+    <ListTable
+      noResultText={intl.formatMessage(constantsMessages.noResults)}
+      isLoading={loading}
+      columns={getColumns()}
+      pageSize={getContent(props).length}
+      content={getContent(props)}
       hideBoxShadow={true}
       highlightRowOnMouseOver
     />

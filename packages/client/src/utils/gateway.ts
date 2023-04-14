@@ -627,6 +627,18 @@ export type EventMetrics = {
   total: Scalars['Int']
 }
 
+export type EventMetricsByLocation = {
+  __typename?: 'EventMetricsByLocation'
+  officeLocation: Scalars['String']
+  total: Scalars['Int']
+}
+
+export type EventMetricsByRegistrar = {
+  __typename?: 'EventMetricsByRegistrar'
+  registrarPractitioner?: Maybe<User>
+  total: Scalars['Int']
+}
+
 export type EventProgressData = {
   __typename?: 'EventProgressData'
   timeInProgress?: Maybe<Scalars['Int']>
@@ -929,6 +941,10 @@ export type MesssageInput = {
   descriptor: MesssageDescriptorInput
   lang: Scalars['String']
 }
+
+export type MixedTotalMetricsResult =
+  | TotalMetricsByLocation
+  | TotalMetricsByRegistrar
 
 export type MonthWiseEstimationMetric = {
   __typename?: 'MonthWiseEstimationMetric'
@@ -1267,6 +1283,7 @@ export type Query = {
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getOfficewiseRegistrations?: Maybe<Array<OfficewiseRegistration>>
+  getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getRoles?: Maybe<Array<Maybe<Role>>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
@@ -1362,6 +1379,14 @@ export type QueryGetLocationStatisticsArgs = {
 export type QueryGetOfficewiseRegistrationsArgs = {
   event: Scalars['String']
   locationId: Scalars['String']
+  timeEnd: Scalars['String']
+  timeStart: Scalars['String']
+}
+
+export type QueryGetRegistrationsListByFilterArgs = {
+  base: Scalars['String']
+  event: Scalars['String']
+  locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
@@ -1753,6 +1778,18 @@ export type TimeLoggedMetricsResultSet = {
   __typename?: 'TimeLoggedMetricsResultSet'
   results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
   totalItems?: Maybe<Scalars['Int']>
+}
+
+export type TotalMetricsByLocation = {
+  __typename?: 'TotalMetricsByLocation'
+  results: Array<EventMetricsByLocation>
+  total?: Maybe<Scalars['Int']>
+}
+
+export type TotalMetricsByRegistrar = {
+  __typename?: 'TotalMetricsByRegistrar'
+  results: Array<EventMetricsByRegistrar>
+  total?: Maybe<Scalars['Int']>
 }
 
 export type TotalMetricsResult = {
@@ -3171,12 +3208,17 @@ export type FetchDeathRegistrationForReviewQuery = {
       age?: number | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
+      literacy?: LiteracyType | null
+      educationalAttainment?: EducationType | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        middleNames?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -3218,6 +3260,7 @@ export type FetchDeathRegistrationForReviewQuery = {
           use?: string | null
           firstNames?: string | null
           familyName?: string | null
+          middleNames?: string | null
         } | null> | null
         telecom?: Array<{
           __typename?: 'ContactPoint'
@@ -3281,6 +3324,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       duplicates?: Array<string | null> | null
+      informantsSignature?: string | null
+      informantsSignatureRecording?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3358,6 +3403,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         id?: string | null
         type?: string | null
         role?: string | null
+        title?: string | null
         name?: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3446,12 +3492,17 @@ export type FetchDeathRegistrationForCertificationQuery = {
       age?: number | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
+      literacy?: LiteracyType | null
+      educationalAttainment?: EducationType | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
+        middleNames?: string | null
       } | null> | null
       identifier?: Array<{
         __typename?: 'IdentityType'
@@ -3493,6 +3544,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
           use?: string | null
           firstNames?: string | null
           familyName?: string | null
+          middleNames?: string | null
         } | null> | null
         telecom?: Array<{
           __typename?: 'ContactPoint'
@@ -3555,6 +3607,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      informantsSignature?: string | null
+      informantsSignatureRecording?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3629,6 +3683,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id?: string | null
         type?: string | null
         role?: string | null
+        title?: string | null
         name?: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -5536,6 +5591,53 @@ export type GetOfficewiseRegistrationsQuery = {
     total: number
     officeLocation: string
   }> | null
+}
+
+export type GetRegistrationsListByFilterQueryVariables = Exact<{
+  event: Scalars['String']
+  timeStart: Scalars['String']
+  timeEnd: Scalars['String']
+  locationId?: InputMaybe<Scalars['String']>
+  base: Scalars['String']
+}>
+
+export type GetRegistrationsListByFilterQuery = {
+  __typename?: 'Query'
+  getRegistrationsListByFilter?:
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          officeLocation: string
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id?: string | null
+            role?: string | null
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null
+        }>
+      }
+    | null
 }
 
 export type SubmitActivateUserMutationVariables = Exact<{

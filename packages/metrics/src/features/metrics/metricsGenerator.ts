@@ -51,6 +51,7 @@ interface IOfficeRegistration {
 }
 
 interface IMetricsTotalGroup extends IGroupedByGender {
+  registrarPractitionerId?: string
   practitionerRole: string
   timeLabel: string
 }
@@ -920,7 +921,7 @@ export async function getTotalMetrics(
       OR officeLocation = '${locationId}')`
           : ``
       }
-    GROUP BY gender, timeLabel, eventLocationType, practitionerRole`
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`
   )
 
   const estimationOfTimeRange: IEstimation =
@@ -968,7 +969,7 @@ export async function getOfficewiseRegistrationsCount(
     authHeader
   )
 
-  return (
+  const results =
     officesUnderLocation.map((loc) => ({
       officeLocation: loc.id,
       total:
@@ -976,7 +977,11 @@ export async function getOfficewiseRegistrationsCount(
           ({ officeLocation }) => officeLocation === `Location/${loc.id}`
         )?.total || 0
     })) || []
-  )
+
+  return {
+    total: results.length,
+    results: results
+  }
 }
 
 function populateGenderBasisMetrics(

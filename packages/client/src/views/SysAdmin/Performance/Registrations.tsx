@@ -19,13 +19,16 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { useDispatch } from 'react-redux'
 import { goToRegistrations, useQuery } from '@client/navigation'
 import { useIntl } from 'react-intl'
-import { GetOfficewiseRegistrationsQuery } from '@client/utils/gateway'
+import {
+  GetOfficewiseRegistrationsQuery,
+  GetRegistrationsListByFilterQuery
+} from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { Query } from '@client/components/Query'
-import { GET_OFFICEWISE_REGISTRATIONS } from './queries'
+import { FETCH_REGISTRATIONS, GET_OFFICEWISE_REGISTRATIONS } from './queries'
 import {
   ToastNotification,
   NOTIFICATION_TYPE
@@ -111,8 +114,7 @@ export function Registrations() {
             },
             {
               label: intl.formatMessage(messages.byRegistrars),
-              value: REGISTRATION_REPORT_BASE.REGISTRAR,
-              disabled: true
+              value: REGISTRATION_REPORT_BASE.REGISTRAR
             }
           ]}
           onChange={(option) =>
@@ -134,13 +136,14 @@ export function Registrations() {
         size={ContentSize.LARGE}
         filterContent={getFilter()}
       >
-        <Query<GetOfficewiseRegistrationsQuery>
-          query={GET_OFFICEWISE_REGISTRATIONS}
+        <Query<GetRegistrationsListByFilterQuery>
+          query={FETCH_REGISTRATIONS}
           variables={{
             event: query.get('eventType'),
             locationId: query.get('locationId'),
             timeStart: query.get('timeStart'),
-            timeEnd: query.get('timeEnd')
+            timeEnd: query.get('timeEnd'),
+            base
           }}
         >
           {({ data, loading, error }) => {
@@ -148,11 +151,12 @@ export function Registrations() {
               return <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
             }
 
-            if (data?.getOfficewiseRegistrations || loading) {
+            if (data?.getRegistrationsListByFilter || loading) {
               return (
                 <RegistrationsDataTable
-                  data={data!.getOfficewiseRegistrations!}
+                  data={data!.getRegistrationsListByFilter!}
                   loading={loading}
+                  base={base}
                   extraData={{
                     days: differenceInDays(
                       new Date(query.get('timeEnd')!),
