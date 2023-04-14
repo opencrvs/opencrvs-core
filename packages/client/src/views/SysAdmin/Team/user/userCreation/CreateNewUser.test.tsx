@@ -236,13 +236,12 @@ describe('create new user tests', () => {
       ).toBe('Required to register a new user')
     })
 
-    it('clicking on confirm button with complete data takes user to preview page', async () => {
+    it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-
-      expect(history.location.pathname).toContain('preview')
+      expect(history.location.pathname).toContain('signature-attachment')
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
@@ -409,7 +408,7 @@ describe('edit user tests', () => {
       component = testComponent
     })
 
-    it('clicking on continue button takes user review details page', async () => {
+    it('clicking on continue button takes user signature attachment page', async () => {
       const continueButtonElement = await waitForElement(
         component,
         '#confirm_form'
@@ -418,9 +417,8 @@ describe('edit user tests', () => {
       continueButtonElement.hostNodes().simulate('click')
       component.update()
       await flushPromises()
-      expect(history.location.pathname).toContain(
-        '/user/5e835e4d81fbf01e4dc554db/preview/'
-      )
+
+      expect(history.location.pathname).toContain('signature-attachment')
     })
   })
 

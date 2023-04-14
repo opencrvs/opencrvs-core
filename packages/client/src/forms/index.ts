@@ -69,6 +69,7 @@ export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
+export const TIME = 'TIME'
 
 export enum Sort {
   ASC = 'asc',
@@ -158,6 +159,10 @@ export type IDynamicFormFieldToolTipMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
+export type IDynamicFormFieldUnitMapper = (
+  key: string
+) => MessageDescriptor | undefined
+
 export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
@@ -175,6 +180,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
     dependency: string
     tooltipMapper: Operation<typeof labels>
   }
+  unit?: {
+    dependency: string
+    unitMapper: Operation<typeof labels>
+  }
   type?:
     | IStaticFieldType
     | {
@@ -182,7 +191,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
         dependency: string
         typeMapper: Operation<typeof types>
       }
-  validate?: Array<{
+  validator?: Array<{
     dependencies: string[]
     validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
@@ -192,8 +201,9 @@ export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
+  unit?: IDynamicFieldUnit
   type?: IDynamicFieldType | IStaticFieldType
-  validate?: IDynamicFormFieldValidators[]
+  validator?: IDynamicFormFieldValidators[]
 }
 
 export interface IDynamicFieldLabel {
@@ -209,6 +219,11 @@ export interface IDynamicFieldHelperText {
 export interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
+}
+
+export interface IDynamicFieldUnit {
+  dependency: string
+  unitMapper: IDynamicFormFieldUnitMapper
 }
 
 export interface IDynamicFieldType {
@@ -411,9 +426,9 @@ export type SerializedFormField = UnionOmit<
   | SerializedFormFieldWithDynamicDefinitions
   | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
-  'validate' | 'mapping'
+  'validator' | 'mapping'
 > & {
-  validate: IValidatorDescriptor[]
+  validator: IValidatorDescriptor[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
@@ -439,10 +454,14 @@ export interface IFormFieldBase {
   label: MessageDescriptor
   helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
+  // Whether or not to run validation functions on the field if it's empty
+  // Default false
+  validateEmpty?: boolean
   prefix?: string
   postfix?: string
+  unit?: MessageDescriptor
   disabled?: boolean
   enabled?: string
   custom?: boolean
@@ -546,6 +565,7 @@ export interface INumberFormField extends IFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -661,6 +681,11 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
+export interface ITimeFormFIeld extends IFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -690,6 +715,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
+  | ITimeFormFIeld
 
 export interface IPreviewGroup {
   id: string
@@ -1036,12 +1062,13 @@ export interface Ii18nFormFieldBase {
   helperText?: string
   tooltip?: string
   description?: string
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue
   extraValue?: IFormFieldValue
   postfix?: string
+  unit?: string
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
@@ -1112,6 +1139,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
@@ -1210,6 +1238,10 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   networkErrorText: string
 }
 
+export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1236,6 +1268,7 @@ export type Ii18nFormField =
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
+  | Ii18nTimeFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1296,7 +1329,8 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
-    DYNAMIC_LIST: messages.dynamicList
+    DYNAMIC_LIST: messages.dynamicList,
+    TIME: messages.time
   }
 
   return labelDict[type]

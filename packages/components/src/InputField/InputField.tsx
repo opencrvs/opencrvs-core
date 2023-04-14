@@ -67,6 +67,7 @@ export interface IInputFieldProps {
   error?: string
   prefix?: string | JSX.Element
   postfix?: string | JSX.Element
+  unit?: string | JSX.Element
   optionalLabel?: string
   children: React.ReactNode
   ignoreMediaQuery?: boolean
@@ -99,6 +100,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     } = this.props
 
     const postfix = this.props.postfix as React.ReactNode | string
+    const unit = this.props.unit as React.ReactNode | string
 
     const { prefix } = this.props
 
@@ -139,7 +141,8 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
         <ComponentWrapper>
           {prefix && <Padding>{prefix}</Padding>}
           {children}
-          {postfix && <PostFixPadding>{postfix}</PostFixPadding>}
+          {!unit && postfix && <PostFixPadding>{postfix}</PostFixPadding>}
+          {unit && !postfix && <PostFixPadding>{unit}</PostFixPadding>}
         </ComponentWrapper>
 
         {error && touched && !hideErrorLabel && (

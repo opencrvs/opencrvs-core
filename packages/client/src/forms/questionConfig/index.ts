@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISerializedForm } from '@client/forms'
+import { ISerializedForm, IValidatorDescriptor } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
@@ -46,23 +46,29 @@ export interface IFieldIdentifiers {
 export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
+  validateEmpty?: boolean
   identifiers: IFieldIdentifiers
+  validator?: IValidatorDescriptor[]
 }
 
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   custom: boolean
   label: IMessage[]
-  required: boolean
+  required?: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
+  unit?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
+  validateEmpty?: boolean
   maxLength?: number
+  inputWidth?: number
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
+  validator?: IValidatorDescriptor[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
@@ -94,7 +100,6 @@ export function getCustomizedDefaultField(
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-
   return {
     ...serializedField,
     ...rest

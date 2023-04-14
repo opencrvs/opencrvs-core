@@ -627,7 +627,8 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Time = 'TIME'
 }
 
 export type CustomSelectOption = {
@@ -2000,6 +2001,7 @@ export type QuestionInput = {
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
   options?: InputMaybe<Array<CustomSelectOption>>
@@ -2007,6 +2009,9 @@ export type QuestionInput = {
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  unit?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
+  validator?: InputMaybe<Array<ValidatorInput>>
 }
 
 export type QuestionnaireQuestion = {
@@ -2473,6 +2478,11 @@ export type VsExport = {
   fileSize: Scalars['String']
   startDate: Scalars['Date']
   url: Scalars['String']
+}
+
+export type ValidatorInput = {
+  operation: Scalars['String']
+  parameters?: InputMaybe<Array<Scalars['Int']>>
 }
 
 export type VerifyPasswordResult = {

@@ -15,6 +15,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { questionsTransformer } from '@client/forms/questionConfig'
+import { merge } from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -124,7 +125,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
-
+  merge(window.config, response.config)
   response.formConfig.questionConfig = questionsTransformer(
     response.formConfig.questionConfig
   )

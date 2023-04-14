@@ -17,7 +17,12 @@ import {
   IQuestionConfig,
   getIdentifiersFromFieldId
 } from '.'
-import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
+import {
+  ISerializedForm,
+  BirthSection,
+  DeathSection,
+  IValidatorDescriptor
+} from '@client/forms'
 import {
   getField,
   getFieldId,
@@ -96,8 +101,11 @@ export function questionsTransformer(
       placeholder,
       description,
       tooltip,
+      unit,
       errorMessage,
+      validateEmpty,
       maxLength,
+      inputWidth,
       fieldName,
       fieldType,
       precedingFieldId,
@@ -106,7 +114,8 @@ export function questionsTransformer(
       custom,
       conditionals,
       datasetId,
-      options
+      options,
+      validator
     }) => {
       if (custom) {
         return {
@@ -114,17 +123,21 @@ export function questionsTransformer(
           label,
           placeholder,
           description,
+          validateEmpty,
           tooltip,
+          unit,
           errorMessage,
           maxLength,
+          inputWidth,
           fieldName,
           fieldType,
           precedingFieldId,
-          required: required ?? false,
+          required,
           custom,
           conditionals,
           datasetId,
-          options
+          options,
+          validator
         } as ICustomQuestionConfig
       }
 
@@ -134,14 +147,24 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
+        validateEmpty: validateEmpty ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+      }
+      if (validator && validator.length > 0) {
+        defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
       }
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields
        */
+
       if (required) {
         defaultQuestionConfig.required = true
       }
+
+      if (required === false) {
+        defaultQuestionConfig.required = false
+      }
+
       return defaultQuestionConfig
     }
   )

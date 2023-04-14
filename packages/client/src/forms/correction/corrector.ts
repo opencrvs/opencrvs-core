@@ -108,7 +108,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: CollectorRelationLabelArray,
       nestedFields: {
         MOTHER: [],
@@ -133,7 +133,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]
@@ -161,7 +161,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         { value: 'INFORMANT', label: messages.informant },
         { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
@@ -198,7 +198,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]

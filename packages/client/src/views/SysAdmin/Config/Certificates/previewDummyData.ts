@@ -398,7 +398,7 @@ const dummyBirthRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:19:25.860+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -408,6 +408,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1112,6 +1116,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1135,8 +1143,8 @@ const dummyBirthRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1357,7 +1365,7 @@ const dummyDeathRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:30:51.727+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -1367,6 +1375,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1471,6 +1483,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1494,8 +1510,8 @@ const dummyDeathRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }

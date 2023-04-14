@@ -53,7 +53,7 @@ const fields: IFormField[] = [
     label: formMessages.typeOfId,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
@@ -67,7 +67,7 @@ const fields: IFormField[] = [
     label: formMessages.iDTypeOtherLabel,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
@@ -91,7 +91,7 @@ const fields: IFormField[] = [
         dependency: 'iDType',
         typeMapper: identityTypeMapper
       },
-      validate: [
+      validator: [
         {
           validator: validIDNumber,
           dependencies: ['iDType']
@@ -101,7 +101,7 @@ const fields: IFormField[] = [
     label: formMessages.iD,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
@@ -114,7 +114,7 @@ const fields: IFormField[] = [
     label: formMessages.firstName,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
@@ -126,7 +126,7 @@ const fields: IFormField[] = [
     label: formMessages.lastName,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
@@ -138,7 +138,7 @@ const fields: IFormField[] = [
     label: formMessages.informantsRelationWithChild,
     required: true,
     initialValue: '',
-    validate: [
+    validator: [
       fieldValidationDescriptorToValidationFunction({
         operation: 'requiredBasic'
       })
