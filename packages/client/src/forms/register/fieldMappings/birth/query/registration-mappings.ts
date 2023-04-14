@@ -436,10 +436,12 @@ export const userTransformer =
     if (!_.history) {
       return
     }
-    const history: History = _.history.find(
-      ({ action, regStatus }: History) =>
-        !action && regStatus && regStatus === status
-    )
+    const history: History = _.history
+      .reverse()
+      .find(
+        ({ action, regStatus }: History) =>
+          !action && regStatus && regStatus === status
+      )
 
     if (history) {
       transformedData[targetSectionId || sectionId][
