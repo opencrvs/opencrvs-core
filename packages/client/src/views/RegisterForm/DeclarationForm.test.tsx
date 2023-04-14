@@ -214,6 +214,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
+          // Child's details view
           await waitForElement(app, '#informant_parent_view')
           app
             .find('#firstNamesEng')
@@ -234,7 +235,7 @@ describe('when user has starts a new declaration', () => {
           expect(storedDeclarations[0].data.child.firstNamesEng).toEqual(
             'hello'
           )
-          expect(window.location.href).toContain('mother')
+          expect(window.location.href).toContain('informant')
         })
         it('redirect to home when pressed save and exit button', async () => {
           app.find('#save_draft').hostNodes().simulate('click')
@@ -289,15 +290,7 @@ describe('when user has starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
+            await goToSection(app, 'documents')
           })
           it('renders list of document upload field', async () => {
             const fileInputs = app
@@ -371,7 +364,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
-          await goToSection(app, 4)
+          await goToSection(app, 'preview')
           app
             .find('#btn_change_child_familyNameEng')
             .hostNodes()
