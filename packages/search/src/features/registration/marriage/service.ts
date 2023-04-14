@@ -207,6 +207,7 @@ async function createBrideIndex(
   }
 
   body.brideIdentifier =
+    bride &&
     bride.identifier &&
     bride.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
@@ -247,6 +248,7 @@ async function createGroomIndex(
   }
 
   body.groomIdentifier =
+    groom &&
     groom.identifier &&
     groom.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value

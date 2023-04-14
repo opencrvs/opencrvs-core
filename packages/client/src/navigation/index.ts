@@ -206,10 +206,10 @@ export function goToVSExport() {
 }
 
 export function goToPerformanceStatistics() {
-  return push(PERFORMANCE_STATISTICS)
+  return push(PERFORMANCE_STATISTICS, { isNavigatedInsideApp: true })
 }
 export function goToLeaderBoardsView() {
-  return push(PERFORMANCE_LEADER_BOARDS)
+  return push(PERFORMANCE_LEADER_BOARDS, { isNavigatedInsideApp: true })
 }
 export function goToDashboardView() {
   return push(PERFORMANCE_DASHBOARD, { isNavigatedInsideApp: true })
