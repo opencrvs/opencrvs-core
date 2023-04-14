@@ -120,7 +120,7 @@ const mockUserDetails = {
   passwordHash:
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
   salt: '12345',
-  role: 'FIELD_AGENT',
+  role: { labels: [{ lang: 'en', label: 'FIELD_AGENT' }] },
   status: 'active',
   practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
