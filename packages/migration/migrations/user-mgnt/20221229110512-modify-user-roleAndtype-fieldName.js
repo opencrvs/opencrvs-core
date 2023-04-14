@@ -162,42 +162,42 @@ const DEFAULT_SYSTEM_ROLES = [
   {
     title: 'Registration Agent',
     value: 'REGISTRATION_AGENT',
-    roles: [],
+    roles: ['REGISTRATION_AGENT'],
     active: true
   },
 
   {
     title: 'Registrar',
     value: 'LOCAL_REGISTRAR',
-    roles: [],
+    roles: ['LOCAL_REGISTRAR'],
     active: true
   },
 
   {
     title: 'System admin (local)',
     value: 'LOCAL_SYSTEM_ADMIN',
-    roles: [],
+    roles: ['LOCAL_SYSTEM_ADMIN'],
     active: true
   },
 
   {
     title: 'System admin (national)',
     value: 'NATIONAL_SYSTEM_ADMIN',
-    roles: [],
+    roles: ['NATIONAL_SYSTEM_ADMIN'],
     active: true
   },
 
   {
     title: 'Performance Management',
     value: 'PERFORMANCE_MANAGEMENT',
-    roles: [],
+    roles: ['PERFORMANCE_MANAGEMENT'],
     active: true
   },
 
   {
     title: 'National Registrar',
     value: 'NATIONAL_REGISTRAR',
-    roles: [],
+    roles: ['NATIONAL_REGISTRAR'],
     active: true
   }
 ]
