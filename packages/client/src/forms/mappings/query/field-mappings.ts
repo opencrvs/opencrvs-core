@@ -40,8 +40,11 @@ import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
-import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { countryAlpha3toAlpha2 } from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  countryAlpha3toAlpha2,
+  getLocationNameMapOfFacility
+} from '@client/utils/locationUtils'
+
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {

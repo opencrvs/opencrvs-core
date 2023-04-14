@@ -34,6 +34,7 @@ import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -241,10 +242,11 @@ export const convertToLocal = (
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
 
-  const countryCode =
-    alpha3CountryCode.toUpperCase() === 'FAR'
-      ? 'ZM'
-      : callingCountries[alpha3CountryCode].alpha2
+  const countryCode = countryAlpha3toAlpha2(alpha3CountryCode)
+
+  if (!countryCode) {
+    return
+  }
 
   const phoneUtil = PhoneNumberUtil.getInstance()
 

@@ -83,18 +83,6 @@ export const getCurrencyObject = (value: string) => {
   }
 }
 
-export const getCountryName = (isoCode: string) => {
-  const countryName = lookup.countries({ alpha3: isoCode })[0]
-  return countryName && countryName.name
-}
-
-export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
-  const alpha2 =
-    isoCode === 'FAR' ? 'FA' : lookup.countries({ alpha3: isoCode })[0]?.alpha2
-
-  return alpha2
-}
-
 export function isValidRegEx(pattern: string): boolean {
   try {
     const value = ''
