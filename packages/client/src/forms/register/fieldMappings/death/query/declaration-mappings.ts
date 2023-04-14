@@ -34,6 +34,7 @@ export function getInformantSectionTransformer(
   sectionId: string
 ) {
   if (
+    queryData[sectionId] &&
     queryData[sectionId].id &&
     queryData[sectionId].individual &&
     queryData[sectionId].individual.id
@@ -45,7 +46,7 @@ export function getInformantSectionTransformer(
     }
   }
   // Getting Informant's relationship data
-  if (queryData[sectionId].relationship) {
+  if (queryData[sectionId] && queryData[sectionId].relationship) {
     transformedData[sectionId].relationship = queryData[sectionId].relationship
   }
   return transformedData

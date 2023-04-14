@@ -123,6 +123,8 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
 import { UserDetails } from '@client/utils/userUtils'
 
 const DesktopHeader = styled(Header)`
@@ -336,28 +338,6 @@ function RecordAuditBody({
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
-  if (
-    declaration.status !== SUBMISSION_STATUS.DRAFT &&
-    (userHasRegisterScope || userHasValidateScope)
-  ) {
-    actions.push(
-      <Button
-        type="secondary"
-        onClick={() => {
-          dispatch(goToViewRecordPage(declaration.id as string))
-        }}
-      >
-        {intl.formatMessage(buttonMessages.view)}
-      </Button>
-    )
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
-  }
-
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -394,15 +374,16 @@ function RecordAuditBody({
       (userHasValidateScope && declaration.status !== VALIDATED))
   ) {
     actions.push(
-      <StyledTertiaryButton
-        align={ICON_ALIGNMENT.LEFT}
+      <Button
         id="archive_button"
+        type="tertiary"
         key="archive_button"
-        icon={() => <Archive />}
+        disabled={!isOnline}
         onClick={toggleDisplayDialog}
       >
+        <Icon name="Archive" color="currentColor" size="large" />{' '}
         {intl.formatMessage(buttonMessages.archive)}
-      </StyledTertiaryButton>
+      </Button>
     )
     desktopActionsView.push(actions[actions.length - 1])
   }
@@ -414,18 +395,41 @@ function RecordAuditBody({
     ARCHIVED.includes(declaration.status)
   ) {
     actions.push(
-      <StyledTertiaryButton
-        align={ICON_ALIGNMENT.LEFT}
+      <Button
         id="reinstate_button"
+        type="tertiary"
         key="reinstate_button"
         disabled={!isOnline}
-        icon={() => <RotateLeft />}
         onClick={toggleDisplayDialog}
       >
+        <Icon name="ArchiveTray" color="currentColor" size="large" />
         {intl.formatMessage(buttonMessages.reinstate)}
-      </StyledTertiaryButton>
+      </Button>
     )
     desktopActionsView.push(actions[actions.length - 1])
+  }
+
+  if (
+    declaration.status !== SUBMISSION_STATUS.DRAFT &&
+    (userHasRegisterScope || userHasValidateScope)
+  ) {
+    actions.push(
+      <Button
+        type="secondary"
+        onClick={() => {
+          dispatch(goToViewRecordPage(declaration.id as string))
+        }}
+      >
+        <Icon name="Eye" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.view)}
+      </Button>
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
   }
 
   if (

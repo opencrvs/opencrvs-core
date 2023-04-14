@@ -13,7 +13,8 @@ import * as React from 'react'
 import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
-import { ArrowDownBlue } from '../icons'
+import { Icon } from '../Icon'
+
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
 export interface ISelectOption {
@@ -36,7 +37,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <ArrowDownBlue />
+        <Icon name="CaretDown" size="small" color="grey600" />
       </components.DropdownIndicator>
     )
   )
@@ -50,8 +51,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     border-radius: 4px;
     height: 40px;
     box-shadow: none;
-    ${({ theme }) => theme.fonts.reg18};
-    padding: 0 8px;
+    padding: 0 0 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -63,6 +63,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     &:focus {
       outline: none;
     }
+  }
+
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.grey400};
   }
 
   .react-select__indicator-separator {

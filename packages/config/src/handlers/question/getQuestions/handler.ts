@@ -39,7 +39,7 @@ function getOptionsForQuestion(
   question: IQuestionFromCountryConfig,
   datasets: IDataSetModel[]
 ): IDataset['options'] {
-  if (!question.datasetId || !question.datasetName) {
+  if (!question.datasetId && !question.datasetName) {
     return []
   }
 

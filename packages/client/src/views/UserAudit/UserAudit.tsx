@@ -33,7 +33,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
 import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { VerticalThreeDots } from '@client/../../components/lib/icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
@@ -301,7 +301,13 @@ export const UserAudit = () => {
                 <Status status={user.status || 'pending'} />
                 <ToggleMenu
                   id={`sub-page-header-munu-button`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={getMenuItems(
                     user.id as string,
                     user.status as string
@@ -332,7 +338,13 @@ export const UserAudit = () => {
                   <Status status={user.status || 'pending'} />,
                   <ToggleMenu
                     id={`sub-page-header-munu-button`}
-                    toggleButton={<VerticalThreeDots />}
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
                     menuItems={getMenuItems(
                       user.id as string,
                       user.status as string
