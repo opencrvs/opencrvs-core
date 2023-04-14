@@ -129,6 +129,7 @@ class ReviewCertificateActionComponent extends React.Component<
             certificatePdf: svg
           })
         },
+        this.props.state,
         this.props.countries
       )
     }
@@ -199,6 +200,7 @@ class ReviewCertificateActionComponent extends React.Component<
       draft,
       this.props.userDetails,
       this.props.offlineCountryConfig,
+      this.props.state,
       this.props.countries
     )
     this.props.modifyDeclaration(draft)
@@ -371,7 +373,8 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
     offlineCountryConfig,
-    registerForm: getEventRegisterForm(state, event)
+    registerForm: getEventRegisterForm(state, event),
+    state: state
   }
 }
 
