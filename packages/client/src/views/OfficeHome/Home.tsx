@@ -9,13 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import { getUserDetails } from '@client/profile/profileSelectors'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { Role } from '@client/utils/gateway'
 import {
   PERFORMANCE_DASHBOARD,
   PERFORMANCE_HOME,
@@ -24,28 +20,24 @@ import {
 import { Redirect } from 'react-router'
 import { getDefaultPerformanceLocationId } from '@client/navigation'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
 
 export function Home() {
-  const PERFORMANCE_MANAGEMENT_ROLES = ['PERFORMANCE MANAGER']
-  const NATL_ADMIN_ROLES = ['NATIONAL SYSTEM ADMIN']
-  const NATIONAL_REGISTRAR_ROLES = ['NATIONAL REGISTRAR']
-  const SYS_ADMIN_ROLES = ['LOCAL SYSTEM ADMIN']
-
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
-
-  const role =
-    (userDetails?.role && getUserRole(language, userDetails.role as Role)) ?? ''
+  const role = userDetails && userDetails.systemRole
   const roleIsValidForDashboard =
-    role.toUpperCase() &&
+    role &&
     [
       ...NATL_ADMIN_ROLES,
       ...PERFORMANCE_MANAGEMENT_ROLES,
       ...NATIONAL_REGISTRAR_ROLES
-    ].includes(role.toUpperCase())
-
-  const roleIsLocalSysAdmin =
-    role && SYS_ADMIN_ROLES.includes(role.toUpperCase())
+    ].includes(role)
+  const roleIsLocalSysAdmin = role && SYS_ADMIN_ROLES.includes(role)
 
   if (roleIsValidForDashboard) return <Redirect to={PERFORMANCE_DASHBOARD} />
   if (roleIsLocalSysAdmin)
