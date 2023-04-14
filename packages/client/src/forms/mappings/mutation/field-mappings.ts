@@ -18,6 +18,7 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
+import { IdentityIdType } from '@client/utils/gateway'
 import { set } from 'lodash'
 
 interface IPersonName {
@@ -94,7 +95,7 @@ export const fieldToIdentifierTransformer =
   }
 
 export const fieldToIdentityTransformer =
-  (identifierField: string, identityType: string) =>
+  (identifierField: string, identityType: IdentityIdType) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -128,16 +129,23 @@ export const nidVerificationFieldToIdentityTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  fieldToIdentityTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-    transformedData,
-    draftData,
-    sectionId,
-    field
+  const mosipTransformer = fieldToIdentityTransformer(
+    'id',
+    IdentityIdType.MosipPsutTokenId
   )
+  mosipTransformer(transformedData, draftData, sectionId, field)
+  const osiaTransformer = fieldToIdentityTransformer(
+    'id',
+    IdentityIdType.OsiaNid
+  )
+  osiaTransformer(transformedData, draftData, sectionId, field)
+
   const sectionData = transformedData[sectionId]
   const existingIdentity = sectionData.identifier.find(
     (identifier: fhir.Identifier) =>
-      identifier.type && identifier.type === 'MOSIP_PSUT_TOKEN_ID'
+      identifier.type &&
+      (identifier.type === IdentityIdType.MosipPsutTokenId ||
+        identifier.type === IdentityIdType.OsiaNid)
   )
   if (existingIdentity) {
     const modifiedFields = draftData[sectionId][

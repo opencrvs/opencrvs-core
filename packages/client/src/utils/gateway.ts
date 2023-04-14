@@ -990,6 +990,7 @@ export enum IdentityIdType {
   MosipPsutTokenId = 'MOSIP_PSUT_TOKEN_ID',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
+  OsiaNid = 'OSIA_NID',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   RefugeeNumber = 'REFUGEE_NUMBER',
@@ -997,6 +998,7 @@ export enum IdentityIdType {
 }
 
 export type IdentityInput = {
+  fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
   otherType?: InputMaybe<Scalars['String']>
   type?: InputMaybe<IdentityIdType>
@@ -1004,6 +1006,7 @@ export type IdentityInput = {
 
 export type IdentityType = {
   __typename?: 'IdentityType'
+  fieldsModifiedByIdentity?: Maybe<Array<Maybe<Scalars['String']>>>
   id?: Maybe<Scalars['ID']>
   otherType?: Maybe<Scalars['String']>
   type?: Maybe<IdentityIdType>
@@ -1621,6 +1624,7 @@ export type NotificationInput = {
 
 export type OidpUserAddress = {
   __typename?: 'OIDPUserAddress'
+  city?: Maybe<Scalars['String']>
   country?: Maybe<Scalars['String']>
   formatted?: Maybe<Scalars['String']>
   locality?: Maybe<Scalars['String']>
@@ -1795,6 +1799,7 @@ export type Query = {
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
+  verifyNationalId?: Maybe<Verification>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
 
@@ -2031,6 +2036,13 @@ export type QuerySearchUsersArgs = {
   status?: InputMaybe<Scalars['String']>
   systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type QueryVerifyNationalIdArgs = {
+  birthDate: Scalars['String']
+  firstName: Scalars['String']
+  lastName: Scalars['String']
+  nationalId: Scalars['String']
 }
 
 export type QueryVerifyPasswordByIdArgs = {
@@ -2541,6 +2553,12 @@ export type VsExport = {
   url: Scalars['String']
 }
 
+export type Verification = {
+  __typename?: 'Verification'
+  nationalId: Scalars['String']
+  verified: Scalars['Boolean']
+}
+
 export type VerifyPasswordResult = {
   __typename?: 'VerifyPasswordResult'
   id?: Maybe<Scalars['String']>
@@ -2674,6 +2692,22 @@ export type FetchPersonByNidQuery = {
       firstNames?: string | null
       familyName?: string | null
     } | null> | null
+  } | null
+}
+
+export type VerifyNationalIdQueryVariables = Exact<{
+  nationalId: Scalars['String']
+  firstName: Scalars['String']
+  lastName: Scalars['String']
+  birthDate: Scalars['String']
+}>
+
+export type VerifyNationalIdQuery = {
+  __typename?: 'Query'
+  verifyNationalId?: {
+    __typename?: 'Verification'
+    nationalId: string
+    verified: boolean
   } | null
 }
 
@@ -3604,6 +3638,7 @@ export type FetchBirthRegistrationForReviewQuery = {
           id?: string | null
           type?: IdentityIdType | null
           otherType?: string | null
+          fieldsModifiedByIdentity?: Array<string | null> | null
         } | null> | null
         name?: Array<{
           __typename?: 'HumanName'
@@ -3648,6 +3683,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id?: string | null
         type?: IdentityIdType | null
         otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
       } | null> | null
       address?: Array<{
         __typename?: 'Address'
@@ -3689,6 +3725,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id?: string | null
         type?: IdentityIdType | null
         otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
       } | null> | null
       address?: Array<{
         __typename?: 'Address'
@@ -5577,6 +5614,54 @@ export type MarkEventAsNotDuplicateMutationVariables = Exact<{
 export type MarkEventAsNotDuplicateMutation = {
   __typename?: 'Mutation'
   markEventAsNotDuplicate: string
+}
+
+export type GetOidpUserInfoQueryVariables = Exact<{
+  code: Scalars['String']
+  clientId: Scalars['String']
+  redirectUri: Scalars['String']
+  grantType?: InputMaybe<Scalars['String']>
+}>
+
+export type GetOidpUserInfoQuery = {
+  __typename?: 'Query'
+  getOIDPUserInfo?: {
+    __typename?: 'UserInfo'
+    districtFhirId?: string | null
+    stateFhirId?: string | null
+    oidpUserInfo?: {
+      __typename?: 'OIDPUserInfo'
+      sub: string
+      name?: string | null
+      given_name?: string | null
+      family_name?: string | null
+      middle_name?: string | null
+      nickname?: string | null
+      preferred_username?: string | null
+      profile?: string | null
+      picture?: string | null
+      website?: string | null
+      email?: string | null
+      email_verified?: boolean | null
+      gender?: string | null
+      birthdate?: string | null
+      zoneinfo?: string | null
+      locale?: string | null
+      phone_number?: string | null
+      phone_number_verified?: boolean | null
+      updated_at?: number | null
+      address?: {
+        __typename?: 'OIDPUserAddress'
+        formatted?: string | null
+        street_address?: string | null
+        locality?: string | null
+        region?: string | null
+        postal_code?: string | null
+        city?: string | null
+        country?: string | null
+      } | null
+    } | null
+  } | null
 }
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {
@@ -7798,6 +7883,7 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
+      integratingSystemType?: IntegratingSystemType | null
       settings?: {
         __typename?: 'SystemSettings'
         webhook?: Array<{

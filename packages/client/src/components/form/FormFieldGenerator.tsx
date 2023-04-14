@@ -27,14 +27,12 @@ import {
   getFieldLabelToolTip,
   getFieldOptionsByValueMapper,
   getFieldType,
-  getQueryData,
   getVisibleOptions,
   getListOfLocations,
   getFieldHelperText
 } from '@client/forms/utils'
 
 import styled, { keyframes } from '@client/styledComponents'
-import { gqlToDraftTransformer } from '@client/transformer'
 import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
@@ -50,7 +48,6 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField,
   IFileValue,
-  IForm,
   IFormField,
   IFormFieldValue,
   IFormSectionData,
@@ -69,10 +66,7 @@ import {
   IDynamicListFormField,
   IListFormField,
   IFormData,
-  FETCH_BUTTON,
-  ILoaderButton,
   FIELD_GROUP_TITLE,
-  IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
   RADIO_GROUP_WITH_NESTED_FIELDS,
@@ -82,15 +76,15 @@ import {
   TEXT,
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
-  NID_VERIFICATION_REDIRECT_BUTTON,
-  INidVerificationRedirectButton
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton,
+  NID_VERIFICATION_FETCH_BUTTON
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 
 import { FormList } from '@client/components/form/FormList'
-import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
@@ -134,6 +128,7 @@ import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
+import { useVerifyNationalIdQuery } from '@client/forms/register/queries/useVerifyNationalIdQuery'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -229,6 +224,8 @@ function GeneratedInputField({
 
   const intl = useIntl()
   const isOnline = useOnlineStatus()
+  const { verifyNationalId, status: verificationStatus } =
+    useVerifyNationalIdQuery({ value })
 
   const inputProps = {
     id: fieldDefinition.name,
@@ -561,22 +558,29 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === FETCH_BUTTON) {
+  if (fieldDefinition.type === NID_VERIFICATION_FETCH_BUTTON) {
     return (
-      <FetchButtonField
-        id={fieldDefinition.name}
-        queryData={fieldDefinition.queryData}
-        modalTitle={fieldDefinition.modalTitle}
-        label={fieldDefinition.label}
-        successTitle={fieldDefinition.successTitle}
-        errorTitle={fieldDefinition.errorTitle}
-        onFetch={fieldDefinition.onFetch}
-        isDisabled={disabled}
-      />
+      <InputField {...inputFieldProps}>
+        <VerificationButton
+          id={fieldDefinition.name}
+          onClick={() =>
+            verifyNationalId(
+              fieldDefinition.verifiedFields,
+              fieldDefinition.variables
+            )
+          }
+          labelForVerified={fieldDefinition.labelForVerified}
+          labelForUnverified={fieldDefinition.labelForUnverified}
+          labelForOffline={fieldDefinition.labelForOffline}
+          labelForLoading="Loading..."
+          status={verificationStatus}
+          disabled={disabled}
+        />
+      </InputField>
     )
   }
 
-  if (fieldDefinition.type === NID_VERIFICATION_REDIRECT_BUTTON) {
+  if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
     return (
       <InputField {...inputFieldProps}>
         <VerificationButton
@@ -709,10 +713,6 @@ type Props = IFormSectionProps &
   IntlShapeProps &
   RouteComponentProps
 
-interface IQueryData {
-  [key: string]: any
-}
-
 export interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
@@ -840,7 +840,6 @@ class FormSectionComponent extends React.Component<Props> {
       offlineCountryConfig,
       intl,
       draftData,
-      setValues,
       dynamicDispatch
     } = this.props
 
@@ -944,41 +943,22 @@ class FormSectionComponent extends React.Component<Props> {
                     field.dynamicItems.valueMapper
                   )
                 } as IListFormField)
-              : field.type === FETCH_BUTTON
-              ? ({
+              : field.type === NID_VERIFICATION_FETCH_BUTTON
+              ? {
                   ...field,
-                  queryData: getQueryData(field as ILoaderButton, values),
-                  draftData: draftData as IFormData,
-                  onFetch: (response) => {
-                    const section = {
-                      id: this.props.id,
-                      groups: [
-                        {
-                          id: `${this.props.id}-view-group`,
-                          fields: fieldsWithValuesDefined
-                        }
-                      ]
-                    } as IFormSection
-
-                    const form = {
-                      sections: [section]
-                    } as IForm
-
-                    const queryData: IQueryData = {}
-                    queryData[this.props.id] = response
-
-                    const transformedData = gqlToDraftTransformer(
-                      form,
-                      queryData
-                    )
-                    const updatedValues = Object.assign(
-                      {},
-                      values,
-                      transformedData[this.props.id]
-                    )
-                    setValues(updatedValues)
+                  verifiedFields: [
+                    'iD',
+                    `${sectionName}BirthDate`,
+                    'firstNamesEng',
+                    'familyNameEng'
+                  ],
+                  variables: {
+                    nationalId: values.iD,
+                    birthDate: values[`${sectionName}BirthDate`],
+                    firstName: values.firstNamesEng,
+                    lastName: values.familyNameEng
                   }
-                } as ILoaderButton)
+                }
               : field.type === LOCATION_SEARCH_INPUT
               ? {
                   ...field,
@@ -994,7 +974,7 @@ class FormSectionComponent extends React.Component<Props> {
                     field.searchableType as LocationType[]
                   )
                 }
-              : field.type === NID_VERIFICATION_REDIRECT_BUTTON
+              : field.type === NID_VERIFICATION_BUTTON
               ? ({
                   ...field,
                   onClick: () => {
@@ -1019,14 +999,14 @@ class FormSectionComponent extends React.Component<Props> {
                       this.props.match.url
                     )
                   }
-                } as INidVerificationRedirectButton)
+                } as INidVerificationButton)
               : field
 
           if (
-            field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_REDIRECT_BUTTON
+            field.type === NID_VERIFICATION_BUTTON ||
+            field.type === NID_VERIFICATION_FETCH_BUTTON
           ) {
             return (
               <FormItem

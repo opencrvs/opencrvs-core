@@ -57,7 +57,7 @@ export interface GQLQuery {
   getFormDataset?: Array<GQLFormDataset>
   informantSMSNotifications?: Array<GQLSMSNotification>
   getOIDPUserInfo?: GQLUserInfo
-  getOSIAUserInfo?: GQLUserInfo
+  verifyNationalId?: GQLVerification
 }
 
 export interface GQLMutation {
@@ -541,6 +541,11 @@ export interface GQLUserInfo {
   oidpUserInfo?: GQLOIDPUserInfo
   districtFhirId?: string
   stateFhirId?: string
+}
+
+export interface GQLVerification {
+  nationalId: string
+  verified: boolean
 }
 
 export interface GQLNotificationInput {
@@ -1537,6 +1542,7 @@ export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
   MOSIP_PSUT_TOKEN_ID = 'MOSIP_PSUT_TOKEN_ID',
+  OSIA_NID = 'OSIA_NID',
   DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
   BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
   DRIVING_LICENSE = 'DRIVING_LICENSE',
@@ -2071,6 +2077,7 @@ export interface GQLResolver {
   FormDataset?: GQLFormDatasetTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
+  Verification?: GQLVerificationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -2202,7 +2209,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getFormDataset?: QueryToGetFormDatasetResolver<TParent>
   informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
-  getOSIAUserInfo?: QueryToGetOSIAUserInfoResolver<TParent>
+  verifyNationalId?: QueryToVerifyNationalIdResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2889,16 +2896,16 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToGetOSIAUserInfoArgs {
+export interface QueryToVerifyNationalIdArgs {
   nationalId: string
   firstName: string
   lastName: string
-  dateOfBirth: string
+  birthDate: string
 }
-export interface QueryToGetOSIAUserInfoResolver<TParent = any, TResult = any> {
+export interface QueryToVerifyNationalIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetOSIAUserInfoArgs,
+    args: QueryToVerifyNationalIdArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6335,6 +6342,32 @@ export interface UserInfoToDistrictFhirIdResolver<
 }
 
 export interface UserInfoToStateFhirIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLVerificationTypeResolver<TParent = any> {
+  nationalId?: VerificationToNationalIdResolver<TParent>
+  verified?: VerificationToVerifiedResolver<TParent>
+}
+
+export interface VerificationToNationalIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface VerificationToVerifiedResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

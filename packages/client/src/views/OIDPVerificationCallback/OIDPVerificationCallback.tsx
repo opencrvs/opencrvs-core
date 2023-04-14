@@ -11,7 +11,7 @@
  */
 import { modifyDeclaration, writeDeclaration } from '@client/declarations'
 import { selectCountryLogo, getOfflineData } from '@client/offline/selectors'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {

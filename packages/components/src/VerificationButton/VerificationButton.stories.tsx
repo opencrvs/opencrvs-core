@@ -59,3 +59,14 @@ Offline.args = {
   labelForOffline:
     'National ID authentication is currently not available offline.'
 }
+
+export const Loading = Template.bind({})
+Loading.args = {
+  status: 'loading',
+  onClick: () => {},
+  labelForVerified: 'Authenticated',
+  labelForUnverified: 'Authenticate',
+  labelForOffline:
+    'National ID authentication is currently not available offline.',
+  labelForLoading: 'Loading...'
+}

@@ -728,7 +728,7 @@ export const deathRegisterForms: ISerializedForm = {
             },
             {
               name: 'informantNidVerification',
-              type: 'NID_VERIFICATION_REDIRECT_BUTTON',
+              type: 'NID_VERIFICATION_BUTTON',
               label: formMessageDescriptors.iDTypeNationalID,
               required: true,
               customisable: true,

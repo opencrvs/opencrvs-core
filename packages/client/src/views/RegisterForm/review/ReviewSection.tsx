@@ -42,7 +42,6 @@ import {
   DATE,
   DeathSection,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IAttachmentValue,
   ICheckboxFormField,
@@ -71,9 +70,10 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
-  NID_VERIFICATION_REDIRECT_BUTTON,
+  NID_VERIFICATION_BUTTON,
   SUBSECTION,
-  WARNING
+  WARNING,
+  NID_VERIFICATION_FETCH_BUTTON
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -550,7 +550,10 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
-  if (field.type === NID_VERIFICATION_REDIRECT_BUTTON) {
+  if (
+    field.type === NID_VERIFICATION_BUTTON ||
+    field.type === NID_VERIFICATION_FETCH_BUTTON
+  ) {
     return (
       <VerificationButton
         onClick={() => {}}
@@ -964,7 +967,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [LIST, PARAGRAPH, WARNING, SUBSECTION].find(
       (type) => type === field.type
     )
   }

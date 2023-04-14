@@ -13,8 +13,6 @@ import { Validation } from '@client/utils/validate'
 import * as mutations from '@client/forms/mappings/mutation'
 import * as queries from '@client/forms/mappings/query'
 import * as labels from '@client/forms/mappings/label'
-import * as responseTransformers from '@client/forms/mappings/response-transformers'
-import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
 import * as validators from '@opencrvs/client/src/utils/validate'
 
@@ -36,10 +34,6 @@ import {
   QueryFactoryOperation,
   IMutationDescriptor,
   MutationFactoryOperation,
-  FETCH_BUTTON,
-  IQueryMap,
-  ISerializedQueryMap,
-  ILoaderButton,
   IFormFieldWithDynamicDefinitions,
   IFormField,
   SELECT_WITH_OPTIONS,
@@ -271,20 +265,6 @@ function deserializeDynamicDefinitions(
   }
 }
 
-function deserializeQueryMap(queryMap: ISerializedQueryMap) {
-  return Object.keys(queryMap).reduce<IQueryMap>((deserialized, key) => {
-    return {
-      ...deserialized,
-      [key]: {
-        ...queryMap[key],
-        responseTransformer:
-          responseTransformers[queryMap[key].responseTransformer.operation],
-        query: graphQLQueries[queryMap[key].query.operation]
-      }
-    }
-  }, {})
-}
-
 export function deserializeFormField(field: SerializedFormField): IFormField {
   const baseFields = {
     ...field,
@@ -337,17 +317,7 @@ export function deserializeFormField(field: SerializedFormField): IFormField {
     } as ISelectFormFieldWithOptions
   }
 
-  if (field.type === FETCH_BUTTON) {
-    return {
-      ...baseFields,
-      queryMap: deserializeQueryMap(field.queryMap)
-    } as ILoaderButton
-  }
-
-  return baseFields as Exclude<
-    IFormField,
-    IFormFieldWithDynamicDefinitions | ILoaderButton
-  >
+  return baseFields as Exclude<IFormField, IFormFieldWithDynamicDefinitions>
 }
 
 export function deserializeFormSection(

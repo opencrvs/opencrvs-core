@@ -14,10 +14,10 @@ type Verification {
 }
 
 type Query {
-  getOSIAUserInfo(
+  verifyNationalId(
     nationalId: String!
     firstName: String!
     lastName: String!
-    dateOfBirth: String!
-  ): UserInfo
+    birthDate: String!
+  ): Verification
 }

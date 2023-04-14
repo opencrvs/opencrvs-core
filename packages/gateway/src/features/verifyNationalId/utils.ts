@@ -11,22 +11,23 @@
  */
 
 import { OSIA_REST_URL, UNSAFE__OSIA_PERSISTENT_JWT } from '@gateway/constants'
-import { logger } from '@gateway/logger'
+import fetch from 'node-fetch'
 
 const OSIA_USERINFO_ENDPOINT = (nationalId: string) =>
-  OSIA_REST_URL &&
-  new URL(`v1/persons/${nationalId}/match`, OSIA_REST_URL).toString()
+  OSIA_REST_URL
+    ? new URL(`v1/persons/${nationalId}/match`, OSIA_REST_URL).toString()
+    : 'https://mockbin.org/bin/19906f7d-3b53-4ab4-a6d0-36ee5d9d1cc0'
 
-export const verifyUserInfo = async ({
+export const verifyUserInfoWithOSIA = async ({
   nationalId,
   firstName,
   lastName,
-  dateOfBirth
+  birthDate
 }: {
   nationalId: string
   firstName: string
   lastName: string
-  dateOfBirth: string
+  birthDate: string
 }) => {
   const request = await fetch(OSIA_USERINFO_ENDPOINT(nationalId)!, {
     method: 'POST',
@@ -37,7 +38,7 @@ export const verifyUserInfo = async ({
     body: JSON.stringify({
       firstName,
       lastName,
-      dateOfBirth
+      dateOfBirth: birthDate
     })
   })
 
@@ -57,7 +58,12 @@ export const verifyUserInfo = async ({
   if (response.length === 0) {
     return { nationalId, verified: true }
   } else {
-    logger.warn("Couldn't verify user info with OSIA", response)
-    return { nationalId, verified: false }
+    throw new Error(
+      `Couldn't verify user info with OSIA: ${JSON.stringify(
+        await request.text(),
+        null,
+        4
+      )}`
+    )
   }
 }

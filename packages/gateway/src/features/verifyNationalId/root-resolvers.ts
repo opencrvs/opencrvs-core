@@ -10,15 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { verifyUserInfo } from './utils'
+import { verifyUserInfoWithOSIA } from './utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    getOSIAUserInfo: async (
+    verifyNationalId: async (
       _,
-      { nationalId, firstName, lastName, dateOfBirth }
+      { nationalId, firstName, lastName, birthDate }
     ) => {
-      return verifyUserInfo({ nationalId, firstName, lastName, dateOfBirth })
+      return verifyUserInfoWithOSIA({
+        nationalId,
+        firstName,
+        lastName,
+        birthDate
+      })
     }
   }
 }

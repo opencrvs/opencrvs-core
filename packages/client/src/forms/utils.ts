@@ -29,11 +29,8 @@ import {
   IFormData,
   IDynamicFormFieldValidators,
   IDynamicFormField,
-  FETCH_BUTTON,
-  ILoaderButton,
-  IFieldInput,
+  NID_VERIFICATION_FETCH_BUTTON,
   IFormSection,
-  IQuery,
   DATE,
   IDateFormField,
   IFormSectionGroup,
@@ -45,8 +42,9 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
   IContactPoint,
-  NID_VERIFICATION_REDIRECT_BUTTON,
-  INidVerificationRedirectButton
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton,
+  INidVerificationFetchButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -58,8 +56,7 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData,
-  LocationType
+  IOfflineData
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -67,8 +64,6 @@ import {
   isDateNotInFuture
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
-import { IDynamicValues } from '@client/navigation'
-import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
@@ -147,27 +142,27 @@ export const internationaliseFieldObject = (
     )
   }
 
-  if (base.type === FETCH_BUTTON) {
-    ;(base as any).modalTitle = intl.formatMessage(
-      (field as ILoaderButton).modalTitle
+  if (base.type === NID_VERIFICATION_FETCH_BUTTON) {
+    ;(base as any).labelForVerified = intl.formatMessage(
+      (field as INidVerificationFetchButton).labelForVerified
     )
-    ;(base as any).successTitle = intl.formatMessage(
-      (field as ILoaderButton).successTitle
+    ;(base as any).labelForUnverified = intl.formatMessage(
+      (field as INidVerificationFetchButton).labelForUnverified
     )
-    ;(base as any).errorTitle = intl.formatMessage(
-      (field as ILoaderButton).errorTitle
+    ;(base as any).labelForOffline = intl.formatMessage(
+      (field as INidVerificationFetchButton).labelForOffline
     )
   }
 
-  if (base.type === NID_VERIFICATION_REDIRECT_BUTTON) {
+  if (base.type === NID_VERIFICATION_BUTTON) {
     ;(base as any).labelForVerified = intl.formatMessage(
-      (field as INidVerificationRedirectButton).labelForVerified
+      (field as INidVerificationButton).labelForVerified
     )
     ;(base as any).labelForUnverified = intl.formatMessage(
-      (field as INidVerificationRedirectButton).labelForUnverified
+      (field as INidVerificationButton).labelForUnverified
     )
     ;(base as any).labelForOffline = intl.formatMessage(
-      (field as INidVerificationRedirectButton).labelForOffline
+      (field as INidVerificationButton).labelForOffline
     )
   }
 
@@ -468,42 +463,6 @@ export function getListOfLocations(
   >
 ) {
   return resource[resourceType]
-}
-
-interface IVars {
-  [key: string]: any
-}
-
-export function getInputValues(
-  inputs: IFieldInput[],
-  values: IFormSectionData
-): IDynamicValues {
-  const variables: IVars = {}
-  inputs.forEach((input: IFieldInput) => {
-    if (input.type && input.type === 'ENVIRONMENT') {
-      variables[input.name] =
-        window.config[input.valueField as keyof typeof window.config]
-    } else {
-      variables[input.name] = values[input.valueField]
-    }
-  })
-  return variables
-}
-
-export function getQueryData(
-  field: ILoaderButton,
-  values: IFormSectionData
-): IQuery | undefined {
-  const selectedValue = values[field.querySelectorInput.valueField] as string
-  const queryData = field.queryMap[selectedValue]
-
-  if (!queryData) {
-    return
-  }
-
-  const variables = getInputValues(queryData.inputs, values)
-  queryData.variables = variables
-  return queryData
 }
 
 export function getSelectedInformantAndContactType(draftData?: IFormData) {
