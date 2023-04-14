@@ -115,6 +115,13 @@ type Query {
     event: String!
     locationId: String!
   ): [OfficewiseRegistration!]
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    base: String!
+  ): MixedTotalMetricsResult
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -453,6 +460,8 @@ type OfficewiseRegistration {
   officeLocation: String!
   total: Int!
 }
+
+union MixedTotalMetricsResult = TotalMetricsByRegistrar | TotalMetricsByLocation
 
 type EventSearchResultSet {
   results: [EventSearchSet]
@@ -936,6 +945,16 @@ type TimeLoggedMetrics {
   time: String!
 }
 
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
+}
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
 interface EventSearchSet {
   id: ID!
   type: String
@@ -1285,6 +1304,16 @@ enum AttachmentSubject {
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
   BIRTH_DECLARATION
+}
+
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+}
+
+type EventMetricsByLocation {
+  officeLocation: String!
+  total: Int!
 }
 
 type RegistrationSearchSet {

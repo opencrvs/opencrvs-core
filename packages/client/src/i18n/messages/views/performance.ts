@@ -380,6 +380,11 @@ const messagesToDefine = {
     id: 'performance.completenessTable.completenessRate',
     defaultMessage: 'Completeness {lineBreak}rate',
     description: 'Title for Completeness rate column in the table'
+  },
+  registrar: {
+    id: 'performance.registrationsListTable.registrarColumn',
+    defaultMessage: 'Registrars',
+    description: 'Title for registrar column in the table'
   }
 }
 

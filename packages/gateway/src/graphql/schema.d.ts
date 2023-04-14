@@ -42,6 +42,7 @@ export interface GQLQuery {
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
   getOfficewiseRegistrations?: Array<GQLOfficewiseRegistration>
+  getRegistrationsListByFilter?: GQLMixedTotalMetricsResult
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -323,6 +324,21 @@ export interface GQLTimeLoggedMetricsResultSet {
 export interface GQLOfficewiseRegistration {
   officeLocation: string
   total: number
+}
+
+export type GQLMixedTotalMetricsResult =
+  | GQLTotalMetricsByRegistrar
+  | GQLTotalMetricsByLocation
+
+/** Use this to resolve union type MixedTotalMetricsResult */
+export type GQLPossibleMixedTotalMetricsResultTypeNames =
+  | 'TotalMetricsByRegistrar'
+  | 'TotalMetricsByLocation'
+
+export interface GQLMixedTotalMetricsResultNameMap {
+  MixedTotalMetricsResult: GQLMixedTotalMetricsResult
+  TotalMetricsByRegistrar: GQLTotalMetricsByRegistrar
+  TotalMetricsByLocation: GQLTotalMetricsByLocation
 }
 
 export interface GQLEventSearchResultSet {
@@ -807,6 +823,16 @@ export interface GQLTimeLoggedMetrics {
   time: string
 }
 
+export interface GQLTotalMetricsByRegistrar {
+  results: Array<GQLEventMetricsByRegistrar>
+  total?: number
+}
+
+export interface GQLTotalMetricsByLocation {
+  results: Array<GQLEventMetricsByLocation>
+  total?: number
+}
+
 export interface GQLEventSearchSet {
   id: string
   type?: string
@@ -1169,6 +1195,16 @@ export const enum GQLAttachmentSubject {
   BIRTH_DECLARATION = 'BIRTH_DECLARATION'
 }
 
+export interface GQLEventMetricsByRegistrar {
+  registrarPractitioner?: GQLUser
+  total: number
+}
+
+export interface GQLEventMetricsByLocation {
+  officeLocation: string
+  total: number
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1409,6 +1445,10 @@ export interface GQLResolver {
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
   OfficewiseRegistration?: GQLOfficewiseRegistrationTypeResolver
+  MixedTotalMetricsResult?: {
+    __resolveType: GQLMixedTotalMetricsResultTypeResolver
+  }
+
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
@@ -1438,6 +1478,8 @@ export interface GQLResolver {
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
+  TotalMetricsByRegistrar?: GQLTotalMetricsByRegistrarTypeResolver
+  TotalMetricsByLocation?: GQLTotalMetricsByLocationTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
   }
@@ -1454,6 +1496,8 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
+  EventMetricsByLocation?: GQLEventMetricsByLocationTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
@@ -1493,6 +1537,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
   fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
   getOfficewiseRegistrations?: QueryToGetOfficewiseRegistrationsResolver<TParent>
+  getRegistrationsListByFilter?: QueryToGetRegistrationsListByFilterResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
@@ -1987,6 +2032,25 @@ export interface QueryToGetOfficewiseRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToGetOfficewiseRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetRegistrationsListByFilterArgs {
+  timeStart: string
+  timeEnd: string
+  locationId?: string
+  event: string
+  base: string
+}
+export interface QueryToGetRegistrationsListByFilterResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetRegistrationsListByFilterArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3713,6 +3777,12 @@ export interface OfficewiseRegistrationToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'TotalMetricsByRegistrar'
+    | 'TotalMetricsByLocation'
+    | Promise<'TotalMetricsByRegistrar' | 'TotalMetricsByLocation'>
+}
 export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
   results?: EventSearchResultSetToResultsResolver<TParent>
   totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
@@ -4855,6 +4925,44 @@ export interface TimeLoggedMetricsToTimeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLTotalMetricsByRegistrarTypeResolver<TParent = any> {
+  results?: TotalMetricsByRegistrarToResultsResolver<TParent>
+  total?: TotalMetricsByRegistrarToTotalResolver<TParent>
+}
+
+export interface TotalMetricsByRegistrarToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TotalMetricsByRegistrarToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLTotalMetricsByLocationTypeResolver<TParent = any> {
+  results?: TotalMetricsByLocationToResultsResolver<TParent>
+  total?: TotalMetricsByLocationToTotalResolver<TParent>
+}
+
+export interface TotalMetricsByLocationToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TotalMetricsByLocationToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'
@@ -5176,6 +5284,44 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
 }
 
 export interface InputOutputToValueStringResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByRegistrarTypeResolver<TParent = any> {
+  registrarPractitioner?: EventMetricsByRegistrarToRegistrarPractitionerResolver<TParent>
+  total?: EventMetricsByRegistrarToTotalResolver<TParent>
+}
+
+export interface EventMetricsByRegistrarToRegistrarPractitionerResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByLocationTypeResolver<TParent = any> {
+  officeLocation?: EventMetricsByLocationToOfficeLocationResolver<TParent>
+  total?: EventMetricsByLocationToTotalResolver<TParent>
+}
+
+export interface EventMetricsByLocationToOfficeLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToTotalResolver<
   TParent = any,
   TResult = any
 > {

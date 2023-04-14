@@ -52,7 +52,6 @@ import {
   getTrackingId,
   getRegLastOffice,
   getEncounterLocationType,
-  getPractitionerIdFromBundle,
   fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
 import {
@@ -188,7 +187,7 @@ export const generateBirthRegPoint = async (
     throw new Error('Composition not found')
   }
 
-  const practitionerRole = await fetchDeclarationsBeginnerRole(
+  const practitionerDetails = await fetchDeclarationsBeginnerRole(
     payload,
     authHeader
   )
@@ -207,7 +206,8 @@ export const generateBirthRegPoint = async (
     regStatus: regStatus,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
-    practitionerRole,
+    practitionerRole: practitionerDetails[0],
+    registrarPractitionerId: practitionerDetails[1],
     ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
     dateLabel: !Number.isNaN(compositionDate.getTime())
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
@@ -249,13 +249,7 @@ export const generateDeathRegPoint = async (
     throw new Error('Composition not found')
   }
 
-  const practitionerId = getPractitionerIdFromBundle(payload)
-
-  if (!practitionerId) {
-    throw new Error('Practitioner id not found')
-  }
-
-  const practitionerRole = await fetchDeclarationsBeginnerRole(
+  const practitionerDetails = await fetchDeclarationsBeginnerRole(
     payload,
     authHeader
   )
@@ -283,7 +277,8 @@ export const generateDeathRegPoint = async (
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
-    practitionerRole,
+    practitionerRole: practitionerDetails[0],
+    registrarPractitionerId: practitionerDetails[1],
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:
@@ -573,7 +568,7 @@ export async function generateDeclarationStartedPoint(
 
   const tags = {
     eventType: getDeclarationType(task),
-    practitionerId: getPractionerIdFromTask(task),
+    registrarPractitionerId: getPractionerIdFromTask(task),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }

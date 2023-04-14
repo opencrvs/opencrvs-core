@@ -16,8 +16,12 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import { getOfficewiseRegistrationsCount } from '@metrics/features/metrics/metricsGenerator'
+import {
+  getOfficewiseRegistrationsCount,
+  getTotalMetrics
+} from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
+import { uniqBy } from 'lodash'
 
 export async function officewiseRegistrationsHandler(
   request: Hapi.Request,
@@ -32,6 +36,79 @@ export async function officewiseRegistrationsHandler(
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
   }
+  return getOfficewiseRegistrationsCount(
+    timeStart,
+    timeEnd,
+    event,
+    locationId,
+    authHeader
+  )
+}
+
+export async function totalMetricsByRegistrar(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const timeStart = request.query[TIME_FROM]
+  const timeEnd = request.query[TIME_TO]
+  const locationId = 'Location/' + request.query[LOCATION_ID]
+
+  const event = request.query[EVENT]
+
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+
+  const totalRegistrations = await getTotalMetrics(
+    timeStart,
+    timeEnd,
+    locationId,
+    event,
+    authHeader
+  )
+
+  const registrarIDs = uniqBy(
+    totalRegistrations.results,
+    'registrarPractitionerId'
+  ).map((item) => item.registrarPractitionerId)
+
+  const results: any[] = []
+
+  registrarIDs.forEach((registrarId) => {
+    const registrarResults = totalRegistrations.results.filter(
+      (result) => result.registrarPractitionerId === registrarId
+    )
+
+    results.push({
+      registrarPractitioner: registrarId,
+      total: registrarResults.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      )
+    })
+  })
+
+  return {
+    total: results.length,
+    results: results
+  }
+}
+
+export async function totalMetricsByLocation(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+
+  const timeStart = request.query[TIME_FROM]
+  const timeEnd = request.query[TIME_TO]
+  const event = request.query[EVENT]
+  const locationId = 'Location/' + request.query[LOCATION_ID]
+
   return getOfficewiseRegistrationsCount(
     timeStart,
     timeEnd,

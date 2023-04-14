@@ -241,3 +241,48 @@ export const GET_OFFICEWISE_REGISTRATIONS = gql`
     }
   }
 `
+export const FETCH_REGISTRATIONS = gql`
+  query getRegistrationsListByFilter(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+    $base: String!
+  ) {
+    getRegistrationsListByFilter(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+      base: $base
+    ) {
+      __typename
+      ... on TotalMetricsByRegistrar {
+        results {
+          total
+          registrarPractitioner {
+            id
+            role
+            primaryOffice {
+              name
+              id
+            }
+            name {
+              firstNames
+              familyName
+              use
+            }
+          }
+        }
+        total
+      }
+      ... on TotalMetricsByLocation {
+        results {
+          total
+          officeLocation
+        }
+        total
+      }
+    }
+  }
+`

@@ -16,6 +16,26 @@ type EventMetrics {
   practitionerRole: String!
 }
 
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+}
+
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
+}
+
+type EventMetricsByLocation {
+  officeLocation: String!
+  total: Int!
+}
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
 type Estimation {
   totalEstimation: Int!
   maleEstimation: Int!
@@ -106,6 +126,8 @@ type OfficewiseRegistration {
   total: Int!
 }
 
+union MixedTotalMetricsResult = TotalMetricsByRegistrar | TotalMetricsByLocation
+
 type Query {
   getTotalMetrics(
     timeStart: String!
@@ -164,4 +186,11 @@ type Query {
     event: String!
     locationId: String!
   ): [OfficewiseRegistration!]
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    base: String!
+  ): MixedTotalMetricsResult
 }

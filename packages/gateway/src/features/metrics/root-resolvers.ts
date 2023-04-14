@@ -23,6 +23,11 @@ export interface IMetricsParam {
   populationYear?: number
 }
 
+export enum FILTER_BY {
+  LOCATION = 'LOCATION',
+  REGISTRAR = 'REGISTRAR'
+}
+
 export const resolvers: GQLResolver = {
   Query: {
     async getTotalMetrics(_, variables, authHeader) {
@@ -175,6 +180,26 @@ export const resolvers: GQLResolver = {
         },
         authHeader
       )
+    },
+    async getRegistrationsListByFilter(_, { ...variables }, authHeader) {
+      let results
+      const { base } = variables
+
+      if (base === FILTER_BY.REGISTRAR) {
+        results = await getMetrics(
+          '/totalMetricsByRegistrar',
+          variables,
+          authHeader
+        )
+      } else if (base === FILTER_BY.LOCATION) {
+        results = await getMetrics(
+          '/totalMetricsByLocation',
+          variables,
+          authHeader
+        )
+      }
+
+      return results
     }
   }
 }

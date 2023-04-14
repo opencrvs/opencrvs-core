@@ -46,7 +46,11 @@ import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
-import { officewiseRegistrationsHandler } from '@metrics/features/officewiseRegistrations/handler'
+import {
+  officewiseRegistrationsHandler,
+  totalMetricsByRegistrar,
+  totalMetricsByLocation
+} from '@metrics/features/officewiseRegistrations/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -542,6 +546,40 @@ export const getRoutes = () => {
         },
         tags: ['api'],
         description: 'Get officewise registration metrics'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalMetricsByRegistrar',
+      handler: totalMetricsByRegistrar,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required(),
+            base: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalMetricsByLocation',
+      handler: totalMetricsByLocation,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            base: Joi.string().required()
+          })
+        },
+        tags: ['api']
       }
     }
   ]
