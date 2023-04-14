@@ -25,6 +25,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
 import * as React from 'react'
+import { EVENT_STATUS } from '@client/workqueue'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
@@ -332,6 +333,11 @@ class ReviewActionComponent extends React.Component<
         ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
           .completionStatus[String(completeDeclaration)]) ||
       null
+
+    const isSecrataryValided =
+      declaration.registrationStatus === EVENT_STATUS.VALIDATED &&
+      declarationToBeRegistered
+
     return !actionContent ? null : (
       <Container id={id}>
         <UnderLayBackground background={background} />
@@ -353,7 +359,11 @@ class ReviewActionComponent extends React.Component<
                 id="registerDeclarationBtn"
                 icon={() => <Check />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeDeclaration || totalFileSizeExceeded}
+                disabled={
+                  !completeDeclaration ||
+                  totalFileSizeExceeded ||
+                  !isSecrataryValided
+                }
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.register)}
