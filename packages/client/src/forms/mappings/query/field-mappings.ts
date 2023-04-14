@@ -41,9 +41,8 @@ import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { getNationalityName } from '@client/views/SysAdmin/Config/Application/utils'
+import { countryAlpha3toAlpha2 } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
-import { getIntl } from '@client/i18n/components/I18nContainer'
 
 interface IName {
   [key: string]: any
@@ -1007,26 +1006,23 @@ export const nationalityTransformer = (
   _?: IFormField,
   __?: IOfflineData
 ) => {
-  const { intl } = getIntl()
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const nationalityName = getNationalityName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId][field.name] && queryData[sectionId][field.name][0]
     )
-    transformedData[sectionId][field.name] =
-      intl.formatMessage(nationalityName) || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   } else if (queryData[sectionId]?.individual) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const nationalityName = getNationalityName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId].individual[field.name] &&
         queryData[sectionId].individual[field.name][0]
     )
-    transformedData[sectionId][field.name] =
-      intl.formatMessage(nationalityName) || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   }
 }
 

@@ -10,14 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { connect } from 'react-redux'
-import * as React from 'react'
-import {
-  createIntl,
-  createIntlCache,
-  IntlConfig,
-  IntlShape,
-  RawIntlProvider
-} from 'react-intl'
+import { IntlProvider } from 'react-intl'
 
 import { getLanguage, getMessages } from '@client/i18n/selectors'
 import { IStoreState } from '@client/store'
@@ -28,36 +21,6 @@ type StateProps = {
   messages: IntlMessages
 }
 
-const cache = createIntlCache()
-
-let intl: IntlShape
-
-export function getIntl() {
-  return {
-    intl
-  }
-}
-
-function CustomIntlProvider(props: React.PropsWithChildren<IntlConfig>) {
-  const [isIntlCreated, setIntlCreated] = React.useState(false)
-  React.useEffect(() => {
-    intl = createIntl(
-      {
-        locale: props.locale,
-        messages: props.messages
-      },
-      cache
-    )
-    setIntlCreated(true)
-  }, [props.locale, props.messages])
-
-  return isIntlCreated ? (
-    <RawIntlProvider value={intl} {...props} />
-  ) : (
-    <React.Fragment />
-  )
-}
-
 const mapStateToProps = (state: IStoreState): StateProps => {
   const locale = getLanguage(state)
   return {
@@ -66,4 +29,4 @@ const mapStateToProps = (state: IStoreState): StateProps => {
   }
 }
 
-export const I18nContainer = connect(mapStateToProps)(CustomIntlProvider)
+export const I18nContainer = connect(mapStateToProps)(IntlProvider)

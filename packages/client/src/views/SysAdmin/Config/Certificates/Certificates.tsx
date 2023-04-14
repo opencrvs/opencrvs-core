@@ -114,6 +114,7 @@ type Props = WrappedComponentProps & {
 } & {
   updateOfflineCertificate: typeof updateOfflineCertificate
   updateOfflineConfigData: typeof updateOfflineConfigData
+  state: IStoreState
 }
 
 interface State {
@@ -145,7 +146,8 @@ export const printDummyCertificate = async (
   registerForm: { birth: IForm; death: IForm; marriage: IForm },
   intl: IntlShape,
   userDetails: UserDetails,
-  offlineData: IOfflineData
+  offlineData: IOfflineData,
+  state: IStoreState
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
 
@@ -153,7 +155,8 @@ export const printDummyCertificate = async (
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    offlineData
+    offlineData,
+    state
   )
 }
 
@@ -200,7 +203,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm
           )
 
-          svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
+          svgCode = executeHandlebarsTemplate(
+            svgCode,
+            dummyTemplateData,
+            this.props.state
+          )
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -218,7 +225,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm,
             intl,
             this.props.userDetails as UserDetails,
-            this.props.offlineResources
+            this.props.offlineResources,
+            this.props.state
           )
         }
       },
@@ -726,7 +734,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   let svgCode = atob(file.data.split(',')[1])
                   svgCode = executeHandlebarsTemplate(
                     svgCode,
-                    dummyTemplateData
+                    dummyTemplateData,
+                    this.props.state
                   )
                   const data = `data:${SVGFile.type};base64,${window.btoa(
                     svgCode
@@ -762,7 +771,8 @@ function mapStateToProps(state: IStoreState) {
     offlineResources: getOfflineData(state),
     registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    state: state
   }
 }
 

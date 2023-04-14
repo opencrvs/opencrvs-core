@@ -24,7 +24,6 @@ import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/For
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
-import { nationalityMessages } from '@client/i18n/messages/nationalities'
 
 export type IActionType =
   | keyof typeof GeneralActionId
@@ -89,14 +88,11 @@ export const getCountryName = (isoCode: string) => {
   return countryName && countryName.name
 }
 
-export const getNationalityName = (isoCode: string) => {
+export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
-    isoCode === 'FAR'
-      ? 'FA'
-      : (lookup.countries({ alpha3: isoCode })[0]
-          ?.alpha2 as keyof typeof nationalityMessages)
+    isoCode === 'FAR' ? 'FA' : lookup.countries({ alpha3: isoCode })[0]?.alpha2
 
-  return nationalityMessages[alpha2]
+  return alpha2
 }
 
 export function isValidRegEx(pattern: string): boolean {

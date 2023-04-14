@@ -104,9 +104,11 @@
     "vite-plugin-svgr": "^0.3.0",
     "vite-tsconfig-paths": "^3.5.0",
     "webfontloader": "^1.6.28",
-    "xregexp": "^4.2.0"
+    "xregexp": "^4.2.0",
+    "handlebars": "^4.7.6"
   },
   "devDependencies": {
+    "@types/handlebars": "^4.1.0",
     "@graphql-codegen/add": "3.1.1",
     "@graphql-codegen/cli": "2.6.2",
     "@graphql-codegen/introspection": "2.1.1",
