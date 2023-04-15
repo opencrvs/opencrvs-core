@@ -189,35 +189,35 @@ export function executeHandlebarsTemplate(
         tenth: string
         number: string
         ordinal: string
+        month: string
       },
       date: string,
       options: Handlebars.HelperOptions
     ) {
-      const { century, tenth, number, ordinal } = keys
+      const { century, tenth, number, ordinal, month } = keys
 
-      if (!century || !tenth || !number || !ordinal || !date) return ''
-      const [year, month, dayOfMonth] = date.split('-')
+      if (!century || !tenth || !number || !ordinal || !date || !month)
+        return ''
+      const [yearValue, monthValue, dayOfMonth] = date.split('-')
       if (
-        !isValidYear(year) ||
-        !isValidMonth(month) ||
+        !isValidYear(yearValue) ||
+        !isValidMonth(monthValue) ||
         !isValidDayOfMonth(dayOfMonth)
       )
         return ''
-      const centuryValue = Number(year.slice(0, 2)) * 100
-      const centuryYear = Number(year.slice(2))
+      const centuryValue = Number(yearValue.slice(0, 2)) * 100
+      const centuryYear = Number(yearValue.slice(2))
       const yearMessage = `${formatMessage(
         intl,
         [century, centuryValue].join('.')
       )} ${getNumberInWords(centuryYear, tenth, number, intl)}`
-      const monthMessage = new Date(1970, Number(month) - 1).toLocaleString(
-        intl.locale,
-        {
-          month: 'long'
-        }
+      const monthMessage = formatMessage(
+        intl,
+        [month, Number(monthValue)].join('.')
       )
       const dayOfMonthMessage = formatMessage(
         intl,
-        [ordinal, dayOfMonth].join('.')
+        [ordinal, Number(dayOfMonth)].join('.')
       )
       return [dayOfMonthMessage, monthMessage, yearMessage].join(' ')
     }
