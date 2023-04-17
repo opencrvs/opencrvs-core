@@ -168,7 +168,7 @@ export async function createRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
   event: Events
-) {
+): Promise<{ resBundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
     const token = getToken(request)
     let payload = await modifyRegistrationBundle(
@@ -207,23 +207,28 @@ export async function createRegistrationHandler(
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
-      invokeRegistrationValidation(payload, request.headers)
+      const { regValidationError } = await invokeRegistrationValidation(
+        payload,
+        request.headers,
+        getToken(request)
+      )
+      return { resBundle, regValidationError }
     }
     if (isEventNonNotifiable(event)) {
-      return resBundle
+      return { resBundle }
     }
 
     /* sending notification to the contact */
     const msisdn = await getSharedContactMsisdn(payload)
     if (!msisdn) {
       logger.info('createRegistrationHandler could not send event notification')
-      return resBundle
+      return { resBundle }
     }
     logger.info('createRegistrationHandler sending event notification')
     sendEventNotification(payload, event, msisdn, {
       Authorization: request.headers.authorization
     })
-    return resBundle
+    return { resBundle }
   } catch (error) {
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
@@ -412,9 +417,13 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-    invokeRegistrationValidation(payload, request.headers)
+    const { regValidationError } = await invokeRegistrationValidation(
+      payload,
+      request.headers,
+      getToken(request)
+    )
 
-    return resBundle
+    return { resBundle, regValidationError }
   } catch (error) {
     logger.error(
       `Workflow/markAsWaitingValidationHandler[${event}]: error: ${error}`
