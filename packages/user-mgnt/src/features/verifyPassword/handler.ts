@@ -15,7 +15,6 @@ import { unauthorized } from '@hapi/boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateBcryptHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
 
 interface IVerifyPayload {
   username: string
