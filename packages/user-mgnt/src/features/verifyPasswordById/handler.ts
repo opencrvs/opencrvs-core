@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { validatePasswordHash } from '@user-mgnt/features/changePassword/handler'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   id: string
@@ -41,17 +41,18 @@ export default async function verifyPassByIdHandler(
     throw unauthorized()
   }
 
-  if (validatePasswordHash(password, user)) {
-    const response: IVerifyResponse = {
-      mobile: user.mobile,
-      scope: user.scope,
-      status: user.status,
-      username: user.username,
-      id: user.id
-    }
-    return response
+  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
+    throw unauthorized()
   }
-  throw unauthorized()
+
+  const response: IVerifyResponse = {
+    mobile: user.mobile,
+    scope: user.scope,
+    status: user.status,
+    username: user.username,
+    id: user.id
+  }
+  return response
 }
 
 export const requestSchema = Joi.object({

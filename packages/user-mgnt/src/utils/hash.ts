@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createHash } from 'crypto'
 import * as bcrypt from 'bcryptjs'
 
 interface ISaltedHash {
@@ -32,13 +31,6 @@ export function generateRandomPassword(demoUser?: boolean) {
   }
 
   return randomPassword
-}
-
-export function generateHash(content: string, salt: string): string {
-  const hash = createHash('sha512')
-  hash.update(salt)
-  hash.update(content)
-  return hash.digest('hex')
 }
 
 export function generateBcryptHash(content: string, salt: string): string {

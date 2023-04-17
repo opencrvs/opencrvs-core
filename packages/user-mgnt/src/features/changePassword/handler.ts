@@ -15,8 +15,7 @@ import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import {
   generateBcryptHash,
-  generateBcryptSaltedHash,
-  generateHash
+  generateBcryptSaltedHash
 } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
@@ -44,33 +43,19 @@ export default async function changePasswordHandler(
   if (
     userUpdateData.existingPassword &&
     user.status === statuses.ACTIVE &&
-    validatePasswordHash(userUpdateData.existingPassword, user)
+    generateBcryptHash(userUpdateData.existingPassword, user.salt) ===
+      user.passwordHash
   ) {
     return await changePassword(userUpdateData, user, request, h)
   }
   if (
     userUpdateData.password &&
-    validatePasswordHash(userUpdateData.password, user)
+    generateBcryptHash(userUpdateData.password, user.salt) === user.passwordHash
   ) {
     return await changePassword(userUpdateData, user, request, h)
   }
 
   return h.response().code(401)
-}
-
-export function validatePasswordHash(
-  existingPassword: string,
-  user: IUserModel
-) {
-  try {
-    return (
-      generateHash(existingPassword, user.salt) === user.passwordHash ||
-      generateBcryptHash(existingPassword, user.salt) === user.passwordHash
-    )
-  } catch (ex) {
-    logger.error(`Invalid salt!`)
-    throw unauthorized()
-  }
 }
 
 async function changePassword(

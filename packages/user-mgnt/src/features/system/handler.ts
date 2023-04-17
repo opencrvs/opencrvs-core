@@ -26,8 +26,7 @@ import System, {
 import User, { IUserModel } from '@user-mgnt/model/user'
 import {
   generateBcryptHash,
-  generateBcryptSaltedHash,
-  generateHash
+  generateBcryptSaltedHash
 } from '@user-mgnt/utils/hash'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
@@ -314,19 +313,16 @@ export async function verifySystemHandler(
     throw unauthorized()
   }
 
-  if (
-    generateHash(client_secret, system.salt) === system.secretHash ||
-    generateBcryptHash(client_secret, system.salt) === system.secretHash
-  ) {
-    const response: IVerifyResponse = {
-      scope: system.scope,
-      status: system.status,
-      id: system.id
-    }
-    return response
+  if (generateBcryptHash(client_secret, system.salt) !== system.secretHash) {
+    throw unauthorized()
   }
 
-  throw unauthorized()
+  const response: IVerifyResponse = {
+    scope: system.scope,
+    status: system.status,
+    id: system.id
+  }
+  return response
 }
 
 export const verifySystemReqSchema = Joi.object({

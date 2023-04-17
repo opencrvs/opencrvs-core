@@ -14,7 +14,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash, generateHash } from '@user-mgnt/utils/hash'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 
 interface IVerifyPayload {
@@ -43,10 +43,7 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
   try {
-    if (
-      generateHash(password, user.salt) === user.passwordHash ||
-      generateBcryptHash(password, user.salt) === user.passwordHash
-    ) {
+    if (generateBcryptHash(password, user.salt) === user.passwordHash) {
       const response: IVerifyResponse = {
         mobile: user.mobile,
         scope: user.scope,
