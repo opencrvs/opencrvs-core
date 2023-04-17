@@ -42,22 +42,17 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  try {
-    if (generateBcryptHash(password, user.salt) === user.passwordHash) {
-      const response: IVerifyResponse = {
-        mobile: user.mobile,
-        scope: user.scope,
-        status: user.status,
-        id: user.id,
-        practitionerId: user.practitionerId
-      }
-      return response
-    }
-  } catch (err) {
-    logger.error(`Invalid salt!`)
+  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
+    throw unauthorized()
   }
-
-  throw unauthorized()
+  const response: IVerifyResponse = {
+    mobile: user.mobile,
+    scope: user.scope,
+    status: user.status,
+    id: user.id,
+    practitionerId: user.practitionerId
+  }
+  return response
 }
 
 export const requestSchema = Joi.object({
