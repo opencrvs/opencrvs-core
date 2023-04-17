@@ -336,7 +336,8 @@ class ReviewActionComponent extends React.Component<
 
     const isSecrataryValided =
       declaration.registrationStatus === EVENT_STATUS.VALIDATED &&
-      declarationToBeRegistered
+      declarationToBeRegistered &&
+      declaration.eventType === 'birth'
 
     return !actionContent ? null : (
       <Container id={id}>
