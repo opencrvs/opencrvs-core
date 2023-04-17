@@ -338,7 +338,7 @@ const messagesToDefine = {
   },
   integratingSystemTypeOsia: {
     id: 'integrations.integratingSystemTypeOsia',
-    defaultMessage: 'OSIA (Coming soon)',
+    defaultMessage: 'OSIA',
     description: 'Integrating system type option "OSIA"'
   },
   integratingSystemTypeOther: {

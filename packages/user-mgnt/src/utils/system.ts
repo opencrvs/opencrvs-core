@@ -28,6 +28,7 @@ export const types = {
 
 export const integratingSystemTypes = {
   OTHER: 'OTHER',
+  OSIA: 'OSIA',
   MOSIP: 'MOSIP'
 }
 

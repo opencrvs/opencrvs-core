@@ -41,6 +41,14 @@ const nidIntegrationConditionals = {
       !nationalIdSystem.settings.openIdProviderClientId ||
       !nationalIdSystem.settings.openIdProviderClaims;
     `
+  },
+  hideIfOsiaIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Osia}');
+    !nationalIdSystem;
+  `
   }
 }
 

@@ -42,6 +42,14 @@ const nidIntegrationConditionals = {
       !nationalIdSystem.settings.openIdProviderClientId ||
       !nationalIdSystem.settings.openIdProviderClaims;
     `
+  },
+  hideIfOsiaIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+      offlineCountryConfig &&
+      offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Osia}');
+      !nationalIdSystem;
+    `
   }
 }
 
@@ -1761,7 +1769,8 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: `!values.iD || !values.motherBirthDate || !values.firstNamesEng || !values.familyNameEng`
-                }
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
               ],
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
