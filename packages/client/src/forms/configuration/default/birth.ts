@@ -1382,7 +1382,7 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: [
                     'individual',
                     {
-                      operation: 'nidVerificationFieldToIdentityTransformer'
+                      operation: 'osiaNidVerificationFieldToIdentityTransformer'
                     }
                   ]
                 },
@@ -1792,7 +1792,7 @@ export const birthRegisterForms: ISerializedForm = {
               validate: [],
               mapping: {
                 mutation: {
-                  operation: 'nidVerificationFieldToIdentityTransformer'
+                  operation: 'osiaNidVerificationFieldToIdentityTransformer'
                 },
                 query: {
                   operation: 'identityToNidVerificationFieldTransformer'
@@ -2416,7 +2416,7 @@ export const birthRegisterForms: ISerializedForm = {
               validate: [],
               mapping: {
                 mutation: {
-                  operation: 'nidVerificationFieldToIdentityTransformer'
+                  operation: 'osiaNidVerificationFieldToIdentityTransformer'
                 },
                 query: {
                   operation: 'identityToNidVerificationFieldTransformer'

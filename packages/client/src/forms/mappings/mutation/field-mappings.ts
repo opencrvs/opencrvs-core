@@ -129,24 +129,47 @@ export const nidVerificationFieldToIdentityTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  const mosipTransformer = fieldToIdentityTransformer(
-    'id',
-    IdentityIdType.MosipPsutTokenId
+  fieldToIdentityTransformer('id', IdentityIdType.MosipPsutTokenId)(
+    transformedData,
+    draftData,
+    sectionId,
+    field
   )
-  mosipTransformer(transformedData, draftData, sectionId, field)
-  const osiaTransformer = fieldToIdentityTransformer(
-    'id',
-    IdentityIdType.OsiaNid
-  )
-  osiaTransformer(transformedData, draftData, sectionId, field)
 
   const sectionData = transformedData[sectionId]
   const existingIdentity = sectionData.identifier.find(
     (identifier: fhir.Identifier) =>
-      identifier.type &&
-      (identifier.type === IdentityIdType.MosipPsutTokenId ||
-        identifier.type === IdentityIdType.OsiaNid)
+      identifier.type && identifier.type === IdentityIdType.MosipPsutTokenId
   )
+
+  if (existingIdentity) {
+    const modifiedFields = draftData[sectionId][
+      'fieldsModifiedByNidUserInfo'
+    ] as string[]
+    existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
+  }
+  return transformedData
+}
+
+export const osiaNidVerificationFieldToIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  fieldToIdentityTransformer('id', IdentityIdType.OsiaNid)(
+    transformedData,
+    draftData,
+    sectionId,
+    field
+  )
+
+  const sectionData = transformedData[sectionId]
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === IdentityIdType.OsiaNid
+  )
+
   if (existingIdentity) {
     const modifiedFields = draftData[sectionId][
       'fieldsModifiedByNidUserInfo'
