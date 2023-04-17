@@ -241,6 +241,7 @@ export function SystemList() {
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
           <Button
+            key="create-client-button"
             type="secondary"
             id="createClientButton"
             onClick={() => setShowModal(true)}
