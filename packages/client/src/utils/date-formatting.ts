@@ -68,14 +68,3 @@ export default function formatDate(date: Date | number, formatStr = 'PP') {
     locale: locales[window.__localeId__]
   })
 }
-
-export const isValidYear = (year: string) =>
-  year.length === 4 && !Number.isNaN(Number(year))
-
-export const isValidMonth = (month: string) =>
-  [1, 2].includes(month.length) && Number(month) > 0 && Number(month) <= 12
-
-export const isValidDayOfMonth = (dayOfMonth: string) =>
-  [1, 2].includes(dayOfMonth.length) &&
-  Number(dayOfMonth) > 0 &&
-  Number(dayOfMonth) <= 31
