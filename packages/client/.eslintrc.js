@@ -55,7 +55,8 @@ Query component now sends errors automatically to Sentry.`
     ],
     'react/boolean-prop-naming': 'off',
     'react/sort-comp': 'off',
-    'react/sort-prop-types': 'off'
+    'react/sort-prop-types': 'off',
+    'react/prop-types': 'off'
   },
   settings: {
     react: {
