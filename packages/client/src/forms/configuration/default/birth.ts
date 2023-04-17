@@ -629,9 +629,9 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               mapping: {
                 template: {
-                  operation: 'dateFormatTransformer',
                   fieldName: 'eventDate',
-                  parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  operation: 'fieldValueTransformer',
+                  parameters: ['birthDate']
                 },
                 mutation: {
                   operation: 'longDateTransformer',
