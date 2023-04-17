@@ -925,7 +925,7 @@ export const deathRegisterForms: ISerializedForm = {
                   ]
                 },
                 query: {
-                  operation: 'identityToNidVerificationFieldTransformer',
+                  operation: 'nestedIdentityValueToFieldTransformer',
                   parameters: ['individual']
                 }
               },

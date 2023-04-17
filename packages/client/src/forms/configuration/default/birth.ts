@@ -1387,7 +1387,7 @@ export const birthRegisterForms: ISerializedForm = {
                   ]
                 },
                 query: {
-                  operation: 'identityToNidVerificationFieldTransformer',
+                  operation: 'nestedIdentityValueToFieldTransformer',
                   parameters: ['individual']
                 }
               },
