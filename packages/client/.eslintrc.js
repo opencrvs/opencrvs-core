@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 module.exports = {
-  extends: ['../../.eslintrc.js', 'eslint-config-react-app'],
+  extends: [
+    '../../.eslintrc.js',
+    'eslint-config-react-app',
+    'plugin:react/recommended'
+  ],
   plugins: ['react', 'formatjs'],
   env: {
     es6: true,
