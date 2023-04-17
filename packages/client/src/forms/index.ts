@@ -654,6 +654,7 @@ export interface INidVerificationFetchButton extends IFormFieldBase {
   labelForVerified: MessageDescriptor
   labelForUnverified: MessageDescriptor
   labelForOffline: MessageDescriptor
+  labelForLoading: MessageDescriptor
 }
 
 export interface INidVerificationButton extends IFormFieldBase {

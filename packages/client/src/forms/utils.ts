@@ -152,6 +152,9 @@ export const internationaliseFieldObject = (
     ;(base as any).labelForOffline = intl.formatMessage(
       (field as INidVerificationFetchButton).labelForOffline
     )
+    ;(base as any).labelForLoading = intl.formatMessage(
+      (field as INidVerificationFetchButton).labelForLoading
+    )
   }
 
   if (base.type === NID_VERIFICATION_BUTTON) {

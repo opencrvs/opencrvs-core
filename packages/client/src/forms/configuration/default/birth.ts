@@ -1400,7 +1400,8 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
-              labelForOffline: formMessageDescriptors.nidOffline
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             }
             // PRIMARY ADDRESS SUBSECTION
             // PRIMARY ADDRESS
@@ -1806,7 +1807,8 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
-              labelForOffline: formMessageDescriptors.nidOffline
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             },
             {
               name: 'seperator',
@@ -2434,7 +2436,8 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
-              labelForOffline: formMessageDescriptors.nidOffline
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             },
             {
               name: 'seperator',
