@@ -334,10 +334,9 @@ class ReviewActionComponent extends React.Component<
           .completionStatus[String(completeDeclaration)]) ||
       null
 
-    const isSecrataryValided =
+    const isValidated =
       declaration.registrationStatus === EVENT_STATUS.VALIDATED &&
-      declarationToBeRegistered &&
-      declaration.eventType === 'birth'
+      declarationToBeRegistered
 
     return !actionContent ? null : (
       <Container id={id}>
@@ -361,9 +360,7 @@ class ReviewActionComponent extends React.Component<
                 icon={() => <Check />}
                 onClick={this.toggleSubmitModalOpen}
                 disabled={
-                  !completeDeclaration ||
-                  totalFileSizeExceeded ||
-                  !isSecrataryValided
+                  !completeDeclaration || totalFileSizeExceeded || !isValidated
                 }
                 align={ICON_ALIGNMENT.LEFT}
               >
