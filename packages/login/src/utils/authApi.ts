@@ -118,6 +118,7 @@ const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
 interface IUserVerifyResponse {
   nonce: string
   securityQuestionKey?: string
+  prevQuestionKey?: string
 }
 
 const verifyUser = (
@@ -134,6 +135,7 @@ const verifyUser = (
 interface IVerifyNumberResponse {
   nonce: string
   securityQuestionKey: string
+  prevQuestionKey?: string
 }
 
 const verifyNumber = (

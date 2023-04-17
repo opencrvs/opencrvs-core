@@ -14,6 +14,7 @@ import { ListTable } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import {
+  GQLHumanName,
   GQLMixedTotalMetricsResult,
   GQLOfficewiseRegistration
 } from '@opencrvs/gateway/src/graphql/schema'
@@ -27,12 +28,27 @@ import { AvatarSmall } from '@client/components/Avatar'
 import { IDynamicValues } from '@client/navigation'
 import { getPercentage } from '@client/utils/data-formatting'
 import { getName } from '@client/views/RecordAudit/utils'
+import styled from 'styled-components'
 
+const NameAvatar = styled.div`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+const CenterItem = styled.div`
+  margin-top: 8px;
+`
 interface Props {
   loading: boolean
   base?: string
   data?: any
   extraData: { days: number }
+}
+
+function createUserName(name: GQLHumanName) {
+  return `${String(name.firstNames)} ${String(name.familyName)}`
 }
 
 export function RegistrationsDataTable(props: Props) {
@@ -146,14 +162,32 @@ export function RegistrationsDataTable(props: Props) {
           return result?.registrarPractitioner?.role === 'REGISTRATION_AGENT'
         })
         .map((result: IDynamicValues, index: number) => ({
-          total: String(result?.total),
-          name:
-            result?.registrarPractitioner?.name?.[0].firstNames +
-            ' ' +
-            result?.registrarPractitioner?.name?.[0].familyName,
-          officeLocation:
-            result?.registrarPractitioner?.primaryOffice?.name ?? '',
-          avgPerDay: getRegistrarAvgPerDay(result?.registrarPractitioner?.id)
+          total: <CenterItem>{String(result?.total)}</CenterItem>,
+          name: (
+            <NameAvatar>
+              <AvatarSmall
+                name={
+                  result.registrarPractitioner.name[0]
+                    ? createUserName(result?.registrarPractitioner?.name[0])
+                    : ''
+                }
+                avatar={result?.registrarPractitioner?.avatar}
+              />
+              <span>
+                {createUserName(result?.registrarPractitioner?.name[0])}
+              </span>
+            </NameAvatar>
+          ),
+          officeLocation: (
+            <CenterItem>
+              {result?.registrarPractitioner?.primaryOffice?.name ?? ''}
+            </CenterItem>
+          ),
+          avgPerDay: (
+            <CenterItem>
+              {getRegistrarAvgPerDay(result?.registrarPractitioner?.id)}
+            </CenterItem>
+          )
         }))
     }
 

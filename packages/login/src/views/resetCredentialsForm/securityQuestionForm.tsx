@@ -89,6 +89,7 @@ interface BaseProps
       forgottenItem: FORGOTTEN_ITEMS
       nonce: string
       securityQuestionKey: QUESTION_KEYS
+      prevQuestionKey?: string
     }
   > {
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
@@ -164,7 +165,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, goToPhoneNumberVerificationForm } = this.props
-    const { forgottenItem } = this.props.location.state
+    const { forgottenItem, prevQuestionKey } = this.props.location.state
 
     return (
       <>
@@ -177,7 +178,9 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
         >
           <form id="security-question-form" onSubmit={this.handleContinue}>
             <Title id="question">
-              {intl.formatMessage(messages[this.state.questionKey])}
+              {prevQuestionKey
+                ? intl.formatMessage(messages[prevQuestionKey as QUESTION_KEYS])
+                : intl.formatMessage(messages[this.state.questionKey])}
             </Title>
             {intl.formatMessage(
               sharedMessages.securityQuestionFormBodySubheader

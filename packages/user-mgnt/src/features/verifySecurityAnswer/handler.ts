@@ -46,7 +46,14 @@ export default async function verifySecurityAnswer(
         securityQNA.answerHash
   )
   if (!isCorrect) {
+    if (!user.prevQuestionKey) {
+      user.prevQuestionKey = payload.questionKey
+      await user.save()
+    }
     throw conflict('User gave wrong answer for security question')
+  } else {
+    user.prevQuestionKey = ''
+    await user.save()
   }
 
   if (

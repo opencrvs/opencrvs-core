@@ -42,7 +42,8 @@ export async function verifyUser(mobile: string) {
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
-    securityQuestionKey: body.securityQuestionKey
+    securityQuestionKey: body.securityQuestionKey,
+    prevQuestionKey: body.prevQuestionKey
   }
 }
 
@@ -53,6 +54,7 @@ export interface IRetrievalStepInformation {
   securityQuestionKey: string
   scope: string[]
   status: RetrievalSteps
+  prevQuestionKey?: string
 }
 export async function storeRetrievalStepInformation(
   nonce: string,
