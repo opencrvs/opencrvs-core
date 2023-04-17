@@ -29,8 +29,7 @@ environment_configuration_sql_file=${OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE
 # as environment variables
 #########
 
-if ! command -v envsubst &> /dev/null
-then
+if ! which envsubst >/dev/null; then
   echo "envsubst could not be found. Please install envsubst before continuing."
   echo "MacOS: brew install gettext && brew link --force gettext"
   exit 1
