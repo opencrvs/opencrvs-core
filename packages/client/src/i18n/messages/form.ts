@@ -2847,9 +2847,9 @@ export const formMessageDescriptors = {
     id: 'form.field.label.docTypeChildBirthProof'
   },
   docTypeChildBirthProofVaccinationCard: {
-    defaultMessage: 'Vaccination Card',
-    description: 'Label for select option vaccination card',
-    id: 'form.field.label.docTypeChildBirthProofVaccinationCard'
+    defaultMessage: 'Immunization Card',
+    description: 'Label for select option immunization card',
+    id: 'form.field.label.docTypeChildBirthProofImmunizationCard'
   },
   docTypeChildBirthProofBaptismalCard: {
     defaultMessage: 'Baptismal Card',
