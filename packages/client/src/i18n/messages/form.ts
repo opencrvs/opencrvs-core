@@ -2401,6 +2401,12 @@ export const formMessageDescriptors: IFormMessages = {
     description:
       'Label for indicating offline status for the user. NID verification is not currently available offline.',
     id: 'form.field.nidVerificationOngoing'
+  },
+  nidNotVerifiedReviewSection: {
+    defaultMessage: 'Unauthenticated',
+    description:
+      'Label for indicating unauthenticated status for the a review section',
+    id: 'form.field.nidNotVerifiedReviewSection'
   }
 }
 

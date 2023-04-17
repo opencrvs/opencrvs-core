@@ -15,6 +15,7 @@ type OIDPUserAddress = {
   locality: string
   region: string
   postal_code: string
+  city: string
   country: string
 }
 export type OIDPUserInfo = {

@@ -13,7 +13,7 @@ import * as jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 import fetch from 'node-fetch'
 import {
-  OIDP_BASE_URL,
+  OIDP_REST_URL,
   OIDP_CLIENT_PRIVATE_KEY,
   OIDP_JWT_AUD_CLAIM
 } from '@gateway/constants'
@@ -25,9 +25,9 @@ const TOKEN_GRANT_TYPE = 'authorization_code'
 const CLIENT_ASSERTION_TYPE =
   'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
 const OIDP_TOKEN_ENDPOINT =
-  OIDP_BASE_URL && new URL('oauth/token', OIDP_BASE_URL).toString()
+  OIDP_REST_URL && new URL('oauth/token', OIDP_REST_URL).toString()
 const OIDP_USERINFO_ENDPOINT =
-  OIDP_BASE_URL && new URL('oidc/userinfo', OIDP_BASE_URL).toString()
+  OIDP_REST_URL && new URL('oidc/userinfo', OIDP_REST_URL).toString()
 
 const JWT_ALG = 'RS256'
 const JWT_EXPIRATION_TIME = '1h'

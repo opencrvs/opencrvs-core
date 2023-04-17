@@ -46,6 +46,7 @@ export {
   X,
   Activity,
   CircleWavyCheck,
+  CircleWavyQuestion,
   ArchiveTray,
   ChartLine,
   ChartBar,

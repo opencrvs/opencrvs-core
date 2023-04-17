@@ -124,6 +124,9 @@ export const typeResolvers: GQLResolver = {
     },
     otherType: (identifier) => {
       return identifier.otherType
+    },
+    fieldsModifiedByIdentity: (identifier) => {
+      return identifier.fieldsModifiedByIdentity
     }
   },
   Address: {

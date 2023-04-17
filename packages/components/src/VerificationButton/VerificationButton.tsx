@@ -23,14 +23,15 @@ export interface VerificationButtonProps {
   labelForVerified: string
   labelForUnverified: string
   labelForOffline: string
+  reviewLabelForUnverified?: string
+  useAsReviewLabel?: boolean
 }
 
-const StyledDiv = styled.div`
+const VerificationBadge = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
   height: 40px;
-  padding: 0 12px;
   color: ${({ theme }) => theme.colors.primary};
   svg {
     height: 24px;
@@ -47,15 +48,26 @@ export const VerificationButton = ({
   onClick,
   labelForUnverified,
   labelForVerified,
-  labelForOffline
+  labelForOffline,
+  reviewLabelForUnverified,
+  useAsReviewLabel
 }: VerificationButtonProps) => {
   return (
     <>
-      {status === 'unverified' && (
+      {status === 'unverified' && !useAsReviewLabel && (
         <Button size="medium" type="secondary" onClick={onClick}>
           <Icon name="CircleWavyCheck" />
           {labelForUnverified}
         </Button>
+      )}
+
+      {status === 'unverified' && useAsReviewLabel && (
+        <VerificationBadge>
+          <Icon name="CircleWavyQuestion" color="red" weight="fill" />
+          <Text variant="bold16" element="p" color="red">
+            {reviewLabelForUnverified}
+          </Text>
+        </VerificationBadge>
       )}
 
       {status === 'offline' && (
@@ -76,12 +88,12 @@ export const VerificationButton = ({
       )}
 
       {status === 'verified' && (
-        <StyledDiv>
+        <VerificationBadge>
           <Icon name="CircleWavyCheck" color="green" weight="fill" />
           <Text variant="bold16" element="p" color="green">
             {labelForVerified}
           </Text>
-        </StyledDiv>
+        </VerificationBadge>
       )}
     </>
   )

@@ -128,12 +128,14 @@ input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input RelatedPersonInput {

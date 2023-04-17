@@ -53,7 +53,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     height: 40px;
     box-shadow: none;
     padding: 0 0 0 8px;
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
+    border: solid
+      ${({ theme, isDisabled }) =>
+        isDisabled ? theme.colors.grey300 : theme.colors.copy}
+      ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
     &:hover {
@@ -114,6 +117,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     }
   }
 
+  .react-select__single-value--is-disabled {
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
   .react-select__menu {
     z-index: 2;
     padding: 0;
@@ -155,6 +162,7 @@ export class Select extends React.Component<ISelectProps> {
         components={{ DropdownIndicator }}
         {...this.props}
         onChange={this.change}
+        isDisabled={this.props.disabled}
         isSearchable={this.props.options.length > length}
         value={getSelectedOption(this.props.value, this.props.options)}
         isOptionDisabled={({ value }: { value: string }) =>

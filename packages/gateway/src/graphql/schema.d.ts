@@ -901,6 +901,7 @@ export interface GQLIdentityType {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLHumanName {
@@ -1786,6 +1787,7 @@ export interface GQLOIDPUserAddress {
   locality?: string
   region?: string
   postal_code?: string
+  city?: string
   country?: string
 }
 
@@ -1793,6 +1795,7 @@ export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLContactPointInput {
@@ -7460,6 +7463,7 @@ export interface GQLIdentityTypeTypeResolver<TParent = any> {
   id?: IdentityTypeToIdResolver<TParent>
   type?: IdentityTypeToTypeResolver<TParent>
   otherType?: IdentityTypeToOtherTypeResolver<TParent>
+  fieldsModifiedByIdentity?: IdentityTypeToFieldsModifiedByIdentityResolver<TParent>
 }
 
 export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
@@ -7481,6 +7485,18 @@ export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentityTypeToOtherTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IdentityTypeToFieldsModifiedByIdentityResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
@@ -11306,6 +11322,7 @@ export interface GQLOIDPUserAddressTypeResolver<TParent = any> {
   locality?: OIDPUserAddressToLocalityResolver<TParent>
   region?: OIDPUserAddressToRegionResolver<TParent>
   postal_code?: OIDPUserAddressToPostal_codeResolver<TParent>
+  city?: OIDPUserAddressToCityResolver<TParent>
   country?: OIDPUserAddressToCountryResolver<TParent>
 }
 
@@ -11358,6 +11375,15 @@ export interface OIDPUserAddressToPostal_codeResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToCityResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

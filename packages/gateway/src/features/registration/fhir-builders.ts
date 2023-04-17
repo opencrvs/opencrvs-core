@@ -232,6 +232,24 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'otherType',
         context
       )
+    },
+    fieldsModifiedByIdentity: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue.split(','),
+        'fieldsModifiedByIdentity',
+        context
+      )
     }
   }
 }
@@ -1748,6 +1766,20 @@ export const builders: IFieldBuilders = {
             'identifier',
             fieldValue,
             'otherType',
+            context
+          )
+        },
+        fieldsModifiedByIdentity: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'identifier',
+            fieldValue.split(','),
+            'fieldsModifiedByIdentity',
             context
           )
         }

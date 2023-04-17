@@ -1027,6 +1027,7 @@ type IdentityType {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 type HumanName {
@@ -1887,6 +1888,7 @@ type OIDPUserAddress {
   locality: String
   region: String
   postal_code: String
+  city: String
   country: String
 }
 
@@ -1894,6 +1896,7 @@ input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input ContactPointInput {

@@ -735,8 +735,27 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               validate: [],
               conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationDisabled
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
               ],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
               labelForOffline: formMessageDescriptors.nidOffline
@@ -1388,6 +1407,10 @@ export const deathRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                 }
               ],
               validate: [
@@ -1511,6 +1534,12 @@ export const deathRegisterForms: ISerializedForm = {
                   operation: 'englishOnlyNameFormat'
                 }
               ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1551,6 +1580,12 @@ export const deathRegisterForms: ISerializedForm = {
               validate: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {
