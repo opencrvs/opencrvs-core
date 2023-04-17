@@ -351,6 +351,7 @@ function RecordAuditBody({
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
