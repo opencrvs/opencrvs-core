@@ -35,8 +35,9 @@ test("verifyPassHandlerById should throw with 401 when user doesn't exist", asyn
 test("verifyPassHandler should throw with 401 when password hash doesn't match", async () => {
   const entry = {
     mobile: '27555555555',
-    passwordHash: 'xyz',
-    salt: '12345',
+    passwordHash:
+      '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
+    salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe',
     scope: ['test']
   }
 
@@ -45,7 +46,7 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPasswordById',
-    payload: { id: '27555555555', password: 'test' }
+    payload: { id: '27555555555', password: 'test1' }
   })
 
   expect(res.result.statusCode).toBe(401)
