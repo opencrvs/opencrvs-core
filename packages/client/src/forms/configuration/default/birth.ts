@@ -1369,6 +1369,38 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName', 'informant', 'individual']
                 }
               }
+            },
+            {
+              name: 'informantOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.informantBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
             }
             // PRIMARY ADDRESS SUBSECTION
             // PRIMARY ADDRESS
@@ -2373,6 +2405,36 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName']
                 }
               }
+            },
+            {
+              name: 'fatherOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'nidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.fatherBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
             },
             {
               name: 'seperator',

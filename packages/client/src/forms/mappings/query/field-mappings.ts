@@ -242,6 +242,8 @@ export const identityToNidVerificationFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
+  if (!queryData) return transformedData
+
   const mosipTransformer = identityToFieldTransformer(
     'id',
     IdentityIdType.MosipPsutTokenId
@@ -634,7 +636,7 @@ export const nestedIdentityValueToFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
+    if (!queryData?.[sectionId]?.[nestedField]) {
       return transformedData
     }
     const clonedData = cloneDeep(transformedData)
