@@ -92,6 +92,7 @@ export interface IUser {
   creationDate: number
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar
+  prevQuestionKey?: string
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -197,7 +198,8 @@ const userSchema = new Schema({
   device: String,
   creationDate: { type: Number, default: Date.now },
   auditHistory: [AuditHistory],
-  avatar: Avatar
+  avatar: Avatar,
+  prevQuestionKey: String
 })
 
 export default model<IUserModel>('User', userSchema)

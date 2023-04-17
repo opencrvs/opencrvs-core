@@ -87,14 +87,17 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
       return
     }
     try {
-      const { nonce, securityQuestionKey } = await authApi.verifyNumber(
-        this.props.location.state.nonce,
-        this.state.recoveryCode
-      )
+      const { nonce, securityQuestionKey, prevQuestionKey } =
+        await authApi.verifyNumber(
+          this.props.location.state.nonce,
+          this.state.recoveryCode
+        )
+
       this.props.goToSecurityQuestionForm(
         nonce,
         securityQuestionKey,
-        this.props.location.state.forgottenItem
+        this.props.location.state.forgottenItem,
+        prevQuestionKey
       )
     } catch (error) {
       this.setState({

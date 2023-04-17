@@ -32,6 +32,7 @@ interface IVerifyResponse {
   securityQuestionKey: string
   id: string
   username: string
+  prevQuestionKey: string
 }
 
 export default async function verifyUserHandler(
@@ -54,13 +55,16 @@ export default async function verifyUserHandler(
     throw conflict("User doesn't have security questions")
   }
 
+  const prevQuestionKey = user.prevQuestionKey || ''
+
   const response: IVerifyResponse = {
     mobile: user.mobile,
     scope: user.scope,
     status: user.status,
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id,
-    username: user.username
+    username: user.username,
+    prevQuestionKey: prevQuestionKey
   }
 
   return response
@@ -91,5 +95,6 @@ export const responseSchema = Joi.object({
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
   id: Joi.string(),
-  username: Joi.string()
+  username: Joi.string(),
+  prevQuestionKey: Joi.string().allow('')
 })

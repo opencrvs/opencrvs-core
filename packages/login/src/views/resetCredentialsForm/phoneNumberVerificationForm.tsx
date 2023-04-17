@@ -50,7 +50,11 @@ interface State {
 }
 
 type Props = BaseProps &
-  RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
+  RouteComponentProps<
+    {},
+    {},
+    { forgottenItem: FORGOTTEN_ITEMS; prevQuestionKey: string }
+  > &
   WrappedComponentProps
 
 class PhoneNumberVerificationComponent extends React.Component<Props, State> {
@@ -85,15 +89,18 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
       return
     }
     try {
-      const { nonce, securityQuestionKey } = await authApi.verifyUser(
-        convertToMSISDN(this.state.phone, window.config.COUNTRY),
-        this.props.location.state.forgottenItem
-      )
+      const { nonce, securityQuestionKey, prevQuestionKey } =
+        await authApi.verifyUser(
+          convertToMSISDN(this.state.phone, window.config.COUNTRY),
+          this.props.location.state.forgottenItem
+        )
+
       if (securityQuestionKey) {
         this.props.goToSecurityQuestionForm(
           nonce,
           securityQuestionKey,
-          this.props.location.state.forgottenItem
+          this.props.location.state.forgottenItem,
+          prevQuestionKey
         )
       } else {
         this.props.goToRecoveryCodeEntryForm(

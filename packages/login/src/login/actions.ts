@@ -236,8 +236,11 @@ export const gotoApp = (appId: string): GoToAppAction => ({
 export function goToForgottenItemForm() {
   return push(FORGOTTEN_ITEM)
 }
-export function goToPhoneNumberVerificationForm(forgottenItem: string) {
-  return push(PHONE_NUMBER_VERIFICATION, { forgottenItem })
+export function goToPhoneNumberVerificationForm(
+  forgottenItem: string,
+  prevQuestionKey?: string
+) {
+  return push(PHONE_NUMBER_VERIFICATION, { forgottenItem, prevQuestionKey })
 }
 export function goToRecoveryCodeEntryForm(
   nonce: string,
@@ -253,12 +256,14 @@ export function goToRecoveryCodeEntryForm(
 export function goToSecurityQuestionForm(
   nonce: string,
   securityQuestionKey: string,
-  forgottenItem: string
+  forgottenItem: string,
+  prevQuestionKey?: string
 ) {
   return push(SECURITY_QUESTION, {
     nonce,
     securityQuestionKey,
-    forgottenItem
+    forgottenItem,
+    prevQuestionKey
   })
 }
 export function goToUpdatePasswordForm(nonce: string) {
