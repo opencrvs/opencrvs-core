@@ -70,7 +70,7 @@ const UnderLayBackground = styled.div<{ background: string }>`
       ? theme.colors.positive
       : background === 'error'
       ? theme.colors.negative
-      : theme.colors.primary};
+      : theme.colors.redDark};
   position: absolute;
   border-radius: 4px;
   top: 0;
