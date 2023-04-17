@@ -46,8 +46,11 @@ export {
   X,
   Activity,
   CircleWavyCheck,
+  ArchiveTray,
   ChartLine,
   ChartBar,
+  Eye,
+  DotsThreeVertical,
   MapPin,
   PaperPlaneTilt
 } from 'phosphor-react'
