@@ -37,30 +37,26 @@ export default async function changePasswordHandler(
     )
     throw unauthorized()
   }
-  if (
-    userUpdateData.existingPassword &&
-    user.status === statuses.ACTIVE &&
-    generateBcryptHash(userUpdateData.existingPassword, user.salt) ===
+  if (userUpdateData.existingPassword) {
+    if (user.status !== statuses.ACTIVE) {
+      logger.error(
+        `User is not in active state for given userid: ${userUpdateData.userId}`
+      )
+      // Don't return a 404 as this gives away that this user account exists
+      throw unauthorized()
+    }
+    if (
+      generateBcryptHash(userUpdateData.existingPassword, user.salt) !==
       user.passwordHash
-  ) {
-    return await changePassword(userUpdateData, user, request, h)
-  }
-  if (
-    userUpdateData.password &&
-    generateBcryptHash(userUpdateData.password, user.salt) === user.passwordHash
-  ) {
-    return await changePassword(userUpdateData, user, request, h)
+    ) {
+      logger.error(
+        `Password didn't match for given userid: ${userUpdateData.userId}`
+      )
+      // Don't return a 404 as this gives away that this user account exists
+      throw unauthorized()
+    }
   }
 
-  return h.response().code(401)
-}
-
-async function changePassword(
-  userUpdateData: IChangePasswordPayload,
-  user: IUserModel,
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
   user.passwordHash = generateBcryptHash(userUpdateData.password, user.salt)
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
