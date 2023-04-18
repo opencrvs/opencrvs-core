@@ -155,6 +155,7 @@ export function BookmarkAdvancedSearchModal({
           </Button>,
           <Button
             type="primary"
+            key="bookmark-advanced-search-result"
             id="bookmark_advanced_search_result"
             onClick={async () => {
               setNotificationMessages(

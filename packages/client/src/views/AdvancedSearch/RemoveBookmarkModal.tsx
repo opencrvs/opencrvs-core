@@ -112,6 +112,7 @@ export function RemoveBookmarkAdvancedSearchModal({
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button
+            key="remove-advanced-search-bookmark"
             type="primary"
             id="remove_advanced_search_bookmark"
             onClick={async () => {

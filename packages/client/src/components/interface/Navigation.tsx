@@ -920,6 +920,7 @@ export const NavigationView = (props: IFullProps) => {
           userDetails.searches.map((bookmarkResult) => {
             return (
               <NavigationItem
+                key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 icon={() => (
                   <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
                 )}
