@@ -79,7 +79,7 @@ jobs:
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Deploy to development
+      - name: Deploy to staging
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -93,6 +93,8 @@ jobs:
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Summarise deployment
