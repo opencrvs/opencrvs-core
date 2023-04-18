@@ -132,11 +132,11 @@ export const statuses = {
 
 const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
-  BIRTH: { type: birthSchema, required: false },
+  BIRTH: { type: birthSchema, required: true },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   CURRENCY: { type: currencySchema, required: false },
-  DEATH: { type: deathSchema, required: false },
-  MARRIAGE: { type: marriageSchema, required: false },
+  DEATH: { type: deathSchema, required: true },
+  MARRIAGE: { type: marriageSchema, required: true },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,
