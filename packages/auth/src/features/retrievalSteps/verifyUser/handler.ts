@@ -38,6 +38,7 @@ export default async function verifyUserHandler(
 ): Promise<IVerifyUserResponse> {
   const payload = request.payload as IVerifyUserPayload
   let result
+  console.log('request', payload.mobile)
 
   try {
     result = await verifyUser(payload.mobile)

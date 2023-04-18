@@ -13,10 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import {
-  generateBcryptHash,
-  generateBcryptSaltedHash
-} from '@user-mgnt/utils/hash'
+import { generateBcryptHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
@@ -64,9 +61,7 @@ async function changePassword(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { hash, salt } = generateBcryptSaltedHash(userUpdateData.password)
-  user.salt = salt
-  user.passwordHash = hash
+  user.passwordHash = generateBcryptHash(userUpdateData.password, user.salt)
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
