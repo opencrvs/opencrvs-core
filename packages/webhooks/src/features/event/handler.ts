@@ -246,6 +246,14 @@ export async function birthCertifiedHandler(
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+
+  // Remove all resources except Task
+  const bundleEntry = bundle.entry?.filter(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+
+  bundle.entry = bundleEntry
+
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -335,6 +343,14 @@ export async function deathCertifiedHandler(
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+
+  // Remove all resources except Task
+  const bundleEntry = bundle.entry?.filter(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+
+  bundle.entry = bundleEntry
+
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -367,7 +383,7 @@ export async function deathCertifiedHandler(
           authHeader,
           EventType.Death
         )
-        permissions.push('Certificates')
+        permissions.push('certificates')
         const transformedBundle = await transformDeathBundle(
           bundle,
           webhookToNotify.createdBy.type,
