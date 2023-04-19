@@ -28,6 +28,7 @@ export const types = {
 
 export const integratingSystemTypes = {
   OTHER: 'OTHER',
+  OSIA: 'OSIA',
   MOSIP: 'MOSIP'
 }
 
@@ -40,7 +41,7 @@ const pickSettings = (system: MongooseQueriedSystem) => {
   })
 
   const openIdConnectUrl =
-    system.type === 'NATIONAL_ID' &&
+    system.integratingSystemType === 'MOSIP' &&
     NATIONAL_ID_OIDP_CLIENT_ID &&
     NATIONAL_ID_OIDP_BASE_URL &&
     (NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS || NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS)

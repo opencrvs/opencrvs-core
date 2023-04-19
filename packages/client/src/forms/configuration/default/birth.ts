@@ -42,6 +42,14 @@ const nidIntegrationConditionals = {
       !nationalIdSystem.settings.openIdProviderClientId ||
       !nationalIdSystem.settings.openIdProviderClaims;
     `
+  },
+  hideIfOsiaIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+      offlineCountryConfig &&
+      offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Osia}');
+      !nationalIdSystem;
+    `
   }
 }
 
@@ -1361,6 +1369,39 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName', 'informant', 'individual']
                 }
               }
+            },
+            {
+              name: 'informantOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'osiaNidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.informantBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             }
             // PRIMARY ADDRESS SUBSECTION
             // PRIMARY ADDRESS
@@ -1498,6 +1539,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('iD')`
                 },
                 nidIntegrationConditionals.hideIfNidIntegrationEnabled
               ],
@@ -1738,6 +1783,32 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName']
                 }
               }
+            },
+            {
+              name: 'motherOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'osiaNidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.motherBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             },
             {
               name: 'seperator',
@@ -2179,7 +2250,7 @@ export const birthRegisterForms: ISerializedForm = {
                 },
                 {
                   action: 'disable',
-                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('fatherBirthDate')`
                 }
               ],
               mapping: {
@@ -2336,6 +2407,37 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName']
                 }
               }
+            },
+            {
+              name: 'fatherOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'osiaNidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.fatherBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             },
             {
               name: 'seperator',

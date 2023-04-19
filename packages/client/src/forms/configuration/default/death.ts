@@ -41,6 +41,14 @@ const nidIntegrationConditionals = {
       !nationalIdSystem.settings.openIdProviderClientId ||
       !nationalIdSystem.settings.openIdProviderClaims;
     `
+  },
+  hideIfOsiaIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Osia}');
+    !nationalIdSystem;
+  `
   }
 }
 
@@ -899,6 +907,39 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['en', 'familyName']
                 }
               }
+            },
+            {
+              name: 'informantOsiaNidVerification',
+              type: 'NID_VERIFICATION_FETCH_BUTTON',
+              label: formMessageDescriptors.nidVerification,
+              initialValue: '',
+              validate: [],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `!values.iD || !values.informantBirthDate || !values.firstNamesEng || !values.familyNameEng`
+                },
+                nidIntegrationConditionals.hideIfOsiaIntegrationDisabled
+              ],
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline,
+              labelForLoading: formMessageDescriptors.nidLoading
             },
             {
               name: 'gender',

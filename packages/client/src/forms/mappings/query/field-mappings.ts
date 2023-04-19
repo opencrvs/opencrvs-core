@@ -43,6 +43,7 @@ import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { IdentityIdType } from '@client/utils/gateway'
 
 interface IName {
   [key: string]: any
@@ -241,14 +242,23 @@ export const identityToNidVerificationFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-    transformedData,
-    queryData,
-    sectionId,
-    field
+  if (!queryData) return transformedData
+
+  const mosipTransformer = identityToFieldTransformer(
+    'id',
+    IdentityIdType.MosipPsutTokenId
   )
+  mosipTransformer(transformedData, queryData, sectionId, field)
+  const osiaTransformer = identityToFieldTransformer(
+    'id',
+    IdentityIdType.OsiaNid
+  )
+  osiaTransformer(transformedData, queryData, sectionId, field)
+
   const existingIdentity = queryData[sectionId].identifier?.find(
-    (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+    (identity: fhir.Identifier) =>
+      identity.type === IdentityIdType.MosipPsutTokenId ||
+      identity.type === IdentityIdType.OsiaNid
   )
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -626,7 +636,7 @@ export const nestedIdentityValueToFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
+    if (!queryData?.[sectionId]?.[nestedField]) {
       return transformedData
     }
     const clonedData = cloneDeep(transformedData)
@@ -634,12 +644,16 @@ export const nestedIdentityValueToFieldTransformer =
       clonedData[nestedField] = {}
     }
 
-    identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-      clonedData,
-      queryData[sectionId],
-      nestedField,
-      field
+    const mosipTransformer = identityToFieldTransformer(
+      'id',
+      IdentityIdType.MosipPsutTokenId
     )
+    const osiaTransformer = identityToFieldTransformer(
+      'id',
+      IdentityIdType.OsiaNid
+    )
+    mosipTransformer(clonedData, queryData[sectionId], nestedField, field)
+    osiaTransformer(clonedData, queryData[sectionId], nestedField, field)
 
     if (clonedData[nestedField][field.name] === undefined) {
       return transformedData
@@ -647,7 +661,9 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+      (identity: fhir.Identifier) =>
+        identity.type === IdentityIdType.MosipPsutTokenId ||
+        identity.type === IdentityIdType.OsiaNid
     )
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
@@ -999,7 +1015,7 @@ export const eventLocationAddressLineTemplateTransformer =
   ) => {
     if (
       queryData.eventLocation?.type &&
-      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
     ) {
       return
     }

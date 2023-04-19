@@ -2407,6 +2407,17 @@ export const formMessageDescriptors: IFormMessages = {
     description:
       'Label for indicating unauthenticated status for the a review section',
     id: 'form.field.nidNotVerifiedReviewSection'
+  },
+  nidVerification: {
+    defaultMessage: 'Verify National ID',
+    description: 'Label for verifying NID button in form',
+    id: 'form.field.nidVerification'
+  },
+  nidLoading: {
+    defaultMessage: 'Loading...',
+    description:
+      "Label for verifying NID button in form when it's fetching data",
+    id: 'form.field.nidLoading'
   }
 }
 

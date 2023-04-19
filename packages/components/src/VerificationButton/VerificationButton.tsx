@@ -17,12 +17,14 @@ import { Text } from '../Text'
 import { Stack } from '../Stack'
 
 export interface VerificationButtonProps {
-  status?: 'unverified' | 'verified' | 'offline'
+  status?: 'unverified' | 'verified' | 'offline' | 'loading'
+  disabled?: boolean
   id?: string
-  onClick: () => void
+  onClick: (event: React.MouseEvent<HTMLElement>) => void
   labelForVerified: string
   labelForUnverified: string
   labelForOffline: string
+  labelForLoading?: string
   reviewLabelForUnverified?: string
   useAsReviewLabel?: boolean
 }
@@ -45,17 +47,24 @@ const VerificationBadge = styled.div`
 
 export const VerificationButton = ({
   status = 'unverified',
+  disabled,
   onClick,
   labelForUnverified,
   labelForVerified,
   labelForOffline,
+  labelForLoading,
   reviewLabelForUnverified,
   useAsReviewLabel
 }: VerificationButtonProps) => {
   return (
     <>
       {status === 'unverified' && !useAsReviewLabel && (
-        <Button size="medium" type="secondary" onClick={onClick}>
+        <Button
+          size="medium"
+          type="secondary"
+          onClick={onClick}
+          disabled={disabled}
+        >
           <Icon name="CircleWavyCheck" />
           {labelForUnverified}
         </Button>
@@ -68,6 +77,12 @@ export const VerificationButton = ({
             {reviewLabelForUnverified}
           </Text>
         </VerificationBadge>
+      )}
+
+      {status === 'loading' && (
+        <Button size="medium" type="secondary" loading>
+          {labelForLoading}
+        </Button>
       )}
 
       {status === 'offline' && (

@@ -158,6 +158,12 @@ type Query {
     redirectUri: String!
     grantType: String
   ): UserInfo
+  verifyNationalId(
+    nationalId: String!
+    firstName: String!
+    lastName: String!
+    birthDate: String!
+  ): Verification
 }
 
 type Mutation {
@@ -666,6 +672,11 @@ type UserInfo {
   oidpUserInfo: OIDPUserInfo
   districtFhirId: String
   stateFhirId: String
+}
+
+type Verification {
+  nationalId: String!
+  verified: Boolean!
 }
 
 input NotificationInput {
@@ -1638,6 +1649,7 @@ enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
   MOSIP_PSUT_TOKEN_ID
+  OSIA_NID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE

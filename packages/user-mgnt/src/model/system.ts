@@ -30,6 +30,7 @@ export interface ISystem {
   }
   creationDate?: number
   type: keyof typeof types
+  integratingSystemType: keyof typeof integratingSystemTypes
 }
 
 export enum EventType {
@@ -83,7 +84,11 @@ const systemSchema = new Schema({
   },
   integratingSystemType: {
     type: String,
-    enum: [integratingSystemTypes.MOSIP, integratingSystemTypes.OTHER]
+    enum: [
+      integratingSystemTypes.MOSIP,
+      integratingSystemTypes.OSIA,
+      integratingSystemTypes.OTHER
+    ]
   }
 })
 

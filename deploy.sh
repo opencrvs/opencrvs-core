@@ -182,8 +182,17 @@ if [ -z "$NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY" ] ; then
 fi
 
 if [ -z "$NATIONAL_ID_OIDP_JWT_AUD_CLAIM" ] ; then
-  echo 'Info: Missing optional National ID verification environment variable NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY'
+  echo 'Info: Missing optional National ID verification environment variable NATIONAL_ID_OIDP_JWT_AUD_CLAIM'
 fi
+
+if [ -z "$NATIONAL_ID_OSIA_REST_URL" ] ; then
+  echo 'Info: Missing optional National ID verification environment variable NATIONAL_ID_OSIA_REST_URL'
+fi
+
+if [ -z "$NATIONAL_ID_OSIA_PERSISTENT_JWT" ] ; then
+  echo 'Info: Missing optional National ID verification environment variable NATIONAL_ID_OSIA_PERSISTENT_JWT'
+fi
+
 
 ENV=$3
 HOST=$4
@@ -371,7 +380,9 @@ docker_stack_deploy() {
   NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS=$NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS
   NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS=$NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS
   NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY=$NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY
-  NATIONAL_ID_OIDP_JWT_AUD_CLAIM=$NATIONAL_ID_OIDP_JWT_AUD_CLAIM"
+  NATIONAL_ID_OIDP_JWT_AUD_CLAIM=$NATIONAL_ID_OIDP_JWT_AUD_CLAIM
+  NATIONAL_ID_OSIA_REST_URL=$NATIONAL_ID_OSIA_REST_URL
+  NATIONAL_ID_OSIA_PERSISTENT_JWT=$NATIONAL_ID_OSIA_PERSISTENT_JWT"
 
   echo "Pulling all docker images. This might take a while"
 

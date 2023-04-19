@@ -40,6 +40,7 @@ import * as queries from './mappings/query'
 import * as responseTransformers from './mappings/response-transformers'
 import * as types from './mappings/type'
 import { UserDetails } from '@client/utils/userUtils'
+import { VerifyNationalIdQueryVariables } from '@client/utils/gateway'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -67,9 +68,11 @@ export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
-export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
+/** Redirects the user to a national id endpoint and then verifies and pre-populates the draft with the response */
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
+/** Fetches data from `verifyNationalId` and then verifies the NID to draft ` */
+export const NID_VERIFICATION_FETCH_BUTTON = 'NID_VERIFICATION_FETCH_BUTTON'
 
 export enum Sort {
   ASC = 'asc',
@@ -389,10 +392,6 @@ type SerializedSelectFormFieldWithOptions = Omit<
   options: ISelectOption[] | { resource: string }
 }
 
-type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
-  queryMap: ISerializedQueryMap
-}
-
 type SerializedRadioGroupWithNestedFields = Omit<
   IRadioGroupWithNestedFieldsFormField,
   'nestedFields'
@@ -404,13 +403,11 @@ export type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
-      | ILoaderButton
       | ISelectFormFieldWithOptions
       | IRadioGroupWithNestedFieldsFormField
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
   'validate' | 'mapping'
 > & {
@@ -651,15 +648,13 @@ export interface ISerializedQueryMap {
 export interface IQueryMap {
   [key: string]: IQuery
 }
-export interface ILoaderButton extends IFormFieldBase {
-  type: typeof FETCH_BUTTON
-  queryMap: IQueryMap
-  queryData?: IQuery
-  querySelectorInput: IFieldInput
-  onFetch?: (response: any) => void
-  modalTitle: MessageDescriptor
-  successTitle: MessageDescriptor
-  errorTitle: MessageDescriptor
+export interface INidVerificationFetchButton extends IFormFieldBase {
+  type: typeof NID_VERIFICATION_FETCH_BUTTON
+  variables?: { [key: string]: IFormFieldValue }
+  labelForVerified: MessageDescriptor
+  labelForUnverified: MessageDescriptor
+  labelForOffline: MessageDescriptor
+  labelForLoading: MessageDescriptor
 }
 
 export interface INidVerificationButton extends IFormFieldBase {
@@ -694,11 +689,11 @@ export type IFormField =
   | IWarningField
   | ILink
   | IDynamicListFormField
-  | ILoaderButton
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
   | INidVerificationButton
+  | INidVerificationFetchButton
 
 export interface IPreviewGroup {
   id: string
@@ -1206,18 +1201,16 @@ export interface Ii18nLinkField extends Ii18nFormFieldBase {
   type: typeof LINK
 }
 
-export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
-  type: typeof FETCH_BUTTON
-  queryMap: IQueryMap
-  queryData?: IQuery
-  querySelectorInput: IFieldInput
-  onFetch?: (response: any) => void
-  modalTitle: string
-  successTitle: string
-  errorTitle: string
-  errorText: string
-  networkErrorText: string
+export interface Ii18NidVerificationFetchButtonField
+  extends Ii18nFormFieldBase {
+  type: typeof NID_VERIFICATION_FETCH_BUTTON
+  variables: VerifyNationalIdQueryVariables
+  verifiedFields: string[]
+  labelForVerified: string
+  labelForUnverified: string
+  labelForOffline: string
 }
+
 export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
   type: typeof NID_VERIFICATION_BUTTON
   onClick: () => void
@@ -1248,7 +1241,7 @@ export type Ii18nFormField =
   | Ii18nDocumentUploaderWithOptions
   | Ii18nWarningField
   | Ii18nLinkField
-  | Ii18nLoaderButtonField
+  | Ii18NidVerificationFetchButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
@@ -1299,7 +1292,6 @@ export function fieldTypeLabel(type: IFormField['type']) {
     LOCATION_SEARCH_INPUT: messages.locationSearch,
     WARNING: messages.warning,
     LINK: messages.link,
-    FETCH_BUTTON: messages.fetchButton,
     TEL: messages.tel,
     NUMBER: messages.numberInput,
     BIG_NUMBER: messages.numberInput,
@@ -1314,7 +1306,8 @@ export function fieldTypeLabel(type: IFormField['type']) {
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList,
-    NID_VERIFICATION_BUTTON: messages.nidVerificationButton
+    NID_VERIFICATION_BUTTON: messages.nidVerificationButton,
+    NID_VERIFICATION_FETCH_BUTTON: messages.fetchButton
   }
 
   return labelDict[type]
