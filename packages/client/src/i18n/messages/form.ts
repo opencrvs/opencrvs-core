@@ -2384,6 +2384,29 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Hide',
     description: 'Hide label for accordion component',
     id: 'form.field.hideLabel'
+  },
+  nidNotVerified: {
+    defaultMessage: 'Authenticate',
+    description: 'label for verified nid state',
+    id: 'form.field.nidNotVerified'
+  },
+  nidVerified: {
+    defaultMessage: 'Authenticated',
+    description: 'label for unverified nid state',
+    id: 'form.field.nidVerified'
+  },
+  nidOffline: {
+    defaultMessage:
+      'National ID authentication is currently not available offline.',
+    description:
+      'Label for indicating offline status for the user. NID verification is not currently available offline.',
+    id: 'form.field.nidVerificationOngoing'
+  },
+  nidNotVerifiedReviewSection: {
+    defaultMessage: 'Unauthenticated',
+    description:
+      'Label for indicating unauthenticated status for the a review section',
+    id: 'form.field.nidNotVerifiedReviewSection'
   }
 }
 

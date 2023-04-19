@@ -234,6 +234,35 @@ export const identityToFieldTransformer =
     }
     return transformedData
   }
+
+export const identityToNidVerificationFieldTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+    transformedData,
+    queryData,
+    sectionId,
+    field
+  )
+  const existingIdentity = queryData[sectionId].identifier?.find(
+    (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+  )
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (existingIdentity) {
+    const modifiedFields = existingIdentity[
+      'fieldsModifiedByIdentity'
+    ] as string[]
+    transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+  }
+
+  return transformedData
+}
 interface IAddress {
   [key: string]: any
 }
@@ -589,6 +618,51 @@ export const nestedValueToFieldTransformer =
     return transformedData
   }
 
+export const nestedIdentityValueToFieldTransformer =
+  (nestedField: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
+      return transformedData
+    }
+    const clonedData = cloneDeep(transformedData)
+    if (!clonedData[nestedField]) {
+      clonedData[nestedField] = {}
+    }
+
+    identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+      clonedData,
+      queryData[sectionId],
+      nestedField,
+      field
+    )
+
+    if (clonedData[nestedField][field.name] === undefined) {
+      return transformedData
+    }
+    transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
+
+    const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
+      (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    if (existingIdentity) {
+      const modifiedFields = existingIdentity[
+        'fieldsModifiedByIdentity'
+      ] as string[]
+      transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+    }
+
+    return transformedData
+  }
+
 export const booleanTransformer = (
   transformedData: IFormData,
   queryData: any,
@@ -724,7 +798,11 @@ export const dateFormatTransformer =
   ): void => {
     let queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
-    if (nestedField && queryData[sectionId][nestedField]) {
+    if (
+      nestedField &&
+      queryData[sectionId] &&
+      queryData[sectionId][nestedField]
+    ) {
       queryValue = String(
         (queryData[sectionId][nestedField] as IFormSectionData)[
           transformedFieldName

@@ -71,6 +71,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
+  NID_VERIFICATION_BUTTON,
   SUBSECTION,
   WARNING
 } from '@client/forms'
@@ -145,6 +146,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   SignatureGenerator,
@@ -164,6 +166,12 @@ export const RequiredField = styled.span`
     text-transform: uppercase;
   }
 `
+
+export const ErrorField = styled.p`
+  margin-top: 0;
+  margin-bottom: 0;
+`
+
 const Row = styled.div`
   display: flex;
   flex: 1;
@@ -542,6 +550,25 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
+  if (field.type === NID_VERIFICATION_BUTTON) {
+    return (
+      <VerificationButton
+        onClick={() => {}}
+        labelForVerified={intl.formatMessage(
+          formMessageDescriptors.nidVerified
+        )}
+        labelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerified
+        )}
+        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
+        reviewLabelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerifiedReviewSection
+        )}
+        status={value ? 'verified' : 'unverified'}
+        useAsReviewLabel={true}
+      />
+    )
+  }
 
   if (typeof value === 'boolean') {
     return value
@@ -634,7 +661,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.hasChangesBeenMade = false
   }
 
@@ -690,6 +717,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let sectionElement: HTMLElement
     let activeSection = this.state.activeSection
 
+    // TODO: Refactor "findDOMNode" away, as it's deprecated
+    // eslint-disable-next-line react/no-find-dom-node
     const node = findDOMNode(this) as HTMLElement
 
     this.docSections.forEach((section: IFormSection) => {
@@ -933,10 +962,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineCountryConfiguration,
       draft.data
     )
-    return (
-      !conditionalActions.includes('hide') &&
-      !conditionalActions.includes('disable')
-    )
+    return !conditionalActions.includes('hide')
   }
 
   isViewOnly(field: IFormField) {
@@ -1034,7 +1060,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getErrorForNestedField(section, field, sectionErrors)
 
     return errorsOnField.length > 0 ? (
-      this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      <ErrorField>
+        {this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])}
+      </ErrorField>
     ) : field.nestedFields && !Boolean(ignoreNestedFieldWrapping) ? (
       (
         (data[section.id] &&
@@ -1593,7 +1621,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    offlineCountryConfiguration: IOfflineData,
+    declaration: IDeclaration
   ) => {
     const { intl, draft } = this.props
     const overriddenFields =
@@ -1616,6 +1646,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
+            const fieldDisabled = getConditionalActionsForField(
+              field,
+              draft.data[section.id] || {},
+              offlineCountryConfiguration,
+              draft.data
+            )
+
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
                   section,
@@ -1640,7 +1677,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   field,
                   errorsOnFields
                 )
-
+            if (fieldDisabled.includes('disable') && tempItem?.action) {
+              tempItem.action.disabled = true
+            }
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
                 section,
@@ -1719,9 +1758,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           )
         } else if (event === Event.Marriage) {
           return (
-            !declaration.data.registration?.groomSignature &&
-            !declaration.data.registration?.brideSignature &&
-            !declaration.data.registration?.witnessOneSignature &&
+            !declaration.data.registration?.groomSignature ||
+            !declaration.data.registration?.brideSignature ||
+            !declaration.data.registration?.witnessOneSignature ||
             !declaration.data.registration?.witnessTwoSignature
           )
         }
@@ -1758,7 +1797,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
-      errorsOnFields
+      errorsOnFields,
+      offlineCountryConfiguration,
+      declaration
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
@@ -1916,13 +1957,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                 </Value>
                               }
                               actions={
-                                <LinkButton
-                                  id={item.action.id}
-                                  disabled={item.action.disabled}
-                                  onClick={item.action.handler}
-                                >
-                                  {item.action.label}
-                                </LinkButton>
+                                !item?.action?.disabled && (
+                                  <LinkButton
+                                    id={item.action.id}
+                                    disabled={item.action.disabled}
+                                    onClick={item.action.handler}
+                                  >
+                                    {item.action.label}
+                                  </LinkButton>
+                                )
                               }
                             />
                           )

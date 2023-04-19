@@ -145,6 +145,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
             <Button
+              key="submit_archive"
               id="submit_archive"
               size="medium"
               type="secondary_negative"
@@ -161,6 +162,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               {intl.formatMessage(buttonMessages.archive)}
             </Button>,
             <Button
+              key="submit_reject_form"
               size="medium"
               type="negative"
               id="submit_reject_form"
