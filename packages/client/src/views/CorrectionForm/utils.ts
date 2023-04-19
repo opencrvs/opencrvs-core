@@ -454,7 +454,7 @@ export const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return formatLongDate(value, intl.locale)
   }
 
   if (field.hideValueInPreview) {
