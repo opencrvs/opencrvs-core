@@ -33,7 +33,7 @@ import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
-import { locales } from '@client/utils/date-formatting'
+import { locales, formatLongDate } from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -134,14 +134,7 @@ export function executeHandlebarsTemplate(
   )
 
   Handlebars.registerHelper('translateDate', function (date: string) {
-    if (!isValid(new Date(date))) {
-      return ''
-    }
-
-    window.__localeId__ = intl.locale
-    return format(new Date(date), 'dd MMMM yyyy', {
-      locale: locales[window.__localeId__]
-    })
+    return formatLongDate(date, intl.locale, 'dd MMMM yyyy')
   })
 
   Handlebars.registerHelper(
