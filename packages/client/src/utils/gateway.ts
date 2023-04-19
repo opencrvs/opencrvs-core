@@ -2415,6 +2415,7 @@ export type User = {
   signature?: Maybe<Signature>
   status: Status
   systemRole: SystemRoleType
+  title: Scalars['String']
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2467,6 +2468,7 @@ export type UserInput = {
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
   systemRole: SystemRoleType
+  title: Scalars['String']
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2900,6 +2902,7 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile: string
     systemRole: SystemRoleType
+    title: string
     status: Status
     role: {
       __typename?: 'Role'
@@ -3287,6 +3290,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    title: string
     username?: string | null
     mobile: string
     systemRole: SystemRoleType
@@ -3741,6 +3745,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4050,6 +4059,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4447,6 +4461,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4739,6 +4758,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {

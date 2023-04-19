@@ -68,6 +68,7 @@ interface IFormMessages
   childFamilyName: MessageDescriptor
   childFirstNames: MessageDescriptor
   firstNames: MessageDescriptor
+  informantFirstNames: MessageDescriptor
   sex: MessageDescriptor
   sexFemale: MessageDescriptor
   sexMale: MessageDescriptor
@@ -727,6 +728,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'First name(s)',
     description: 'Label for form field: First names',
     id: 'form.field.label.firstNames'
+  },
+  informantFirstNames: {
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First names',
+    id: 'form.field.label.informantFirstNames'
   },
   sex: {
     defaultMessage: 'Sex',

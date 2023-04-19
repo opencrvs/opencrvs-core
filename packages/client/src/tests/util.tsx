@@ -1278,6 +1278,7 @@ export const userDetails: UserDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   systemRole: SystemRoleType.FieldAgent,
+  title: 'Test user',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
@@ -2267,32 +2268,35 @@ export const getFileFromBase64String = (
   })
 }
 
-export async function goToSection(component: ReactWrapper, nth: number) {
-  for (let i = 0; i < nth; i++) {
+export async function goToSection(
+  component: ReactWrapper,
+  name: 'mother' | 'father' | 'preview' | 'documents' | 'informant'
+) {
+  while (!window.location.href.includes(name)) {
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
     await flushPromises()
-    await component.update()
+    component.update()
   }
 }
 
 export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 6)
+  await goToSection(component, 'preview')
   await waitForElement(component, '#review_header')
 }
 
 export async function goToDocumentsSection(component: ReactWrapper) {
-  await goToSection(component, 3)
+  await goToSection(component, 'documents')
   await waitForElement(component, '#form_section_id_documents-view-group')
 }
 
 export async function goToFatherSection(component: ReactWrapper) {
-  await goToSection(component, 2)
+  await goToSection(component, 'father')
   await waitForElement(component, '#form_section_id_father-view-group')
 }
 
 export async function goToMotherSection(component: ReactWrapper) {
-  await goToSection(component, 1)
+  await goToSection(component, 'mother')
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
@@ -2344,6 +2348,7 @@ export function loginAsFieldAgent(store: AppStore) {
         getUser: {
           id: '5eba726866458970cf2e23c2',
           username: 'a.alhasan',
+          title: 'Test user',
           creationDate: '2022-10-03T10:42:46.920Z',
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
@@ -2812,6 +2817,7 @@ export const mockCompleteFormData = {
   familyNameEng: 'Hossain',
   firstNames: 'Jeff',
   firstNamesEng: 'Jeff',
+  title: 'Test user',
   nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
@@ -3196,6 +3202,7 @@ export const mockDataWithRegistarRoleSelected = {
   firstNames: 'Jeff',
   firstNamesEng: 'Jeff',
   nid: '101488192',
+  title: 'Test user',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   systemRole: 'LOCAL_REGISTRAR',

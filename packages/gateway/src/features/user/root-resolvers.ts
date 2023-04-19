@@ -553,6 +553,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: user.email || '',
+    title: user.title,
     mobile: user.mobile as string,
     device: user.device as string,
     signature: user.signature

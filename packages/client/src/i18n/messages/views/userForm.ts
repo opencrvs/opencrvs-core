@@ -130,5 +130,10 @@ export const messages = {
     defaultMessage: 'Updating user',
     description: 'label for updating user',
     id: 'form.field.label.updatingUser'
+  },
+  title: {
+    defaultMessage: 'Title',
+    description: 'The title of this user',
+    id: 'constants.title'
   }
 }

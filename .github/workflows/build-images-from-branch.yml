@@ -20,6 +20,7 @@ on:
     branches:
       - 'develop'
       - 'release-v1.4.0'
+      - 'release-v1.4.0-cameroon'
 
 jobs:
   base:

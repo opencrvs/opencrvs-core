@@ -96,7 +96,7 @@ describe('Verify getInformantName', () => {
     const fhirBundle = cloneDeep(testFhirBundle)
     fhirBundle.entry[2].resource.name = []
     await expect(getInformantName(fhirBundle)).rejects.toThrow(
-      "Didn't found informant's bn name"
+      "Couldn't find informant's name: bn"
     )
   })
 })
