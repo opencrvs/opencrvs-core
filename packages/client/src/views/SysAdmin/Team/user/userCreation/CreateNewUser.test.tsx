@@ -237,7 +237,7 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
-      store.dispatch(modifyUserFormData(mockCompleteFormData))
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
@@ -340,7 +340,7 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
-            systemRole: 'API_USER',
+            systemRole: 'REGISTRATION_AGENT',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',
             title: 'Test user',
