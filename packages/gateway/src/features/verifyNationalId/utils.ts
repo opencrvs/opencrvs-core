@@ -58,11 +58,7 @@ export const verifyUserInfoWithOSIA = async ({
     return { nationalId, verified: true }
   } else {
     throw new Error(
-      `Couldn't verify user info with OSIA: ${JSON.stringify(
-        await request.text(),
-        null,
-        4
-      )}`
+      `Couldn't verify user info with OSIA: ${JSON.stringify(response)}`
     )
   }
 }
