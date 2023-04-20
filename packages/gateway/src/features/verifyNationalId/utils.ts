@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { OSIA_REST_URL, UNSAFE__OSIA_PERSISTENT_JWT } from '@gateway/constants'
+import { OSIA_REST_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
 
 const OSIA_USERINFO_ENDPOINT = (nationalId: string) =>
@@ -31,7 +31,6 @@ export const verifyUserInfoWithOSIA = async ({
   const request = await fetch(OSIA_USERINFO_ENDPOINT(nationalId)!, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${UNSAFE__OSIA_PERSISTENT_JWT}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
