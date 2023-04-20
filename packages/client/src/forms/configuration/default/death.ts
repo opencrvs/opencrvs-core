@@ -939,7 +939,8 @@ export const deathRegisterForms: ISerializedForm = {
               labelForVerified: formMessageDescriptors.nidVerified,
               labelForUnverified: formMessageDescriptors.nidNotVerified,
               labelForOffline: formMessageDescriptors.nidOffline,
-              labelForLoading: formMessageDescriptors.nidLoading
+              labelForLoading: formMessageDescriptors.nidLoading,
+              labelForError: formMessageDescriptors.nidError
             },
             {
               name: 'gender',
