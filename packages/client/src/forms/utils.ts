@@ -155,6 +155,9 @@ export const internationaliseFieldObject = (
     ;(base as any).labelForLoading = intl.formatMessage(
       (field as INidVerificationFetchButton).labelForLoading
     )
+    ;(base as any).labelForError = intl.formatMessage(
+      (field as INidVerificationFetchButton).labelForError
+    )
   }
 
   if (base.type === NID_VERIFICATION_BUTTON) {

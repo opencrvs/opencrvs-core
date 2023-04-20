@@ -48,7 +48,7 @@ export const useVerifyNationalIdQuery = ({
   const { pageId } = useParams<{ pageId: string }>()
   const declaration = useCurrentDraftDeclaration()
   const dispatch = useDispatch()
-  const [query, { loading, data }] =
+  const [query, { loading, data, error }] =
     useLazyQuery<VerifyNationalIdQuery>(VERIFY_NATIONAL_ID)
 
   const verifyNationalId = (
@@ -69,7 +69,9 @@ export const useVerifyNationalIdQuery = ({
   }
 
   return {
-    status: loading
+    status: error
+      ? ('error' as const)
+      : loading
       ? ('loading' as const)
       : data?.verifyNationalId?.verified || nidVerificationFieldValue
       ? ('verified' as const)
