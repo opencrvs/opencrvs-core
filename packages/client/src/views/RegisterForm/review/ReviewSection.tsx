@@ -506,7 +506,7 @@ const renderValue = (
     value &&
     typeof value === 'string'
   ) {
-    return formatLongDate(value)
+    return formatLongDate(value, intl.locale)
   }
 
   if (field.hideValueInPreview) {
@@ -559,7 +559,7 @@ const renderValue = (
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
-      ? String(value).concat(intl.formatMessage(field.unit))
+      ? String(value).concat(' ' + field.unit.defaultMessage)
       : value
   }
 

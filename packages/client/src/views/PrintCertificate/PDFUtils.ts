@@ -32,6 +32,8 @@ import getDate from 'date-fns/getDate'
 import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import isValid from 'date-fns/isValid'
+import format from 'date-fns/format'
+import { locales, formatLongDate } from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -104,8 +106,9 @@ const getNumberInWords = (
   let word = ''
   let remainder
   if (n < 20) {
-    remainder = 0
-    word = formatMessage(intl, [unitKey, n].join('.'))
+    if (n > 0) {
+      word = formatMessage(intl, [unitKey, n].join('.'))
+    }
   } else if (n < 100) {
     remainder = n % 10
     word = formatMessage(intl, [tenthKey, Math.floor(n / 10)].join('.'))
@@ -129,6 +132,10 @@ export function executeHandlebarsTemplate(
     },
     cache
   )
+
+  Handlebars.registerHelper('translateDate', function (date: string) {
+    return formatLongDate(date, intl.locale, 'dd MMMM yyyy')
+  })
 
   Handlebars.registerHelper(
     'intl',
@@ -215,7 +222,7 @@ export function executeHandlebarsTemplate(
         return ''
       }
       const year = getYear(date)
-      const month = getMonth(date)
+      const month = getMonth(date) + 1
       const dayOfMonth = getDate(date)
 
       const century = Math.floor(year / 100) * 100
