@@ -24,6 +24,7 @@ export interface IAdvancedSearchParam {
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
+  recordId?: string
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
