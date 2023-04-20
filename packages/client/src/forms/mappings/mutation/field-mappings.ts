@@ -157,7 +157,7 @@ export const osiaNidVerificationFieldToIdentityTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  fieldToIdentityTransformer('id', IdentityIdType.OsiaNid)(
+  fieldToIdentityTransformer('id', IdentityIdType.OsiaUinVidNid)(
     transformedData,
     draftData,
     sectionId,
@@ -167,7 +167,7 @@ export const osiaNidVerificationFieldToIdentityTransformer = (
   const sectionData = transformedData[sectionId]
   const existingIdentity = sectionData.identifier.find(
     (identifier: fhir.Identifier) =>
-      identifier.type && identifier.type === IdentityIdType.OsiaNid
+      identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
   )
 
   if (existingIdentity) {

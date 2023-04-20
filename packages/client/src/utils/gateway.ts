@@ -990,7 +990,7 @@ export enum IdentityIdType {
   MosipPsutTokenId = 'MOSIP_PSUT_TOKEN_ID',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
-  OsiaNid = 'OSIA_NID',
+  OsiaUinVidNid = 'OSIA_UIN_VID_NID',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   RefugeeNumber = 'REFUGEE_NUMBER',
@@ -2695,22 +2695,6 @@ export type FetchPersonByNidQuery = {
   } | null
 }
 
-export type VerifyNationalIdQueryVariables = Exact<{
-  nationalId: Scalars['String']
-  firstName: Scalars['String']
-  lastName: Scalars['String']
-  birthDate: Scalars['String']
-}>
-
-export type VerifyNationalIdQuery = {
-  __typename?: 'Query'
-  verifyNationalId?: {
-    __typename?: 'Verification'
-    nationalId: string
-    verified: boolean
-  } | null
-}
-
 export type QueryRegistrationByIdentifierQueryVariables = Exact<{
   identifier: Scalars['ID']
 }>
@@ -2732,6 +2716,22 @@ export type QueryRegistrationByIdentifierQuery = {
         familyName?: string | null
       } | null> | null
     } | null
+  } | null
+}
+
+export type VerifyNationalIdQueryVariables = Exact<{
+  nationalId: Scalars['String']
+  firstName: Scalars['String']
+  lastName: Scalars['String']
+  birthDate: Scalars['String']
+}>
+
+export type VerifyNationalIdQuery = {
+  __typename?: 'Query'
+  verifyNationalId?: {
+    __typename?: 'Verification'
+    nationalId: string
+    verified: boolean
   } | null
 }
 
