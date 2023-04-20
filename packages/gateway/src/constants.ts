@@ -77,6 +77,3 @@ export const OIDP_CLIENT_PRIVATE_KEY =
 export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
 /** Base URL for getting user info from OSIA */
 export const OSIA_REST_URL = process.env.NATIONAL_ID_OSIA_REST_URL
-/** Persistent JWT for getting user info from OSIa. NOTE: This is not production safe due to the persistent nature of the JWT! */
-export const UNSAFE__OSIA_PERSISTENT_JWT =
-  process.env.NATIONAL_ID_OSIA_PERSISTENT_JWT

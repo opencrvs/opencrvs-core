@@ -2418,6 +2418,12 @@ export const formMessageDescriptors: IFormMessages = {
     description:
       "Label for verifying NID button in form when it's fetching data",
     id: 'form.field.nidLoading'
+  },
+  nidError: {
+    defaultMessage:
+      'There was an error verifying National ID. Please check the national ID, date of birth and name.',
+    description: 'Label when there was an error when verifying National ID',
+    id: 'form.field.nidError'
   }
 }
 

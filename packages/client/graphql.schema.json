@@ -8732,7 +8732,7 @@
             "deprecationReason": null
           },
           {
-            "name": "OSIA_NID",
+            "name": "OSIA_UIN_VID_NID",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

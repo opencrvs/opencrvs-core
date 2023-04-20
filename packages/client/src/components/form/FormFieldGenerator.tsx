@@ -560,7 +560,17 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === NID_VERIFICATION_FETCH_BUTTON) {
     return (
-      <InputField {...inputFieldProps}>
+      <InputField
+        {...inputFieldProps}
+        error={
+          verificationStatus === 'error'
+            ? fieldDefinition.labelForError
+            : inputFieldProps.error
+        }
+        touched={
+          verificationStatus === 'error' ? true : inputFieldProps.touched
+        }
+      >
         <VerificationButton
           id={fieldDefinition.name}
           onClick={() =>
@@ -572,8 +582,10 @@ function GeneratedInputField({
           labelForVerified={fieldDefinition.labelForVerified}
           labelForUnverified={fieldDefinition.labelForUnverified}
           labelForOffline={fieldDefinition.labelForOffline}
-          labelForLoading="Loading..."
-          status={verificationStatus}
+          labelForLoading={fieldDefinition.labelForLoading}
+          status={
+            verificationStatus === 'error' ? 'unverified' : verificationStatus
+          }
           disabled={disabled}
         />
       </InputField>

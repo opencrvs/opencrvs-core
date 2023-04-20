@@ -251,14 +251,14 @@ export const identityToNidVerificationFieldTransformer = (
   mosipTransformer(transformedData, queryData, sectionId, field)
   const osiaTransformer = identityToFieldTransformer(
     'id',
-    IdentityIdType.OsiaNid
+    IdentityIdType.OsiaUinVidNid
   )
   osiaTransformer(transformedData, queryData, sectionId, field)
 
   const existingIdentity = queryData[sectionId].identifier?.find(
     (identity: fhir.Identifier) =>
       identity.type === IdentityIdType.MosipPsutTokenId ||
-      identity.type === IdentityIdType.OsiaNid
+      identity.type === IdentityIdType.OsiaUinVidNid
   )
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -650,7 +650,7 @@ export const nestedIdentityValueToFieldTransformer =
     )
     const osiaTransformer = identityToFieldTransformer(
       'id',
-      IdentityIdType.OsiaNid
+      IdentityIdType.OsiaUinVidNid
     )
     mosipTransformer(clonedData, queryData[sectionId], nestedField, field)
     osiaTransformer(clonedData, queryData[sectionId], nestedField, field)
@@ -663,7 +663,7 @@ export const nestedIdentityValueToFieldTransformer =
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
       (identity: fhir.Identifier) =>
         identity.type === IdentityIdType.MosipPsutTokenId ||
-        identity.type === IdentityIdType.OsiaNid
+        identity.type === IdentityIdType.OsiaUinVidNid
     )
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
