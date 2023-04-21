@@ -576,7 +576,13 @@ function UserListComponent(props: IProps) {
             const avatar = user.avatar
 
             return {
-              image: <AvatarSmall name={name} avatar={avatar || undefined} />,
+              image: (
+                <AvatarSmall
+                  name={name}
+                  avatar={avatar || undefined}
+                  onClick={() => goToUserProfile(String(user.id))}
+                />
+              ),
               label: (
                 <Link
                   id="profile-link"

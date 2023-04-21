@@ -335,9 +335,13 @@ export const UserAudit = () => {
           topActionButtons={
             userDetails && scope
               ? [
-                  <Status status={user.status || 'pending'} />,
+                  <Status
+                    key="top-action-status"
+                    status={user.status || 'pending'}
+                  />,
                   <ToggleMenu
                     id={`sub-page-header-munu-button`}
+                    key="top-action-toggle-menu"
                     toggleButton={
                       <Icon
                         name="DotsThreeVertical"

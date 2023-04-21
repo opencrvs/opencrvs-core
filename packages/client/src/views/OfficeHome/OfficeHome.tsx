@@ -25,28 +25,24 @@ import {
   goToEvents,
   goToPage,
   goToPrintCertificate,
-  goToHomeTab,
-  getDefaultPerformanceLocationId
+  goToHomeTab
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES,
-  NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
+  FIELD_AGENT_ROLES
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, Redirect } from 'react-router'
+import { RouteComponentProps } from 'react-router'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -58,7 +54,6 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { constantsMessages } from '@client/i18n/messages'
@@ -68,7 +63,6 @@ import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
-import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -301,22 +295,6 @@ class OfficeHomeView extends React.Component<
 
     return (
       <>
-        {this.role &&
-          (NATL_ADMIN_ROLES.includes(this.role) ||
-            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
-            <Redirect to={PERFORMANCE_HOME} />
-          )}
-        {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
-          <Redirect
-            to={{
-              pathname: PERFORMANCE_HOME,
-              search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as UserDetails
-              )}`
-            }}
-          />
-        )}
-
         {tabId === WORKQUEUE_TABS.inProgress && (
           <InProgress
             drafts={drafts}

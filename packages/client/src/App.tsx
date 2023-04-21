@@ -76,6 +76,7 @@ import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificat
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { Home } from '@client/views/OfficeHome/Home'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -135,7 +136,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={routes.HOME}
-                                              component={OfficeHome}
+                                              component={Home}
                                             />
                                             <ProtectedRoute
                                               exact
