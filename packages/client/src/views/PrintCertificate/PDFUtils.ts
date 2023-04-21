@@ -34,15 +34,17 @@ function isMessageDescriptor(
 }
 
 export function formatAllNonStringValues(
-  templateData: Record<string, string | MessageDescriptor | Array<string>>
+  templateData: Record<string, string | MessageDescriptor | Array<string>>,
+  intl: IntlShape
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
     if (
       typeof templateData[key] === 'object' &&
       isMessageDescriptor(templateData[key] as Record<string, unknown>)
     ) {
-      templateData[key] = (templateData[key] as MessageDescriptor)
-        .defaultMessage as string
+      templateData[key] = intl.formatMessage(
+        templateData[key] as MessageDescriptor
+      )
     } else if (Array.isArray(templateData[key])) {
       // For address field, country label is a MessageDescriptor
       // but state, province is string
@@ -52,7 +54,7 @@ export function formatAllNonStringValues(
         .filter(Boolean)
         .map((item) =>
           isMessageDescriptor(item as Record<string, unknown>)
-            ? (item as MessageDescriptor).defaultMessage
+            ? intl.formatMessage(item as MessageDescriptor)
             : item
         )
         .join(', ')
@@ -62,10 +64,11 @@ export function formatAllNonStringValues(
 }
 export function executeHandlebarsTemplate(
   templateString: string,
-  data: Record<string, any> = {}
+  data: Record<string, any> = {},
+  intl: IntlShape
 ): string {
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data)
+  const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
   return output
 }
@@ -84,7 +87,7 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, intl),
     declaration,
     userDetails,
     offlineResource,
@@ -119,13 +122,15 @@ export function printCertificate(
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize
+  pageSize: PageSize,
+  intl: IntlShape
 ): IPDFTemplate {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event].definition
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
-    declaration.data.template
+    declaration.data.template,
+    intl
   )
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize

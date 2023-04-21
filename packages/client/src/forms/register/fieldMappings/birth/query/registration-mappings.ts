@@ -29,6 +29,7 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -106,6 +107,22 @@ export function getBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+}
+
+export function informantTypeTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'informantType'
+  ] = queryData[sectionId].informantType
+    ? (informantMessageDescriptors[
+        queryData[sectionId].informantType
+      ] as MessageDescriptor & Record<string, string>)
+    : ''
 }
 
 export function registrationNumberTransformer(
