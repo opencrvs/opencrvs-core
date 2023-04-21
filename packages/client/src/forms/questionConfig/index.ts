@@ -63,6 +63,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   validateEmpty?: boolean
   maxLength?: number
   inputWidth?: number
+  initialValue?: string
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]

@@ -19,9 +19,15 @@ import Question, { IQuestion } from '@config/models/question'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 
-async function getQuestionsFromCountryConfig(): Promise<IQuestion[]> {
+async function getQuestionsFromCountryConfig(
+  token: string
+): Promise<IQuestion[]> {
   try {
-    const response = await fetch(`${COUNTRY_CONFIG_URL}/forms/questions`)
+    const response = await fetch(`${COUNTRY_CONFIG_URL}/forms/questions`, {
+      headers: {
+        Authorization: token
+      }
+    })
 
     if (response.status !== 200) {
       return []
@@ -62,7 +68,9 @@ export default async function getQuestions(
 ) {
   const datasets = await FormDataset.find().exec()
 
-  const allQuestionsFromCountryConfig = await getQuestionsFromCountryConfig()
+  const allQuestionsFromCountryConfig = await getQuestionsFromCountryConfig(
+    request.headers.authorization
+  )
 
   type QuestionWithDatasetPopulated = IQuestion & {
     options: IDataset['options']
