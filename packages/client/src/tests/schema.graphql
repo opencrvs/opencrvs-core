@@ -1133,6 +1133,7 @@ input QuestionInput {
   errorMessage: [MesssageInput!]
   maxLength: Int
   inputWidth: Int
+  initialValue: String
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!

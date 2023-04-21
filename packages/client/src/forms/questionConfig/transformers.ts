@@ -94,6 +94,10 @@ export function questionsTransformer(
       Event.Marriage
     )
   }
+  /*
+   * If you're adding a new field you want country config to be configuring,
+   * you need to also add it to function named "createCustomField"
+   */
   return questionsPayload.map(
     ({
       fieldId,
@@ -109,6 +113,7 @@ export function questionsTransformer(
       fieldName,
       fieldType,
       precedingFieldId,
+      initialValue,
       required,
       enabled,
       custom,
@@ -131,6 +136,7 @@ export function questionsTransformer(
           inputWidth,
           fieldName,
           fieldType,
+          initialValue,
           precedingFieldId,
           required,
           custom,

@@ -2001,6 +2001,7 @@ export type QuestionInput = {
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>

@@ -1382,6 +1382,7 @@ export interface GQLQuestionInput {
   tooltip?: Array<GQLMesssageInput>
   unit?: Array<GQLMesssageInput>
   errorMessage?: Array<GQLMesssageInput>
+  initialValue?: string
   maxLength?: number
   inputWidth?: number
   fieldName?: string

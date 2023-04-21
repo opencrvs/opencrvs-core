@@ -1479,6 +1479,7 @@ input QuestionInput {
   tooltip: [MesssageInput!]
   unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
+  initialValue: String
   maxLength: Int
   inputWidth: Int
   fieldName: String
