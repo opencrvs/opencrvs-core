@@ -79,6 +79,8 @@ interface IUserSetupMessages
   reInstatedInReviewAuditAction: MessageDescriptor
   reInStatedRejectedAuditAction: MessageDescriptor
   sentForApprovalAuditAction: MessageDescriptor
+  markedAsDuplicate: MessageDescriptor
+  markedAsNotDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -418,6 +420,16 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'Description for sending registration for approval audit action',
     id: 'user.profile.auditList.sentForApproval'
+  },
+  markedAsDuplicate: {
+    defaultMessage: 'Marked as duplicate',
+    description: 'Description for marked as duplicate in audit action',
+    id: 'user.profile.auditList.markedAsDuplicate'
+  },
+  markedAsNotDuplicate: {
+    defaultMessage: 'Marked as not duplicate',
+    description: 'Description for marked as not duplicate in audit action',
+    id: 'user.profile.auditList.markedAsNotDuplicate'
   }
 }
 

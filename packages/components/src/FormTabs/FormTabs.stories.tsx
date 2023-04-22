@@ -34,7 +34,7 @@ interface IProps {
 const sections: IFormTabs[] = [
   { id: 'generalTab', title: 'General' },
   { id: 'birthTab', title: 'Birth' },
-  { id: 'generalTab', title: 'Death' }
+  { id: 'deathTab', title: 'Death' }
 ]
 
 const Template: Story<IProps> = (args) => <FormTabs {...args} />

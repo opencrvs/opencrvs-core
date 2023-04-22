@@ -83,9 +83,15 @@ import { getSystem, getUser } from '@gateway/features/user/utils'
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
     __resolveType(obj) {
-      if (obj.type.coding[0].code === 'birth-declaration') {
+      if (
+        obj.type.coding[0].code === 'birth-declaration' ||
+        obj.type.coding[0].code === 'birth-notification'
+      ) {
         return 'BirthRegistration'
-      } else if (obj.type.coding[0].code === 'death-declaration') {
+      } else if (
+        obj.type.coding[0].code === 'death-declaration' ||
+        obj.type.coding[0].code === 'death-notification'
+      ) {
         return 'DeathRegistration'
       } else {
         return 'MarriageRegistration'
@@ -811,7 +817,7 @@ export const typeResolvers: GQLResolver = {
     latitude: (location) => location.position.latitude,
     alias: (location) => location.alias,
     description: (location) => location.description,
-    partOf: (location) => location.partOf,
+    partOf: (location) => location.partOf.reference,
     type: (location: fhir.Location) => {
       return (
         (location.type &&

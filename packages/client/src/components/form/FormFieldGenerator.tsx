@@ -147,10 +147,6 @@ const LocationSearchFormField = styled(LocationSearch)`
   ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
     width: 344px;
   }`}
-
-  & > input {
-    border-radius: 0;
-  }
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {

@@ -47,36 +47,36 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
     id: 'advancedSearchResult.pill.event'
   },
   registationStatus: {
-    defaultMessage: 'Registration Status',
+    defaultMessage: 'Registration status',
     description:
       'The label for registration Status param in active advancedSearchParams',
     id: 'advancedSearchResult.pill.registationStatus'
   },
   eventDate: {
-    defaultMessage: 'Event Date',
+    defaultMessage: 'Event date',
     description:
       'The label for event date param in active advancedSearchParams',
     id: 'advancedSearchResult.pill.eventDate'
   },
   regNumber: {
-    defaultMessage: 'Registration Number',
+    defaultMessage: 'Registration number',
     description:
       'The label for registration number in active advancedSearchParams',
     id: 'advancedSearchResult.pill.regNumber'
   },
   trackingId: {
-    defaultMessage: 'Tracking Id',
+    defaultMessage: 'Tracking ID',
     description: 'The label for tracking id in active advancedSearchParams',
     id: 'advancedSearchResult.pill.trackingId'
   },
   regDate: {
-    defaultMessage: 'Registration Date',
+    defaultMessage: 'Registration date',
     description:
       'The label for  registration date in active advancedSearchParams',
     id: 'advancedSearchResult.pill.regDate'
   },
   eventLocation: {
-    defaultMessage: 'Event Location',
+    defaultMessage: 'Event location',
     description: 'The label for event location in active advancedSearchParams',
     id: 'advancedSearchResult.pill.eventLocation'
   },
@@ -86,99 +86,99 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
     id: 'advancedSearchResult.pill.regLocation'
   },
   childFirstName: {
-    defaultMessage: 'Child Firstname',
+    defaultMessage: 'Child firstname',
     description: 'The label for child firstname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.childFirstName'
   },
   childLastName: {
-    defaultMessage: 'Child Lastname',
+    defaultMessage: 'Child lastname',
     description: 'The label for child lastname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.childLastName'
   },
   fatherFirstName: {
-    defaultMessage: 'Father Firstname',
+    defaultMessage: 'Father firstname',
     description:
       'The label for father firstname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.fatherFirstName'
   },
   fatherLastName: {
-    defaultMessage: 'Father Lastname',
+    defaultMessage: 'Father lastname',
     description: 'The label for father lastname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.fatherLastName'
   },
   motherFirstName: {
-    defaultMessage: 'Mother Firstname',
+    defaultMessage: 'Mother firstname',
     description:
       'The label for mother firstname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.motherFirstName'
   },
   motherLastName: {
-    defaultMessage: 'Mother Lastname',
+    defaultMessage: 'Mother lastname',
     description: 'The label for mother lastname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.motherLastName'
   },
   deceasedFirstName: {
-    defaultMessage: 'Deceased Firstname',
+    defaultMessage: 'Deceased Ffirstname',
     description:
       'The label for deceased firstname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.deceasedFirstName'
   },
   deceasedLastName: {
-    defaultMessage: 'Deceased Lastname',
+    defaultMessage: 'Deceased lastname',
     description:
       'The label for deceased lastname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.deceasedLastName'
   },
   informantFirstName: {
-    defaultMessage: 'Informant FirstName',
+    defaultMessage: 'Informant Firstname',
     description:
       'The label for informant firstname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.informantFirstName'
   },
   informantLastName: {
-    defaultMessage: 'Informant LastName',
+    defaultMessage: 'Informant lastname',
     description:
       'The label for informant lastname in active advancedSearchParams',
     id: 'advancedSearchResult.pill.informantLastName'
   },
   gender: {
-    defaultMessage: 'Gender',
+    defaultMessage: 'Sex',
     description: 'The label for gender in active advancedSearchParams',
     id: 'advancedSearchResult.pill.gender'
   },
   childDoB: {
-    defaultMessage: 'ChildDOB',
-    description: 'The label for child DOB in active advancedSearchParams',
+    defaultMessage: 'Child d.o.b',
+    description: 'The label for child d.o.b in active advancedSearchParams',
     id: 'advancedSearchResult.pill.childDoB'
   },
   fatherDoB: {
-    defaultMessage: 'FatherDOB',
-    description: 'The label for father DOB in active advancedSearchParams',
+    defaultMessage: 'Father d.o.b',
+    description: 'The label for father d.o.b in active advancedSearchParams',
     id: 'advancedSearchResult.pill.fatherDoB'
   },
   motherDoB: {
-    defaultMessage: 'MotherDOB',
-    description: 'The label for mother DOB in active advancedSearchParams',
+    defaultMessage: 'Mother d.o.b',
+    description: 'The label for mother d.o.b in active advancedSearchParams',
     id: 'advancedSearchResult.pill.motherDoB'
   },
   deceasedDoB: {
-    defaultMessage: 'DeceasedDOB',
-    description: 'The label for deceased DOB in active advancedSearchParams',
+    defaultMessage: 'Deceased d.o.b',
+    description: 'The label for deceased d.o.b in active advancedSearchParams',
     id: 'advancedSearchResult.pill.deceasedDoB'
   },
   informantDoB: {
-    defaultMessage: 'InformantDOB',
-    description: 'The label for informant DOB in active advancedSearchParams',
+    defaultMessage: 'Informant d.o.b',
+    description: 'The label for informant d.o.b in active advancedSearchParams',
     id: 'advancedSearchResult.pill.informantDoB'
   },
   searchResult: {
-    defaultMessage: 'Search Result',
+    defaultMessage: 'Search results',
     description:
       'The label for search result header in advancedSearchResult page',
     id: 'advancedSearchResult.table.searchResult'
   },
   noResult: {
-    defaultMessage: 'No Result',
+    defaultMessage: 'No result',
     description: 'The label for no result in advancedSearchResult page',
     id: 'advancedSearchResult.table.noResult'
   }

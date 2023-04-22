@@ -104,7 +104,7 @@ function UserAuditActionModalComponent(
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
-    <TertiaryButton id="modal-cancel" onClick={onClose}>
+    <TertiaryButton key="modal-cancel" id="modal-cancel" onClick={onClose}>
       {intl.formatMessage(buttonMessages.cancel)}
     </TertiaryButton>
   ]

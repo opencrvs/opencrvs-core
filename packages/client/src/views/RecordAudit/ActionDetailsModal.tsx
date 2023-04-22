@@ -46,7 +46,6 @@ import {
   CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
 import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
@@ -394,14 +393,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
-          : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
     }

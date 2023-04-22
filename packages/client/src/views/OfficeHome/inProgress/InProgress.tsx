@@ -41,7 +41,7 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { ITheme, withTheme } from '@client/styledComponents'
-import { LANG_EN } from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -215,11 +215,14 @@ export class InProgressComponent extends React.Component<
           const brideNamesMap = createNamesMap(brideNames)
           const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
           const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
-          name = groomName + (brideName ? ` & ${brideName}` : '')
+          name =
+          brideName && groomName
+            ? `${groomName} & ${brideName}`
+            : brideName || groomName || EMPTY_STRING
           const date = reg.dateOfMarriage
           eventDate = date && date
-        }
       }
+      
       const dateOfEvent =
         eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
       const actions: IAction[] = []

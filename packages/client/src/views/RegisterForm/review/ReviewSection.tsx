@@ -164,6 +164,12 @@ export const RequiredField = styled.span`
     text-transform: uppercase;
   }
 `
+
+export const ErrorField = styled.p`
+  margin-top: 0;
+  margin-bottom: 0;
+`
+
 const Row = styled.div`
   display: flex;
   flex: 1;
@@ -634,7 +640,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.hasChangesBeenMade = false
   }
 
@@ -690,6 +696,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let sectionElement: HTMLElement
     let activeSection = this.state.activeSection
 
+    // TODO: Refactor "findDOMNode" away, as it's deprecated
+    // eslint-disable-next-line react/no-find-dom-node
     const node = findDOMNode(this) as HTMLElement
 
     this.docSections.forEach((section: IFormSection) => {
@@ -1034,7 +1042,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getErrorForNestedField(section, field, sectionErrors)
 
     return errorsOnField.length > 0 ? (
-      this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      <ErrorField>
+        {this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])}
+      </ErrorField>
     ) : field.nestedFields && !Boolean(ignoreNestedFieldWrapping) ? (
       (
         (data[section.id] &&
@@ -1719,9 +1729,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           )
         } else if (event === Event.Marriage) {
           return (
-            !declaration.data.registration?.groomSignature &&
-            !declaration.data.registration?.brideSignature &&
-            !declaration.data.registration?.witnessOneSignature &&
+            !declaration.data.registration?.groomSignature ||
+            !declaration.data.registration?.brideSignature ||
+            !declaration.data.registration?.witnessOneSignature ||
             !declaration.data.registration?.witnessTwoSignature
           )
         }
