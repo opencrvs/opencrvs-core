@@ -216,13 +216,14 @@ export class InProgressComponent extends React.Component<
           const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
           const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
           name =
-          brideName && groomName
-            ? `${groomName} & ${brideName}`
-            : brideName || groomName || EMPTY_STRING
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
           const date = reg.dateOfMarriage
           eventDate = date && date
+        }
       }
-      
+
       const dateOfEvent =
         eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
       const actions: IAction[] = []
