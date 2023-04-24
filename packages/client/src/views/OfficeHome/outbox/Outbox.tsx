@@ -228,7 +228,7 @@ export function Outbox() {
             ? `${groomName} & ${brideName}`
             : brideName || groomName || EMPTY_STRING
 
-        dateOfEvent = declaration.data?.marriageEvent?.marriageDate.toString()
+        dateOfEvent = declaration.data?.marriageEvent?.marriageDate?.toString()
       }
 
       const statusText = intl.formatMessage(
