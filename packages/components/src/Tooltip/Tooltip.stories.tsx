@@ -3,7 +3,6 @@ import { Story, Meta } from '@storybook/react'
 import { Tooltip, TooltipProps } from './Tooltip'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { Text } from '../Text'
 
 export default {
   title: 'Data/Tooltip',
@@ -12,7 +11,16 @@ export default {
     position: {
       control: {
         type: 'select',
-        options: ['top', 'bottom', 'left', 'right']
+        options: [
+          'top',
+          'bottom',
+          'left',
+          'right',
+          'topLeft',
+          'topRight',
+          'bottomLeft',
+          'bottomRight'
+        ]
       }
     }
   }
@@ -24,9 +32,9 @@ const ButtonContainer = ({ children }: { children: React.ReactNode }) => (
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '120px', // adjust height as needed
-      marginTop: '24px', // add extra space above
-      marginBottom: '24px' // add extra space below
+      height: '120px',
+      marginTop: '24px',
+      marginBottom: '24px'
     }}
   >
     {children}
@@ -48,10 +56,28 @@ Default.args = {
   content: 'View performance'
 }
 
+export const Top = Template.bind({})
+Top.args = {
+  content: 'View performance',
+  position: 'top'
+}
+
+export const TopRight = Template.bind({})
+TopRight.args = {
+  content: 'View performance',
+  position: 'topRight'
+}
+
 export const Right = Template.bind({})
 Right.args = {
   content: 'View performance',
   position: 'right'
+}
+
+export const BottomRight = Template.bind({})
+BottomRight.args = {
+  content: 'View performance',
+  position: 'bottomRight'
 }
 
 export const Bottom = Template.bind({})
@@ -66,20 +92,14 @@ BottomLeft.args = {
   position: 'bottomLeft'
 }
 
-export const BottomRight = Template.bind({})
-BottomRight.args = {
-  content: 'View performance',
-  position: 'bottomRight'
-}
-
 export const Left = Template.bind({})
 Left.args = {
   content: 'View performance',
   position: 'left'
 }
 
-export const Top = Template.bind({})
-Top.args = {
+export const TopLeft = Template.bind({})
+TopLeft.args = {
   content: 'View performance',
-  position: 'top'
+  position: 'topLeft'
 }
