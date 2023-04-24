@@ -6,7 +6,7 @@ const TooltipWrapper = styled.div`
   display: inline-block;
 `
 
-const TooltipContent = styled.div<{ position: React.ReactNode }>`
+const TooltipContent = styled.div<{ position: TooltipProps['position'] }>`
   visibility: hidden;
   background-color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold12};
@@ -18,8 +18,8 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
   opacity: 0;
   transition: opacity 0.3s;
   white-space: nowrap;
-
-  ${({ position }) => {
+  
+${({ position }) => {
     switch (position) {
       case 'top':
         return `
@@ -37,6 +37,37 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
             border-color: #222 transparent transparent transparent;
           }
         `
+      case 'topRight':
+        return `
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-20%);
+            &::after {
+              content: '';
+              position: absolute;
+              top: 100%;
+              right: 80%;
+              margin-right: -4px;
+              border-width: 4px;
+              border-style: solid;
+              border-color: transparent transparent #222 transparent;
+          `
+      case 'topLeft':
+        return `
+              bottom: 125%;
+              left: 50%;
+              transform: translateX(-80%);
+              &::after {
+                content: '';
+                position: absolute;
+                top: 100%;
+                left: 80%;
+                margin-left: -4px;
+                border-width: 4px;
+                border-style: solid;
+                border-color: transparent transparent #222 transparent;
+              }
+            `
       case 'bottom':
         return `
           top: 125%;
@@ -69,6 +100,22 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
               border-color: transparent transparent #222 transparent;
             }
           `
+      case 'bottomRight':
+        return `
+                  top: 125%;
+                  left: 50%;
+                  transform: translateX(-20%);
+                  &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 100%;
+                    right: 80%;
+                    margin-right: -4px;
+                    border-width: 4px;
+                    border-style: solid;
+                    border-color: transparent transparent #222 transparent;
+                  }
+                `
       case 'left':
         return `
           top: 50%;
@@ -85,22 +132,6 @@ const TooltipContent = styled.div<{ position: React.ReactNode }>`
             border-color: transparent transparent transparent #222;
           }
         `
-      case 'bottomRight':
-        return `
-              top: 125%;
-              left: 50%;
-              transform: translateX(-20%);
-              &::after {
-                content: '';
-                position: absolute;
-                bottom: 100%;
-                right: 80%;
-                margin-right: -4px;
-                border-width: 4px;
-                border-style: solid;
-                border-color: transparent transparent #222 transparent;
-              }
-            `
       case 'right':
         return `
           top: 50%;
@@ -133,7 +164,15 @@ const TooltipTrigger = styled.span`
 export interface TooltipProps {
   content: React.ReactNode
   children: React.ReactNode
-  position?: 'top' | 'bottom' | 'left' | 'right'
+  position?:
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'topLeft'
+    | 'topRight'
+    | 'bottomLeft'
+    | 'bottomRight'
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
