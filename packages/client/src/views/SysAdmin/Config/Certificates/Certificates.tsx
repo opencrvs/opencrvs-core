@@ -86,7 +86,10 @@ type Props = WrappedComponentProps & {
     birth: IForm
     death: IForm
   }
-} & { updateOfflineCertificate: typeof updateOfflineCertificate }
+} & {
+  updateOfflineCertificate: typeof updateOfflineCertificate
+  state: IStoreState
+}
 
 interface State {
   selectedSubMenuItem: string
@@ -137,7 +140,8 @@ export const printDummyCertificate = async (
   registerForm: { birth: IForm; death: IForm },
   intl: IntlShape,
   userDetails: IUserDetails,
-  offlineData: IOfflineData
+  offlineData: IOfflineData,
+  state: IStoreState
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
   let certEvent: Event
@@ -166,7 +170,8 @@ export const printDummyCertificate = async (
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    updatedOfflineData
+    updatedOfflineData,
+    state
   )
 }
 
@@ -208,7 +213,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm
           )
 
-          svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData, intl)
+          svgCode = executeHandlebarsTemplate(
+            svgCode,
+            dummyTemplateData,
+            this.props.state
+          )
           svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
@@ -227,7 +236,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm,
             intl,
             this.props.userDetails as IUserDetails,
-            this.props.offlineResources
+            this.props.offlineResources,
+            this.props.state
           )
         }
       },
@@ -539,7 +549,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   svgCode = executeHandlebarsTemplate(
                     svgCode,
                     dummyTemplateData,
-                    intl
+                    this.props.state
                   )
                   const data = `data:${SVGFile.type};base64,${window.btoa(
                     svgCode
@@ -573,7 +583,8 @@ function mapStateToProps(state: IStoreState) {
     offlineResources: getOfflineData(state),
     registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    state
   }
 }
 
