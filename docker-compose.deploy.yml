@@ -299,7 +299,7 @@ services:
     networks:
       overlay_net:
         aliases:
-          - ${MINIO_DOMAIN}
+          - minio.{{hostname}}
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
