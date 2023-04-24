@@ -734,6 +734,7 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
       - MINIO_HOST=minio.{{hostname}}
+      - MINIO_PORT=9000
       - MINIO_BUCKET=ocrvs
     networks:
       - overlay_net
