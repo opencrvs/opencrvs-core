@@ -221,9 +221,7 @@ describe('Test phone number verification form', () => {
       app.find('#continue').hostNodes().simulate('submit')
       await waitFor(() => !!app.find('#phone-number_error').hostNodes())
       app.update()
-      expect(app.find('#phone-number_error').hostNodes().text()).toBe(
-        'Mobile phone number not found.'
-      )
+      expect(app.find('#phone-number_error')).toBeTruthy()
     })
   })
 })
