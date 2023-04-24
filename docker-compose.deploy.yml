@@ -297,7 +297,9 @@ services:
         - 'traefik.http.services.minio.loadbalancer.server.port=9000'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
-      - overlay_net
+      overlay_net:
+        aliases:
+          - ${HOSTNAME}
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
