@@ -16,7 +16,6 @@ import {
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
-import { callingCountries } from 'country-data'
 import * as decode from 'jwt-decode'
 import fetch from 'node-fetch'
 export interface ITokenPayload {
@@ -24,17 +23,6 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: string[]
-}
-
-export const convertToLocal = (
-  mobileWithCountryCode: string,
-  countryCode: string
-) => {
-  countryCode = countryCode.toUpperCase()
-  return mobileWithCountryCode.replace(
-    callingCountries[countryCode].countryCallingCodes[0],
-    '0'
-  )
 }
 
 export async function getUser(
