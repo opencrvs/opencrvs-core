@@ -26,6 +26,7 @@
     "eslint-plugin-react": "^7.13.0",
     "final-form": "^4.20.7",
     "focus-visible": "^5.0.2",
+    "google-libphonenumber": "^3.2.32",
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
@@ -75,6 +76,7 @@
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
+    "@types/google-libphonenumber": "^7.4.23",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.12.5",

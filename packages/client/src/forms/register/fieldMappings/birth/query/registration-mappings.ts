@@ -30,6 +30,7 @@ import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -184,24 +185,29 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
-const convertToLocal = (
+export const convertToLocal = (
   mobileWithCountryCode: string,
-  country: string,
-  codeReplacement?: string
+  alpha3CountryCode: string
 ) => {
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-  const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
 
-  return (
-    mobileWithCountryCode &&
-    mobileWithCountryCode.replace(
-      callingCountries[countryCode].countryCallingCodes[0],
-      codeReplacement ? codeReplacement : '0'
-    )
-  )
+  const countryCode =
+    alpha3CountryCode.toUpperCase() === 'FAR'
+      ? 'ZM'
+      : callingCountries[alpha3CountryCode].alpha2
+
+  const phoneUtil = PhoneNumberUtil.getInstance()
+
+  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
+    return
+  }
+  const number = phoneUtil.parse(mobileWithCountryCode, countryCode)
+
+  return phoneUtil
+    .format(number, PhoneNumberFormat.NATIONAL)
+    .replace(/[^A-Z0-9]+/gi, '')
 }
 
 export const localPhoneTransformer =
@@ -214,11 +220,7 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
-    const localPhone = convertToLocal(
-      msisdnPhone,
-      window.config.COUNTRY,
-      codeReplacement
-    )
+    const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
     transformedData[sectionId][field.name] = localPhone
     return transformedData
   }

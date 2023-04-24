@@ -47,7 +47,7 @@ const config = {
       DELAYED: 0
     }
   },
-  COUNTRY: 'bgd',
+  COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
