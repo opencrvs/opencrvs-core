@@ -20,6 +20,8 @@ interface IFormMessages
   whoIsDeathInformant: Message
   GRANDFATHER: MessageDescriptor
   GRANDMOTHER: MessageDescriptor
+  MOTHER: MessageDescriptor
+  FATHER: MessageDescriptor
   BROTHER: MessageDescriptor
   SISTER: MessageDescriptor
   LEGAL_GUARDIAN: MessageDescriptor
