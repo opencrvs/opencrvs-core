@@ -208,7 +208,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm
           )
 
-          svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
+          svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData, intl)
           svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
@@ -538,7 +538,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   let svgCode = atob(file.data.split(',')[1])
                   svgCode = executeHandlebarsTemplate(
                     svgCode,
-                    dummyTemplateData
+                    dummyTemplateData,
+                    intl
                   )
                   const data = `data:${SVGFile.type};base64,${window.btoa(
                     svgCode
