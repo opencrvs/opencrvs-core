@@ -36,11 +36,11 @@ const StyledInput = styled.input<ITextInputProps>`
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
-  ${({ hideBorder, error, touched, isDisabled, theme }) =>
+  ${({ hideBorder, error, touched, disabled, theme }) =>
     hideBorder
       ? `
       border:none;
@@ -59,8 +59,8 @@ const StyledInput = styled.input<ITextInputProps>`
       border: 2px solid ${
         error && touched
           ? theme.colors.negative
-          : isDisabled
-          ? theme.colors.greyGrey
+          : disabled
+          ? theme.colors.grey300
           : theme.colors.copy
       };
       &:focus {

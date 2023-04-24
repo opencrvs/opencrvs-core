@@ -66,6 +66,22 @@ export async function waitingExternalValidationHandler(
   return h.response().code(200)
 }
 
+export async function markedAsDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_DUPLICATE', request)
+  return h.response().code(200)
+}
+
+export async function markedAsNotDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_NOT_DUPLICATE', request)
+  return h.response().code(200)
+}
+
 export async function requestForRegistrarValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit

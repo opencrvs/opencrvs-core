@@ -46,7 +46,9 @@ import {
   declarationUpdatedHandler,
   markEventRegisteredHandler,
   newEventRegistrationHandler,
-  markIssuedHandler
+  markIssuedHandler,
+  markedAsDuplicate,
+  markedAsNotDuplicate
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -146,6 +148,22 @@ export const getRoutes = () => {
             event: Joi.string().valid(...Object.values(EventType))
           })
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/marked-as-duplicate',
+      handler: markedAsDuplicate,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/not-duplicate',
+      handler: markedAsNotDuplicate,
+      config: {
+        tags: ['api']
       }
     },
 

@@ -637,6 +637,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           id="end-date-small"
           date={endDateNav}
           onNavigateDate={setEndDateNav}
+          // eslint-disable-next-line react/prop-types
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
           onSelectDate={(date) => {
