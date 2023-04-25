@@ -256,6 +256,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - xpack.security.authc.api_key.enabled=true
+      - 'ES_JAVA_OPTS=-Xms4g -Xmx4g'
     ports:
       - 9200:9200
     networks:

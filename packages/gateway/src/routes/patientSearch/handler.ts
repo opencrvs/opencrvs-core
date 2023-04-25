@@ -101,8 +101,9 @@ export async function getPersonsRecord(
         }
         return requestedAttributes
       }
-      //this need to be replaced by uin later on
-      const nidIdentifier = identifier?.find((id) => id.type === 'NATIONAL_ID')
+      const nidIdentifier = identifier?.find(
+        (id) => id.type === 'OSIA_UIN_VID_NID'
+      )
       return { uid: nidIdentifier?.value || '' }
     })
 

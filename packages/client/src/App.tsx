@@ -48,7 +48,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { Route, Switch } from 'react-router'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
@@ -71,11 +71,12 @@ import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
-
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { Home } from '@client/views/OfficeHome/Home'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -135,7 +136,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={routes.HOME}
-                                              component={OfficeHome}
+                                              component={Home}
                                             />
                                             <ProtectedRoute
                                               exact
@@ -551,6 +552,15 @@ export function App(props: IAppProps) {
                                                 routes.ISSUE_CERTIFICATE_PAYMENT
                                               }
                                               component={IssuePayment}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.OIDP_VERIFICATION_CALLBACK
+                                              }
+                                              component={
+                                                OIDPVerificationCallback
+                                              }
                                             />
                                           </Switch>
                                         </TransitionWrapper>

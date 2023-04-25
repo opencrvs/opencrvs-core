@@ -232,6 +232,24 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'otherType',
         context
       )
+    },
+    fieldsModifiedByIdentity: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      setObjectPropInResourceArray(
+        person,
+        'identifier',
+        fieldValue.split(','),
+        'fieldsModifiedByIdentity',
+        context
+      )
     }
   }
 }
@@ -1748,6 +1766,20 @@ export const builders: IFieldBuilders = {
             'identifier',
             fieldValue,
             'otherType',
+            context
+          )
+        },
+        fieldsModifiedByIdentity: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+          setObjectPropInResourceArray(
+            person,
+            'identifier',
+            fieldValue.split(','),
+            'fieldsModifiedByIdentity',
             context
           )
         }
@@ -3378,21 +3410,19 @@ export const builders: IFieldBuilders = {
             context,
             context.event
           )
-          if (
-            relatedPersonResource.relationship &&
-            relatedPersonResource.relationship.coding
-          ) {
+          if (!relatedPersonResource.relationship) {
+            relatedPersonResource.relationship = {}
+          }
+          if (relatedPersonResource.relationship.coding?.[0]) {
             relatedPersonResource.relationship.coding[0].code = fieldValue
           } else {
-            relatedPersonResource.relationship = {
-              coding: [
-                {
-                  system:
-                    'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                  code: fieldValue
-                }
-              ]
-            }
+            relatedPersonResource.relationship.coding = [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: fieldValue
+              }
+            ]
           }
           /* if mother/father is collecting then we will just put the person ref here */
           if (fieldValue === 'MOTHER') {
@@ -3416,6 +3446,20 @@ export const builders: IFieldBuilders = {
               fhirBundle,
               context
             )
+          } else if (fieldValue === 'BRIDE') {
+            await setCertificateCollectorReference(
+              BRIDE_CODE,
+              relatedPersonResource,
+              fhirBundle,
+              context
+            )
+          } else if (fieldValue === 'GROOM') {
+            await setCertificateCollectorReference(
+              GROOM_CODE,
+              relatedPersonResource,
+              fhirBundle,
+              context
+            )
           }
         },
         otherRelationship: async (
@@ -3428,22 +3472,10 @@ export const builders: IFieldBuilders = {
             context,
             context.event
           )
-          if (
-            relatedPersonResource.relationship &&
-            relatedPersonResource.relationship.coding
-          ) {
-            relatedPersonResource.relationship.coding[0].display = fieldValue
-          } else {
-            relatedPersonResource.relationship = {
-              coding: [
-                {
-                  system:
-                    'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                  display: fieldValue
-                }
-              ]
-            }
+          if (!relatedPersonResource.relationship) {
+            relatedPersonResource.relationship = {}
           }
+          relatedPersonResource.relationship.text = fieldValue
         },
         affidavit: {
           contentType: (

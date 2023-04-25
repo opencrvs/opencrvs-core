@@ -43,6 +43,7 @@ import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { IdentityIdType } from '@client/utils/gateway'
 
 interface IName {
   [key: string]: any
@@ -234,6 +235,44 @@ export const identityToFieldTransformer =
     }
     return transformedData
   }
+
+export const identityToNidVerificationFieldTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (!queryData) return transformedData
+
+  const mosipTransformer = identityToFieldTransformer(
+    'id',
+    IdentityIdType.MosipPsutTokenId
+  )
+  mosipTransformer(transformedData, queryData, sectionId, field)
+  const osiaTransformer = identityToFieldTransformer(
+    'id',
+    IdentityIdType.OsiaUinVidNid
+  )
+  osiaTransformer(transformedData, queryData, sectionId, field)
+
+  const existingIdentity = queryData[sectionId].identifier?.find(
+    (identity: fhir.Identifier) =>
+      identity.type === IdentityIdType.MosipPsutTokenId ||
+      identity.type === IdentityIdType.OsiaUinVidNid
+  )
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (existingIdentity) {
+    const modifiedFields = existingIdentity[
+      'fieldsModifiedByIdentity'
+    ] as string[]
+    transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+  }
+
+  return transformedData
+}
 interface IAddress {
   [key: string]: any
 }
@@ -589,6 +628,57 @@ export const nestedValueToFieldTransformer =
     return transformedData
   }
 
+export const nestedIdentityValueToFieldTransformer =
+  (nestedField: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!queryData?.[sectionId]?.[nestedField]) {
+      return transformedData
+    }
+    const clonedData = cloneDeep(transformedData)
+    if (!clonedData[nestedField]) {
+      clonedData[nestedField] = {}
+    }
+
+    const mosipTransformer = identityToFieldTransformer(
+      'id',
+      IdentityIdType.MosipPsutTokenId
+    )
+    const osiaTransformer = identityToFieldTransformer(
+      'id',
+      IdentityIdType.OsiaUinVidNid
+    )
+    mosipTransformer(clonedData, queryData[sectionId], nestedField, field)
+    osiaTransformer(clonedData, queryData[sectionId], nestedField, field)
+
+    if (clonedData[nestedField][field.name] === undefined) {
+      return transformedData
+    }
+    transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
+
+    const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
+      (identity: fhir.Identifier) =>
+        identity.type === IdentityIdType.MosipPsutTokenId ||
+        identity.type === IdentityIdType.OsiaUinVidNid
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    if (existingIdentity) {
+      const modifiedFields = existingIdentity[
+        'fieldsModifiedByIdentity'
+      ] as string[]
+      transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+    }
+
+    return transformedData
+  }
+
 export const booleanTransformer = (
   transformedData: IFormData,
   queryData: any,
@@ -724,7 +814,11 @@ export const dateFormatTransformer =
   ): void => {
     let queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
-    if (nestedField && queryData[sectionId][nestedField]) {
+    if (
+      nestedField &&
+      queryData[sectionId] &&
+      queryData[sectionId][nestedField]
+    ) {
       queryValue = String(
         (queryData[sectionId][nestedField] as IFormSectionData)[
           transformedFieldName
@@ -921,7 +1015,7 @@ export const eventLocationAddressLineTemplateTransformer =
   ) => {
     if (
       queryData.eventLocation?.type &&
-      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
     ) {
       return
     }

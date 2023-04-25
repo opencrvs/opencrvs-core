@@ -12,7 +12,6 @@
 import {
   CHECKBOX_GROUP,
   DATE,
-  FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   ICheckboxGroupFormField,
   IDynamicOptions,
@@ -634,7 +633,7 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
+  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
     (type) => type === field.type
   )
 }

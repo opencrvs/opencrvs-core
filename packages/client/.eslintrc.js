@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 module.exports = {
-  extends: ['../../.eslintrc.js', 'eslint-config-react-app'],
+  extends: [
+    '../../.eslintrc.js',
+    'eslint-config-react-app',
+    'plugin:react/recommended'
+  ],
   plugins: ['react', 'formatjs'],
   env: {
     es6: true,
@@ -51,7 +55,8 @@ Query component now sends errors automatically to Sentry.`
     ],
     'react/boolean-prop-naming': 'off',
     'react/sort-comp': 'off',
-    'react/sort-prop-types': 'off'
+    'react/sort-prop-types': 'off',
+    'react/prop-types': 'off'
   },
   settings: {
     react: {

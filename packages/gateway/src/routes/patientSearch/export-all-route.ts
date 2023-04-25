@@ -26,6 +26,8 @@ export default [
     path: `/${OSIA_SERVICE_VERSION}/persons`,
     handler: getPersonsRecord,
     config: {
+      // Temporarily blocking OSIA search using OpenCRVS auth
+      auth: true,
       validate: {
         query: requestSchemaForPersons,
         failAction: (
@@ -41,6 +43,8 @@ export default [
     path: `/${OSIA_SERVICE_VERSION}/persons/{uin}`,
     handler: getSinglePersonRecord,
     config: {
+      // Temporarily blocking OSIA search using OpenCRVS auth
+      auth: true,
       validate: {
         params: requestParamSchemaForPerson,
         query: requestQuerySchemaForPerson,

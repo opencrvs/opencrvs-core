@@ -67,4 +67,16 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   : 600
 export const DEFAULT_TIMEOUT = 600000
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
+
+// The following constants are used in the MOSIP integration
+export const OIDP_BASE_URL = process.env.NATIONAL_ID_OIDP_BASE_URL
+export const OIDP_REST_URL = process.env.NATIONAL_ID_OIDP_REST_URL
+/** Base64 encoded RS256 JSON Web Key */
+export const OIDP_CLIENT_PRIVATE_KEY =
+  process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY
+/** Value for "aud" claim when getting access token for fetching Open ID provider user info */
+export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
+
+// The following constants are used for an OSIA integration
+export const OSIA_REST_URL = process.env.NATIONAL_ID_OSIA_REST_URL
 export const OSIA_SERVICE_VERSION = process.env.OSIA_SERVICE_VERSION || 'v1'

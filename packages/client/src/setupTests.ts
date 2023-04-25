@@ -232,7 +232,11 @@ beforeEach(() => {
 vi.mock('lodash/debounce', () => ({
   default: vi.fn().mockImplementation((arg) => arg)
 }))
-vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
+
+vi.mock('./utils', async () => ({
+  useOnlineStatus: () => true,
+  isNavigatorOnline: () => true
+}))
 
 vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
@@ -240,4 +244,13 @@ vi.mock('react-router', async () => ({
     event: 'birth',
     section: 'child'
   }))
+}))
+
+vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
+  ...((await vi.importActual(
+    '@client/views/OIDPVerificationCallback/utils'
+  )) as any),
+  useExtractCallBackState: vi.fn(),
+  useQueryParams: vi.fn(),
+  useCheckNonce: vi.fn()
 }))
