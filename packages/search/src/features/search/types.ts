@@ -68,6 +68,17 @@ export interface IAdvancedSearchParam {
   informantDoBEnd?: string
   informantIdentifier?: string
   compositionType?: string[]
+  groomFirstNames?: string
+  groomFamilyName?: string
+  groomDoB?: string
+  groomDoBStart?: string
+  groomDoBEnd?: string
+  brideFirstNames?: string
+  brideFamilyName?: string
+  brideDoB?: string
+  brideDoBStart?: string
+  brideDoBEnd?: string
+  dateOfMarriage?: string
 }
 
 export interface ISearchCriteria {

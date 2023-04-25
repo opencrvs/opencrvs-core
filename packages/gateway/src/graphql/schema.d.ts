@@ -442,6 +442,17 @@ export interface GQLAdvancedSearchParametersInput {
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
   deceasedIdentifier?: string
+  groomFirstNames?: string
+  groomFamilyName?: string
+  groomDoB?: string
+  groomDoBStart?: string
+  groomDoBEnd?: string
+  brideFirstNames?: string
+  brideFamilyName?: string
+  brideDoB?: string
+  brideDoBStart?: string
+  brideDoBEnd?: string
+  dateOfMarriage?: string
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
