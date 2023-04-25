@@ -237,6 +237,7 @@ services:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
+      - './infrastructure/elasticsearch/jvm.options:/usr/share/elasticsearch/config/jvm.options.d/jvm.options'
     deploy:
       resources:
         limits:
@@ -256,7 +257,6 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - xpack.security.authc.api_key.enabled=true
-      - 'ES_JAVA_OPTS=-Xms4g -Xmx4g'
     ports:
       - 9200:9200
     networks:
