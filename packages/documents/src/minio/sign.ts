@@ -17,7 +17,8 @@ import {
   MINIO_SECRET_KEY,
   MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND,
   MINIO_URL,
-  MINIO_PROTOCOL
+  MINIO_PROTOCOL,
+  MINIO_BUCKET
 } from './constants'
 
 export function signFileUrl(path: string) {
@@ -28,7 +29,7 @@ export function signFileUrl(path: string) {
       },
       protocol: MINIO_PROTOCOL,
       method: 'GET',
-      path: `/ocrvs/${path}`
+      path: `/${MINIO_BUCKET}/${path}`
     },
     MINIO_ACCESS_KEY,
     MINIO_SECRET_KEY,
