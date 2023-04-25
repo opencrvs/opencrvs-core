@@ -417,6 +417,7 @@ export interface GQLAdvancedSearchParametersInput {
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
+  recordId?: string
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
