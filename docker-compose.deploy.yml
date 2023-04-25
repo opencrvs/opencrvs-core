@@ -275,6 +275,7 @@ services:
       - MINIO_SERVER_URL=http://minio:443
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
     ports:
+      - '443:443'
       - '9001:9001'
     volumes:
       - '/data/minio:/data'
