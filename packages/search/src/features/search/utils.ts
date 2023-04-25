@@ -620,6 +620,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.recordId) {
+    must.push({
+      match: {
+        _id: params.recordId
+      }
+    })
+  }
+
   if (params.nationalId) {
     must.push({
       bool: {

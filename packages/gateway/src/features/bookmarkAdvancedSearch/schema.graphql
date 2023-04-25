@@ -88,6 +88,7 @@ input AdvancedSearchParametersInput {
   nationalId: String
   registrationNumber: String
   trackingId: String
+  recordId: ID
   dateOfRegistration: String
   dateOfRegistrationStart: String
   dateOfRegistrationEnd: String
