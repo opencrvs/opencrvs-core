@@ -274,9 +274,9 @@ services:
       - MINIO_DOMAIN=minio.{{hostname}}
       - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
-    ports:
-      - '9000:9000'
-      - '9001:9001'
+    expose:
+      - 9000
+      - 9001
     volumes:
       - '/data/minio:/data'
     command: server --console-address ":9001" /data
