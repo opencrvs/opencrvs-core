@@ -101,7 +101,7 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('blocks requests signed with wrong algorithm (HS512)', async () => {
+  it('blocks requests signed with wrong algorithm (RS384)', async () => {
     const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS384',
