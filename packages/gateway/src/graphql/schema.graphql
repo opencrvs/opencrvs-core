@@ -550,6 +550,7 @@ input AdvancedSearchParametersInput {
   nationalId: String
   registrationNumber: String
   trackingId: String
+  recordId: ID
   dateOfRegistration: String
   dateOfRegistrationStart: String
   dateOfRegistrationEnd: String
@@ -575,6 +576,17 @@ input AdvancedSearchParametersInput {
   deceasedDoBStart: String
   deceasedDoBEnd: String
   deceasedIdentifier: String
+  groomFirstNames: String
+  groomFamilyName: String
+  groomDoB: String
+  groomDoBStart: String
+  groomDoBEnd: String
+  brideFirstNames: String
+  brideFamilyName: String
+  brideDoB: String
+  brideDoBStart: String
+  brideDoBEnd: String
+  dateOfMarriage: String
   motherFirstNames: String
   motherFamilyName: String
   motherDoB: String
