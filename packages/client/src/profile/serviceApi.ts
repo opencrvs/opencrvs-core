@@ -53,7 +53,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const sendVerifyCode = (data: ISendVerifyCodeData) => {
   return request<ISendVerifyCodeResponse>({
-    url: new URL(window.config.API_GATEWAY_URL, 'sendVerifyCode').toString(),
+    url: new URL('sendVerifyCode', window.config.API_GATEWAY_URL).toString(),
     method: 'POST',
     data
   })
