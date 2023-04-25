@@ -10,23 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND } from '@documents/constants'
-import { minioClient } from '@documents/minio/client'
-import { MINIO_BUCKET } from '@documents/minio/constants'
+import { signFileUrl } from '@documents/minio/sign'
 import * as Hapi from '@hapi/hapi'
 
-export async function createPreSignedUrl(
+export function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as { fileName: string }
   try {
-    const presignedURL = await minioClient.presignedGetObject(
-      MINIO_BUCKET,
-      payload.fileName,
-      MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND
-    )
-    return h.response({ presignedURL: presignedURL }).code(200)
+    const presignedURL = signFileUrl(payload.fileName)
+    return h.response({ presignedURL }).code(200)
   } catch (error) {
     return h.response(error).code(400)
   }
