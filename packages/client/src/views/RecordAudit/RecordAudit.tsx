@@ -351,6 +351,7 @@ function RecordAuditBody({
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -566,7 +567,7 @@ function RecordAuditBody({
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
-      <BackButtonDiv>
+      <BackButtonDiv key="go-back">
         <BackButton onClick={() => goBack()}>
           <BackArrow />
         </BackButton>

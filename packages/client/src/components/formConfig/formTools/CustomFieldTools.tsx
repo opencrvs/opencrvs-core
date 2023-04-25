@@ -1119,10 +1119,15 @@ class CustomFieldToolsComp extends React.Component<
           }
         ],
         CSVUploaderModalActions: [
-          <Button onClick={this.closeCSVUploadModal.bind(this)} type="tertiary">
+          <Button
+            key="cancel-button"
+            onClick={this.closeCSVUploadModal.bind(this)}
+            type="tertiary"
+          >
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <CFileSelectLink
+            key="upload-data-source"
             id="upload-data-source"
             accept=".csv"
             handleFileChange={this.onFileChangeHandler.bind(this)}

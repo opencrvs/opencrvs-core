@@ -640,7 +640,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.hasChangesBeenMade = false
   }
 
@@ -696,6 +696,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let sectionElement: HTMLElement
     let activeSection = this.state.activeSection
 
+    // TODO: Refactor "findDOMNode" away, as it's deprecated
+    // eslint-disable-next-line react/no-find-dom-node
     const node = findDOMNode(this) as HTMLElement
 
     this.docSections.forEach((section: IFormSection) => {
