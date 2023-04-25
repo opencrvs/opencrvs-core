@@ -24,7 +24,8 @@ import {
   markBundleAsRequestedForCorrection,
   validateDeceasedDetails,
   makeTaskAnonymous,
-  markBundleAsIssued
+  markBundleAsIssued,
+  invokeOSIARegistrationNotificationAPI
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -48,7 +49,11 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  FATHER_SECTION_CODE,
+  MOTHER_SECTION_CODE
+} from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
@@ -62,6 +67,18 @@ interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
+}
+
+interface OSIATopicPublicPayload {
+  source: string
+  uin?: string
+  uin1?: string
+  uin2?: string
+}
+
+export type IFullOSIAPayload = OSIATopicPublicPayload & {
+  uuid: string
+  subject: string
 }
 
 async function sendBundleToHearth(
@@ -313,9 +330,27 @@ export async function markEventAsRegisteredCallbackHandler(
     /** pushing registrationNumber on related person's identifier
      *  taking patients as an array because MARRIAGE Event has two types of patient
      */
+
+    const sectionCodes = SECTION_CODE[event]
+    const hasMotherDetails = composition.section?.some(
+      (sec) => sec.code?.coding?.[0]?.code === 'mother-details'
+    )
+    const hasFatherDetails = composition.section?.some(
+      (sec) => sec.code?.coding?.[0]?.code === 'father-details'
+    )
+
+    const modifiedSectionCodes =
+      event === EVENT_TYPE.BIRTH
+        ? [
+            ...sectionCodes,
+            ...(hasMotherDetails ? [MOTHER_SECTION_CODE] : []),
+            ...(hasFatherDetails ? [FATHER_SECTION_CODE] : [])
+          ]
+        : sectionCodes
+
     const patients: fhir.Patient[] = await updatePatientIdentifierWithRN(
       composition,
-      SECTION_CODE[event],
+      modifiedSectionCodes,
       REG_NUMBER_SYSTEM[event],
       registrationNumber
     )
@@ -333,7 +368,38 @@ export async function markEventAsRegisteredCallbackHandler(
     for (const patient of patients) {
       bundle.entry?.push({ resource: patient })
     }
+
     await sendBundleToHearth(bundle)
+    //here we have to set uuid for topic
+    const payload: IFullOSIAPayload = {
+      uuid: '',
+      subject: event === EVENT_TYPE.BIRTH ? 'liveBirth' : event.toLowerCase(),
+      source: 'systemX'
+    }
+
+    bundle.entry?.forEach((patient, index) => {
+      if (patient.resource?.resourceType === 'Patient') {
+        const uinIdentifier = (
+          patient.resource as fhir.Patient
+        ).identifier?.find((identifier) => {
+          return identifier.type === 'OSIA_UIN_VID_NID'
+        })
+
+        if (uinIdentifier) {
+          const uinIndex =
+            event === EVENT_TYPE.MARRIAGE
+              ? index + 1
+              : index === 0
+              ? ''
+              : index + 1
+          payload[`uin${uinIndex}`] = uinIdentifier.value
+        }
+      }
+    })
+
+    //call OSIA for post a notification to a topic asynchronously
+    invokeOSIARegistrationNotificationAPI(payload, request.headers)
+
     //TODO: We have to configure sms and identify informant for marriage event
     if (event !== EVENT_TYPE.MARRIAGE) {
       const phoneNo = await getPhoneNo(task, event)

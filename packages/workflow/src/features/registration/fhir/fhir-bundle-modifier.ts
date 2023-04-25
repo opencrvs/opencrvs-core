@@ -11,6 +11,8 @@
  */
 import {
   EVENT_TYPE,
+  FATHER_SECTION_CODE,
+  MOTHER_SECTION_CODE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
@@ -54,6 +56,7 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { IFullOSIAPayload } from '@workflow/features/registration/handler'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -632,20 +635,25 @@ export async function updatePatientIdentifierWithRN(
       if (!patient.identifier) {
         patient.identifier = []
       }
-      const rnIdentifier = patient.identifier.find(
-        (identifier: { type: string }) => identifier.type === identifierType
-      )
-      if (rnIdentifier) {
-        rnIdentifier.value = registrationNumber
-      } else {
-        patient.identifier.push({
-          // @ts-ignore
-          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-          // type should have CodeableConcept instead of string
-          // Need to fix in both places together along with a script for legacy data update
-          type: identifierType,
-          value: registrationNumber
-        })
+      if (
+        sectionCode !== MOTHER_SECTION_CODE &&
+        sectionCode !== FATHER_SECTION_CODE
+      ) {
+        const rnIdentifier = patient.identifier.find(
+          (identifier: { type: string }) => identifier.type === identifierType
+        )
+        if (rnIdentifier) {
+          rnIdentifier.value = registrationNumber
+        } else {
+          patient.identifier.push({
+            // @ts-ignore
+            // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+            // type should have CodeableConcept instead of string
+            // Need to fix in both places together along with a script for legacy data update
+            type: identifierType,
+            value: registrationNumber
+          })
+        }
       }
       return patient
     })
@@ -796,4 +804,48 @@ export async function validateDeceasedDetails(
     //
   }
   return patient
+}
+
+export async function isIntegratingSystemOSIAEnabled(authHeader: {
+  Authorization: string
+}) {
+  const res = await fetch(`${APPLICATION_CONFIG_URL}integrationConfig`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(`Could not fetch config, ${res.statusText} ${res.status}`)
+  }
+
+  const configResponse: Integration[] | undefined = await res.json()
+
+  const isEnabled = configResponse?.find((integration) => {
+    return integration.name === 'OSIA' && integration.status === statuses.ACTIVE
+  })
+
+  return isEnabled
+}
+
+export function invokeOSIARegistrationNotificationAPI(
+  payload: IFullOSIAPayload,
+  headers: Record<string, string>
+) {
+  try {
+    fetch(`${RESOURCE_SERVICE_URL}osia-topic-notification`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      }
+    })
+  } catch (err) {
+    throw new Error(
+      `Unable to send registration topic notification to OSIA: ${err}`
+    )
+  }
 }

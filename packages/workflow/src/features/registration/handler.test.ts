@@ -1097,6 +1097,8 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [compositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
       [patientMock, { status: 200 }],
       [motherMock, { status: 200 }],
       [JSON.stringify(informantSMSNotificationMock), { status: 200 }]
