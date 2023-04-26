@@ -74,7 +74,11 @@ import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
-import { refresh } from '@metrics/features/performance/viewRefresher'
+import {
+  metabaseDataRefreshHandler,
+  refresh
+} from '@metrics/features/performance/viewRefresher'
+import { PRODUCTION, QA_ENV } from '@metrics/constants'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -97,7 +101,9 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
   // Do not use await for the refresh operation. This operation can take minutes or more.
   // Consider triggering this a task that will be left to be run in the background.
   return (...params: T) => {
-    refresh()
+    if (!PRODUCTION && QA_ENV) {
+      refresh()
+    }
     return handler(...params)
   }
 }
@@ -686,6 +692,15 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/vsExport',
       handler: vsExportHandler,
+      config: {
+        tags: ['api'],
+        auth: false
+      }
+    },
+    {
+      method: 'GET',
+      path: '/refreshMetabaseData',
+      handler: metabaseDataRefreshHandler,
       config: {
         tags: ['api'],
         auth: false
