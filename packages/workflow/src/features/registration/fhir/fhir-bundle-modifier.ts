@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   FATHER_SECTION_CODE,
   MOTHER_SECTION_CODE,
@@ -26,7 +27,8 @@ import {
   getRegStatusCode,
   fetchExistingRegStatusCode,
   updateResourceInHearth,
-  mergePatientIdentifier
+  mergePatientIdentifier,
+  postToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateTrackingIdForEvents,
@@ -57,6 +59,8 @@ import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { IFullOSIAPayload } from '@workflow/features/registration/handler'
+import { triggerEvent } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -169,8 +173,9 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  headers: Record<string, string>
-) {
+  headers: Record<string, string>,
+  token: string
+): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
     await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
@@ -180,8 +185,48 @@ export async function invokeRegistrationValidation(
         ...headers
       }
     })
+    return { bundle }
   } catch (err) {
-    throw new Error(`Unable to send registration for validation: ${err}`)
+    const taskResource = getTaskResource(bundle)
+    const practitioner = await getLoggedInPractitionerResource(token)
+
+    if (
+      !taskResource ||
+      !taskResource.businessStatus ||
+      !taskResource.businessStatus.coding ||
+      !taskResource.businessStatus.coding[0] ||
+      !taskResource.businessStatus.coding[0].code
+    ) {
+      throw new Error('taskResource has no businessStatus code')
+    }
+    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
+
+    const statusReason: fhir.CodeableConcept = {
+      text: BIRTH_REG_NUMBER_GENERATION_FAILED
+    }
+    taskResource.statusReason = statusReason
+    taskResource.lastModified = new Date().toISOString()
+
+    /* setting registration workflow status here */
+    await setupRegistrationWorkflow(
+      taskResource,
+      getTokenPayload(token),
+      RegStatus.REJECTED
+    )
+
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+
+    /* setting lastRegUser here */
+    setupLastRegUser(taskResource, practitioner)
+
+    /* check if the status of any event draft is not published and setting configuration extension*/
+    await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+    await postToHearth(bundle)
+    await triggerEvent(Events.BIRTH_MARK_VOID, bundle, headers)
+
+    return { bundle, regValidationError: true }
   }
 }
 
@@ -663,6 +708,7 @@ export async function updatePatientIdentifierWithRN(
 interface Integration {
   name: string
   status: string
+  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
 }
 
 const statuses = {
@@ -710,7 +756,7 @@ export async function validateDeceasedDetails(
   )
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
-      return integration.name === 'MOSIP'
+      return integration.integratingSystemType === 'MOSIP'
     })[0]
     if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
@@ -755,7 +801,7 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.type === 'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )

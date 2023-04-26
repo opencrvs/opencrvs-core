@@ -49,7 +49,7 @@ import {
   INPROGRESS_STATUS,
   IRetryStatus
 } from '@client/SubmissionController'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { Spinner } from '@opencrvs/components/lib'
 import { EMPTY_STRING } from '@client/utils/constants'
@@ -228,7 +228,7 @@ export function Outbox() {
             ? `${groomName} & ${brideName}`
             : brideName || groomName || EMPTY_STRING
 
-        dateOfEvent = declaration.data?.marriageEvent?.marriageDate.toString()
+        dateOfEvent = declaration.data?.marriageEvent?.marriageDate?.toString()
       }
 
       const statusText = intl.formatMessage(

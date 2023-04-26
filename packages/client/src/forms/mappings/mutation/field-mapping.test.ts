@@ -15,11 +15,17 @@ import {
   longDateTransformer
 } from '@client/forms/mappings/mutation/field-mappings'
 import { IFormField } from '@client/forms'
+import { IdentityIdType } from '@client/utils/gateway'
 
 describe('Mutation FieldMapping', () => {
-  const factory = fieldToIdentityTransformer('id', 'nationalId')
+  const factory = fieldToIdentityTransformer(
+    'id',
+    IdentityIdType.MosipPsutTokenId
+  )
   const expectedResult = {
-    person: { identifier: [{ id: undefined, type: 'nationalId' }] }
+    person: {
+      identifier: [{ id: undefined, type: IdentityIdType.MosipPsutTokenId }]
+    }
   }
   const draftData = {
     person: {}
@@ -49,7 +55,7 @@ describe('Mutation FieldMapping', () => {
       person: {
         identifier: [
           {
-            type: 'nationalId'
+            type: IdentityIdType.MosipPsutTokenId
           }
         ]
       }

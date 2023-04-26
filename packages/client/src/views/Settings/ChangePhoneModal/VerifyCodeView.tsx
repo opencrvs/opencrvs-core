@@ -84,6 +84,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
         <Mutation<ChangePasswordMutation, ChangePhoneMutationVariables>
+          key="change-phone-mutation"
           mutation={changePhoneMutation}
           onCompleted={phoneChangeCompleted}
           onError={() => setErrorOccured(true)}

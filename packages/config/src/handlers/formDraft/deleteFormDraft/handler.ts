@@ -14,10 +14,7 @@ import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 import FormDraft, { validEvent } from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
-import {
-  clearHearthElasticInfluxData,
-  clearQuestionConfigs
-} from '@config/services/formDraftService'
+import { clearQuestionConfigs } from '@config/services/formDraftService'
 
 export interface IDeleteFormDraftPayload {
   event: Event
@@ -30,7 +27,6 @@ export async function deleteFormDraftHandler(
   const { event } = request.payload as IDeleteFormDraftPayload
 
   try {
-    await clearHearthElasticInfluxData(request)
     await Promise.all([
       clearQuestionConfigs(event),
       FormDraft.findOneAndRemove({ event })

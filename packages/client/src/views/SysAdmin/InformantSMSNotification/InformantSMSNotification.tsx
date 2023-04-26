@@ -24,10 +24,8 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
@@ -203,6 +201,7 @@ const InformantNotification = () => {
           {items.map((item: SmsNotification) => {
             return (
               <ListViewItemSimplified
+                key={`${item.name}_label`}
                 label={
                   <Label id={`${item.name}_label`}>
                     {intl.formatMessage(

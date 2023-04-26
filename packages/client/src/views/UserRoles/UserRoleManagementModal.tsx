@@ -190,7 +190,10 @@ export function UserRoleManagementModal(props: IProps) {
         />
         {userRoles.map((item, index) => {
           return (
-            <Stack justifyContent="flex-start">
+            <Stack
+              key={item._id ?? `new-role-${index}`}
+              justifyContent="flex-start"
+            >
               <StyledTextInput
                 id="roleNameInput"
                 value={

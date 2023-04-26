@@ -18,6 +18,7 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
+import { IdentityIdType } from '@client/utils/gateway'
 import { set } from 'lodash'
 
 interface IPersonName {
@@ -94,7 +95,7 @@ export const fieldToIdentifierTransformer =
   }
 
 export const fieldToIdentityTransformer =
-  (identifierField: string, identityType: string) =>
+  (identifierField: string, identityType: IdentityIdType) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -121,6 +122,62 @@ export const fieldToIdentityTransformer =
     }
     return transformedData
   }
+
+export const nidVerificationFieldToIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  fieldToIdentityTransformer('id', IdentityIdType.MosipPsutTokenId)(
+    transformedData,
+    draftData,
+    sectionId,
+    field
+  )
+
+  const sectionData = transformedData[sectionId]
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === IdentityIdType.MosipPsutTokenId
+  )
+
+  if (existingIdentity) {
+    const modifiedFields = draftData[sectionId][
+      'fieldsModifiedByNidUserInfo'
+    ] as string[]
+    existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
+  }
+  return transformedData
+}
+
+export const osiaNidVerificationFieldToIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  fieldToIdentityTransformer('id', IdentityIdType.OsiaUinVidNid)(
+    transformedData,
+    draftData,
+    sectionId,
+    field
+  )
+
+  const sectionData = transformedData[sectionId]
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
+  )
+
+  if (existingIdentity) {
+    const modifiedFields = draftData[sectionId][
+      'fieldsModifiedByNidUserInfo'
+    ] as string[]
+    existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
+  }
+  return transformedData
+}
 
 interface IAddress {
   [key: string]: any

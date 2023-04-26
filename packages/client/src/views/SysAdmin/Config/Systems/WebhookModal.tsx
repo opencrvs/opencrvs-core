@@ -52,10 +52,15 @@ export function WebhookModal({
     <>
       <ResponsiveModal
         actions={[
-          <Button onClick={closeModal} type="secondary">
+          <Button key="close-modal" onClick={closeModal} type="secondary">
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
-          <Button onClick={updatePermissions} type="primary" loading={loading}>
+          <Button
+            key="update-permissions"
+            onClick={updatePermissions}
+            type="primary"
+            loading={loading}
+          >
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}

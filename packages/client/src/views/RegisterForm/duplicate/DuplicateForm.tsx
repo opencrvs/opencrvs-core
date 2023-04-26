@@ -160,6 +160,7 @@ export const DuplicateForm = (props: IProps) => {
             {intl.formatMessage(buttonMessages.cancel)}
           </CancelButton>,
           <Button
+            key="mark-as-duplicate-button"
             id="mark-as-duplicate-button"
             type="negative"
             onClick={() => {
