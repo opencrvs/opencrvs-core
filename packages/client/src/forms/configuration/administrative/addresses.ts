@@ -695,6 +695,12 @@ function getAddressCaseFields(
       options: {
         resource: 'countries'
       },
+      conditionals: [
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('countryPrimary')`
+        }
+      ],
       mapping: {
         template: {
           fieldName: `country${sentenceCase(useCase)}`,
@@ -1246,6 +1252,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalStatePrimary')`
         }
       ],
       mapping: {
@@ -1305,6 +1315,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalDistrictPrimary')`
         }
       ],
       mapping: {
@@ -1364,6 +1378,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalCityPrimary')`
         }
       ],
       mapping: {
@@ -1423,6 +1441,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalAddressLine1Primary')`
         }
       ],
       mapping: {
@@ -1600,6 +1622,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalPostcodePrimary')`
         }
       ],
       mapping: {

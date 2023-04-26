@@ -9,18 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import System from '@user-mgnt/model/system'
+import { pickSystem } from '@user-mgnt/utils/system'
 
-export const VerticalThreeDots = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={40} height={40} fill="none" {...props}>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M21 14a1 1 0 1 0-2 0 1 1 0 0 0 2 0zM21 20a1 1 0 1 0-2 0 1 1 0 0 0 2 0zM21 26a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+export async function getAllSystemsHandler() {
+  const systems = await System.find()
+  return systems.map((system) => pickSystem(system))
+}

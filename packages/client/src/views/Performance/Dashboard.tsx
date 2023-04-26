@@ -15,12 +15,14 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
 import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
-import { goBack } from '@client/navigation'
+import { goBack, goToPerformanceHome } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from '@client/styledComponents'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
+import { useLocation } from 'react-router'
+
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -32,9 +34,25 @@ interface IdashboardView {
   icon?: JSX.Element
 }
 
+interface ILocationState {
+  isNavigatedInsideApp: boolean
+}
+
 export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const location = useLocation<ILocationState>()
+  const handleCrossBar = () => {
+    const navigatedFromInsideApp = Boolean(
+      location.state && location.state.isNavigatedInsideApp
+    )
+    if (navigatedFromInsideApp) {
+      dispatch(goBack())
+    } else {
+      dispatch(goToPerformanceHome())
+    }
+  }
+
   return (
     <>
       <Frame
@@ -46,7 +64,7 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
               <Button
                 type="icon"
                 size="medium"
-                onClick={() => dispatch(goBack())}
+                onClick={() => handleCrossBar()}
               >
                 <Icon name="X" color="primary" />
               </Button>
@@ -56,7 +74,7 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
               <Button
                 type="icon"
                 size="medium"
-                onClick={() => dispatch(goBack())}
+                onClick={() => handleCrossBar()}
               >
                 <Icon name="X" color="primary" />
               </Button>

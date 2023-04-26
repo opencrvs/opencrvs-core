@@ -987,7 +987,7 @@ export enum IdentityIdType {
   DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
   MarriageRegistrationNumber = 'MARRIAGE_REGISTRATION_NUMBER',
-  MosipUintoken = 'MOSIP_UINTOKEN',
+  MosipPsutTokenId = 'MOSIP_PSUT_TOKEN_ID',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
   OsiaUinVidNid = 'OSIA_UIN_VID_NID',
@@ -998,6 +998,7 @@ export enum IdentityIdType {
 }
 
 export type IdentityInput = {
+  fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
   otherType?: InputMaybe<Scalars['String']>
   type?: InputMaybe<IdentityIdType>
@@ -1005,6 +1006,7 @@ export type IdentityInput = {
 
 export type IdentityType = {
   __typename?: 'IdentityType'
+  fieldsModifiedByIdentity?: Maybe<Array<Maybe<Scalars['String']>>>
   id?: Maybe<Scalars['ID']>
   otherType?: Maybe<Scalars['String']>
   type?: Maybe<IdentityIdType>
@@ -1042,6 +1044,12 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export enum IntegratingSystemType {
+  Mosip = 'MOSIP',
+  Osia = 'OSIA',
+  Other = 'OTHER'
 }
 
 export type LabelInput = {
@@ -1614,6 +1622,41 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
+export type OidpUserAddress = {
+  __typename?: 'OIDPUserAddress'
+  city?: Maybe<Scalars['String']>
+  country?: Maybe<Scalars['String']>
+  formatted?: Maybe<Scalars['String']>
+  locality?: Maybe<Scalars['String']>
+  postal_code?: Maybe<Scalars['String']>
+  region?: Maybe<Scalars['String']>
+  street_address?: Maybe<Scalars['String']>
+}
+
+export type OidpUserInfo = {
+  __typename?: 'OIDPUserInfo'
+  address?: Maybe<OidpUserAddress>
+  birthdate?: Maybe<Scalars['String']>
+  email?: Maybe<Scalars['String']>
+  email_verified?: Maybe<Scalars['Boolean']>
+  family_name?: Maybe<Scalars['String']>
+  gender?: Maybe<Scalars['String']>
+  given_name?: Maybe<Scalars['String']>
+  locale?: Maybe<Scalars['String']>
+  middle_name?: Maybe<Scalars['String']>
+  name?: Maybe<Scalars['String']>
+  nickname?: Maybe<Scalars['String']>
+  phone_number?: Maybe<Scalars['String']>
+  phone_number_verified?: Maybe<Scalars['Boolean']>
+  picture?: Maybe<Scalars['String']>
+  preferred_username?: Maybe<Scalars['String']>
+  profile?: Maybe<Scalars['String']>
+  sub: Scalars['String']
+  updated_at?: Maybe<Scalars['Int']>
+  website?: Maybe<Scalars['String']>
+  zoneinfo?: Maybe<Scalars['String']>
+}
+
 export type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
   notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
@@ -1731,6 +1774,7 @@ export type Query = {
   getFormDataset?: Maybe<Array<FormDataset>>
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
+  getOIDPUserInfo?: Maybe<UserInfo>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
@@ -1755,6 +1799,7 @@ export type Query = {
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
+  verifyNationalId?: Maybe<Verification>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
 
@@ -1833,6 +1878,13 @@ export type QueryGetEventsWithProgressArgs = {
 export type QueryGetLocationStatisticsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
+}
+
+export type QueryGetOidpUserInfoArgs = {
+  clientId: Scalars['String']
+  code: Scalars['String']
+  grantType?: InputMaybe<Scalars['String']>
+  redirectUri: Scalars['String']
 }
 
 export type QueryGetRegistrationsListByFilterArgs = {
@@ -1984,6 +2036,13 @@ export type QuerySearchUsersArgs = {
   status?: InputMaybe<Scalars['String']>
   systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type QueryVerifyNationalIdArgs = {
+  birthDate: Scalars['String']
+  firstName: Scalars['String']
+  lastName: Scalars['String']
+  nationalId: Scalars['String']
 }
 
 export type QueryVerifyPasswordByIdArgs = {
@@ -2297,16 +2356,18 @@ export type System = {
   __typename?: 'System'
   _id: Scalars['ID']
   clientId: Scalars['ID']
+  integratingSystemType?: Maybe<IntegratingSystemType>
   name: Scalars['String']
-  settings?: Maybe<Array<WebhookPermission>>
+  settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
 }
 
 export type SystemInput = {
+  integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
-  settings?: InputMaybe<SystemSettings>
+  settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
 }
 
@@ -2342,6 +2403,15 @@ export type SystemSecret = {
 }
 
 export type SystemSettings = {
+  __typename?: 'SystemSettings'
+  dailyQuota?: Maybe<Scalars['Int']>
+  openIdProviderBaseUrl?: Maybe<Scalars['String']>
+  openIdProviderClaims?: Maybe<Scalars['String']>
+  openIdProviderClientId?: Maybe<Scalars['String']>
+  webhook?: Maybe<Array<WebhookPermission>>
+}
+
+export type SystemSettingsInput = {
   dailyQuota?: InputMaybe<Scalars['Int']>
   webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
@@ -2451,6 +2521,13 @@ export type UserIdentifierInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export type UserInfo = {
+  __typename?: 'UserInfo'
+  districtFhirId?: Maybe<Scalars['String']>
+  oidpUserInfo?: Maybe<OidpUserInfo>
+  stateFhirId?: Maybe<Scalars['String']>
+}
+
 export type UserInput = {
   catchmentArea?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   device?: InputMaybe<Scalars['String']>
@@ -2474,6 +2551,12 @@ export type VsExport = {
   fileSize: Scalars['String']
   startDate: Scalars['Date']
   url: Scalars['String']
+}
+
+export type Verification = {
+  __typename?: 'Verification'
+  nationalId: Scalars['String']
+  verified: Scalars['Boolean']
 }
 
 export type VerifyPasswordResult = {
@@ -2633,6 +2716,22 @@ export type QueryRegistrationByIdentifierQuery = {
         familyName?: string | null
       } | null> | null
     } | null
+  } | null
+}
+
+export type VerifyNationalIdQueryVariables = Exact<{
+  nationalId: Scalars['String']
+  firstName: Scalars['String']
+  lastName: Scalars['String']
+  birthDate: Scalars['String']
+}>
+
+export type VerifyNationalIdQuery = {
+  __typename?: 'Query'
+  verifyNationalId?: {
+    __typename?: 'Verification'
+    nationalId: string
+    verified: boolean
   } | null
 }
 
@@ -3544,6 +3643,7 @@ export type FetchBirthRegistrationForReviewQuery = {
           id?: string | null
           type?: IdentityIdType | null
           otherType?: string | null
+          fieldsModifiedByIdentity?: Array<string | null> | null
         } | null> | null
         name?: Array<{
           __typename?: 'HumanName'
@@ -3588,6 +3688,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id?: string | null
         type?: IdentityIdType | null
         otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
       } | null> | null
       address?: Array<{
         __typename?: 'Address'
@@ -3629,6 +3730,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id?: string | null
         type?: IdentityIdType | null
         otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
       } | null> | null
       address?: Array<{
         __typename?: 'Address'
@@ -5517,6 +5619,54 @@ export type MarkEventAsNotDuplicateMutationVariables = Exact<{
 export type MarkEventAsNotDuplicateMutation = {
   __typename?: 'Mutation'
   markEventAsNotDuplicate: string
+}
+
+export type GetOidpUserInfoQueryVariables = Exact<{
+  code: Scalars['String']
+  clientId: Scalars['String']
+  redirectUri: Scalars['String']
+  grantType?: InputMaybe<Scalars['String']>
+}>
+
+export type GetOidpUserInfoQuery = {
+  __typename?: 'Query'
+  getOIDPUserInfo?: {
+    __typename?: 'UserInfo'
+    districtFhirId?: string | null
+    stateFhirId?: string | null
+    oidpUserInfo?: {
+      __typename?: 'OIDPUserInfo'
+      sub: string
+      name?: string | null
+      given_name?: string | null
+      family_name?: string | null
+      middle_name?: string | null
+      nickname?: string | null
+      preferred_username?: string | null
+      profile?: string | null
+      picture?: string | null
+      website?: string | null
+      email?: string | null
+      email_verified?: boolean | null
+      gender?: string | null
+      birthdate?: string | null
+      zoneinfo?: string | null
+      locale?: string | null
+      phone_number?: string | null
+      phone_number_verified?: boolean | null
+      updated_at?: number | null
+      address?: {
+        __typename?: 'OIDPUserAddress'
+        formatted?: string | null
+        street_address?: string | null
+        locality?: string | null
+        region?: string | null
+        postal_code?: string | null
+        city?: string | null
+        country?: string | null
+      } | null
+    } | null
+  } | null
 }
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {
@@ -7738,11 +7888,15 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
-      settings?: Array<{
-        __typename?: 'WebhookPermission'
-        event: string
-        permissions: Array<string>
-      }> | null
+      integratingSystemType?: IntegratingSystemType | null
+      settings?: {
+        __typename?: 'SystemSettings'
+        webhook?: Array<{
+          __typename?: 'WebhookPermission'
+          event: string
+          permissions: Array<string>
+        }> | null
+      } | null
     }
   } | null
 }
@@ -7761,11 +7915,14 @@ export type DeactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
+    } | null
   } | null
 }
 
@@ -7783,11 +7940,14 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
+    } | null
   } | null
 }
 
@@ -7826,11 +7986,14 @@ export type UpdatePermissionsMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    settings?: Array<{
-      __typename?: 'WebhookPermission'
-      event: string
-      permissions: Array<string>
-    }> | null
+    settings?: {
+      __typename?: 'SystemSettings'
+      webhook?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
+    } | null
   } | null
 }
 
@@ -8295,14 +8458,16 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
+          id: string
           name?: string | null
           description?: string | null
           type?: LocationType | null
           address?: {
             __typename?: 'Address'
+            district?: string | null
+            state?: string | null
             city?: string | null
-            districtName?: string | null
-            stateName?: string | null
+            country?: string | null
           } | null
         } | null
         registration?: {
@@ -8349,14 +8514,16 @@ export type FetchRecordDetailsForVerificationQuery = {
         } | null
         eventLocation?: {
           __typename?: 'Location'
+          id: string
           name?: string | null
           description?: string | null
           type?: LocationType | null
           address?: {
             __typename?: 'Address'
+            district?: string | null
+            state?: string | null
             city?: string | null
-            districtName?: string | null
-            stateName?: string | null
+            country?: string | null
           } | null
         } | null
         registration?: {
@@ -8587,6 +8754,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -8874,6 +9042,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null
@@ -9158,6 +9327,7 @@ export type FetchViewRecordByCompositionQuery = {
               __typename?: 'Location'
               name?: string | null
               alias?: Array<string> | null
+              partOf?: string | null
               address?: {
                 __typename?: 'Address'
                 district?: string | null

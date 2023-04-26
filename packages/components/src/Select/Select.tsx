@@ -13,12 +13,14 @@ import * as React from 'react'
 import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
-import { ArrowDownBlue } from '../icons'
+import { Icon } from '../Icon'
+
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
 export interface ISelectOption {
   value: string
   label: string
+  disabled?: boolean
 }
 
 export interface IStyledSelectProps extends Props<ISelectOption> {
@@ -36,7 +38,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <ArrowDownBlue />
+        <Icon name="CaretDown" size="small" color="grey600" />
       </components.DropdownIndicator>
     )
   )
@@ -50,9 +52,11 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     border-radius: 4px;
     height: 40px;
     box-shadow: none;
-    ${({ theme }) => theme.fonts.reg18};
-    padding: 0 8px;
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
+    padding: 0 0 0 8px;
+    border: solid
+      ${({ theme, isDisabled }) =>
+        isDisabled ? theme.colors.grey300 : theme.colors.copy}
+      ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
     &:hover {
@@ -63,6 +67,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     &:focus {
       outline: none;
     }
+  }
+
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.grey400};
   }
 
   .react-select__indicator-separator {
@@ -109,6 +117,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     }
   }
 
+  .react-select__single-value--is-disabled {
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
   .react-select__menu {
     z-index: 2;
     padding: 0;
@@ -150,8 +162,14 @@ export class Select extends React.Component<ISelectProps> {
         components={{ DropdownIndicator }}
         {...this.props}
         onChange={this.change}
+        isDisabled={this.props.disabled}
         isSearchable={this.props.options.length > length}
         value={getSelectedOption(this.props.value, this.props.options)}
+        isOptionDisabled={({ value }: { value: string }) =>
+          this.props.options.some(
+            (option: ISelectOption) => option.value === value && option.disabled
+          )
+        }
       />
     )
   }

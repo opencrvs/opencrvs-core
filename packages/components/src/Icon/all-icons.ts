@@ -45,8 +45,13 @@ export {
   WarningCircle,
   X,
   Activity,
+  CircleWavyCheck,
+  CircleWavyQuestion,
+  ArchiveTray,
   ChartLine,
   ChartBar,
+  Eye,
+  DotsThreeVertical,
   MapPin,
   PaperPlaneTilt
 } from 'phosphor-react'

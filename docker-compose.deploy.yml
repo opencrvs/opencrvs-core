@@ -237,6 +237,7 @@ services:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
+      - './infrastructure/elasticsearch/jvm.options:/usr/share/elasticsearch/config/jvm.options.d/jvm.options'
     deploy:
       resources:
         limits:

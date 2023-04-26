@@ -78,6 +78,21 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     }
   }
 
+  componentDidUpdate(prevProps: IProps) {
+    if (prevProps.options !== this.props.options) {
+      this.setState({
+        selectedOption:
+          typeof this.props.options.selectOptions[0] !== 'undefined'
+            ? this.props.options.selectOptions[0].value
+            : '',
+        selectedDocument:
+          typeof this.props.options.documentOptions[0] !== 'undefined'
+            ? this.props.options.documentOptions[0].value
+            : ''
+      })
+    }
+  }
+
   render() {
     const { options, children, id } = this.props
 

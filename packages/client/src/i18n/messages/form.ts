@@ -1170,7 +1170,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.familyName'
   },
   marriedLastName: {
-    defaultMessage: 'Last name at birth (if different from above)',
+    defaultMessage: 'Married Last name (if different)',
     description: 'Label for married last name text input',
     id: 'form.field.label.marriedLastName'
   },
@@ -1727,7 +1727,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.proofOfGroomsID'
   },
   proofOfBridesID: {
-    defaultMessage: "Proof of Brides's identity",
+    defaultMessage: "Proof of Bride's identity",
     description: 'Label for list item Bride ID Proof',
     id: 'form.field.label.proofOfBridesID'
   },
@@ -2384,6 +2384,46 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Hide',
     description: 'Hide label for accordion component',
     id: 'form.field.hideLabel'
+  },
+  nidNotVerified: {
+    defaultMessage: 'Authenticate',
+    description: 'label for verified nid state',
+    id: 'form.field.nidNotVerified'
+  },
+  nidVerified: {
+    defaultMessage: 'Authenticated',
+    description: 'label for unverified nid state',
+    id: 'form.field.nidVerified'
+  },
+  nidOffline: {
+    defaultMessage:
+      'National ID authentication is currently not available offline.',
+    description:
+      'Label for indicating offline status for the user. NID verification is not currently available offline.',
+    id: 'form.field.nidVerificationOngoing'
+  },
+  nidNotVerifiedReviewSection: {
+    defaultMessage: 'Unauthenticated',
+    description:
+      'Label for indicating unauthenticated status for the a review section',
+    id: 'form.field.nidNotVerifiedReviewSection'
+  },
+  nidVerification: {
+    defaultMessage: 'Verify National ID',
+    description: 'Label for verifying NID button in form',
+    id: 'form.field.nidVerification'
+  },
+  nidLoading: {
+    defaultMessage: 'Loading...',
+    description:
+      "Label for verifying NID button in form when it's fetching data",
+    id: 'form.field.nidLoading'
+  },
+  nidError: {
+    defaultMessage:
+      'There was an error verifying National ID. Please check the national ID, date of birth and name.',
+    description: 'Label when there was an error when verifying National ID',
+    id: 'form.field.nidError'
   }
 }
 

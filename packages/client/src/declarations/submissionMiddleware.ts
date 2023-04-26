@@ -45,6 +45,8 @@ import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutatio
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
 // eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -68,12 +70,17 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
-function getGqlDetails(form: IForm, draft: IDeclaration) {
+function getGqlDetails(
+  form: IForm,
+  draft: IDeclaration,
+  offlineData: IOfflineData
+) {
   const gqlDetails = draftToGqlTransformer(
     form,
     draft.data,
     draft.id,
-    draft.originalData
+    draft.originalData,
+    offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
   return gqlDetails
@@ -144,7 +151,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
-      declaration
+      declaration,
+      getOfflineData(getState())
     )
 
     //then add payment while issue declaration
