@@ -274,9 +274,6 @@ services:
       - MINIO_DOMAIN=minio.{{hostname}}
       - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
-    ports:
-      - '9000:9000'
-      - '9001:9001'
     volumes:
       - '/data/minio:/data'
     command: server --console-address ":9001" /data
@@ -299,6 +296,8 @@ services:
         - 'traefik.http.routers.minio.middlewares=minio-https-redirect'
         - 'traefik.http.middlewares.minio-https-redirect.redirectscheme.scheme=https'
         - 'traefik.http.services.minio.loadbalancer.server.port=9000'
+    networks:
+      - overlay_net
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
