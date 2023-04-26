@@ -299,10 +299,6 @@ services:
         - 'traefik.http.routers.minio.middlewares=minio-https-redirect'
         - 'traefik.http.middlewares.minio-https-redirect.redirectscheme.scheme=https'
         - 'traefik.http.services.minio.loadbalancer.server.port=9000'
-    networks:
-      overlay_net:
-        aliases:
-          - minio.{{hostname}}
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
@@ -736,7 +732,8 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
-      - MINIO_HOST=minio.{{hostname}}
+      - MINIO_URL=minio.{{hostname}}
+      - MINIO_HOST=minio
       - MINIO_PORT=9000
       - MINIO_BUCKET=ocrvs
     networks:
