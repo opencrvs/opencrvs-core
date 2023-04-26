@@ -1727,7 +1727,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.proofOfGroomsID'
   },
   proofOfBridesID: {
-    defaultMessage: "Proof of Brides's identity",
+    defaultMessage: "Proof of Bride's identity",
     description: 'Label for list item Bride ID Proof',
     id: 'form.field.label.proofOfBridesID'
   },
