@@ -197,6 +197,7 @@ function AvatarChangeModalComp({
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
         <Mutation<{ changeAvatar: IImage }, { userId: string; avatar: IImage }>
+          key="change-avatar-mutation"
           mutation={changeAvatarMutation}
           onCompleted={({ changeAvatar: avatar }) => {
             onAvatarChanged(avatar)
