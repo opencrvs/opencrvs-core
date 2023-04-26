@@ -34,7 +34,7 @@
     "packages/components/.storybook/manager-head.html",
     "grafana",
     "packages/scheduler/start.sh",
-    "packages/scheduler/cronTabFiles/*",
+    "packages/scheduler/cronTabFile/*",
     "packages/scheduler/jobs/*",
     ".nvmrc",
     ".idea",

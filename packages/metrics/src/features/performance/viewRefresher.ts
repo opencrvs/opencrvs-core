@@ -26,9 +26,26 @@ import { MongoClient } from 'mongodb'
  * - One that tracks whether an update is in progress
  * - One that tracks if an uodate has been requested after the first update run started
  */
+import * as Hapi from '@hapi/hapi'
 
 let updateInProgress = false
 let nextUpdateRequested = false
+
+export async function metabaseDataRefreshHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    await refresh()
+  } catch (err) {
+    console.error(err)
+  }
+
+  return h.response({
+    message: 'Successfully refreshed metabase data.',
+    statusCode: 200
+  })
+}
 
 export async function refresh() {
   if (updateInProgress) {
