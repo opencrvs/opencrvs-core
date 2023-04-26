@@ -64,6 +64,10 @@ export async function transformBirthBundle(
       nationalIdPermissions.push('supporting-documents')
     }
 
+    if (statusType?.code === 'CERTIFIED') {
+      nationalIdPermissions.push('certificates')
+    }
+
     switch (scope) {
       case 'nationalId':
         return getPermissionsBundle(
