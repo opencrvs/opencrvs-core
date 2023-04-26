@@ -134,6 +134,9 @@ export function executeHandlebarsTemplate(
   )
 
   Handlebars.registerHelper('translateDate', function (date: string) {
+    if (!date) {
+      return ''
+    }
     return formatLongDate(date, intl.locale, 'dd MMMM yyyy')
   })
 
