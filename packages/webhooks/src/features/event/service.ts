@@ -11,11 +11,14 @@
  */
 
 import * as crypto from 'crypto'
-import { FHIR_URL, MINIO_URL } from '@webhooks/constants'
+import {
+  FHIR_URL,
+  MINIO_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from '@webhooks/constants'
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { IAuthHeader } from '@webhooks/features/event/handler'
-import { fromBuffer } from 'file-type'
 
 export function createRequestSignature(
   requestSigningVersion: string,
@@ -45,17 +48,27 @@ export async function transformBirthBundle(
       task.focus.reference as string,
       authHeader
     )
+    const statusType = task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) =>
+        coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    )
+
+    const nationalIdPermissions = [
+      'child-details',
+      'mother-details',
+      'father-details',
+      'informant-details'
+    ]
+
+    if (statusType?.code === 'REGISTERED') {
+      nationalIdPermissions.push('supporting-documents')
+    }
+
     switch (scope) {
       case 'nationalId':
         return getPermissionsBundle(
           bundle,
-          [
-            'child-details',
-            'mother-details',
-            'father-details',
-            'supporting-documents',
-            'informant-details'
-          ],
+          nationalIdPermissions,
           composition,
           authHeader
         )
@@ -93,16 +106,27 @@ export async function transformDeathBundle(
       task.focus.reference as string,
       authHeader
     )
+
+    const statusType = task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) =>
+        coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    )
+
+    const nationalIdPermissions = [
+      'deceased-details',
+      'informant-details',
+      'death-encounter'
+    ]
+
+    if (statusType?.code === 'REGISTERED') {
+      nationalIdPermissions.push('supporting-documents')
+    }
+
     switch (scope) {
       case 'nationalId':
         return getPermissionsBundle(
           bundle,
-          [
-            'deceased-details',
-            'supporting-documents',
-            'informant-details',
-            'death-encounter'
-          ],
+          nationalIdPermissions,
           composition,
           authHeader
         )
@@ -137,7 +161,6 @@ export const getPermissionsBundle = async (
       bundle.entry!.push({ resource })
     }
   })
-
   return bundle
 }
 
@@ -214,11 +237,5 @@ async function getBase64DocumentFromMinio(minioDocumentName: string) {
 
   // convert buffer to base64 string
   const base64String = fileBuffer.toString('base64')
-
-  // get file type from buffer
-  const fileType = await fromBuffer(fileBuffer)
-  if (fileType) {
-    return `data:${fileType.mime};base64,${base64String}`
-  }
-  return `data:application/pdf;base64,${base64String}`
+  return base64String
 }
