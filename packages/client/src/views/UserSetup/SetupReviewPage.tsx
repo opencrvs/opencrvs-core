@@ -164,6 +164,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 title={intl.formatMessage(messages.userSetupReviewHeader)}
                 bottomActionButtons={[
                   <ConfirmButton
+                    key="confirm"
                     id="Confirm"
                     onClick={() => submitActivateUser()}
                   >

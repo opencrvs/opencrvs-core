@@ -203,6 +203,7 @@ const InformantNotification = () => {
           {items.map((item: SmsNotification) => {
             return (
               <ListViewItemSimplified
+                key={`${item.name}_label`}
                 label={
                   <Label id={`${item.name}_label`}>
                     {intl.formatMessage(

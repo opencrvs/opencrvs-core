@@ -289,10 +289,15 @@ class ReviewCertificateActionComponent extends React.Component<
               : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
           }
           actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+            <CustomTertiaryButton
+              key="close-modal"
+              onClick={this.toggleModal}
+              id="close-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton
+              key="print-certificate"
               onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >
