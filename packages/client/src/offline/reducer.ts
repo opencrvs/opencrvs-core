@@ -59,6 +59,7 @@ export interface ILocation {
   jurisdictionType?: string
   type: string
   partOf: string
+  primary?: string
 }
 
 export interface IOfflineData {
