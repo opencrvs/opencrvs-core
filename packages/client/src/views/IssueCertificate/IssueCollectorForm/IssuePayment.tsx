@@ -199,10 +199,15 @@ export const IssuePayment = () => {
           show={showConfirmationModal}
           handleClose={toggleModal}
           actions={[
-            <TertiaryButton onClick={toggleModal} id="close-issue-modal">
+            <TertiaryButton
+              key="close-issue-modal"
+              onClick={toggleModal}
+              id="close-issue-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </TertiaryButton>,
             <Button
+              key="issue-certificate-confirmation"
               onClick={() => readyToIssue()}
               id="issue-certificate-confirmation"
               type={'primary'}

@@ -191,6 +191,7 @@ export const IssueCollectorFormForOthers = ({
       title={intl.formatMessage(issueMessages.collectorDetails)}
       bottomActionButtons={[
         <PrimaryButton
+          key="continue-button"
           id="continue-button"
           onClick={continueButtonHandler}
           disabled={groupHasError(
