@@ -963,7 +963,21 @@ export const birthRegisterForms: ISerializedForm = {
             }
           ]
         }
-      ]
+      ],
+      mapping: {
+        mutation: {
+          operation: 'childOsiaUinToIdentityTransformer'
+        },
+        query: {
+          operation: 'identityToChildOsiaUinTransformer'
+        },
+        template: [
+          {
+            fieldName: 'childOsiaVidNid',
+            operation: 'identityToChildOsiaUinTransformer'
+          }
+        ]
+      }
     },
     {
       id: BirthSection.Informant,

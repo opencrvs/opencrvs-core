@@ -43,6 +43,7 @@ import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { IdentityIdType } from '@client/utils/gateway'
 
 interface IName {
   [key: string]: any
@@ -1042,4 +1043,28 @@ export const plainInputTransformer = (
     }
     transformedData[sectionId][field.name] = queryData[field.name] || ''
   }
+}
+
+export const identityToChildOsiaUinTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  if (queryData[sectionId] && queryData[sectionId].identifier) {
+    const existingIdentity = queryData[sectionId].identifier.find(
+      (identity: fhir.Identifier) =>
+        //@ts-ignore
+        identity.type === IdentityIdType.OsiaUinVidNid
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'childOsiaUin'
+    ] = (existingIdentity && existingIdentity['id']) || EMPTY_STRING
+  }
+
+  return transformedData
 }

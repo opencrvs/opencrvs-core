@@ -990,6 +990,7 @@ export enum IdentityIdType {
   MosipUintoken = 'MOSIP_UINTOKEN',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
+  OsiaUinVidNid = 'OSIA_UIN_VID_NID',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   RefugeeNumber = 'REFUGEE_NUMBER',
@@ -3519,6 +3520,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         firstNames?: string | null
         familyName?: string | null
       } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+      } | null> | null
     } | null
     informant?: {
       __typename?: 'RelatedPerson'
@@ -3677,6 +3683,7 @@ export type FetchBirthRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4381,6 +4388,7 @@ export type FetchDeathRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -5074,6 +5082,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null

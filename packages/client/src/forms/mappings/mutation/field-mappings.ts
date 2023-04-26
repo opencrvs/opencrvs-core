@@ -19,6 +19,7 @@ import {
   IFormFieldMutationMapFunction
 } from '@client/forms'
 import { set } from 'lodash'
+import { IdentityIdType } from '@client/utils/gateway'
 
 interface IPersonName {
   [key: string]: string
@@ -581,3 +582,29 @@ export const longDateTransformer =
 
     return transformedData
   }
+
+export const childOsiaUinToIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string
+) => {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = []
+  }
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      //@ts-ignore
+      identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
+  )
+  if (!existingIdentity) {
+    sectionData.identifier.push({
+      id: draftData[sectionId]['childOsiaUin'],
+      type: IdentityIdType.OsiaUinVidNid
+    })
+  } else {
+    existingIdentity['id'] = draftData[sectionId]['childOsiaUin']
+    existingIdentity.type = IdentityIdType.OsiaUinVidNid
+  }
+  return transformedData
+}
