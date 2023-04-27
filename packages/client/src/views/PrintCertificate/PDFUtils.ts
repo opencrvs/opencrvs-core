@@ -32,8 +32,7 @@ import getDate from 'date-fns/getDate'
 import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import isValid from 'date-fns/isValid'
-import format from 'date-fns/format'
-import { locales, formatLongDate } from '@client/utils/date-formatting'
+import formatDate from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -133,11 +132,35 @@ export function executeHandlebarsTemplate(
     cache
   )
 
-  Handlebars.registerHelper('translateDate', function (date: string) {
-    if (!date) {
+  Handlebars.registerHelper(
+    'translateDatasetValue',
+    function (this: any, dataSetName: string, value: string, ...args) {
+      if (value) {
+        const formDataset = state.offline.offlineData.formConfig?.formDataset
+        const currentDataset = formDataset?.find(
+          (r) => r.fileName === dataSetName
+        )
+        if (currentDataset) {
+          const currentValue = currentDataset.options.find(
+            (r) => r.value === value
+          )
+
+          if (currentValue) {
+            const currentValueLanguage = currentValue.label.find(
+              (r) => r.lang === state.i18n.language
+            )
+            return currentValueLanguage
+              ? intl.formatMessage(currentValueLanguage.descriptor)
+              : ''
+          }
+        }
+      }
       return ''
     }
-    return formatLongDate(date, intl.locale, 'dd MMMM yyyy')
+  )
+
+  Handlebars.registerHelper('translateDate', function (date: string) {
+    return formatDate(new Date(date), 'dd MMMM yyyy')
   })
 
   Handlebars.registerHelper(
