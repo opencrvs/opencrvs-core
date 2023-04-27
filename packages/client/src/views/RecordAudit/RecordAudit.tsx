@@ -347,11 +347,11 @@ function RecordAuditBody({
     declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -567,7 +567,7 @@ function RecordAuditBody({
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
-      <BackButtonDiv>
+      <BackButtonDiv key="go-back">
         <BackButton onClick={() => goBack()}>
           <BackArrow />
         </BackButton>

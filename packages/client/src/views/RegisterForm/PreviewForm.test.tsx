@@ -29,7 +29,7 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_PAGE,
-  HOME
+  REGISTRAR_HOME
 } from '@client/navigation/routes'
 import {
   storeDeclaration,
@@ -120,7 +120,7 @@ describe('when user is previewing the form data', () => {
           })
           it('should redirect to home page', () => {
             app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(history.location.pathname).toBe(HOME)
+            expect(history.location.pathname).toBe(REGISTRAR_HOME)
           })
         })
       })
@@ -229,7 +229,7 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
   describe('when user is in the death review section', () => {
@@ -287,7 +287,7 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -347,7 +347,7 @@ describe('when user is previewing the form data', () => {
         })
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 

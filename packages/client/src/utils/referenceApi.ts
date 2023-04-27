@@ -126,7 +126,16 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
+  /*
+   * This is a temporary fix to merge the config from the config API with the global config object.
+   * Without this questionsTransformer doesn't have the correct window.config.ADMIN_LEVELS value
+   * when the application is loaded with no offline data.
+   * This causes:
+   * - incorrect form fields for address to be shown in the forms
+   * - runtime errors if an implementing country has customized address fields
+   */
   merge(window.config, response.config)
+
   response.formConfig.questionConfig = questionsTransformer(
     response.formConfig.questionConfig
   )
