@@ -132,6 +132,31 @@ export function executeHandlebarsTemplate(
     cache
   )
 
+  Handlebars.registerHelper(
+    'translateDatasetValue',
+    function (this: any, dataSetName: string, value: string, ...args) {
+      if (value) {
+        const formDataset = state.offline.offlineData.formConfig?.formDataset
+        const currentDataset = formDataset?.filter(
+          (r) => r.fileName === dataSetName
+        )
+        if (currentDataset?.length) {
+          const currentValue = currentDataset[0].options.filter(
+            (r) => r.value === value
+          )
+
+          if (currentValue.length) {
+            const currentValueLanguage = currentValue[0].label.filter(
+              (r) => r.lang === state.i18n.language
+            )
+            return currentValueLanguage[0].descriptor.defaultMessage
+          }
+        }
+      }
+      return ''
+    }
+  )
+
   Handlebars.registerHelper('translateDate', function (date: string) {
     return formatDate(new Date(date), 'dd MMMM yyyy')
   })
