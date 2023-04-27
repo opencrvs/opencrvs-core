@@ -11,7 +11,11 @@
  */
 
 import * as crypto from 'crypto'
-import { FHIR_URL } from '@webhooks/constants'
+import {
+  FHIR_URL,
+  MINIO_URL,
+  OPENCRVS_SPECIFICATION_URL
+} from '@webhooks/constants'
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { IAuthHeader } from '@webhooks/features/event/handler'
@@ -35,23 +39,40 @@ export async function transformBirthBundle(
   if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
     throw new Error('Invalid FHIR bundle found')
   }
-  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
+  const task: fhir.Task = bundle.entry.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )?.resource as fhir.Task
+
   if (task && task.focus && task.focus.reference) {
     const composition = await getComposition(
       task.focus.reference as string,
       authHeader
     )
+    const statusType = task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) =>
+        coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    )
+
+    const nationalIdPermissions = [
+      'child-details',
+      'mother-details',
+      'father-details',
+      'informant-details'
+    ]
+
+    if (statusType?.code === 'REGISTERED') {
+      nationalIdPermissions.push('supporting-documents')
+    }
+
+    if (statusType?.code === 'CERTIFIED') {
+      nationalIdPermissions.push('certificates')
+    }
+
     switch (scope) {
       case 'nationalId':
         return getPermissionsBundle(
           bundle,
-          [
-            'child-details',
-            'mother-details',
-            'father-details',
-            'supporting-documents',
-            'informant-details'
-          ],
+          nationalIdPermissions,
           composition,
           authHeader
         )
@@ -79,22 +100,37 @@ export async function transformDeathBundle(
   if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
     throw new Error('Invalid FHIR bundle found')
   }
-  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
+
+  const task: fhir.Task = bundle.entry.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )?.resource as fhir.Task
+
   if (task && task.focus && task.focus.reference) {
     const composition = await getComposition(
       task.focus.reference as string,
       authHeader
     )
+
+    const statusType = task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) =>
+        coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    )
+
+    const nationalIdPermissions = [
+      'deceased-details',
+      'informant-details',
+      'death-encounter'
+    ]
+
+    if (statusType?.code === 'REGISTERED') {
+      nationalIdPermissions.push('supporting-documents')
+    }
+
     switch (scope) {
       case 'nationalId':
         return getPermissionsBundle(
           bundle,
-          [
-            'deceased-details',
-            'supporting-documents',
-            'informant-details',
-            'death-encounter'
-          ],
+          nationalIdPermissions,
           composition,
           authHeader
         )
@@ -129,7 +165,6 @@ export const getPermissionsBundle = async (
       bundle.entry!.push({ resource })
     }
   })
-
   return bundle
 }
 
@@ -179,9 +214,32 @@ async function getResourceBySection(
   // and searched to find which document is the visual identity MOSIP requires.
   const resource = resourceSection.entry[0].reference
   try {
-    return await getFromFhir(`/${resource}`, authHeader)
+    if (sectionCode === 'certificates') {
+      const fhirResponse = (await getFromFhir(
+        `/${resource}`,
+        authHeader
+      )) as fhir.DocumentReference
+      const minioObjectName = fhirResponse.content[0].attachment.data || ''
+      const base64Certificate = await getBase64DocumentFromMinio(
+        minioObjectName
+      )
+      fhirResponse.content[0].attachment.data = base64Certificate
+      return fhirResponse
+    } else {
+      return await getFromFhir(`/${resource}`, authHeader)
+    }
   } catch (error) {
     logger.error(`getting resource by identifer failed with error: ${error}`)
     throw new Error(error)
   }
+}
+
+async function getBase64DocumentFromMinio(minioDocumentName: string) {
+  const minioDocumentURL = new URL(`${minioDocumentName}`, MINIO_URL).toString()
+  const response = await fetch(minioDocumentURL)
+  const fileBuffer = await response.buffer()
+
+  // convert buffer to base64 string
+  const base64String = fileBuffer.toString('base64')
+  return base64String
 }
