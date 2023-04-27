@@ -165,6 +165,29 @@ export function populateCompositionWithID(
   }
 }
 
+export function modifyTaskWithCompositionID(
+  payload: fhir.Bundle,
+  response: fhir.Bundle
+) {
+  const task =
+    payload.entry &&
+    (payload.entry.find((entry) => entry.resource?.resourceType === 'Task')
+      ?.resource as fhir.Task)
+
+  const compositionResponse = response.entry?.find(
+    (entry) =>
+      entry.response &&
+      entry.response.location &&
+      entry.response.location.includes('Composition/')
+  )
+
+  if (task && task.focus && task.focus.reference) {
+    task.focus.reference = `Composition/${
+      compositionResponse?.response?.location?.split('/')[3]
+    }`
+  }
+}
+
 export async function createRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
@@ -464,7 +487,9 @@ export async function markEventAsCertifiedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const hearthResponse = await postToHearth(payload)
+    modifyTaskWithCompositionID(payload, hearthResponse)
+    return hearthResponse
   } catch (error) {
     logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
