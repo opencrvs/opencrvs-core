@@ -644,6 +644,10 @@ export const childOsiaUinToIdentityTransformer = (
   draftData: IFormData,
   sectionId: string
 ) => {
+  if (!draftData[sectionId].childOsiaUin) {
+    return
+  }
+
   const sectionData = transformedData[sectionId]
   if (!sectionData.identifier) {
     sectionData.identifier = []
