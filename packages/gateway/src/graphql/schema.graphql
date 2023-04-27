@@ -1330,6 +1330,7 @@ input RegistrationInput {
   witnessOneSignature: String
   witnessTwoSignature: String
   informantType: InformantType
+  registrationOffice: String
   otherInformantType: String
   contact: String
   contactRelationship: String
