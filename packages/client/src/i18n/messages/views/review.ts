@@ -147,6 +147,11 @@ const messagesToDefine = {
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
     id: 'review.actions.desc.regConfInComp'
   },
+  registerActionDescriptionNotToBeRegisted: {
+    defaultMessage:
+      'Mandatory information is missing. Please add this information so that you can complete the registration process.',
+    id: 'review.actions.desc.regConfNotToBeRegisted'
+  },
   registerActionTitle: {
     defaultMessage: 'Ready to register?',
     id: 'review.actions.title.registerActionTitle'

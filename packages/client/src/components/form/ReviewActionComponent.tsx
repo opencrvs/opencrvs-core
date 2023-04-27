@@ -254,7 +254,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.registerActionDescriptionNotToBeRegisted
             }
           }
         }
@@ -263,10 +263,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.registerActionTitle
+              message: messages.reviewActionToBeRegistredTitle,
+              payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.registerActionDescription
+              message: messages.registerActionDescriptionNotToBeRegisted
             },
             modal: {
               title: {
@@ -324,18 +325,27 @@ class ReviewActionComponent extends React.Component<
     const background = !completeDeclaration
       ? 'error'
       : draftDeclaration
+      ? isValidated
+        ? 'success'
+        : ''
+      : declarationToBeValidated
       ? 'success'
       : ''
+
     const action = declarationToBeRegistered
       ? ACTION.DECLARATION_TO_BE_REGISTERED
       : declarationToBeValidated
       ? ACTION.DECLARATION_TO_BE_VALIDATED
       : ACTION.DECLARATION_TO_BE_DECLARED
 
+    const completionStatus = declarationToBeRegistered
+      ? isValidated
+      : completeDeclaration
+
     const actionContent =
       (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)] &&
         ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
-          .completionStatus[String(completeDeclaration)]) ||
+          .completionStatus[String(completionStatus)]) ||
       null
 
     return !actionContent ? null : (
