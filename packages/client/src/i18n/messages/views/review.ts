@@ -256,13 +256,13 @@ const messagesToDefine = {
   officeSelectLabel: {
     id: 'review.inputs.officeSelect.label',
     defaultMessage: 'Assign a registration office',
-    description: 'Label text for declaration office select component'
+    description: 'Label text for registration office select component'
   },
   officeSelectHelper: {
     id: 'review.inputs.officeSelect.helper',
     defaultMessage:
       'Select the office that this declaration should be sent to for review',
-    description: 'Helper text for declaration office select component'
+    description: 'Helper text for registration office select component'
   }
 }
 

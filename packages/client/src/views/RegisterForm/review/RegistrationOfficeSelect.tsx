@@ -17,11 +17,13 @@ import { InputField } from '@client/components/form/InputField'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
 
-interface IDeclarationOfficeSelectProps {
+interface IRegistrationOfficeSelectProps {
   value: string
   onChange: (value: string) => void
 }
-export function DeclarationOfficeSelect(props: IDeclarationOfficeSelectProps) {
+export function RegistrationOfficeSelect(
+  props: IRegistrationOfficeSelectProps
+) {
   const offlineData = useSelector(getOfflineData)
   const offices = offlineData.offices
   const primaryOffices = Object.values(offices)
@@ -33,7 +35,7 @@ export function DeclarationOfficeSelect(props: IDeclarationOfficeSelectProps) {
   const intl = useIntl()
   return (
     <InputField
-      id="declaration-office-select"
+      id="registration-office-select"
       label={intl.formatMessage(messages.officeSelectLabel)}
       helperText={intl.formatMessage(messages.officeSelectHelper)}
       touched

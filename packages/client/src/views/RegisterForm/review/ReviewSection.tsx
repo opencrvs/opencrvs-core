@@ -151,7 +151,7 @@ import {
   SignatureInputProps
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
-import { DeclarationOfficeSelect } from './DeclaratationOfficeSelect'
+import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 import { UserDetails } from '@client/utils/userUtils'
 
@@ -1750,8 +1750,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
     }
 
-    const declarationOffice =
-      (declaration.data.registration?.declarationOffice as string) ||
+    const registrationOffice =
+      (declaration.data.registration?.registrationOffice as string) ||
       this.props.user?.primaryOffice?.id ||
       ''
 
@@ -1985,12 +1985,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 {isReviewDeclaration && this.userHasDeclareScope() && (
                   <InputWrapper>
                     <SubSectionDivider label=""></SubSectionDivider>
-                    <DeclarationOfficeSelect
-                      value={declarationOffice}
+                    <RegistrationOfficeSelect
+                      value={registrationOffice}
                       onChange={(value: string) => {
                         this.props.onChangeReviewForm &&
                           this.props.onChangeReviewForm(
-                            { declarationOffice: value },
+                            { registrationOffice: value },
                             registrationSection,
                             declaration
                           )
