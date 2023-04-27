@@ -236,7 +236,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.reviewActionToBeRegistredTitle,
               payload: { completeDeclaration: true }
             },
             description: {
@@ -250,7 +250,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.reviewActionToBeRegistredTitle,
               payload: { completeDeclaration: false }
             },
             description: {
@@ -317,6 +317,10 @@ class ReviewActionComponent extends React.Component<
       intl
     } = this.props
 
+    const isValidated = declarationToBeRegistered
+      ? declaration.registrationStatus === EVENT_STATUS.VALIDATED
+      : declarationToBeValidated
+
     const background = !completeDeclaration
       ? 'error'
       : draftDeclaration
@@ -333,10 +337,6 @@ class ReviewActionComponent extends React.Component<
         ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
           .completionStatus[String(completeDeclaration)]) ||
       null
-
-    const isValidated =
-      declaration.registrationStatus === EVENT_STATUS.VALIDATED &&
-      declarationToBeRegistered
 
     return !actionContent ? null : (
       <Container id={id}>

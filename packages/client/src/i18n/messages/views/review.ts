@@ -194,6 +194,12 @@ const messagesToDefine = {
     description: 'Title for review action component',
     id: 'review.actions.title.declarationStatus'
   },
+  reviewActionToBeRegistredTitle: {
+    defaultMessage:
+      'Declaration {completeDeclaration, select, true {complete} false {has not been reviewed by Registration Agent}}',
+    description: 'Title for review action component',
+    id: 'review.actions.title.declarationStatusToBeRegistred'
+  },
   reviewName: {
     defaultMessage: 'Review',
     description: 'Form section name for Review',
