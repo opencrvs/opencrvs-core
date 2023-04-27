@@ -186,7 +186,6 @@ export async function createRegistrationHandler(
     ) {
       options = { ignoreModifyRegLastLocation: true }
     }
-    console.log('options in workflow', JSON.stringify(options))
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
       token,
