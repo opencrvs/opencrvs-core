@@ -30,10 +30,14 @@ import {
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
   DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
+  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  OPENCRVS_SPECIFICATION_URL
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  getTaskResource,
+  selectOrCreateTaskRefResource
+} from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
 interface INotificationPayload {
@@ -622,4 +626,11 @@ function isInformantSMSNotificationEnabled(
     (notification) => notification.name === name
   )?.enabled
   return Boolean(isNotificationEnabled)
+}
+
+export function hasTaskRegLastOffice(bundle: fhir.Bundle) {
+  const taskResource = selectOrCreateTaskRefResource(bundle)
+  return taskResource.extension?.some(
+    (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+  )
 }

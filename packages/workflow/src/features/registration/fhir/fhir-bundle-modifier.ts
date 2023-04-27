@@ -58,9 +58,13 @@ export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
 
+interface ModifyBundleOptions {
+  ignoreModifyRegLastLocation: boolean
+}
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
-  token: string
+  token: string,
+  options?: Partial<ModifyBundleOptions>
 ): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
@@ -91,8 +95,10 @@ export async function modifyRegistrationBundle(
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  if (!isEventNotification(fhirBundle)) {
+  if (
+    !isEventNotification(fhirBundle) &&
+    !options?.ignoreModifyRegLastLocation
+  ) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
