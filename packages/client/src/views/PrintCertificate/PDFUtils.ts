@@ -137,19 +137,21 @@ export function executeHandlebarsTemplate(
     function (this: any, dataSetName: string, value: string, ...args) {
       if (value) {
         const formDataset = state.offline.offlineData.formConfig?.formDataset
-        const currentDataset = formDataset?.filter(
+        const currentDataset = formDataset?.find(
           (r) => r.fileName === dataSetName
         )
-        if (currentDataset?.length) {
-          const currentValue = currentDataset[0].options.filter(
+        if (currentDataset) {
+          const currentValue = currentDataset.options.find(
             (r) => r.value === value
           )
 
-          if (currentValue.length) {
-            const currentValueLanguage = currentValue[0].label.filter(
+          if (currentValue) {
+            const currentValueLanguage = currentValue.label.find(
               (r) => r.lang === state.i18n.language
             )
-            return currentValueLanguage[0].descriptor.defaultMessage
+            return currentValueLanguage
+              ? intl.formatMessage(currentValueLanguage.descriptor)
+              : ''
           }
         }
       }
