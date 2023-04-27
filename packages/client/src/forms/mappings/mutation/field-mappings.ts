@@ -170,10 +170,11 @@ export const osiaNidVerificationFieldToIdentityTransformer = (
       identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
   )
 
-  if (existingIdentity) {
-    const modifiedFields = draftData[sectionId][
-      'fieldsModifiedByNidUserInfo'
-    ] as string[]
+  const modifiedFields = draftData[sectionId][
+    'fieldsModifiedByNidUserInfo'
+  ] as string[]
+
+  if (existingIdentity && modifiedFields) {
     existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
   }
   return transformedData
