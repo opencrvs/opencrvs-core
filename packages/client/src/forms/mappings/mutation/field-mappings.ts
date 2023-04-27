@@ -20,7 +20,6 @@ import {
 } from '@client/forms'
 import { IdentityIdType } from '@client/utils/gateway'
 import { set } from 'lodash'
-import { IdentityIdType } from '@client/utils/gateway'
 
 interface IPersonName {
   [key: string]: string
