@@ -36,7 +36,8 @@
     "packages/scheduler/cronTabFile/*",
     "packages/scheduler/jobs/*",
     ".nvmrc",
-    ".idea"
+    ".idea",
+    "infrastructure/elasticsearch/jvm.options"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
