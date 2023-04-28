@@ -332,6 +332,8 @@ class ReviewActionComponent extends React.Component<
         : ''
       : declarationToBeValidated
       ? 'success'
+      : draftDeclaration
+      ? 'success'
       : ''
 
     const action = declarationToBeRegistered
