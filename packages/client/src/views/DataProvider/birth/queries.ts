@@ -26,6 +26,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         gender
+        identifier {
+          id
+          type
+        }
       }
       informant {
         id
