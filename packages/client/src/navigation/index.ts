@@ -86,7 +86,7 @@ import {
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IWORKQUEUE_TAB } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { UserDetails } from '@client/utils/userUtils'
@@ -228,7 +228,7 @@ export function goToApplicationConfig() {
 }
 
 export function goToHomeTab(
-  tabId: IWORKQUEUE_TABS,
+  tabId: IWORKQUEUE_TAB,
   selectorId = '',
   pageId = 1
 ) {
