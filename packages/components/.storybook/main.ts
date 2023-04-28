@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { mergeConfig } from 'vite';
+import remarkGfm from 'remark-gfm';
+import type { StorybookConfig } from '@storybook/react-vite';
+import BRAND_BLUE from './theme'
 
-const { mergeConfig } = require('vite')
-
-const BRAND_BLUE =
-  '#0058E0' /* See `theme.js`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
-
-const viteFinal = async (config) => {
+const viteFinal = async (config: Record<string, any>) => {
   // return the customized config
   return mergeConfig(config, {
     // customize the Vite config here
@@ -30,30 +29,34 @@ const viteFinal = async (config) => {
     }
   })
 }
-
-module.exports = {
+const config: StorybookConfig = {
   viteFinal,
   stories: [
     '../@(src|stories)/**/*.stories.mdx',
     '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
   ],
-  core: { builder: '@storybook/builder-vite' },
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
-    '@storybook/addon-a11y'
+    '@storybook/addon-a11y',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          }
+        }
+      }
+    }
   ],
   staticDirs: ['../public'],
-  framework: '@storybook/react',
-
-  managerHead: (head) => {
-    return `${head}
-    <link rel="icon" href="favicon.png" />
-    <style type="text/css">
-      #storybook-explorer-tree .sidebar-item[data-selected=false] svg {
-        color: ${BRAND_BLUE};
-      }
-    </style>
-    `
+  framework: {
+    name: '@storybook/react-vite',
+    options: {}
+  },
+  docs: {
+    autodocs: true
   }
 }
+export default config

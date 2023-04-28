@@ -1,4 +1,4 @@
-FROM node:erbium-alpine
+FROM node:gallium-alpine
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
