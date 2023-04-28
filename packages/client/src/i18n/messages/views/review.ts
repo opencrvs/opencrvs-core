@@ -147,10 +147,10 @@ const messagesToDefine = {
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
     id: 'review.actions.desc.regConfInComp'
   },
-  registerActionDescriptionNotToBeRegisted: {
+  registerActionDescriptionNotToBeRegistered: {
     defaultMessage:
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
-    id: 'review.actions.desc.regConfNotToBeRegisted'
+    id: 'review.actions.desc.regConfNotToBeRegistered'
   },
   registerActionTitle: {
     defaultMessage: 'Ready to register?',
@@ -199,11 +199,11 @@ const messagesToDefine = {
     description: 'Title for review action component',
     id: 'review.actions.title.declarationStatus'
   },
-  reviewActionToBeRegistredTitle: {
+  reviewActionToBeRegisteredTitle: {
     defaultMessage:
       'Declaration {completeDeclaration, select, true {complete} false {has not been reviewed by Registration Agent}}',
     description: 'Title for review action component',
-    id: 'review.actions.title.declarationStatusToBeRegistred'
+    id: 'review.actions.title.declarationStatusToBeRegistered'
   },
   reviewName: {
     defaultMessage: 'Review',
