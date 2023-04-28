@@ -947,7 +947,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     return (
       !conditionalActions.includes('hide') &&
-      !conditionalActions.includes('disable')
+      !conditionalActions.includes('disable') &&
+      !conditionalActions.includes('hideInPreview')
     )
   }
 
