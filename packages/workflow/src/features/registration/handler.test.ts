@@ -161,6 +161,12 @@ describe('Verify handler', () => {
       )
     })
     it('returns OK for a correctly authenticated user  with birth declaration', async () => {
+      fetch.resetMocks()
+      fetch.mockResponses(
+        [userMock, { status: 200 }],
+        [fieldAgentPractitionerMock, { status: 200 }]
+      )
+
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -556,6 +562,11 @@ describe('Verify handler', () => {
     })
 
     it('generates a new tracking id and repeats the request if a 409 is received from hearth', async () => {
+      fetch.resetMocks()
+      fetch.mockResponses(
+        [userMock, { status: 200 }],
+        [fieldAgentPractitionerMock, { status: 200 }]
+      )
       fetch.mockResponses(
         ['', { status: 409 }],
         ['', { status: 409 }],

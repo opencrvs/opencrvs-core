@@ -109,7 +109,7 @@ import {
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
@@ -151,6 +151,9 @@ import {
   SignatureInputProps
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
+import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
+import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -296,6 +299,7 @@ interface IProps {
   ) => void
   scope: Scope | null
   offlineCountryConfiguration: IOfflineData
+  user: UserDetails | null
   language: string
   onChangeReviewForm?: onChangeReviewForm
   onContinue?: () => void
@@ -930,6 +934,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   userHasValidateScope() {
     if (this.props.scope) {
       return this.props.scope && this.props.scope.includes('validate')
+    } else {
+      return false
+    }
+  }
+
+  userHasDeclareScope() {
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('declare')
     } else {
       return false
     }
@@ -1740,6 +1752,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
     }
 
+    const registrationOffice =
+      (declaration.data.registration?.registrationOffice as string) ||
+      this.props.user?.primaryOffice?.id ||
+      ''
+
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
@@ -1863,6 +1880,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
       }
     }
+    const isReviewDeclaration =
+      !isCorrection(declaration) && !isDuplicate && !viewRecord
 
     return (
       <FullBodyContent>
@@ -1963,10 +1982,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputWrapper>
                 )}
 
-                {!isCorrection(declaration) &&
-                  !isDuplicate &&
-                  !viewRecord &&
+                {isReviewDeclaration &&
                   getSignature(declaration?.event as Event)}
+                {isReviewDeclaration && this.userHasDeclareScope() && (
+                  <InputWrapper>
+                    <SubSectionDivider label=""></SubSectionDivider>
+                    <RegistrationOfficeSelect
+                      value={registrationOffice}
+                      onChange={(value: string) => {
+                        this.props.onChangeReviewForm &&
+                          this.props.onChangeReviewForm(
+                            { registrationOffice: value },
+                            registrationSection,
+                            declaration
+                          )
+                      }}
+                    />
+                  </InputWrapper>
+                )}
                 {totalFileSizeExceeded && (
                   <Alert type="warning">
                     {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
@@ -2167,7 +2200,8 @@ export const ReviewSection = connect(
     documentsSection: getBirthSection(state, BirthSection.Documents),
     scope: getScope(state),
     offlineCountryConfiguration: getOfflineData(state),
-    language: getLanguage(state)
+    language: getLanguage(state),
+    user: getUserDetails(state)
   }),
   { goToPageGroup, writeDeclaration }
 )(injectIntl(ReviewSectionComp))

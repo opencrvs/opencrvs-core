@@ -38,7 +38,8 @@ import {
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  hasTaskRegLastOffice
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -171,9 +172,24 @@ export async function createRegistrationHandler(
 ): Promise<{ resBundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
     const token = getToken(request)
+    let options
+    if (
+      [
+        Events.BIRTH_IN_PROGRESS_DEC,
+        Events.DEATH_IN_PROGRESS_DEC,
+        Events.MARRIAGE_IN_PROGRESS_DEC,
+        Events.BIRTH_NEW_DEC,
+        Events.DEATH_NEW_DEC,
+        Events.MARRIAGE_NEW_DEC
+      ].includes(event) &&
+      hasTaskRegLastOffice(request.payload as fhir.Bundle)
+    ) {
+      options = { ignoreModifyRegLastLocation: true }
+    }
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      token
+      token,
+      options
     )
     if (
       [

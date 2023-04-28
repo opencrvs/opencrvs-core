@@ -785,6 +785,24 @@ function createInformantsSignature(
   })
 }
 
+function createOrUpdateRegLastOffice(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  const url = `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+  const regLastOfficeExtension = resource.extension.find(
+    (extension) => extension.url === url
+  )
+  if (regLastOfficeExtension?.valueReference) {
+    regLastOfficeExtension.valueReference.reference = `Location/${fieldValue}`
+  } else {
+    resource.extension.push({
+      url,
+      valueReference: { reference: `Location/${fieldValue}` }
+    })
+  }
+}
+
 function createInformantShareContactNumber(
   resource: fhir.Task,
   fieldValue: string
@@ -3790,6 +3808,14 @@ export const builders: IFieldBuilders = {
         }
         certDocResource.content[0].attachment.data = fieldValue
       }
+    },
+    registrationOffice: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      createOrUpdateRegLastOffice(taskResource, fieldValue)
     }
   },
   questionnaire: createQuestionnaireBuilder(),
