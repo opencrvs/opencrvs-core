@@ -294,6 +294,7 @@ export interface GQLUser {
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
+  primaryFacilityId?: string
   catchmentArea?: Array<GQLLocation>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
@@ -638,6 +639,7 @@ export interface GQLUserInput {
   catchmentArea?: Array<string | null>
   device?: string
   signature?: GQLSignatureInput
+  primaryFacilityId?: string
 }
 
 export interface GQLSecurityQuestionAnswer {
@@ -4990,6 +4992,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
+  primaryFacilityId?: UserToPrimaryFacilityIdResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
@@ -5103,6 +5106,15 @@ export interface UserToUnderInvestigationResolver<
 }
 
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserToPrimaryFacilityIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

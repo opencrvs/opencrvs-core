@@ -143,6 +143,7 @@ export interface IUser {
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar
   searches?: ISearch[]
+  primaryFacilityId?: string
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -303,6 +304,7 @@ const userSchema = new Schema({
   role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
+  primaryFacilityId: { type: String, required: false },
   catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], required: true },
   status: {

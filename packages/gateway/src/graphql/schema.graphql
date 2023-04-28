@@ -428,6 +428,7 @@ type User {
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
+  primaryFacilityId: String
   catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
@@ -759,6 +760,7 @@ input UserInput {
   catchmentArea: [String]
   device: String
   signature: SignatureInput
+  primaryFacilityId: String
 }
 
 input SecurityQuestionAnswer {

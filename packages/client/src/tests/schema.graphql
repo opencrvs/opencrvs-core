@@ -575,6 +575,7 @@ input UserInput {
   type: String
   email: String
   primaryOffice: String
+  primaryFacilityId: String
   catchmentArea: [String]
   device: String
   signature: SignatureInput

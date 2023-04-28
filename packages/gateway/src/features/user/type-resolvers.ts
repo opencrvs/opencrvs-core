@@ -94,6 +94,7 @@ export interface IUserPayload
   systemRole: string
   role: string
   signature?: GQLSignatureInput
+  primaryFacilityId?: string
 }
 
 export interface IUserSearchPayload {
