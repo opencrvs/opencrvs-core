@@ -409,6 +409,7 @@ function RegistrationListComponent(props: IProps) {
                     ? getName(result.registrarPractitioner.name, 'en')
                     : ''
                 }
+                avatar={result.registrarPractitioner.avatar}
               />
               <Link
                 font="bold14"
