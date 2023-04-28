@@ -1301,8 +1301,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    if (field.name === 'primaryAddressSameAsOtherPrimary') return
-    if (!originalData) return false
+    if (!originalData || field.name === 'primaryAddressSameAsOtherPrimary')
+      return false
     if (data[field.name] && (data[field.name] as IFormData).value) {
       return this.hasNestedDataChanged(
         data[field.name] as IFormData,
@@ -2166,27 +2166,24 @@ function fatherDoesNotExistAndStateIsFather(
 
 function addSameAddressValues(draft: IDeclaration) {
   const draftEvent = draft.event
-  let modifier
-  let copyAddressFrom
-  if (draftEvent === 'birth') {
-    modifier = 'father'
-    copyAddressFrom = 'mother'
-  } else if (draftEvent === 'death') {
-    modifier = 'informant'
-    copyAddressFrom = 'deceased'
-  }
+  const modifier =
+    draftEvent === 'birth'
+      ? 'father'
+      : draftEvent === 'death'
+      ? 'informant'
+      : null
 
-  if (!modifier || !copyAddressFrom) return draft
+  if (!modifier) return draft
 
   const isPrimaryAddressSameAsOtherPrimary =
     draft.data[modifier].primaryAddressSameAsOtherPrimary
 
-  const addressNames = getAddressCaseFields(
-    AddressCases.PRIMARY_ADDRESS,
-    true
-  ).map((address) => address.name)
-
   if (isPrimaryAddressSameAsOtherPrimary) {
+    const addressNames = getAddressCaseFields(
+      AddressCases.PRIMARY_ADDRESS,
+      true
+    ).map((address) => address.name)
+
     const modifiedDraft = {
       ...draft,
       data: {
@@ -2194,7 +2191,7 @@ function addSameAddressValues(draft: IDeclaration) {
         ...(modifier === 'father' && {
           father: {
             ...draft.data.father,
-            ...pick(draft.data.father, addressNames)
+            ...pick(draft.data.mother, addressNames)
           }
         }),
         ...(modifier === 'informant' && {
@@ -2205,6 +2202,7 @@ function addSameAddressValues(draft: IDeclaration) {
         })
       }
     }
+    //@ts-ignore
     modifiedDraft.data[modifier].primaryAddressSameAsOtherPrimary = false
     return modifiedDraft
   }
