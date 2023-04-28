@@ -556,6 +556,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     title: user.title,
     mobile: user.mobile as string,
     device: user.device as string,
+    primaryFacilityId: user.primaryFacilityId,
     signature: user.signature
   }
   if (user.id) {

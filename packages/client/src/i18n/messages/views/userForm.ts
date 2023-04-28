@@ -100,6 +100,11 @@ export const messages = {
     description: 'User device',
     id: 'form.field.label.userDevice'
   },
+  userOrganisation: {
+    defaultMessage: 'Organisation',
+    description: 'User organisation',
+    id: 'form.field.label.userOrganisation'
+  },
   userSignatureAttachmentTitle: {
     defaultMessage: 'Attach the signature',
     description: 'Title for user signature attachment',
