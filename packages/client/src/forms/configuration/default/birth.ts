@@ -1345,6 +1345,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: 'mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'hideInPreview',
+                  expression: 'values.detailsExist'
                 }
               ],
               mapping: {
@@ -1898,6 +1902,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: 'fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'hideInPreview',
+                  expression: 'values.detailsExist'
                 }
               ],
               mapping: {

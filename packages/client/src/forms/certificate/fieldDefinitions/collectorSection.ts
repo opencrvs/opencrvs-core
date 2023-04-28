@@ -389,8 +389,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+              expression: 'values.noAffidavitAgreement?.length !== 0'
             }
           ]
         },
@@ -410,8 +409,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+              expression: 'values.affidavitFile !== ""'
             }
           ]
         }
@@ -583,8 +581,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+              expression: 'values.noAffidavitAgreement?.length !== 0'
             }
           ]
         },
@@ -604,8 +601,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+              expression: 'values.affidavitFile !== ""'
             }
           ]
         }
@@ -778,8 +774,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+              expression: 'values.noAffidavitAgreement?.length !== 0'
             }
           ]
         },
@@ -799,8 +794,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+              expression: 'values.affidavitFile !== ""'
             }
           ]
         }

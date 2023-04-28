@@ -12,8 +12,7 @@
 import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
-  MOSIP_TOKEN_SEEDER_URL,
-  APPLICATION_CONFIG_URL
+  MOSIP_TOKEN_SEEDER_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -35,6 +34,11 @@ import {
 import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import {
+  getInformantSMSNotification,
+  InformantSMSNotificationName,
+  isInformantSMSNotificationEnabled
+} from './smsNotificationUtils'
 
 interface INotificationPayload {
   msisdn: string
@@ -42,24 +46,6 @@ interface INotificationPayload {
   trackingId?: string
   crvsOffice?: string
   registrationNumber?: string
-}
-
-enum InformantSMSNotificationName {
-  birthInProgressSMS = 'birthInProgressSMS',
-  birthDeclarationSMS = 'birthDeclarationSMS',
-  birthRegistrationSMS = 'birthRegistrationSMS',
-  birthRejectionSMS = 'birthRejectionSMS',
-  deathInProgressSMS = 'deathInProgressSMS',
-  deathDeclarationSMS = 'deathDeclarationSMS',
-  deathRegistrationSMS = 'deathRegistrationSMS',
-  deathRejectionSMS = 'deathRejectionSMS'
-}
-interface IInformantSMSNotification {
-  _id: string
-  name: InformantSMSNotificationName
-  enabled: boolean
-  updatedAt: number
-  createdAt: number
 }
 export type Composition = fhir.Composition & { id: string }
 export type Patient = fhir.Patient & { id: string }
@@ -592,34 +578,4 @@ export function getPatientBySection(
       }
     })?.resource as fhir.Patient)
   )
-}
-
-async function getInformantSMSNotification(token: string) {
-  try {
-    const informantSMSNotificationURL = new URL(
-      'informantSMSNotification',
-      APPLICATION_CONFIG_URL
-    ).toString()
-    const res = await fetch(informantSMSNotificationURL, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    })
-    return (await res.json()) as IInformantSMSNotification[]
-  } catch (err) {
-    logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
-    throw err
-  }
-}
-
-function isInformantSMSNotificationEnabled(
-  informantSMSNotifications: IInformantSMSNotification[],
-  name: InformantSMSNotificationName
-) {
-  const isNotificationEnabled = informantSMSNotifications.find(
-    (notification) => notification.name === name
-  )?.enabled
-  return Boolean(isNotificationEnabled)
 }

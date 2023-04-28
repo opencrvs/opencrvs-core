@@ -34,7 +34,7 @@ export default {
 
 export const Default = Template.bind({})
 Default.args = {
-  name: 'Globe',
+  name: 'Archive',
   color: 'currentColor',
   size: 'large'
 }
