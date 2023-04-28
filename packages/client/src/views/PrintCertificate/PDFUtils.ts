@@ -28,6 +28,11 @@ import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
+import getDate from 'date-fns/getDate'
+import getMonth from 'date-fns/getMonth'
+import getYear from 'date-fns/getYear'
+import isValid from 'date-fns/isValid'
+import formatDate from '@client/utils/date-formatting'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -78,6 +83,41 @@ export function formatAllNonStringValues(
 }
 
 const cache = createIntlCache()
+/**
+ *
+ * Formats message with a fallback if key not found
+ * @param intl
+ * @param key
+ */
+function formatMessage(intl: IntlShape, key: string) {
+  return intl.formatMessage({
+    id: key,
+    defaultMessage: 'Missing translation for ' + key
+  })
+}
+
+const getNumberInWords = (
+  n: number,
+  tenthKey: string,
+  unitKey: string,
+  intl: IntlShape
+) => {
+  let word = ''
+  let remainder
+  if (n < 20) {
+    if (n > 0) {
+      word = formatMessage(intl, [unitKey, n].join('.'))
+    }
+  } else if (n < 100) {
+    remainder = n % 10
+    word = formatMessage(intl, [tenthKey, Math.floor(n / 10)].join('.'))
+    // In case of remainder, we need to handle it here to be able to add the “-”
+    if (remainder) {
+      word += '-' + formatMessage(intl, [unitKey, remainder].join('.'))
+    }
+  }
+  return word
+}
 
 export function executeHandlebarsTemplate(
   templateString: string,
@@ -91,6 +131,37 @@ export function executeHandlebarsTemplate(
     },
     cache
   )
+
+  Handlebars.registerHelper(
+    'translateDatasetValue',
+    function (this: any, dataSetName: string, value: string, ...args) {
+      if (value) {
+        const formDataset = state.offline.offlineData.formConfig?.formDataset
+        const currentDataset = formDataset?.find(
+          (r) => r.fileName === dataSetName
+        )
+        if (currentDataset) {
+          const currentValue = currentDataset.options.find(
+            (r) => r.value === value
+          )
+
+          if (currentValue) {
+            const currentValueLanguage = currentValue.label.find(
+              (r) => r.lang === state.i18n.language
+            )
+            return currentValueLanguage
+              ? intl.formatMessage(currentValueLanguage.descriptor)
+              : ''
+          }
+        }
+      }
+      return ''
+    }
+  )
+
+  Handlebars.registerHelper('translateDate', function (date: string) {
+    return formatDate(new Date(date), 'dd MMMM yyyy')
+  })
 
   Handlebars.registerHelper(
     'intl',
@@ -141,6 +212,68 @@ export function executeHandlebarsTemplate(
       }
     }
   )
+
+  Handlebars.registerHelper(
+    'dateToWords',
+    function (
+      keys: {
+        century: string
+        tenth: string
+        number: string
+        ordinal: string
+        month: string
+      },
+      dateString: string
+    ) {
+      const translationFileKeys: Array<keyof typeof keys> = [
+        'century',
+        'tenth',
+        'number',
+        'ordinal',
+        'month'
+      ]
+
+      for (const key of translationFileKeys) {
+        if (!keys[key as keyof typeof keys]) {
+          return (
+            'Cannot turn date to words without all translation keys. Missing: ' +
+            key
+          )
+        }
+      }
+
+      const date = new Date(dateString)
+
+      if (!isValid(date)) {
+        return ''
+      }
+      const year = getYear(date)
+      const month = getMonth(date) + 1
+      const dayOfMonth = getDate(date)
+
+      const century = Math.floor(year / 100) * 100
+      const centuryYear = year - century
+
+      const yearMessage = `${formatMessage(
+        intl,
+        [keys.century, century].join('.')
+      )} ${getNumberInWords(centuryYear, keys.tenth, keys.number, intl)}`
+      const monthMessage = formatMessage(intl, [keys.month, month].join('.'))
+      const dayOfMonthMessage = formatMessage(
+        intl,
+        [keys.ordinal, dayOfMonth].join('.')
+      )
+      return [dayOfMonthMessage, monthMessage, yearMessage].join(' ')
+    }
+  )
+
+  Handlebars.registerHelper(
+    'keys',
+    function (options: Handlebars.HelperOptions) {
+      return options.hash
+    }
+  )
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data)
   const output = template(formattedTemplateData)

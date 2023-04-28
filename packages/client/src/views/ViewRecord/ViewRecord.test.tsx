@@ -55,12 +55,12 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
                         __typename: 'Address'
                       },
-                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c',
                       __typename: 'Location'
                     },
                     __typename: 'RegWorkflow'
@@ -72,6 +72,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -88,6 +89,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -104,6 +106,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -120,6 +123,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -136,6 +140,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -152,6 +157,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -168,6 +174,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -184,6 +191,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',
@@ -200,6 +208,7 @@ describe('View Record for loading and success state', () => {
                     office: {
                       name: 'Ibombo District Office',
                       alias: ['Ibombo District Office'],
+                      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
                       address: {
                         district: 'Ibombo District',
                         state: 'Central Province',

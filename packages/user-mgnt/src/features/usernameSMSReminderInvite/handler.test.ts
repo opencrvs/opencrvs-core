@@ -41,6 +41,7 @@ const mockUser: IUser & { _id: string } = {
   mobile: '+8801234567890',
   systemRole: 'LOCAL_REGISTRAR',
   role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
+  title: 'Test user',
   status: 'pending',
   primaryOfficeId: '321',
   practitionerId: '123',

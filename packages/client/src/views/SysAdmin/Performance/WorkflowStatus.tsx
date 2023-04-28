@@ -48,7 +48,11 @@ import {
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import {
+  injectIntl,
+  MessageDescriptor,
+  WrappedComponentProps
+} from 'react-intl'
 import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
@@ -164,7 +168,7 @@ export const StatusMapping: IStatusMapping = {
 
 const statusOptions = [
   {
-    label: constantsMessages.allStatuses,
+    label: constantsMessages.allStatuses as MessageDescriptor,
     value: ''
   }
 ].concat(

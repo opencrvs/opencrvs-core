@@ -119,6 +119,10 @@ export const birthRegisterForms: ISerializedForm = {
                 ]
               },
               mapping: {
+                template: {
+                  fieldName: 'informantType',
+                  operation: 'plainInputTransformer'
+                },
                 mutation: {
                   operation: 'nestedRadioFieldToBundleFieldTransformer',
                   parameters: ['registration.informantType']
@@ -625,9 +629,9 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               mapping: {
                 template: {
-                  operation: 'dateFormatTransformer',
                   fieldName: 'eventDate',
-                  parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  operation: 'fieldValueTransformer',
+                  parameters: ['birthDate']
                 },
                 mutation: {
                   operation: 'longDateTransformer',
@@ -989,13 +993,6 @@ export const birthRegisterForms: ISerializedForm = {
       groups: [
         {
           id: 'informant-view-group',
-          conditionals: [
-            {
-              action: 'hide',
-              expression:
-                "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
-            }
-          ],
           fields: [
             {
               name: 'nationality',
@@ -1011,6 +1008,13 @@ export const birthRegisterForms: ISerializedForm = {
               options: {
                 resource: 'countries'
               },
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1061,7 +1065,13 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['father.iD']
                 }
               ],
-              conditionals: [],
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1111,6 +1121,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               mapping: {
@@ -1159,6 +1174,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               mapping: {
@@ -1196,6 +1216,11 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: '!values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                 }
               ],
               postfix: 'years',
@@ -1215,10 +1240,17 @@ export const birthRegisterForms: ISerializedForm = {
               name: 'firstNamesEng',
               previewGroup: 'informantNameInEnglish',
               type: 'TEXT',
-              label: formMessageDescriptors.firstNames,
+              label: formMessageDescriptors.informantFirstNames,
               maxLength: 32,
               required: true,
               initialValue: '',
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               validator: [
                 {
                   operation: 'englishOnlyNameFormat'
@@ -1261,6 +1293,13 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
+              conditionals: [
+                {
+                  action: 'hide',
+                  expression:
+                    "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                }
+              ],
               validator: [
                 {
                   operation: 'englishOnlyNameFormat'
@@ -1486,9 +1525,9 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               mapping: {
                 template: {
-                  operation: 'dateFormatTransformer',
+                  operation: 'fieldValueTransformer',
                   fieldName: 'motherBirthDate',
-                  parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  parameters: ['birthDate']
                 },
                 mutation: {
                   operation: 'longDateTransformer',
@@ -2043,9 +2082,9 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               mapping: {
                 template: {
-                  operation: 'dateFormatTransformer',
+                  operation: 'fieldValueTransformer',
                   fieldName: 'fatherBirthDate',
-                  parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  parameters: ['birthDate']
                 },
                 mutation: {
                   operation: 'longDateTransformer',

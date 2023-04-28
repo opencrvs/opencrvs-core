@@ -278,7 +278,7 @@ export function Outbox() {
       ...item,
       dateOfEvent:
         item.dateOfEvent && typeof item.dateOfEvent === 'string'
-          ? formatLongDate(item.dateOfEvent)
+          ? formatLongDate(item.dateOfEvent, intl.locale)
           : ''
     }))
   }

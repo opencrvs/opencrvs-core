@@ -33,6 +33,7 @@ const users: UserDetails[] = [
       }
     ],
     username: 'r.tagore',
+    title: 'Test user',
     systemRole: SystemRoleType.RegistrationAgent,
     localRegistrar: {
       name: [
@@ -90,6 +91,7 @@ const users: UserDetails[] = [
       }
     ],
     username: 'np.huq',
+    title: 'Test user',
     systemRole: SystemRoleType.LocalRegistrar,
     role: {
       _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',

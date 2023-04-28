@@ -147,6 +147,11 @@ export type AdvancedSeachParameters = {
 }
 
 export type AdvancedSearchParametersInput = {
+  brideDoB?: InputMaybe<Scalars['String']>
+  brideDoBEnd?: InputMaybe<Scalars['String']>
+  brideDoBStart?: InputMaybe<Scalars['String']>
+  brideFamilyName?: InputMaybe<Scalars['String']>
+  brideFirstNames?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -158,6 +163,7 @@ export type AdvancedSearchParametersInput = {
   dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfEventEnd?: InputMaybe<Scalars['String']>
   dateOfEventStart?: InputMaybe<Scalars['String']>
+  dateOfMarriage?: InputMaybe<Scalars['String']>
   dateOfRegistration?: InputMaybe<Scalars['String']>
   dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
   dateOfRegistrationStart?: InputMaybe<Scalars['String']>
@@ -184,6 +190,11 @@ export type AdvancedSearchParametersInput = {
   fatherFamilyName?: InputMaybe<Scalars['String']>
   fatherFirstNames?: InputMaybe<Scalars['String']>
   fatherIdentifier?: InputMaybe<Scalars['String']>
+  groomDoB?: InputMaybe<Scalars['String']>
+  groomDoBEnd?: InputMaybe<Scalars['String']>
+  groomDoBStart?: InputMaybe<Scalars['String']>
+  groomFamilyName?: InputMaybe<Scalars['String']>
+  groomFirstNames?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -198,6 +209,7 @@ export type AdvancedSearchParametersInput = {
   motherIdentifier?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
   nationalId?: InputMaybe<Scalars['String']>
+  recordId?: InputMaybe<Scalars['ID']>
   registrationNumber?: InputMaybe<Scalars['String']>
   registrationStatuses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   trackingId?: InputMaybe<Scalars['String']>
@@ -2416,6 +2428,7 @@ export type User = {
   signature?: Maybe<Signature>
   status: Status
   systemRole: SystemRoleType
+  title: Scalars['String']
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2468,6 +2481,7 @@ export type UserInput = {
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
   systemRole: SystemRoleType
+  title: Scalars['String']
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2901,6 +2915,7 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile: string
     systemRole: SystemRoleType
+    title: string
     status: Status
     role: {
       __typename?: 'Role'
@@ -3288,6 +3303,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    title: string
     username?: string | null
     mobile: string
     systemRole: SystemRoleType
@@ -3742,6 +3758,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4051,6 +4072,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4448,6 +4474,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4740,6 +4771,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -8157,6 +8193,11 @@ export type GetRegistrationsListByFilterQuery = {
               familyName?: string | null
               use?: string | null
             }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
           } | null
         }>
       }

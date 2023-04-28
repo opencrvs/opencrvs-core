@@ -16,6 +16,7 @@ import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { questionsTransformer } from '@client/forms/questionConfig'
 import { merge } from 'lodash'
+import { OPENCRVS_SPECIFICATION_URL } from '@client/utils/constants'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -254,10 +255,15 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
       if (!entry.resource || !entry.resource.id) {
         throw new Error('Resource in entry not valid')
       }
-
-      accumulator[entry.resource.id] = generateLocationResource(
+      const facility = generateLocationResource(entry.resource as fhir.Location)
+      facility.primary = (
         entry.resource as fhir.Location
-      )
+      ).type?.extension?.find(
+        (ext) =>
+          ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/primary-office`
+      )?.valueString
+      accumulator[entry.resource.id] = facility
+
       return accumulator
     },
     {}

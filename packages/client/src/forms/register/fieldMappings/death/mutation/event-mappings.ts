@@ -174,5 +174,10 @@ export function setDeathRegistrationSectionTransformer(
       draftData[sectionId].informantsSignature
   }
 
+  if (draftData[sectionId].registrationOffice) {
+    transformedData[sectionId].registrationOffice =
+      draftData[sectionId].registrationOffice
+  }
+
   return transformedData
 }
