@@ -182,6 +182,10 @@ export const FETCH_REGISTRATIONS = gql`
               familyName
               use
             }
+            avatar {
+              type
+              data
+            }
           }
         }
         total
