@@ -171,6 +171,26 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Report',
     description: 'Report Dashboard Section',
     id: 'navigation.report'
+  },
+  recordGroup: {
+    defaultMessage: 'RECORD',
+    description: 'Record Group Section',
+    id: 'navigation.recordGroup'
+  },
+  performanceGroup: {
+    defaultMessage: 'PERFORMANCE',
+    description: 'Performance Group Section',
+    id: 'navigation.performanceGroup'
+  },
+  organizationGroup: {
+    defaultMessage: 'ORGANIZATION',
+    description: 'Organization Group Section',
+    id: 'navigation.organizationGroup'
+  },
+  configGroup: {
+    defaultMessage: 'CONFIG',
+    description: 'Config Group Section',
+    id: 'navigation.configGroup'
   }
 }
 
