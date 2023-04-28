@@ -17,6 +17,7 @@ import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { TimeField } from '@opencrvs/components/lib/TimeField'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -81,7 +82,8 @@ import {
   Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
-  IDateRangePickerValue
+  IDateRangePickerValue,
+  TIME
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -207,6 +209,7 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
+    unit: fieldDefinition.unit,
     hideAsterisk: fieldDefinition.hideAsterisk,
     hideInputHeader: fieldDefinition.hideHeader,
     error,
@@ -374,7 +377,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={String(value)}
           selected={(value as string) === checkedValue}
-          onChange={(event) =>
+          onChange={(event: { target: { value: string } }) =>
             onSetFieldValue(
               fieldDefinition.name,
               event.target.value === String(checkedValue)
@@ -393,6 +396,18 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          value={value as string}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === TIME) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TimeField
+          {...inputProps}
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
@@ -466,6 +481,11 @@ function GeneratedInputField({
     return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
+    let inputFieldWidth = fieldDefinition.inputFieldWidth
+    if (fieldDefinition?.inputWidth) {
+      inputFieldWidth = fieldDefinition.inputWidth + 'px'
+    }
+
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -473,7 +493,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           max={fieldDefinition.max}
           {...inputProps}
-          onKeyPress={(e) => {
+          onKeyPress={(e: { key: string; preventDefault: () => void }) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
@@ -482,7 +502,7 @@ function GeneratedInputField({
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
           }}
-          inputFieldWidth={fieldDefinition.inputFieldWidth}
+          inputFieldWidth={inputFieldWidth}
         />
       </InputField>
     )

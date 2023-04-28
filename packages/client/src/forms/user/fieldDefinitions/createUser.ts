@@ -13,7 +13,6 @@ import {
   FIELD_GROUP_TITLE,
   ISerializedFormSection,
   LOCATION_SEARCH_INPUT,
-  SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT,
@@ -21,7 +20,6 @@ import {
 } from '@client/forms/index'
 import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { userMessages } from '@client/i18n/messages/user'
 
 export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,
@@ -47,7 +45,7 @@ export const userSectionFormType: ISerializedFormSection = {
           required: false,
           hidden: true,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'registrationOffice',
@@ -57,7 +55,7 @@ export const userSectionFormType: ISerializedFormSection = {
           initialValue: '',
           searchableResource: ['offices'],
           searchableType: ['CRVS_OFFICE'],
-          validate: [
+          validator: [
             {
               operation: 'officeMustBeSelected'
             }
@@ -86,7 +84,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.firstNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -104,7 +102,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -123,7 +121,7 @@ export const userSectionFormType: ISerializedFormSection = {
           previewGroup: 'userNameGroup',
           required: false,
           initialValue: '',
-          validate: [],
+          validator: [],
           readonly: true,
           hidden: true
         },
@@ -133,7 +131,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat' }],
+          validator: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
               operation: 'msisdnTransformer',
@@ -151,7 +149,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.NID,
           required: false,
           initialValue: '',
-          validate: [
+          validator: [
             {
               operation: 'validIDNumber',
               parameters: [NATIONAL_ID]
@@ -178,7 +176,7 @@ export const userSectionFormType: ISerializedFormSection = {
           },
           initialValue: '',
           ignoreBottomMargin: true,
-          validate: [],
+          validator: [],
           conditionals: []
         },
         {
@@ -187,7 +185,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.role,
           required: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           options: [],
           conditionals: []
         },
@@ -199,7 +197,7 @@ export const userSectionFormType: ISerializedFormSection = {
           hidden: true,
           hideValueInPreview: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           conditionals: []
         },
 
@@ -209,7 +207,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userDevice,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'seperator',
@@ -221,7 +219,7 @@ export const userSectionFormType: ISerializedFormSection = {
           },
           initialValue: '',
           ignoreBottomMargin: true,
-          validate: [],
+          validator: [],
           conditionals: [
             {
               action: 'hide',
@@ -248,7 +246,7 @@ export const userSectionFormType: ISerializedFormSection = {
               expression: 'values.systemRole!=="FIELD_AGENT"'
             }
           ],
-          validate: [
+          validator: [
             {
               operation: 'facilityMustBeSelected'
             }
@@ -259,13 +257,7 @@ export const userSectionFormType: ISerializedFormSection = {
     {
       id: 'signature-attachment',
       title: userFormMessages.userSignatureAttachmentTitle,
-      conditionals: [
-        {
-          action: 'hide',
-          expression:
-            'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
-        }
-      ],
+      conditionals: [],
       fields: [
         {
           name: 'attachmentTitle',
@@ -274,7 +266,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userAttachmentSection,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'signature',
@@ -283,8 +275,8 @@ export const userSectionFormType: ISerializedFormSection = {
           description: userFormMessages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
-          required: true,
-          validate: []
+          required: false,
+          validator: []
         }
       ]
     }

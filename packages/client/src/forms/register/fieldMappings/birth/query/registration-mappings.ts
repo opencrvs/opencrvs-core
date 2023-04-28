@@ -13,7 +13,8 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
@@ -33,6 +34,7 @@ import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -240,10 +242,11 @@ export const convertToLocal = (
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
 
-  const countryCode =
-    alpha3CountryCode.toUpperCase() === 'FAR'
-      ? 'ZM'
-      : callingCountries[alpha3CountryCode].alpha2
+  const countryCode = countryAlpha3toAlpha2(alpha3CountryCode)
+
+  if (!countryCode) {
+    return
+  }
 
   const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -305,6 +308,24 @@ export const changeHirerchyQueryTransformer =
 
     return transformedData
   }
+
+const getUserFullName = (history: History): string => {
+  return history?.user ? getUserName(history.user) : ''
+}
+
+const getUserRole = (history: History): MessageDescriptor => {
+  return (
+    (history?.user && userMessages[history.user.systemRole]) || {
+      defaultMessage: ' ',
+      description: 'empty string',
+      id: 'form.field.label.empty'
+    }
+  )
+}
+
+const getUserSignature = (history: History): string => {
+  return history?.signature?.data as string
+}
 
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
@@ -402,6 +423,38 @@ export const registrarSignatureUserTransformer = (
   ] = history?.signature?.data as string
 }
 
+export const userTransformer =
+  (status: RegStatus) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    if (!_.history) {
+      return
+    }
+    const history: History = _.history
+      .reverse()
+      .find(
+        ({ action, regStatus }: History) =>
+          !action && regStatus && regStatus === status
+      )
+
+    if (history) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrar'
+      ] = {
+        name: getUserFullName(history),
+        role: getUserRole(history),
+        office: history?.office,
+        signature: getUserSignature(history)
+      } as IFormSectionData
+    }
+  }
+
 export const registrationDateTransformer =
   (locale: string, dateFormat: string) =>
   (
@@ -415,7 +468,6 @@ export const registrationDateTransformer =
     if (!_.history) {
       return
     }
-
     const history = _.history.find(
       ({ action, regStatus }: History) =>
         !action && regStatus === RegStatus.Registered

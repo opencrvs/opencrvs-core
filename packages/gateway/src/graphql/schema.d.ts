@@ -1392,17 +1392,22 @@ export interface GQLQuestionInput {
   placeholder?: Array<GQLMesssageInput>
   description?: Array<GQLMesssageInput>
   tooltip?: Array<GQLMesssageInput>
+  unit?: Array<GQLMesssageInput>
   errorMessage?: Array<GQLMesssageInput>
+  initialValue?: string
   maxLength?: number
+  inputWidth?: number
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
+  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
   conditionals?: Array<GQLConditionalInput>
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
+  validator?: Array<GQLValidatorInput>
 }
 
 export interface GQLSystemSettings {
@@ -1877,7 +1882,8 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  TIME = 'TIME'
 }
 
 export interface GQLConditionalInput {
@@ -1888,6 +1894,11 @@ export interface GQLConditionalInput {
 export interface GQLCustomSelectOption {
   value: string
   label: GQLMesssageDescriptorInput
+}
+
+export interface GQLValidatorInput {
+  operation: string
+  parameters?: Array<number>
 }
 
 export interface GQLPayment {

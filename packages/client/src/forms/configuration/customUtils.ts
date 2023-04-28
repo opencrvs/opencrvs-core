@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SerializedFormField, BirthSection } from '@client/forms/index'
+import {
+  SerializedFormField,
+  BirthSection,
+  IConditional
+} from '@client/forms/index'
 import {
   IMessage,
   ICustomQuestionConfig,
@@ -36,10 +40,19 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
 }
 
 function getOtherConditionalsAction(
-  conditionals: IConditionalConfig[] | undefined
+  conditionals: Array<IConditionalConfig | IConditional> | undefined
 ) {
+  const isConditional = (
+    condition: IConditionalConfig | IConditional
+  ): condition is IConditional => condition.hasOwnProperty('expression')
+
   if (!conditionals) return []
   return conditionals.map((condition) => {
+    // Allow country config to use normal way of defining conditionals
+    if (isConditional(condition)) {
+      return condition
+    }
+
     const escapeRegExpValue = escapeRegExp(condition.regexp)
     const { fieldName, sectionId } = getIdentifiersFromFieldId(
       condition.fieldId
@@ -59,11 +72,15 @@ export function createCustomField({
   label,
   description,
   tooltip,
+  unit,
+  initialValue,
   placeholder,
   required,
   maxLength,
+  inputWidth,
   conditionals,
-  options
+  options,
+  validator
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -72,8 +89,8 @@ export function createCustomField({
     required,
     type: fieldType,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
-    initialValue: '',
-    validate: [],
+    initialValue: initialValue || '',
+    validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
     options: [],
@@ -90,6 +107,7 @@ export function createCustomField({
       }
     }
   }
+
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
 
   const othersConditionals = getOtherConditionalsAction(conditionals)
@@ -119,8 +137,12 @@ export function createCustomField({
   ) {
     baseField.placeholder = getDefaultLanguageMessage(placeholder)
   }
+  if (baseField.type === 'NUMBER') {
+    baseField.unit = getDefaultLanguageMessage(unit)
+    baseField.inputWidth = inputWidth
+  }
   if (baseField.type === 'TEL') {
-    baseField.validate = [
+    baseField.validator = [
       {
         operation: 'phoneNumberFormat'
       }
@@ -140,6 +162,7 @@ export function createCustomField({
         }
       }) || []
   }
+
   return baseField
 }
 

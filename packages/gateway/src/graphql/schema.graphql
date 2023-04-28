@@ -1489,17 +1489,22 @@ input QuestionInput {
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
   tooltip: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
+  initialValue: String
   maxLength: Int
+  inputWidth: Int
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!
+  validateEmpty: Boolean
   required: Boolean
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
   datasetId: String
   options: [CustomSelectOption!]
+  validator: [ValidatorInput!]
 }
 
 input SystemSettings {
@@ -1974,6 +1979,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  TIME
 }
 
 input ConditionalInput {
@@ -1984,6 +1990,11 @@ input ConditionalInput {
 input CustomSelectOption {
   value: String!
   label: MesssageDescriptorInput!
+}
+
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
 }
 
 type Payment {
