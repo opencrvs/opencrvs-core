@@ -121,7 +121,7 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
+import { clone, flatten, flattenDeep, get, isArray, pick } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
@@ -151,6 +151,10 @@ import {
   SignatureInputProps
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
+import {
+  AddressCases,
+  getAddressCaseFields
+} from '@client/forms/configuration/administrative/addresses'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1169,13 +1173,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
         .filter((value) => value)
 
+      // fishy around here
       let completeValue = values[0]
       values.shift()
       values.forEach(
         (value) =>
           (completeValue = (
             <>
-              {completeValue}
+              {completeValue.props.children !== 'No' && completeValue}
               {tagDef[0].delimiter ? (
                 <span>{tagDef[0].delimiter}</span>
               ) : (
@@ -1296,6 +1301,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
+    if (field.name === 'primaryAddressSameAsOtherPrimary') return
     if (!originalData) return false
     if (data[field.name] && (data[field.name] as IFormData).value) {
       return this.hasNestedDataChanged(
@@ -2158,8 +2164,57 @@ function fatherDoesNotExistAndStateIsFather(
   )
 }
 
+function addSameAddressValues(draft: IDeclaration) {
+  const draftEvent = draft.event
+  let modifier
+  let copyAddressFrom
+  if (draftEvent === 'birth') {
+    modifier = 'father'
+    copyAddressFrom = 'mother'
+  } else if (draftEvent === 'death') {
+    modifier = 'informant'
+    copyAddressFrom = 'deceased'
+  }
+
+  if (!modifier || !copyAddressFrom) return draft
+
+  const isPrimaryAddressSameAsOtherPrimary =
+    draft.data[modifier].primaryAddressSameAsOtherPrimary
+
+  const addressNames = getAddressCaseFields(
+    AddressCases.PRIMARY_ADDRESS,
+    true
+  ).map((address) => address.name)
+
+  if (isPrimaryAddressSameAsOtherPrimary) {
+    const modifiedDraft = {
+      ...draft,
+      data: {
+        ...draft.data,
+        ...(modifier === 'father' && {
+          father: {
+            ...draft.data.father,
+            ...pick(draft.data.father, addressNames)
+          }
+        }),
+        ...(modifier === 'informant' && {
+          informant: {
+            ...draft.data.informant,
+            ...pick(draft.data.deceased, addressNames)
+          }
+        })
+      }
+    }
+    modifiedDraft.data[modifier].primaryAddressSameAsOtherPrimary = false
+    return modifiedDraft
+  }
+
+  return draft
+}
+
 export const ReviewSection = connect(
-  (state: IStoreState) => ({
+  (state: IStoreState, props: { draft: IDeclaration }) => ({
+    draft: addSameAddressValues(props.draft),
     registerForm: getRegisterForm(state),
     registrationSection: getBirthSection(state, BirthSection.Registration),
     documentsSection: getBirthSection(state, BirthSection.Documents),

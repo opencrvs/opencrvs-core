@@ -667,7 +667,7 @@ function getPlaceOfEventAdminLevelSelects(
   }
 }
 
-function getAddressCaseFields(
+export function getAddressCaseFields(
   addressCase: AddressCases,
   informant: boolean
 ): SerializedFormField[] {
