@@ -170,10 +170,11 @@ export const osiaNidVerificationFieldToIdentityTransformer = (
       identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
   )
 
-  if (existingIdentity) {
-    const modifiedFields = draftData[sectionId][
-      'fieldsModifiedByNidUserInfo'
-    ] as string[]
+  const modifiedFields = draftData[sectionId][
+    'fieldsModifiedByNidUserInfo'
+  ] as string[]
+
+  if (existingIdentity && modifiedFields) {
     existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
   }
   return transformedData
@@ -638,3 +639,33 @@ export const longDateTransformer =
 
     return transformedData
   }
+
+export const childOsiaUinToIdentityTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string
+) => {
+  if (!draftData[sectionId].childOsiaUin) {
+    return
+  }
+
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = []
+  }
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      //@ts-ignore
+      identifier.type && identifier.type === IdentityIdType.OsiaUinVidNid
+  )
+  if (!existingIdentity) {
+    sectionData.identifier.push({
+      id: draftData[sectionId]['childOsiaUin'],
+      type: IdentityIdType.OsiaUinVidNid
+    })
+  } else {
+    existingIdentity['id'] = draftData[sectionId]['childOsiaUin']
+    existingIdentity.type = IdentityIdType.OsiaUinVidNid
+  }
+  return transformedData
+}

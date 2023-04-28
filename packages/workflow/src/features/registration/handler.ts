@@ -62,6 +62,7 @@ interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
+  OSIA_UIN_VID_NID?: string
 }
 
 async function sendBundleToHearth(
@@ -300,8 +301,12 @@ export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { trackingId, registrationNumber, error } =
-    request.payload as IEventRegistrationCallbackPayload
+  const {
+    trackingId,
+    registrationNumber,
+    error,
+    OSIA_UIN_VID_NID: osiaUinVidNid
+  } = request.payload as IEventRegistrationCallbackPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -347,6 +352,23 @@ export async function markEventAsRegisteredCallbackHandler(
       REG_NUMBER_SYSTEM[event],
       registrationNumber
     )
+
+    // if birth event, then add OSIA_UIN_NID_VID to child identifier if it's available in payload
+    if (event === EVENT_TYPE.BIRTH && osiaUinVidNid) {
+      const osiaIdentifier = patients[0]?.identifier?.find(
+        //@ts-ignore
+        (identifier) => identifier.type === 'OSIA_UIN_VID_NID'
+      )
+      if (osiaIdentifier) {
+        osiaIdentifier.value = osiaUinVidNid
+      } else {
+        patients[0]?.identifier?.push({
+          // @ts-ignore
+          type: 'OSIA_UIN_VID_NID',
+          value: osiaUinVidNid
+        })
+      }
+    }
 
     if (event === EVENT_TYPE.DEATH) {
       /** using first patient because for death event there is only one patient */

@@ -3619,6 +3619,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         firstNames?: string | null
         familyName?: string | null
       } | null> | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+      } | null> | null
     } | null
     informant?: {
       __typename?: 'RelatedPerson'

@@ -15,6 +15,7 @@
     "packages/login/public/robots.txt",
     "infrastructure/monitoring/kibana/config.ndjson",
     "infrastructure/monitoring/logstash/*.conf",
+    "infrastructure/elasticsearch/jvm.options",
     ".env*",
     ".vs",
     "**/.DS_Store",
