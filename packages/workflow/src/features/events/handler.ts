@@ -195,33 +195,25 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_IN_PROGRESS_DEC:
     case Events.MARRIAGE_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_NEW_DEC:
     case Events.DEATH_NEW_DEC:
     case Events.MARRIAGE_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
     case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_REQUEST_CORRECTION:
     case Events.DEATH_REQUEST_CORRECTION:
@@ -233,9 +225,7 @@ export async function fhirWorkflowEventHandler(
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.BIRTH_MARK_REINSTATED:
     case Events.DEATH_MARK_REINSTATED:
@@ -253,9 +243,7 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_REG:
     case Events.MARRIAGE_MARK_REG:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      if (!response.regValidationError) {
-        await triggerEvent(event, request.payload, request.headers)
-      }
+      await triggerEvent(event, request.payload, request.headers)
       break
 
     case Events.BIRTH_MARK_CERT:
