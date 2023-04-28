@@ -44,6 +44,3 @@ export enum EVENT_TYPE {
   DEATH = 'DEATH',
   MARRIAGE = 'MARRIAGE'
 }
-
-export const BIRTH_REG_NUMBER_GENERATION_FAILED =
-  'Birth registration number generation failed'

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "ngrok": "^3.2.7",
+    "ngrok": "^4.3.3",
     "ts-node": "^8.6.0"
   }
 }
