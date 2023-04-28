@@ -485,9 +485,18 @@ export const getXAddressSameAsY = (
           {
             action: 'hide',
             expression: `${conditionalCase}`
+          },
+          {
+            action: 'hideInPreview',
+            expression: `!values.${AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY}`
           }
         ]
-      : [],
+      : [
+          {
+            action: 'hideInPreview',
+            expression: `!values.${AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY}`
+          }
+        ],
     mapping: {
       mutation: {
         operation: 'copyAddressTransformer',
@@ -508,14 +517,6 @@ export const getXAddressSameAsY = (
         ]
       }
     }
-  }
-  if (conditionalCase) {
-    copyAddressField['conditionals'] = [
-      {
-        action: 'hide',
-        expression: `${conditionalCase}`
-      }
-    ]
   }
   return [copyAddressField]
 }
