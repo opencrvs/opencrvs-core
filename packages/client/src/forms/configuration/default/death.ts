@@ -124,6 +124,10 @@ export const deathRegisterForms: ISerializedForm = {
                 ]
               },
               mapping: {
+                template: {
+                  fieldName: 'informantType',
+                  operation: 'plainInputTransformer'
+                },
                 mutation: {
                   operation: 'nestedRadioFieldToBundleFieldTransformer',
                   parameters: ['registration.informantType']
@@ -730,7 +734,7 @@ export const deathRegisterForms: ISerializedForm = {
                 template: {
                   operation: 'dateFormatTransformer',
                   fieldName: 'deceasedBirthDate',
-                  parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  parameters: ['birthDate', 'en', 'yyyy-MM-dd']
                 },
                 mutation: {
                   operation: 'longDateTransformer',
@@ -903,7 +907,7 @@ export const deathRegisterForms: ISerializedForm = {
               mapping: {
                 template: {
                   fieldName: 'deceasedMaritalStatus',
-                  operation: 'selectTransformer'
+                  operation: 'plainInputTransformer'
                 }
               },
               options: [
@@ -998,7 +1002,7 @@ export const deathRegisterForms: ISerializedForm = {
                 template: {
                   operation: 'deceasedDateFormatTransformation',
                   fieldName: 'eventDate',
-                  parameters: ['en', 'do MMMM yyyy', 'deceased']
+                  parameters: ['en', 'yyyy-MM-dd', 'deceased']
                 },
                 mutation: {
                   operation: 'fieldToDeceasedDateTransformation',
