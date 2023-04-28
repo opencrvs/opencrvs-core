@@ -115,3 +115,5 @@ export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 export const APPLICATION_VERSION = 'v1.3.0-beta'
 export const ENABLE_REVIEW_ATTACHMENTS_SCROLLING =
   import.meta.env.MODE === 'test' ? true : false
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'

@@ -38,7 +38,8 @@ import {
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  hasTaskRegLastOffice
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -168,12 +169,27 @@ export async function createRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
   event: Events
-): Promise<{ resBundle: fhir.Bundle; regValidationError?: boolean }> {
+) {
   try {
     const token = getToken(request)
+    let options
+    if (
+      [
+        Events.BIRTH_IN_PROGRESS_DEC,
+        Events.DEATH_IN_PROGRESS_DEC,
+        Events.MARRIAGE_IN_PROGRESS_DEC,
+        Events.BIRTH_NEW_DEC,
+        Events.DEATH_NEW_DEC,
+        Events.MARRIAGE_NEW_DEC
+      ].includes(event) &&
+      hasTaskRegLastOffice(request.payload as fhir.Bundle)
+    ) {
+      options = { ignoreModifyRegLastLocation: true }
+    }
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      token
+      token,
+      options
     )
     if (
       [
@@ -207,28 +223,23 @@ export async function createRegistrationHandler(
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
-      const { regValidationError } = await invokeRegistrationValidation(
-        payload,
-        request.headers,
-        getToken(request)
-      )
-      return { resBundle, regValidationError }
+      invokeRegistrationValidation(payload, request.headers)
     }
     if (isEventNonNotifiable(event)) {
-      return { resBundle }
+      return resBundle
     }
 
     /* sending notification to the contact */
     const msisdn = await getSharedContactMsisdn(payload)
     if (!msisdn) {
       logger.info('createRegistrationHandler could not send event notification')
-      return { resBundle }
+      return resBundle
     }
     logger.info('createRegistrationHandler sending event notification')
     sendEventNotification(payload, event, msisdn, {
       Authorization: request.headers.authorization
     })
-    return { resBundle }
+    return resBundle
   } catch (error) {
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
@@ -417,13 +428,9 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-    const { regValidationError } = await invokeRegistrationValidation(
-      payload,
-      request.headers,
-      getToken(request)
-    )
+    invokeRegistrationValidation(payload, request.headers)
 
-    return { resBundle, regValidationError }
+    return resBundle
   } catch (error) {
     logger.error(
       `Workflow/markAsWaitingValidationHandler[${event}]: error: ${error}`

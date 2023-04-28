@@ -263,6 +263,17 @@ const messagesToDefine = {
     defaultMessage: 'Clear',
     description: 'Label for button that clear signature input',
     id: 'review.signature.clear'
+  },
+  officeSelectLabel: {
+    id: 'review.inputs.officeSelect.label',
+    defaultMessage: 'Assign a registration office',
+    description: 'Label text for registration office select component'
+  },
+  officeSelectHelper: {
+    id: 'review.inputs.officeSelect.helper',
+    defaultMessage:
+      'Select the office that this declaration should be sent to for review',
+    description: 'Helper text for registration office select component'
   }
 }
 

@@ -1245,6 +1245,7 @@ export interface GQLRegistrationInput {
   witnessOneSignature?: string
   witnessTwoSignature?: string
   informantType?: GQLInformantType
+  registrationOffice?: string
   otherInformantType?: string
   contact?: string
   contactRelationship?: string

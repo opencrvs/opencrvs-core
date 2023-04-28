@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -25,8 +24,7 @@ import {
   getRegStatusCode,
   fetchExistingRegStatusCode,
   updateResourceInHearth,
-  mergePatientIdentifier,
-  postToHearth
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateTrackingIdForEvents,
@@ -56,15 +54,17 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { triggerEvent } from '@workflow/features/events/handler'
-import { Events } from '@workflow/features/events/utils'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
 
+interface ModifyBundleOptions {
+  ignoreModifyRegLastLocation: boolean
+}
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
-  token: string
+  token: string,
+  options?: Partial<ModifyBundleOptions>
 ): Promise<fhir.Bundle> {
   if (
     !fhirBundle ||
@@ -95,8 +95,10 @@ export async function modifyRegistrationBundle(
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  if (!isEventNotification(fhirBundle)) {
+  if (
+    !isEventNotification(fhirBundle) &&
+    !options?.ignoreModifyRegLastLocation
+  ) {
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
@@ -170,9 +172,8 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  headers: Record<string, string>,
-  token: string
-): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
+  headers: Record<string, string>
+) {
   try {
     await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
@@ -182,48 +183,8 @@ export async function invokeRegistrationValidation(
         ...headers
       }
     })
-    return { bundle }
   } catch (err) {
-    const taskResource = getTaskResource(bundle)
-    const practitioner = await getLoggedInPractitionerResource(token)
-
-    if (
-      !taskResource ||
-      !taskResource.businessStatus ||
-      !taskResource.businessStatus.coding ||
-      !taskResource.businessStatus.coding[0] ||
-      !taskResource.businessStatus.coding[0].code
-    ) {
-      throw new Error('taskResource has no businessStatus code')
-    }
-    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
-
-    const statusReason: fhir.CodeableConcept = {
-      text: BIRTH_REG_NUMBER_GENERATION_FAILED
-    }
-    taskResource.statusReason = statusReason
-    taskResource.lastModified = new Date().toISOString()
-
-    /* setting registration workflow status here */
-    await setupRegistrationWorkflow(
-      taskResource,
-      getTokenPayload(token),
-      RegStatus.REJECTED
-    )
-
-    /* setting lastRegLocation here */
-    await setupLastRegLocation(taskResource, practitioner)
-
-    /* setting lastRegUser here */
-    setupLastRegUser(taskResource, practitioner)
-
-    /* check if the status of any event draft is not published and setting configuration extension*/
-    await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
-    await postToHearth(bundle)
-    await triggerEvent(Events.BIRTH_MARK_VOID, bundle, headers)
-
-    return { bundle, regValidationError: true }
+    throw new Error(`Unable to send registration for validation: ${err}`)
   }
 }
 
