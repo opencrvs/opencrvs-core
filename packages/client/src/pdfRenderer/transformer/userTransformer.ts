@@ -18,8 +18,7 @@ import {
   ILocationPayload
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
-import { HumanName, LocalRegistrar } from '@client/utils/gateway'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { HumanName } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 export function getUserName(
