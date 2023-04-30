@@ -200,8 +200,7 @@ export class InProgressComponent extends React.Component<
           const names = reg.childName as GQLHumanName[]
           const namesMap = createNamesMap(names)
           name = namesMap[locale] || namesMap[LANG_EN]
-          const date = reg.dateOfBirth
-          eventDate = date && date
+          eventDate = reg.dateOfBirth
         } else if (isDeathEvent(reg)) {
           const names = reg.deceasedName as GQLHumanName[]
           const namesMap = createNamesMap(names)
