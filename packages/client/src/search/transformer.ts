@@ -51,10 +51,9 @@ export const transformData = (
     return []
   }
 
-  const results = data.results.filter(
-    (req): req is GQLEventSearchSet => req !== null
-  )
-  return results.map((reg: GQLEventSearchSet) => {
+  return data.results
+  .filter((req): req is GQLEventSearchSet => req !== null)
+  .map((reg: GQLEventSearchSet) => {
     let birthReg
     let deathReg
     let marriageReg
