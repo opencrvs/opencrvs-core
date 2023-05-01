@@ -46,7 +46,8 @@ function getOptionsForQuestion(
   datasets: IDataSetModel[]
 ): IDataset['options'] {
   if (!question.datasetId && !question.datasetName) {
-    return []
+    if (!question.options) return []
+    return question.options
   }
 
   const dataset = datasets.find(

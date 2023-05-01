@@ -153,6 +153,7 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
+        options: options ?? undefined,
         validateEmpty: validateEmpty ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
