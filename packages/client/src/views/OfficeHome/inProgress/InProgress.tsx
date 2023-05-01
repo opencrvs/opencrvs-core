@@ -18,10 +18,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
-  GQLEventSearchResultSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLMarriageEventSearchSet
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   IDeclaration,
@@ -57,7 +54,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, HumanName, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
