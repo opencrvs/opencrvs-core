@@ -822,50 +822,32 @@ export async function updateWorkqueueData(
         .registrationPhone) ||
     ''
 
-  const birthEventData: GQLBirthEventSearchSet = {
-    ...workqueueApp,
-    childName: transformedName,
-    dateOfBirth: transformedBirthDate,
-    registration: {
-      contactNumber: transformedInformantContactNumber
-    }
+  if (declaration.event === 'birth') {
+    ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
+    ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
+    ;(
+      (workqueueApp as GQLDeathEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
+  } else if (declaration.event === 'death') {
+    ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
+    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
+    ;(
+      (workqueueApp as GQLDeathEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
+  } else if (declaration.event === 'marriage') {
+    ;(workqueueApp as GQLMarriageEventSearchSet).brideName =
+      transformedNameForBride
+    ;(workqueueApp as GQLMarriageEventSearchSet).groomName =
+      transformedNameForGroom
+    ;(workqueueApp as GQLMarriageEventSearchSet).dateOfMarriage =
+      transformedMarriageDate
+    ;(
+      (workqueueApp as GQLMarriageEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
   }
-
-  const deathEventData: GQLDeathEventSearchSet = {
-    ...workqueueApp,
-    deceasedName: transformedName,
-    dateOfDeath: transformedDeathDate,
-    registration: {
-      contactNumber: transformedInformantContactNumber
-    }
-  }
-    
-  const marriageEventData: GQLMarriageEventSearchSet = {
-    ...workqueueApp,
-    brideName: transformedNameForBride,
-    groomName: transformedNameForGroom,
-    dateOfMarriage: transformedMarriageDate,
-    registration: {
-      contactNumber: transformedInformantContactNumber
-    }
-  }
-
-  const generateWorkqueueResult = () => {
-    if (declaration.event === 'birth') {
-      return birthEventData
-    }
-    if (declaration.event === 'death') {
-      return deathEventData
-    }
-    if (declaration.event === 'marriage') {
-      return marriageEventData
-    }
-    return workqueueApp
-  }
-  
-  const workqueueResult = generateWorkqueueResult()
-
-  return workqueueResult
 }
 
 export async function writeDeclarationByUser(
