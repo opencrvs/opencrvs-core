@@ -20,7 +20,7 @@ const DateWrapper = styled.div`
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
 `
-interface IProps {
+type IProps = {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }

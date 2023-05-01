@@ -147,6 +147,11 @@ export type AdvancedSeachParameters = {
 }
 
 export type AdvancedSearchParametersInput = {
+  brideDoB?: InputMaybe<Scalars['String']>
+  brideDoBEnd?: InputMaybe<Scalars['String']>
+  brideDoBStart?: InputMaybe<Scalars['String']>
+  brideFamilyName?: InputMaybe<Scalars['String']>
+  brideFirstNames?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -158,6 +163,7 @@ export type AdvancedSearchParametersInput = {
   dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfEventEnd?: InputMaybe<Scalars['String']>
   dateOfEventStart?: InputMaybe<Scalars['String']>
+  dateOfMarriage?: InputMaybe<Scalars['String']>
   dateOfRegistration?: InputMaybe<Scalars['String']>
   dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
   dateOfRegistrationStart?: InputMaybe<Scalars['String']>
@@ -184,6 +190,11 @@ export type AdvancedSearchParametersInput = {
   fatherFamilyName?: InputMaybe<Scalars['String']>
   fatherFirstNames?: InputMaybe<Scalars['String']>
   fatherIdentifier?: InputMaybe<Scalars['String']>
+  groomDoB?: InputMaybe<Scalars['String']>
+  groomDoBEnd?: InputMaybe<Scalars['String']>
+  groomDoBStart?: InputMaybe<Scalars['String']>
+  groomFamilyName?: InputMaybe<Scalars['String']>
+  groomFirstNames?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -198,6 +209,7 @@ export type AdvancedSearchParametersInput = {
   motherIdentifier?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
   nationalId?: InputMaybe<Scalars['String']>
+  recordId?: InputMaybe<Scalars['ID']>
   registrationNumber?: InputMaybe<Scalars['String']>
   registrationStatuses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   trackingId?: InputMaybe<Scalars['String']>
@@ -8181,6 +8193,11 @@ export type GetRegistrationsListByFilterQuery = {
               familyName?: string | null
               use?: string | null
             }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
           } | null
         }>
       }

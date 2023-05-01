@@ -105,6 +105,11 @@ export function setBirthRegistrationSectionTransformer(
       draftData[sectionId].informantsSignature
   }
 
+  if (draftData[sectionId].registrationOffice) {
+    transformedData[sectionId].registrationOffice =
+      draftData[sectionId].registrationOffice
+  }
+
   if (draftData[sectionId].commentsOrNotes) {
     if (!transformedData[sectionId].status[0].comments) {
       transformedData[sectionId].status[0].comments = []

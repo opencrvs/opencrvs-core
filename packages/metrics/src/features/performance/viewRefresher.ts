@@ -40,8 +40,8 @@ export async function refresh() {
   const client = new MongoClient(HEARTH_MONGO_URL)
   try {
     updateInProgress = true
-    await client.connect()
-    await refreshPerformanceMaterialisedViews(client)
+    const connectedClient = await client.connect()
+    await refreshPerformanceMaterialisedViews(connectedClient)
     logger.info('Performance materialised views refreshed')
   } catch (error) {
     logger.error(`Error refreshing performances materialised views ${error}`)
@@ -57,8 +57,7 @@ export async function refresh() {
 }
 
 async function refreshPerformanceMaterialisedViews(client: MongoClient) {
-  const db = client.db(client.options.dbName)
-
+  const db = client.db()
   const lastUpdatedAt = subMinutes(new Date(), 5).toISOString()
   await db
     .collection('Task')

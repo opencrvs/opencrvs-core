@@ -173,6 +173,7 @@ export function IssueCollectorForm({
       title={intl.formatMessage(issueMessages.issueCertificate)}
       bottomActionButtons={[
         <PrimaryButton
+          key="continue-button"
           id="continue-button"
           onClick={continueButtonHandler}
           disabled={groupHasError(

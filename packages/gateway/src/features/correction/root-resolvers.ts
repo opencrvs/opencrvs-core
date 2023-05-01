@@ -101,7 +101,7 @@ export const resolvers: GQLResolver = {
           id,
           authHeader,
           details,
-          EVENT_TYPE.DEATH
+          EVENT_TYPE.MARRIAGE
         )
       } else {
         throw new Error('User does not have a register scope')

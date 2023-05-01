@@ -107,6 +107,7 @@ export const GET_USER = gql`
       status
       underInvestigation
       practitionerId
+      primaryFacilityId
       primaryOffice {
         id
         name
