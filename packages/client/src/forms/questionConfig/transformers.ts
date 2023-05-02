@@ -154,7 +154,16 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        options:
+        validateEmpty: validateEmpty ?? false,
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+      }
+
+      if (validator && validator.length > 0) {
+        defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
+      }
+
+      if (options) {
+        defaultQuestionConfig.options =
           /*
            * This is done like this as the function parameters are typed incorrectly.
            * The actual argument type for this function should be whatever the backend returns as part of configuration.
@@ -162,13 +171,9 @@ export function questionsTransformer(
            */
           (options as Array<
             Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
-          >) ?? undefined,
-        validateEmpty: validateEmpty ?? false,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+          >) ?? undefined
       }
-      if (validator && validator.length > 0) {
-        defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
-      }
+
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields
        */
