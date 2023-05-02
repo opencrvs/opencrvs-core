@@ -28,9 +28,10 @@ import {
   getFieldId,
   getPrecedingDefaultFieldIdAcrossGroups
 } from '@client/forms/configuration/defaultUtils'
-import { Event, QuestionInput } from '@client/utils/gateway'
+import { CustomSelectOption, Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default/index'
+import { MessageDescriptor } from 'react-intl'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
@@ -153,6 +154,15 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
+        options:
+          /*
+           * This is done like this as the function parameters are typed incorrectly.
+           * The actual argument type for this function should be whatever the backend returns as part of configuration.
+           * Currently the type used here is whatever the frontend is expected to send to the backend as part of form configuration UI.
+           */
+          (options as Array<
+            Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
+          >) ?? undefined,
         validateEmpty: validateEmpty ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
