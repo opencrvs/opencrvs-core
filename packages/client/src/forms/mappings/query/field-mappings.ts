@@ -20,7 +20,7 @@ import {
   DeathRegistration,
   MarriageRegistration,
   Address,
-  Attachment,
+  Attachment
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -54,7 +54,7 @@ interface IName {
 
 type QueryData = BirthRegistration | DeathRegistration | MarriageRegistration
 
-type SectionId = keyof (
+export type SectionId = keyof (
   | BirthRegistration
   | DeathRegistration
   | MarriageRegistration

@@ -11,7 +11,8 @@
  */
 import {
   eventLocationNameQueryOfflineTransformer,
-  identityToFieldTransformer
+  identityToFieldTransformer,
+  SectionId
 } from '@client/forms/mappings/query/field-mappings'
 import { IFormField } from '@client/forms'
 import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
@@ -25,7 +26,7 @@ describe('Query FieldMapping', () => {
       id: '12345',
       mother: {}
     }
-    const sectionId = 'mother'
+    const sectionId = 'mother' as SectionId
     const field = {} as IFormField
     const transformedData = {}
     const result = factory(
@@ -52,7 +53,7 @@ describe('Query FieldMapping', () => {
         ]
       }
     }
-    const sectionId = 'mother'
+    const sectionId = 'mother' as SectionId
     const field = { name: 'nationalId' } as IFormField
     const transformedData = {
       mother: {}
