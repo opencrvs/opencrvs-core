@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, IRef, TextInput } from '../TextInput/TextInput'
 
-interface IProps {
+export interface IProps {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
