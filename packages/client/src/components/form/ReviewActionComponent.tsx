@@ -250,11 +250,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.reviewActionToBeRegisteredTitle,
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.registerActionDescriptionNotToBeRegistered
             }
           }
         }
@@ -263,10 +263,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.registerActionTitle
+              message: messages.reviewActionTitle,
+              payload: { completeDeclaration: true }
             },
             description: {
-              message: messages.registerActionDescription
+              message: messages.registerActionDescriptionComplete
             },
             modal: {
               title: {
@@ -276,11 +277,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.reviewActionToBeRegisteredTitle,
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.registerActionDescriptionNotToBeRegistered
             }
           }
         }
@@ -317,26 +318,41 @@ class ReviewActionComponent extends React.Component<
       intl
     } = this.props
 
+    const isValidated = declarationToBeRegistered
+      ? declaration.registrationStatus === EVENT_STATUS.VALIDATED
+      : declarationToBeValidated
+
     const background = !completeDeclaration
       ? 'error'
+      : declarationToBeRegistered
+      ? draftDeclaration
+        ? ''
+        : isValidated
+        ? 'success'
+        : ''
+      : declarationToBeValidated
+      ? 'success'
       : draftDeclaration
       ? 'success'
       : ''
+
     const action = declarationToBeRegistered
       ? ACTION.DECLARATION_TO_BE_REGISTERED
       : declarationToBeValidated
       ? ACTION.DECLARATION_TO_BE_VALIDATED
       : ACTION.DECLARATION_TO_BE_DECLARED
 
+    const completionStatus = declarationToBeRegistered
+      ? draftDeclaration
+        ? false
+        : isValidated
+      : completeDeclaration
+
     const actionContent =
       (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)] &&
         ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
-          .completionStatus[String(completeDeclaration)]) ||
+          .completionStatus[String(completionStatus)]) ||
       null
-
-    const isValidated =
-      declaration.registrationStatus === EVENT_STATUS.VALIDATED &&
-      declarationToBeRegistered
 
     return !actionContent ? null : (
       <Container id={id}>
