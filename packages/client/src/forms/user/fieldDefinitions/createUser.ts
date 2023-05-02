@@ -219,6 +219,49 @@ export const userSectionFormType: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validator: []
+        },
+        {
+          name: 'seperator',
+          type: 'SUBSECTION',
+          label: {
+            defaultMessage: ' ',
+            description: 'empty string',
+            id: 'form.field.label.empty'
+          },
+          initialValue: '',
+          ignoreBottomMargin: true,
+          validator: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'values.systemRole!=="FIELD_AGENT"'
+            }
+          ]
+        },
+        {
+          name: 'primaryFacilityId',
+          customisable: false,
+          type: 'LOCATION_SEARCH_INPUT',
+          label: userFormMessages.userOrganisation,
+          previewGroup: 'placeOfBirth',
+          required: true,
+          initialValue: '',
+          searchableResource: ['facilities'],
+          searchableType: ['HEALTH_FACILITY'],
+          dynamicOptions: {
+            resource: 'facilities'
+          },
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'values.systemRole!=="FIELD_AGENT"'
+            }
+          ],
+          validator: [
+            {
+              operation: 'facilityMustBeSelected'
+            }
+          ]
         }
       ]
     },
