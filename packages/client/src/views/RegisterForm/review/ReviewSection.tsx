@@ -2171,6 +2171,11 @@ function addSameAddressValues(draft: IDeclaration) {
       : draftEvent === 'death'
       ? 'informant'
       : null
+  const addressNames = getAddressCaseFields(
+    AddressCases.PRIMARY_ADDRESS,
+    true
+  ).map((address) => address.name)
+  let modifiedDraft
 
   if (!modifier) return draft
 
@@ -2178,12 +2183,7 @@ function addSameAddressValues(draft: IDeclaration) {
     draft.data[modifier]?.primaryAddressSameAsOtherPrimary
 
   if (isPrimaryAddressSameAsOtherPrimary) {
-    const addressNames = getAddressCaseFields(
-      AddressCases.PRIMARY_ADDRESS,
-      true
-    ).map((address) => address.name)
-
-    const modifiedDraft = {
+    modifiedDraft = {
       ...draft,
       data: {
         ...draft.data,
@@ -2201,27 +2201,35 @@ function addSameAddressValues(draft: IDeclaration) {
         })
       }
     }
-
-    if (modifiedDraft.originalData) {
-      modifiedDraft.originalData = {
-        ...modifiedDraft.originalData,
-        ...(modifier === 'father' && {
-          father: {
-            ...modifiedDraft.originalData.father,
-            ...pick(modifiedDraft.originalData.mother, addressNames)
-          }
-        }),
-        ...(modifier === 'informant' && {
-          informant: {
-            ...modifiedDraft.originalData.informant,
-            ...pick(modifiedDraft.originalData.deceased, addressNames)
-          }
-        })
-      }
-      modifiedDraft.originalData[modifier].primaryAddressSameAsOtherPrimary =
-        false
-    }
     modifiedDraft.data[modifier]!.primaryAddressSameAsOtherPrimary = false
+  }
+
+  const isPrimaryAddressSameAsOtherPrimaryForOriginal =
+    draft.originalData &&
+    draft.originalData[modifier]?.primaryAddressSameAsOtherPrimary
+
+  if (
+    isPrimaryAddressSameAsOtherPrimaryForOriginal &&
+    modifiedDraft?.originalData
+  ) {
+    modifiedDraft.originalData = {
+      ...modifiedDraft?.originalData,
+      ...(modifier === 'father' && {
+        father: {
+          ...modifiedDraft.originalData.father,
+          ...pick(modifiedDraft.originalData.mother, addressNames)
+        }
+      }),
+      ...(modifier === 'informant' && {
+        informant: {
+          ...modifiedDraft?.originalData.informant,
+          ...pick(modifiedDraft?.originalData.deceased, addressNames)
+        }
+      })
+    }
+    modifiedDraft.originalData[modifier].primaryAddressSameAsOtherPrimary =
+      false
+
     return modifiedDraft
   }
 
