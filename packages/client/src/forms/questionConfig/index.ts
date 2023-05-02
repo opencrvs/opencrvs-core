@@ -13,7 +13,12 @@ import { ISerializedForm, IValidatorDescriptor } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
-import { CustomFieldType, Event, CustomSelectOption } from '@client/utils/gateway'
+import {
+  CustomFieldType,
+  Event,
+  CustomSelectOption
+} from '@client/utils/gateway'
+import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
 
 export * from './transformers'
@@ -49,7 +54,9 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
   validator?: IValidatorDescriptor[]
-  options?: CustomSelectOption[]
+  options?: Array<
+    Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
+  >
 }
 
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
