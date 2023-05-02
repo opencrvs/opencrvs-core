@@ -77,14 +77,13 @@ export function TimeField(props: ITimeFieldProps) {
       if (Number(val) < 0 || Number(val) > 59) return
       setState((state) => ({ ...state, mm: val }))
     }
-  }
-  React.useEffect(() => {
     if (state.hh && state.mm) {
       props.onChange(
         `${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`
       )
     }
-  }, [state.hh, state.mm, props])
+  }
+
   return (
     <Container id={id}>
       <Segment
