@@ -40,8 +40,6 @@ export const UserHeader = styled.table`
   th:nth-child(2) {
     width: 100%;
   }
-  td:last-child {
-  }
 
   /* Media query for mobile */
   @media screen and (max-width: 768px) {
@@ -70,11 +68,9 @@ export const UserRow = styled.table`
     ${({ theme }) => theme.fonts.reg16};
     width: 260px;
     max-width: 260px;
-    whitespace: nowrap;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  td:nth-child(3) {
   }
   td:nth-child(4) {
     position: relative;
@@ -93,15 +89,11 @@ export const UserRow = styled.table`
 
   /* Media query for mobile */
   @media screen and (max-width: 768px) {
-    td:first-child {
-    }
     td:nth-child(2) {
       width: 100%;
     }
     td:nth-child(3) {
       display: none;
-    }
-    td:last-child {
     }
   }
 `
