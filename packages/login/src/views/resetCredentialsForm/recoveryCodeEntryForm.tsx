@@ -150,43 +150,46 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
           }
           skipToContentText="Skip to main content"
         >
-          <Content
-            title={intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
-            subtitle={intl.formatMessage(
-              messages.recoveryCodeEntryFormBodySubheader,
-              {
-                link: (
-                  <Link
-                    onClick={this.resendSMS}
-                    id="retrieve-login-mobile-resend"
-                    font="bold16"
-                    type="button"
-                  >
-                    {intl.formatMessage(messages.resend)}
-                  </Link>
-                )
-              }
-            )}
-            bottomActionButtons={[
-              <Button
-                key="1"
-                id="continue"
-                onClick={this.handleContinue}
-                type="primary"
-                size="large"
-              >
-                {intl.formatMessage(messages.continueButtonLabel)}
-              </Button>
-            ]}
-          >
-            {resentSMS && (
-              <Toast type="success">
-                {intl.formatMessage(messages.resentSMS, {
-                  number: this.props.location.state.mobile
-                })}
-              </Toast>
-            )}
-            <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
+          <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
+            <Content
+              title={intl.formatMessage(
+                messages.recoveryCodeEntryFormBodyHeader
+              )}
+              subtitle={intl.formatMessage(
+                messages.recoveryCodeEntryFormBodySubheader,
+                {
+                  link: (
+                    <Link
+                      onClick={this.resendSMS}
+                      id="retrieve-login-mobile-resend"
+                      font="bold16"
+                      type="button"
+                    >
+                      {intl.formatMessage(messages.resend)}
+                    </Link>
+                  )
+                }
+              )}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue"
+                  onClick={this.handleContinue}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.continueButtonLabel)}
+                </Button>
+              ]}
+            >
+              {resentSMS && (
+                <Toast type="success">
+                  {intl.formatMessage(messages.resentSMS, {
+                    number: this.props.location.state.mobile
+                  })}
+                </Toast>
+              )}
+
               <Actions id="recovery-code-verification">
                 <InputField
                   id="recovery-code"
@@ -215,8 +218,8 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                   />
                 </InputField>
               </Actions>
-            </form>
-          </Content>
+            </Content>
+          </form>
         </Frame>
       </>
     )

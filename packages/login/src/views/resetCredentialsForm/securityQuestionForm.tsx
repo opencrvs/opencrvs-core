@@ -209,24 +209,24 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
           }
           skipToContentText="Skip to main content"
         >
-          <Content
-            title={intl.formatMessage(messages[this.state.questionKey])}
-            subtitle={intl.formatMessage(
-              sharedMessages.securityQuestionFormBodySubheader
-            )}
-            bottomActionButtons={[
-              <Button
-                key="1"
-                id="continue"
-                onClick={this.handleContinue}
-                type="primary"
-                size="large"
-              >
-                {intl.formatMessage(sharedMessages.continueButtonLabel)}
-              </Button>
-            ]}
-          >
-            <form id="security-question-form" onSubmit={this.handleContinue}>
+          <form id="security-question-form" onSubmit={this.handleContinue}>
+            <Content
+              title={intl.formatMessage(messages[this.state.questionKey])}
+              subtitle={intl.formatMessage(
+                sharedMessages.securityQuestionFormBodySubheader
+              )}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue"
+                  onClick={this.handleContinue}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(sharedMessages.continueButtonLabel)}
+                </Button>
+              ]}
+            >
               <Actions id="security-answer">
                 <InputField
                   id="security-answer"
@@ -255,8 +255,8 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
                   />
                 </InputField>
               </Actions>
-            </form>
-          </Content>
+            </Content>
+          </form>
         </Frame>
       </>
     )

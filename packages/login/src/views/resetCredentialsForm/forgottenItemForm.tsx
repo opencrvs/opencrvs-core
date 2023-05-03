@@ -110,21 +110,21 @@ class ForgottenItemComponent extends React.Component<Props, State> {
           }
           skipToContentText="Skip to main content"
         >
-          <Content
-            title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
-            bottomActionButtons={[
-              <Button
-                key="1"
-                id="continue"
-                onClick={this.handleContinue}
-                type="primary"
-                size="large"
-              >
-                {intl.formatMessage(messages.continueButtonLabel)}
-              </Button>
-            ]}
-          >
-            <form id="forgotten-item-form" onSubmit={this.handleContinue}>
+          <form id="forgotten-item-form" onSubmit={this.handleContinue}>
+            <Content
+              title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue"
+                  onClick={this.handleContinue}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.continueButtonLabel)}
+                </Button>
+              ]}
+            >
               <Actions id="forgotten-item-options">
                 {this.state.error && (
                   <ErrorText id="error-text">
@@ -152,8 +152,8 @@ class ForgottenItemComponent extends React.Component<Props, State> {
                   )
                 })}
               </Actions>
-            </form>
-          </Content>
+            </Content>
+          </form>
         </Frame>
       </>
     )

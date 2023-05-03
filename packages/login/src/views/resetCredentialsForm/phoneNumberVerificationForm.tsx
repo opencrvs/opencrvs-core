@@ -162,25 +162,25 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           }
           skipToContentText="Skip to main content"
         >
-          <Content
-            title={intl.formatMessage(
-              messages.phoneNumberConfirmationFormBodyHeader
-            )}
-            bottomActionButtons={[
-              <Button
-                key="1"
-                id="continue"
-                onClick={this.handleContinue}
-                type="primary"
-                size="large"
-              >
-                {intl.formatMessage(messages.continueButtonLabel)}
-              </Button>
-            ]}
+          <form
+            id="phone-number-verification-form"
+            onSubmit={this.handleContinue}
           >
-            <form
-              id="phone-number-verification-form"
-              onSubmit={this.handleContinue}
+            <Content
+              title={intl.formatMessage(
+                messages.phoneNumberConfirmationFormBodyHeader
+              )}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue"
+                  onClick={this.handleContinue}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.continueButtonLabel)}
+                </Button>
+              ]}
             >
               <Actions id="phone-number-verification">
                 <InputField
@@ -215,8 +215,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                   />
                 </InputField>
               </Actions>
-            </form>
-          </Content>
+            </Content>
+          </form>
         </Frame>
       </>
     )

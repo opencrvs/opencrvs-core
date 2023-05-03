@@ -211,24 +211,24 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
           }
           skipToContentText="Skip to main content"
         >
-          <Content
-            title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
-            subtitle={intl.formatMessage(
-              messages.passwordUpdateFormBodySubheader
-            )}
-            bottomActionButtons={[
-              <Button
-                key="1"
-                id="continue-button"
-                onClick={this.whatNext}
-                type="primary"
-                size="large"
-              >
-                {intl.formatMessage(messages.confirmButtonLabel)}
-              </Button>
-            ]}
-          >
-            <form id="password-update-form" onSubmit={this.whatNext}>
+          <form id="password-update-form" onSubmit={this.whatNext}>
+            <Content
+              title={intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
+              subtitle={intl.formatMessage(
+                messages.passwordUpdateFormBodySubheader
+              )}
+              bottomActionButtons={[
+                <Button
+                  key="1"
+                  id="continue-button"
+                  onClick={this.whatNext}
+                  type="primary"
+                  size="large"
+                >
+                  {intl.formatMessage(messages.confirmButtonLabel)}
+                </Button>
+              ]}
+            >
               <GlobalError id="GlobalError">
                 {this.state.continuePressed &&
                   this.state.passwordMismatched && (
@@ -329,8 +329,8 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                   </PasswordMatch>
                 )}
               </PasswordContents>
-            </form>
-          </Content>
+            </Content>
+          </form>
         </Frame>
       </>
     )
