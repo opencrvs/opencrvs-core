@@ -700,7 +700,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=false'
-      replicas: 2
+      replicas: 1
     networks:
       - overlay_net
     logging:

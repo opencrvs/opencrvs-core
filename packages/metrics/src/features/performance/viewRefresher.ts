@@ -35,14 +35,11 @@ export async function metabaseDataRefreshHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  try {
-    await refresh()
-  } catch (err) {
-    console.error(err)
-  }
-
+  refresh().catch((error) => {
+    logger.error(`Error on metabase data refresh triggered: ${error}`)
+  })
   return h.response({
-    message: 'Successfully refreshed metabase data.',
+    message: 'Successfully triggered metabase data refresh',
     statusCode: 200
   })
 }
