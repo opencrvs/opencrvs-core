@@ -28,8 +28,9 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   cursor: pointer;
   border: 0;
   outline: none;
+  border-radius: 4px;
   background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.white : theme.colors.white};
+    isSelected ? theme.colors.yellow : theme.colors.white};
   :hover {
     background-color: ${({ theme }) => theme.colors.grey100};
   }
@@ -42,7 +43,7 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
   flex-flow: row;
   align-items: center;
-  padding: 4px 4px 4px 8px;
+  padding: 4px 0px 4px 2px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.grey600 : theme.colors.grey500};
 `

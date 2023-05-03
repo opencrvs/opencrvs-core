@@ -787,7 +787,17 @@ export const NavigationView = (props: IFullProps) => {
               <NavigationItem
                 key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 icon={() => (
-                  <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
+                  <Icon
+                    name={'Star'}
+                    color={
+                      advancedSearchParams.searchId ===
+                        bookmarkResult.searchId &&
+                      props.location.pathname === ADVANCED_SEARCH_RESULT
+                        ? 'grey600'
+                        : 'yellow'
+                    }
+                    weight={'fill'}
+                  ></Icon>
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}
