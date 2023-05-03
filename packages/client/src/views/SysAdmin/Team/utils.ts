@@ -116,6 +116,46 @@ export const getAddressName = (
   return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
+interface GetAddressMapping {
+  name: string
+  type: string
+}
+
+export const getAddressMapping = (
+  offlineCountryConfig: IOfflineData,
+  { partOf }: ILocation
+): GetAddressMapping[] => {
+  let parentLocationId = partOf.split('/')[1]
+  const arrayLocation = []
+
+  if (parentLocationId !== '0') {
+    do {
+      const currentOffice = offlineCountryConfig?.locations[parentLocationId]
+      parentLocationId = currentOffice?.partOf.split('/')[1]
+
+      if (currentOffice) {
+        arrayLocation.push(currentOffice.name)
+      } else {
+        parentLocationId = ''
+      }
+    } while (parentLocationId !== '')
+  }
+
+  return arrayLocation.reverse().map((obj, index) => {
+    return {
+      name: obj,
+      type:
+        index === 0
+          ? 'region'
+          : index === 1
+          ? 'division'
+          : index === 2
+          ? 'subdivision'
+          : 'community'
+    }
+  })
+}
+
 export function getUserAuditDescription(
   status: string
 ): MessageDescriptor | undefined {
