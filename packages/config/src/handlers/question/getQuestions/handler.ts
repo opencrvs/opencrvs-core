@@ -44,9 +44,9 @@ type IQuestionFromCountryConfig = IQuestion & { datasetName?: string }
 function getOptionsForQuestion(
   question: IQuestionFromCountryConfig,
   datasets: IDataSetModel[]
-): IDataset['options'] {
+): IDataset['options'] | undefined {
   if (!question.datasetId && !question.datasetName) {
-    return []
+    return question.options
   }
 
   const dataset = datasets.find(
@@ -73,7 +73,7 @@ export default async function getQuestions(
   )
 
   type QuestionWithDatasetPopulated = IQuestion & {
-    options: IDataset['options']
+    options?: IDataset['options']
   }
 
   /*

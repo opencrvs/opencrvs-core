@@ -632,6 +632,26 @@ export const deathRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationLocation',
             operation: 'registrationLocationUserTransformer'
+          },
+          {
+            fieldName: 'registrationRegion',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['region']
+          },
+          {
+            fieldName: 'registrationDivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['division']
+          },
+          {
+            fieldName: 'registrationRegion',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['region']
+          },
+          {
+            fieldName: 'registrationSubdivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['subdivision']
           }
         ],
         mutation: {
