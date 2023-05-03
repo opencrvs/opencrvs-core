@@ -219,6 +219,10 @@ function GeneratedInputField({
   }
 
   const intl = useIntl()
+  const onChangeGroupInput = React.useCallback(
+    (val: string) => onSetFieldValue(fieldDefinition.name, val),
+    [onSetFieldValue, fieldDefinition.name]
+  )
   const inputProps = {
     id: fieldDefinition.name,
     onChange,
@@ -409,7 +413,7 @@ function GeneratedInputField({
         <TimeField
           {...inputProps}
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          onChange={onChangeGroupInput}
           value={value as string}
         />
       </InputField>

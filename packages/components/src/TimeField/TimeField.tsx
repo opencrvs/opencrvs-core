@@ -45,12 +45,27 @@ const Segment = styled(TextInput)`
 
 export type ITimeFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
+function usePrevious(value?: string) {
+  const ref = React.useRef<string | undefined>()
+  React.useEffect(() => {
+    ref.current = value
+  }, [value])
+  return ref.current
+}
 export function TimeField(props: ITimeFieldProps) {
-  const { id, meta, focusInput, notice, ignorePlaceHolder, ...otherProps } =
-    props
-  function getInitialState(): IState {
-    if (props.value && typeof props.value === 'string') {
-      const dateSegmentVals = props.value.split('-')
+  const {
+    id,
+    meta,
+    focusInput,
+    notice,
+    ignorePlaceHolder,
+    onChange,
+    value,
+    ...otherProps
+  } = props
+  const getInitialState = React.useCallback((): IState => {
+    if (value && typeof value === 'string') {
+      const dateSegmentVals = value.split('-')
       return {
         hh: dateSegmentVals[0],
         mm: dateSegmentVals[1]
@@ -61,8 +76,9 @@ export function TimeField(props: ITimeFieldProps) {
         mm: ''
       }
     }
-  }
+  }, [value])
   const [state, setState] = React.useState(getInitialState())
+  const prevValue = usePrevious(value as string)
   const hh = React.useRef<IRef>(null)
   const mm = React.useRef<IRef>(null)
   function change(event: React.ChangeEvent<HTMLInputElement>) {
@@ -77,13 +93,19 @@ export function TimeField(props: ITimeFieldProps) {
       if (Number(val) < 0 || Number(val) > 59) return
       setState((state) => ({ ...state, mm: val }))
     }
-    if (state.hh && state.mm) {
-      props.onChange(
-        `${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`
-      )
-    }
   }
-
+  React.useEffect(() => {
+    if (state.hh && state.mm) {
+      onChange(`${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`)
+    } else if (!state.hh && !state.mm) {
+      onChange('')
+    }
+  }, [state.hh, state.mm, onChange])
+  React.useEffect(() => {
+    if (!prevValue && value) {
+      setState(getInitialState())
+    }
+  }, [value, prevValue, getInitialState])
   return (
     <Container id={id}>
       <Segment
