@@ -386,10 +386,12 @@ const NavIcons: INavIcons = {
   [WORKQUEUE_TABS.readyToIssue]: <DeclarationIconSmall color={'teal'} />,
   [WORKQUEUE_TABS.outbox]: <Icon name="PaperPlaneTilt" size="medium" />,
   [WORKQUEUE_TABS.performance]: <Icon name="ChartLine" size="medium" />,
-  [WORKQUEUE_TABS.vsexports]: <Icon name="Share" size="small" />,
+  [WORKQUEUE_TABS.vsexports]: <Icon name="UploadSimple" size="small" />,
   [WORKQUEUE_TABS.dashboard]: <Icon name="ChartLine" size="medium" />,
   [WORKQUEUE_TABS.report]: <Icon name="Activity" size="medium" />,
-  [WORKQUEUE_TABS.administrativeAreas]: <Icon name="List" size="small" />,
+  [WORKQUEUE_TABS.administrativeAreas]: (
+    <Icon name="ListBullets" size="small" />
+  ),
   [WORKQUEUE_TABS.team]: <Icon name="Users" size="medium" />,
   [WORKQUEUE_TABS.application]: <Icon name="Compass" size="medium" />,
   [WORKQUEUE_TABS.certificate]: <Icon name="Medal" size="medium" />,

@@ -51,5 +51,6 @@ export {
   Eye,
   DotsThreeVertical,
   MapPin,
-  PaperPlaneTilt
+  PaperPlaneTilt,
+  UploadSimple
 } from 'phosphor-react'
