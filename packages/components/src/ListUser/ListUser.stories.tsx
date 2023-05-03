@@ -31,7 +31,7 @@ const UserMenu = (
     menuItems={[
       {
         handler: () => {},
-        icon: <Icon name="PencilSimple" size="medium" weight="bold" />,
+        icon: <Icon name="Pencil" size="medium" weight="bold" />,
         label: 'Edit'
       },
       {
