@@ -302,40 +302,6 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         },
         {
           $lookup: {
-            from: 'Observation',
-            localField: 'encounterIdForJoining',
-            foreignField: 'context.reference',
-            as: 'observations'
-          }
-        },
-        {
-          $addFields: {
-            birthTypeObservation: {
-              $filter: {
-                input: '$observations',
-                as: 'element',
-                cond: {
-                  $eq: [
-                    {
-                      $let: {
-                        vars: {
-                          firstElement: {
-                            $arrayElemAt: ['$$element.code.coding', 0]
-                          }
-                        },
-                        in: '$$firstElement.code'
-                      }
-                    },
-                    '57722-1'
-                  ]
-                }
-              }
-            }
-          }
-        },
-        { $unwind: '$birthTypeObservation' },
-        {
-          $lookup: {
             from: 'Location',
             localField: 'placeOfBirthLocationId',
             foreignField: 'id',
@@ -467,12 +433,15 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
           }
         },
         { $unwind: '$practitionerRole' },
-        { $unwind: '$practitionerRole.code' },
-        { $unwind: '$practitionerRole.code.coding' },
+        {
+          $addFields: {
+            firstCode: { $slice: ['$practitionerRole.code', 1] }
+          }
+        },
+        { $unwind: '$firstCode' },
         {
           $match: {
-            'practitionerRole.code.coding.system':
-              'http://opencrvs.org/specs/titles'
+            'firstCode.coding.system': 'http://opencrvs.org/specs/roles'
           }
         },
         {
@@ -538,10 +507,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
-            birthType: '$birthTypeObservation.valueQuantity.value',
             mothersAgeAtBirthOfChildInYears: '$mothersAgeAtBirthOfChild',
             placeOfBirthType: 1,
-            practitionerRole: '$practitionerRole.code.coding.code',
+            practitionerRole: { $arrayElemAt: ['$firstCode.coding.code', 0] },
             practitionerName: {
               $concat: [
                 '$practitionerFamilyname',
