@@ -37,7 +37,10 @@
     "packages/scheduler/jobs/*",
     ".nvmrc",
     ".idea",
-    "infrastructure/elasticsearch/jvm.options"
+    "infrastructure/elasticsearch/jvm.options",
+    "packages/dashboards/*.jar",
+    "packages/dashboards/plugins/*.jar",
+    "packages/dashboards/data/metabase/*.db"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
