@@ -962,7 +962,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineCountryConfiguration,
       draft.data
     )
-    return !conditionalActions.includes('hide')
+    return (
+      !conditionalActions.includes('hide') &&
+      !conditionalActions.includes('disable') &&
+      !conditionalActions.includes('hideInPreview')
+    )
   }
 
   isViewOnly(field: IFormField) {
