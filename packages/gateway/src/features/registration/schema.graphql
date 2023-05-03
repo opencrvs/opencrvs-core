@@ -481,6 +481,11 @@ type Registration { # -> Task
   brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
   witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
   witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
+  informantsSignatureURI: String # actual minio object uri for informantsSignature
+  groomSignatureURI: String # actual minio object uri for groomSignatureURI
+  brideSignatureURI: String # actual minio object uri for brideSignatureURI
+  witnessOneSignatureURI: String # actual minio object uri for witnessOneSignatureURI
+  witnessTwoSignatureURI: String # actual minio object uri for witnessTwoSignatureURI
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code

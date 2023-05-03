@@ -261,7 +261,7 @@ function GeneratedInputField({
         if (isMinioUrl) {
           return {
             ...file,
-            data: `${window.config.MINIO_URL}${file.data}`
+            data: file.data
           }
         }
         return file

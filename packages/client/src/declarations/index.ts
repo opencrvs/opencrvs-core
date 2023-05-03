@@ -1048,7 +1048,7 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
   }
   const urlsWithMinioPath = attachments
     .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
+    .map((a) => a && fetch(String(a.data)))
 
   return Promise.all(urlsWithMinioPath)
 }
@@ -1834,9 +1834,7 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
-  )
+  const minioFullUrls = minioUrls.map((pathToImage) => pathToImage)
   navigator?.serviceWorker?.controller?.postMessage({
     minioUrls: minioFullUrls
   })

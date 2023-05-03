@@ -291,6 +291,7 @@ export interface IAttachmentValue {
   name?: string
   type: string
   data: string
+  uri?: string
 }
 
 export type IFormFieldMutationMapFunction = (

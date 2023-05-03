@@ -101,8 +101,23 @@ export function setBirthRegistrationSectionTransformer(
   }
 
   if (draftData[sectionId].informantsSignature) {
-    transformedData[sectionId].informantsSignature =
-      draftData[sectionId].informantsSignature
+    const isMinioUrl =
+      String(draftData[sectionId].informantsSignature).split('/').length > 1 &&
+      String(draftData[sectionId].informantsSignature).split('/')[1] ===
+        window.config.MINIO_BUCKET
+
+    if (isMinioUrl) {
+      transformedData[sectionId].informantsSignature = `/${
+        window.config.MINIO_BUCKET
+      }${
+        String(draftData[sectionId].informantsSignatureURI).split(
+          `/${window.config.MINIO_BUCKET}`
+        )[1]
+      }`
+    } else {
+      transformedData[sectionId].informantsSignature =
+        draftData[sectionId].informantsSignature
+    }
   }
 
   if (draftData[sectionId].commentsOrNotes) {

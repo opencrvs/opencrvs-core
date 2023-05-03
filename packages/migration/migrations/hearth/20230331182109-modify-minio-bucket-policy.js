@@ -12,8 +12,6 @@
 import * as Minio from 'minio'
 import {
   MINIO_BUCKET,
-  MINIO_HOST,
-  MINIO_PORT,
   DEFAULT_MINIO_ACCESS_KEY,
   minioClient
   // eslint-disable-next-line import/no-relative-parent-imports
@@ -26,7 +24,9 @@ const updatedPolicy = `
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::minio-user:${DEFAULT_MINIO_ACCESS_KEY}"
+        "AWS": "arn:aws:iam::minio-user:${
+          process.env.MINIO_ACCESS_KEY || DEFAULT_MINIO_ACCESS_KEY
+        }"
       },
       "Action": [
         "s3:GetObject"

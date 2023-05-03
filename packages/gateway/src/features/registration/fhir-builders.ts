@@ -2494,60 +2494,95 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
     },
-    informantsSignature: (
+    informantsSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      if (isBase64FileString(fieldValue)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          fieldValue,
+          context.authHeader
+        )
+        fieldValue = docUploadResponse
+      }
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.INFORMANT
       )
     },
-    groomSignature: (
+    groomSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      if (isBase64FileString(fieldValue)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          fieldValue,
+          context.authHeader
+        )
+        fieldValue = docUploadResponse
+      }
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.GROOM
       )
     },
-    brideSignature: (
+    brideSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      if (isBase64FileString(fieldValue)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          fieldValue,
+          context.authHeader
+        )
+        fieldValue = docUploadResponse
+      }
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.BRIDE
       )
     },
-    witnessOneSignature: (
+    witnessOneSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      if (isBase64FileString(fieldValue)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          fieldValue,
+          context.authHeader
+        )
+        fieldValue = docUploadResponse
+      }
       return createInformantsSignature(
         taskResource,
         fieldValue,
         SignatureExtensionPostfix.WITNESS_ONE
       )
     },
-    witnessTwoSignature: (
+    witnessTwoSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      if (isBase64FileString(fieldValue)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          fieldValue,
+          context.authHeader
+        )
+        fieldValue = docUploadResponse
+      }
       return createInformantsSignature(
         taskResource,
         fieldValue,

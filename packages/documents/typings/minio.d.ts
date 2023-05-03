@@ -9,19 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import { signFileUrl } from '@documents/minio/sign'
-import * as Hapi from '@hapi/hapi'
-
-export function createPreSignedUrl(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const payload = request.payload as { fileName: string }
-  try {
-    const presignedURL = signFileUrl(payload.fileName)
-    return h.response({ presignedURL }).code(200)
-  } catch (error) {
-    return h.response(error).code(400)
+type Request = {
+  headers: {
+    host: string
   }
+  protocol: string
+  method: string
+  path: string
+}
+
+declare module 'minio/dist/main/signing' {
+  export function presignSignatureV4(
+    request: Request,
+    accessKey: string,
+    secretKey: string,
+    sessionToken?: string,
+    region: string,
+    requestDate: Date,
+    expires: number
+  ): string
 }

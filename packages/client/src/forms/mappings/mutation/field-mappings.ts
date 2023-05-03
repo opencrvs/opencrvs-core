@@ -399,7 +399,11 @@ export function fieldToAttachmentTransformer(
     (attachment) => {
       return {
         ...(attachment.uri
-          ? { uri: attachment.uri }
+          ? {
+              uri: `/${window.config.MINIO_BUCKET}${
+                attachment.uri.split(`/${window.config.MINIO_BUCKET}`)[1]
+              }`
+            }
           : { data: attachment.data }),
         subject: attachment.optionValues[0],
         type: typeMapper
