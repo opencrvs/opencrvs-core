@@ -26,12 +26,14 @@ const ImageBase = styled(SecondaryButton)`
 const HiddenInput = styled.input`
   display: none;
 `
+
 const Icon = styled.div`
   display: flex;
   justify-content: center;
   margin-left: 2em;
 `
-interface IImagePickerProps {
+
+type IImagePickerProps = {
   id: string
   title: string
   icon?: () => React.ReactNode
