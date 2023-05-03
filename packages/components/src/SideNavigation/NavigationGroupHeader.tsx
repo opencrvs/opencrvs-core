@@ -29,6 +29,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   outline: none;
   border-radius: 4px;
+  margin-bottom: 2px;
   background-color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.yellow : theme.colors.white};
   :hover {
