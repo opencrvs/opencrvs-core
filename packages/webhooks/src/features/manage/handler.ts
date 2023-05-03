@@ -245,3 +245,26 @@ export async function deleteWebhookHandler(
   }
   return h.response().code(204)
 }
+
+interface IDeleteWebhooksByClientIdPayload {
+  clientId: string
+}
+
+export async function deleteWebhookByClientIdHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { clientId } = request.payload as IDeleteWebhooksByClientIdPayload
+  if (!clientId) {
+    return h.response('No clientId in URL params').code(400)
+  }
+
+  try {
+    await Webhook.deleteMany({ 'createdBy.client_id': clientId })
+  } catch (err) {
+    logger.info(
+      `Could not delete webhooks associated with client_id: ${clientId}`
+    )
+  }
+  return h.response().code(204)
+}
