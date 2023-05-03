@@ -15,6 +15,7 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 import {
   InputField,
   ISelectOption as SelectComponentOptions,
@@ -140,10 +141,7 @@ import {
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { ListReview } from '@opencrvs/components/lib/ListReview'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
@@ -248,13 +246,6 @@ const Title = styled.div`
   justify-content: space-between;
   ${({ theme }) => theme.fonts.h3};
   padding: 16px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-`
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
-const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
 `
 const SectionContainer = styled.div`
   margin-bottom: 40px;
@@ -1904,30 +1895,38 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           />
                         </DocumentListPreviewContainer>
                       )}
-                      <ListViewSimplified id={'Section_' + sec.id}>
-                        {sec.items.map((item, index) => {
-                          return (
-                            <ListViewItemSimplified
-                              key={index}
-                              label={<Label>{item.label}</Label>}
-                              value={
-                                <Value id={item.label.split(' ')[0]}>
-                                  {item.value}
-                                </Value>
-                              }
-                              actions={
-                                <LinkButton
-                                  id={item.action.id}
-                                  disabled={item.action.disabled}
-                                  onClick={item.action.handler}
-                                >
-                                  {item.action.label}
-                                </LinkButton>
-                              }
-                            />
-                          )
-                        })}
-                      </ListViewSimplified>
+                      <ListReview
+                        id={'Section_' + sec.id}
+                        key={index}
+                        rows={sec.items.map((item) => ({
+                          id: item.id,
+                          label: [
+                            <Text variant="bold16" element="h4">
+                              {item.label}
+                            </Text>
+                          ],
+                          value: [
+                            <Text
+                              id={item.label.split(' ')[0]}
+                              variant="reg16"
+                              element="p"
+                            >
+                              {item.value}
+                            </Text>
+                          ],
+                          actions: [
+                            <Link
+                              id={item.action.id}
+                              disabled={item.action.disabled}
+                              onClick={item.action.handler}
+                              element="button"
+                              font="reg16"
+                            >
+                              {item.action.label}
+                            </Link>
+                          ]
+                        }))}
+                      />
                     </SectionContainer>
                   )
                 })}
