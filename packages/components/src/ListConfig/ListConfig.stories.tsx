@@ -28,7 +28,7 @@ const ConfigMenu = (
     menuItems={[
       {
         handler: () => {},
-        icon: <Icon name="PencilSimple" size="medium" weight="bold" />,
+        icon: <Icon name="Pencil" size="medium" weight="bold" />,
         label: 'Edit'
       },
       {
@@ -43,7 +43,7 @@ const ConfigMenu = (
 
 const EditButton = (
   <Button type="icon" size="medium">
-    <Icon name="PencilSimple" size="medium" weight="bold" />
+    <Icon name="Pencil" size="medium" weight="bold" />
   </Button>
 )
 const StatusPill = <Pill label="Active" type="active" size="small" />
