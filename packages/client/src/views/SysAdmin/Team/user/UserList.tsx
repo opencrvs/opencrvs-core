@@ -73,10 +73,7 @@ import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAudit
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { ListUser } from '@opencrvs/components/lib/ListUser'
 import { useCallback } from 'react'
 import {
   withOnlineStatus,
@@ -651,7 +648,16 @@ function UserListComponent(props: IProps) {
           requiredLocationTypes={'CRVS_OFFICE'}
         />
       )
-      buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)
+      buttons.push(
+        <Button
+          id="add-user"
+          type="icon"
+          size="medium"
+          onClick={onClickAddUser}
+        >
+          <Icon name="UserPlus" />
+        </Button>
+      )
     }
     return buttons
   }
@@ -673,25 +679,22 @@ function UserListComponent(props: IProps) {
       return (
         <>
           <UserTable id="user_list">
-            <ListViewSimplified>
-              {userContent.length <= 0 ? (
-                <NoRecord id="no-record">
-                  {intl.formatMessage(constantsMessages.noResults)}
-                </NoRecord>
-              ) : (
-                userContent.map((content, index) => {
-                  return (
-                    <ListViewItemSimplified
-                      key={index}
-                      image={content.image}
-                      label={content.label}
-                      value={content.value}
-                      actions={content.actions}
-                    />
-                  )
-                })
-              )}
-            </ListViewSimplified>
+            {userContent.length <= 0 ? (
+              <NoRecord id="no-record">
+                {intl.formatMessage(constantsMessages.noResults)}
+              </NoRecord>
+            ) : (
+              <ListUser
+                rows={userContent.map((content) => ({
+                  avatar: content.image,
+                  label: content.label,
+                  value: content.value,
+                  actions: content.actions ? [content.actions] : []
+                }))}
+                labelHeader="USER"
+                valueHeader="ROLE"
+              />
+            )}
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
               <Pagination
                 currentPage={currentPageNumber}
@@ -865,19 +868,6 @@ function UserListComponent(props: IProps) {
                   </Loading>
                 ) : (
                   <>
-                    <Header id="header">
-                      {(searchedLocation && searchedLocation.name) || ''}
-                    </Header>
-                    <LocationInfo>
-                      {searchedLocation && (
-                        <LocationInfoValue>
-                          {getAddressName(
-                            offlineCountryConfig,
-                            getParentLocation(searchedLocation)
-                          )}
-                        </LocationInfoValue>
-                      )}
-                    </LocationInfo>
                     <RenderUserList
                       data={data}
                       locationId={locationId}
