@@ -219,7 +219,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
             bottomActionButtons={[
               <Button
                 key="1"
-                id="continue"
+                id="continue-button"
                 onClick={this.whatNext}
                 type="primary"
                 size="large"
