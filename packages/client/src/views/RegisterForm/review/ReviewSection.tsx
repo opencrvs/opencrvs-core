@@ -1901,12 +1901,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         rows={sec.items.map((item) => ({
                           id: item.id,
                           label: [
-                            <Text variant="bold16" element="h4">
+                            <Text key={item.id} variant="bold16" element="h4">
                               {item.label}
                             </Text>
                           ],
                           value: [
                             <Text
+                              key={item.id}
                               id={item.label.split(' ')[0]}
                               variant="reg16"
                               element="p"
@@ -1916,6 +1917,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           ],
                           actions: [
                             <Link
+                              key={item.action.id}
                               id={item.action.id}
                               disabled={item.action.disabled}
                               onClick={item.action.handler}
