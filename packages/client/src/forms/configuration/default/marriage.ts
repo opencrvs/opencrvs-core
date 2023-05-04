@@ -145,7 +145,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.others
                 }
               ],
               nestedFields: {
