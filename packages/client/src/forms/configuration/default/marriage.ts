@@ -144,8 +144,12 @@ export const marriageRegisterForms: ISerializedForm = {
                   label: informantMessageDescriptors.bride
                 },
                 {
+                  value: 'OTHER_FAMILY_MEMBER',
+                  label: informantMessageDescriptors.otherFamilyMember
+                },
+                {
                   value: 'OTHER',
-                  label: informantMessageDescriptors.others
+                  label: formMessageDescriptors.someoneElse
                 }
               ],
               nestedFields: {
@@ -186,6 +190,42 @@ export const marriageRegisterForms: ISerializedForm = {
                   }
                 ],
                 BRIDE: [
+                  {
+                    name: 'registrationPhone',
+                    type: 'TEL',
+                    label: formMessageDescriptors.phoneNumber,
+                    required: true,
+                    initialValue: '',
+                    validator: [
+                      {
+                        operation: 'phoneNumberFormat'
+                      }
+                    ],
+                    mapping: {
+                      mutation: {
+                        operation: 'changeHirerchyMutationTransformer',
+                        parameters: [
+                          'registration.contactPhoneNumber',
+                          {
+                            operation: 'msisdnTransformer',
+                            parameters: ['registration.contactPhoneNumber']
+                          }
+                        ]
+                      },
+                      query: {
+                        operation: 'changeHirerchyQueryTransformer',
+                        parameters: [
+                          'registration.contactPhoneNumber',
+                          {
+                            operation: 'localPhoneTransformer',
+                            parameters: ['registration.contactPhoneNumber']
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                OTHER_FAMILY_MEMBER: [
                   {
                     name: 'registrationPhone',
                     type: 'TEL',
