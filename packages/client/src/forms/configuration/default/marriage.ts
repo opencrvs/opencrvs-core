@@ -30,7 +30,12 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'who-is-applying-view-group',
           title: informantMessageDescriptors.marriageInformantTitle,
-          conditionals: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'true'
+            }
+          ],
           preventContinueIfError: true,
           showExitButtonOnly: true,
           fields: [
