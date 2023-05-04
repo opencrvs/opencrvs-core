@@ -567,7 +567,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'familyNameEng',
               previewGroup: 'groomNameInEnglish',
               type: 'TEXT',
-              label: formMessageDescriptors.familyName,
+              label: formMessageDescriptors.husbandFamilyName,
               maxLength: 32,
               required: true,
               initialValue: '',
