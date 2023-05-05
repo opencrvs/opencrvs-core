@@ -1719,6 +1719,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
+    const hasValidPhoneForContact = Boolean(
+      errorsOnFields.registration.contactPoint.nestedFields.registrationPhone
+    )
+
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
         return false
@@ -1996,6 +2000,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
+                          hasValidPhoneForContact={hasValidPhoneForContact}
                         />
                       </>
                     ) : (
