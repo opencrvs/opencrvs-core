@@ -13,7 +13,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 export interface INavigationItemProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  extends React.LiHTMLAttributes<HTMLLIElement> {
   icon?: () => React.ReactNode
   label: string
   count?: number
@@ -23,7 +23,8 @@ export interface INavigationItemProps
   children?: React.ReactNode
 }
 
-const ItemContainer = styled.button<{ isSelected?: boolean }>`
+const ItemContainer = styled.li<{ isSelected?: boolean }>`
+  list-style-type: none;
   width: 100%;
   min-height: 40px;
   cursor: pointer;
@@ -83,7 +84,15 @@ export const NavigationItem = ({
   ...otherProps
 }: INavigationItemProps) => {
   return (
-    <ItemContainer isSelected={isSelected} {...otherProps}>
+    <ItemContainer
+      isSelected={isSelected}
+      {...otherProps}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        const target = e.target as HTMLLIElement
+        if (e.code == 'Enter' || e.code == 'Space') target.click()
+      }}
+    >
       <ItemContentContainer isSelected={isSelected}>
         {icon && <IconContainer>{icon()}</IconContainer>}
         <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>

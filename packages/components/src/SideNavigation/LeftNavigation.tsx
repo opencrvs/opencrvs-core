@@ -102,7 +102,7 @@ const Container = styled.div`
   flex: 0 0 auto;
 `
 
-const MenuItem = styled.div`
+const MenuItem = styled.nav`
   flex: 1 1 auto;
   overflow-y: auto;
 `

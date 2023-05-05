@@ -13,7 +13,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 export interface INavigationGroupHeaderProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  extends React.LiHTMLAttributes<HTMLLIElement> {
   icon?: () => React.ReactNode
   label: string
   count?: number
@@ -22,7 +22,8 @@ export interface INavigationGroupHeaderProps
   children?: React.ReactNode
 }
 
-const ItemContainer = styled.button<{ isSelected?: boolean }>`
+const ItemContainer = styled.li<{ isSelected?: boolean }>`
+  list-style-type: none;
   width: 100%;
   min-height: 40px;
   cursor: pointer;
@@ -44,7 +45,7 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
   flex-flow: row;
   align-items: center;
-  padding: 4px 0px 4px 2px;
+  padding: 11px 16px 11px 10px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.grey600 : theme.colors.grey500};
 `
@@ -61,8 +62,14 @@ const LabelContainer = styled.span<{
 `
 
 const IconContainer = styled.div`
-  width: 24px;
+  width: 18px;
 `
+// const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
+//   switch (e.code) {
+//     case 'Enter':
+//       e.click()
+//   }
+// }
 
 export const NavigationGroupHeader = ({
   icon,
@@ -74,7 +81,15 @@ export const NavigationGroupHeader = ({
   ...otherProps
 }: INavigationGroupHeaderProps) => {
   return (
-    <ItemContainer isSelected={isSelected} {...otherProps}>
+    <ItemContainer
+      isSelected={isSelected}
+      {...otherProps}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        const target = e.target as HTMLLIElement
+        if (e.code == 'Enter' || e.code == 'Space') target.click()
+      }}
+    >
       <ItemContentContainer isSelected={isSelected}>
         {icon && <IconContainer>{icon()}</IconContainer>}
         <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>

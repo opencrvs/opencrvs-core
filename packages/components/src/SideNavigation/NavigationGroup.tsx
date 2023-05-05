@@ -14,9 +14,9 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 export interface INavigationGroup
-  extends React.HTMLAttributes<HTMLDivElement> {}
+  extends React.HTMLAttributes<HTMLUListElement> {}
 
-const NavigationGroupContainer = styled.div`
+const NavigationGroupContainer = styled.ul`
   padding: 8px 0px;
   box-shadow: 0px 16px 1px -16px ${({ theme }) => theme.colors.grey400};
   &:last-child {
