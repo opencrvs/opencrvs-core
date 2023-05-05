@@ -1141,7 +1141,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
         props.initialValues ?? mapFieldsToValues(props.fields, userDetails)
       }
       onSubmit={() => {}}
-      enableReinitialize
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
