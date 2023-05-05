@@ -11,7 +11,8 @@
  */
 import {
   CERTIFIED_STATUS,
-  REGISTERED_STATUS
+  REGISTERED_STATUS,
+  ISSUED_STATUS
 } from '@search/elasticsearch/utils'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 
@@ -70,7 +71,7 @@ export function advancedQueryBuilder(
       query_string: {
         default_field: 'type',
         query: isExternalSearch
-          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
+          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS}) OR (${ISSUED_STATUS})`
           : `(${params.registrationStatuses!.join(') OR (')})`
       }
     })

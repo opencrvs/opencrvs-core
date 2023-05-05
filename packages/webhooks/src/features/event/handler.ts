@@ -293,6 +293,7 @@ export async function birthCertifiedHandler(
           authHeader,
           permissions
         )
+
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_CERTIFIED]) {
           const payload = {
             timestamp: new Date().toISOString(),

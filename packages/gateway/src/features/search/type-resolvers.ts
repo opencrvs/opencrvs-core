@@ -20,6 +20,7 @@ import {
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
+import { logger } from '@gateway/logger'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -190,9 +191,23 @@ export const searchTypeResolvers: GQLResolver = {
       return (resultSet._source && resultSet._source.childDoB) || null
     },
     placeOfBirth(resultSet: ISearchEventDataTemplate) {
+      if (resultSet._source && resultSet._source.eventLocationId) {
+        logger.info(
+          `resultSet._source.eventLocationId,
+          ${resultSet._source.eventLocationId}`
+        )
+      }
+      if (resultSet._source && resultSet._source.eventJurisdictionIds) {
+        logger.info(
+          `resultSet._source.eventJurisdictionIds,
+          ${JSON.stringify(resultSet._source.eventJurisdictionIds)}`
+        )
+      }
       return (
         (resultSet._source && resultSet._source.eventLocationId) ||
         (resultSet._source &&
+          resultSet._source.eventJurisdictionIds &&
+          resultSet._source.eventJurisdictionIds.length > 0 &&
           resultSet._source.eventJurisdictionIds[
             resultSet._source.eventJurisdictionIds.length - 1
           ]) ||

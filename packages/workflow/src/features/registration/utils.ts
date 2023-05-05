@@ -13,7 +13,7 @@ import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
   MOSIP_TOKEN_SEEDER_URL,
-  APPLICATION_CONFIG_URL
+  HEARTH_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -35,6 +35,11 @@ import {
 import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import {
+  getInformantSMSNotification,
+  InformantSMSNotificationName,
+  isInformantSMSNotificationEnabled
+} from './smsNotificationUtils'
 
 interface INotificationPayload {
   msisdn: string
@@ -42,24 +47,6 @@ interface INotificationPayload {
   trackingId?: string
   crvsOffice?: string
   registrationNumber?: string
-}
-
-enum InformantSMSNotificationName {
-  birthInProgressSMS = 'birthInProgressSMS',
-  birthDeclarationSMS = 'birthDeclarationSMS',
-  birthRegistrationSMS = 'birthRegistrationSMS',
-  birthRejectionSMS = 'birthRejectionSMS',
-  deathInProgressSMS = 'deathInProgressSMS',
-  deathDeclarationSMS = 'deathDeclarationSMS',
-  deathRegistrationSMS = 'deathRegistrationSMS',
-  deathRejectionSMS = 'deathRejectionSMS'
-}
-interface IInformantSMSNotification {
-  _id: string
-  name: InformantSMSNotificationName
-  enabled: boolean
-  updatedAt: number
-  createdAt: number
 }
 export type Composition = fhir.Composition & { id: string }
 export type Patient = fhir.Patient & { id: string }
@@ -593,33 +580,43 @@ export function getPatientBySection(
     })?.resource as fhir.Patient)
   )
 }
+export const fetchHearth = async <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+    method: method,
+    body,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
 
-async function getInformantSMSNotification(token: string) {
-  try {
-    const informantSMSNotificationURL = new URL(
-      'informantSMSNotification',
-      APPLICATION_CONFIG_URL
-    ).toString()
-    const res = await fetch(informantSMSNotificationURL, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
-    })
-    return (await res.json()) as IInformantSMSNotification[]
-  } catch (err) {
-    logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
-    throw err
+  if (!res.ok) {
+    throw new Error(
+      `FHIR get to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
   }
+  return res.json()
 }
 
-function isInformantSMSNotificationEnabled(
-  informantSMSNotifications: IInformantSMSNotification[],
-  name: InformantSMSNotificationName
-) {
-  const isNotificationEnabled = informantSMSNotifications.find(
-    (notification) => notification.name === name
-  )?.enabled
-  return Boolean(isNotificationEnabled)
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const taskBundle: fhir.Bundle = await fetchHearth(
+    `/Task?focus=Composition/${id}`
+  )
+  return taskBundle.entry?.[0]?.resource as fhir.Task
+}
+
+export function getVoidEvent(event: EVENT_TYPE): Events {
+  switch (event) {
+    case EVENT_TYPE.MARRIAGE:
+      return Events.MARRIAGE_MARK_VOID
+    case EVENT_TYPE.BIRTH:
+      return Events.BIRTH_MARK_VOID
+    case EVENT_TYPE.DEATH:
+      return Events.DEATH_MARK_VOID
+    default:
+      return Events.BIRTH_MARK_VOID
+  }
 }

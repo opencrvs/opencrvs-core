@@ -73,8 +73,6 @@ type BirthEventSearchSet implements EventSearchSet {
   fatherDateOfBirth: String
   motherIdentifier: String
   fatherIdentifier: String
-
-
 }
 
 type DeathEventSearchSet implements EventSearchSet {
