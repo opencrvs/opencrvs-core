@@ -46,8 +46,15 @@ const Segment = styled(TextInput)`
 export type ITimeFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 export function TimeField(props: ITimeFieldProps) {
-  const { id, meta, focusInput, notice, ignorePlaceHolder, ...otherProps } =
-    props
+  const {
+    id,
+    meta,
+    focusInput,
+    notice,
+    ignorePlaceHolder,
+    onChange,
+    ...otherProps
+  } = props
   function getInitialState(): IState {
     if (props.value && typeof props.value === 'string') {
       const dateSegmentVals = props.value.split('-')
@@ -80,11 +87,9 @@ export function TimeField(props: ITimeFieldProps) {
   }
   React.useEffect(() => {
     if (state.hh && state.mm) {
-      props.onChange(
-        `${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`
-      )
+      onChange(`${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`)
     }
-  }, [state.hh, state.mm, props])
+  }, [state.hh, state.mm, onChange])
   return (
     <Container id={id}>
       <Segment
