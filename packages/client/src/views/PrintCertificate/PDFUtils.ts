@@ -159,6 +159,17 @@ export function executeHandlebarsTemplate(
     }
   )
 
+  Handlebars.registerHelper(
+    'split',
+    function (str: string, separator: string, index: number) {
+      if (!str) {
+        return ''
+      }
+
+      return str.split(separator)[index] || ''
+    }
+  )
+
   Handlebars.registerHelper('translateDate', function (date: string) {
     return formatDate(new Date(date), 'dd MMMM yyyy')
   })
