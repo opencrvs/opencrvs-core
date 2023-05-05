@@ -19,6 +19,7 @@ export interface IProps {
   meta?: { touched: boolean; error: string }
   focusInput?: boolean
   notice?: string
+  value?: string
   ignorePlaceHolder?: boolean
   onChange: (dateString: string) => void
 }
@@ -43,7 +44,12 @@ const Segment = styled(TextInput)`
   }
 `
 
-export type ITimeFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
+export type ITimeFieldProps = IProps &
+  Omit<ITextInputProps, 'onChange' | 'value'>
+
+function getFormattedValue(time: { hh: string; mm: string }) {
+  return `${time.hh.padStart(2, '0')}-${time.mm.padStart(2, '0')}`
+}
 
 export function TimeField(props: ITimeFieldProps) {
   const {
@@ -55,23 +61,35 @@ export function TimeField(props: ITimeFieldProps) {
     onChange,
     ...otherProps
   } = props
-  function getInitialState(): IState {
-    if (props.value && typeof props.value === 'string') {
-      const dateSegmentVals = props.value.split('-')
+
+  const [state, setState] = React.useState({
+    hh: '',
+    mm: ''
+  })
+
+  React.useEffect(() => {
+    function getInitialState(time: string): IState {
+      const dateSegmentVals = time.split('-')
       return {
         hh: dateSegmentVals[0],
         mm: dateSegmentVals[1]
       }
-    } else {
-      return {
-        hh: '',
-        mm: ''
-      }
     }
-  }
-  const [state, setState] = React.useState(getInitialState())
+
+    const isValidTime = (time: string) => time.split('-').length === 2
+
+    if (
+      props.value &&
+      isValidTime(props.value) &&
+      props.value !== getFormattedValue(state)
+    ) {
+      setState(getInitialState(props.value))
+    }
+  }, [props.value, state])
+
   const hh = React.useRef<IRef>(null)
   const mm = React.useRef<IRef>(null)
+
   function change(event: React.ChangeEvent<HTMLInputElement>) {
     const val = event.target.value
     if (event.target.id.includes('hh')) {
@@ -87,9 +105,10 @@ export function TimeField(props: ITimeFieldProps) {
   }
   React.useEffect(() => {
     if (state.hh && state.mm) {
-      onChange(`${state.hh.padStart(2, '0')}-${state.mm.padStart(2, '0')}`)
+      onChange(getFormattedValue(state))
     }
-  }, [state.hh, state.mm, onChange])
+  }, [state, onChange])
+
   return (
     <Container id={id}>
       <Segment
