@@ -1720,7 +1720,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
 
     const hasValidPhoneForContact = Boolean(
-      errorsOnFields.registration.contactPoint.nestedFields.registrationPhone
+      errorsOnFields.registration.contactPoint.nestedFields.registrationPhone ||
+        errorsOnFields.registration.contactPoint.errors.length !== 0
     )
 
     const isSignatureMissing = () => {
