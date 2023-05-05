@@ -48,6 +48,15 @@ export async function transformBirthBundle(
       task.focus.reference as string,
       authHeader
     )
+
+    if (
+      !bundle.entry.some(
+        (entry) => entry.resource?.resourceType === 'Composition'
+      )
+    ) {
+      bundle.entry.push({ resource: composition })
+    }
+
     const statusType = task.businessStatus?.coding?.find(
       (coding: fhir.Coding) =>
         coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
@@ -110,6 +119,14 @@ export async function transformDeathBundle(
       task.focus.reference as string,
       authHeader
     )
+
+    if (
+      !bundle.entry.some(
+        (entry) => entry.resource?.resourceType === 'Composition'
+      )
+    ) {
+      bundle.entry.push({ resource: composition })
+    }
 
     const statusType = task.businessStatus?.coding?.find(
       (coding: fhir.Coding) =>

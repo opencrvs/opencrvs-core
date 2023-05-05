@@ -355,6 +355,9 @@ const mosipBundle = {
       }
     },
     {
+      resource: compositionResource
+    },
+    {
       resource: {
         resourceType: 'Patient',
         active: true,
