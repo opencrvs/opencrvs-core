@@ -417,16 +417,15 @@ describe('when user is in the register form preview section', () => {
     component = testComponent
   })
 
-  it('submit button will be enabled when even if form is not fully filled-up', () => {
+  it('submit button will be disabled since no phone number is provided for contact point', () => {
     expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
-      false
+      true
     )
   })
 
-  it('Displays submit confirm modal when submit button is clicked', () => {
+  it('Does not display submit confirm modal when submit button is clicked', () => {
     component.find('#submit_form').hostNodes().simulate('click')
-
-    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
+    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(0)
   })
 
   describe('User in the Preview section for submitting the Form', () => {

@@ -1719,9 +1719,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const hasValidPhoneForContact = Boolean(
-      errorsOnFields.registration.contactPoint.nestedFields.registrationPhone ||
-        errorsOnFields.registration.contactPoint.errors.length !== 0
+    const hasInvalidPhoneForContact = Boolean(
+      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
+        ?.length > 0 ||
+        errorsOnFields.registration?.contactPoint?.errors.length !== 0
     )
 
     const isSignatureMissing = () => {
@@ -2001,7 +2002,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
-                          hasValidPhoneForContact={hasValidPhoneForContact}
+                          hasInvalidPhoneForContact={hasInvalidPhoneForContact}
                         />
                       </>
                     ) : (
