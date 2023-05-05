@@ -49,7 +49,7 @@ interface IProps {
   chartBottom: number
   chartLeft: number
   maximizeXAxisInterval?: boolean
-  legendLayout: Recharts.LayoutType
+  legendLayout: Recharts.LegendProps['layout']
 }
 
 interface ILineDataPoint {
