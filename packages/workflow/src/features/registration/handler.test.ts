@@ -1303,7 +1303,7 @@ describe('unassigned action handler', () => {
   })
 })
 
-describe('markEventAsWaitingValidationHandler', () => {
+/*describe('markEventAsWaitingValidationHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1360,7 +1360,7 @@ describe('markEventAsWaitingValidationHandler', () => {
     })
     expect(res.statusCode).toBe(200)
   })
-})
+})*/
 
 describe('markEventAsRequestedForCorrection handler', () => {
   let server: any

@@ -374,6 +374,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
     [REJECTED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,
+      WAITING_VALIDATION_STATUS,
       VALIDATED_STATUS,
       ARCHIVED_STATUS
     ],
