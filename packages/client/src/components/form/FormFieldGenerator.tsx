@@ -255,15 +255,6 @@ function GeneratedInputField({
     value =
       value &&
       (value as IFileValue[]).map((file) => {
-        const isMinioUrl =
-          file.data.split('/').length > 1 &&
-          file.data.split('/')[1] === window.config.MINIO_BUCKET
-        if (isMinioUrl) {
-          return {
-            ...file,
-            data: file.data
-          }
-        }
         return file
       })
 

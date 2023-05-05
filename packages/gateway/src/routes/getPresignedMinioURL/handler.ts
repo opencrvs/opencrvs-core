@@ -19,7 +19,7 @@ export async function getPresignedMinioURLHandler(
   const fileName = request.params.fileName
   const response = await fetchDocuments(
     '/presigned-url',
-    request.headers.authorization,
+    { Authorization: request.headers.authorization },
     'POST',
     JSON.stringify({ fileName: fileName })
   )

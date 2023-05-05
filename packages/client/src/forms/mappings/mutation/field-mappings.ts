@@ -400,9 +400,7 @@ export function fieldToAttachmentTransformer(
       return {
         ...(attachment.uri
           ? {
-              uri: `/${window.config.MINIO_BUCKET}${
-                attachment.uri.split(`/${window.config.MINIO_BUCKET}`)[1]
-              }`
+              uri: attachment.uri
             }
           : { data: attachment.data }),
         subject: attachment.optionValues[0],
