@@ -57,7 +57,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       convertToMSISDN(phoneNumber, window.config.COUNTRY)
     )
     const userDetails = userData.data.getUserByMobile
-    if (isNull(userDetails.id)) {
+    if (!userDetails) {
       dispatch(
         sendVerifyCode(convertToMSISDN(phoneNumber, window.config.COUNTRY))
       )
