@@ -43,6 +43,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS
   TIME
 }
 
@@ -54,6 +55,12 @@ input CustomSelectOption {
 input ValidatorInput {
   operation: String!
   parameters: [Int!]
+}
+
+input DynamicOptionInput {
+  resource: String
+  dependency: String!
+  jurisdictionType: String
 }
 input QuestionInput {
   fieldId: String!
@@ -77,4 +84,5 @@ input QuestionInput {
   datasetId: String
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
+  dynamicOptions: DynamicOptionInput
 }

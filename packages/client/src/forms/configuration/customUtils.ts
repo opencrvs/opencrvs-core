@@ -80,7 +80,8 @@ export function createCustomField({
   inputWidth,
   conditionals,
   options,
-  validator
+  validator,
+  dynamicOptions
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -150,6 +151,9 @@ export function createCustomField({
   }
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
+  }
+  if (baseField.type === CustomFieldType.SelectWithDynamicOptions) {
+    baseField.dynamicOptions = dynamicOptions || { dependency: undefined }
   }
   if (baseField.type === CustomFieldType.SelectWithOptions) {
     baseField.options =

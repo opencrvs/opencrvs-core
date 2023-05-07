@@ -59,6 +59,11 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   >
 }
 
+export interface IDynamicOptions {
+  resource?: string
+  dependency: string
+  jurisdicitonType?: string
+}
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   custom: boolean
   label: IMessage[]
@@ -78,6 +83,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   options?: ICustomSelectOption[]
   datasetId?: string
   validator?: IValidatorDescriptor[]
+  dynamicOptions?: IDynamicOptions
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

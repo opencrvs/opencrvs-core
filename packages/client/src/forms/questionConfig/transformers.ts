@@ -121,7 +121,8 @@ export function questionsTransformer(
       conditionals,
       datasetId,
       options,
-      validator
+      validator,
+      dynamicOptions
     }) => {
       if (custom) {
         return {
@@ -144,7 +145,8 @@ export function questionsTransformer(
           conditionals,
           datasetId,
           options,
-          validator
+          validator,
+          dynamicOptions
         } as ICustomQuestionConfig
       }
 

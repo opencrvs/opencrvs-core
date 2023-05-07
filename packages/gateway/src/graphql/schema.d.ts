@@ -1411,6 +1411,7 @@ export interface GQLQuestionInput {
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
   validator?: Array<GQLValidatorInput>
+  dynamicOptions?: GQLDynamicOptionInput
 }
 
 export interface GQLSystemSettings {
@@ -1886,6 +1887,7 @@ export const enum GQLCustomFieldType {
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
   SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS',
   TIME = 'TIME'
 }
 
@@ -1902,6 +1904,12 @@ export interface GQLCustomSelectOption {
 export interface GQLValidatorInput {
   operation: string
   parameters?: Array<number>
+}
+
+export interface GQLDynamicOptionInput {
+  resource?: string
+  dependency: string
+  jurisdictionType?: string
 }
 
 export interface GQLPayment {

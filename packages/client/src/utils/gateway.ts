@@ -635,6 +635,7 @@ export type CurrencyInput = {
 export enum CustomFieldType {
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
+  SelectWithDynamicOptions = 'SELECT_WITH_DYNAMIC_OPTIONS',
   SelectWithOptions = 'SELECT_WITH_OPTIONS',
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
@@ -775,6 +776,12 @@ export type DuplicatesInfo = {
   __typename?: 'DuplicatesInfo'
   compositionId?: Maybe<Scalars['ID']>
   trackingId?: Maybe<Scalars['String']>
+}
+
+export type DynamicOptionInput = {
+  dependency: Scalars['String']
+  jurisdictionType?: InputMaybe<Scalars['String']>
+  resource?: InputMaybe<Scalars['String']>
 }
 
 export enum EducationType {
@@ -2008,6 +2015,7 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  dynamicOptions?: InputMaybe<DynamicOptionInput>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
   fieldId: Scalars['String']
@@ -2146,6 +2154,7 @@ export type RegistrationInput = {
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
+  registrationOffice?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Array<InputMaybe<RegWorkflowInput>>>
   trackingId?: InputMaybe<Scalars['String']>
   type?: InputMaybe<RegistrationType>
@@ -2422,6 +2431,7 @@ export type User = {
   mobile: Scalars['String']
   name: Array<HumanName>
   practitionerId: Scalars['String']
+  primaryFacilityId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role: Role
   searches?: Maybe<Array<BookmarkedSeachItem>>
@@ -2477,6 +2487,7 @@ export type UserInput = {
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile: Scalars['String']
   name: Array<HumanNameInput>
+  primaryFacilityId?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
@@ -3310,6 +3321,7 @@ export type GetUserQuery = {
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
+    primaryFacilityId?: string | null
     creationDate: string
     device?: string | null
     name: Array<{
