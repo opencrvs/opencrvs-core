@@ -165,6 +165,7 @@ interface IProps {
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
+  noPadding?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
