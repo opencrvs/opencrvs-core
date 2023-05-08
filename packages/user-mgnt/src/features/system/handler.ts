@@ -387,7 +387,7 @@ const webHookSchema = Joi.array().items(
   Joi.object({
     event: Joi.string().required(),
     permissions: Joi.array().items(Joi.string())
-  })
+  }).unknown(true)
 )
 
 export const getSystemResponseSchema = Joi.object({
