@@ -34,15 +34,15 @@ export function setMarriageRegistrationSectionTransformer(
     }
 
     if (draftData[sectionId].groomSignatureURI) {
-      transformedData[sectionId].groomSignatureURI =
+      transformedData[sectionId].groomSignature =
         draftData[sectionId].groomSignatureURI
     } else if (draftData[sectionId].groomSignature) {
       transformedData[sectionId].groomSignature =
         draftData[sectionId].groomSignature
     }
-    
+
     if (draftData[sectionId].brideSignatureURI) {
-      transformedData[sectionId].brideSignatureURI =
+      transformedData[sectionId].brideSignature =
         draftData[sectionId].brideSignatureURI
     } else if (draftData[sectionId].brideSignature) {
       transformedData[sectionId].brideSignature =
@@ -51,7 +51,7 @@ export function setMarriageRegistrationSectionTransformer(
     
 
     if (draftData[sectionId].witnessOneSignatureURI) {
-      transformedData[sectionId].witnessOneSignatureURI =
+      transformedData[sectionId].witnessOneSignature =
         draftData[sectionId].witnessOneSignatureURI
     } else if (draftData[sectionId].witnessOneSignature) {
       transformedData[sectionId].witnessOneSignature =
@@ -59,7 +59,7 @@ export function setMarriageRegistrationSectionTransformer(
     }
 
     if (draftData[sectionId].witnessTwoSignatureURI) {
-      transformedData[sectionId].witnessTwoSignatureURI =
+      transformedData[sectionId].witnessTwoSignature =
         draftData[sectionId].witnessTwoSignatureURI
     } else if (draftData[sectionId].witnessTwoSignature) {
       transformedData[sectionId].witnessTwoSignature =

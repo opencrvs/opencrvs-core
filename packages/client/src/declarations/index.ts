@@ -1834,9 +1834,8 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map((pathToImage) => pathToImage)
   navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioFullUrls
+    minioUrls: minioUrls
   })
 }
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {

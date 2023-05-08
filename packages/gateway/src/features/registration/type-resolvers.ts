@@ -80,6 +80,7 @@ import {
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { getSystem, getUser } from '@gateway/features/user/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -463,15 +464,7 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       if (contact && contact.valueString) {
-        const fileName =
-          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
-        const response = (await fetchDocuments(
-          '/presigned-url',
-          authHeader,
-          'POST',
-          JSON.stringify({ fileName: fileName })
-        )) as { presignedURL: string }
-        return response.presignedURL
+        return await getPresignedUrlFromUri(contact, authHeader)
       }
       return null
     },
@@ -488,15 +481,7 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       if (contact && contact.valueString) {
-        const fileName =
-          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
-        const response = (await fetchDocuments(
-          '/presigned-url',
-          authHeader,
-          'POST',
-          JSON.stringify({ fileName: fileName })
-        )) as { presignedURL: string }
-        return response.presignedURL
+        return await getPresignedUrlFromUri(contact, authHeader)
       }
       return null
     },
@@ -513,15 +498,7 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       if (contact && contact.valueString) {
-        const fileName =
-          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
-        const response = (await fetchDocuments(
-          '/presigned-url',
-          authHeader,
-          'POST',
-          JSON.stringify({ fileName: fileName })
-        )) as { presignedURL: string }
-        return response.presignedURL
+        return await getPresignedUrlFromUri(contact, authHeader)
       }
       return null
     },
@@ -538,15 +515,7 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       if (contact && contact.valueString) {
-        const fileName =
-          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
-        const response = (await fetchDocuments(
-          '/presigned-url',
-          authHeader,
-          'POST',
-          JSON.stringify({ fileName: fileName })
-        )) as { presignedURL: string }
-        return response.presignedURL
+        return await getPresignedUrlFromUri(contact, authHeader)
       }
       return null
     },
@@ -563,15 +532,7 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       if (contact && contact.valueString) {
-        const fileName =
-          contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
-        const response = (await fetchDocuments(
-          '/presigned-url',
-          authHeader,
-          'POST',
-          JSON.stringify({ fileName: fileName })
-        )) as { presignedURL: string }
-        return response.presignedURL
+        return await getPresignedUrlFromUri(contact, authHeader)
       }
       return null
     },

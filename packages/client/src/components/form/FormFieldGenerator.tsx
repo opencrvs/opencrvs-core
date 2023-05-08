@@ -252,12 +252,6 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-    value =
-      value &&
-      (value as IFileValue[]).map((file) => {
-        return file
-      })
-
     return (
       <DocumentUploaderWithOption
         {...inputProps}
