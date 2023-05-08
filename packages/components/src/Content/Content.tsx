@@ -227,7 +227,7 @@ export class UnstyledContent extends React.Component<IProps> {
             </HeaderBottom>
           )}
         </Header>
-        <Contents>
+        <Contents noPadding={noPaddin} >
           {subtitle && <SubHeader>{subtitle}</SubHeader>}
           {children && <Body>{children}</Body>}
         </Contents>
