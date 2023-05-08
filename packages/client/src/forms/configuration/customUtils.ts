@@ -80,7 +80,9 @@ export function createCustomField({
   inputWidth,
   conditionals,
   options,
-  validator
+  extraValue,
+  validator,
+  mapping
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -88,13 +90,21 @@ export function createCustomField({
     custom,
     required,
     type: fieldType,
+    extraValue,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: initialValue || '',
     validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
-    options: [],
-    mapping: {
+    options: (options || []).map((option) => {
+      return {
+        ...option,
+        label: Array.isArray(option.label)
+          ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+          : option.label
+      }
+    }),
+    mapping: mapping || {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
       },
