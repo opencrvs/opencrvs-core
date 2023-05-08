@@ -243,7 +243,7 @@ export async function markRejectedHandler(
     points.push(
       await generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']

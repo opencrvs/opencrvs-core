@@ -368,10 +368,20 @@ export type Birth = {
 
 export type BirthEventSearchSet = EventSearchSet & {
   __typename?: 'BirthEventSearchSet'
+  childGender?: Maybe<Scalars['String']>
   childName?: Maybe<Array<Maybe<HumanName>>>
   dateOfBirth?: Maybe<Scalars['Date']>
+  fatherDateOfBirth?: Maybe<Scalars['String']>
+  fatherIdentifier?: Maybe<Scalars['String']>
+  fathersFirstName?: Maybe<Scalars['String']>
+  fathersLastName?: Maybe<Scalars['String']>
   id: Scalars['ID']
+  motherDateOfBirth?: Maybe<Scalars['String']>
+  motherIdentifier?: Maybe<Scalars['String']>
+  mothersFirstName?: Maybe<Scalars['String']>
+  mothersLastName?: Maybe<Scalars['String']>
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
+  placeOfBirth?: Maybe<Scalars['String']>
   registration?: Maybe<RegistrationSearchSet>
   type?: Maybe<Scalars['String']>
 }
