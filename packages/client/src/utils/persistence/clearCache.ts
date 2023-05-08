@@ -1,17 +1,20 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { isBefore } from 'date-fns'
 import subMonths from 'date-fns/subMonths'
 import subYears from 'date-fns/subYears'
+import lastDayOfMonth from 'date-fns/lastDayOfMonth'
+import isBefore from 'date-fns/isBefore'
 
 /**
  * Removes old cache entries
  *
- * Based on requirements in OCRVS-5151, e.g. when we get to the May 2023, we clear out March 2022 values
+ * Based on requirements in OCRVS-5151, e.g. when we get to the May 2023, we clear out March 2022 and older values
  */
 export const clearOldCacheEntries = (
   client: ApolloClient<NormalizedCacheObject>
 ) => {
-  const evictBeforeThisDate = subMonths(subYears(new Date(), 1), 2)
+  const evictBeforeThisDate = lastDayOfMonth(
+    subMonths(subYears(new Date(), 1), 2)
+  )
 
   const cache = client.cache.extract()
   const cacheEntries = cache['ROOT_QUERY']
@@ -28,12 +31,13 @@ export const clearOldCacheEntries = (
       return false
     }
 
-    const timeStart = new Date(timeStartString!)
+    const timeStart = new Date(timeStartString)
     return isBefore(timeStart, evictBeforeThisDate)
   })
 
   for (const toEvictKey of cacheKeysToEvict) {
     delete cacheEntries[toEvictKey]
+    // eslint-disable-next-line no-console
     console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
   }
 }
