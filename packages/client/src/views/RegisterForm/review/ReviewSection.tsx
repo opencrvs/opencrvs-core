@@ -1719,7 +1719,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const hasInvalidPhoneForContact = Boolean(
+    const disableSubmit = Boolean(
       errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
         ?.length > 0 ||
         errorsOnFields.registration?.contactPoint?.errors.length !== 0
@@ -2002,7 +2002,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
-                          hasInvalidPhoneForContact={hasInvalidPhoneForContact}
+                          disableSubmit={disableSubmit}
                         />
                       </>
                     ) : (

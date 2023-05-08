@@ -41,7 +41,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
-  hasInvalidPhoneForContact: boolean
+  disableSubmit: boolean
 }
 
 const Container = styled.div`
@@ -315,7 +315,7 @@ class ReviewActionComponent extends React.Component<
       draftDeclaration,
       rejectDeclarationAction,
       intl,
-      hasInvalidPhoneForContact
+      disableSubmit
     } = this.props
 
     const background = !completeDeclaration
@@ -375,7 +375,7 @@ class ReviewActionComponent extends React.Component<
                 id="submit_form"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded || hasInvalidPhoneForContact}
+                disabled={totalFileSizeExceeded || disableSubmit}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(
