@@ -31,7 +31,7 @@ import { CustomFieldType } from '@client/utils/gateway'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
-function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
+export function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   const language = getDefaultLanguage()
   const defaultMessage = find(messages, {
     lang: language

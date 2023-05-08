@@ -20,6 +20,7 @@ import {
 } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
+import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
 
 export * from './transformers'
 
@@ -104,6 +105,9 @@ export function getIdentifiersFromFieldId(fieldId: string) {
   }
 }
 
+function hasQuestionAlteredOptions(question: IDefaultQuestionConfig) {
+  return question.options?.length
+}
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
@@ -115,10 +119,27 @@ export function getCustomizedDefaultField(
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-  return {
+
+  const customizedDefaultField = {
     ...serializedField,
     ...rest
   }
+
+  if (
+    serializedField.type === 'SELECT_WITH_OPTIONS' &&
+    hasQuestionAlteredOptions(question)
+  ) {
+    customizedDefaultField.options =
+      question.options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
+  }
+  return customizedDefaultField
 }
 
 export function getSectionIdentifiers(fieldId: string, form: ISerializedForm) {
