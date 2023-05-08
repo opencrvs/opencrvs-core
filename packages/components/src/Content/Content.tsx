@@ -188,6 +188,7 @@ export class UnstyledContent extends React.Component<IProps> {
       topActionButtons,
       tabBarContent,
       filterContent,
+      noPadding,
       subtitle,
       children,
       bottomActionButtons,
@@ -227,7 +228,7 @@ export class UnstyledContent extends React.Component<IProps> {
             </HeaderBottom>
           )}
         </Header>
-        <Contents noPadding={noPaddin} >
+        <Contents noPadding={noPadding}>
           {subtitle && <SubHeader>{subtitle}</SubHeader>}
           {children && <Body>{children}</Body>}
         </Contents>
