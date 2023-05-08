@@ -1120,6 +1120,7 @@ export type LocationStatisticsResponse = {
 
 export enum LocationType {
   AdminStructure = 'ADMIN_STRUCTURE',
+  Community = 'COMMUNITY',
   CrvsOffice = 'CRVS_OFFICE',
   DeceasedUsualResidence = 'DECEASED_USUAL_RESIDENCE',
   HealthFacility = 'HEALTH_FACILITY',
