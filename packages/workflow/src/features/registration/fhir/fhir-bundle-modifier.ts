@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -27,11 +28,14 @@ import {
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
+  fetchTaskByCompositionIdFromHearth,
   generateTrackingIdForEvents,
+  getComposition,
   getEventType,
   getMosipUINToken,
   isEventNotification,
-  isInProgressDeclaration
+  isInProgressDeclaration,
+  getVoidEvent
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -54,6 +58,7 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { triggerEvent } from '@workflow/features/events/handler'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -166,10 +171,11 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  headers: Record<string, string>
-) {
+  headers: Record<string, string>,
+  token: string
+): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    const res = await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -177,8 +183,64 @@ export async function invokeRegistrationValidation(
         ...headers
       }
     })
+    if (!res.ok) {
+      const errorData = await res.json()
+      throw `System error: ${res.statusText} ${res.status} ${errorData.boomCustromMessage}`
+    }
+    return { bundle }
   } catch (err) {
-    throw new Error(`Unable to send registration for validation: ${err}`)
+    const eventType = getEventType(bundle)
+    const composition = await getComposition(bundle)
+    if (!composition) {
+      throw new Error('Cant get composition in bundle')
+    }
+    const taskResource = await fetchTaskByCompositionIdFromHearth(
+      composition.id
+    )
+    const practitioner = await getLoggedInPractitionerResource(token)
+
+    if (
+      !taskResource ||
+      !taskResource.businessStatus ||
+      !taskResource.businessStatus.coding ||
+      !taskResource.businessStatus.coding[0] ||
+      !taskResource.businessStatus.coding[0].code
+    ) {
+      throw new Error('taskResource has no businessStatus code')
+    }
+    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
+
+    const statusReason: fhir.CodeableConcept = {
+      text: `${JSON.stringify(err)} - ${BIRTH_REG_NUMBER_GENERATION_FAILED}`
+    }
+    taskResource.statusReason = statusReason
+    taskResource.lastModified = new Date().toISOString()
+
+    /* setting registration workflow status here */
+    await setupRegistrationWorkflow(
+      taskResource,
+      getTokenPayload(token),
+      RegStatus.REJECTED
+    )
+
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+
+    /* setting lastRegUser here */
+    setupLastRegUser(taskResource, practitioner)
+
+    /* check if the status of any event draft is not published and setting configuration extension*/
+    await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+    await updateResourceInHearth(taskResource)
+
+    await triggerEvent(
+      getVoidEvent(eventType),
+      { resourceType: 'Bundle', entry: [{ resource: taskResource }] },
+      headers
+    )
+
+    return { bundle, regValidationError: true }
   }
 }
 
