@@ -170,7 +170,9 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
         <LargeGreyedInfo />
       </>
     )
