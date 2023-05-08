@@ -19,7 +19,6 @@ export interface INavigationItemProps
   count?: number
   isSelected?: boolean
   expandableIcon?: () => React.ReactNode
-  isSubItem?: boolean
   children?: React.ReactNode
 }
 
@@ -51,7 +50,6 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
 `
 const LabelContainer = styled.span<{
   isSelected?: boolean
-  isSubItem?: boolean
 }>`
   ${({ theme }) => theme.fonts.bold14};
   margin-left: 13px;
@@ -79,7 +77,6 @@ export const NavigationItem = ({
   count,
   isSelected,
   expandableIcon,
-  isSubItem,
   children,
   ...otherProps
 }: INavigationItemProps) => {
@@ -95,9 +92,7 @@ export const NavigationItem = ({
     >
       <ItemContentContainer isSelected={isSelected}>
         {icon && <IconContainer>{icon()}</IconContainer>}
-        <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
-          {label}
-        </LabelContainer>
+        <LabelContainer isSelected={isSelected}>{label}</LabelContainer>
         <ValueContainer isSelected={isSelected}>
           {count && count !== 0 ? count : expandableIcon && expandableIcon()}
         </ValueContainer>

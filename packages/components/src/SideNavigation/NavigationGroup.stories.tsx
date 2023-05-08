@@ -14,56 +14,25 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { NavigationGroup, INavigationGroup } from './NavigationGroup'
 import {
-  itemConfiguration,
   itemInProgress,
-  itemPerformance,
   itemReadyForReview,
-  itemReadyToPrint,
-  itemRequiresUpdates,
-  itemTeam
+  itemRequiresUpdates
 } from './NavigationItem.stories'
+import { NavigationGroupHeader } from './NavigationGroupHeader'
+import { recordGroup } from './NavigationGroupHeader.stories'
 import { NavigationItem } from './NavigationItem'
-import { NavigationSubItem } from './NavigationSubItem'
-import {
-  subItemBranding,
-  subItemCertificates,
-  subItemForms,
-  subItemVsexports
-} from './NavigationSubItem.stories'
-
-const DeclarationTemplate: Story<INavigationGroup> = (args) => (
-  <div {...args}>
+const RecordTemplate: Story<INavigationGroup> = (args) => (
+  <NavigationGroup>
+    {/* <NavigationGroupHeader {...recordGroup.args} />
     <NavigationItem {...itemInProgress.args} />
     <NavigationItem {...itemReadyForReview.args} />
-    <NavigationItem {...itemRequiresUpdates.args} />
-    <NavigationItem {...itemReadyToPrint.args} />
-  </div>
+    <NavigationItem {...itemRequiresUpdates.args} /> */}
+  </NavigationGroup>
 )
 
-export const groupDeclaration = DeclarationTemplate.bind({})
+export const groupRecord = RecordTemplate.bind({})
 
-groupDeclaration.args = {
-  children: <DeclarationTemplate />
-}
-
-const SettingTemplate: Story<INavigationGroup> = (args) => (
-  <div {...args}>
-    <NavigationItem {...itemPerformance.args} />
-    <NavigationItem {...subItemVsexports.args} />
-    <NavigationItem {...itemTeam.args} />
-    <NavigationItem {...itemConfiguration.args}>
-      <NavigationSubItem {...subItemCertificates.args} />
-      <NavigationSubItem {...subItemForms.args} />
-      <NavigationSubItem {...subItemBranding.args} />
-    </NavigationItem>
-  </div>
-)
-
-export const groupSetting = SettingTemplate.bind({})
-
-groupSetting.args = {
-  children: <SettingTemplate />
-}
+groupRecord.args = {}
 
 export default {
   title: 'Layout/Side navigation/Side navigation group',

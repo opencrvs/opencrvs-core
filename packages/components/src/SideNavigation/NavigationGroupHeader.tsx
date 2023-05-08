@@ -18,7 +18,6 @@ export interface INavigationGroupHeaderProps
   label: string
   count?: number
   isSelected?: boolean
-  isSubItem?: boolean
   children?: React.ReactNode
 }
 
@@ -51,7 +50,6 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
 `
 const LabelContainer = styled.span<{
   isSelected?: boolean
-  isSubItem?: boolean
 }>`
   ${({ theme }) => theme.fonts.bold12};
   margin-left: 0px;
@@ -64,19 +62,12 @@ const LabelContainer = styled.span<{
 const IconContainer = styled.div`
   width: 18px;
 `
-// const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
-//   switch (e.code) {
-//     case 'Enter':
-//       e.click()
-//   }
-// }
 
 export const NavigationGroupHeader = ({
   icon,
   label,
   count,
   isSelected,
-  isSubItem,
   children,
   ...otherProps
 }: INavigationGroupHeaderProps) => {
@@ -92,9 +83,7 @@ export const NavigationGroupHeader = ({
     >
       <ItemContentContainer isSelected={isSelected}>
         {icon && <IconContainer>{icon()}</IconContainer>}
-        <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
-          {label}
-        </LabelContainer>
+        <LabelContainer isSelected={isSelected}>{label}</LabelContainer>
       </ItemContentContainer>
       {isSelected && children}
     </ItemContainer>

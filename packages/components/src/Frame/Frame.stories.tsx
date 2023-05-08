@@ -15,10 +15,7 @@ import { EventTopBar } from '../EventTopBar'
 import { LeftNavigation } from '../SideNavigation/LeftNavigation'
 import { leftNavigationView } from '../SideNavigation/LeftNavigation.stories'
 import { NavigationGroup } from '../SideNavigation/NavigationGroup'
-import {
-  groupDeclaration,
-  groupSetting
-} from '../SideNavigation/NavigationGroup.stories'
+import { groupRecord } from '../SideNavigation/NavigationGroup.stories'
 import { Frame } from './Frame'
 import { Content, ContentSize } from '../Content'
 import { Box } from '../Box'
@@ -44,8 +41,7 @@ export const PageTemplateContentLarge = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"
@@ -65,8 +61,7 @@ export const PageTemplateContentMedium = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"
@@ -108,8 +103,7 @@ export const PageTemplateContentSideColumn = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"
@@ -128,8 +122,7 @@ export const PageTemplateContentMultipleSideColumns = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"
@@ -155,8 +148,7 @@ export const PageTemplateSequentialContents = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"
@@ -173,8 +165,7 @@ export const PageTemplateSequentialContentsWrapped = () => (
     header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
-        <NavigationGroup {...groupDeclaration.args} />
-        <NavigationGroup {...groupSetting.args} />
+        <NavigationGroup {...groupRecord.args} />
       </LeftNavigation>
     }
     skipToContentText="Skip to main content"

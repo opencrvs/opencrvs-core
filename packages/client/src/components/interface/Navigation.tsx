@@ -803,10 +803,10 @@ export const NavigationView = (props: IFullProps) => {
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}
-                disabled={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
-                }
+                // disabled={
+                //   advancedSearchParams.searchId === bookmarkResult.searchId &&
+                //   props.location.pathname === ADVANCED_SEARCH_RESULT
+                // }
                 onClick={() => {
                   const filteredParam = omit(
                     bookmarkResult.parameters,

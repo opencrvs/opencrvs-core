@@ -14,12 +14,12 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { LeftNavigation, ILeftNavigationProps } from './LeftNavigation'
 import { NavigationGroup } from './NavigationGroup'
-import { groupDeclaration, groupSetting } from './NavigationGroup.stories'
+// import { groupDeclaration, groupSetting } from './NavigationGroup.stories'
 
 const Template: Story<ILeftNavigationProps> = (args) => (
   <LeftNavigation {...args}>
-    <NavigationGroup {...groupDeclaration.args} />
-    <NavigationGroup {...groupSetting.args} />
+    {/* <NavigationGroup {...groupDeclaration.args} />
+    <NavigationGroup {...groupSetting.args} /> */}
   </LeftNavigation>
 )
 

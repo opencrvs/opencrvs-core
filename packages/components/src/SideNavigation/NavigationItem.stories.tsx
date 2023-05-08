@@ -14,9 +14,6 @@ import React from 'react'
 import { Story } from '@storybook/react'
 import { NavigationItem, INavigationItemProps } from './NavigationItem'
 import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
-import { Activity } from '../icons/Activity'
-import { Users } from '../icons/Users'
-import { Configuration } from '../icons/Configuration'
 
 const Template: Story<INavigationItemProps> = (args) => (
   <NavigationItem {...args} />
@@ -35,7 +32,8 @@ export const itemReadyForReview = Template.bind({})
 itemReadyForReview.args = {
   icon: () => <DeclarationIconSmall color={'orange'} />,
   label: 'Ready for review',
-  count: 23
+  count: 23,
+  isSelected: true
 }
 
 export const itemRequiresUpdates = Template.bind({})
@@ -43,37 +41,6 @@ export const itemRequiresUpdates = Template.bind({})
 itemRequiresUpdates.args = {
   icon: () => <DeclarationIconSmall color={'red'} />,
   label: 'Requires updates'
-}
-
-export const itemReadyToPrint = Template.bind({})
-
-itemReadyToPrint.args = {
-  icon: () => <DeclarationIconSmall color={'green'} />,
-  label: 'Ready to print',
-  count: 23
-}
-
-export const itemPerformance = Template.bind({})
-
-itemPerformance.args = {
-  icon: () => <Activity stroke={'#595C5F'} height={15} width={15} />,
-  label: 'Performance',
-  isSelected: true
-}
-
-export const itemTeam = Template.bind({})
-
-itemTeam.args = {
-  icon: () => <Users stroke={'#595C5F'} height={15} width={15} />,
-  label: 'Team'
-}
-
-export const itemConfiguration = Template.bind({})
-
-itemConfiguration.args = {
-  icon: () => <Configuration />,
-  label: 'Configuration',
-  isSelected: true
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
