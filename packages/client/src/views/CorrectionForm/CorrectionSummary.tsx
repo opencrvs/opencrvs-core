@@ -17,7 +17,7 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { connect } from 'react-redux'
-import { get } from 'lodash'
+import { get, propertyOf } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -903,10 +903,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     return (
       <div>
         {proofOfDoc &&
-          proofOfDoc.map((proof) => {
+          proofOfDoc.map((proof, i) => {
             const doc = proof.optionValues as IFormSectionData[]
             return (
-              <SupportingDocument>
+              <SupportingDocument key={`proof-${i}`}>
                 <PaperClip />
                 <span>{doc[1] as any}</span>
               </SupportingDocument>

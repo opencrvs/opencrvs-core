@@ -417,6 +417,7 @@ export interface GQLAdvancedSearchParametersInput {
   nationalId?: string
   registrationNumber?: string
   trackingId?: string
+  recordId?: string
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
@@ -442,6 +443,17 @@ export interface GQLAdvancedSearchParametersInput {
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
   deceasedIdentifier?: string
+  groomFirstNames?: string
+  groomFamilyName?: string
+  groomDoB?: string
+  groomDoBStart?: string
+  groomDoBEnd?: string
+  brideFirstNames?: string
+  brideFamilyName?: string
+  brideDoB?: string
+  brideDoBStart?: string
+  brideDoBEnd?: string
+  dateOfMarriage?: string
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
@@ -1699,6 +1711,16 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  placeOfBirth?: string
+  childGender?: string
+  mothersFirstName?: string
+  mothersLastName?: string
+  fathersFirstName?: string
+  fathersLastName?: string
+  motherDateOfBirth?: string
+  fatherDateOfBirth?: string
+  motherIdentifier?: string
+  fatherIdentifier?: string
 }
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
@@ -10531,6 +10553,16 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
   operationHistories?: BirthEventSearchSetToOperationHistoriesResolver<TParent>
+  placeOfBirth?: BirthEventSearchSetToPlaceOfBirthResolver<TParent>
+  childGender?: BirthEventSearchSetToChildGenderResolver<TParent>
+  mothersFirstName?: BirthEventSearchSetToMothersFirstNameResolver<TParent>
+  mothersLastName?: BirthEventSearchSetToMothersLastNameResolver<TParent>
+  fathersFirstName?: BirthEventSearchSetToFathersFirstNameResolver<TParent>
+  fathersLastName?: BirthEventSearchSetToFathersLastNameResolver<TParent>
+  motherDateOfBirth?: BirthEventSearchSetToMotherDateOfBirthResolver<TParent>
+  fatherDateOfBirth?: BirthEventSearchSetToFatherDateOfBirthResolver<TParent>
+  motherIdentifier?: BirthEventSearchSetToMotherIdentifierResolver<TParent>
+  fatherIdentifier?: BirthEventSearchSetToFatherIdentifierResolver<TParent>
 }
 
 export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -10591,6 +10623,126 @@ export interface BirthEventSearchSetToRegistrationResolver<
 }
 
 export interface BirthEventSearchSetToOperationHistoriesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToPlaceOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToChildGenderResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMothersFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMothersLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFathersFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFathersLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMotherDateOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFatherDateOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMotherIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFatherIdentifierResolver<
   TParent = any,
   TResult = any
 > {

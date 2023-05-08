@@ -1,4 +1,4 @@
-<!--This Source Code Form is subject to the terms of the Mozilla Public
+{/*This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
@@ -6,7 +6,7 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 & Healthcare Disclaimer located at http://opencrvs.org/license.
 
 Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.-->
+graphic logo are (registered/a) trademark(s) of Plan International.*/}
 
 import { Meta, DocsContainer } from '@storybook/addon-docs'
 import { Pill } from '@opencrvs/components/lib/Pill'
@@ -17,17 +17,8 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 <Meta
   title="Introduction"
   parameters={{
-    docs: {
-      container: ({ children, context }) => {
-        const theme = getTheme()
-        return (
-          <DocsContainer context={context}>
-            <ThemeProvider theme={theme}>
-              <div style={{ maxWidth: '640px' }}>{children}</div>
-            </ThemeProvider>
-          </DocsContainer>
-        )
-      }
+    docsCss: {
+      maxWidth: '640px'
     }
   }}
 />
@@ -40,10 +31,10 @@ export const ExternalLinkIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="#4972BB"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    class="feather feather-external-link"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="feather feather-external-link"
   >
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
     <polyline points="15 3 21 3 21 9"></polyline>

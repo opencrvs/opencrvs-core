@@ -444,7 +444,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
                 onPageChange={(page: any) => setCurrentPageNumber(page)}
-                topActionButtons={[<BookmarkAdvancedSearchResult />]}
+                topActionButtons={[
+                  <BookmarkAdvancedSearchResult key="bookmark-advanced-search-result" />
+                ]}
                 showTitleOnMobile={true}
               >
                 {loading ? (
@@ -498,6 +500,7 @@ const SearchModifierComponent = () => {
         {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
+              key={pillKey}
               label={`${intl.formatMessage(
                 advancedSearchResultMessages[pillKey as advancedSearchPillKey]
               )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
