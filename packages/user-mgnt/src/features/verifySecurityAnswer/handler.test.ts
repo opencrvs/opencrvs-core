@@ -12,7 +12,7 @@
 import { createServer } from '@user-mgnt/server'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import { generateHash } from '@user-mgnt/utils/hash'
 
 import * as mockingoose from 'mockingoose'
 
@@ -38,21 +38,21 @@ const mockUser: Partial<IUser & { _id: string }> = {
   securityQuestionAnswers: [
     {
       questionKey: 'TEST_QUESTION_1',
-      answerHash: generateBcryptHash(
+      answerHash: generateHash(
         'correct answer for q1',
         '$2a$10$fyVfYYctO8oqs9euSvtgVe'
       )
     },
     {
       questionKey: 'TEST_QUESTION_2',
-      answerHash: generateBcryptHash(
+      answerHash: generateHash(
         'correct answer for q2',
         '$2a$10$fyVfYYctO8oqs9euSvtgVe'
       )
     },
     {
       questionKey: 'TEST_QUESTION_3',
-      answerHash: generateBcryptHash(
+      answerHash: generateHash(
         'correct answer for q3',
         '$2a$10$fyVfYYctO8oqs9euSvtgVe'
       )

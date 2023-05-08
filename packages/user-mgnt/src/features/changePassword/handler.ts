@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
@@ -46,7 +46,7 @@ export default async function changePasswordHandler(
       throw unauthorized()
     }
     if (
-      generateBcryptHash(userUpdateData.existingPassword, user.salt) !==
+      generateHash(userUpdateData.existingPassword, user.salt) !==
       user.passwordHash
     ) {
       logger.error(
@@ -57,7 +57,7 @@ export default async function changePasswordHandler(
     }
   }
 
-  user.passwordHash = generateBcryptHash(userUpdateData.password, user.salt)
+  user.passwordHash = generateHash(userUpdateData.password, user.salt)
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =

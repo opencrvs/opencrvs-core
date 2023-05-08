@@ -14,7 +14,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateBcryptHash } from '@user-mgnt/utils/hash'
+import { generateHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   username: string
@@ -41,7 +41,7 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (generateBcryptHash(password, user.salt) !== user.passwordHash) {
+  if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
   const response: IVerifyResponse = {

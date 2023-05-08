@@ -24,10 +24,7 @@ import System, {
   WebhookPermissions
 } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import {
-  generateBcryptHash,
-  generateBcryptSaltedHash
-} from '@user-mgnt/utils/hash'
+import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
@@ -120,7 +117,7 @@ export async function registerSystem(
     const clientSecret = uuid()
     const sha_secret = uuid()
 
-    const { hash, salt } = generateBcryptSaltedHash(clientSecret)
+    const { hash, salt } = generateSaltedHash(clientSecret)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)
     const practitionerId = await postFhir(
@@ -313,7 +310,7 @@ export async function verifySystemHandler(
     throw unauthorized()
   }
 
-  if (generateBcryptHash(client_secret, system.salt) !== system.secretHash) {
+  if (generateHash(client_secret, system.salt) !== system.secretHash) {
     throw unauthorized()
   }
 
@@ -494,7 +491,7 @@ export async function refreshSystemSecretHandler(
     }
 
     const client_secret = uuid()
-    const { hash, salt } = generateBcryptSaltedHash(client_secret)
+    const { hash, salt } = generateSaltedHash(client_secret)
 
     systemUser.salt = salt
     systemUser.secretHash = hash

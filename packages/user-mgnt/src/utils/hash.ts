@@ -33,15 +33,14 @@ export function generateRandomPassword(demoUser?: boolean) {
   return randomPassword
 }
 
-export function generateBcryptHash(content: string, salt: string): string {
-  //Beware, it will throw exceptions if salt version is not matched
+export function generateHash(content: string, salt: string): string {
   return bcrypt.hashSync(content, salt)
 }
 
-export function generateBcryptSaltedHash(password: string): ISaltedHash {
+export function generateSaltedHash(password: string): ISaltedHash {
   const salt = bcrypt.genSaltSync(10)
   return {
-    hash: generateBcryptHash(password, salt),
+    hash: generateHash(password, salt),
     salt
   }
 }
