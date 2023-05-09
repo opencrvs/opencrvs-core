@@ -992,6 +992,7 @@ export interface GQLIdentifier {
 
 export const enum GQLLocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
+  COMMUNITY = 'COMMUNITY',
   HOSPITAL = 'HOSPITAL',
   OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
@@ -1406,6 +1407,7 @@ export interface GQLQuestionInput {
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
   validator?: Array<GQLValidatorInput>
+  dynamicOptions?: GQLDynamicOptionInput
 }
 
 export interface GQLSystemSettings {
@@ -1891,6 +1893,7 @@ export const enum GQLCustomFieldType {
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
   SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS',
   TIME = 'TIME'
 }
 
@@ -1907,6 +1910,12 @@ export interface GQLCustomSelectOption {
 export interface GQLValidatorInput {
   operation: string
   parameters?: Array<number>
+}
+
+export interface GQLDynamicOptionInput {
+  resource?: string
+  dependency: string
+  jurisdictionType?: string
 }
 
 export interface GQLPayment {

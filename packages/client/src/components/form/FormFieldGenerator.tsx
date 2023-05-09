@@ -607,10 +607,17 @@ export function getInitialValueForSelectDynamicValue(
   const catchmentAreas = userDetails?.catchmentArea
   let district = ''
   let state = ''
+  let locationLevel3 = ''
 
   if (catchmentAreas) {
     catchmentAreas.forEach((catchmentArea) => {
       if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
+        )
+      ) {
+        locationLevel3 = catchmentArea.id
+      } else if (
         catchmentArea?.identifier?.find(
           (identifier) => identifier?.value === 'DISTRICT'
         )
@@ -631,6 +638,9 @@ export function getInitialValueForSelectDynamicValue(
   }
   if (field.name.includes('state') && !field.initialValue && state) {
     fieldInitialValue = state as IFormFieldValue
+  }
+  if (!field.initialValue && locationLevel3) {
+    fieldInitialValue = locationLevel3 as IFormFieldValue
   }
   return fieldInitialValue
 }

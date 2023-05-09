@@ -205,6 +205,7 @@ export const parsedLocations = {
     alias: 'Central',
     status: 'active',
     physicalType: 'Jurisdiction',
+    jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
   },
@@ -214,6 +215,7 @@ export const parsedLocations = {
     alias: 'Sulaka',
     status: 'active',
     physicalType: 'Jurisdiction',
+    jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
   }
@@ -470,6 +472,7 @@ export const parsedFacilities = {
     alias: 'HQ Office',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'CRVS_OFFICE',
     partOf: 'Location/56eafead-7264-4c22-aa38-3dc75ad061b4'
   },
@@ -479,6 +482,7 @@ export const parsedFacilities = {
     alias: 'Isamba District Office',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'CRVS_OFFICE',
     partOf: 'Location/6f0ae45f-eefa-4b9e-9224-159e66bbee26'
   },
@@ -488,6 +492,7 @@ export const parsedFacilities = {
     alias: 'Ibombo Rural Health Centre',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'HEALTH_FACILITY',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
   },
@@ -497,6 +502,7 @@ export const parsedFacilities = {
     alias: 'Chikobo Rural Health Centre',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'HEALTH_FACILITY',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
   }
