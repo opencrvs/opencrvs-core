@@ -16,17 +16,16 @@ import {
   SerializedFormField
 } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
+import { transformUIConfiguredConditionalsToDefaultFormat } from '@client/forms/configuration/customUtils'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
 import {
   CustomFieldType,
-  Event,
   CustomSelectOption,
-  MappingInput
+  Event
 } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
-import { transformUIConfiguredConditionalsToDefaultFormat } from '@client/forms/configuration/customUtils'
 
 export * from './transformers'
 
@@ -120,6 +119,13 @@ export function getCustomizedDefaultField(
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+
+  if (!conditionals) {
+    return {
+      ...serializedField,
+      ...rest
+    }
+  }
 
   return {
     ...serializedField,
