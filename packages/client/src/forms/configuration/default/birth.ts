@@ -949,7 +949,7 @@ export const birthRegisterForms: ISerializedForm = {
               type: 'LOCATION_SEARCH_INPUT',
               label: formMessageDescriptors.healthInstitution,
               previewGroup: 'placeOfBirth',
-              required: false,
+              required: true,
               initialValue: '',
               searchableResource: ['facilities'],
               searchableType: ['HEALTH_FACILITY'],
