@@ -49,14 +49,8 @@ import {
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  Plus,
-  SearchDark,
-  Activity,
-  SearchBlue,
-  AddUser
-} from '@opencrvs/components/lib/icons'
+import { Button } from '@opencrvs/components/lib/Button'
+
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -79,7 +73,6 @@ import {
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
-import { Hamburger } from './Hamburger'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -142,24 +135,6 @@ enum ACTIVE_MENU_ITEM {
   INTEGRATION
 }
 
-const StyledPrimaryButton = styled(PrimaryButton)`
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:focus {
-    background: ${({ theme }) => theme.colors.yellow};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-`
-
 const Search = styled(SearchTool)`
   position: static;
   left: calc(50% - 624px / 2 + 24px);
@@ -202,13 +177,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Hamburger />,
+            icon: () => <Icon name="List" size="medium" color="primary" />,
             handler: () => {}
           }
         ],
         mobileRight: [
           {
-            icon: () => <Activity stroke={theme.colors.primary} />,
+            icon: () => <Icon name="Activity" size="medium" color="primary" />,
             handler: () =>
               this.props.mapPerformanceClickHandler &&
               this.props.mapPerformanceClickHandler()
@@ -220,18 +195,22 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => <Icon name="List" size="medium" color="primary" />,
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <SearchBlue />,
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
               handler: () =>
                 this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -249,13 +228,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => <Icon name="List" size="medium" color="primary" />,
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -270,7 +251,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => <Icon name="List" size="medium" color="primary" />,
               handler: () => {}
             }
           ]
@@ -283,7 +264,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Hamburger />,
+            icon: () => <Icon name="List" size="medium" color="primary" />,
             handler: () => {}
           }
         ]
@@ -303,13 +284,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => <Icon name="List" size="medium" color="primary" />,
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <SearchDark />,
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
               handler: () => this.props.goToSearch()
             }
           ]
@@ -349,7 +332,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
-        invertIcon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -357,28 +339,24 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
-        invertIcon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <Icon name="CreditCard" size="small" />,
-        invertIcon: <Icon name="CreditCard" />,
+        icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
-        invertIcon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
-        invertIcon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
@@ -482,12 +460,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
             ) && (
               <HeaderCenter>
-                <StyledPrimaryButton
+                <Button
+                  type="iconPrimary"
+                  size="medium"
                   key="newEvent"
                   id="header_new_event"
                   onClick={this.props.goToEvents}
-                  icon={() => <Plus />}
-                />
+                >
+                  <Icon name="Plus" size="medium" />
+                </Button>
 
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>

@@ -24,6 +24,8 @@ type ButtonType =
   | 'negative'
   | 'secondary_negative'
   | 'icon'
+  | 'iconPrimary'
+
 type ButtonModifier = 'disabled' | 'loading'
 
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
@@ -63,6 +65,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}
   ${(props) => props.variant === 'icon' && styles.icon}
+  ${(props) => props.variant === 'iconPrimary' && styles.iconPrimary}
 
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}

@@ -19,6 +19,8 @@ import {
 import dedent from 'ts-dedent'
 import { Button } from './Button'
 import { Stack } from '../Stack'
+import { Icon } from '../Icon'
+
 import { Activity } from '../icons'
 
 <Meta title="Controls / Button" component={Button} />
@@ -36,36 +38,63 @@ export const Sizes = () => (
     <Button type="primary" size="small">
       Small
     </Button>
+    <Button type="secondary" size="large">
+      Large
+    </Button>
+    <Button type="secondary" size="medium">
+      Default
+    </Button>
+    <Button type="secondary" size="small">
+      Small
+    </Button>
+    <Button type="tertiary" size="large">
+      Large
+    </Button>
+    <Button type="tertiary" size="medium">
+      Default
+    </Button>
+    <Button type="tertiary" size="small">
+      Small
+    </Button>
   </Stack>
 )
 
 export const WithIcon = () => (
   <Stack>
     <Button type="primary">
-      <Activity stroke="#ffffff" />
+      <Icon name="Target" size="medium" />
       Primary
     </Button>
     <Button type="secondary">
-      <Activity stroke="#4972bb" />
+      <Icon name="Target" size="medium" />
       Secondary
     </Button>
-    <Button type="tertiary" size="small">
-      <Activity stroke="#4972bb" />
-      Primary
+    <Button type="tertiary" size="medium">
+      <Icon name="Target" size="large" />
+      Tertiary
     </Button>
   </Stack>
 )
 
-export const Icon = () => (
+export const Icons = () => (
   <Stack>
     <Button type="icon" size="large" aria-label="View performance data">
-      <Activity />
+      <Icon name="Target" size="large" />
     </Button>
     <Button type="icon" size="medium" aria-label="View performance data">
-      <Activity />
+      <Icon name="Target" size="medium" />
     </Button>
     <Button type="icon" size="small" aria-label="View performance data">
-      <Activity />
+      <Icon name="Target" size="medium" />
+    </Button>
+    <Button type="iconPrimary" size="large" aria-label="View performance data">
+      <Icon name="Target" size="large" />
+    </Button>
+    <Button type="iconPrimary" size="medium" aria-label="View performance data">
+      <Icon name="Target" size="medium" />
+    </Button>
+    <Button type="iconPrimary" size="small" aria-label="View performance data">
+      <Icon name="Target" size="medium" />
     </Button>
   </Stack>
 )
@@ -154,10 +183,10 @@ Use the `aria-label`-prop when the button's visible text doesn't fully convey th
   <Story name="With icon">{WithIcon.bind({})}</Story>
 </Canvas>
 
-## Icon
+## Icons
 
 <Canvas>
-  <Story name="Icon">{Icon.bind({})}</Story>
+  <Story name="Icons">{Icons.bind({})}</Story>
 </Canvas>
 
 ## Loading

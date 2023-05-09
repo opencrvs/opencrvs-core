@@ -18,6 +18,7 @@ import {
 import { logger } from '@gateway/logger'
 import * as decode from 'jwt-decode'
 import fetch from 'node-fetch'
+
 export interface ITokenPayload {
   sub: string
   exp: string
