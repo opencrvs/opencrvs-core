@@ -44,7 +44,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Event, User } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -72,7 +72,6 @@ import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/adva
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { Text } from '@opencrvs/components'
 import { UserDetails } from '@client/utils/userUtils'
-import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -122,7 +121,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -182,7 +180,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.readyToIssue,
+    WORKQUEUE_TABS.performance,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
@@ -900,7 +898,9 @@ export const NavigationView = (props: IFullProps) => {
                       />
                       <NavigationItem
                         icon={() => <Icon name="ChartBar" size="medium" />}
-                        label={intl.formatMessage(navigationMessages['report'])}
+                        label={intl.formatMessage(
+                          navigationMessages['performance']
+                        )}
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
@@ -922,6 +922,7 @@ export const NavigationView = (props: IFullProps) => {
           userDetails.searches.map((bookmarkResult) => {
             return (
               <NavigationItem
+                key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 icon={() => (
                   <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
                 )}

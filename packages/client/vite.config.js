@@ -40,7 +40,16 @@ export default defineConfig(({ mode }) => {
     }
   }
   return {
-    // This changes the out put dir from dist to build
+    /*
+     * https://github.com/storybookjs/storybook/issues/18920
+     * the issue occurs because of util.js which is a
+     * transitive depedency of storybook. I think it might
+     * be a good idea to separate components and storybook
+     * in that case because possibly storybook is getting
+     * included in components bundle
+     */
+    define: { 'process.env': {} },
+    // This changes the output dir from dist to build
     build: {
       outDir: 'build',
       rollupOptions: {

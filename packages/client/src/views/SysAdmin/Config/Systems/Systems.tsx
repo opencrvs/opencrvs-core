@@ -241,6 +241,7 @@ export function SystemList() {
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
           <Button
+            key="create-client-button"
             type="secondary"
             id="createClientButton"
             onClick={() => setShowModal(true)}
@@ -347,6 +348,7 @@ export function SystemList() {
         <ResponsiveModal
           actions={[
             <Link
+              key="cancel-link"
               onClick={() => {
                 toggleRevealKeyModal()
                 resetData()
@@ -439,6 +441,7 @@ export function SystemList() {
             ? []
             : [
                 <Link
+                  key="cancel"
                   onClick={() => {
                     toggleModal()
                     clearNewSystemDraft()
@@ -448,6 +451,7 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
+                  key="submit-client-form"
                   id="submitClientForm"
                   disabled={
                     !newSystemType ||

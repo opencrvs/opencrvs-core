@@ -19,7 +19,6 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { resolve } from 'url'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
@@ -39,7 +38,7 @@ export const createClient = (
   restoredCache?: InMemoryCache
 ) => {
   const httpLink = createHttpLink({
-    uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
+    uri: new URL('graphql', window.config.API_GATEWAY_URL).toString()
   })
 
   const authLink = setContext((_, { headers }) => {
