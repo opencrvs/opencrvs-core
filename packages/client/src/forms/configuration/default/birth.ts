@@ -909,7 +909,7 @@ export const birthRegisterForms: ISerializedForm = {
             },
             {
               name: 'placeOfBirth',
-              customisable: true,
+              customisable: false,
               type: 'SELECT_WITH_OPTIONS',
               previewGroup: 'placeOfBirth',
               ignoreFieldLabelOnErrorMessage: true,
