@@ -12,7 +12,8 @@
 import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
-  MOSIP_TOKEN_SEEDER_URL
+  MOSIP_TOKEN_SEEDER_URL,
+  HEARTH_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -589,4 +590,45 @@ export function hasTaskRegLastOffice(bundle: fhir.Bundle) {
   return taskResource.extension?.some(
     (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
+}
+
+export const fetchHearth = async <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const res = await fetch(`${HEARTH_URL}${suffix}`, {
+    method: method,
+    body,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `FHIR get to /fhir failed with [${res.status}] body: ${await res.text()}`
+    )
+  }
+  return res.json()
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const taskBundle: fhir.Bundle = await fetchHearth(
+    `/Task?focus=Composition/${id}`
+  )
+  return taskBundle.entry?.[0]?.resource as fhir.Task
+}
+
+export function getVoidEvent(event: EVENT_TYPE): Events {
+  switch (event) {
+    case EVENT_TYPE.MARRIAGE:
+      return Events.MARRIAGE_MARK_VOID
+    case EVENT_TYPE.BIRTH:
+      return Events.BIRTH_MARK_VOID
+    case EVENT_TYPE.DEATH:
+      return Events.DEATH_MARK_VOID
+    default:
+      return Events.BIRTH_MARK_VOID
+  }
 }

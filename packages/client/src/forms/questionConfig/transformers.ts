@@ -122,6 +122,8 @@ export function questionsTransformer(
       datasetId,
       options,
       validator,
+      extraValue,
+      mapping,
       dynamicOptions
     }) => {
       if (custom) {
@@ -146,6 +148,8 @@ export function questionsTransformer(
           datasetId,
           options,
           validator,
+          extraValue,
+          mapping,
           dynamicOptions
         } as ICustomQuestionConfig
       }
@@ -157,6 +161,7 @@ export function questionsTransformer(
         enabled: enabled ?? '',
         precedingFieldId,
         validateEmpty: validateEmpty ?? false,
+        conditionals: conditionals || undefined,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
 

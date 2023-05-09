@@ -414,6 +414,12 @@ type SerializedRadioGroupWithNestedFields = Omit<
   nestedFields: { [key: string]: SerializedFormField[] }
 }
 
+export type IMapping = {
+  mutation?: IMutationDescriptor
+  query?: IQueryDescriptor
+  template?: ITemplateDescriptor
+}
+
 export type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
@@ -429,11 +435,7 @@ export type SerializedFormField = UnionOmit<
   'validator' | 'mapping'
 > & {
   validator: IValidatorDescriptor[]
-  mapping?: {
-    mutation?: IMutationDescriptor
-    query?: IQueryDescriptor
-    template?: ITemplateDescriptor
-  }
+  mapping?: IMapping
 }
 export interface IAttachment {
   data: string

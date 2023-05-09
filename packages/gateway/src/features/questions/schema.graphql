@@ -57,6 +57,15 @@ input ValidatorInput {
   parameters: [Int!]
 }
 
+input Operation {
+  operation: String!
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 input DynamicOptionInput {
   resource: String
   dependency: String!
@@ -84,5 +93,7 @@ input QuestionInput {
   datasetId: String
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
+  mapping: MappingInput
+  extraValue: String
   dynamicOptions: DynamicOptionInput
 }

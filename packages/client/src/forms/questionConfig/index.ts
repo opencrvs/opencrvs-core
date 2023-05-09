@@ -11,8 +11,10 @@
  */
 import {
   IDynamicOptions,
+  IMapping,
   ISerializedForm,
-  IValidatorDescriptor
+  IValidatorDescriptor,
+  SerializedFormField
 } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
@@ -20,11 +22,15 @@ import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/t
 import {
   CustomFieldType,
   Event,
-  CustomSelectOption
+  CustomSelectOption,
+  MappingInput
 } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
-import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
+import {
+  transformUIConfiguredConditionalsToDefaultFormat,
+  getDefaultLanguageMessage
+} from '@client/forms/configuration/customUtils'
 
 export * from './transformers'
 
@@ -58,6 +64,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   enabled: string
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
+  conditionals?: IConditionalConfig[]
   validator?: IValidatorDescriptor[]
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
@@ -78,11 +85,13 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   inputWidth?: number
   initialValue?: string
   fieldName: string
+  extraValue?: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
   validator?: IValidatorDescriptor[]
+  mapping?: IMapping
   dynamicOptions?: IDynamicOptions
 }
 
@@ -110,9 +119,10 @@ function hasQuestionAlteredOptions(question: IDefaultQuestionConfig) {
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
-) {
+): SerializedFormField {
   const {
     identifiers: { sectionIndex, groupIndex, fieldIndex },
+    conditionals,
     ...rest
   } = question
 
@@ -121,7 +131,8 @@ export function getCustomizedDefaultField(
 
   const customizedDefaultField = {
     ...serializedField,
-    ...rest
+    ...rest,
+    conditionals: transformUIConfiguredConditionalsToDefaultFormat(conditionals)
   }
 
   if (

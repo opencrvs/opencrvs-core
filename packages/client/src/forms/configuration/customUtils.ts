@@ -39,7 +39,7 @@ export function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
-function getOtherConditionalsAction(
+export function transformUIConfiguredConditionalsToDefaultFormat(
   conditionals: Array<IConditionalConfig | IConditional> | undefined
 ) {
   const isConditional = (
@@ -80,7 +80,9 @@ export function createCustomField({
   inputWidth,
   conditionals,
   options,
+  extraValue,
   validator,
+  mapping,
   dynamicOptions
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
@@ -89,14 +91,22 @@ export function createCustomField({
     custom,
     required,
     type: fieldType,
+    extraValue,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: initialValue || '',
     validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
-    options: [],
+    options: (options || []).map((option) => {
+      return {
+        ...option,
+        label: Array.isArray(option.label)
+          ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+          : option.label
+      }
+    }),
     dynamicOptions: {},
-    mapping: {
+    mapping: mapping || {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
       },
@@ -112,7 +122,8 @@ export function createCustomField({
 
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
 
-  const othersConditionals = getOtherConditionalsAction(conditionals)
+  const othersConditionals =
+    transformUIConfiguredConditionalsToDefaultFormat(conditionals)
 
   if (sectionId === BirthSection.Father) {
     baseField.conditionals = [
