@@ -1508,6 +1508,8 @@ input QuestionInput {
   datasetId: String
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
+  mapping: MappingInput
+  extraValue: String
 }
 
 input SystemSettings {
@@ -2010,6 +2012,11 @@ input ValidatorInput {
   parameters: [Int!]
 }
 
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 type Payment {
   paymentId: ID
   type: PaymentType
@@ -2065,6 +2072,10 @@ input MesssageDescriptorInput {
   id: String!
   description: String
   defaultMessage: String!
+}
+
+input Operation {
+  operation: String!
 }
 
 enum PaymentType {

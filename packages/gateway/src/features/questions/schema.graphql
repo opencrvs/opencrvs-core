@@ -55,6 +55,16 @@ input ValidatorInput {
   operation: String!
   parameters: [Int!]
 }
+
+input Operation {
+  operation: String!
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -77,4 +87,6 @@ input QuestionInput {
   datasetId: String
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
+  mapping: MappingInput
+  extraValue: String
 }

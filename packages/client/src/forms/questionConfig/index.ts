@@ -9,17 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISerializedForm, IValidatorDescriptor } from '@client/forms'
+import {
+  IMapping,
+  ISerializedForm,
+  IValidatorDescriptor,
+  SerializedFormField
+} from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
 import {
   CustomFieldType,
   Event,
-  CustomSelectOption
+  CustomSelectOption,
+  MappingInput
 } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
+import { transformUIConfiguredConditionalsToDefaultFormat } from '@client/forms/configuration/customUtils'
 
 export * from './transformers'
 
@@ -53,6 +60,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   enabled: string
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
+  conditionals?: IConditionalConfig[]
   validator?: IValidatorDescriptor[]
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
@@ -73,11 +81,13 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   inputWidth?: number
   initialValue?: string
   fieldName: string
+  extraValue?: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
   validator?: IValidatorDescriptor[]
+  mapping?: IMapping
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
@@ -101,17 +111,20 @@ export function getIdentifiersFromFieldId(fieldId: string) {
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
-) {
+): SerializedFormField {
   const {
     identifiers: { sectionIndex, groupIndex, fieldIndex },
+    conditionals,
     ...rest
   } = question
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+
   return {
     ...serializedField,
-    ...rest
+    ...rest,
+    conditionals: transformUIConfiguredConditionalsToDefaultFormat(conditionals)
   }
 }
 

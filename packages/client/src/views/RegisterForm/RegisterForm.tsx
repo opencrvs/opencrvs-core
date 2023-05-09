@@ -624,6 +624,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup,
       declaration
     )
+
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const menuItemDeleteOrClose =
