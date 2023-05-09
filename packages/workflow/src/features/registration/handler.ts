@@ -467,6 +467,7 @@ export async function markEventAsCertifiedHandler(
     await mergePatientIdentifier(payload)
     const hearthResponse = await postToHearth(payload)
     modifyTaskWithCompositionID(payload, hearthResponse)
+    populateCompositionWithID(payload, hearthResponse)
     return hearthResponse
   } catch (error) {
     logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
@@ -484,7 +485,9 @@ export async function markEventAsIssuedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
     throw new Error(error)
