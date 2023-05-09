@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IMapping, ISerializedForm, IValidatorDescriptor } from '@client/forms'
+import {
+  IMapping,
+  ISerializedForm,
+  IValidatorDescriptor,
+  SerializedFormField
+} from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
@@ -21,6 +26,7 @@ import {
 } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
+import { transformUIConfiguredConditionalsToDefaultFormat } from '@client/forms/configuration/customUtils'
 
 export * from './transformers'
 
@@ -105,9 +111,10 @@ export function getIdentifiersFromFieldId(fieldId: string) {
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
-) {
+): SerializedFormField {
   const {
     identifiers: { sectionIndex, groupIndex, fieldIndex },
+    conditionals,
     ...rest
   } = question
 
@@ -116,7 +123,8 @@ export function getCustomizedDefaultField(
 
   return {
     ...serializedField,
-    ...rest
+    ...rest,
+    conditionals: transformUIConfiguredConditionalsToDefaultFormat(conditionals)
   }
 }
 

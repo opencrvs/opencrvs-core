@@ -39,7 +39,7 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
-function getOtherConditionalsAction(
+export function transformUIConfiguredConditionalsToDefaultFormat(
   conditionals: Array<IConditionalConfig | IConditional> | undefined
 ) {
   const isConditional = (
@@ -120,7 +120,8 @@ export function createCustomField({
 
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
 
-  const othersConditionals = getOtherConditionalsAction(conditionals)
+  const othersConditionals =
+    transformUIConfiguredConditionalsToDefaultFormat(conditionals)
 
   if (sectionId === BirthSection.Father) {
     baseField.conditionals = [
