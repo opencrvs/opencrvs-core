@@ -33,6 +33,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
+import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
   NATIONAL_ID_TEXT,
