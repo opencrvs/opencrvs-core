@@ -95,6 +95,7 @@ export function createCustomField({
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
     options: [],
+    dynamicOptions: {},
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
