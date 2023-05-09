@@ -23,7 +23,6 @@ import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavi
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { NavigationGroupHeader } from '@opencrvs/components/lib/SideNavigation/NavigationGroupHeader'
-import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
   goToHomeTab,
@@ -135,7 +134,7 @@ interface ParentNav {
   [groupKey: string]: Nav[]
 }
 
-const NavTree: ParentNav = {
+export const NavTree: ParentNav = {
   [GROUP_ID.recordGroup]: [
     WORKQUEUE_TABS.outbox,
     WORKQUEUE_TABS.inProgress,
@@ -498,9 +497,6 @@ const RecordGroup = (props: IFullProps) => {
         label={intl.formatMessage(navigationMessages[GROUP_ID.recordGroup])}
         onClick={() => setIsNavGroupExpanded(!isNavGroupExpanded)}
         isSelected={enableMenuSelection && isNavGroupActive}
-        icon={() => (
-          <Expandable selected={isNavGroupExpanded || isNavGroupActive} />
-        )}
       />
 
       {(isNavGroupExpanded || isNavGroupActive) &&
@@ -571,9 +567,6 @@ const PerformanceGroup = (props: IFullProps) => {
         )}
         onClick={() => setIsNavGroupExpanded(!isNavGroupExpanded)}
         isSelected={enableMenuSelection && isNavGroupActive}
-        icon={() => (
-          <Expandable selected={isNavGroupExpanded || isNavGroupActive} />
-        )}
       />
 
       {(isNavGroupExpanded || isNavGroupActive) &&
@@ -636,9 +629,6 @@ const ConfigGroup = (props: IFullProps) => {
         label={intl.formatMessage(navigationMessages[GROUP_ID.configGroup])}
         onClick={() => setIsNavGroupExpanded(!isNavGroupExpanded)}
         isSelected={enableMenuSelection && isNavGroupActive}
-        icon={() => (
-          <Expandable selected={isNavGroupExpanded || isNavGroupActive} />
-        )}
       />
 
       {(isNavGroupExpanded || isNavGroupActive) &&
@@ -699,9 +689,6 @@ const OrganizationGroup = (props: IFullProps) => {
         )}
         onClick={() => setIsNavGroupExpanded(!isNavGroupExpanded)}
         isSelected={enableMenuSelection && isNavGroupActive}
-        icon={() => (
-          <Expandable selected={isNavGroupExpanded || isNavGroupActive} />
-        )}
       />
 
       {(isNavGroupExpanded || isNavGroupActive) &&

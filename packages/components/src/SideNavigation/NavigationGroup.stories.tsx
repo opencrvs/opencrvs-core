@@ -23,10 +23,10 @@ import { recordGroup } from './NavigationGroupHeader.stories'
 import { NavigationItem } from './NavigationItem'
 const RecordTemplate: Story<INavigationGroup> = (args) => (
   <NavigationGroup>
-    {/* <NavigationGroupHeader {...recordGroup.args} />
+    <NavigationGroupHeader {...recordGroup.args} />
     <NavigationItem {...itemInProgress.args} />
     <NavigationItem {...itemReadyForReview.args} />
-    <NavigationItem {...itemRequiresUpdates.args} /> */}
+    <NavigationItem {...itemRequiresUpdates.args} />
   </NavigationGroup>
 )
 
@@ -35,6 +35,6 @@ export const groupRecord = RecordTemplate.bind({})
 groupRecord.args = {}
 
 export default {
-  title: 'Layout/Side navigation/Side navigation group',
+  title: 'Layout/Side navigation/Navigation group',
   component: NavigationGroup
 } as Meta

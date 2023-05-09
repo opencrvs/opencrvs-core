@@ -12,4 +12,4 @@
 export * from './LeftNavigation'
 export * from './NavigationGroup'
 export * from './NavigationItem'
-export * from './NavigationSubItem'
+export * from './NavigationGroupHeader'

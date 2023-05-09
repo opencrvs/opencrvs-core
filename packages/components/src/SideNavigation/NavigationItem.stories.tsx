@@ -45,6 +45,6 @@ itemRequiresUpdates.args = {
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  title: 'Layout/Side navigation/Side navigation item',
+  title: 'Layout/Side navigation/Item',
   component: NavigationItem
 }

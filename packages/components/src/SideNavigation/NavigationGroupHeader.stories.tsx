@@ -16,7 +16,6 @@ import {
   NavigationGroupHeader,
   INavigationGroupHeaderProps
 } from './NavigationGroupHeader'
-import { Expandable } from 'src/icons/Expandable'
 
 const Template: Story<INavigationGroupHeaderProps> = (args) => (
   <NavigationGroupHeader {...args} />
@@ -26,11 +25,23 @@ export const recordGroup = Template.bind({})
 
 recordGroup.args = {
   label: 'RECORD',
-  icon: <Expandable selected={true} />
+  isSelected: true
+}
+
+export const performanceGroup = Template.bind({})
+
+performanceGroup.args = {
+  label: 'PERFORMANCE',
+  isExpanded: true
+}
+export const organizationGroup = Template.bind({})
+
+organizationGroup.args = {
+  label: 'ORGANIZATION'
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  title: 'Layout/Side navigation/Side navigation item',
+  title: 'Layout/Side navigation/Group header',
   component: NavigationGroupHeader
 }

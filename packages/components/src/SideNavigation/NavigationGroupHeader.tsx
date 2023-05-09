@@ -12,13 +12,14 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+
+import { Expandable } from '../icons/Expandable'
+
 export interface INavigationGroupHeaderProps
   extends React.LiHTMLAttributes<HTMLLIElement> {
-  icon?: () => React.ReactNode
   label: string
-  count?: number
   isSelected?: boolean
-  children?: React.ReactNode
+  isExpanded?: boolean
 }
 
 const ItemContainer = styled.li<{ isSelected?: boolean }>`
@@ -64,11 +65,9 @@ const IconContainer = styled.div`
 `
 
 export const NavigationGroupHeader = ({
-  icon,
   label,
-  count,
   isSelected,
-  children,
+  isExpanded,
   ...otherProps
 }: INavigationGroupHeaderProps) => {
   return (
@@ -82,10 +81,11 @@ export const NavigationGroupHeader = ({
       }}
     >
       <ItemContentContainer isSelected={isSelected}>
-        {icon && <IconContainer>{icon()}</IconContainer>}
+        <IconContainer>
+          <Expandable expanded={isExpanded || isSelected} />
+        </IconContainer>
         <LabelContainer isSelected={isSelected}>{label}</LabelContainer>
       </ItemContentContainer>
-      {isSelected && children}
     </ItemContainer>
   )
 }

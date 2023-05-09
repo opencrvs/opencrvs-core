@@ -13,9 +13,9 @@
 import * as React from 'react'
 
 export const Expandable = (
-  props: React.HTMLAttributes<SVGElement> & { selected?: boolean }
+  props: React.HTMLAttributes<SVGElement> & { expanded?: boolean }
 ) => {
-  return props.selected ? (
+  return props.expanded ? (
     <svg
       width="10"
       height="6"
