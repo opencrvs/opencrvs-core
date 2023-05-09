@@ -24,7 +24,6 @@ import styled from '@client/styledComponents'
 import { PrimaryButton, CircleButton } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/EventTopBar'
-import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -232,9 +231,7 @@ function FormConfigWizardView() {
         goHome={() => dispatch(goToFormConfigHome())}
       />
       <WizardContainer>
-        <NavigationContainer>
-          <SectionNavigation />
-        </NavigationContainer>
+        <NavigationContainer>{/* <SectionNavigation /> */}</NavigationContainer>
         {section !== 'settings' ? (
           <>
             <CanvasWrapper

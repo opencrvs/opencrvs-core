@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { Event, CustomFieldType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
