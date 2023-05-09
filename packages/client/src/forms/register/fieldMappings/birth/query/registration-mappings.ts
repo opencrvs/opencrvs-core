@@ -32,7 +32,10 @@ import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
-import { getAddressName } from '@client/views/SysAdmin/Team/utils'
+import {
+  getAddressMapping,
+  getAddressName
+} from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
@@ -400,6 +403,51 @@ export const registrationLocationUserTransformer = (
     targetFieldName || 'registrationOffice'
   ] = officeName
 }
+
+export const registrationAddressUserTransformer =
+  (valueLocation: 'region' | 'division' | 'subdivision') =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    offlineData?: IOfflineData
+  ) => {
+    const statusData = queryData[REGISTRATION_SECTION]
+      .status as GQLRegWorkflow[]
+    const registrationStatus =
+      statusData &&
+      statusData.find((status) => {
+        return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      })
+    if (!registrationStatus?.office || !offlineData) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrationOfficeAddress'
+      ] = ''
+      return
+    }
+
+    const officeAddress = getAddressMapping(
+      offlineData,
+      registrationStatus.office as unknown as ILocation
+    )
+
+    const currentOfficeAddress = officeAddress.find(
+      (r) => r.type === valueLocation
+    )
+
+    if (currentOfficeAddress) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrationOfficeAddress'
+      ] = currentOfficeAddress.name
+      return
+    }
+
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationOfficeAddress'
+    ] = ''
+  }
 
 export const registrarSignatureUserTransformer = (
   transformedData: IFormData,

@@ -368,10 +368,20 @@ export type Birth = {
 
 export type BirthEventSearchSet = EventSearchSet & {
   __typename?: 'BirthEventSearchSet'
+  childGender?: Maybe<Scalars['String']>
   childName?: Maybe<Array<Maybe<HumanName>>>
   dateOfBirth?: Maybe<Scalars['Date']>
+  fatherDateOfBirth?: Maybe<Scalars['String']>
+  fatherIdentifier?: Maybe<Scalars['String']>
+  fathersFirstName?: Maybe<Scalars['String']>
+  fathersLastName?: Maybe<Scalars['String']>
   id: Scalars['ID']
+  motherDateOfBirth?: Maybe<Scalars['String']>
+  motherIdentifier?: Maybe<Scalars['String']>
+  mothersFirstName?: Maybe<Scalars['String']>
+  mothersLastName?: Maybe<Scalars['String']>
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
+  placeOfBirth?: Maybe<Scalars['String']>
   registration?: Maybe<RegistrationSearchSet>
   type?: Maybe<Scalars['String']>
 }
@@ -1159,6 +1169,11 @@ export enum MannerOfDeath {
   Suicide = 'SUICIDE'
 }
 
+export type MappingInput = {
+  mutation: Operation
+  query: Operation
+}
+
 export enum MaritalStatusType {
   Divorced = 'DIVORCED',
   Married = 'MARRIED',
@@ -1626,6 +1641,10 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
+export type Operation = {
+  operation: Scalars['String']
+}
+
 export type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
   notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
@@ -2010,12 +2029,14 @@ export type QuestionInput = {
   description?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
+  extraValue?: InputMaybe<Scalars['String']>
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
   initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
+  mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>

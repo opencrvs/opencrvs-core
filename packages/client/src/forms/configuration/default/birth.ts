@@ -595,6 +595,21 @@ export const birthRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationLocation',
             operation: 'registrationLocationUserTransformer'
+          },
+          {
+            fieldName: 'registrationDivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['division']
+          },
+          {
+            fieldName: 'registrationRegion',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['region']
+          },
+          {
+            fieldName: 'registrationSubdivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['subdivision']
           }
         ],
         mutation: {

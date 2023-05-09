@@ -30,7 +30,7 @@ import {
 export function Home() {
   const userDetails = useSelector(getUserDetails)
   const role = userDetails && userDetails.systemRole
-  const roleIsValidForDashboard =
+  const isRoleAdmins =
     role &&
     [
       ...NATL_ADMIN_ROLES,
@@ -39,7 +39,7 @@ export function Home() {
     ].includes(role)
   const roleIsLocalSysAdmin = role && SYS_ADMIN_ROLES.includes(role)
 
-  if (roleIsValidForDashboard) return <Redirect to={PERFORMANCE_DASHBOARD} />
+  if (isRoleAdmins) return <Redirect to={PERFORMANCE_HOME} />
   if (roleIsLocalSysAdmin)
     return (
       <Redirect

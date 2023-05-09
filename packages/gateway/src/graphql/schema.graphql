@@ -1508,6 +1508,8 @@ input QuestionInput {
   datasetId: String
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
+  mapping: MappingInput
+  extraValue: String
 }
 
 input SystemSettings {
@@ -1817,6 +1819,16 @@ type BirthEventSearchSet implements EventSearchSet {
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+  placeOfBirth: String
+  childGender: String
+  mothersFirstName: String
+  mothersLastName: String
+  fathersFirstName: String
+  fathersLastName: String
+  motherDateOfBirth: String
+  fatherDateOfBirth: String
+  motherIdentifier: String
+  fatherIdentifier: String
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -2000,6 +2012,11 @@ input ValidatorInput {
   parameters: [Int!]
 }
 
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 type Payment {
   paymentId: ID
   type: PaymentType
@@ -2055,6 +2072,10 @@ input MesssageDescriptorInput {
   id: String!
   description: String
   defaultMessage: String!
+}
+
+input Operation {
+  operation: String!
 }
 
 enum PaymentType {
