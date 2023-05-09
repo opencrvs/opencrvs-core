@@ -10,13 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  IDynamicOptions,
   IMapping,
   ISerializedForm,
   IValidatorDescriptor,
   SerializedFormField
 } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
-import { transformUIConfiguredConditionalsToDefaultFormat } from '@client/forms/configuration/customUtils'
+import {
+  transformUIConfiguredConditionalsToDefaultFormat,
+  getDefaultLanguageMessage
+} from '@client/forms/configuration/customUtils'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
 import {
@@ -87,6 +91,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   datasetId?: string
   validator?: IValidatorDescriptor[]
   mapping?: IMapping
+  dynamicOptions?: IDynamicOptions
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
@@ -107,6 +112,9 @@ export function getIdentifiersFromFieldId(fieldId: string) {
   }
 }
 
+function hasQuestionAlteredOptions(question: IDefaultQuestionConfig) {
+  return question.options?.length
+}
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
@@ -119,19 +127,30 @@ export function getCustomizedDefaultField(
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-
-  if (!conditionals) {
-    return {
-      ...serializedField,
-      ...rest
-    }
-  }
-
-  return {
+  const customizedDefaultField = {
     ...serializedField,
-    ...rest,
-    conditionals: transformUIConfiguredConditionalsToDefaultFormat(conditionals)
+    ...rest
   }
+  if (conditionals) {
+    customizedDefaultField.conditionals =
+      transformUIConfiguredConditionalsToDefaultFormat(conditionals)
+  }
+
+  if (
+    serializedField.type === 'SELECT_WITH_OPTIONS' &&
+    hasQuestionAlteredOptions(question)
+  ) {
+    customizedDefaultField.options =
+      question.options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
+  }
+  return customizedDefaultField
 }
 
 export function getSectionIdentifiers(fieldId: string, form: ISerializedForm) {

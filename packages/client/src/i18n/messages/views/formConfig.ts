@@ -567,6 +567,10 @@ const messagesToDefine: IFormConfigMessages = {
   customSelect: {
     id: 'config.form.tools.input.customSelect',
     defaultMessage: 'Custom Select'
+  },
+  customSelectWithDynamicOptions: {
+    id: 'config.form.tools.input.customSelectWithDynamicOptions',
+    defaultMessage: 'Custom select with dynamic options'
   }
 }
 

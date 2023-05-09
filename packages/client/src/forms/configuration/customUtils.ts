@@ -31,7 +31,7 @@ import { CustomFieldType } from '@client/utils/gateway'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
-function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
+export function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   const language = getDefaultLanguage()
   const defaultMessage = find(messages, {
     lang: language
@@ -82,7 +82,8 @@ export function createCustomField({
   options,
   extraValue,
   validator,
-  mapping
+  mapping,
+  dynamicOptions
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -104,6 +105,7 @@ export function createCustomField({
           : option.label
       }
     }),
+    dynamicOptions: {},
     mapping: mapping || {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -161,6 +163,9 @@ export function createCustomField({
   }
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
+  }
+  if (baseField.type === CustomFieldType.SelectWithDynamicOptions) {
+    baseField.dynamicOptions = dynamicOptions || { dependency: undefined }
   }
   if (baseField.type === CustomFieldType.SelectWithOptions) {
     baseField.options =

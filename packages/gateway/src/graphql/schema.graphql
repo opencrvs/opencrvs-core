@@ -1117,6 +1117,7 @@ type Identifier {
 
 enum LocationType {
   HEALTH_FACILITY
+  COMMUNITY
   HOSPITAL
   OTHER_HEALTH_INSTITUTION
   ADMIN_STRUCTURE
@@ -1510,6 +1511,7 @@ input QuestionInput {
   validator: [ValidatorInput!]
   mapping: MappingInput
   extraValue: String
+  dynamicOptions: DynamicOptionInput
 }
 
 input SystemSettings {
@@ -1994,6 +1996,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS
   TIME
 }
 
@@ -2015,6 +2018,12 @@ input ValidatorInput {
 input MappingInput {
   mutation: Operation!
   query: Operation!
+}
+
+input DynamicOptionInput {
+  resource: String
+  dependency: String!
+  jurisdictionType: String
 }
 
 type Payment {
