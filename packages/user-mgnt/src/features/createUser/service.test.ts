@@ -18,7 +18,7 @@ import { readFileSync } from 'fs'
 import { logger } from '@user-mgnt/logger'
 
 const fetch = fetchMock as fetchMock.FetchMock
-const mockUsernameRecord = {
+const mockUser = {
   username: 'je.doe'
 }
 
@@ -44,9 +44,9 @@ describe('Username generation', () => {
   it('generates valid username with given and family names with appended number', async () => {
     const finderMock = (query: any) => {
       if (query.getQuery().username === 'je.doe') {
-        return mockUsernameRecord
+        return mockUser
       }
-      return
+      return null
     }
     mockingoose(User).toReturn(finderMock, 'findOne')
     const names = [{ given: ['John', 'Evan'], family: 'Doe', use: 'en' }]
