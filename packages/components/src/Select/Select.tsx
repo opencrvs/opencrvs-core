@@ -92,6 +92,8 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__option {
+    border-radius: 4px;
+    margin-bottom: 2px;
     ${({ theme }) => theme.fonts.reg16};
     background-color: ${({ theme }) => theme.colors.white};
   }
@@ -106,17 +108,17 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__option--is-selected {
-    background-color: ${({ theme }) => theme.colors.primary};
-    color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.copy};
     &:active {
-      background: ${({ theme }) => theme.colors.primaryDark};
-      color: ${({ theme }) => theme.colors.white};
+      background: ${({ theme }) => theme.colors.grey200};
+      color: ${({ theme }) => theme.colors.copy};
     }
   }
 
   .react-select__menu {
     z-index: 2;
-    padding: 0;
+    padding: 1px 4px;
   }
 `
 
