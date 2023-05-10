@@ -177,7 +177,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon name="List" size="medium" color="primary" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ],
@@ -195,7 +195,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -228,7 +228,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -251,7 +251,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ]
@@ -264,7 +264,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon name="List" size="medium" color="primary" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ]
@@ -284,7 +284,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
