@@ -1407,6 +1407,8 @@ export interface GQLQuestionInput {
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
   validator?: Array<GQLValidatorInput>
+  mapping?: GQLMappingInput
+  extraValue?: string
   dynamicOptions?: GQLDynamicOptionInput
 }
 
@@ -1912,6 +1914,11 @@ export interface GQLValidatorInput {
   parameters?: Array<number>
 }
 
+export interface GQLMappingInput {
+  mutation: GQLOperation
+  query: GQLOperation
+}
+
 export interface GQLDynamicOptionInput {
   resource?: string
   dependency: string
@@ -1984,6 +1991,10 @@ export interface GQLMesssageDescriptorInput {
   id: string
   description?: string
   defaultMessage: string
+}
+
+export interface GQLOperation {
+  operation: string
 }
 
 export const enum GQLPaymentType {
