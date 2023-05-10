@@ -78,14 +78,10 @@ export function TimeField(props: ITimeFieldProps) {
 
     const isValidTime = (time: string) => time.split('-').length === 2
 
-    if (
-      props.value &&
-      isValidTime(props.value) &&
-      props.value !== getFormattedValue(state)
-    ) {
+    if (props.value && isValidTime(props.value)) {
       setState(getInitialState(props.value))
     }
-  }, [props.value, state])
+  }, [props.value])
 
   const hh = React.useRef<IRef>(null)
   const mm = React.useRef<IRef>(null)
