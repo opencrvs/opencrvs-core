@@ -841,12 +841,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
-        const documentData = !isBase64FileString(document.data)
-          ? `${window.config.MINIO_URL}${document.data}`
-          : document.data
-
         documentOptions.push({
-          value: documentData,
+          value: document.data,
           label
         })
         selectOptions.push({
@@ -1516,14 +1512,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    previewImageTransformed.data = isBase64FileString(
-      previewImageTransformed.data
-    )
-      ? previewImageTransformed.data
-      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
-
-    this.setState({ previewImage: previewImageTransformed as IFileValue })
+    this.setState({ previewImage: previewImage as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1717,6 +1706,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       offlineCountryConfiguration,
       declaration
+    )
+
+    const disableSubmit = Boolean(
+      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
+        ?.length > 0 ||
+        errorsOnFields.registration?.contactPoint?.errors.length !== 0
     )
 
     const isSignatureMissing = () => {
@@ -1996,6 +1991,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           declaration={declaration}
                           submitDeclarationAction={submitClickEvent}
                           rejectDeclarationAction={rejectDeclarationClickEvent}
+                          disableSubmit={disableSubmit}
                         />
                       </>
                     ) : (

@@ -10,68 +10,68 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { storage } from '@client/storage'
 import {
+  filterProcessingDeclarationsFromQuery,
   IDeclaration,
-  SUBMISSION_STATUS,
-  filterProcessingDeclarationsFromQuery
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { IStoreState } from '@opencrvs/client/src/store'
-import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { NavigationGroupHeader } from '@opencrvs/components/lib/SideNavigation/NavigationGroupHeader'
 import { connect } from 'react-redux'
 import {
-  goToHomeTab,
-  goToCertificateConfig,
-  goToSettings,
-  goToPerformanceView,
-  goToTeamView,
-  goToSystemList,
-  goToFormConfigHome,
-  goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport,
-  goToPerformanceStatistics,
-  goToLeaderBoardsView,
+  goToApplicationConfig,
+  goToCertificateConfig,
   goToDashboardView,
-  goToUserRolesConfig,
+  goToFormConfigHome,
+  goToHomeTab,
+  goToInformantNotification,
+  goToLeaderBoardsView,
   goToOrganisationView,
-  goToInformantNotification
+  goToPerformanceStatistics,
+  goToPerformanceView,
+  goToSettings,
+  goToSystemList,
+  goToTeamView,
+  goToUserRolesConfig,
+  goToVSExport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
-import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import {
   injectIntl,
   IntlShape,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
 import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import styled from '@client/styledComponents'
-import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
+import { isMobileDevice } from '@client/utils/commonUtils'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
+import { IStoreState } from '@opencrvs/client/src/store'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
+import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
+import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
+import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
+import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { UserDetails } from '@client/utils/userUtils'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { storage } from '@client/storage'
+import styled from '@client/styledComponents'
+import React from 'react'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -93,7 +93,6 @@ export const WORKQUEUE_TABS = {
   performance: 'performance',
   vsexports: 'vsexports',
   team: 'team',
-  config: 'config',
   organisation: 'organisation',
   application: 'application',
   certificate: 'certificate',
@@ -218,7 +217,7 @@ const USER_SCOPE: IUSER_SCOPE = {
       WORKQUEUE_TABS.vsexports
     ],
     [GROUP_ID.configGroup]: [
-      WORKQUEUE_TABS.config,
+      WORKQUEUE_TABS.application,
       WORKQUEUE_TABS.declarationForms,
       WORKQUEUE_TABS.certificate,
       WORKQUEUE_TABS.userRoles
@@ -817,8 +816,6 @@ export const NavigationView = (props: IFullProps) => {
     className,
     activeMenuItem
   } = props
-
-  console.log(userDetails?.systemRole, activeMenuItem, window.location.href)
 
   const runningVer = String(localStorage.getItem('running-version'))
 

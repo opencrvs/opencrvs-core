@@ -82,7 +82,10 @@ export const NavigationGroupHeader = ({
     >
       <ItemContentContainer isSelected={isSelected}>
         <IconContainer>
-          <Expandable expanded={isExpanded || isSelected} />
+          <Expandable
+            expanded={isExpanded || isSelected}
+            selected={isSelected}
+          />
         </IconContainer>
         <LabelContainer isSelected={isSelected}>{label}</LabelContainer>
       </ItemContentContainer>
