@@ -149,7 +149,7 @@
     "opener": "^1.5.1",
     "prettier": "^2.5.1",
     "qrcode": "^1.5.1",
-    "serve": "^10.0.2",
+    "serve": "^14.2.0",
     "stylelint": "^14.11.0",
     "stylelint-config-recommended": "^9.0.0",
     "stylelint-config-styled-components": "^0.1.1",
