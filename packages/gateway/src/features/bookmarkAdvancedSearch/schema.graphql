@@ -119,11 +119,13 @@ input AdvancedSearchParametersInput {
   groomDoB: String
   groomDoBStart: String
   groomDoBEnd: String
+  groomIdentifier: String
   brideFirstNames: String
   brideFamilyName: String
   brideDoB: String
   brideDoBStart: String
   brideDoBEnd: String
+  brideIdentifier: String
   dateOfMarriage: String
   motherFirstNames: String
   motherFamilyName: String

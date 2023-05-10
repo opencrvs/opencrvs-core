@@ -10,21 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import styled from 'styled-components'
+import { signFileUrl } from '@documents/minio/sign'
+import * as Hapi from '@hapi/hapi'
 
-export interface INavigationGroup
-  extends React.HTMLAttributes<HTMLDivElement> {}
-
-const NavigationGroupContainer = styled.div`
-  padding: 6px;
-  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
-`
-
-interface IProps {
-  children?: React.ReactNode
-}
-
-export const NavigationGroup = (props: IProps) => {
-  return <NavigationGroupContainer>{props.children}</NavigationGroupContainer>
+export function createPreSignedUrl(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as { fileName: string }
+  try {
+    const presignedURL = signFileUrl(payload.fileName)
+    return h.response({ presignedURL }).code(200)
+  } catch (error) {
+    return h.response(error).code(400)
+  }
 }

@@ -9,22 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import * as React from 'react'
-import styled from 'styled-components'
-
-export interface INavigationGroup
-  extends React.HTMLAttributes<HTMLDivElement> {}
-
-const NavigationGroupContainer = styled.div`
-  padding: 6px;
-  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
-`
-
-interface IProps {
-  children?: React.ReactNode
+type Request = {
+  headers: {
+    host: string
+  }
+  protocol: string
+  method: string
+  path: string
 }
 
-export const NavigationGroup = (props: IProps) => {
-  return <NavigationGroupContainer>{props.children}</NavigationGroupContainer>
+declare module 'minio/dist/main/signing' {
+  export function presignSignatureV4(
+    request: Request,
+    accessKey: string,
+    secretKey: string,
+    sessionToken?: string,
+    region: string,
+    requestDate: Date,
+    expires: number
+  ): string
 }
