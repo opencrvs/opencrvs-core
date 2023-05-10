@@ -286,7 +286,7 @@ export async function generateUsername(
   return proposedUsername
 }
 
-async function checkUsername(username: any) {
+async function checkUsername(username: string) {
   const user = await User.findOne({ username })
   return !!user
 }
