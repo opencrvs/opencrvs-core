@@ -9,36 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { BirthSection, DeathSection } from '@client/forms'
-import { useIntl } from 'react-intl'
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import {
-  messages,
-  draftStatusMessages
+  draftStatusMessages,
+  messages
 } from '@client/i18n/messages/views/formConfig'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { goToFormConfigWizard } from '@client/navigation'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IStoreState } from '@client/store'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import { DraftStatus, Event } from '@client/utils/gateway'
-import { Value, DraftVersion } from './components'
 import {
   ActionStatus,
   isDefaultDraft
 } from '@client/views/SysAdmin/Config/Forms/utils'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 import { ActionContext, Actions } from './ActionsModal'
+import { DraftVersion, Value } from './components'
 import { FormConfigMobileViewModal } from './FormConfigMobileViewModal'
-import { isMobileDevice } from '@client/utils/commonUtils'
 
 function ActionButton({ event, version }: IFormDraft) {
   const intl = useIntl()

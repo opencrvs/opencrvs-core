@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import * as Hapi from '@hapi/hapi'
 import { logger } from '@user-mgnt/logger'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import * as Joi from 'joi'
 
 interface IChangeAvatarPayload {
   userId: string

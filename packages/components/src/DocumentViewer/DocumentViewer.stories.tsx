@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { DocumentViewer, IDocumentViewerOptions } from './DocumentViewer'
 import React from 'react'
+import { DocumentViewer, IDocumentViewerOptions } from './DocumentViewer'
 
 interface IProps {
   id?: string

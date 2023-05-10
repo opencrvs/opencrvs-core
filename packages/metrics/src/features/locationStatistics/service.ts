@@ -10,15 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  fetchChildLocationsByParentId,
   countRegistrarsByLocation,
-  totalOfficesInCountry,
+  fetchChildLocationsByParentId,
+  fetchLocation,
   fetchLocationsByType,
-  fetchLocation
+  totalOfficesInCountry
 } from '@metrics/api'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
-import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number

@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  RegisterForm,
-  RouteProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { IDeclaration } from '@client/declarations'
+import { IForm } from '@client/forms'
+import { Event } from '@client/utils/gateway'
+import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
   DRAFT_MARRIAGE_FORM_PAGE_GROUP,
   HOME
 } from '@opencrvs/client/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
+import {
+  RegisterForm,
+  RouteProps
+} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import * as React from 'react'
 import { connect } from 'react-redux'
-import { IForm, MarriageSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { IDeclaration } from '@client/declarations'
 import { Redirect } from 'react-router'
 
 interface IFormProps {

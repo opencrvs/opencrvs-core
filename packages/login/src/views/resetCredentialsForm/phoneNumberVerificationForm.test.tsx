@@ -12,10 +12,10 @@
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
 import { createTestApp, flushPromises, waitFor } from '@login/tests/util'
-import { rest } from 'msw'
-import { setupServer } from 'msw/node'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
 
 //mock api calls
 const server = setupServer(

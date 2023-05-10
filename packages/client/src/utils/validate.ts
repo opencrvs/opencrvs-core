@@ -9,29 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
-import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
-import {
-  REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_ALPHA_NUMERIC,
-  REGEXP_DECIMAL_POINT_NUMBER,
-  INFORMANT_MINIMUM_AGE
-} from '@client/utils/constants'
-import { validate as validateEmail } from 'email-validator'
-import XRegExp from 'xregexp'
-import { isArray } from 'util'
-import {
-  NATIONAL_ID,
-  BIRTH_REGISTRATION_NUMBER,
-  DEATH_REGISTRATION_NUMBER,
-  PASSPORT,
-  DRIVING_LICENSE
-} from '@client/forms/identity'
-import { IOfflineData } from '@client/offline/reducer'
+import { NATIONAL_ID } from '@client/forms/identity'
 import { getListOfLocations } from '@client/forms/utils'
-import _, { values } from 'lodash'
+import { validationMessages as messages } from '@client/i18n/messages'
+import { IOfflineData } from '@client/offline/reducer'
+import {
+  INFORMANT_MINIMUM_AGE,
+  REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
+  REGEXP_DECIMAL_POINT_NUMBER
+} from '@client/utils/constants'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
+import { IFormData, IFormFieldValue } from '@opencrvs/client/src/forms'
+import { validate as validateEmail } from 'email-validator'
+import _ from 'lodash'
+import { MessageDescriptor } from 'react-intl'
+import { isArray } from 'util'
+import XRegExp from 'xregexp'
 
 export interface IValidationResult {
   message: MessageDescriptor

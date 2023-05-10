@@ -12,8 +12,8 @@
 /**
  * Taken from https://github.com/TallerWebSolutions/apollo-cache-instorage
  */
-import { visit } from 'graphql'
 import { checkDocument, cloneDeep } from '@apollo/client/utilities'
+import { visit } from 'graphql'
 
 const PERSIST_FIELD = {
   kind: 'Field',

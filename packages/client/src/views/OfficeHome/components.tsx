@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { SUBMISSION_STATUS } from '@client/declarations'
 import styled from '@client/styledComponents'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
-import { SUBMISSION_STATUS } from '@client/declarations'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
-import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { Link } from '@opencrvs/components/lib/Link'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import * as React from 'react'
 
 const Flex = styled.div`
   display: flex;

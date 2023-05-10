@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Workqueue } from './Workqueue'
-import { DeclarationIcon, Download, Downloaded } from '../icons'
 import React from 'react'
-import { Stack } from '../Stack'
-import { Link } from '../Link'
 import { Button } from '../Button'
+import { DeclarationIcon, Download, Downloaded } from '../icons'
+import { Link } from '../Link'
+import { Stack } from '../Stack'
+import { Workqueue } from './Workqueue'
 
 export default {
   title: 'Data/Workqueue',

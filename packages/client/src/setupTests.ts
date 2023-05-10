@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { storage } from '@client/storage'
-import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
-import { referenceApi } from './utils/referenceApi'
+import { IUserData } from './declarations'
 import { authApi } from './utils/authApi'
+import { referenceApi } from './utils/referenceApi'
 // eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
-import { userQueries } from './user/queries'
 import { mockOfflineData } from './tests/mock-offline-data'
+import { userQueries } from './user/queries'
 // eslint-disable-next-line import/no-unassigned-import
-import './tests/queryMock'
 import { vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'
+import './tests/queryMock'
 
 /*
  * Navigator & Window
@@ -82,12 +82,12 @@ import { queries } from './profile/queries'
  */
 /* eslint-disable import/first */
 import {
-  mockUserResponse,
-  mockConfigResponse,
-  userDetails,
-  validToken,
   getItem,
-  setItem
+  mockConfigResponse,
+  mockUserResponse,
+  setItem,
+  userDetails,
+  validToken
 } from './tests/util'
 
 vi.doMock('@client/forms/configuration/default', async () => ({

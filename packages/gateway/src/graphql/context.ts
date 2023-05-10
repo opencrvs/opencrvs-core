@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable import/no-relative-parent-imports */
+import { Request } from '@hapi/hapi'
 import { IAuthHeader } from '../common-types'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
-import { Request } from '@hapi/hapi'
 
 export interface Context {
   request: Request

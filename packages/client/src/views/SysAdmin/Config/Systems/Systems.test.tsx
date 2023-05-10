@@ -10,25 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockOfflineDataDispatch,
   selectOption
 } from '@client/tests/util'
-import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
-import { useParams } from 'react-router'
-import { describe, Mock } from 'vitest'
+import { waitForElement } from '@client/tests/wait-for-element'
 import {
   activateSystem,
   deactivateSystem,
   deleteSystem,
   registerSystem
 } from '@client/views/SysAdmin/Config/Systems/mutations'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { offlineDataReady } from '@client/offline/actions'
+import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
+import { useParams } from 'react-router'
+import { describe, Mock } from 'vitest'
 
 describe('render system integration', () => {
   let component: ReactWrapper<{}, {}>

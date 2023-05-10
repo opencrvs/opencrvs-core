@@ -12,10 +12,10 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
+import { Box } from '../Box'
 import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
 import { BackArrow } from '../icons'
-import { Box } from '../Box'
 
 const Container = styled(Box)<{ size: string }>`
   position: relative;

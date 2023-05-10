@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { CreatePassword } from '@client/views/UserSetup/CreatePassword'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
-import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
+import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
+import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
+import * as React from 'react'
 export const SCREEN_LOCK = 'screenLock'
 
 export enum ProtectedAccoutStep {

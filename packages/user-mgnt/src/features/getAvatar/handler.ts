@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import User, { IUserModel } from '@user-mgnt/model/user'
 import { AVATAR_API } from '@user-mgnt/constants'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 
 export default async function getUserAvatar(

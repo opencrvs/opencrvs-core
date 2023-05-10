@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/utils/gateway'
 import {
   getDraftInformantFullName,
   transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
+import { Event } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet

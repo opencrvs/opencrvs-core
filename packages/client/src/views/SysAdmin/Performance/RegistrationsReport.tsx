@@ -9,29 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import React from 'react'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { messages } from '@client/i18n/messages/views/performance'
+import { goToRegistrationsList } from '@client/navigation'
+import styled from '@client/styledComponents'
 import {
+  Breakdown,
+  BreakdownLabel,
+  BreakdownRow,
+  BreakdownValue,
+  calculateTotal,
+  PercentageDisplay,
+  PerformanceListHeader,
   PerformanceTitle,
   PerformanceValue,
-  Breakdown,
-  BreakdownRow,
-  BreakdownLabel,
-  BreakdownValue,
   ReportContainer,
-  PercentageDisplay,
-  calculateTotal,
-  TotalDisplayWithPercentage,
-  PerformanceListHeader
+  TotalDisplayWithPercentage
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
-import { messages } from '@client/i18n/messages/views/performance'
-import { useIntl } from 'react-intl'
-import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages/buttons'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
-import { goToRegistrationsList } from '@client/navigation'
 
 const ActionButton = styled(LinkButton)`
   align-self: baseline;

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
 import * as React from 'react'
 import { LoadingIndicator } from './LoadingIndicator'
-import { createTestComponent } from '@client/tests/util'
-import { createStore } from '@client/store'
 
 describe('LoadingIndicator test cases', () => {
   const { store, history } = createStore()

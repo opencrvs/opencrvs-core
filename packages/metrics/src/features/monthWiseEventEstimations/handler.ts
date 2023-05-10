@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
+import {
+  EVENT,
+  LOCATION_ID,
+  TIME_FROM,
+  TIME_TO
+} from '@metrics/features/metrics/constants'
 import { fetchEventsGroupByMonthDates } from '@metrics/features/metrics/metricsGenerator'
 import {
+  fetchEstimateForTargetDaysByLocationId,
   getMonthRangeFilterListFromTimeRage,
-  IMonthRangeFilter,
-  fetchEstimateForTargetDaysByLocationId
+  IMonthRangeFilter
 } from '@metrics/features/metrics/utils'
-import {
-  TIME_FROM,
-  TIME_TO,
-  LOCATION_ID,
-  EVENT
-} from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration/'
 
 interface IMonthWiseEstimation {

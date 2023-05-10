@@ -9,33 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
+import { gql, useQuery } from '@apollo/client'
+import { useTimeout } from '@client/hooks/useTimeout'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
-import { Button } from '@opencrvs/components/lib/Button'
 import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
-import { Box } from '@opencrvs/components/lib/Box'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { Text } from '@opencrvs/components/lib/Text'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from 'styled-components'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { useDispatch, useSelector } from 'react-redux'
+import { goToHome } from '@client/navigation'
 import {
   getOfflineData,
   selectApplicationName,
   selectCountryLogo
 } from '@client/offline/selectors'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { Spinner, Stack } from '@opencrvs/components'
-import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-import { useParams } from 'react-router'
-import { gql, useQuery } from '@apollo/client'
+import { EMPTY_STRING } from '@client/utils/constants'
 import formatDate from '@client/utils/date-formatting'
 import {
   BirthRegistration,
@@ -44,9 +28,25 @@ import {
   RegistrationType,
   RegStatus
 } from '@client/utils/gateway'
-import { useTimeout } from '@client/hooks/useTimeout'
-import { goToHome } from '@client/navigation'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { Spinner, Stack } from '@opencrvs/components'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Box } from '@opencrvs/components/lib/Box'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Toast } from '@opencrvs/components/lib/Toast/Toast'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router'
+import styled from 'styled-components'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;

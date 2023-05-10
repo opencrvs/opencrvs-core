@@ -9,16 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/config'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { useMutation, useQuery } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { Navigation } from '@client/components/interface/Navigation'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import {
+  getSystemRolesQuery,
+  updateRoleQuery
+} from '@client/forms/user/query/queries'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getLanguage } from '@client/i18n/selectors'
+import { offlineDataReady } from '@client/offline/actions'
+import { getOfflineData } from '@client/offline/selectors'
 import {
   GetSystemRolesQuery,
   Role,
@@ -26,32 +31,27 @@ import {
   UpdateRoleMutation,
   UpdateRoleMutationVariables
 } from '@client/utils/gateway'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Navigation } from '@client/components/interface/Navigation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { useMutation, useQuery } from '@apollo/client'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { Link } from '@opencrvs/components/lib/Link'
-import { Text } from '@opencrvs/components/lib/Text'
-import {
-  getSystemRolesQuery,
-  updateRoleQuery
-} from '@client/forms/user/query/queries'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { getUserSystemRole } from '@client/views/SysAdmin//Team/utils'
 import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { getUserSystemRole } from '@client/views/SysAdmin//Team/utils'
-import { getLanguage } from '@client/i18n/selectors'
+import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
+import { Stack, Toast } from '@opencrvs/components'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Link } from '@opencrvs/components/lib/Link'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Text } from '@opencrvs/components/lib/Text'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserRole } from './utils'
-import { Stack, Toast } from '@opencrvs/components'
-import { ProfileMenu } from '@client/components/ProfileMenu'
-import { useModal } from '@client/hooks/useModal'
-import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
-import { offlineDataReady } from '@client/offline/actions'
-import { getOfflineData } from '@client/offline/selectors'
 
 export type RolesInput = (Omit<Role, '_id'> & { _id?: string })[]
 

@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable */
+import { ILanguage } from '@login/i18n/reducer'
+import chalk from 'chalk'
 import * as fs from 'fs'
 import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
-import chalk from 'chalk'
-import { ILanguage } from '@login/i18n/reducer'
 
 interface IReactIntlDescriptions {
   [key: string]: string

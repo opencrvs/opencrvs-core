@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from '@client/styledComponents'
-import { useDispatch } from 'react-redux'
-import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
-import { Toggle } from '@opencrvs/components/lib/Toggle'
-import {
-  IDefaultConfigField,
-  ICustomConfigField
-} from '@client/forms/configuration/formConfig/utils'
-import { Tooltip } from '@opencrvs/components/lib/icons'
-import ReactTooltip from 'react-tooltip'
-import { Event } from '@client/utils/gateway'
-import { BirthSection, DeathSection } from '@client/forms'
-import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
-import { useParams } from 'react-router'
-import { getFieldId } from '@client/forms/configuration/defaultUtils'
-import { IConditionalConfig } from '@client/forms/questionConfig'
 import { previewSectionFilter } from '@client/components/formConfig/SectionNavigation'
+import { BirthSection, DeathSection } from '@client/forms'
+import { getFieldId } from '@client/forms/configuration/defaultUtils'
+import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
+import {
+  ICustomConfigField,
+  IDefaultConfigField
+} from '@client/forms/configuration/formConfig/utils'
+import { IConditionalConfig } from '@client/forms/questionConfig'
+import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
+import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
+import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { Tooltip } from '@opencrvs/components/lib/icons'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
+import React from 'react'
+import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router'
+import ReactTooltip from 'react-tooltip'
 
 export const Title = styled.h3`
   margin: 0;

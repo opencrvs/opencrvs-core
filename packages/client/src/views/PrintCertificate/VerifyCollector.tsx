@@ -9,13 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
   IPrintableDeclaration,
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import {
+  IVerifyIDCertificateCollectorField,
+  verifyIDOnDeclarationCertificateCollectorDefinition
+} from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -25,25 +29,21 @@ import {
   goToPrintCertificatePayment,
   goToReviewCertificate
 } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import { Event } from '@client/utils/gateway'
 import {
-  IDVerifier,
-  ICollectorInfo
+  ICollectorInfo,
+  IDVerifier
 } from '@client/views/PrintCertificate/IDVerifier'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  IVerifyIDCertificateCollectorField,
-  verifyIDOnDeclarationCertificateCollectorDefinition
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IMatchParams {
   registrationId: string

@@ -9,29 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { connect } from 'react-redux'
+import { AvatarSmall } from '@client/components/Avatar'
+import { buttonMessages } from '@client/i18n/messages'
+import { getLanguage } from '@client/i18n/selectors'
+import { goToSettings } from '@client/navigation'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import {
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  IntlShape
-} from 'react-intl'
+import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   IToggleMenuItem,
   ToggleMenu
 } from '@opencrvs/components/lib/ToggleMenu'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
-import { IStoreState } from '@client/store'
-import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { goToSettings } from '@client/navigation'
-import { buttonMessages } from '@client/i18n/messages'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};

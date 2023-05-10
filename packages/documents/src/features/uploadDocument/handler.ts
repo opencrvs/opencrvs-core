@@ -12,8 +12,8 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
+import { v4 as uuid } from 'uuid'
 
 export interface IDocumentPayload {
   fileData: string

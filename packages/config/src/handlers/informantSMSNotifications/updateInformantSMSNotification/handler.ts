@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
-import * as Joi from 'joi'
+import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
 import InformantSMSNotification from '@config/models/informantSMSNotifications'
 import { badRequest } from '@hapi/boom'
-import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 export interface IInformantSMSNotificationPayload {
   id: string
   name: string

@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Box, IBox } from './Box'
 import React from 'react'
+import { Box, IBox } from './Box'
 
 const Template: Story<IBox> = (args) => <Box {...args}>A 6 columns box</Box>
 export const BoxView = Template.bind({})

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
+import fetch from 'node-fetch'
 import { resolve } from 'url'
 
 export interface IVerifySecurityAnswerResponse {

@@ -9,19 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { NATIONAL_ID } from '@client/forms/identity'
 import {
   FIELD_GROUP_TITLE,
   ISerializedFormSection,
   LOCATION_SEARCH_INPUT,
-  SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT,
   UserSection
 } from '@client/forms/index'
-import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { userMessages } from '@client/i18n/messages/user'
 
 export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,

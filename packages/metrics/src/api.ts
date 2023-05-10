@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
-import { IAuthHeader } from '@metrics/features/registration'
 import {
-  fhirUrl,
   COUNTRY_CONFIG_URL,
+  DOCUMENTS_URL,
+  fhirUrl,
   SEARCH_URL,
-  USER_MANAGEMENT_URL,
-  DOCUMENTS_URL
+  USER_MANAGEMENT_URL
 } from '@metrics/constants'
+import { IAuthHeader } from '@metrics/features/registration'
+import fetch from 'node-fetch'
 
 export function fetchFHIR<T = any>(
   suffix: string,

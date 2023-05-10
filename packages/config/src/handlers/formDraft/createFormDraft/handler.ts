@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { logger } from '@config/config/logger'
+import { requestSchema as questionReqeustSchema } from '@config/handlers/question/createQuestion/handler'
+import { Event } from '@config/models/certificate'
+import FormDraft, {
+  DraftStatus,
+  IFormDraft,
+  IFormDraftModel,
+  IHistory,
+  validEvent
+} from '@config/models/formDraft'
 import Question, { IQuestion, IQuestionModel } from '@config/models/question'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import FormDraft, {
-  IFormDraft,
-  IHistory,
-  IFormDraftModel,
-  validEvent,
-  DraftStatus
-} from '@config/models/formDraft'
-import { requestSchema as questionReqeustSchema } from '@config/handlers/question/createQuestion/handler'
-import { find, partition, isEmpty } from 'lodash'
-import { Event } from '@config/models/certificate'
+import { find, isEmpty, partition } from 'lodash'
 
 export interface ICreateDraft
   extends Pick<IFormDraftModel, 'event' | 'comment'> {

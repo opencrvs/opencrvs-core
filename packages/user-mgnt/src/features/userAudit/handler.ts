@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import { logger } from '@user-mgnt/logger'
 import User, {
   AUDIT_ACTION,
@@ -17,10 +20,7 @@ import User, {
   IUserModel
 } from '@user-mgnt/model/user'
 import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
-import { unauthorized } from '@hapi/boom'
-import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IAuditUserPayload {
   userId: string

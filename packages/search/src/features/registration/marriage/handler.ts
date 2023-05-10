@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { upsertEvent } from '@search/features/registration/marriage/service'
-import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { upsertEvent } from '@search/features/registration/marriage/service'
+import { logger } from '@search/logger'
 
 export async function marriageEventHandler(
   request: Hapi.Request,

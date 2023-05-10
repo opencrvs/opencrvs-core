@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { UserAuditActionModal, AUDIT_ACTION } from './UserAuditActionModal'
-import { createTestComponent, flushPromises } from '@client/tests/util'
 import { AppStore, createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
+import { Status, SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
+import { AUDIT_ACTION, UserAuditActionModal } from './UserAuditActionModal'
 
 const users: UserDetails[] = [
   {

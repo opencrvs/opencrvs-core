@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as decode from 'jwt-decode'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
-import fetch from 'node-fetch'
 import * as crypto from 'crypto'
+import * as decode from 'jwt-decode'
+import fetch from 'node-fetch'
 
 export interface IAuthHeader {
   Authorization: string

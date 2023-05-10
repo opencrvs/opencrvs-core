@@ -11,15 +11,15 @@
  */
 import * as actions from '@client/profile/profileActions'
 import { initialState } from '@client/profile/profileReducer'
-import { createStore, AppStore } from '@client/store'
-import {
-  mockUserResponse,
-  getItem,
-  userDetails,
-  mockRegistrarUserResponse
-} from '@client/tests/util'
 import { storage } from '@client/storage'
-import { vi, Mock } from 'vitest'
+import { AppStore, createStore } from '@client/store'
+import {
+  getItem,
+  mockRegistrarUserResponse,
+  mockUserResponse,
+  userDetails
+} from '@client/tests/util'
+import { Mock, vi } from 'vitest'
 
 storage.removeItem = vi.fn()
 

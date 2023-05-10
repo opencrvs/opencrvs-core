@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import ReactPanZoom from './PanDraggable'
 import styled, { css } from 'styled-components'
-import { ZoomIn, ZoomOut, RotateLeft } from '../../icons'
+import { RotateLeft, ZoomIn, ZoomOut } from '../../icons'
+import ReactPanZoom from './PanDraggable'
 const Container = css`
   width: 100%;
   min-height: calc(100vh - 200px);

@@ -9,6 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import {
+  APPLICATION_CONFIG_URL,
+  RESOURCE_SERVICE_URL
+} from '@workflow/constants'
+import { triggerEvent } from '@workflow/features/events/handler'
 import {
   BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
@@ -16,16 +22,16 @@ import {
   RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import {
+  getSectionEntryBySectionCode,
   getTaskResource,
-  selectOrCreateTaskRefResource,
-  getSectionEntryBySectionCode
+  selectOrCreateTaskRefResource
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
+  fetchExistingRegStatusCode,
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode,
-  updateResourceInHearth,
-  mergePatientIdentifier
+  mergePatientIdentifier,
+  updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   fetchTaskByCompositionIdFromHearth,
@@ -33,10 +39,11 @@ import {
   getComposition,
   getEventType,
   getMosipUINToken,
+  getVoidEvent,
   isEventNotification,
-  isInProgressDeclaration,
-  getVoidEvent
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
+import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
@@ -44,21 +51,14 @@ import {
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import * as Hapi from '@hapi/hapi'
-import {
-  APPLICATION_CONFIG_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
 import {
   getToken,
   getTokenPayload,
   ITokenPayload,
   USER_SCOPE
 } from '@workflow/utils/authUtils'
-import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
-import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
-import { triggerEvent } from '@workflow/features/events/handler'
+import fetch from 'node-fetch'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }

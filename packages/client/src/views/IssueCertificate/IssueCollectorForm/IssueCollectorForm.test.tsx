@@ -9,28 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { createLocation, History } from 'history'
-import { ReactWrapper } from 'enzyme'
-import { IssueCollectorForm } from './IssueCollectorForm'
-import {
-  createTestComponent,
-  flushPromises,
-  getFileFromBase64String,
-  inValidImageB64String,
-  mockDeathDeclarationData,
-  mockDeclarationData,
-  selectOption,
-  validImageB64String
-} from '@client/tests/util'
-import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { storeDeclaration } from '@client/declarations'
-import { merge } from 'lodash'
-import { vi } from 'vitest'
-import { selectDeclaration } from '@client/declarations/selectors'
+import { AppStore, createStore } from '@client/store'
+import { createTestComponent, mockDeclarationData } from '@client/tests/util'
 import { Event } from '@client/utils/gateway'
-import { flush } from 'fetch-mock'
+import { ReactWrapper } from 'enzyme'
+import { createLocation, History } from 'history'
+import React from 'react'
+import { IssueCollectorForm } from './IssueCollectorForm'
 import { IssueCollectorFormForOthers } from './IssueFormForOthers'
 
 let store: AppStore

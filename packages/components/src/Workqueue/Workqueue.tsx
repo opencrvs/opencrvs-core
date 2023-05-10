@@ -11,14 +11,14 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
+import { IAction } from '../common-types'
 import { grid } from '../grid'
-import { IColumn, IActionObject } from './types'
+import { SortIcon } from '../icons/SortIcon'
+import { ITheme } from '../theme'
+import { ListItemAction } from './components/ListItemAction'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
-import { ITheme } from '../theme'
-import { SortIcon } from '../icons/SortIcon'
-import { IAction } from '../common-types'
-import { ListItemAction } from './components/ListItemAction'
+import { IActionObject, IColumn } from './types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -191,34 +191,32 @@ export class WorkqueueComp extends React.Component<
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
-        {content.length > 0 &&
-          width > grid.breakpoints.lg &&
-          !hideTableHeader && (
-            <TableHeader>
-              {columns.map((preference, index) => (
-                <ColumnContainer
-                  key={index}
-                  width={preference.width}
-                  onClick={
-                    preference.sortFunction
-                      ? () => preference.sortFunction!(preference.key)
-                      : undefined
-                  }
-                  clickable={Boolean(preference.sortFunction)}
-                >
-                  <ColumnTitleWrapper>
-                    {preference.label && preference.label}
-                    {preference.sortFunction && (
-                      <SortIcon
-                        isSorted={Boolean(preference.isSorted)}
-                        isDescending={sortOrder === SORT_ORDER.DESCENDING}
-                      />
-                    )}
-                  </ColumnTitleWrapper>
-                </ColumnContainer>
-              ))}
-            </TableHeader>
-          )}
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
+          <TableHeader>
+            {columns.map((preference, index) => (
+              <ColumnContainer
+                key={index}
+                width={preference.width}
+                onClick={
+                  preference.sortFunction
+                    ? () => preference.sortFunction!(preference.key)
+                    : undefined
+                }
+                clickable={Boolean(preference.sortFunction)}
+              >
+                <ColumnTitleWrapper>
+                  {preference.label && preference.label}
+                  {preference.sortFunction && (
+                    <SortIcon
+                      isSorted={Boolean(preference.isSorted)}
+                      isDescending={sortOrder === SORT_ORDER.DESCENDING}
+                    />
+                  )}
+                </ColumnTitleWrapper>
+              </ColumnContainer>
+            ))}
+          </TableHeader>
+        )}
         {!isMobileView ? (
           <WorkqueueRowDesktop
             columns={this.props.columns}

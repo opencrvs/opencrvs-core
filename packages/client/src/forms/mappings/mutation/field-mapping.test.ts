@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormField } from '@client/forms'
 import {
   fieldToIdentityTransformer,
-  nestedRadioFieldToBundleFieldTransformer,
-  longDateTransformer
+  longDateTransformer,
+  nestedRadioFieldToBundleFieldTransformer
 } from '@client/forms/mappings/mutation/field-mappings'
-import { IFormField } from '@client/forms'
 
 describe('Mutation FieldMapping', () => {
   const factory = fieldToIdentityTransformer('id', 'nationalId')

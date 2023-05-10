@@ -15,8 +15,8 @@ import { fetchFromHearth } from '@gateway/features/fhir/utils'
 import {
   ExtensionUrl,
   Facility,
-  Location,
   JurisdictionType,
+  Location,
   LocationStatistic,
   Statistics
 } from './locationHandler'

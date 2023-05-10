@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { MarriageActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { MarriageActionId } from '@client/views/SysAdmin/Config/Application'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
-import { getOfflineData } from '@client/offline/selectors'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { isString } from 'lodash'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 export function MarriageDelayedRegistrationTarget() {
   const intl = useIntl()

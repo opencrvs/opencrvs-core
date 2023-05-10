@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import { unauthorized } from '@hapi/boom'
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
+import {
+  createToken,
+  getStoredUserInformation,
+  postUserActionToMetrics
+} from '@auth/features/authenticate/service'
 import {
   checkVerificationCode,
   deleteUsedVerificationCode
 } from '@auth/features/verifyCode/service'
-import {
-  getStoredUserInformation,
-  createToken,
-  postUserActionToMetrics
-} from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 interface IVerifyPayload {
   nonce: string
   code: string

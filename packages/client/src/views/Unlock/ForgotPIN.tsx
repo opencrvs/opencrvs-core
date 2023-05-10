@@ -9,36 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, {
-  ChangeEvent,
-  FocusEventHandler,
-  useCallback,
-  useState
-} from 'react'
-import styled from '@client/styledComponents'
-import { useDispatch, useSelector } from 'react-redux'
-import { storage } from '@client/storage'
+import { AvatarLarge } from '@client/components/Avatar'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { Button } from '@opencrvs/components/lib/Button'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
-import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
   buttonMessages,
   constantsMessages,
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
-import { userQueries } from '@client/user/queries'
-import { AvatarLarge } from '@client/components/Avatar'
-import { getUserName } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-import { Box, Link, Stack, Toast } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import styled from '@client/styledComponents'
+import { userQueries } from '@client/user/queries'
+import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { getUserName } from '@client/utils/userUtils'
 import { BackgroundWrapper } from '@client/views/common/Common'
+import { Box, Link, Stack, Toast } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
+import React, {
+  ChangeEvent,
+  FocusEventHandler,
+  useCallback,
+  useState
+} from 'react'
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 interface IForgotPINProps {
   goBack: () => void

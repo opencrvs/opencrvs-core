@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop } from 'redux-loop'
 import { IForm, ReviewSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
-import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
+import { Event } from '@client/utils/gateway'
+import { Loop, LoopReducer } from 'redux-loop'
 
 export type IReviewFormState =
   | {

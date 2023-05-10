@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { formatUrl } from '@client/navigation'
+import { INFORMANT_NOTIFICATION } from '@client/navigation/routes'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { AppStore, createStore } from '@client/store'
+import { informantSMSNotificationMock } from '@client/tests/mock-graphql-responses'
 import {
-  createTestComponent,
   createRouterProps,
+  createTestComponent,
   flushPromises,
   userDetails
 } from '@client/tests/util'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
-import { AppStore, createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
-import { formatUrl } from '@client/navigation'
-import { INFORMANT_NOTIFICATION } from '@client/navigation/routes'
-import { GET_INFORMANT_SMS_NOTIFICATIONS } from '@client/views/SysAdmin/InformantSMSNotification/queries'
-import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from '@client/views/SysAdmin/InformantSMSNotification/mutations'
-import { History } from 'history'
-import { informantSMSNotificationMock } from '@client/tests/mock-graphql-responses'
-import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 import { waitForElement } from '@client/tests/wait-for-element'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from '@client/views/SysAdmin/InformantSMSNotification/mutations'
+import { GET_INFORMANT_SMS_NOTIFICATIONS } from '@client/views/SysAdmin/InformantSMSNotification/queries'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import * as React from 'react'
 
 const graphqlMock = [
   {

@@ -9,22 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { AppBar } from './AppBar'
-import { Button } from '../Button'
-import {
-  Hamburger,
-  DeclarationIcon,
-  SearchBlue,
-  Phone,
-  BRN,
-  TrackingID
-} from '../icons'
-import { Stack } from '../Stack'
-import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
+import React from 'react'
+import { Button } from '../Button'
 import { Icon } from '../Icon'
+import { DeclarationIcon, Hamburger } from '../icons'
+import { SearchTool } from '../SearchTool'
+import { Stack } from '../Stack'
+import { AppBar } from './AppBar'
 
 export default {
   title: 'Layout/AppBar',

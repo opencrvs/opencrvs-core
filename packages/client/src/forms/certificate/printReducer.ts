@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop } from 'redux-loop'
+import { IFormSection } from '@client/forms'
 import {
   collectBirthCertificateFormSection,
   collectDeathCertificateFormSection,
   collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { Action } from 'redux'
-import { IFormSection } from '@client/forms'
 import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/payment-section'
+import { Action } from 'redux'
+import { Loop, LoopReducer } from 'redux-loop'
 
 const initialState: IPrintFormState = {
   collectBirthCertificateForm: collectBirthCertificateFormSection,

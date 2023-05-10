@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Story } from '@storybook/react'
-import { Icon } from '../Icon'
-import { SearchTool, ISearchType } from './SearchTool'
 import React from 'react'
+import { Icon } from '../Icon'
+import { ISearchType, SearchTool } from './SearchTool'
 
 interface ISearchToolProps {
   searchTypeList: ISearchType[]

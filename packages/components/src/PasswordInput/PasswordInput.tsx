@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { EyeOn, EyeOff } from '../icons'
 import { CircleButton } from '../buttons'
+import { EyeOff, EyeOn } from '../icons'
 
 interface ICustomProps {
   error?: boolean

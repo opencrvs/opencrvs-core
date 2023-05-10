@@ -9,8 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { writePoints } from '@metrics/influxdb/client'
+import { EventType } from '@metrics/config/routes'
+import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
+import { Events } from '@metrics/features/metrics/constants'
+import { IPoints } from '@metrics/features/registration'
+import {
+  getActionFromTask,
+  getTask
+} from '@metrics/features/registration/fhirUtils'
 import {
   generateBirthRegPoint,
   generateCertificationPoint,
@@ -24,16 +32,8 @@ import {
   generateRejectedPoints,
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
-import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
-import { Events } from '@metrics/features/metrics/constants'
-import { IPoints } from '@metrics/features/registration'
-import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
-import {
-  getActionFromTask,
-  getTask
-} from '@metrics/features/registration/fhirUtils'
-import { EventType } from '@metrics/config/routes'
+import { writePoints } from '@metrics/influxdb/client'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,

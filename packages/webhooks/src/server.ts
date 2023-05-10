@@ -11,20 +11,20 @@
  */
 
 import * as Hapi from '@hapi/hapi'
+import { validateFunc } from '@opencrvs/commons'
+import getPlugins from '@webhooks/config/plugins'
+import { getRoutes } from '@webhooks/config/routes'
 import {
-  HOST,
-  PORT,
+  AUTH_URL,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL,
-  DEFAULT_TIMEOUT
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
 } from '@webhooks/constants'
-import getPlugins from '@webhooks/config/plugins'
 import * as database from '@webhooks/database'
-import { readFileSync } from 'fs'
-import { validateFunc } from '@opencrvs/commons'
-import { getRoutes } from '@webhooks/config/routes'
 import * as queue from '@webhooks/queue'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

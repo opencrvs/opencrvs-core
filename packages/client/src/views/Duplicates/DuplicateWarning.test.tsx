@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createTestComponent } from '@client/tests/util'
-import { createDuplicateDetailsQuery } from './utils'
 import { createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { DuplicateWarning } from './DuplicateWarning'
 import { Alert } from '@opencrvs/components/lib/Alert'
+import * as React from 'react'
+import { DuplicateWarning } from './DuplicateWarning'
+import { createDuplicateDetailsQuery } from './utils'
 
 const duplicateIds = [
   '450ce5e3-b495-4868-bb6a-1183ffd0fee1',

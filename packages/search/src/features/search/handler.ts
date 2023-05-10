@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { logger } from '@search/logger'
 import { badRequest, internal } from '@hapi/boom'
-import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
-import { ISearchCriteria } from '@search/features/search/types'
+import * as Hapi from '@hapi/hapi'
+import { RouteScope } from '@search/config/routes'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
-  ICompositionBody,
   EVENT,
   IBirthCompositionBody,
+  ICompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
-import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { capitalize } from '@search/features/search/utils'
-import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { getTokenPayload } from '@search/utils/authUtils'
-import { RouteScope } from '@search/config/routes'
 import {
-  searchForDeathDuplicates,
-  searchForBirthDuplicates
+  searchForBirthDuplicates,
+  searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import { advancedSearch, DEFAULT_SIZE } from '@search/features/search/service'
+import { ISearchCriteria } from '@search/features/search/types'
+import { capitalize } from '@search/features/search/utils'
+import { logger } from '@search/logger'
+import { getTokenPayload } from '@search/utils/authUtils'
 
 type IAssignmentPayload = {
   compositionId: string

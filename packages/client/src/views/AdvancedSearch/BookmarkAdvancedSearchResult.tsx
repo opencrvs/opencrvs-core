@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
-import styled from '@client/styledComponents'
-import { useSelector } from 'react-redux'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
-import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
+import styled from '@client/styledComponents'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
 
 export const Message = styled.div`
   margin-bottom: 16px;

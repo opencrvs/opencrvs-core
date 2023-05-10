@@ -13,57 +13,43 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
+  goToAdvancedSearch,
+  goToCreateNewUser,
+  goToCreateNewUserWithLocationId,
   goToEvents as goToEventsAction,
   goToPerformanceHome,
   goToSearch,
   goToSearchResult,
   goToSettings,
   goToTeamSearch,
-  goToTeamUserList,
-  goToCreateNewUserWithLocationId,
-  goToCreateNewUser,
-  goToAdvancedSearch
+  goToTeamUserList
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
-import { Hamburger } from './Hamburger'
 import {
+  ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
-  NATIONAL_ID_TEXT,
   FIELD_AGENT_ROLES,
   NAME_TEXT,
+  NATIONAL_ID_TEXT,
   NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
   PHONE_TEXT,
-  ADVANCED_SEARCH_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES
+  TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
-import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
-import {
-  SearchTool,
-  ISearchType,
-  INavigationType
-} from '@opencrvs/components/lib/SearchTool'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import styled from 'styled-components'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
   PERFORMANCE_HOME,
@@ -72,6 +58,19 @@ import {
 } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
+import {
+  INavigationType,
+  ISearchType,
+  SearchTool
+} from '@opencrvs/components/lib/SearchTool'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import styled from 'styled-components'
 import { HistoryNavigator } from './HistoryNavigator'
 
 type IStateProps = {

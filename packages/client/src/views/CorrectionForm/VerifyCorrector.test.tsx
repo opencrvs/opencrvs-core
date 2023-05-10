@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { storeDeclaration } from '@client/declarations'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
-  mockDeclarationData,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  mockDeclarationData
 } from '@client/tests/util'
-import { VerifyCorrector } from './VerifyCorrector'
-import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { VerifyCorrector } from './VerifyCorrector'
 
 describe('verify corrector tests', () => {
   const { store, history } = createStore()

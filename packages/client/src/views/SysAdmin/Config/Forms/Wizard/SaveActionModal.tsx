@@ -9,38 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { Mutation } from '@apollo/client/react/components'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default/index'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
+import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
+import { questionsTransformer } from '@client/forms/questionConfig'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { goToFormConfigHome } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import { useIntl } from 'react-intl'
+import {
+  CreateFormDraftMutationVariables,
+  Event,
+  Mutation as GQLMutation
+} from '@client/utils/gateway'
+import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
 import {
   ActionStatus,
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
-  Event,
-  Mutation as GQLMutation,
-  CreateFormDraftMutationVariables
-} from '@client/utils/gateway'
-import { Mutation } from '@apollo/client/react/components'
-import {
-  SecondaryButton,
-  PrimaryButton
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField } from '@opencrvs/components/lib/InputField'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
-import { goToFormConfigHome } from '@client/navigation'
-import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
-import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
-import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default/index'
-import { questionsTransformer } from '@client/forms/questionConfig'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,

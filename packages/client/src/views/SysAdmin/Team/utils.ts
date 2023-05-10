@@ -16,10 +16,10 @@ import {
   ISelectFormFieldWithOptions
 } from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
-import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { SystemRoleType } from '@client/utils/gateway'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { SystemRoleType } from '@client/utils/gateway'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export enum UserStatus {
   ACTIVE,

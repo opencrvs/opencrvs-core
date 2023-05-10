@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createTestComponent, createTestStore } from '@client/tests/util'
-import {
-  WorkflowStatus,
-  IHistoryStateProps
-} from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { AppStore } from '@client/store'
-import { createBrowserHistory, createLocation, History } from 'history'
-import { ReactWrapper } from 'enzyme'
-import { stringify, parse } from 'query-string'
+import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+import {
+  IHistoryStateProps,
+  WorkflowStatus
+} from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
+import { createBrowserHistory, createLocation, History } from 'history'
+import { parse, stringify } from 'query-string'
+import * as React from 'react'
 import { match } from 'react-router'
 import { vi } from 'vitest'
+import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
 describe('Workflow status tests', () => {
   let store: AppStore

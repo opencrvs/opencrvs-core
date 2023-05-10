@@ -17,11 +17,11 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { waitForElement } from '@client/tests/wait-for-element'
 
 const { store, history } = createStore()
 

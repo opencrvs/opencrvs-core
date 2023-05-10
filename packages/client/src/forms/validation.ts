@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { required, IValidationResult } from '@client/utils/validate'
 import {
-  IFormField,
-  IFormSectionData,
   IDynamicFormField,
   IFormData,
+  IFormField,
+  IFormSectionData,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
+import { IOfflineData } from '@client/offline/reducer'
+import { IValidationResult, required } from '@client/utils/validate'
 import {
   getConditionalActionsForField,
   getFieldValidation
 } from '@opencrvs/client/src/forms/utils'
-import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
 
 export interface IFieldErrors {

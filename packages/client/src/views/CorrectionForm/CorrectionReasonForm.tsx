@@ -9,34 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { FormFieldGenerator } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { connect } from 'react-redux'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  CorrectionSection,
+  IFormSection,
+  IFormSectionData
+} from '@client/forms'
+import { correctReasonSection } from '@client/forms/correction/reason'
+import { buttonMessages } from '@client/i18n/messages'
 import {
   goBack,
   goToCertificateCorrection,
   goToHomeTab
 } from '@client/navigation'
-import {
-  CorrectionSection,
-  IFormSection,
-  IFormSectionData,
-  IForm
-} from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
-import { correctReasonSection } from '@client/forms/correction/reason'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import { groupHasError } from './utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 type IProps = {
   declaration: IDeclaration

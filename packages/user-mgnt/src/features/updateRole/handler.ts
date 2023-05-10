@@ -11,11 +11,11 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { Types } from 'mongoose'
 import { logger } from '@user-mgnt/logger'
-import { UserRole } from '@user-mgnt/model/user'
 import SystemRole, { ISystemRoleModel } from '@user-mgnt/model/systemRole'
+import { UserRole } from '@user-mgnt/model/user'
 import * as Joi from 'joi'
+import { Types } from 'mongoose'
 
 const roleLabelSchema = Joi.object({
   lang: Joi.string().required(),

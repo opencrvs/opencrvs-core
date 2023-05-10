@@ -9,40 +9,40 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
-import styled from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Loader } from '@opencrvs/components/lib/Loader'
+import { Mutation } from '@apollo/client/react/components'
 import {
-  ProtectedAccoutStep,
   IProtectedAccountSetupData,
-  ISecurityQuestionAnswer
+  ISecurityQuestionAnswer,
+  ProtectedAccoutStep
 } from '@client/components/ProtectedAccount'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/userSetup'
+import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
 import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
-import { Mutation } from '@apollo/client/react/components'
-import {
-  userMessages,
-  buttonMessages,
-  constantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
-import { Check } from '@opencrvs/components/lib/icons'
-import { activateUserMutation } from '@client/views/UserSetup/queries'
-import { messages } from '@client/i18n/messages/views/userSetup'
-import { Content } from '@opencrvs/components/lib/Content'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { getLanguage } from '@client/i18n/selectors'
+import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { ErrorText } from '@opencrvs/components/lib/'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Check } from '@opencrvs/components/lib/icons'
+import { Loader } from '@opencrvs/components/lib/Loader'
+import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};

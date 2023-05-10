@@ -10,23 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import styled from '@client/styledComponents'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
-import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
-import { Cross } from '@opencrvs/components/lib/icons/Cross'
-import {
-  isValidRegEx,
-  isValidExample
-} from '@client/views/SysAdmin/Config/Application/utils'
+import styled from '@client/styledComponents'
 import {
   Content,
   Field,
   HalfWidthInput
 } from '@client/views/SysAdmin/Config/Application/Components'
+import {
+  isValidExample,
+  isValidRegEx
+} from '@client/views/SysAdmin/Config/Application/utils'
+import { Cross } from '@opencrvs/components/lib/icons/Cross'
+import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { Link } from '@opencrvs/components/lib/Link'
+import React from 'react'
+import { IntlShape } from 'react-intl'
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.bold14}

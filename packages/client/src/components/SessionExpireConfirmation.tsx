@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from '@client/store'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { messages } from '@client/i18n/messages/views/session'
 import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/session'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { IStoreState } from '@client/store'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 type SessionExpireProps = {
   sessionExpired: boolean

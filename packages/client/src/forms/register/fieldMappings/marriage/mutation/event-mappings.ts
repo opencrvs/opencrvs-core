@@ -11,10 +11,10 @@
  */
 
 import {
-  IFormField,
   IFormData,
-  TransformedData,
-  IFormFieldMutationMapFunction
+  IFormField,
+  IFormFieldMutationMapFunction,
+  TransformedData
 } from '@client/forms'
 import { cloneDeep } from 'lodash'
 

@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as ShortUIDGen from 'short-uid'
 import {
-  NOTIFICATION_SERVICE_URL,
+  HEARTH_URL,
   MOSIP_TOKEN_SEEDER_URL,
-  HEARTH_URL
+  NOTIFICATION_SERVICE_URL
 } from '@workflow/constants'
-import fetch from 'node-fetch'
-import { logger } from '@workflow/logger'
+import { Events } from '@workflow/features/events/utils'
 import {
-  getInformantName,
-  getTrackingId,
-  getCRVSOfficeName,
-  getRegistrationNumber,
-  concatenateName
-} from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  EVENT_TYPE,
-  CHILD_SECTION_CODE,
-  DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  CHILD_SECTION_CODE,
   DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  DECEASED_SECTION_CODE,
+  EVENT_TYPE,
   MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  concatenateName,
+  getCRVSOfficeName,
+  getInformantName,
+  getRegistrationNumber,
+  getTrackingId
+} from '@workflow/features/registration/fhir/fhir-utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import { logger } from '@workflow/logger'
+import fetch from 'node-fetch'
+import * as ShortUIDGen from 'short-uid'
 import {
   getInformantSMSNotification,
   InformantSMSNotificationName,

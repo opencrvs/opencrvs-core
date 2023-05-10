@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
-import styled from 'styled-components'
 import type { Property } from 'csstype'
+import React from 'react'
+import styled from 'styled-components'
+import { colors, IColor } from '../colors'
+import { fonts, IFont } from '../fonts'
 
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
 type Align = 'left' | 'center'

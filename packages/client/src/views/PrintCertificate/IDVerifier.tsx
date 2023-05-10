@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { identityNameMapper } from '@client/forms/identity'
+import { constantsMessages, countryMessages } from '@client/i18n/messages'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import styled from '@client/styledComponents'
-import { Content } from '@opencrvs/components/lib/Content'
+import { formatLongDate } from '@client/utils/date-formatting'
 import {
-  SuccessButton,
   DangerButton,
   ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
+  PrimaryButton,
+  SuccessButton,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { constantsMessages, countryMessages } from '@client/i18n/messages'
-import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { identityNameMapper } from '@client/forms/identity'
-import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IVerifierActionProps {
   positiveAction: {

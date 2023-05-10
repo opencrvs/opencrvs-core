@@ -11,7 +11,6 @@
  */
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { BirthSection, DeathSection, SELECT_WITH_OPTIONS } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { FieldEnabled } from '@client/forms/configuration'
 import {
   removeCustomField,
@@ -21,25 +20,26 @@ import {
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
-  isDefaultConfigField,
-  isPreviewGroupConfigField,
-  isCustomConfigField,
+  ICustomConfigField,
   IDefaultConfigField,
-  ICustomConfigField
+  isCustomConfigField,
+  isDefaultConfigField,
+  isPreviewGroupConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { FormConfigElementCard } from '@opencrvs/components/lib/FormConfigElementCard'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Text } from '@opencrvs/components/lib/Text'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
-import { Text } from '@opencrvs/components/lib/Text'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 const CanvasBox = styled.div`
   display: flex;

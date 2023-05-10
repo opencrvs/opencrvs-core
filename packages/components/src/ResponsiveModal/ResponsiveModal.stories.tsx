@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ComponentStory, Meta } from '@storybook/react'
+import React, { useState } from 'react'
 import { Button } from '../Button'
 import { ResponsiveModal } from './ResponsiveModal'
-import React, { useState } from 'react'
 
 const Template: ComponentStory<typeof ResponsiveModal> = (args) => {
   const [isVisible, setIsVisible] = useState(false)

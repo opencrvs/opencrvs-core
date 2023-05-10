@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import * as React from 'react'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { Query } from '@client/components/Query'
+import { messages } from '@client/i18n/messages/views/performance'
 import {
   ListContainer,
+  PercentageDisplay,
   PerformanceListHeader,
+  PerformanceListSubHeader,
   PerformanceTitle,
   PerformanceValue,
-  PerformanceListSubHeader,
-  ReportContainer,
-  PercentageDisplay
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/performance'
-import { Query } from '@client/components/Query'
-import { GET_TOTAL_CERTIFICATIONS } from './queries'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { GET_TOTAL_CERTIFICATIONS } from './queries'
 interface ICertificationRateData {
   label: string
   value: number

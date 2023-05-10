@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import { IImage, validateImage, ERROR_TYPES } from '@client/utils/imageUtils'
-import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 import { messages } from '@client/i18n/messages/views/imageUpload'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import styled from '@client/styledComponents'
+import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
+import { ERROR_TYPES, IImage, validateImage } from '@client/utils/imageUtils'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const HiddenInput = styled.input`
   display: none;

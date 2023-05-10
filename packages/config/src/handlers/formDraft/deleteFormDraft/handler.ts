@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
-import * as Joi from 'joi'
-import FormDraft, { validEvent } from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
+import FormDraft, { validEvent } from '@config/models/formDraft'
 import { clearQuestionConfigs } from '@config/services/formDraftService'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 
 export interface IDeleteFormDraftPayload {
   event: Event

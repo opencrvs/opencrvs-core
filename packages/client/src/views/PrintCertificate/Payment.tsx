@@ -9,12 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Currency } from '@opencrvs/components/lib/Currency'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -23,11 +19,21 @@ import {
   goToHomeTab,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Currency } from '@opencrvs/components/lib/Currency'
+import { Summary } from '@opencrvs/components/lib/Summary'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
@@ -37,12 +43,6 @@ import {
   getRegisteredDate,
   getServiceMessage
 } from './utils'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { Summary } from '@opencrvs/components/lib/Summary'
-import { UserDetails } from '@client/utils/userUtils'
 
 const Action = styled.div`
   margin-top: 32px;

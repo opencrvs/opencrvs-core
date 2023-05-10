@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface IProps {
   onUnmount: (duration: number) => void // in milliseconds

@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  TopAlignedListViewItemSimplified,
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import { useIntl, FormattedMessage } from 'react-intl'
 import { Avatar } from '@client/components/Avatar'
-import { userMessages, buttonMessages } from '@client/i18n/messages'
-import { ImageLoader } from '@client/views/Settings/ImageLoader'
-import { IImage } from '@client/utils/imageUtils'
-import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { UserDetails, useUserName } from '@client/utils/userUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { IImage } from '@client/utils/imageUtils'
+import { UserDetails, useUserName } from '@client/utils/userUtils'
+import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
+import { ImageLoader } from '@client/views/Settings/ImageLoader'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  TopAlignedListViewItemSimplified,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function ProfileImage() {
   const intl = useIntl()

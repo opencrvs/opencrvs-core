@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { NetworkStatus } from '@apollo/client'
+import { createStore } from '@client/store'
 import {
-  createTestComponent,
   createRouterProps,
+  createTestComponent,
   userDetails
 } from '@client/tests/util'
-import { createStore } from '@client/store'
-import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
-import { ReactWrapper } from 'enzyme'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
 import { changePhoneMutation } from '@client/views/Settings/mutations'
 import { queriesForUser } from '@client/views/Settings/queries'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { vi } from 'vitest'
-import { NetworkStatus } from '@apollo/client'
 
 const graphqlMocks = [
   {

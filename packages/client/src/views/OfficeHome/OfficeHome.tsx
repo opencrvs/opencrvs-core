@@ -9,60 +9,60 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Header } from '@client/components/Header/Header'
+import {
+  Navigation,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import {
   filterProcessingDeclarationsFromQuery,
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { Header } from '@client/components/Header/Header'
-import {
-  updateRegistrarWorkqueue,
-  updateWorkqueuePagination,
-  selectWorkqueuePagination
-} from '@client/workqueue'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToEvents,
+  goToHomeTab,
   goToPage,
-  goToPrintCertificate,
-  goToHomeTab
+  goToPrintCertificate
 } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { getUserLocation } from '@client/utils/userUtils'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
-import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import { ArrayElement } from '@client/SubmissionController'
 import {
-  PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  PAGE_TRANSITIONS_ENTER_TIME
 } from '@client/utils/constants'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { Event } from '@client/utils/gateway'
+import { getUserLocation } from '@client/utils/userUtils'
+import {
+  selectWorkqueuePagination,
+  updateRegistrarWorkqueue,
+  updateWorkqueuePagination
+} from '@client/workqueue'
+import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { SentForReview } from './sentForReview/SentForReview'
+import { InExternalValidationTab } from './inExternalValidation/InExternalValidationTab'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
+import { Outbox } from './outbox/Outbox'
+import { ReadyForReview } from './readyForReview/ReadyForReview'
+import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
 import { RequiresUpdate } from './requiresUpdate/RequiresUpdate'
-import { ReadyForReview } from './readyForReview/ReadyForReview'
-import { InExternalValidationTab } from './inExternalValidation/InExternalValidationTab'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { constantsMessages } from '@client/i18n/messages'
-import { Outbox } from './outbox/Outbox'
-import { ArrayElement } from '@client/SubmissionController'
-import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { Event } from '@client/utils/gateway'
+import { SentForReview } from './sentForReview/SentForReview'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;

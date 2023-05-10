@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
 import { ComponentMeta, Story } from '@storybook/react'
-import { ComparisonListView, IComparisonListProps } from './ComparisonListView'
+import React from 'react'
 import { Text } from '../Text'
+import { ComparisonListView, IComparisonListProps } from './ComparisonListView'
 
 export default {
   title: 'Data/Comparison List',

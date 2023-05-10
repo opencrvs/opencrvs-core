@@ -21,8 +21,8 @@
  * import styled from '@client/styledComponents';
  */
 
-import * as styledComponents from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import * as styledComponents from 'styled-components'
 
 export type ITheme = ReturnType<typeof getTheme>
 

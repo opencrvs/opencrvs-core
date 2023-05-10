@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import { InputField } from '@client/components/form/InputField'
 import {
-  Ii18nFormField,
   IFormFieldValue,
-  Ii18nRadioGroupFormField,
-  Ii18nInformativeRadioGroupFormField
+  Ii18nFormField,
+  Ii18nInformativeRadioGroupFormField,
+  Ii18nRadioGroupFormField
 } from '@client/forms'
+import { RadioGroup } from '@opencrvs/components/lib/Radio'
+import * as React from 'react'
 
-import { ParentDetails } from '@client/views/PrintCertificate/ParentDetails'
 import styled from '@client/styledComponents'
+import { ParentDetails } from '@client/views/PrintCertificate/ParentDetails'
 
 const RadioGroupWrapper = styled.div`
   > div > span {

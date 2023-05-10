@@ -9,58 +9,51 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { FormikTouched, FormikValues } from 'formik'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten } from 'lodash'
-import debounce from 'lodash/debounce'
-import {
-  ICON_ALIGNMENT,
-  PrimaryButton,
-  TertiaryButton,
-  SecondaryButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
-import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
-import {
-  FixedEventTopBar,
-  IEventTopBarProps,
-  IEventTopBarMenuAction
-} from '@opencrvs/components/lib/EventTopBar'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Container, BodyContent } from '@opencrvs/components/lib/Content'
-import {
-  deleteDeclaration,
-  IDeclaration,
-  IPayload,
-  modifyDeclaration,
-  SUBMISSION_STATUS,
-  writeDeclaration,
-  DOWNLOAD_STATUS
-} from '@client/declarations'
 import {
   FormFieldGenerator,
   getInitialValueForSelectDynamicValue,
   ITouchedNestedFields
 } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
+import { TimeMounted } from '@client/components/TimeMounted'
 import {
+  deleteDeclaration,
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  IPayload,
+  modifyDeclaration,
+  SUBMISSION_STATUS,
+  writeDeclaration
+} from '@client/declarations'
+import {
+  CorrectionSection,
   IForm,
+  IFormData,
   IFormField,
+  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData,
-  CorrectionSection,
-  IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import {
+  getNextSectionIds,
+  getSectionFields,
+  getVisibleGroupFields,
+  getVisibleSectionGroupsBasedOnConditions,
+  hasFormError,
+  VIEW_TYPE
+} from '@client/forms/utils'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessages
+} from '@client/i18n/messages'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { messages } from '@client/i18n/messages/views/register'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -68,50 +61,56 @@ import {
   goToHomeTab,
   goToPageGroup as goToPageGroupAction
 } from '@client/navigation'
-import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
+import { toggleDraftSavedNotification } from '@client/notification/actions'
+import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields,
-  hasFormError,
-  getSectionFields,
-  getNextSectionIds,
-  VIEW_TYPE
-} from '@client/forms/utils'
-import { messages } from '@client/i18n/messages/views/register'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import {
-  buttonMessages,
-  constantsMessages,
-  formMessages
-} from '@client/i18n/messages'
-import {
-  PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
-  PAGE_TRANSITIONS_EXIT_TIME,
-  DECLARED,
-  REJECTED,
-  VALIDATED,
   ACCUMULATED_FILE_SIZE,
-  EMPTY_STRING
+  DECLARED,
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_EXIT_TIME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
+  REJECTED,
+  VALIDATED
 } from '@client/utils/constants'
-import { TimeMounted } from '@client/components/TimeMounted'
-import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
-import { UserDetails } from '@client/utils/userUtils'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import {
+  DangerButton,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  SecondaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import {
+  FixedEventTopBar,
+  IEventTopBarMenuAction,
+  IEventTopBarProps
+} from '@opencrvs/components/lib/EventTopBar'
+import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { FormikTouched, FormikValues } from 'formik'
+import { flatten, isNull, isUndefined, merge } from 'lodash'
+import debounce from 'lodash/debounce'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};

@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import TimeoutLink from '@client/utils/timeoutLink'
 import {
-  gql,
   ApolloLink,
-  Observable,
-  Operation,
   execute,
+  FetchResult,
+  gql,
   GraphQLRequest,
-  FetchResult
+  Observable,
+  Operation
 } from '@apollo/client'
+import TimeoutLink from '@client/utils/timeoutLink'
 
 const testOperation: GraphQLRequest = {
   query: gql`

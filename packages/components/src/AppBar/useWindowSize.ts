@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function useWindowSize() {
   const [windowSize, setWindowSize] = useState({

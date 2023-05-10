@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape, MessageDescriptor } from 'react-intl'
-import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
+import { createPDF, printPDF } from '@client/pdfRenderer'
 import {
-  OptionalData,
-  IPDFTemplate
+  IPDFTemplate,
+  OptionalData
 } from '@client/pdfRenderer/transformer/types'
-import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
-import * as Handlebars from 'handlebars'
-import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
+import * as Handlebars from 'handlebars'
+import { PageSize } from 'pdfmake/interfaces'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>

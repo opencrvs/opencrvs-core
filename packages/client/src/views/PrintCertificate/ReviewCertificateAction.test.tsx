@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { IDeclaration, storeDeclaration } from '@client/declarations'
+import { IFormSectionData } from '@client/forms'
+import * as pdfRender from '@client/pdfRenderer'
 import { createStore } from '@client/store'
-import { storeDeclaration, IDeclaration } from '@client/declarations'
 import {
+  createRouterProps,
   createTestComponent,
-  mockDeclarationData,
-  mockDeathDeclarationData,
-  mockMarriageDeclarationData,
   flushPromises,
   loginAsFieldAgent,
-  createRouterProps
+  mockDeathDeclarationData,
+  mockDeclarationData,
+  mockMarriageDeclarationData
 } from '@client/tests/util'
-import { ReviewCertificateAction } from './ReviewCertificateAction'
-import { ReactWrapper } from 'enzyme'
-import { IFormSectionData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
 import { push } from 'connected-react-router'
-import * as pdfRender from '@client/pdfRenderer'
+import { ReactWrapper } from 'enzyme'
+import { cloneDeep } from 'lodash'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { ReviewCertificateAction } from './ReviewCertificateAction'
 
 describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>

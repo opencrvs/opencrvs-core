@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IDeclaration } from '@client/declarations'
 import {
-  ExecutorKey,
-  IEventWiseKey,
   Condition,
-  ConditionOperation
+  ConditionOperation,
+  ExecutorKey,
+  IEventWiseKey
 } from '@client/pdfRenderer/transformer/types'
+import { Event } from '@client/utils/gateway'
 import {
   IFormData,
-  IFormSectionData,
-  IFormFieldValue
+  IFormFieldValue,
+  IFormSectionData
 } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
-import { IDeclaration } from '@client/declarations'
 import { MessageDescriptor } from 'react-intl'
 
 const eventMessageDescriptor = {

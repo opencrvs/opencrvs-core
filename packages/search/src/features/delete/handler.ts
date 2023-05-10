@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
-import { client } from '@search/elasticsearch/client'
+import * as Hapi from '@hapi/hapi'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
 
 export async function deleteOCRVSIndexHandler(
   request: Hapi.Request,

@@ -9,71 +9,71 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
 import {
-  IBirthRegistrationFields,
-  IDeathRegistrationFields,
-  IInProgressDeclarationFields,
-  ITimeLoggedFields,
-  IDeclarationsStartedFields,
-  IRejectedFields,
-  IDurationFields,
-  IPaymentFields,
-  IPointLocation,
+  Events,
+  OPENCRVS_SPECIFICATION_URL
+} from '@metrics/features/metrics/constants'
+import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import {
   IAuthHeader,
+  IBirthRegistrationFields,
   IBirthRegistrationTags,
-  IDeathRegistrationTags,
-  IInProgressDeclarationTags,
-  ITimeLoggedTags,
-  IDurationTags,
-  ILocationTags,
-  IPoints,
-  IPaymentPoints,
-  IDeclarationsStartedPoints,
-  IRejectedPoints,
   ICorrectionPoint,
-  IUserAuditTags,
-  IUserAuditFields,
+  IDeathRegistrationFields,
+  IDeathRegistrationTags,
+  IDeclarationsStartedFields,
+  IDeclarationsStartedPoints,
+  IDurationFields,
+  IDurationTags,
+  IInProgressDeclarationFields,
+  IInProgressDeclarationTags,
+  ILocationTags,
   IMarriageRegistrationFields,
-  IMarriageRegistrationTags
+  IMarriageRegistrationTags,
+  IPaymentFields,
+  IPaymentPoints,
+  IPointLocation,
+  IPoints,
+  IRejectedFields,
+  IRejectedPoints,
+  ITimeLoggedFields,
+  ITimeLoggedTags,
+  IUserAuditFields,
+  IUserAuditTags
 } from '@metrics/features/registration'
 import {
-  getSectionBySectionCode,
-  getRegLastLocation,
-  getTask,
-  getPreviousTask,
-  getComposition,
-  DECLARATION_STATUS,
-  getDeclarationStatus,
-  getTimeLoggedFromTask,
-  getDeclarationType,
-  getStartedByFieldAgent,
-  getPaymentReconciliation,
-  getObservationValueByCode,
-  isNotification,
-  MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
-  getPractionerIdFromTask,
-  getTrackingId,
-  getRegLastOffice,
+  DECLARATION_STATUS,
+  fetchDeclarationsBeginnerRole,
+  getComposition,
+  getDeclarationStatus,
+  getDeclarationType,
   getEncounterLocationType,
+  getObservationValueByCode,
+  getPaymentReconciliation,
+  getPractionerIdFromTask,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole
+  getPreviousTask,
+  getRegLastLocation,
+  getRegLastOffice,
+  getSectionBySectionCode,
+  getStartedByFieldAgent,
+  getTask,
+  getTimeLoggedFromTask,
+  getTrackingId,
+  isNotification,
+  MANNER_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
   getAgeInYears,
-  getDurationInSeconds,
-  getDurationInDays,
-  getTimeLabel,
   getAgeLabel,
-  getdaysAfterEvent
+  getdaysAfterEvent,
+  getDurationInDays,
+  getDurationInSeconds,
+  getTimeLabel
 } from '@metrics/features/registration/utils'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  Events
-} from '@metrics/features/metrics/constants'
-import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
-import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,

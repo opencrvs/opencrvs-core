@@ -10,30 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  sendBirthDeclarationConfirmation,
-  sendBirthRegistrationConfirmation,
-  sendBirthRejectionConfirmation,
-  inProgressNotificationSchema,
   declarationNotificationSchema,
+  inProgressNotificationSchema,
   registrationNotificationSchema,
   rejectionNotificationSchema,
-  sendBirthInProgressConfirmation
+  sendBirthDeclarationConfirmation,
+  sendBirthInProgressConfirmation,
+  sendBirthRegistrationConfirmation,
+  sendBirthRejectionConfirmation
 } from '@notification/features/sms/birth-handler'
 import {
   sendDeathDeclarationConfirmation,
+  sendDeathInProgressConfirmation,
   sendDeathRegistrationConfirmation,
-  sendDeathRejectionConfirmation,
-  sendDeathInProgressConfirmation
+  sendDeathRejectionConfirmation
 } from '@notification/features/sms/death-handler'
 import {
-  sendUserCredentials,
-  retrieveUserName,
-  updateUserName,
-  sendUserAuthenticationCode,
-  userCredentialsNotificationSchema,
-  retrieveUserNameNotificationSchema,
   authCodeNotificationSchema,
+  retrieveUserName,
+  retrieveUserNameNotificationSchema,
   sendResetPasswordSMS,
+  sendUserAuthenticationCode,
+  sendUserCredentials,
+  updateUserName,
+  userCredentialsNotificationSchema,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
 

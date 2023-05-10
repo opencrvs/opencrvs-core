@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { mount, configure } from 'enzyme'
-import { Provider } from 'react-redux'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import { configure, mount } from 'enzyme'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 import { Router } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 import { App } from '@login/App'
-import { IStoreState, createStore } from '@login/store'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
+import { createStore, IStoreState } from '@login/store'
 
 configure({ adapter: new Adapter() })
 

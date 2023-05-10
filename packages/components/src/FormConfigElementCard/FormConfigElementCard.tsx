@@ -11,8 +11,8 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { ArrowUp, ArrowDown, Trash } from '../icons'
 import { CircleButton } from '../buttons'
+import { ArrowDown, ArrowUp, Trash } from '../icons'
 import { Pill } from '../Pill'
 
 const Card = styled.div<{ selected: boolean }>`

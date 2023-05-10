@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { cloneDeep } from 'lodash'
-import { mockFhirLocation } from '@gateway/utils/testUtils'
 import {
   generateStatisticalExtensions,
   updateStatisticalExtensions
 } from '@gateway/features/restLocation/utils'
+import { mockFhirLocation } from '@gateway/utils/testUtils'
+import { cloneDeep } from 'lodash'
 
 describe('location utils function testing', () => {
   describe('generateStatisticalExtensions()', () => {

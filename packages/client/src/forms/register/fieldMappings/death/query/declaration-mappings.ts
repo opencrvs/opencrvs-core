@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
+import { IFormData, IFormField } from '@client/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 
 export const phoneNumberToFieldTransformer = (

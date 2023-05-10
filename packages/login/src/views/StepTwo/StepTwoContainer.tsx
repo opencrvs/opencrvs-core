@@ -9,21 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { Field, Form } from 'react-final-form'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { Text } from '@opencrvs/components/lib/Text'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import * as React from 'react'
+import { Field, Form } from 'react-final-form'
+import { useIntl } from 'react-intl'
 
+import { Box } from '@login/../../components/lib/Box'
+import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
+import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers, resetSubmissionError } from '@login/login/actions'
-import { ceil } from 'lodash'
-import { messages } from '@login/i18n/messages/views/stepTwoForm'
-import { useDispatch, useSelector } from 'react-redux'
-import { Box } from '@login/../../components/lib/Box'
 import {
   getResentSMS,
   getStepOneDetails,
@@ -31,11 +30,12 @@ import {
   getsubmitting,
   selectApplicationName
 } from '@login/login/selectors'
-import { Toast } from '@opencrvs/components'
-import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { Stack } from '@opencrvs/components/lib/Stack/Stack'
+import { Toast } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Stack } from '@opencrvs/components/lib/Stack/Stack'
+import { ceil } from 'lodash'
+import { useDispatch, useSelector } from 'react-redux'
 
 const FORM_NAME = 'STEP_TWO'
 

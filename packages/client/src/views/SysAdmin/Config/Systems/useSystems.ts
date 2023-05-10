@@ -16,6 +16,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   DeactivateSystemMutation,
   DeactivateSystemMutationVariables,
+  DeleteSystemMutation,
+  DeleteSystemMutationVariables,
+  Event,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
   RefreshSystemSecretMutation,
@@ -26,10 +29,7 @@ import {
   SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
-  WebhookPermission,
-  Event,
-  DeleteSystemMutation,
-  DeleteSystemMutationVariables
+  WebhookPermission
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'

@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
-import { configApplicationMutations } from './mutations'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { configApplicationMutations } from './mutations'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='

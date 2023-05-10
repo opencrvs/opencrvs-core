@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { badRequest } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { badRequest } from '@hapi/boom'
-import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 
 export const typeResolvers: GQLResolver = {

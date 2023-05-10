@@ -11,16 +11,16 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@user-mgnt/constants'
 import getPlugins from '@user-mgnt/config/plugins'
+import { getRoutes } from '@user-mgnt/config/routes'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@user-mgnt/constants'
 import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
-import { getRoutes } from '@user-mgnt/config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

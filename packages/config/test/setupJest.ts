@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
+import { join } from 'path'
 
 jest.setMock('node-fetch', { default: fetch })
 

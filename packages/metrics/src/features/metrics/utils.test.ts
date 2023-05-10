@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as api from '@metrics/api'
 import {
   calculateInterval,
+  EVENT_TYPE,
   fetchEstimateByLocation,
   fetchEstimateForTargetDaysByLocationId,
-  getDistrictLocation,
   fillEmptyDataArrayByKey,
-  EVENT_TYPE,
+  getDistrictLocation,
   getMonthRangeFilterListFromTimeRage
 } from '@metrics/features/metrics/utils'
-import * as api from '@metrics/api'
 import { cloneDeep } from 'lodash'
 
 const fetchLocation = api.fetchLocation as jest.Mock

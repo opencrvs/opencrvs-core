@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { countries } from '@client/forms/countries'
 import { identityNameMapper } from '@client/forms/identity'
-import { formatLongDate } from '@client/utils/date-formatting'
 import { messages } from '@client/i18n/messages/views/certificate'
+import styled from '@client/styledComponents'
+import { formatLongDate } from '@client/utils/date-formatting'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const Wrapper = styled.div`
   width: 100%;

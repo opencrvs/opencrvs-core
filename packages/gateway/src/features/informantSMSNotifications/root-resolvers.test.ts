@@ -11,9 +11,9 @@
  */
 
 import { resolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
 const informantSMSNotificationMock = [

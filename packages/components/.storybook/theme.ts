@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { create } from '@storybook/theming'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { create } from '@storybook/theming'
 
 export const BRAND_BLUE =
   '#0058E0' /* Also see `manager-head.html`, if you're going to change this */

@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
-  RegisterForm,
-  FullProps
+  FullProps,
+  RegisterForm
 } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { Redirect, RouteComponentProps } from 'react-router'
 
-import { IStoreState } from '@opencrvs/client/src/store'
-import { connect } from 'react-redux'
-import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
-import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/client/src/utils/authUtils'
 import { Event } from '@client/utils/gateway'
+import { IDeclaration } from '@opencrvs/client/src/declarations'
+import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { Scope } from '@opencrvs/client/src/utils/authUtils'
+import { connect } from 'react-redux'
 
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { errorMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
 } from '@client/navigation/routes'
-import { errorMessages } from '@client/i18n/messages'
-import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IReviewProps {
   theme: ITheme

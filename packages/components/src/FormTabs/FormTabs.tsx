@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Tab, Tabs } from './components/Tabs'
 import { colors } from '../colors'
-import { Text } from '../Text'
 import { Stack } from '../Stack'
+import { Text } from '../Text'
+import { Tab, Tabs } from './components/Tabs'
 
 export type ITabColor = keyof typeof colors
 export interface IFormTabs<T extends string | number = string> {

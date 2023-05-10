@@ -10,20 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import styled from '@client/styledComponents'
-import {
-  NavigationSubItem,
-  LabelContainer
-} from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { BirthSection, DeathSection, WizardSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { useIntl } from 'react-intl'
 import {
   messages,
   navigationMessages
 } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
+import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
+import {
+  LabelContainer,
+  NavigationSubItem
+} from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IConfigField } from '.'
-import { MessageDescriptor } from 'react-intl'
-import { IDefaultConfigField } from './defaultConfig'
 import { ISerializedFormSectionGroup } from '@client/forms'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default/index'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
+import { MessageDescriptor } from 'react-intl'
+import { IConfigField } from '.'
+import { IDefaultConfigField } from './defaultConfig'
 
 export type IPreviewGroupConfigField = {
   /*

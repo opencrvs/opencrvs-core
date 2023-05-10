@@ -9,41 +9,41 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { FormFieldGenerator } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import {
-  CorrectorRelationship,
-  getCorrectorSection
-} from '@client/forms/correction/corrector'
-import { connect } from 'react-redux'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import {
-  goBack,
-  goToVerifyCorrector,
-  goToPageGroup,
-  goToHomeTab
-} from '@client/navigation'
 import {
   IFormSection,
   IFormSectionData,
   IRadioGroupWithNestedFieldsFormField,
   ReviewSection
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { FormFieldGenerator } from '@client/components/form'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  CorrectorRelationship,
+  getCorrectorSection
+} from '@client/forms/correction/corrector'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
-import { Content } from '@opencrvs/components/lib/Content'
-import { groupHasError } from './utils'
+import {
+  goBack,
+  goToHomeTab,
+  goToPageGroup,
+  goToVerifyCorrector
+} from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { Event } from '@client/utils/gateway'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { groupHasError } from './utils'
 
 type IProps = {
   declaration: IDeclaration

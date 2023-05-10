@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import {
   CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
@@ -19,16 +17,18 @@ import {
   QA_ENV
 } from '@gateway/constants'
 import { del, get, set } from '@gateway/features/user/database'
+import { logger } from '@gateway/logger'
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 import * as crypto from 'crypto'
-import { resolve } from 'url'
+import { chainW, tryCatch } from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
 import { readFileSync } from 'fs'
+import * as t from 'io-ts'
+import * as Joi from 'joi'
 import * as jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
-import { unauthorized } from '@hapi/boom'
-import { logger } from '@gateway/logger'
-import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { chainW, tryCatch } from 'fp-ts/Either'
+import { resolve } from 'url'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

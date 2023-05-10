@@ -17,13 +17,13 @@
  * Remove when these dependencies are upgraded
  */
 
-import * as React from 'react'
-import { vi } from 'vitest'
 import {
   // eslint-disable-next-line no-restricted-imports
   Query as ApolloQuery,
   QueryComponentOptions
 } from '@apollo/client/react/components'
+import * as React from 'react'
+import { vi } from 'vitest'
 
 const mockQuery = function Query(props: QueryComponentOptions) {
   const { fetchPolicy, ...propsWithoutFetchPolicy } = props

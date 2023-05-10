@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
 import InformantSMSNotification, {
   IInformantSMSNotificationsModel
 } from '@config/models/informantSMSNotifications'
 import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 
 export default async function getInformantSMSNotifications(
   request: Hapi.Request,

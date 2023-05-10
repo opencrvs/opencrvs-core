@@ -11,8 +11,8 @@
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
-import * as mockingoose from 'mockingoose'
 import * as fetchAny from 'jest-fetch-mock'
+import * as mockingoose from 'mockingoose'
 
 const dummyUser = {
   _id: '5d027bc403b93b17526323f6',

@@ -10,19 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { withTheme } from 'styled-components'
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
+  CartesianGrid,
+  Cell,
   Label,
   ResponsiveContainer,
-  CartesianGrid,
-  Cell
+  XAxis,
+  YAxis
 } from 'recharts'
-import { ITheme } from '../theme'
+import styled, { withTheme } from 'styled-components'
 import { IDataPoint } from '../chart-datapoint-types'
+import { ITheme } from '../theme'
 import { CustomizedXAxisTick } from './components/AxisTick'
 
 const Container = styled.div`

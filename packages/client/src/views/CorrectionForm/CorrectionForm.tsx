@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { TimeMounted } from '@client/components/TimeMounted'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
+import { CorrectionSection } from '@client/forms'
+import { HOME } from '@client/navigation/routes'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import {
   CorrectorForm,
   SupportingDocumentsForm
 } from '@client/views/CorrectionForm'
-import { CorrectionSection } from '@client/forms'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import styled from '@client/styledComponents'
-import { TimeMounted } from '@client/components/TimeMounted'
-import { HOME } from '@client/navigation/routes'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;

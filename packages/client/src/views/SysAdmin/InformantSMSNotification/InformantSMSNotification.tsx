@@ -9,27 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import styled from 'styled-components'
-import { useIntl } from 'react-intl'
-import { Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/config'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { GET_INFORMANT_SMS_NOTIFICATIONS } from './queries'
-import {
-  Label,
-  Value
-} from '@client/views/SysAdmin/Config/Application/Components'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { Toggle } from '@opencrvs/components/lib/Toggle'
+import { useMutation, useQuery } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { Navigation } from '@client/components/interface/Navigation'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
 import {
   Event,
   GetInformantSmsNotificationsQuery,
@@ -38,18 +24,32 @@ import {
   ToggleInformantSmsNotificationMutation,
   ToggleInformantSmsNotificationMutationVariables
 } from '@client/utils/gateway'
-import { find, lowerFirst } from 'lodash'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Navigation } from '@client/components/interface/Navigation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { Button } from '@opencrvs/components/lib/Button'
-import { useMutation, useQuery } from '@apollo/client'
-import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from './mutations'
+import {
+  LoadingIndicator,
+  useOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  Label,
+  Value
+} from '@client/views/SysAdmin/Config/Application/Components'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { ProfileMenu } from '@client/components/ProfileMenu'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
+import { find, lowerFirst } from 'lodash'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
+import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from './mutations'
+import { GET_INFORMANT_SMS_NOTIFICATIONS } from './queries'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;

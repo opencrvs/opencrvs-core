@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
-import { ViewRecord } from './ViewRecord'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
 import { useParams } from 'react-router'
 import { Mock } from 'vitest'
+import { ViewRecord } from './ViewRecord'
 
 describe('View Record for loading and success state', () => {
   let component: ReactWrapper<{}, {}>

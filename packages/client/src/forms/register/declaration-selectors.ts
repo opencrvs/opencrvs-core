@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IRegisterFormState } from '@client/forms/register/reducer'
-import { IStoreState } from '@opencrvs/client/src/store'
 import {
-  Section,
-  IFormSection,
+  BirthSection,
   DeathSection,
-  BirthSection
+  IFormSection,
+  Section
 } from '@client/forms'
+import { IRegisterFormState } from '@client/forms/register/reducer'
 import { Event } from '@client/utils/gateway'
+import { IStoreState } from '@opencrvs/client/src/store'
 
 const getPartialState = (state: IStoreState): IRegisterFormState =>
   state.registerForm

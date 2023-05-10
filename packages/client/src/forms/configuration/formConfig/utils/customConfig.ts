@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  ICustomQuestionConfig,
-  getIdentifiersFromFieldId
-} from '@client/forms/questionConfig'
-import { IConfigField } from '.'
-import { camelCase } from 'lodash'
 import { FieldPosition } from '@client/forms/configuration'
-import { CustomFieldType, Event } from '@client/utils/gateway'
-import { getDefaultLanguage } from '@client/i18n/utils'
 import {
-  isPreviewGroupConfigField,
-  getLastFieldOfPreviewGroup
+  getIdentifiersFromFieldId,
+  ICustomQuestionConfig
+} from '@client/forms/questionConfig'
+import { getDefaultLanguage } from '@client/i18n/utils'
+import { CustomFieldType, Event } from '@client/utils/gateway'
+import { camelCase } from 'lodash'
+import { IConfigField } from '.'
+import {
+  getLastFieldOfPreviewGroup,
+  isPreviewGroupConfigField
 } from './previewGroup'
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'

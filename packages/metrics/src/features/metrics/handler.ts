@@ -11,18 +11,18 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  fetchRegWithinTimeFrames,
-  getCurrentAndLowerLocationLevels,
   fetchCertificationPayments,
+  fetchEstimatedTargetDayMetrics,
   fetchGenderBasisMetrics,
-  fetchEstimatedTargetDayMetrics
+  fetchRegWithinTimeFrames,
+  getCurrentAndLowerLocationLevels
 } from '@metrics/features/metrics/metricsGenerator'
 
 import {
-  TIME_FROM,
-  TIME_TO,
+  EVENT,
   LOCATION_ID,
-  EVENT
+  TIME_FROM,
+  TIME_TO
 } from '@metrics/features/metrics/constants'
 import {
   EVENT_TYPE,

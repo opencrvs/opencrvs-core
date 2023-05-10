@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
+import * as decode from 'jwt-decode'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { verifyToken, validateFunc } from './token-verifier'
 import * as fetchMock from 'jest-fetch-mock'
+import { validateFunc, verifyToken } from './token-verifier'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 

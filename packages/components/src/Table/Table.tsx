@@ -11,13 +11,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { Pagination } from '../Pagination'
 import {
+  ColumnContentAlignment,
   IColumn,
   IDynamicValues,
-  IFooterFColumn,
-  ColumnContentAlignment
+  IFooterFColumn
 } from '../Workqueue'
-import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{
   fixedWidth: number | undefined

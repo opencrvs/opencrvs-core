@@ -59,8 +59,8 @@ import {
   formConfigReducer,
   IFormConfigState
 } from './forms/configuration/formConfig/reducer'
-import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
+import { workqueueReducer, WorkqueueState } from './workqueue'
 
 export interface IStoreState {
   profile: ProfileState

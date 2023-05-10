@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 import {
   indexComposition,
   searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
+  CERTIFIED_STATUS,
   createStatusHistory,
   detectBirthDuplicates,
   EVENT,
@@ -22,32 +26,28 @@ import {
   getStatus,
   IBirthCompositionBody,
   ICompositionBody,
-  NAME_EN,
   IOperationHistory,
-  REJECTED_STATUS,
-  VALIDATED_STATUS,
+  NAME_EN,
   REGISTERED_STATUS,
-  CERTIFIED_STATUS,
-  ARCHIVED_STATUS
+  REJECTED_STATUS,
+  VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
+  addEventLocation,
+  addFlaggedAsPotentialDuplicate,
   findEntry,
+  findEntryResourceByUrl,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
   getCompositionById,
-  updateInHearth,
-  findEntryResourceByUrl,
-  addEventLocation,
   getdeclarationJurisdictionIds,
-  addFlaggedAsPotentialDuplicate
+  updateInHearth
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
-import * as Hapi from '@hapi/hapi'
-import { client } from '@search/elasticsearch/client'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'

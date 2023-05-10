@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { useMutation } from '@apollo/client'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION } from '@client/profile/mutations'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import styled from '@client/styledComponents'
+import { EMPTY_STRING } from '@client/utils/constants'
 import {
   AdvancedSearchParametersInput,
   BookmarkAdvancedSearchMutation,
   BookmarkAdvancedSearchMutationVariables,
   BookmarkedSeachItem
 } from '@client/utils/gateway'
-import { useDispatch, useSelector } from 'react-redux'
-import { useMutation } from '@apollo/client'
-import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { modifyUserDetails } from '@client/profile/profileActions'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { Button } from '@opencrvs/components/lib/Button'
-import { buttonMessages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-import { omitBy } from 'lodash'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { omitBy } from 'lodash'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export const Message = styled.div`
   margin-bottom: 16px;

@@ -12,39 +12,37 @@
 
 import React from 'react'
 
+import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
+import { messages } from '@login/i18n/messages/views/stepOneForm'
+import * as actions from '@login/login/actions'
+import {
+  goToForgottenItemForm,
+  resetSubmissionError
+} from '@login/login/actions'
 import {
   getErrorCode,
   getSubmissionError,
   getsubmitting,
   selectApplicationName
 } from '@login/login/selectors'
-import { useDispatch, useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
-import { Field, Form } from 'react-final-form'
-import { Box, InputField, PasswordInput, TextInput } from '@opencrvs/components'
-import { messages } from '@login/i18n/messages/views/stepOneForm'
-import { stepOneFields } from '@login/views/StepOne/stepOneFields'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { IAuthenticationData } from '@login/utils/authApi'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_FORBIDDEN_CREDENTIALS,
   ERROR_CODE_INVALID_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
-import { IAuthenticationData } from '@login/utils/authApi'
-import * as actions from '@login/login/actions'
-import {
-  goToForgottenItemForm,
-  resetSubmissionError
-} from '@login/login/actions'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
-import { Text } from '@opencrvs/components/lib/Text/Text'
-import { Link } from '@opencrvs/components/lib/Link/Link'
+import { stepOneFields } from '@login/views/StepOne/stepOneFields'
+import { Box, InputField, PasswordInput, TextInput } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
+import { Text } from '@opencrvs/components/lib/Text/Text'
+import { Toast } from '@opencrvs/components/lib/Toast/Toast'
+import { Field, Form } from 'react-final-form'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password

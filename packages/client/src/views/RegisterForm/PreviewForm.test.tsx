@@ -10,48 +10,45 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createTestApp,
-  getItem,
-  mockDeclarationData,
-  goToEndOfForm,
-  waitForReady,
-  validateScopeToken,
-  registerScopeToken,
-  primaryAddressData,
-  primaryInternationalAddressLines,
-  secondaryAddressData,
-  secondaryInternationalAddressLines,
-  eventAddressData,
-  flushPromises,
-  getFileFromBase64String,
-  validImageB64String
-} from '@client/tests/util'
+  createReviewDeclaration,
+  IDeclaration,
+  storeDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import {
   DRAFT_BIRTH_PARENT_FORM,
-  REVIEW_EVENT_PARENT_FORM_PAGE,
-  REGISTRAR_HOME
+  REGISTRAR_HOME,
+  REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import {
-  storeDeclaration,
-  IDeclaration,
-  SUBMISSION_STATUS,
-  createReviewDeclaration
-} from '@client/declarations'
+  createTestApp,
+  flushPromises,
+  getItem,
+  goToEndOfForm,
+  mockDeclarationData,
+  primaryAddressData,
+  primaryInternationalAddressLines,
+  registerScopeToken,
+  secondaryAddressData,
+  secondaryInternationalAddressLines,
+  validateScopeToken,
+  waitForReady
+} from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { Event } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from '@apollo/client/react'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
-import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
   birthReviewDraftData,
   deathReviewDraftData,
   marriageReviewDraftData
 } from '@client/tests/mock-drafts'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { vi } from 'vitest'
 
 interface IPersonDetails {

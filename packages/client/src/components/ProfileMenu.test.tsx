@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { ProfileMenu } from '@client/components/ProfileMenu'
 import { createStore } from '@client/store'
 import { createTestComponent, userDetails } from '@client/tests/util'
-import { ProfileMenu } from '@client/components/ProfileMenu'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 

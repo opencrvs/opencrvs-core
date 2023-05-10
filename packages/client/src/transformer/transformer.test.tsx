@@ -10,32 +10,32 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createTestApp,
-  mockOfflineData,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@client/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
-import {
-  storeDeclaration,
   IDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
+import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
+import { getOfflineDataSuccess } from '@client/offline/actions'
+import { birthDraftData } from '@client/tests/mock-drafts'
+import {
+  createTestApp,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  validToken
+} from '@client/tests/util'
+import { draftToGqlTransformer } from '@client/transformer'
+import { Event } from '@client/utils/gateway'
+import { IForm } from '@opencrvs/client/src/forms'
+import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import { clone } from 'lodash'
 import { Store } from 'redux'
 import { v4 as uuid } from 'uuid'
-import { draftToGqlTransformer } from '@client/transformer'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
-import { getOfflineDataSuccess } from '@client/offline/actions'
-import { IForm } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
-import { clone } from 'lodash'
-import { birthDraftData } from '@client/tests/mock-drafts'
-import createFetchMock from 'vitest-fetch-mock'
 import { vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock'
 
 const fetch = createFetchMock(vi)
 fetch.enableMocks()

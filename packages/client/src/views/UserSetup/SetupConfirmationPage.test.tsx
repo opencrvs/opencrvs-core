@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createTestComponent, validToken } from '@client/tests/util'
-import { createStore } from '@client/store'
 import { checkAuth } from '@client/profile/profileActions'
+import { createStore } from '@client/store'
+import { createTestComponent, validToken } from '@client/tests/util'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
+import * as React from 'react'
 import { Mock } from 'vitest'
 
 const getItem = window.localStorage.getItem as Mock

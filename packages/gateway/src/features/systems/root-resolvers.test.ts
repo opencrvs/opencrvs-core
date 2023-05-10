@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/systems/root-resolvers'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
 let authHeaderSysAdmin: { Authorization: string }

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import traverse from 'traverse'
 import { IForm } from '@client/forms'
-import { deserializeForm } from './deserializer'
 import { registerForms } from '@client/forms/configuration/default/index'
+import traverse from 'traverse'
 import { Mock } from 'vitest'
+import { deserializeForm } from './deserializer'
 
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives

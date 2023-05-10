@@ -11,9 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { TertiaryButton, CircleButton } from '../buttons'
-import { DeclarationIcon, Cross } from '../icons'
+import { CircleButton, TertiaryButton } from '../buttons'
 import { Icon } from '../Icon'
+import { Cross, DeclarationIcon } from '../icons'
 import { ToggleMenu } from '../ToggleMenu'
 
 const TopBar = styled.div`

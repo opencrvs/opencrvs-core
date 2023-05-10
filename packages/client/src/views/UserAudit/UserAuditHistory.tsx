@@ -9,45 +9,45 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { messages } from '@client/i18n/messages/views/userSetup'
-import { withTheme } from '@client/styledComponents'
-import * as React from 'react'
-import Bowser from 'bowser'
-import { goToDeclarationRecordAudit } from '@client/navigation'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Query } from '@client/components/Query'
+import { messages } from '@client/i18n/messages/views/userSetup'
+import { goToDeclarationRecordAudit } from '@client/navigation'
+import { withTheme } from '@client/styledComponents'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
-import { connect } from 'react-redux'
+import format from '@client/utils/date-formatting'
+import {
+  GetUserAuditLogQuery,
+  UserAuditLogResultItem
+} from '@client/utils/gateway'
+import {
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
+import { Link } from '@opencrvs/components'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLUserAuditLogItemWithComposition,
   GQLUserAuditLogResultItem,
   GQLUserAuditLogResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
-import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
-import { Table } from '@opencrvs/components/lib/Table'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { DateRangePicker } from '@client/components/DateRangePicker'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
-import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
-import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+import Bowser from 'bowser'
 import subMonths from 'date-fns/subMonths'
-import {
-  IOnlineStatusProps,
-  withOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
-import {
-  GetUserAuditLogQuery,
-  UserAuditLogResultItem
-} from '@client/utils/gateway'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import format from '@client/utils/date-formatting'
-import { Link } from '@opencrvs/components'
-import { Text } from '@opencrvs/components/lib/Text'
+import { orderBy } from 'lodash'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 
 const DEFAULT_LIST_SIZE = 10
 

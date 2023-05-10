@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
+import { constantsMessages } from '@client/i18n/messages'
+import {
+  draftTabsMessages,
+  messages
+} from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { DraftStatus, Event } from '@client/utils/gateway'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Text } from '@opencrvs/components/lib/Text'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Content } from '@opencrvs/components/lib/Content'
 import {
-  messages,
-  draftTabsMessages
-} from '@client/i18n/messages/views/formConfig'
-import { DraftStatus, Event } from '@client/utils/gateway'
-import { DraftsTab } from './DraftsTab'
-import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { PreviewTab } from './PreviewTab'
-import { PublishedTab } from './PublishedTab'
-import styled from '@client/styledComponents'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { Text } from '@opencrvs/components/lib/Text'
-import { constantsMessages } from '@client/i18n/messages'
-import {
-  ActionState,
   ActionContext,
   ActionsModal,
+  ActionState,
   defaultActionState
 } from './ActionsModal'
 import { ActionsNotification } from './ActionsNotification'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { DraftsTab } from './DraftsTab'
+import { PreviewTab } from './PreviewTab'
+import { PublishedTab } from './PublishedTab'
 
 const StyledAlert = styled(Alert)`
   margin: 24px auto 16px;

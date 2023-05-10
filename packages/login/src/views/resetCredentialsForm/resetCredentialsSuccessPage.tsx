@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { goToHome, FORGOTTEN_ITEMS } from '@login/login/actions'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { FORGOTTEN_ITEMS, goToHome } from '@login/login/actions'
+import { selectCountryLogo } from '@login/login/selectors'
 import { storage } from '@login/storage'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { IStoreState } from '@login/store'
 import {
   Container,
   LogoContainer,
   Page
 } from '@login/views/resetCredentialsForm/commons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
-import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { RouteComponentProps } from 'react-router'
-import { selectCountryLogo } from '@login/login/selectors'
-import { IStoreState } from '@login/store'
+import styled from 'styled-components'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};

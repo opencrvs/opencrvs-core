@@ -10,20 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  getLoggedInPractitionerResource,
-  getUser,
   getLoggedInPractitionerPrimaryLocation,
+  getLoggedInPractitionerResource,
+  getPractitionerRef,
   getPrimaryLocationFromLocationList,
-  getPractitionerRef
+  getUser
 } from '@workflow/features/user/utils'
 import {
-  userMock,
+  districtMock,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
+  officeMock,
   unionMock,
-  officeMock
+  upazilaMock,
+  userMock
 } from '@workflow/test/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'

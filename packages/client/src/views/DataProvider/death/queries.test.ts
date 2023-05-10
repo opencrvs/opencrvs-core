@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
-  getDeathQueryMappings
-} from '@client/views/DataProvider/death/queries'
 import { DownloadAction, SubmissionAction } from '@client/forms'
+import {
+  getDeathQueryMappings,
+  GET_DEATH_REGISTRATION_FOR_CERTIFICATION
+} from '@client/views/DataProvider/death/queries'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {

@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
-import { createTestComponent, createTestApp } from '@login/tests/util'
-import { client } from '@login/utils/authApi'
 import { applicationConfigLoadedAction } from '@login/login/actions'
+import { createTestApp, createTestComponent } from '@login/tests/util'
+import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 
 describe('Login app step one', () => {
   describe('Step One Container', () => {

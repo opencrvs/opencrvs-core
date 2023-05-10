@@ -11,22 +11,22 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@metrics/constants'
+import * as database from '@metrics/config/database'
 import getPlugins from '@metrics/config/plugins'
 import { getRoutes } from '@metrics/config/routes'
-import { readFileSync } from 'fs'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@metrics/constants'
 import { influx } from '@metrics/influxdb/client'
 import {
   INFLUX_DB,
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
-import * as database from '@metrics/config/database'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

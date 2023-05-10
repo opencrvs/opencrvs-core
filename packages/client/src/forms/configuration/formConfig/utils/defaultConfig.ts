@@ -9,26 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IDefaultQuestionConfig,
-  getIdentifiersFromFieldId
-} from '@client/forms/questionConfig'
-import { IConfigField } from '.'
-import { isCustomConfigField } from './customConfig'
+import { ISerializedForm } from '@client/forms'
+import { FieldEnabled } from '@client/forms/configuration'
 import {
   getField,
   getGroup,
   getPrecedingDefaultFieldIdAcrossGroups
 } from '@client/forms/configuration/defaultUtils'
 import {
-  isPreviewGroupConfigField,
+  getIdentifiersFromFieldId,
+  IDefaultQuestionConfig
+} from '@client/forms/questionConfig'
+import { IConfigField } from '.'
+import { isCustomConfigField } from './customConfig'
+import {
+  getPreviewGroupFieldId,
   getPreviewGroupLabel,
-  isPlaceHolderPreviewGroup,
   IPreviewGroupConfigField,
-  getPreviewGroupFieldId
+  isPlaceHolderPreviewGroup,
+  isPreviewGroupConfigField
 } from './previewGroup'
-import { ISerializedForm } from '@client/forms'
-import { FieldEnabled } from '@client/forms/configuration'
 
 export type IDefaultConfigField = IDefaultQuestionConfig & {
   required: boolean

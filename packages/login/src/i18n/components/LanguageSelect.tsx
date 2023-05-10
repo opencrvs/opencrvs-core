@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { changeLanguage } from '@login/i18n/actions'
+import { getLanguage, getLanguages } from '@login/i18n/selectors'
+import { useSearchQuery } from '@login/i18n/utils'
 import {
   ISelect2Option,
   Select2
 } from '@opencrvs/components/lib/Select/Select2'
-import styled from 'styled-components'
-import { useSearchQuery } from '@login/i18n/utils'
-import { getLanguages, getLanguage } from '@login/i18n/selectors'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
+import styled from 'styled-components'
 
 const SelectContainer = styled.div`
   ${({ theme }) => theme.colors.primary};

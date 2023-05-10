@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { System, WebhookPermission, Event } from '@client/utils/gateway'
+import { Event, System, WebhookPermission } from '@client/utils/gateway'
 import { CheckboxGroup, FormTabs, ResponsiveModal } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'

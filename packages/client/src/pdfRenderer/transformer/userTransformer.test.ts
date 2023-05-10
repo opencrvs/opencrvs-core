@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  userDetails,
-  validImageB64String,
-  mockDeclarationData,
-  mockOfflineData
-} from '@client/tests/util'
 import { userTransformers } from '@client/pdfRenderer/transformer/userTransformer'
-import { createIntl } from 'react-intl'
-import { omit } from 'lodash'
+import {
+  mockDeclarationData,
+  mockOfflineData,
+  userDetails,
+  validImageB64String
+} from '@client/tests/util'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { omit } from 'lodash'
+import { createIntl } from 'react-intl'
 import { TemplateTransformerData } from './types'
 
 describe("PDF template's logged-in user field related transformer tests", () => {

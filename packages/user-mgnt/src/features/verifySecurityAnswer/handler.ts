@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { conflict, unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import { unauthorized, conflict } from '@hapi/boom'
+import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
+import { logger } from '@user-mgnt/logger'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
-import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
 import { isNonEmptyArray } from '@user-mgnt/utils/non-empty-array'
+import * as Joi from 'joi'
 
 interface IVerifySecurityAnswer {
   userId: string

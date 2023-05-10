@@ -12,14 +12,14 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
-import { verifySecurityAnswer, IVerifySecurityAnswerResponse } from './service'
+import { IVerifySecurityAnswerResponse, verifySecurityAnswer } from './service'
 
-import { unauthorized } from '@hapi/boom'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
   storeRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
+import { unauthorized } from '@hapi/boom'
 
 interface IPayload {
   answer: string

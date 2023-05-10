@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Stack } from './Stack'
+import React from 'react'
 import { Pill } from '../Pill'
+import { Stack } from './Stack'
 
 export default {
   title: 'Layout/Stack',

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { AvatarLarge as DefaultAvatar } from '@opencrvs/components/lib/icons'
+import styled from '@client/styledComponents'
 import { AVATAR_API } from '@client/utils/constants'
 import { Avatar } from '@client/utils/gateway'
-import styled from '@client/styledComponents'
+import { AvatarLarge as DefaultAvatar } from '@opencrvs/components/lib/icons'
+import * as React from 'react'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string

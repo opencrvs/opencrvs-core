@@ -9,6 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { queries } from '@client/profile/queries'
+import { AppStore } from '@client/store'
+import { birthDraftData } from '@client/tests/mock-drafts'
+import {
+  createTestComponent,
+  createTestStore,
+  getReviewFormFromStore,
+  mockDeathDeclarationData,
+  mockUserResponseWithName
+} from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
+import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import {
   createReviewDeclaration,
   DOWNLOAD_STATUS,
@@ -17,26 +30,13 @@ import {
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
 import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
-import * as React from 'react'
-import { queries } from '@client/profile/queries'
-import { AppStore } from '@client/store'
-import {
-  createTestComponent,
-  mockUserResponseWithName,
-  getReviewFormFromStore,
-  createTestStore,
-  mockDeathDeclarationData
-} from '@client/tests/util'
-import { v4 as uuid } from 'uuid'
-import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { birthDraftData } from '@client/tests/mock-drafts'
-import { vi, Mock } from 'vitest'
+import * as React from 'react'
+import { v4 as uuid } from 'uuid'
+import { Mock, vi } from 'vitest'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'

@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { messages } from '@client/i18n/messages/views/correction'
+import { Event } from '@client/utils/gateway'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death

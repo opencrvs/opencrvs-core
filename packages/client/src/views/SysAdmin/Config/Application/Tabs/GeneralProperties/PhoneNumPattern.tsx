@@ -10,8 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   ApplyButton,
   CancelButton,
@@ -19,23 +23,19 @@ import {
   Message,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
-import { getOfflineData } from '@client/offline/selectors'
+import ContentComponent from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties/NIDPhoneNumContent'
 import {
   callApplicationConfigMutation,
   isValidRegEx,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { EMPTY_STRING } from '@client/utils/constants'
-import ContentComponent from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties/NIDPhoneNumContent'
 import { Link } from '@opencrvs/components/lib/Link'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function PhoneNumPattern() {
   const intl = useIntl()

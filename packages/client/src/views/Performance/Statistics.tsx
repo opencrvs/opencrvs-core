@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { messages } from '@client/i18n/messages/views/dashboard'
+import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { DashboardEmbedView } from '@client/views/Performance/Dashboard'
-import { messages } from '@client/i18n/messages/views/dashboard'
 
 export const PerformanceStatistics = () => {
   const intl = useIntl()

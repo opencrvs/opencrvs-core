@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  GQLAttachment,
-  GQLPerson,
-  GQLRelatedPerson
-} from '@opencrvs/gateway/src/graphql/schema'
-import {
   ICertificate,
   IFileValue,
   IFormData,
   IFormField,
+  IFormFieldMutationMapFunction,
   IFormSectionData,
-  TransformedData,
-  IFormFieldMutationMapFunction
+  TransformedData
 } from '@client/forms'
-import { set, omit } from 'lodash'
 import { convertToMSISDN } from '@client/forms/utils'
+import {
+  GQLAttachment,
+  GQLPerson,
+  GQLRelatedPerson
+} from '@opencrvs/gateway/src/graphql/schema'
+import { omit, set } from 'lodash'
 
 export function transformCertificateData(
   transformedData: TransformedData,

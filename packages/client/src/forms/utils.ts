@@ -9,69 +9,66 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IDeclaration } from '@client/declarations'
 import {
-  IFormField,
-  Ii18nFormField,
-  ISelectOption,
-  IConditionals,
-  IFormSectionData,
-  IConditional,
-  SELECT_WITH_OPTIONS,
-  RADIO_GROUP,
   CHECKBOX_GROUP,
-  IRadioOption,
+  DATE,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
   ICheckboxOption,
-  ISelectFormFieldWithDynamicOptions,
-  INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH,
+  IConditional,
+  IConditionals,
+  IContactPoint,
+  IDateFormField,
+  IDynamicFormField,
+  IDynamicFormFieldValidators,
   IDynamicListFormField,
   IDynamicValueMapper,
-  IFormData,
-  IDynamicFormFieldValidators,
-  IDynamicFormField,
-  FETCH_BUTTON,
-  ILoaderButton,
   IFieldInput,
-  IFormSection,
-  IQuery,
-  DATE,
-  IDateFormField,
-  IFormSectionGroup,
-  IRadioGroupFormField,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormData,
+  IFormField,
   IFormFieldValue,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  IRadioGroupWithNestedFieldsFormField,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  Ii18nFormField,
   IInformant,
-  IContactPoint
+  ILoaderButton,
+  INFORMATIVE_RADIO_GROUP,
+  IQuery,
+  IRadioGroupFormField,
+  IRadioGroupWithNestedFieldsFormField,
+  IRadioOption,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectOption,
+  PARAGRAPH,
+  RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SELECT_WITH_OPTIONS
 } from '@client/forms'
-import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
+  Errors,
   getValidationErrorsForForm,
-  IFieldErrors,
-  Errors
+  IFieldErrors
 } from '@client/forms/validation'
+import { IDynamicValues } from '@client/navigation'
 import {
-  OFFLINE_LOCATIONS_KEY,
-  OFFLINE_FACILITIES_KEY,
   ILocation,
   IOfflineData,
-  LocationType
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
 import {
-  Validation,
   isAValidDateFormat,
-  isDateNotInFuture
+  isDateNotInFuture,
+  Validation
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
-import { IDynamicValues } from '@client/navigation'
-import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
-import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-import _ from 'lodash'
-import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',

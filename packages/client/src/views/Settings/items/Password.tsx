@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { useIntl, FormattedMessage } from 'react-intl'
 import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import {
-  constantsMessages,
   buttonMessages,
+  constantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export function Password() {
   const intl = useIntl()

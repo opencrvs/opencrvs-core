@@ -10,8 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { ICurrency } from '@client/utils/referenceApi'
+import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   ApplyButton,
   CancelButton,
@@ -21,26 +25,22 @@ import {
   Message,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { Select } from '@opencrvs/components/lib/Select'
-import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
-import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   getCurrencyObject,
   getCurrencySelectOptions,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { lookup } from 'country-data'
-import { ICurrency } from '@client/utils/referenceApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { Link } from '@opencrvs/components/lib/Link'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Select } from '@opencrvs/components/lib/Select'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { lookup } from 'country-data'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function Currency() {
   const intl = useIntl()

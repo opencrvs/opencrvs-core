@@ -10,23 +10,34 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  ApolloClient,
+  ApolloError,
+  ApolloQueryResult,
+  InternalRefetchQueriesInclude
+} from '@apollo/client'
+import {
   Action as DeclarationAction,
-  SubmissionAction,
   DownloadAction,
+  FieldValueMap,
+  IAttachmentValue,
+  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue,
-  IContactPoint,
-  FieldValueMap,
-  IAttachmentValue
+  SubmissionAction
 } from '@client/forms'
-import { Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
   GO_TO_PAGE,
   IDynamicValues
 } from '@client/navigation'
+import {
+  showDownloadDeclarationFailedToast,
+  ShowDownloadDeclarationFailedToast
+} from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -35,46 +46,35 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
-  gqlToDraftTransformer,
-  draftToGqlTransformer
+  draftToGqlTransformer,
+  gqlToDraftTransformer
 } from '@client/transformer'
-import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLRegistrationSearchSet,
-  GQLHumanName,
-  GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
-import {
-  ApolloClient,
-  ApolloError,
-  ApolloQueryResult,
-  InternalRefetchQueriesInclude
-} from '@apollo/client'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { v4 as uuid } from 'uuid'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast
-} from '@client/notification/actions'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
-import {
-  UpdateRegistrarWorkqueueAction,
-  updateRegistrarWorkqueue,
-  IQueryData,
-  IWorkqueue
-} from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
+import { Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
+import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import {
+  IQueryData,
+  IWorkqueue,
+  updateRegistrarWorkqueue,
+  UpdateRegistrarWorkqueueAction
+} from '@client/workqueue'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchResultSet,
+  GQLEventSearchSet,
+  GQLHumanName,
+  GQLMarriageEventSearchSet,
+  GQLRegistrationSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { v4 as uuid } from 'uuid'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'

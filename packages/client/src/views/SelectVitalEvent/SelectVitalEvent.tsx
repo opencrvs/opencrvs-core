@@ -9,35 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
-import { RadioButton } from '@opencrvs/components/lib/Radio'
-import { BodyContent, Container } from '@opencrvs/components/lib/Content'
-import { Event } from '@client/utils/gateway'
+import {
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import {
   goBack,
-  goToHome,
   goToBirthInformant,
   goToDeathInformant,
-  goToEventInfo
+  goToEventInfo,
+  goToHome
 } from '@client/navigation'
-import { messages } from '@client/i18n/messages/views/selectVitalEvent'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
+import styled, { keyframes } from '@client/styledComponents'
 import {
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@client/utils/constants'
-import {
-  storeDeclaration,
-  IDeclaration,
-  createDeclaration
-} from '@client/declarations'
+import { Event } from '@client/utils/gateway'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h2};

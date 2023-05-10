@@ -11,15 +11,15 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@notification/constants'
 import getPlugins from '@notification/config/plugins'
-import { readFileSync } from 'fs'
 import getRoutes from '@notification/config/routes'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@notification/constants'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

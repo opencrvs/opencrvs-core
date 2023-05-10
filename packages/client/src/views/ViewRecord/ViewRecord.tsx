@@ -10,34 +10,34 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
+import { useQuery } from '@apollo/client'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
   createReviewDeclaration,
   IDeclaration,
   IDuplicates,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
-import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
-import { goBack } from '@client/navigation'
-import { Event, FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
-import styled from '@client/styledComponents'
-import { useDispatch, useSelector } from 'react-redux'
-import { Button } from '@opencrvs/components/lib/Button'
-import { getOfflineData } from '@client/offline/selectors'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { AppBar, Frame, Spinner } from '@opencrvs/components'
-import { messages } from '@client/i18n/messages/views/review'
-import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/review'
+import { goBack } from '@client/navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import styled from '@client/styledComponents'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { Event, FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
+import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router'
 
 const Container = styled.div`
   height: 100%;

@@ -12,8 +12,8 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { Text } from '../../Text'
 import { colors } from '../../colors'
+import { Text } from '../../Text'
 
 const RowContainer = styled.tr``
 

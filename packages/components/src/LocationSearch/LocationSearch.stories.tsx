@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, ComponentStory } from '@storybook/react'
-import { LocationSearch, ISearchLocation } from './LocationSearch'
+import { ComponentStory, Meta } from '@storybook/react'
 import React from 'react'
+import { ISearchLocation, LocationSearch } from './LocationSearch'
 
 export default {
   title: 'Input/Location search',

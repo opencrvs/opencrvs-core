@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
+  CHECKBOX,
   CHECKBOX_GROUP,
   DATE,
   FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IAttachmentValue,
+  ICheckboxFormField,
   ICheckboxGroupFormField,
   IDynamicOptions,
   IFileValue,
@@ -27,6 +31,7 @@ import {
   IRadioOption,
   ISelectOption,
   LIST,
+  LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
@@ -34,33 +39,28 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING,
-  LOCATION_SEARCH_INPUT,
-  IAttachmentValue,
-  CHECKBOX,
-  ICheckboxFormField
+  WARNING
 } from '@client/forms'
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import {
+  getConditionalActionsForField,
+  getListOfLocations,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@client/forms/utils'
 import { getValidationErrorsForForm } from '@client/forms/validation'
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
+import { getDefaultLanguage } from '@client/i18n/utils'
 import {
   ILocation,
   IOfflineData,
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { generateLocations } from '@client/utils/locationUtils'
-import {
-  getConditionalActionsForField,
-  getListOfLocations,
-  getVisibleSectionGroupsBasedOnConditions
-} from '@client/forms/utils'
-import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
+import { clone, flattenDeep, get, isArray, isEqual } from 'lodash'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export function groupHasError(
   group: IFormSectionGroup,

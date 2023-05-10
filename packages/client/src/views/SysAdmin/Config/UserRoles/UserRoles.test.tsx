@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { describe, Mock } from 'vitest'
-import { ReactWrapper } from 'enzyme'
-import { createStore } from '@client/store'
-import { createTestComponent } from '@client/tests/util'
-import { useParams } from 'react-router'
-import React from 'react'
-import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
-import { waitForElement } from '@client/tests/wait-for-element'
 import {
   getSystemRolesQuery,
   updateRoleQuery
 } from '@client/forms/user/query/queries'
+import { createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
+import { useParams } from 'react-router'
+import { describe, Mock } from 'vitest'
 
 describe('render system role update modal', () => {
   let component: ReactWrapper<{}, {}>

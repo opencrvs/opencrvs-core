@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { addons } from '@storybook/manager-api'
-import theme from './theme'
 import WebFont from 'webfontloader'
+import theme from './theme'
 
 WebFont.load({
   google: {

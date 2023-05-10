@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
@@ -17,11 +16,12 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEXTAREA
 } from '@client/forms'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { validationMessages } from '@client/i18n/messages'
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
 import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
-import { validationMessages } from '@client/i18n/messages'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectionReason {
   CLERICAL_ERROR = 'CLERICAL_ERROR',

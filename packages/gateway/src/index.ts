@@ -11,12 +11,12 @@
  */
 
 // eslint-disable-next-line import/no-unassigned-import
+import { createServer } from '@gateway/server'
 import '@opencrvs/commons/monitoring'
+import * as DotEnv from 'dotenv'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-import * as DotEnv from 'dotenv'
-import { createServer } from '@gateway/server'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`

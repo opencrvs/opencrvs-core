@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  getTokenPayload,
   getToken,
+  getTokenPayload,
   refreshToken
 } from '@client/utils/authUtils'
+import { Mock, vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'
-import { vi, Mock } from 'vitest'
 
 describe('authUtils tests', () => {
   describe('getAuthorizedToken', () => {

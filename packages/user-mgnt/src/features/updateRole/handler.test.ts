@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import SystemRole from '@user-mgnt/model/systemRole'
+import { createServer } from '@user-mgnt/server'
+import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 import * as mockingoose from 'mockingoose'
-import { createServer } from '@user-mgnt/server'
-import SystemRole from '@user-mgnt/model/systemRole'
 
 const fetch = fetchMock as fetchMock.FetchMock
 

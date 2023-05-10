@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import {
-  getFieldDefinition,
-  IDefaultConfigField,
-  ICustomConfigField
-} from '@client/forms/configuration/formConfig/utils'
 import { IFormField } from '@client/forms'
-import { useParams } from 'react-router'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default/index'
+import {
+  getFieldDefinition,
+  ICustomConfigField,
+  IDefaultConfigField
+} from '@client/forms/configuration/formConfig/utils'
 import { Event } from '@client/utils/gateway'
+import React from 'react'
+import { useParams } from 'react-router'
 
 export function useDefaultForm() {
   const { event } = useParams<{ event: Event }>()

@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as crypto from 'crypto'
 import { FHIR_URL } from '@webhooks/constants'
-import fetch from 'node-fetch'
-import { logger } from '@webhooks/logger'
 import { IAuthHeader } from '@webhooks/features/event/handler'
+import { logger } from '@webhooks/logger'
+import * as crypto from 'crypto'
+import fetch from 'node-fetch'
 
 export function createRequestSignature(
   requestSigningVersion: string,

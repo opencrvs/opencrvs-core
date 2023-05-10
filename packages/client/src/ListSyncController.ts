@@ -11,8 +11,8 @@
  */
 import { client } from '@client/utils/apolloClient'
 import {
-  REGISTRATION_HOME_QUERY,
-  FIELD_AGENT_HOME_QUERY
+  FIELD_AGENT_HOME_QUERY,
+  REGISTRATION_HOME_QUERY
 } from '@client/views/OfficeHome/queries'
 
 export async function syncRegistrarWorkqueue(

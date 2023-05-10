@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { EyeOff, EyeOn } from '../icons'
-import { PasswordInput, IPasswordInputProps } from './PasswordInput'
 import React from 'react'
+import { EyeOff, EyeOn } from '../icons'
+import { IPasswordInputProps, PasswordInput } from './PasswordInput'
 
 export default {
   title: 'Input/Password input',

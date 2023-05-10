@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  RouteProps,
-  RegisterForm
-} from '@client/views/RegisterForm/RegisterForm'
-import { IForm } from '@client/forms'
 import { IDeclaration } from '@client/declarations'
-import { IStoreState } from '@client/store'
-import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
-import { connect } from 'react-redux'
+import { IForm } from '@client/forms'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
+import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
+import { IStoreState } from '@client/store'
 import { Event } from '@client/utils/gateway'
+import {
+  RegisterForm,
+  RouteProps
+} from '@client/views/RegisterForm/RegisterForm'
+import * as React from 'react'
+import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 
 type IStateProps = {

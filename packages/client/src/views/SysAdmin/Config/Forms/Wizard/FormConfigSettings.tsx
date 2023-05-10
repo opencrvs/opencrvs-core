@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { buttonMessages } from '@client/i18n/messages'
+import { messages as configMessages } from '@client/i18n/messages/views/config'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import { buttonMessages } from '@client/i18n/messages'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Link } from '@opencrvs/components/lib/Link'
-import styled from 'styled-components'
-import { Toggle } from '@opencrvs/components/lib/Toggle'
-import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import {
   callApplicationConfigMutation,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { messages as configMessages } from '@client/i18n/messages/views/config'
+import { Link } from '@opencrvs/components/lib/Link'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { RadioGroup } from '@opencrvs/components/lib/Radio'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};

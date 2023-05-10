@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { ShowUnassignedPayload } from '@client/notification/actions'
+import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { Loop, LoopReducer } from 'redux-loop'
 
 type UserAuditSuccessToastState =
   | {

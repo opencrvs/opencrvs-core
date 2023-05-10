@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { fieldToAttachmentTransformer } from '@client/forms/mappings/mutation/field-mappings'
 import {
-  TransformedData,
+  BirthSection,
   IFormData,
   IFormField,
-  BirthSection
+  TransformedData
 } from '@client/forms'
+import { fieldToAttachmentTransformer } from '@client/forms/mappings/mutation/field-mappings'
 
 export const birthDocumentForWhomFhirMapping = {
   CHILD: 'CHILD',

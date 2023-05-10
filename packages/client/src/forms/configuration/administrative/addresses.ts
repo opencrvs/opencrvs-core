@@ -11,24 +11,23 @@
  */
 
 import {
-  BirthSection,
-  DeathSection,
-  MarriageSection,
-  FLEX_DIRECTION,
-  SerializedFormField,
-  ISerializedForm,
-  IPreviewGroup
-} from '@client/forms/index'
-import { formMessageDescriptors } from '@client/i18n/messages'
-import { MessageDescriptor } from 'react-intl'
-import { cloneDeep } from 'lodash'
-import { getFieldIdentifiers } from '@client/forms/questionConfig'
-import {
   getLocationSelect,
   getPlaceOfEventLocationSelect,
   getRuralOrUrbanConditionals
 } from '@client/forms/configuration/administrative/utils'
+import {
+  BirthSection,
+  DeathSection,
+  FLEX_DIRECTION,
+  IPreviewGroup,
+  ISerializedForm,
+  SerializedFormField
+} from '@client/forms/index'
+import { getFieldIdentifiers } from '@client/forms/questionConfig'
+import { formMessageDescriptors } from '@client/i18n/messages'
 import { sentenceCase } from '@client/utils/data-formatting'
+import { cloneDeep } from 'lodash'
+import { MessageDescriptor } from 'react-intl'
 
 export enum AddressCases {
   // the below are UPPER_CASE because they map to GQLAddress type enums

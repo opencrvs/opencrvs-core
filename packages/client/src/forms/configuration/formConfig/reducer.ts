@@ -10,24 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormConfig, IFormDataSet } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default/index'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
+  DEFAULT_FORM_DRAFT,
   getEventDraft,
-  IFormDraft,
-  DEFAULT_FORM_DRAFT
+  IFormDraft
 } from '@client/forms/configuration/formDrafts/utils'
+import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 import * as offlineActions from '@client/offline/actions'
+import { Event } from '@client/utils/gateway'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 import {
   generateConfigFields,
   ISectionFieldMap,
   prepareNewCustomFieldConfig
 } from './utils'
-import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default/index'
-import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
-import { IDataSourceSelectOption } from '@client/forms/configuration/formConfig/utils'
 
 export type IFormConfigState =
   | {

@@ -16,15 +16,15 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/server'
 import {
+  mockEncounterResponse,
+  mockLocationResponse,
   mockMarriageFhirBundle,
   mockMarriageFhirBundleWithoutCompositionId,
   mockMarriageRejectionTaskBundle,
-  mockLocationResponse,
   mockMinimalMarriageFhirBundle,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
-  mockUserModelResponse,
-  mockEncounterResponse
+  mockUserModelResponse
 } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'

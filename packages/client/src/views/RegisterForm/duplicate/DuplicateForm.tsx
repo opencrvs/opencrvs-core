@@ -10,16 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { Content } from '@opencrvs/components/lib/Content'
 import { archiveDeclaration, IDeclaration } from '@client/declarations'
-import styled from 'styled-components'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { useIntl } from 'react-intl'
-import { Button } from '@opencrvs/components/src/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { useDispatch } from 'react-redux'
 import { updateDeclaration } from '@client/declarations/submissionMiddleware'
+import { buttonMessages } from '@client/i18n/messages'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { goToHome } from '@client/navigation'
+import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
 import {
   ResponsiveModal,
   Select,
@@ -27,9 +23,13 @@ import {
   Text,
   TextArea
 } from '@opencrvs/components/lib'
-import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
-import { buttonMessages } from '@client/i18n/messages'
-import { goToHome } from '@client/navigation'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Button } from '@opencrvs/components/src/Button'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
+import styled from 'styled-components'
 
 interface IProps {
   declaration: IDeclaration

@@ -9,6 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ITaskHistory } from '@client/declarations'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -18,11 +23,6 @@ import {
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { ITaskHistory } from '@client/declarations'
 
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],

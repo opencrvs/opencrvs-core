@@ -11,11 +11,11 @@
  */
 import { Meta, Story } from '@storybook/react'
 import React from 'react'
+import styled from 'styled-components'
 import {
   FormConfigElementCard,
   IFormConfigElementCardProps
 } from './FormConfigElementCard'
-import styled from 'styled-components'
 
 export default {
   title: 'Data/Form config element card',

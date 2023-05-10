@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  identityTypeMapper,
-  NATIONAL_ID,
   BIRTH_REGISTRATION_NUMBER,
-  DEATH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER,
+  identityTypeMapper,
+  NATIONAL_ID
 } from '@client/forms/identity'
 import { BIG_NUMBER } from '.'
 

@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@client/i18n/actions'
 import {
-  getDefaultLanguage,
   getAvailableLanguages,
+  getDefaultLanguage,
   storeLanguage
 } from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
 import {
-  IRoleMessagesLoadedAction,
   IRoleLoadedAction,
+  IRoleMessagesLoadedAction,
   rolesMessageAddData,
   ROLES_LOADED
 } from '@client/user/userReducer'
 import { SystemRole } from '@client/utils/gateway'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 
 export interface IntlMessages {
   [key: string]: string

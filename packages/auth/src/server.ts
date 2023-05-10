@@ -10,21 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
+import getPlugins from '@auth/config/plugins'
 import {
   AUTH_HOST,
   AUTH_PORT,
   DEFAULT_TIMEOUT,
   HOSTNAME
 } from '@auth/constants'
+import * as database from '@auth/database'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@auth/features/authenticate/handler'
-import verifyCodeHandler, {
-  requestSchema as reqVerifySchema,
-  responseSchma as resVerifySchema
-} from '@auth/features/verifyCode/handler'
+import { getPublicKey } from '@auth/features/authenticate/service'
+import invalidateTokenHandler, {
+  reqInvalidateTokenSchema
+} from '@auth/features/invalidateToken/handler'
 import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
@@ -33,40 +34,39 @@ import resendSmsHandler, {
   requestSchema as reqResendSmsSchema,
   responseSchma as resResendSmsSchema
 } from '@auth/features/resend/handler'
-import getPlugins from '@auth/config/plugins'
-import * as database from '@auth/database'
-import verifyTokenHandler, {
-  reqVerifyTokenSchema,
-  resVerifyTokenSchema
-} from '@auth/features/verifyToken/handler'
-import invalidateTokenHandler, {
-  reqInvalidateTokenSchema
-} from '@auth/features/invalidateToken/handler'
-import verifyUserHandler, {
-  requestSchema as reqVerifyUserSchema,
-  responseSchema as resVerifyUserSchema
-} from '@auth/features/retrievalSteps/verifyUser/handler'
-import verifyNumberHandler, {
-  requestSchema as reqVerifyNumberSchema,
-  responseSchema as resVerifyNumberSchema
-} from '@auth/features/retrievalSteps/verifyNumber/handler'
-import verifySecurityQuestionHandler, {
-  verifySecurityQuestionSchema,
-  verifySecurityQuestionResSchema
-} from '@auth/features/retrievalSteps/verifySecurityAnswer/handler'
 import changePasswordHandler, {
   reqChangePasswordSchema
 } from '@auth/features/retrievalSteps/changePassword/handler'
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
+import verifyNumberHandler, {
+  requestSchema as reqVerifyNumberSchema,
+  responseSchema as resVerifyNumberSchema
+} from '@auth/features/retrievalSteps/verifyNumber/handler'
+import verifySecurityQuestionHandler, {
+  verifySecurityQuestionResSchema,
+  verifySecurityQuestionSchema
+} from '@auth/features/retrievalSteps/verifySecurityAnswer/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@auth/features/retrievalSteps/verifyUser/handler'
 import {
   authenticateSystemClientHandler,
   requestSchema as reqSystemSchema,
   responseSchema as resSystemSchema
 } from '@auth/features/system/handler'
+import verifyCodeHandler, {
+  requestSchema as reqVerifySchema,
+  responseSchma as resVerifySchema
+} from '@auth/features/verifyCode/handler'
+import verifyTokenHandler, {
+  reqVerifyTokenSchema,
+  resVerifyTokenSchema
+} from '@auth/features/verifyToken/handler'
 import { logger } from '@auth/logger'
-import { getPublicKey } from '@auth/features/authenticate/service'
+import * as Hapi from '@hapi/hapi'
 import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'

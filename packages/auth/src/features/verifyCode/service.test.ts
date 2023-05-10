@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  generateVerificationCode,
-  getVerificationCodeDetails,
-  generateNonce,
   checkVerificationCode,
-  deleteUsedVerificationCode
+  deleteUsedVerificationCode,
+  generateNonce,
+  generateVerificationCode,
+  getVerificationCodeDetails
 } from '@auth/features/verifyCode/service'
 
 import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from '@auth/constants'

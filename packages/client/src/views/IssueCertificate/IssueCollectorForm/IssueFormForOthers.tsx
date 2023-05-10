@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Content } from '@opencrvs/components/lib'
+import { FormFieldGenerator } from '@client/components/form'
 import {
   ICertificate,
   IPrintableDeclaration,
@@ -29,22 +29,18 @@ import {
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
 import { conditionals } from '@client/forms/utils'
+import { buttonMessages } from '@client/i18n/messages'
 import { formMessages } from '@client/i18n/messages/form'
-import { validIDNumber } from '@client/utils/validate'
-import React from 'react'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { useIntl } from 'react-intl'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
-import { groupHasError } from '@client/views/CorrectionForm/utils'
-import { FormFieldGenerator } from '@client/components/form'
-import { useDispatch } from 'react-redux'
-import {
-  goToIssueCertificatePayment,
-  goToVerifyCollector,
-  goToVerifyIssueCollector
-} from '@client/navigation'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { goToIssueCertificatePayment } from '@client/navigation'
+import { validIDNumber } from '@client/utils/validate'
+import { groupHasError } from '@client/views/CorrectionForm/utils'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { Content } from '@opencrvs/components/lib'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
 const fields: IFormField[] = [
   {

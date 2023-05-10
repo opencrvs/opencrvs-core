@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { query } from '@metrics/influxdb/client'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import { query } from '@metrics/influxdb/client'
 
 export interface IPractitionerMetrics {
   practitionerId: string

@@ -10,29 +10,29 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
 } from '@workflow/features/registration/fhir/constants'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  getRegistrationNumber,
+  getCRVSOfficeName,
   getEntryId,
   getInformantName,
-  getCRVSOfficeName,
   getPaperFormID,
+  getRegistrationNumber,
   getRegStatusCode,
   getSharedContactMsisdn,
   getTrackingId
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  testFhirBundle,
+  officeMock,
   testDeathFhirBundle,
-  testMarriageFhirBundle,
+  testFhirBundle,
   testFhirTaskBundle,
-  officeMock
+  testMarriageFhirBundle
 } from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
+import { cloneDeep } from 'lodash'
 const fetch = fetchAny as any
 
 describe('Verify getSharedContactMsisdn', () => {

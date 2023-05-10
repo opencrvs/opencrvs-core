@@ -11,11 +11,11 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Check, Help, Cross, NotificationError, Notification } from '../icons'
-import { Spinner } from '../Spinner'
 import { Button } from '../Button'
-import { Text } from '../Text'
 import { colors } from '../colors'
+import { Check, Cross, Help, Notification, NotificationError } from '../icons'
+import { Spinner } from '../Spinner'
+import { Text } from '../Text'
 
 export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 

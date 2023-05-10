@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death/query/documents-mappings'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import { IFormData, IFormField } from '@client/forms'
 import { transformStatusData } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
+import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 import format from '@client/utils/date-formatting'
+import { Event } from '@client/utils/gateway'
+import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 
 export const deceasedDateToFieldTransformation =
   (alternativeSectionId?: string) =>

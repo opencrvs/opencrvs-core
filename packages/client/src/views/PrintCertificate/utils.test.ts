@@ -11,8 +11,8 @@
  */
 import {
   calculateDaysFromToday,
-  timeElapsed,
-  getCountryTranslations
+  getCountryTranslations,
+  timeElapsed
 } from '@client/views/PrintCertificate/utils'
 import { vi } from 'vitest'
 

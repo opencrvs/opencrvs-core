@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import {
   FORGOTTEN_ITEMS,
   goToPhoneNumberVerificationForm,
   goToSuccessPage
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h2};

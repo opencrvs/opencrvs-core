@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, ISerializedForm } from '@client/forms/index'
-import {
-  IQuestionConfig,
-  isDefaultQuestionConfig,
-  IDefaultQuestionConfig,
-  getFieldIdentifiers,
-  getCustomizedDefaultField,
-  getGroupIdentifiers,
-  IFieldIdentifiers
-} from '@client/forms/questionConfig'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
-import { registerForms } from './default/index'
+import { IFormConfig, ISerializedForm } from '@client/forms/index'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
+import {
+  getCustomizedDefaultField,
+  getFieldIdentifiers,
+  getGroupIdentifiers,
+  IDefaultQuestionConfig,
+  IFieldIdentifiers,
+  IQuestionConfig,
+  isDefaultQuestionConfig
+} from '@client/forms/questionConfig'
 import { DraftStatus, Event } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { registerForms } from './default/index'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 

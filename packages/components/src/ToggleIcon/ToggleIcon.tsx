@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Icon, IconProps } from '../Icon'
 import { Button } from '../Button'
+import { Icon, IconProps } from '../Icon'
 
 export function ToggleIcon({
   name,

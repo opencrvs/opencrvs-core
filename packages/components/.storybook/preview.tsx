@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { DocsContainer } from '@storybook/addon-docs'
-import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import WebFont from 'webfontloader'
-import type { Preview } from '@storybook/react'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { DocsContainer } from '@storybook/addon-docs'
+import type { Preview } from '@storybook/react'
+import React from 'react'
+import { createGlobalStyle, ThemeProvider } from 'styled-components'
+import WebFont from 'webfontloader'
 
 const theme = getTheme()
 

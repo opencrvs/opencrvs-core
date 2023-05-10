@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { constantsMessages, errorMessages } from '@client/i18n/messages'
+import { isNavigatorOnline } from '@client/utils'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
-import { errorMessages, constantsMessages } from '@client/i18n/messages'
-import { isNavigatorOnline } from '@client/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};

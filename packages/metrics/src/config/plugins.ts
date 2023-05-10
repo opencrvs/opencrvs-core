@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Pino from 'hapi-pino'
-import * as JWT from 'hapi-auth-jwt2'
-import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@metrics/constants'
 import { logger } from '@metrics/logger'
+import * as JWT from 'hapi-auth-jwt2'
+import * as Pino from 'hapi-pino'
+import * as Sentry from 'hapi-sentry'
 
 export default function getPlugins() {
   const plugins: any[] = [

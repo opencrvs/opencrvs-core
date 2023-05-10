@@ -9,75 +9,75 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloError } from '@apollo/client'
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { LocationPicker } from '@client/components/LocationPicker'
+import { Query } from '@client/components/Query'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
+import {
+  goToCompletenessRates,
+  goToPerformanceHome,
+  goToWorkflowStatus
+} from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
+import { REGISTRAR_ROLES } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
+import { ICurrency } from '@client/utils/referenceApi'
+import { UserDetails } from '@client/utils/userUtils'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
+import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
+import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
+import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
+import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
+import {
+  calculateTotal,
+  CompletenessRateTime,
+  getAdditionalLocations,
+  isCountry,
+  NATIONAL_ADMINISTRATIVE_LEVEL,
+  StatusMapping
+} from '@client/views/SysAdmin/Performance/utils'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Box } from '@opencrvs/components/lib/Box'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { NoWifi } from '@opencrvs/components/lib/icons'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import * as React from 'react'
-import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import {
+  GQLCorrectionMetric,
+  GQLTotalMetricsResult
+} from '@opencrvs/gateway/src/graphql/schema'
+import startOfMonth from 'date-fns/startOfMonth'
+import subMonths from 'date-fns/subMonths'
+import { parse } from 'query-string'
+import * as React from 'react'
+import { injectIntl, IntlShape, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { DateRangePicker } from '@client/components/DateRangePicker'
-import subMonths from 'date-fns/subMonths'
-import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/utils/gateway'
-import { LocationPicker } from '@client/components/LocationPicker'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Query } from '@client/components/Query'
+import { AppSources } from './ApplicationSourcesReport'
+import { LocationStatsView } from './LocationStatsView'
 import {
   CORRECTION_TOTALS,
   PERFORMANCE_METRICS,
   PERFORMANCE_STATS
 } from './metricsQuery'
-import { ApolloError } from '@apollo/client'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
-import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
-import {
-  GQLCorrectionMetric,
-  GQLTotalMetricsResult
-} from '@opencrvs/gateway/src/graphql/schema'
-import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
-import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
-import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
-import {
-  StatusMapping,
-  getAdditionalLocations,
-  CompletenessRateTime,
-  isCountry,
-  NATIONAL_ADMINISTRATIVE_LEVEL,
-  calculateTotal
-} from '@client/views/SysAdmin/Performance/utils'
-import { constantsMessages } from '@client/i18n/messages/constants'
-import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
-import { AppSources } from './ApplicationSourcesReport'
-import { LocationStatsView } from './LocationStatsView'
 import {
   IStatusMapping,
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
-import {
-  goToWorkflowStatus,
-  goToCompletenessRates,
-  goToPerformanceHome
-} from '@client/navigation'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { NoWifi } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_ROLES } from '@client/utils/constants'
-import { ICurrency } from '@client/utils/referenceApi'
-import { Box } from '@opencrvs/components/lib/Box'
-import startOfMonth from 'date-fns/startOfMonth'
-import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;

@@ -10,17 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
 import { AppStore, createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
 import { createTestComponent } from '@client/tests/util'
-import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
-import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
+import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 
-import { History } from 'history'
 import { COMPLETENESS_RATE_REPORT_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { History } from 'history'
 
 describe('CompletenessDataTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>

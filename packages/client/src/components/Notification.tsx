@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { messages } from '@client/i18n/messages/views/notifications'
 import { userMessages } from '@client/i18n/messages/user'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
-import { IStoreState } from '@opencrvs/client/src/store'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { Link } from '@opencrvs/components/lib/Link'
+import { messages } from '@client/i18n/messages/views/notifications'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 import {
   hideConfigurationErrorNotification,
-  toggleDraftSavedNotification,
-  hideSubmitFormSuccessToast,
-  hideSubmitFormErrorToast,
-  hideUserAuditSuccessToast,
-  hidePINUpdateSuccessToast,
-  hideDownloadDeclarationFailedToast,
-  ShowUnassignedPayload,
-  hideUnassignedModal,
   hideCreateUserErrorToast,
+  hideDownloadDeclarationFailedToast,
+  hideDuplicateRecordsToast,
+  hidePINUpdateSuccessToast,
+  hideSubmitFormErrorToast,
+  hideSubmitFormSuccessToast,
+  hideUnassignedModal,
+  hideUserAuditSuccessToast,
   hideUserReconnectedToast,
-  hideDuplicateRecordsToast
+  ShowUnassignedPayload,
+  toggleDraftSavedNotification
 } from '@client/notification/actions'
-import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
-import { goToDeclarationRecordAudit } from '@client/navigation'
+import { TOAST_MESSAGES } from '@client/user/userReducer'
+import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 type NotificationProps = {
   language?: string

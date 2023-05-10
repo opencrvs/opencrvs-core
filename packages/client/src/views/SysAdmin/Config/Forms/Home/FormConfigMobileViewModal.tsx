@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import React from 'react'
+import { useIntl } from 'react-intl'
 
 const Message = styled.div`
   margin-top: 36px;

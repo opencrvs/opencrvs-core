@@ -11,8 +11,6 @@
  */
 import { LoginState } from '@login/login/reducer'
 import { IStoreState } from '@login/store'
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 const getPartialState = (store: IStoreState): LoginState => store.login
 
 function getKey<K extends keyof LoginState>(store: IStoreState, key: K) {

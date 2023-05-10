@@ -11,10 +11,10 @@
  */
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
-import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { SystemRoleType } from '@client/utils/gateway'
+import * as Sentry from '@sentry/react'
+import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { UserDetails } from './userUtils'
 
 export type Scope = string[]

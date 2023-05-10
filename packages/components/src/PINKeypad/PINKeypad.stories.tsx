@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, ComponentStory } from '@storybook/react'
-import { PINKeypad } from './PINKeypad'
+import { ComponentStory, Meta } from '@storybook/react'
 import React from 'react'
+import { PINKeypad } from './PINKeypad'
 
 const Template: ComponentStory<typeof PINKeypad> = (args) => (
   <PINKeypad {...args} />

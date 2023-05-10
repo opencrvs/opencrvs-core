@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
+import { countries } from '@client/forms/countries'
+import { countryMessages, locationMessages } from '@client/i18n/messages'
+import { ILocation, IOfflineData, LocationType } from '@client/offline/reducer'
 import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { locationMessages, countryMessages } from '@client/i18n/messages'
-import { countries } from '@client/forms/countries'
 import { UserDetails } from './userUtils'
 
 export function filterLocations(

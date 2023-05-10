@@ -28,27 +28,36 @@ import {
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 
 import {
+  getUserAuditsHandler,
+  newAuditHandler
+} from '@metrics/features/audit/handler'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
+import { totalPaymentsHandler } from '@metrics/features/payments/handler'
+import { refresh } from '@metrics/features/performance/viewRefresher'
+import {
+  declarationArchivedHandler,
+  declarationAssignedHandler,
+  declarationDownloadedHandler,
+  declarationReinstatedHandler,
+  declarationUnassignedHandler,
+  declarationUpdatedHandler,
+  declarationViewedHandler,
   inProgressHandler,
   markCertifiedHandler,
+  markedAsDuplicate,
+  markedAsNotDuplicate,
+  markEventRegisteredHandler,
+  markIssuedHandler,
   markRejectedHandler,
   markValidatedHandler,
   newDeclarationHandler,
+  newEventRegistrationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
   requestCorrectionHandler,
   requestForRegistrarValidationHandler,
-  declarationAssignedHandler,
-  declarationUnassignedHandler,
-  waitingExternalValidationHandler,
-  declarationViewedHandler,
-  declarationDownloadedHandler,
-  declarationArchivedHandler,
-  declarationReinstatedHandler,
-  declarationUpdatedHandler,
-  markEventRegisteredHandler,
-  newEventRegistrationHandler,
-  markIssuedHandler,
-  markedAsDuplicate,
-  markedAsNotDuplicate
+  waitingExternalValidationHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -61,20 +70,11 @@ import {
   totalMetricsByTime,
   totalMetricsHandler
 } from '@metrics/features/totalMetrics/handler'
-import { totalPaymentsHandler } from '@metrics/features/payments/handler'
-import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
-import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
-import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
-import {
-  getUserAuditsHandler,
-  newAuditHandler
-} from '@metrics/features/audit/handler'
-import * as Joi from 'joi'
 import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
-import { refresh } from '@metrics/features/performance/viewRefresher'
+import * as Joi from 'joi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'

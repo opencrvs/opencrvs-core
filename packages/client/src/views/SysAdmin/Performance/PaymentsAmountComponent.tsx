@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import React from 'react'
+import { messages } from '@client/i18n/messages/views/performance'
+import { ICurrency } from '@client/utils/referenceApi'
+import { getAmountWithCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import {
+  calculateTotalPaymentAmount,
+  ListContainer,
+  PerformanceListHeader,
   PerformanceTitle,
   PerformanceValue,
-  calculateTotalPaymentAmount,
-  PerformanceListHeader,
-  ListContainer,
   ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
+import React from 'react'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/performance'
-import { getAmountWithCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
-import { ICurrency } from '@client/utils/referenceApi'
 
 interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>

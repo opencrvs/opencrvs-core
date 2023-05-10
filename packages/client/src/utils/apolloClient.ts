@@ -11,10 +11,10 @@
  */
 import {
   ApolloClient,
-  InMemoryCache,
   ApolloLink,
-  from,
   createHttpLink,
+  from,
+  InMemoryCache,
   NormalizedCacheObject
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
@@ -24,12 +24,12 @@ import { showSessionExpireConfirmation } from '@client/notification/actions'
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
+import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
 import TimeoutLink from '@client/utils/timeoutLink'
-import * as React from 'react'
+import * as Sentry from '@sentry/react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import localforage from 'localforage'
-import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
+import * as React from 'react'
 
 export let client: ApolloClient<NormalizedCacheObject>
 

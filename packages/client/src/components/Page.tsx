@@ -9,31 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { connect } from 'react-redux'
-import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
+import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
+import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
+import { changeLanguage } from '@client/i18n/actions'
+import { getPreferredLanguage } from '@client/i18n/utils'
+import {
+  hideConfigurationErrorNotification,
+  showConfigurationErrorNotification
+} from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
 import {
   getOfflineData,
   getOfflineDataLoaded,
   getOfflineLoadingError
 } from '@client/offline/selectors'
 import { checkAuth } from '@client/profile/profileActions'
-import {
-  showConfigurationErrorNotification,
-  hideConfigurationErrorNotification
-} from '@client/notification/actions'
-import { changeLanguage } from '@client/i18n/actions'
+import styled from '@client/styledComponents'
 import { Ii18n } from '@client/type/i18n'
-import { getPreferredLanguage } from '@client/i18n/utils'
-import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
-import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};

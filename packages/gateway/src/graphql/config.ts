@@ -9,13 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils'
+import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils'
 import { defaultFieldResolver, GraphQLSchema } from 'graphql'
 
+import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
+import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
+import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
+import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
+import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
+import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
+import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
-import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
@@ -24,19 +33,15 @@ import { resolvers as roleRootResolvers } from '@gateway/features/role/root-reso
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
-import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
-import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
-import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
-import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
-import { getUser, getSystem } from '@gateway/features/user/utils'
+import { getSystem, getUser } from '@gateway/features/user/utils'
+import { Context } from '@gateway/graphql/context'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
 import {
@@ -46,12 +51,7 @@ import {
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual, uniqueId } from 'lodash'
-import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
-import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import LocationsAPI from '@gateway/features/fhir/locationsAPI'
-import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
-import { Context } from '@gateway/graphql/context'
+import { isEqual, merge, uniqueId } from 'lodash'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 

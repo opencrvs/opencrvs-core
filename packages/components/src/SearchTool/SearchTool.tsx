@@ -10,11 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ClearText } from '../icons'
+import styled from 'styled-components'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import styled from 'styled-components'
-import { Text } from '../Text'
+import { ClearText } from '../icons'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};

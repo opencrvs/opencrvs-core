@@ -10,21 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { countries as countryList, lookup } from 'country-data'
-import { orderBy, uniqBy } from 'lodash'
+import { updateOfflineConfigData } from '@client/offline/actions'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 import {
   BirthActionId,
   DeathActionId,
   GeneralActionId,
   MarriageActionId
 } from '@client/views/SysAdmin/Config/Application'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { IOfflineData } from '@client/offline/reducer'
 import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
-import { updateOfflineConfigData } from '@client/offline/actions'
+import { countries as countryList, lookup } from 'country-data'
+import { orderBy, uniqBy } from 'lodash'
 import { Dispatch } from 'redux'
-import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
 export type IActionType =
   | keyof typeof GeneralActionId

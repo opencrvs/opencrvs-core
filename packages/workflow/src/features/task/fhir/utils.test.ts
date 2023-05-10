@@ -10,19 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  filterTaskExtensions,
-  getTaskBusinessStatus,
-  isArchiveTask,
-  isRejectedTask,
-  getTaskEventType,
-  hasExtension
-} from '@workflow/features/task/fhir/utils'
-import { testFhirTaskBundle } from '@workflow/test/utils'
-import {
-  RegStatus,
-  EVENT_TYPE
+  EVENT_TYPE,
+  RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import {
+  filterTaskExtensions,
+  getTaskBusinessStatus,
+  getTaskEventType,
+  hasExtension,
+  isArchiveTask,
+  isRejectedTask
+} from '@workflow/features/task/fhir/utils'
+import { testFhirTaskBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 const task = testFhirTaskBundle.entry[0].resource

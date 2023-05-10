@@ -11,15 +11,15 @@
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  GQLAdvancedSearchParametersInput,
-  GQLOperationHistorySearchSet,
-  GQLResolver
-} from '@gateway/graphql/schema'
-import {
   getEventDurationsFromMetrics,
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
+import {
+  GQLAdvancedSearchParametersInput,
+  GQLOperationHistorySearchSet,
+  GQLResolver
+} from '@gateway/graphql/schema'
 
 interface ISearchEventDataTemplate {
   _type: string

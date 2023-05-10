@@ -17,19 +17,19 @@ import {
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import { merge } from 'lodash'
-import * as React from 'react'
-import { SentForReview } from './SentForReview'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { formattedDuration } from '@client/utils/date-formatting'
+import { readFileSync } from 'fs'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
+import * as jwt from 'jsonwebtoken'
+import { merge } from 'lodash'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
+import { SentForReview } from './SentForReview'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },

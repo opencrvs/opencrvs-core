@@ -11,14 +11,14 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@workflow/constants'
 import getPlugins from '@workflow/config/plugins'
 import { getRoutes } from '@workflow/config/routes'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@workflow/constants'
 import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)

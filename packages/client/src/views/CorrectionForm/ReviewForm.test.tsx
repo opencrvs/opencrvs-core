@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { mockDeclarationData, createTestApp } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { ReviewSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  IDeclaration,
-  storeDeclaration,
-  modifyDeclaration,
   createReviewDeclaration,
+  IDeclaration,
+  modifyDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
+import { ReviewSection } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
-import { Store } from 'redux'
-import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { createTestApp, mockDeclarationData } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import { Store } from 'redux'
 
 let wrapper: ReactWrapper<{}, {}>
 let store: Store

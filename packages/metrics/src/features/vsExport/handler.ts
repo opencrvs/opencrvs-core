@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { uploadFileToMinio } from '@metrics/api'
 import {
-  VS_EXPORT_SCRIPT_PATH,
   BIRTH_REPORT_PATH,
-  DEATH_REPORT_PATH
+  DEATH_REPORT_PATH,
+  VS_EXPORT_SCRIPT_PATH
 } from '@metrics/constants'
 import VS_Export, { Event, IVSExport } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
+import { format, isFirstDayOfMonth } from 'date-fns'
 import * as fs from 'fs'
-import { internal } from '@hapi/boom'
-import { isFirstDayOfMonth, format } from 'date-fns'
 
 export async function vsExportHandler(
   request: Hapi.Request,

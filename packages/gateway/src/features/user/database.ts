@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as redis from 'redis'
 import { REDIS_HOST } from '@gateway/constants'
-import { promisify } from 'util'
 import { logger } from '@gateway/logger'
+import * as redis from 'redis'
+import { promisify } from 'util'
 
 let redisClient: redis.RedisClient
 

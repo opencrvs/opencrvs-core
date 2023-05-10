@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ViewType,
-  SELECT_WITH_OPTIONS,
-  PARAGRAPH,
   IFormSection,
-  PaymentSection
+  PARAGRAPH,
+  PaymentSection,
+  SELECT_WITH_OPTIONS,
+  ViewType
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/certificate'
 

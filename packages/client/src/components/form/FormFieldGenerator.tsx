@@ -9,119 +9,119 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import {
+  getConditionalActionsForField,
+  getFieldHelperText,
+  getFieldLabel,
+  getFieldLabelToolTip,
+  getFieldOptions,
+  getFieldOptionsByValueMapper,
+  getFieldType,
+  getListOfLocations,
+  getQueryData,
+  getVisibleOptions,
+  internationaliseFieldObject
+} from '@client/forms/utils'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { Select } from '@opencrvs/components/lib/Select'
 import { Text } from '@opencrvs/components/lib/Text'
-import {
-  internationaliseFieldObject,
-  getConditionalActionsForField,
-  getFieldOptions,
-  getFieldLabel,
-  getFieldLabelToolTip,
-  getFieldOptionsByValueMapper,
-  getFieldType,
-  getQueryData,
-  getVisibleOptions,
-  getListOfLocations,
-  getFieldHelperText
-} from '@client/forms/utils'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import * as React from 'react'
 
-import styled, { keyframes } from '@client/styledComponents'
-import { gqlToDraftTransformer } from '@client/transformer'
+import { InputField } from '@client/components/form/InputField'
+import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 import {
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  SELECT_WITH_OPTIONS,
-  RADIO_GROUP,
-  CHECKBOX_GROUP,
+  BIG_NUMBER,
   CHECKBOX,
+  CHECKBOX_GROUP,
   DATE,
+  DATE_RANGE_PICKER,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  TEXTAREA,
-  TEL,
-  SUBSECTION,
-  WARNING,
+  DYNAMIC_LIST,
+  FETCH_BUTTON,
+  FIELD_GROUP_TITLE,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IAttachmentValue,
+  IDateRangePickerValue,
   IDynamicFormField,
+  IDynamicListFormField,
   IFileValue,
   IForm,
+  IFormData,
   IFormField,
   IFormFieldValue,
+  IFormSection,
   IFormSectionData,
   Ii18nFormField,
+  Ii18nRadioGroupWithNestedFieldsFormField,
+  Ii18nTextareaFormField,
+  Ii18nTextFormField,
+  IListFormField,
+  ILoaderButton,
   INFORMATIVE_RADIO_GROUP,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
   ITextFormField,
-  Ii18nTextFormField,
   LINK,
   LIST,
-  NUMBER,
-  BIG_NUMBER,
-  PARAGRAPH,
-  DYNAMIC_LIST,
-  IDynamicListFormField,
-  IListFormField,
-  IFormData,
-  FETCH_BUTTON,
-  ILoaderButton,
-  FIELD_GROUP_TITLE,
-  IFormSection,
-  SIMPLE_DOCUMENT_UPLOADER,
-  IAttachmentValue,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField,
+  NUMBER,
+  PARAGRAPH,
+  RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  SIMPLE_DOCUMENT_UPLOADER,
+  SUBSECTION,
+  TEL,
   TEXT,
-  DATE_RANGE_PICKER,
-  IDateRangePickerValue
+  TEXTAREA,
+  WARNING
 } from '@client/forms'
-import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
-import { InputField } from '@client/components/form/InputField'
-import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
+import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
+import styled, { keyframes } from '@client/styledComponents'
+import { gqlToDraftTransformer } from '@client/transformer'
 
-import { FormList } from '@client/components/form/FormList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
+import { FormList } from '@client/components/form/FormList'
 
+import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
+import { dynamicDispatch } from '@client/declarations'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { isMobileDevice } from '@client/utils/commonUtils'
+import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
+import { generateLocations } from '@client/utils/locationUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
-import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  FormattedMessage,
-  MessageDescriptor,
-  useIntl
-} from 'react-intl'
+import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import {
   FastField,
   Field,
-  FormikProps,
   FieldProps,
+  Formik,
+  FormikProps,
   FormikTouched,
-  FormikValues,
-  Formik
+  FormikValues
 } from 'formik'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten } from 'lodash'
-import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
-import { getOfflineData } from '@client/offline/selectors'
+import { flatten, isEqual } from 'lodash'
+import {
+  FormattedMessage,
+  MessageDescriptor,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import { dynamicDispatch } from '@client/declarations'
-import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
-import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import { generateLocations } from '@client/utils/locationUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { buttonMessages } from '@client/i18n/messages/buttons'
-import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
-import { UserDetails } from '@client/utils/userUtils'
+import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
+import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

@@ -10,30 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* istanbul ignore next */
-import {
-  compose,
-  createStore as createReduxStore,
-  applyMiddleware,
-  AnyAction,
-  Store,
-  StoreEnhancer
-} from 'redux'
-import { createBrowserHistory } from 'history'
-import {
-  combineReducers,
-  install,
-  StoreCreator,
-  getModel,
-  LoopReducer
-} from 'redux-loop'
+import { intlReducer, IntlState } from '@login/i18n/reducer'
+import { loginReducer, LoginState } from '@login/login/reducer'
+import * as Sentry from '@sentry/react'
 import {
   connectRouter,
   routerMiddleware,
   RouterState
 } from 'connected-react-router'
-import { loginReducer, LoginState } from '@login/login/reducer'
-import { intlReducer, IntlState } from '@login/i18n/reducer'
-import * as Sentry from '@sentry/react'
+import { createBrowserHistory } from 'history'
+import {
+  AnyAction,
+  applyMiddleware,
+  compose,
+  createStore as createReduxStore,
+  Store,
+  StoreEnhancer
+} from 'redux'
+import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
 import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {

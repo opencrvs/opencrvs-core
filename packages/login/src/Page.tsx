@@ -11,16 +11,16 @@
  */
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  applicationConfigLoadAction,
-  storeClientRedirectRoute
-} from './login/actions'
 import { changeLanguage, loadLanguages } from './i18n/actions'
 import {
   getDefaultLanguage,
   retrieveLanguage,
   useSearchQuery
 } from './i18n/utils'
+import {
+  applicationConfigLoadAction,
+  storeClientRedirectRoute
+} from './login/actions'
 import { selectApplicationName } from './login/selectors'
 
 type IProps = {

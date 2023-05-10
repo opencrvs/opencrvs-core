@@ -9,31 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import PageVisibility from 'react-page-visibility'
-import { Unlock } from '@client/views/Unlock/Unlock'
-import { storage } from '@client/storage'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
-import * as LogRocket from 'logrocket'
+import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { refreshOfflineData } from '@client/offline/actions'
+import { storage } from '@client/storage'
 import { refreshToken } from '@client/utils/authUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   DESKTOP_TIME_OUT_MILLISECONDS,
   LOADER_MIN_DISPLAY_TIME,
   REFRESH_TOKEN_CHECK_MILLIS
 } from '@client/utils/constants'
-import { connect } from 'react-redux'
-import { refreshOfflineData } from '@client/offline/actions'
-import { PropsWithChildren } from 'react'
-import styled from 'styled-components'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
-import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { UserDetails, USER_DETAILS } from '@client/utils/userUtils'
 import { CreatePin } from '@client/views/PIN/CreatePin'
+import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
+import { Unlock } from '@client/views/Unlock/Unlock'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import * as LogRocket from 'logrocket'
+import * as React from 'react'
+import { PropsWithChildren } from 'react'
+import IdleTimer from 'react-idle-timer'
+import PageVisibility from 'react-page-visibility'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import styled from 'styled-components'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{

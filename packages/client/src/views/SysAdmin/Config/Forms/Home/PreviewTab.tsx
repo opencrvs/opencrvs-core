@@ -9,26 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import {
-  messages,
-  draftStatusMessages
+  draftStatusMessages,
+  messages
 } from '@client/i18n/messages/views/formConfig'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { IStoreState } from '@client/store'
 import { DraftStatus, Event } from '@client/utils/gateway'
-import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/Pill'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { ActionContext, Actions } from './ActionsModal'
+import { DraftVersion, Value } from './components'
 
 function ActionButton({
   action,

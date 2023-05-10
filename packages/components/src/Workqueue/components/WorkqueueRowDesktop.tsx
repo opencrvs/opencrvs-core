@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
+import { ColumnContentAlignment, IAction, IActionObject, IColumn } from '..'
 
 export interface IWorkqueueRow {
   displayItems: Array<Record<string, unknown>>

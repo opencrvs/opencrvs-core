@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { PageContainer } from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import * as routes from '@login/navigation/routes'
 import { AppStore, createStore } from '@login/store'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
+import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import * as React from 'react'
+import { ConnectedRouter } from 'connected-react-router'
 import { History } from 'history'
+import * as React from 'react'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
-import { ConnectedRouter } from 'connected-react-router'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
+import { Page } from './Page'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
-import { ResetCredentialsSuccessPage } from './views/resetCredentialsForm/resetCredentialsSuccessPage'
 import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
 import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntryForm'
+import { ResetCredentialsSuccessPage } from './views/resetCredentialsForm/resetCredentialsSuccessPage'
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
-import { Page } from './Page'
-import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
-import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 
 export const { store, history } = createStore()
 

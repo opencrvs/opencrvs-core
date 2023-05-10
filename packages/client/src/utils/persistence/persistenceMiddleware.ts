@@ -9,26 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { QueryOptions } from '@apollo/client'
+import { getDefaultPerformanceLocationId } from '@client/navigation'
+import { READY } from '@client/offline/actions'
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
 import { IStoreState } from '@client/store'
-import {
-  CORRECTION_TOTALS,
-  PERFORMANCE_METRICS,
-  PERFORMANCE_STATS
-} from '@client/views/SysAdmin/Performance/metricsQuery'
-import { Action, Middleware } from 'redux'
-import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 import {
   FIELD_AGENT_ROLES,
   NATIONAL_REGISTRAR_ROLES,
   NATL_ADMIN_ROLES
 } from '@client/utils/constants'
-import { client } from '@client/utils/apolloClient'
-import { READY } from '@client/offline/actions'
+import { UserDetails } from '@client/utils/userUtils'
+import {
+  CORRECTION_TOTALS,
+  PERFORMANCE_METRICS,
+  PERFORMANCE_STATS
+} from '@client/views/SysAdmin/Performance/metricsQuery'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { QueryOptions } from '@apollo/client'
+import { Action, Middleware } from 'redux'
 
 const isUserOfNationalScope = (userDetails: UserDetails) =>
   [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(

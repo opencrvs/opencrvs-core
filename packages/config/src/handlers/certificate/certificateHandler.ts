@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import Certificate, {
-  ICertificateModel,
-  Status,
-  Event
-} from '@config/models/certificate' //   IDeclarationConfigurationModel
 import { logger } from '@config/config/logger'
-import * as Joi from 'joi'
-import { badRequest } from '@hapi/boom'
+import { RouteScope } from '@config/config/routes'
+import Certificate, {
+  Event,
+  ICertificateModel,
+  Status
+} from '@config/models/certificate' //   IDeclarationConfigurationModel
 import { isValidSVGCode } from '@config/services/certificateService'
 import { verifyToken } from '@config/utils/verifyToken'
-import { RouteScope } from '@config/config/routes'
+import { badRequest } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 import { pipe } from 'fp-ts/lib/function'
+import * as Joi from 'joi'
 
 interface IActivePayload {
   status: Status

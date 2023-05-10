@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  createTestComponent,
-  getRegisterFormFromStore,
-  createTestStore
-} from '@client/tests/util'
-import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import {
   createDeclaration,
-  IUserData,
+  deleteDeclarationByUser,
   getCurrentUserID,
   getDeclarationsOfCurrentUser,
-  writeDeclarationByUser,
-  deleteDeclarationByUser,
-  IDeclaration
+  IDeclaration,
+  IUserData,
+  writeDeclarationByUser
 } from '@client/declarations'
+import {
+  createTestComponent,
+  createTestStore,
+  getRegisterFormFromStore
+} from '@client/tests/util'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
+import * as React from 'react'
 import { vi } from 'vitest'
 
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
+import { Event, Status, SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data

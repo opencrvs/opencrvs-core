@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
+import {
+  AGE_VERIFICATION_USER_AUDIENCE,
+  JWT_ISSUER,
+  NATIONAL_ID_USER_AUDIENCE,
+  NOTIFICATION_API_USER_AUDIENCE,
+  VALIDATOR_API_USER_AUDIENCE,
+  WEB_USER_JWT_AUDIENCES
+} from '@auth/constants'
 import {
   authenticateSystem,
   createToken
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  NOTIFICATION_API_USER_AUDIENCE,
-  VALIDATOR_API_USER_AUDIENCE,
-  AGE_VERIFICATION_USER_AUDIENCE,
-  NATIONAL_ID_USER_AUDIENCE
-} from '@auth/constants'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 interface ISystemAuthPayload {
   client_id: string
   client_secret: string

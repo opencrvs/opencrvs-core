@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { find } from 'lodash'
 import { DraftStatus, Event } from '@client/utils/gateway'
+import { find } from 'lodash'
 
 export const DEFAULT_FORM_DRAFT = {
   birth: {

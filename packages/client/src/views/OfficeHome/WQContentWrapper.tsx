@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import styled from 'styled-components'
-import { NoResultText } from '@opencrvs/components/lib/Workqueue'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
+  IOnlineStatusProps,
   LoadingIndicator,
-  withOnlineStatus,
-  IOnlineStatusProps
+  withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { NoResultText } from '@opencrvs/components/lib/Workqueue'
+import * as React from 'react'
+import styled from 'styled-components'
 
 interface IContentWrapper {
   isMobileSize: boolean

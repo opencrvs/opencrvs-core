@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { EMPTY_STRING } from '@client/utils/constants'
-import * as React from 'react'
 import { ChangeNumberView } from '@client/views/Settings/ChangePhoneModal/ChangeNumberView'
 import { VerifyCodeView } from '@client/views/Settings/ChangePhoneModal/VerifyCodeView'
+import * as React from 'react'
 
 const VIEW_TYPE = {
   CHANGE_NUMBER: 'change',

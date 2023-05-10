@@ -10,39 +10,39 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  GQLAddress,
-  GQLAttachment,
-  GQLComment,
-  GQLHumanName,
-  GQLRegWorkflow,
-  GQLLocationType,
-  GQLAddressType
-} from '@opencrvs/gateway/src/graphql/schema'
-import {
   IAttachment,
   IFormData,
   IFormField,
   IFormFieldQueryMapFunction,
-  TransformedData,
   IFormSectionData,
-  ISelectFormFieldWithOptions
+  ISelectFormFieldWithOptions,
+  TransformedData
 } from '@client/forms'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { camelCase, cloneDeep, get, isArray } from 'lodash'
-import format from '@client/utils/date-formatting'
+import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { countries } from '@client/forms/countries'
+import { getSelectedOption } from '@client/forms/utils'
 import {
   IOfflineData,
+  LocationType,
   OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY,
-  LocationType
+  OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
-import { countries } from '@client/forms/countries'
-import { MessageDescriptor } from 'react-intl'
-import { getSelectedOption } from '@client/forms/utils'
+import format from '@client/utils/date-formatting'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
-import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import {
+  GQLAddress,
+  GQLAddressType,
+  GQLAttachment,
+  GQLComment,
+  GQLHumanName,
+  GQLLocationType,
+  GQLRegWorkflow
+} from '@opencrvs/gateway/src/graphql/schema'
+import { camelCase, cloneDeep, get, isArray } from 'lodash'
+import { MessageDescriptor } from 'react-intl'
 
 interface IName {
   [key: string]: any

@@ -9,26 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  createTestComponent,
-  getReviewFormFromStore,
-  createTestStore
-} from '@client/tests/util'
-import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
-import { ReactWrapper } from 'enzyme'
 import {
   createReviewDeclaration,
-  storeDeclaration,
-  setInitialDeclarations
+  setInitialDeclarations,
+  storeDeclaration
 } from '@client/declarations'
-import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { Event } from '@client/utils/gateway'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import { vi } from 'vitest'
+import {
+  createTestComponent,
+  createTestStore,
+  getReviewFormFromStore
+} from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { v4 as uuid } from 'uuid'
+import { vi } from 'vitest'
 
 const viewRecordMock = {
   data: {

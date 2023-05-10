@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { formatUrl } from '@client/navigation'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
 import {
   createRouterProps,
@@ -16,14 +18,12 @@ import {
   createTestStore
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import * as React from 'react'
 import { vi } from 'vitest'
-import { TEAM_USER_LIST } from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
 
 describe('User audit list tests', () => {
   let component: ReactWrapper<{}, {}>

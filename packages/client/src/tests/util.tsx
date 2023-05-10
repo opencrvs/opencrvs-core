@@ -9,55 +9,55 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { ThemeProvider } from '@client/styledComponents'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
 import {
-  configure,
-  mount,
-  ReactWrapper,
-  shallow,
-  MountRendererProps
-} from 'enzyme'
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
-import * as jwt from 'jsonwebtoken'
-import * as React from 'react'
-import {
-  ApolloProvider,
-  NetworkStatus,
   ApolloClient,
-  InMemoryCache,
   ApolloLink,
+  ApolloProvider,
+  InMemoryCache,
+  NetworkStatus,
   Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
+import { App } from '@client/App'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import { Section, SubmissionAction } from '@client/forms'
+import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import { offlineDataReady, setOfflineData } from '@client/offline/actions'
+import { setUserDetails } from '@client/profile/profileActions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { ThemeProvider } from '@client/styledComponents'
+import { getSchema } from '@client/tests/graphql-schema-mock'
+import { draftToGqlTransformer } from '@client/transformer'
+import { Event, Status, SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import { ConnectedRouter } from 'connected-react-router'
+import {
+  configure,
+  mount,
+  MountRendererProps,
+  ReactWrapper,
+  shallow
+} from 'enzyme'
+import { readFileSync } from 'fs'
+import { graphql, print } from 'graphql'
+import { createLocation, createMemoryHistory, History } from 'history'
+import * as jwt from 'jsonwebtoken'
+import { stringify } from 'query-string'
+import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
-import { AnyAction, Store } from 'redux'
-import { waitForElement } from './wait-for-element'
-import { setUserDetails } from '@client/profile/profileActions'
-import { createLocation, createMemoryHistory, History } from 'history'
-import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
-import { ConnectedRouter } from 'connected-react-router'
-import { mockOfflineData } from './mock-offline-data'
-import { Section, SubmissionAction } from '@client/forms'
-import { SUBMISSION_STATUS } from '@client/declarations'
+import { AnyAction, Store } from 'redux'
 import { vi } from 'vitest'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { mockOfflineData } from './mock-offline-data'
+import { waitForElement } from './wait-for-element'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'

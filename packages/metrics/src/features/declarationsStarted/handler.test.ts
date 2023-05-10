@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@metrics/server'
+import * as service from '@metrics/features/declarationsStarted/service'
 import * as influx from '@metrics/influxdb/client'
+import { createServer } from '@metrics/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as service from '@metrics/features/declarationsStarted/service'
 
 const readPoints = influx.query as jest.Mock
 

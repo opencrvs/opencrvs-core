@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { List } from '@opencrvs/components/lib/List'
 import * as React from 'react'
 import {
   injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
-import { List } from '@opencrvs/components/lib/List'
 
 export interface IProps {
   list: MessageDescriptor[]

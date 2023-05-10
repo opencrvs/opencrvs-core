@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { TransformedData } from '@client/forms'
 import { setDeathRegistrationSectionTransformer } from '@client/forms/register/fieldMappings/death/mutation/event-mappings'
 import {
   mockDeathDeclarationData,
   mockDeathRegistrationSectionData
 } from '@client/tests/util'
-import { TransformedData } from '@client/forms'
 import { cloneDeep } from 'lodash'
 
 describe('Death registration mutation mapping related tests', () => {

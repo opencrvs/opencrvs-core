@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { storage } from '@client/storage'
+import { AppStore, createStore } from '@client/store'
+import { flushPromises, mockDeclarationData } from '@client/tests/util'
+import { Event, Status, SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { vi } from 'vitest'
 import {
-  createDeclaration,
   archiveDeclaration,
-  storeDeclaration,
+  createDeclaration,
+  filterProcessingDeclarations,
+  filterProcessingDeclarationsFromQuery,
   IUserData,
   mergeDeclaredDeclarations,
-  filterProcessingDeclarations,
-  filterProcessingDeclarationsFromQuery
+  storeDeclaration
 } from '.'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
-import { AppStore, createStore } from '@client/store'
-import { mockDeclarationData, flushPromises } from '@client/tests/util'
-import { storage } from '@client/storage'
-import { vi } from 'vitest'
-import { UserDetails } from '@client/utils/userUtils'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {

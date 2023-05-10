@@ -9,21 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
-import * as bcrypt from 'bcryptjs'
-import { storage } from '@opencrvs/client/src/storage'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/pin'
-import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@client/declarations'
+import { messages } from '@client/i18n/messages/views/pin'
 import { IOfflineData } from '@client/offline/reducer'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Box, Stack, Text, Toast } from '@opencrvs/components'
+import { IStoreState } from '@client/store'
 import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
+import { storage } from '@opencrvs/client/src/storage'
+import { Box, Text, Toast } from '@opencrvs/components'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
+import * as bcrypt from 'bcryptjs'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import styled from 'styled-components'
 
 type IProps = IntlShapeProps & {

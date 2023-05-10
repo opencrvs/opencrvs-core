@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import User, { IUser } from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
 import * as mockingoose from 'mockingoose'
-import User, { IUser } from '@user-mgnt/model/user'
 
 const mockUser: Partial<IUser & { _id: string }> = {
   _id: '5d10885374be318fa7689f0b',

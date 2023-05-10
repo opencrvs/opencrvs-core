@@ -9,14 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { AvatarSmall } from '@client/components/Avatar'
+import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import {
   buttonMessages,
   constantsMessages,
   errorMessages
 } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
+import { messages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
@@ -27,8 +29,10 @@ import {
 } from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
+import { userMutations } from '@client/user/mutations'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   LANG_EN,
@@ -36,31 +40,44 @@ import {
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { Query as QueryType, User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import {
+  LoadingIndicator,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import {
   getAddressName,
   getUserRoleIntlKey,
   UserStatus
 } from '@client/views/SysAdmin/Team/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { AddUser, SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   BodyContent,
   Content,
   ContentSize
 } from '@opencrvs/components/lib/Content'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { AddUser, NoWifi, SearchRed } from '@opencrvs/components/lib/icons'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { ITheme } from '@opencrvs/components/lib/theme'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
+import { useCallback } from 'react'
 import {
   injectIntl,
   useIntl,
@@ -69,23 +86,6 @@ import {
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { userMutations } from '@client/user/mutations'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { useCallback } from 'react'
-import {
-  withOnlineStatus,
-  LoadingIndicator
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { LocationPicker } from '@client/components/LocationPicker'
-import { Query as QueryType, User } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { Link } from '@opencrvs/components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React

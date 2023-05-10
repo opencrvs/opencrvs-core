@@ -12,9 +12,9 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
+import { createServer } from '@webhooks/server'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-import { createServer } from '@webhooks/server'
 
 createServer().then((server) => server.start())

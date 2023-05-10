@@ -10,49 +10,49 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
-  goToDeclarationRecordAudit,
-  goToIssueCertificate
-} from '@client/navigation'
-import { transformData } from '@client/search/transformer'
-import {
-  ColumnContentAlignment,
-  Workqueue,
-  SORT_ORDER,
-  COLUMNS,
-  IAction
-} from '@opencrvs/components/lib/Workqueue'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import * as React from 'react'
-import { useIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+  clearCorrectionAndPrintChanges,
+  DOWNLOAD_STATUS
+} from '@client/declarations'
+import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { IStoreState } from '@client/store'
-import {
-  DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
-} from '@client/declarations'
-import { DownloadAction } from '@client/forms'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { formattedDuration } from '@client/utils/date-formatting'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import {
+  goToDeclarationRecordAudit,
+  goToIssueCertificate
+} from '@client/navigation'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import { useTheme } from '@client/styledComponents'
+import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  IconWithName,
+  NameContainer,
+  NoNameContainer
+} from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import {
-  IconWithName,
-  NoNameContainer,
-  NameContainer
-} from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  IAction,
+  SORT_ORDER,
+  Workqueue
+} from '@opencrvs/components/lib/Workqueue'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { useTheme } from '@client/styledComponents'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 interface IBasePrintTabProps {
   queryData: {

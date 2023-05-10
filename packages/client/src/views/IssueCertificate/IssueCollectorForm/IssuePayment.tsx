@@ -11,58 +11,46 @@
  */
 
 import {
-  IDeclaration,
+  ActionPageLight,
+  Content,
+  Currency,
+  ResponsiveModal,
+  Summary
+} from '@client/../../components/lib'
+import {
+  SuccessButton,
+  TertiaryButton
+} from '@client/../../components/lib/buttons'
+import { Button } from '@client/../../components/src/Button'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
   IPrintableDeclaration,
   modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import {
-  formatUrl,
-  goBack,
-  goToHomeTab,
-  goToReviewCertificate
-} from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  useIntl
-} from 'react-intl'
-import * as React from 'react'
-import styled from 'styled-components'
-import { Redirect, RouteComponentProps, useParams } from 'react-router'
+import { SubmissionAction } from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { messages } from '@client/i18n/messages/views/certificate'
+import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { Event } from '@client/utils/gateway'
+import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import {
   calculatePrice,
   getEventDate,
   getRegisteredDate,
   getServiceMessage
 } from '@client/views/PrintCertificate/utils'
-import {
-  ActionPageLight,
-  Content,
-  Summary,
-  Currency,
-  ResponsiveModal
-} from '@client/../../components/lib'
-import {
-  SuccessButton,
-  TertiaryButton
-} from '@client/../../components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/certificate'
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
-import { connect, useDispatch, useSelector } from 'react-redux'
-import { Event } from '@client/utils/gateway'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Button } from '@client/../../components/src/Button'
-import { SubmissionAction } from '@client/forms'
-import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import * as React from 'react'
 import { useState } from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import { Redirect, useParams } from 'react-router'
+import styled from 'styled-components'
 
 const Action = styled.div`
   margin-top: 32px;

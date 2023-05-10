@@ -10,17 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import fetch from 'node-fetch'
 import { HEARTH_URL } from '@workflow/constants'
-import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
+import { Events } from '@workflow/features/events/utils'
 import {
   getEntryId,
   getSharedContactMsisdn
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { getToken } from '@workflow/utils/authUtils'
-import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
-import { Events } from '@workflow/features/events/utils'
+import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
+import { logger } from '@workflow/logger'
+import { getToken } from '@workflow/utils/authUtils'
+import fetch from 'node-fetch'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,

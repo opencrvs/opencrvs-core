@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { CHECKBOX_GROUP, TEXTAREA, IFormField } from '@client/forms'
+import { CHECKBOX_GROUP, IFormField, TEXTAREA } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/reject'
 
 export interface IRejectRegistrationForm {

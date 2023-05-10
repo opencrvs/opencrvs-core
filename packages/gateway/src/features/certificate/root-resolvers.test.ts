@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/certificate/root-resolvers'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 // eslint-disable-next-line import/no-relative-parent-imports
 import mockCertificate from '../../../test/mockCertificate'
 

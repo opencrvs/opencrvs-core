@@ -10,40 +10,40 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
+import { InternalRefetchQueriesInclude } from '@apollo/client'
+import { Button } from '@client/../../components/src/Button'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
+  clearCorrectionAndPrintChanges,
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
+import { DownloadAction } from '@client/forms'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  goToIssueCertificate,
   goToPage,
   goToPrintCertificate,
-  goToUserProfile,
   goToTeamUserList,
-  goToIssueCertificate
+  goToUserProfile
 } from '@client/navigation'
-import { IntlShape } from 'react-intl'
-import {
-  IDeclaration,
-  SUBMISSION_STATUS,
-  DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
-} from '@client/declarations'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { EVENT_STATUS } from '@client/workqueue'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { DownloadAction } from '@client/forms'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { SystemRoleType } from '@client/utils/gateway'
-import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { InternalRefetchQueriesInclude } from '@apollo/client'
-import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
+import { SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
+import { EVENT_STATUS } from '@client/workqueue'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import React from 'react'
+import { IntlShape } from 'react-intl'
 import { useDispatch } from 'react-redux'
-import { Button } from '@client/../../components/src/Button'
+import { IDeclarationData } from './utils'
 
 export type CMethodParams = {
   declaration: IDeclarationData

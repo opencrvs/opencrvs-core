@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { isEqual } from 'lodash'
 import * as React from 'react'
 import styled from 'styled-components'
-import { isEqual } from 'lodash'
 import PanViewer from './PanViewer'
 const ImageContainer = styled.div`
   top: 0px;

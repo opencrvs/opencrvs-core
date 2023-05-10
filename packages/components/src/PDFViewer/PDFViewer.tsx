@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from 'styled-components'
 import { Document, Page } from 'react-pdf'
-import { Spinner } from '../Spinner'
+import styled from 'styled-components'
 import { Pagination } from '../Pagination'
+import { Spinner } from '../Spinner'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.heavy};

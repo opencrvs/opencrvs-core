@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import Question, { IQuestion, validFieldType } from '@config/models/question'
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { internal } from '@hapi/boom'
 
 export default async function createQuestion(
   request: Hapi.Request,

@@ -15,9 +15,9 @@ import {
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { mockOfflineData } from '@client/tests/mock-offline-data'
 import { LocationType } from '@client/utils/gateway'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 
 describe('Transforms advancedSearch local state to advancedSearch store state properly', () => {
   const mockLocalState: IBaseAdvancedSearchState = {

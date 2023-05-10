@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as bcrypt from 'bcryptjs'
 import { pinLoader } from '@client/views/Unlock/utils'
+import * as bcrypt from 'bcryptjs'
 
 // wrapping bcrypt.compare in a separate file
 // and exporting this function for tests

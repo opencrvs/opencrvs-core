@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Pagination, IPaginationProps } from './Pagination'
 import React from 'react'
+import { IPaginationProps, Pagination } from './Pagination'
 
 export default {
   title: 'Controls/Pagination',

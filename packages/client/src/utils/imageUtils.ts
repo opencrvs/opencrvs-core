@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Area } from 'react-easy-crop/types'
 import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
 } from '@client/utils/constants'
+import { Area } from 'react-easy-crop/types'
 
 export type IImage = {
   type: string

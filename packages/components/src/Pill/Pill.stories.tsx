@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Pill, IPillProps } from './Pill'
 import React from 'react'
 import { Stack } from '../Stack'
+import { IPillProps, Pill } from './Pill'
 
 const Template: Story<IPillProps> = (args) => {
   return (

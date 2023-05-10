@@ -17,12 +17,12 @@
  * of apollo client & react apollo and fetchPolicy isn't working with MockedProvider
  */
 
-import * as React from 'react'
 import {
   // eslint-disable-next-line no-restricted-imports
   Query as ApolloQuery,
   QueryComponentOptions
 } from '@apollo/client/react/components'
+import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 

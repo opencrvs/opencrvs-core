@@ -10,28 +10,28 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
 import { getPlugins } from '@gateway/config/plugins'
 import { getRoutes } from '@gateway/config/routes'
 import {
+  AUTH_URL,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL,
-  PORT,
+  DEFAULT_TIMEOUT,
   HOST,
   HOSTNAME,
-  DEFAULT_TIMEOUT
+  PORT
 } from '@gateway/constants'
-import { readFileSync } from 'fs'
+import * as database from '@gateway/features/user/database'
+import { getApolloConfig } from '@gateway/graphql/config'
+import { logger } from '@gateway/logger'
+import * as Hapi from '@hapi/hapi'
 import { validateFunc } from '@opencrvs/commons'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import {
   ApolloServer,
   ApolloServerPluginStopHapiServer
 } from 'apollo-server-hapi'
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
-import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/features/user/database'
-import { logger } from '@gateway/logger'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

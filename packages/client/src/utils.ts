@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IUserData } from '@client/declarations'
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION } from '@client/utils/constants'
-import { IUserData } from '@client/declarations'
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 

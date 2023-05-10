@@ -11,11 +11,11 @@
  */
 import {
   isAValidPhoneNumberFormat,
-  requiredSymbol,
-  required,
-  minLength,
   isNumber,
-  phoneNumberFormat
+  minLength,
+  phoneNumberFormat,
+  required,
+  requiredSymbol
 } from '@login/utils/validate'
 
 describe('validate', () => {

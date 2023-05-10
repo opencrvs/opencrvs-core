@@ -11,9 +11,9 @@
  */
 import {
   IFormData,
-  TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  TransformedData
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
@@ -23,16 +23,16 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
+import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import {
   GQLRegStatus,
   GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
-import { cloneDeep, get } from 'lodash'
-import { MessageDescriptor } from 'react-intl'
 import { callingCountries } from 'country-data'
-import QRCode from 'qrcode'
-import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { cloneDeep, get } from 'lodash'
+import QRCode from 'qrcode'
+import { MessageDescriptor } from 'react-intl'
 
 export function transformStatusData(
   transformedData: IFormData,

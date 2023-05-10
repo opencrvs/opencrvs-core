@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  mockDeclarationData,
-  mockDeathDeclarationData,
-  createRouterProps
-} from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
-import { CorrectorForm } from './CorrectorForm'
-import { CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IDeclaration, storeDeclaration } from '@client/declarations'
-import { CorrectionForm } from './CorrectionForm'
+import { CorrectionSection } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { createStore } from '@client/store'
+import {
+  createRouterProps,
+  createTestComponent,
+  mockDeathDeclarationData,
+  mockDeclarationData
+} from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { CorrectionForm } from './CorrectionForm'
+import { CorrectorForm } from './CorrectorForm'
 
 let wrapper: ReactWrapper<{}, {}>
 

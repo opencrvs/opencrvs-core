@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Document, model, Schema } from 'mongoose'
 import { ISelectOption, message } from '@config/models/question'
+import { Document, model, Schema } from 'mongoose'
 
 export interface IDataset {
   fileName: string

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { IAttachmentValue, IFileValue } from '@client/forms'
 import styled from '@client/styledComponents'
-import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
+import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
+import * as React from 'react'
 const PreviewContainer = styled.div`
   position: fixed;
   top: 0;

@@ -22,9 +22,9 @@ import {
   TEXT
 } from '@client/forms'
 import {
-  identityOptions,
   identityHelperTextMapper,
   identityNameMapper,
+  identityOptions,
   identityTypeMapper
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'

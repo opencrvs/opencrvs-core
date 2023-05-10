@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
 import { COMPOSITION_ID } from '@metrics/features/getTimeLogged/constants'
 import { query } from '@metrics/influxdb/client'
-import * as Hapi from '@hapi/hapi'
 
 export async function getEventDurationHandler(
   request: Hapi.Request,

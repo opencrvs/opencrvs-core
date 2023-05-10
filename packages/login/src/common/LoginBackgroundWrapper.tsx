@@ -12,14 +12,14 @@
 import * as React from 'react'
 import styled, { css, useTheme } from 'styled-components'
 
+import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import {
   selectCountryBackground,
   selectCountryLogo
 } from '@login/login/selectors'
-import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
-import { useSelector } from 'react-redux'
-import { isEqual } from 'lodash-es'
 import { ITheme } from '@opencrvs/components'
+import { isEqual } from 'lodash-es'
+import { useSelector } from 'react-redux'
 
 const StyledPage = styled.div<{
   background: NonNullable<ReturnType<typeof selectCountryBackground>>

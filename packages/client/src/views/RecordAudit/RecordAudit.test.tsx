@@ -10,40 +10,40 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import {
-  createTestComponent,
-  mockDeclarationData,
-  createRouterProps,
-  registerScopeToken,
-  getItem,
-  flushPromises,
-  mockDeathDeclarationData,
-  mockMarriageDeclarationData,
-  userDetails
-} from '@client/tests/util'
-import { RecordAudit } from './RecordAudit'
-import { createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
 import {
   createDeclaration,
-  storeDeclaration,
+  DOWNLOAD_STATUS,
   IDeclaration,
-  SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  storeDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
-import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
-import { FETCH_DECLARATION_SHORT_INFO } from './queries'
+import { createStore } from '@client/store'
+import {
+  createRouterProps,
+  createTestComponent,
+  flushPromises,
+  getItem,
+  mockDeathDeclarationData,
+  mockDeclarationData,
+  mockMarriageDeclarationData,
+  registerScopeToken,
+  userDetails
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
 import {
   getCurrentUserWorkqueuSuccess,
   IWorkqueue,
   workqueueInitialState
 } from '@client/workqueue'
+import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
+import { RecordAudit } from './RecordAudit'
 
 const declaration: IDeclaration = createDeclaration(
   Event.Birth,

@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape } from 'react-intl'
+import { isDefaultCountry } from '@client/forms/utils'
 import {
   IFunctionTransformer,
-  TemplateTransformerData,
-  TransformerPayload,
+  IOfflineAddressCondition,
   IOfflineAddressPayload,
-  IOfflineAddressCondition
+  TemplateTransformerData,
+  TransformerPayload
 } from '@client/pdfRenderer/transformer/types'
 import {
-  getValueFromDeclarationDataByKey,
-  getMatchedCondition
+  getMatchedCondition,
+  getValueFromDeclarationDataByKey
 } from '@client/pdfRenderer/transformer/utils'
 import {
   IAvailableCountries,
   ICountry
 } from '@client/views/PrintCertificate/utils'
-import { isDefaultCountry } from '@client/forms/utils'
+import { IntlShape } from 'react-intl'
 
 type KeyValues = { [key: string]: string }
 

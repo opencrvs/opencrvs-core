@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 // eslint-disable-next-line import/no-unassigned-import
+import { App } from '@client/App'
+import * as actions from '@client/notification/actions'
+import registerServiceWorker from '@client/registerServiceWorker'
+import { storage } from '@client/storage'
+import { createStore } from '@client/store'
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { App } from '@client/App'
-import registerServiceWorker from '@client/registerServiceWorker'
-import { createStore } from '@client/store'
-import * as actions from '@client/notification/actions'
-import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
+import * as Sentry from '@sentry/react'
+import { BrowserTracing } from '@sentry/tracing'
+import * as LogRocket from 'logrocket'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
-import { BrowserTracing } from '@sentry/tracing'
 
 WebFont.load({
   google: {

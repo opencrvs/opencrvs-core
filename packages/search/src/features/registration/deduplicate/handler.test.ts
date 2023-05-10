@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  updateComposition,
-  searchByCompositionId
+  searchByCompositionId,
+  updateComposition
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/server'
 import { mockCompositionResponse, mockSearchResponse } from '@search/test/utils'

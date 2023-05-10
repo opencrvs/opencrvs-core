@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { client } from '@search/elasticsearch/client'
+import { advancedSearch } from '@search/features/search/service'
+import { createServer } from '@search/server'
+import {
+  mockAggregationSearchResult,
+  mockSearchResult
+} from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@search/server'
-import { advancedSearch } from '@search/features/search/service'
-import {
-  mockSearchResult,
-  mockAggregationSearchResult
-} from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
 
 jest.mock('./service.ts')
 

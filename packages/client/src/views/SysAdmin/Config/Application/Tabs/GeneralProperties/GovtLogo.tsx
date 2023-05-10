@@ -10,8 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { IAttachmentValue } from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   ApplyButton,
   CancelButton,
@@ -20,29 +26,22 @@ import {
   ErrorMessage,
   Field,
   Label,
-  Message,
-  Value
+  Message
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
-import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   isWithinFileLength,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
-import { IAttachmentValue } from '@client/forms'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { Link } from '@opencrvs/components/lib/Link'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function GovtLogo() {
   const intl = useIntl()

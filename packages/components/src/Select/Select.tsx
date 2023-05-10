@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { default as ReactSelect, components } from 'react-select'
-import styled from 'styled-components'
+import { components, default as ReactSelect } from 'react-select'
 import { Props } from 'react-select/lib/Select'
+import styled from 'styled-components'
 import { Icon } from '../Icon'
 
 import { IndicatorProps } from 'react-select/lib/components/indicators'

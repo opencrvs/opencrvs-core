@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { setex } from '@auth/database'
 import {
-  INVALID_TOKEN_NAMESPACE,
-  CONFIG_TOKEN_EXPIRY_SECONDS
+  CONFIG_TOKEN_EXPIRY_SECONDS,
+  INVALID_TOKEN_NAMESPACE
 } from '@auth/constants'
+import { setex } from '@auth/database'
 
 export async function invalidateToken(token: string) {
   return setex(

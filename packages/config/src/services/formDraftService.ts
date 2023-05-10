@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import Question from '@config/models/question'
-import { logger } from '@config/config/logger'
-import fetch from 'node-fetch'
 import {
   METRICS_URL,
   OPENCRVS_SPECIFICATION_URL,
   SEARCH_URL
 } from '@config/config/constants'
+import { logger } from '@config/config/logger'
 import { IModifyFormDraftPayload } from '@config/handlers/formDraft/updateFormDraft/handler'
-import { fetchFHIR, deleteFHIR } from '@config/services/fhirService'
+import Question from '@config/models/question'
+import { deleteFHIR, fetchFHIR } from '@config/services/fhirService'
+import * as Hapi from '@hapi/hapi'
 import { every } from 'lodash'
+import fetch from 'node-fetch'
 
 export enum HearthCollectionsName {
   Composition = 'Composition',

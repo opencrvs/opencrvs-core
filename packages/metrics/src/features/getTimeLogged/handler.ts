@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
 import {
   COMPOSITION_ID,
   PRACTITIONER_ID,
   STATUS
 } from '@metrics/features/getTimeLogged/constants'
 import {
-  TIME_FROM,
-  TIME_TO,
-  LOCATION_ID,
-  COUNT
-} from '@metrics/features/metrics/constants'
-import {
+  countTimeLoggedForPractitioner,
   getTimeLogged,
   getTimeLoggedByStatus,
-  getTimeLoggedForPractitioner,
-  countTimeLoggedForPractitioner
+  getTimeLoggedForPractitioner
 } from '@metrics/features/getTimeLogged/utils'
-import * as Hapi from '@hapi/hapi'
+import {
+  COUNT,
+  LOCATION_ID,
+  TIME_FROM,
+  TIME_TO
+} from '@metrics/features/metrics/constants'
 
 export async function getTimeLoggedHandler(
   request: Hapi.Request,

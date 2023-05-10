@@ -11,8 +11,8 @@
  */
 import { getAvailableLanguages } from './utils'
 // eslint-disable-next-line import/no-unassigned-import
-import './components/I18nContainer'
 import { locales } from '@client/utils/date-formatting'
+import './components/I18nContainer'
 
 describe('Available languages', () => {
   it('are all defined as date-fns locales', () => {

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
-import { logger } from '@workflow/logger'
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { logger } from '@workflow/logger'
+import fetch from 'node-fetch'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',

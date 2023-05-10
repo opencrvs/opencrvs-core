@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import {
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@client/../../components/lib'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IDeclaration } from '@client/declarations'
 import {
   BirthSection,
@@ -21,32 +26,27 @@ import {
   IFormSection,
   Section
 } from '@client/forms'
-import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/'
-import { getVisibleSections } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions
-} from '@client/../../components/lib'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
 import {
   getBirthSection,
   getDeathSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { messages } from '@client/i18n/messages/views/review'
+import { IStoreState } from '@client/store'
+import { isBase64FileString } from '@client/utils/commonUtils'
+import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
-import { isArray } from 'lodash'
+import { getVisibleSections } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import {
   SECTION_MAPPING,
   ZeroDocument
 } from '@client/views/RegisterForm/review/ReviewSection'
-import { isBase64FileString } from '@client/utils/commonUtils'
-import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/'
+import { isArray } from 'lodash'
+import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/review'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { buttonMessages } from '@client/i18n/messages/buttons'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 interface IProps {

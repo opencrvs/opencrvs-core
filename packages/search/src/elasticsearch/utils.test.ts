@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  detectBirthDuplicates,
   createStatusHistory,
+  detectBirthDuplicates,
   IBirthCompositionBody
 } from '@search/elasticsearch/utils'
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import {
-  mockSearchResponse,
-  mockCompositionBody,
   mockBirthFhirBundle,
-  mockUserModelResponse,
-  mockLocationResponse,
+  mockCompositionBody,
   mockFacilityResponse,
-  mockTaskBirthCorrectionBundle
+  mockLocationResponse,
+  mockSearchResponse,
+  mockTaskBirthCorrectionBundle,
+  mockUserModelResponse
 } from '@search/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
-import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch = fetchAny as any
 

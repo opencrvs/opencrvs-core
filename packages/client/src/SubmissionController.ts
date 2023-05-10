@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import { Action, SubmissionAction } from '@client/forms'
 import { AppStore } from '@client/store'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
-import { Action, SubmissionAction } from '@client/forms'
 import { isNavigatorOnline } from './utils'
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =

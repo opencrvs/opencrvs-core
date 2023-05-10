@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
-import { del, get, set } from '@auth/database'
 import {
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
   JWT_ISSUER,
   NOTIFICATION_SERVICE_URL
 } from '@auth/constants'
-import * as crypto from 'crypto'
-import { resolve } from 'url'
+import { del, get, set } from '@auth/database'
 import { createToken } from '@auth/features/authenticate/service'
+import * as crypto from 'crypto'
+import fetch from 'node-fetch'
+import { resolve } from 'url'
 
 interface ICodeDetails {
   code: string

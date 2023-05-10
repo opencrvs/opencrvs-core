@@ -11,13 +11,13 @@
  */
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Spinner } from '../Spinner'
 import { Button } from '../Button'
-import { Text } from '../Text'
-import { Link } from '../Link'
 import { colors } from '../colors'
-import { useToastVisibility } from './useToastVisibility'
 import { Icon } from '../Icon'
+import { Link } from '../Link'
+import { Spinner } from '../Spinner'
+import { Text } from '../Text'
+import { useToastVisibility } from './useToastVisibility'
 
 const TOAST_DEFAULT_DURATION_MS = 8000
 

@@ -14,21 +14,26 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToCompletenessRates } from '@client/navigation'
+import { Event } from '@client/utils/gateway'
 
+import { SegmentedControl } from '@client/components/SegmentedControl'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import format from '@client/utils/date-formatting'
 import {
-  getJurisidictionType,
   CompletenessRateTime,
   getAdditionalLocations,
+  getJurisidictionType,
   NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import { useCallback } from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -41,11 +46,6 @@ import {
   HAS_CHILD_LOCATION
 } from './queries'
 import { CompletenessDataTable } from './reports/completenessRates/CompletenessDataTable'
-import { useCallback } from 'react'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import format from '@client/utils/date-formatting'
-import { SegmentedControl } from '@client/components/SegmentedControl'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {

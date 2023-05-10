@@ -11,11 +11,11 @@
  */
 
 import {
-  GQLCurrencyInput,
   GQLBirthInput,
+  GQLCountryLogoInput,
+  GQLCurrencyInput,
   GQLDeathInput,
   GQLLoginBackgroundInput,
-  GQLCountryLogoInput,
   GQLMarriageInput
 } from '@gateway/graphql/schema'
 

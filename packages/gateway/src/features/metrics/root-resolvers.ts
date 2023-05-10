@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
 import { getMetrics } from '@gateway/features/fhir/utils'
 import { inScope } from '@gateway/features/user/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export interface IMetricsParam {
   timeStart?: string

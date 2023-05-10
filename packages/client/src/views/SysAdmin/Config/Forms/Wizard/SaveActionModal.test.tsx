@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
 import { MockedResponse } from '@apollo/client/testing'
-import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus, Event } from '@client/utils/gateway'
-import { SaveActionContext, SaveActionModal } from './SaveActionModal'
 import { AppStore, createStore } from '@client/store'
-import { History } from 'history'
 import { createTestComponent, flushPromises } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
+import { DraftStatus, Event } from '@client/utils/gateway'
+import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import React from 'react'
 import { Route } from 'react-router'
+import { SaveActionContext, SaveActionModal } from './SaveActionModal'
 
 const draft: IFormDraft = {
   event: Event.Birth,

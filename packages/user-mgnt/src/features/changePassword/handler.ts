@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { logger } from '@user-mgnt/logger'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import * as Joi from 'joi'
 
 interface IChangePasswordPayload {
   userId: string

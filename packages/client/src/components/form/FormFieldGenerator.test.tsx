@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  selectOption,
-  flushPromises,
-  resizeWindow,
-  createTestComponent
-} from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { ReactWrapper } from 'enzyme'
 import { createDeclaration, storeDeclaration } from '@client/declarations'
+import {
+  BIG_NUMBER,
+  DATE,
+  LOCATION_SEARCH_INPUT,
+  NUMBER,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  TEL
+} from '@client/forms'
+import { countries } from '@client/forms/countries'
+import { formMessages } from '@client/i18n/messages'
+import { LocationType, OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
 import { createStore } from '@client/store'
 import {
-  SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  TEL,
-  BIG_NUMBER,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  LOCATION_SEARCH_INPUT,
-  DATE,
-  NUMBER
-} from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { countries } from '@client/forms/countries'
-import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
-import { formMessages } from '@client/i18n/messages'
+  createTestComponent,
+  flushPromises,
+  resizeWindow,
+  selectOption
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
+import { Event } from '@client/utils/gateway'
+import { dateNotInFuture, phoneNumberFormat } from '@client/utils/validate'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { vi } from 'vitest'
 
 export interface IMotherSectionFormData {

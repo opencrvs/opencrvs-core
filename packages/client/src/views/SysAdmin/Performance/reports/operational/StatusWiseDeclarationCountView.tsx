@@ -11,6 +11,8 @@
  */
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 
+import { Event } from '@client/utils/gateway'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import {
   Description,
   SubHeader
@@ -24,8 +26,6 @@ import {
   WrappedComponentProps
 } from 'react-intl'
 import styled from 'styled-components'
-import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
-import { Event } from '@client/utils/gateway'
 
 type Props = WrappedComponentProps & BaseProps
 

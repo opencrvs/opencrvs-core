@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Text } from '@opencrvs/components/lib/Text'
 import styled from '@client/styledComponents'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 
 export const Content = styled.div`

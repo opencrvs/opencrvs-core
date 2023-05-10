@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ComponentMeta, Story } from '@storybook/react'
-import { Accordion, IAccordionProps } from './Accordion'
 import React from 'react'
+import { Accordion, IAccordionProps } from './Accordion'
 
 export default {
   title: 'Data/Accordion',

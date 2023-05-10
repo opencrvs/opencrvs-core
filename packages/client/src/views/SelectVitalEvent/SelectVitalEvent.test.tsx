@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
+import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('when user is selecting the vital event', () => {
   let app: ReactWrapper

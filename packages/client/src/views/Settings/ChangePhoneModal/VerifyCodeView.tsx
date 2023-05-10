@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Mutation } from '@apollo/client/react/components'
-import { changePhoneMutation } from '@client/views/Settings/mutations'
 import { convertToMSISDN } from '@client/forms/utils'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { useSelector, useDispatch } from 'react-redux'
-import { getUserNonce, getUserDetails } from '@client/profile/profileSelectors'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { Message } from '@client/views/Settings/items/components'
+import { getUserDetails, getUserNonce } from '@client/profile/profileSelectors'
+import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  ChangePhoneMutationVariables,
-  ChangePasswordMutation
+  ChangePasswordMutation,
+  ChangePhoneMutationVariables
 } from '@client/utils/gateway'
+import { Message } from '@client/views/Settings/items/components'
+import { changePhoneMutation } from '@client/views/Settings/mutations'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 interface IProps {
   show: boolean

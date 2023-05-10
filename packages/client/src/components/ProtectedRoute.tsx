@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Route } from 'react-router'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
 import { hasAccessToRoute } from '@client/utils/authUtils'
 import { SystemRoleType } from '@client/utils/gateway'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { Route } from 'react-router'
 
 export interface IProps {
   roles?: SystemRoleType[]

@@ -10,60 +10,60 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  DangerButton,
   PrimaryButton,
   SuccessButton,
-  DangerButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Check } from '@opencrvs/components/lib/icons'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Check } from '@opencrvs/components/lib/icons'
 
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IPrintableDeclaration,
-  modifyDeclaration,
-  writeDeclaration,
-  storeDeclaration,
-  SUBMISSION_STATUS
-} from '@opencrvs/client/src/declarations'
-import { SubmissionAction, CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { CorrectionSection, SubmissionAction } from '@client/forms'
+import { countries } from '@client/forms/countries'
+import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
-  goToHomeTab,
+  formatUrl,
   goBack,
   goToCertificateCorrection,
-  formatUrl
+  goToHomeTab
 } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { getOfflineData } from '@client/offline/selectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
-import { getUserDetails, getScope } from '@client/profile/profileSelectors'
+import { hasRegisterScope } from '@client/utils/authUtils'
+import { Event } from '@client/utils/gateway'
 import {
   previewCertificate,
   printCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
-import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
-  getCountryTranslations,
-  isCertificateForPrintInAdvance,
-  getEventDate,
-  isFreeOfCost,
-  calculatePrice,
-  getRegisteredDate,
-  getRegistrarSignatureHandlebarName
-} from './utils'
-import { getOfflineData } from '@client/offline/selectors'
-import { countries } from '@client/forms/countries'
+  IPrintableDeclaration,
+  modifyDeclaration,
+  storeDeclaration,
+  SUBMISSION_STATUS,
+  writeDeclaration
+} from '@opencrvs/client/src/declarations'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { hasRegisterScope } from '@client/utils/authUtils'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
+import {
+  calculatePrice,
+  getCountryTranslations,
+  getEventDate,
+  getRegisteredDate,
+  getRegistrarSignatureHandlebarName,
+  isCertificateForPrintInAdvance,
+  isFreeOfCost
+} from './utils'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;

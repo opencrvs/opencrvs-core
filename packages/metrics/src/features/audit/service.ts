@@ -11,17 +11,17 @@
  */
 import * as Hapi from '@hapi/hapi'
 
-import { query, writePoints } from '@metrics/influxdb/client'
-import {
-  generateAuditPoint,
-  toInfluxTimestamp
-} from '@metrics/features/registration/pointGenerator'
 import {
   getCompositionIdFromCompositionOrTask,
   getPractitionerIdFromBundle,
   getTask,
   getTrackingId
 } from '@metrics/features/registration/fhirUtils'
+import {
+  generateAuditPoint,
+  toInfluxTimestamp
+} from '@metrics/features/registration/pointGenerator'
+import { query, writePoints } from '@metrics/influxdb/client'
 
 type UserAuditAction =
   | 'DECLARED'

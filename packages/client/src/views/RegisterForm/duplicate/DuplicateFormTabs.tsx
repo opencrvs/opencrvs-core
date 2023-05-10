@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { IDeclaration } from '@client/declarations'
 import {
   IForm,
   IFormData,
@@ -21,52 +21,52 @@ import {
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION
 } from '@client/forms'
-import { useSelector } from 'react-redux'
-import { getOfflineData } from '@client/offline/selectors'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { Event, HumanName, RegStatus, History } from '@client/utils/gateway'
-import { MessageDescriptor, useIntl } from 'react-intl'
-import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { FormTabs, IFormTabs } from '@opencrvs/components/lib/FormTabs'
-import { IDeclaration } from '@client/declarations'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
-import {
-  getErrorsOnFieldsBySection,
-  IErrorsBySection,
-  RequiredField
-} from '@client/views/RegisterForm/review/ReviewSection'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { IFieldErrors } from '@client/forms/validation'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import {
+  recordAuditMessages,
+  regStatusMessages
+} from '@client/i18n/messages/views/recordAudit'
+import { getLanguage } from '@client/i18n/selectors'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import styled from '@client/styledComponents'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { Event, History, HumanName, RegStatus } from '@client/utils/gateway'
+import { IValidationResult } from '@client/utils/validate'
 import {
   getOverriddenFieldsListForPreview,
   isViewOnly,
   isVisibleField,
   renderValue
 } from '@client/views/CorrectionForm/utils'
-import {
-  FullBodyContent,
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/Content'
-import {
-  recordAuditMessages,
-  regStatusMessages
-} from '@client/i18n/messages/views/recordAudit'
-import styled from '@client/styledComponents'
-import { get } from 'lodash'
-import { IValidationResult } from '@client/utils/validate'
-import { IFieldErrors } from '@client/forms/validation'
-import { ComparisonListView } from '@opencrvs/components/lib/ComparisonListView'
-import { Text } from '@opencrvs/components/lib/Text'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { getName, capitalize } from '@client/views/RecordAudit/utils'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { constantsMessages } from '@client/i18n/messages/constants'
+import { capitalize, getName } from '@client/views/RecordAudit/utils'
 import { SupportingDocumentsView } from '@client/views/RegisterForm/duplicate/SupportingDocumentsView'
+import {
+  getErrorsOnFieldsBySection,
+  IErrorsBySection,
+  RequiredField
+} from '@client/views/RegisterForm/review/ReviewSection'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { ComparisonListView } from '@opencrvs/components/lib/ComparisonListView'
+import {
+  Content,
+  ContentSize,
+  FullBodyContent
+} from '@opencrvs/components/lib/Content'
+import { FormTabs, IFormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Text } from '@opencrvs/components/lib/Text'
+import { get } from 'lodash'
+import * as React from 'react'
+import { MessageDescriptor, useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;

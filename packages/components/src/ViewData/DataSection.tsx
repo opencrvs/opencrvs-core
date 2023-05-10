@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IDataProps, DataRow } from './DataRow'
 import { Link } from '../Link'
+import { DataRow, IDataProps } from './DataRow'
 
 const Container = styled.div`
   margin-top: 48px;

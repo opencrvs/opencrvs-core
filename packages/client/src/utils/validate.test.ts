@@ -9,35 +9,34 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { validationMessages as messages } from '@client/i18n/messages'
 import {
-  isAValidPhoneNumberFormat,
-  requiredSymbol,
-  required,
-  minLength,
-  numeric,
-  phoneNumberFormat,
-  dateFormat,
-  emailAddressFormat,
   bengaliOnlyNameFormat,
-  englishOnlyNameFormat,
-  range,
-  validIDNumber,
-  maxLength,
-  isValidBirthDate,
   checkBirthDate,
-  checkMarriageDate,
-  isValidDeathOccurrenceDate,
-  greaterThanZero,
+  dateFormat,
+  dateFormatIsCorrect,
   dateGreaterThan,
+  dateInPast,
   dateLessThan,
   dateNotInFuture,
-  dateFormatIsCorrect,
-  dateInPast,
-  validLength,
+  emailAddressFormat,
+  englishOnlyNameFormat,
+  greaterThanZero,
+  isAValidPhoneNumberFormat,
   isDateAfter,
-  notGreaterThan
+  isValidBirthDate,
+  isValidDeathOccurrenceDate,
+  maxLength,
+  minLength,
+  notGreaterThan,
+  numeric,
+  phoneNumberFormat,
+  range,
+  required,
+  requiredSymbol,
+  validIDNumber,
+  validLength
 } from '@client/utils/validate'
-import { validationMessages as messages } from '@client/i18n/messages'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {

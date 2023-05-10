@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import React from 'react'
+import { CorrectionReason } from '@client/forms/correction/reason'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { messages } from '@client/i18n/messages/views/performance'
 import {
   calculateTotal,
+  ListContainer,
+  PerformanceListHeader,
   PerformanceTitle,
   PerformanceValue,
-  PerformanceListHeader,
-  ReportContainer,
-  ListContainer
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
-import { messages } from '@client/i18n/messages/views/performance'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { CorrectionReason } from '@client/forms/correction/reason'
+import React from 'react'
 import { useIntl } from 'react-intl'
 
 interface CorrectionsReportProps {

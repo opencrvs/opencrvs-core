@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import { createStore } from '@client/store'
 import { createTestComponent, flushPromises } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { FormConfigSettings } from './FormConfigSettings'
-import { vi } from 'vitest'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { vi } from 'vitest'
+import { FormConfigSettings } from './FormConfigSettings'
 
 const { store, history } = createStore()
 let testComponent: ReactWrapper

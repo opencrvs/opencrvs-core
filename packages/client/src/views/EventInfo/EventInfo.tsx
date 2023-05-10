@@ -9,38 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
-import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
-  WrappedComponentProps as IntlShapeProps,
-  MessageDescriptor,
-  injectIntl
-} from 'react-intl'
-import { Event } from '@client/utils/gateway'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/eventInfo'
-import styled from '@client/styledComponents'
-import {
-  TertiaryButton,
-  ICON_ALIGNMENT,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { BulletList } from '@opencrvs/components/lib/BulletList'
-import { connect } from 'react-redux'
 import {
   goBack,
   goToBirthInformant,
   goToDeathInformant,
   goToHome
 } from '@client/navigation'
+import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
+import { BulletList } from '@opencrvs/components/lib/BulletList'
 import {
-  storeDeclaration,
-  IDeclaration,
-  createDeclaration
-} from '@client/declarations'
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import * as React from 'react'
+import {
+  injectIntl,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
 interface IDispatchProps {
   goBack: typeof goBack

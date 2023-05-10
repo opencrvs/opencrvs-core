@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { MockedProvider } from '@apollo/client/testing'
 import { createStore } from '@client/store'
 import { createRouterProps, createTestComponent } from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
+import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { Event } from '@client/utils/gateway'
-import { MockedProvider } from '@apollo/client/testing'
 import {
-  mockRegistrationCountRequest,
   mockPerformanceMetricsRequest,
+  mockRegistrationCountRequest,
   mockTotalCertificationsRequest,
-  mockTotalPaymentsRequest,
-  mockTotalCorrectionsRequest
+  mockTotalCorrectionsRequest,
+  mockTotalPaymentsRequest
 } from './utils'
 
 const graphqlMocks: MockedProvider['props']['mocks'] = [

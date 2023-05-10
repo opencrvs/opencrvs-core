@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
@@ -17,6 +16,7 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export const correctionFeesPayment: IFormSectionGroup = {
   id: 'correctionFeesPayment',

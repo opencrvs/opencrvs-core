@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  previewCertificate,
-  downloadFile
-} from '@client/views/PrintCertificate/PDFUtils'
-import { mockDeathDeclarationData, mockOfflineData } from '@client/tests/util'
-import { createIntl } from 'react-intl'
-import { Event } from '@client/utils/gateway'
-import { omit } from 'lodash'
 import { validImageB64String } from '@client/tests/mock-offline-data'
+import { mockDeathDeclarationData, mockOfflineData } from '@client/tests/util'
+import { Event } from '@client/utils/gateway'
+import {
+  downloadFile,
+  previewCertificate
+} from '@client/views/PrintCertificate/PDFUtils'
+import { omit } from 'lodash'
+import { createIntl } from 'react-intl'
 import { vi } from 'vitest'
 
 const intl = createIntl({

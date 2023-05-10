@@ -10,38 +10,39 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@gateway/common-types'
+import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import {
-  EVENT_TYPE,
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  OPENCRVS_SPECIFICATION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
+  DOWNLOADED_EXTENSION_URL,
   DUPLICATE_TRACKING_ID,
+  EVENT_TYPE,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  OPENCRVS_SPECIFICATION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
   VERIFIED_EXTENSION_URL,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
+  getDeclarationIds,
   getDeclarationIdsFromResponse,
   getIDFromResponse,
-  getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition,
   getRegistrationIds,
-  getDeclarationIds,
+  getRegistrationIdsFromResponse,
   getStatusFromTask,
+  removeDuplicatesFromComposition,
   setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle,
-  ITaskBundle,
   checkUserAssignment,
-  taskBundleWithExtension
+  ITaskBundle,
+  taskBundleWithExtension,
+  updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
@@ -52,15 +53,14 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
-import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
-import { UserInputError } from 'apollo-server-hapi'
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
+import { UserInputError } from 'apollo-server-hapi'
+import fetch from 'node-fetch'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())

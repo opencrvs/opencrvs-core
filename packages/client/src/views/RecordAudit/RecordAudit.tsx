@@ -9,121 +9,119 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import { Mutation } from '@apollo/client/react/components'
 import { Header } from '@client/components/Header/Header'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
-import styled from '@client/styledComponents'
-import {
-  RotateLeft,
-  Archive,
-  DeclarationIcon,
-  Edit,
-  BackArrow,
-  Duplicate
-} from '@opencrvs/components/lib/icons'
-import { connect, useDispatch, useSelector } from 'react-redux'
-import { RouteComponentProps, Redirect, useParams } from 'react-router'
-import {
-  goToHomeTab,
-  goToPage,
-  goToCertificateCorrection,
-  goToPrintCertificate,
-  goToUserProfile,
-  goToTeamUserList,
-  goToViewRecordPage,
-  goToIssueCertificate
-} from '@client/navigation'
-import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps,
-  useIntl
-} from 'react-intl'
+import { Query } from '@client/components/Query'
 import {
   archiveDeclaration,
   clearCorrectionAndPrintChanges,
-  IDeclaration,
-  SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
-  modifyDeclaration
+  IDeclaration,
+  modifyDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { IStoreState } from '@client/store'
-import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Loader } from '@opencrvs/components/lib/Loader'
-import { getScope } from '@client/profile/profileSelectors'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
+import { selectDeclaration } from '@client/declarations/selectors'
+import { CorrectionSection, IForm } from '@client/forms'
+import { IRegisterFormState } from '@client/forms/register/reducer'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { errorMessages } from '@client/i18n/messages/errors'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { getLanguage } from '@client/i18n/selectors'
 import {
-  PrimaryButton,
-  TertiaryButton,
-  ICON_ALIGNMENT,
-  DangerButton,
-  CircleButton
-} from '@opencrvs/components/lib/buttons'
+  goToCertificateCorrection,
+  goToHomeTab,
+  goToIssueCertificate,
+  goToPage,
+  goToPrintCertificate,
+  goToTeamUserList,
+  goToUserProfile,
+  goToViewRecordPage
+} from '@client/navigation'
+import { HOME } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getScope } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
+import { hasRegisterScope, Scope } from '@client/utils/authUtils'
 import {
   ARCHIVED,
   DECLARED,
-  VALIDATED,
-  REJECTED,
   FIELD_AGENT_ROLES,
-  IN_PROGRESS
+  IN_PROGRESS,
+  REJECTED,
+  VALIDATED
 } from '@client/utils/constants'
-import { IQueryData } from '@client/workqueue'
-import { Query } from '@client/components/Query'
-import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
-import { HOME } from '@client/navigation/routes'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { getLanguage } from '@client/i18n/selectors'
 import {
-  MarkEventAsReinstatedMutation,
-  MarkEventAsReinstatedMutationVariables,
   Event,
-  History
+  History,
+  MarkEventAsReinstatedMutation,
+  MarkEventAsReinstatedMutationVariables
 } from '@client/utils/gateway'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { get } from 'lodash'
-import { IRegisterFormState } from '@client/forms/register/reducer'
-import { goBack } from 'connected-react-router'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
+import { IQueryData } from '@client/workqueue'
+import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
-  IDeclarationData,
-  getGQLDeclaration,
-  getDraftDeclarationData,
-  getWQDeclarationData
-} from './utils'
-import { GetDeclarationInfo } from './DeclarationInfo'
+  CircleButton,
+  DangerButton,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  BackArrow,
+  DeclarationIcon,
+  Duplicate,
+  Edit
+} from '@opencrvs/components/lib/icons'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { Loader } from '@opencrvs/components/lib/Loader'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { goBack } from 'connected-react-router'
+import { get } from 'lodash'
+import React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { Redirect, RouteComponentProps, useParams } from 'react-router'
 import {
   ShowDownloadButton,
-  ShowReviewButton,
-  ShowUpdateButton,
+  ShowIssueButton,
   ShowPrintButton,
-  ShowIssueButton
+  ShowReviewButton,
+  ShowUpdateButton
 } from './ActionButtons'
-import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
-import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { Mutation } from '@apollo/client/react/components'
+import { GetDeclarationInfo } from './DeclarationInfo'
+import { GetHistory } from './History'
 import {
   REINSTATE_BIRTH_DECLARATION,
   REINSTATE_DEATH_DECLARATION
 } from './mutations'
-import { selectDeclaration } from '@client/declarations/selectors'
-import { errorMessages } from '@client/i18n/messages/errors'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  getDraftDeclarationData,
+  getGQLDeclaration,
+  getWQDeclarationData,
+  IDeclarationData
+} from './utils'
 
 import { UserDetails } from '@client/utils/userUtils'
 

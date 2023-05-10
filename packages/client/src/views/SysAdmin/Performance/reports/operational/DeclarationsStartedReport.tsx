@@ -10,27 +10,27 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { goToFieldAgentList } from '@client/navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import format from '@client/utils/date-formatting'
+import { getJurisidictionType } from '@client/utils/locationUtils'
 import {
   Description,
-  SubHeader,
-  ReportHeader,
   getJurisdictionLocationIdFromUserDetails,
+  getPrimaryLocationIdOfOffice,
   isUnderJurisdictionOfUser,
-  getPrimaryLocationIdOfOffice
+  ReportHeader,
+  SubHeader
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import styled from 'styled-components'
-import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getJurisidictionType } from '@client/utils/locationUtils'
-import { goToFieldAgentList } from '@client/navigation'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { SYS_ADMIN_ROLES } from '@client/utils/constants'
-import format from '@client/utils/date-formatting'
+import styled from 'styled-components'
 
 const Report = styled.div<{
   total?: boolean

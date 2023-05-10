@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
+import format from '@client/utils/date-formatting'
+import { StatusProgress } from '@opencrvs/components/lib/icons'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { constantsMessages } from '@client/i18n/messages'
-import format from '@client/utils/date-formatting'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};

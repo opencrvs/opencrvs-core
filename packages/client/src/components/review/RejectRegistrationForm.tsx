@@ -11,15 +11,16 @@
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
+  archiveDeclaration,
   IDeclaration,
   IPayload,
-  SUBMISSION_STATUS,
-  archiveDeclaration
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
+import { goToHome } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { Event } from '@client/utils/gateway'
 import {
@@ -29,13 +30,10 @@ import {
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { isEmpty } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { isEmpty } from 'lodash'
-import { goToHome } from '@client/navigation'
-import { HOME } from '@client/navigation/routes'
-import { RouteComponentProps } from 'react-router'
 
 const Instruction = styled.div`
   margin-bottom: 28px;

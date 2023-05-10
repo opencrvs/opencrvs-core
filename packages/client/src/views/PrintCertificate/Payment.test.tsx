@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { storeDeclaration } from '@client/declarations'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { checkAuth } from '@client/profile/profileActions'
+import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockDeclarationData,
+  flushPromises,
   mockDeathDeclarationData,
-  validToken,
+  mockDeclarationData,
   mockUserResponse,
-  flushPromises
+  validToken
 } from '@client/tests/util'
-import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
 import { Payment } from './Payment'
-import { queries } from '@client/profile/queries'
-import { checkAuth } from '@client/profile/profileActions'
-import { vi, Mock } from 'vitest'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
 
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)

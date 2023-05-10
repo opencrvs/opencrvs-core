@@ -11,11 +11,11 @@
  */
 import format from 'date-fns/format'
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
-import enGB from 'date-fns/locale/en-GB'
+import isValid from 'date-fns/isValid'
 import bn from 'date-fns/locale/bn'
+import enGB from 'date-fns/locale/en-GB'
 import fr from 'date-fns/locale/fr'
 import subYears from 'date-fns/subYears'
-import isValid from 'date-fns/isValid'
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 

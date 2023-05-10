@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestApp } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
+import { createTestApp } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
+import { Store } from 'redux'
 
 describe('when app notifies the user', () => {
   let app: ReactWrapper

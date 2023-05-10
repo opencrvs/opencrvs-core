@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch = fetchMock as fetchMock.FetchMock

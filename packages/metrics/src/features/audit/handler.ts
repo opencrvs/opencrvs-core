@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
+import { IUserAuditBody } from '@metrics/features/registration'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
-import { internal } from '@hapi/boom'
-import { IUserAuditBody } from '@metrics/features/registration'
-import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
-import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { countUserAuditEvents, getUserAuditEvents } from './service'
 
 export async function newAuditHandler(
   request: Hapi.Request,

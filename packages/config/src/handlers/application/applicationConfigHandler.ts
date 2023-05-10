@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
+import { logger } from '@config/config/logger'
+import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
+import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
+import getSystems from '@config/handlers/system/systemHandler'
 import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config'
-import { logger } from '@config/config/logger'
 import { badRequest, internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
-import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
-import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
-import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
-import getSystems from '@config/handlers/system/systemHandler'
-import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
 
 export default async function configHandler(
   request: Hapi.Request,

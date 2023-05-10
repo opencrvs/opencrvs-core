@@ -9,14 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToTeamUserList } from '@client/navigation'
-import { IOfflineData, ILocation } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { NoWifi } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
   LocationSearch
@@ -26,10 +30,6 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
-import { NoWifi } from '@opencrvs/components/lib/icons'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { constantsMessages } from '@client/i18n/messages/constants'
-import { buttonMessages } from '@client/i18n/messages/buttons'
 
 interface BaseProps {
   goToTeamUserList: typeof goToTeamUserList

@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as mongoose from 'mongoose'
 import { start, stop } from '@metrics/config/database'
 import { logger } from '@metrics/logger'
+import * as mongoose from 'mongoose'
 
 jest.mock('mongoose', () => ({
   connection: {

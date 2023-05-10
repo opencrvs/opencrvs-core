@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Content, RadioSize } from '@opencrvs/components/lib'
-import { buttonMessages } from '@client/i18n/messages'
-import { useIntl } from 'react-intl'
-import { IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
+import { PrimaryButton } from '@client/../../components/lib/buttons'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  modifyDeclaration,
+  ICertificate,
   IPrintableDeclaration,
-  ICertificate
+  modifyDeclaration
 } from '@client/declarations'
-import { useDispatch } from 'react-redux'
-import { PrimaryButton } from '@client/../../components/lib/buttons'
-import { groupHasError } from '@client/views/CorrectionForm/utils'
+import { IRadioGroupFormField, RADIO_GROUP } from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import {
   goToIssueCertificate,
   goToVerifyIssueCollector
 } from '@client/navigation'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { Event } from '@client/utils/gateway'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { groupHasError } from '@client/views/CorrectionForm/utils'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { Content, RadioSize } from '@opencrvs/components/lib'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
 const fields: IRadioGroupFormField[] = [
   {

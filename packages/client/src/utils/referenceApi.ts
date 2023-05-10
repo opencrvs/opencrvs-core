@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormConfig } from '@client/forms'
+import { questionsTransformer } from '@client/forms/questionConfig'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { questionsTransformer } from '@client/forms/questionConfig'
 import { merge } from 'lodash'
 
 export interface ILocationDataResponse {

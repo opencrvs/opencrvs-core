@@ -9,9 +9,39 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { certificateTemplateMutations } from '@client/certificate/mutations'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { IAttachmentValue, IForm } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { messages } from '@client/i18n/messages/views/config'
+import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
+import {
+  updateOfflineCertificate,
+  updateOfflineConfigData
+} from '@client/offline/actions'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
+import {
+  downloadFile,
+  executeHandlebarsTemplate,
+  printCertificate
+} from '@client/views/PrintCertificate/PDFUtils'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import * as React from 'react'
 import {
   FormattedMessage,
@@ -21,54 +51,24 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { messages } from '@client/i18n/messages/views/config'
-import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
-import { buttonMessages } from '@client/i18n/messages/buttons'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { certificateTemplateMutations } from '@client/certificate/mutations'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Event } from '@client/utils/gateway'
-import { IAttachmentValue, IForm } from '@client/forms'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
   getDummyCertificateTemplateData,
   getDummyDeclarationData
 } from './previewDummyData'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  executeHandlebarsTemplate,
-  printCertificate,
-  downloadFile
-} from '@client/views/PrintCertificate/PDFUtils'
-import { Content } from '@opencrvs/components/lib/Content'
-import {
-  updateOfflineCertificate,
-  updateOfflineConfigData
-} from '@client/offline/actions'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
-import { ICertificateTemplateData } from '@client/utils/referenceApi'
+import { Link, Text, Toggle } from '@client/../../components/lib'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IDeclaration } from '@client/declarations'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { ICertificateTemplateData } from '@client/utils/referenceApi'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   ApplyButton,
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
-import { constantsMessages } from '@client/i18n/messages/constants'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { Link, Text, Toggle } from '@client/../../components/lib'
-import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { UserDetails } from '@client/utils/userUtils'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};

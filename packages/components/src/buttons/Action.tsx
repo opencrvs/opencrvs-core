@@ -12,8 +12,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { Button, IButtonProps } from './Button'
 import { ArrowWithGradient, DisabledArrow } from '../icons'
+import { Button, IButtonProps } from './Button'
 
 const ActionContainer = styled(Button)`
   width: 100%;

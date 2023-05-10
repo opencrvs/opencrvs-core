@@ -9,25 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ResponsiveModal } from '@client/../../components/lib'
 import {
-  NUMBER,
-  TEL,
-  TEXT,
-  TEXTAREA,
   BirthSection,
   DeathSection,
+  IFormDataSet,
   IFormField,
-  SELECT_WITH_OPTIONS,
   ISelectOption,
-  IFormDataSet
+  NUMBER,
+  SELECT_WITH_OPTIONS,
+  TEL,
+  TEXT,
+  TEXTAREA
 } from '@client/forms'
-import {
-  getIdentifiersFromFieldId,
-  ICustomSelectOption,
-  IMessage
-} from '@client/forms/questionConfig'
-import { CreateFormDatasetMutation, Event } from '@client/utils/gateway'
+import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   getCertificateHandlebar,
   ICustomConfigField,
@@ -35,31 +32,49 @@ import {
   isPreviewGroupConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import {
+  getIdentifiersFromFieldId,
+  ICustomSelectOption,
+  IMessage
+} from '@client/forms/questionConfig'
+import {
   buttonMessages,
   formMessageDescriptors,
   locationMessages
 } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import {
   ILanguageState,
   initLanguages,
   IntlMessages
 } from '@client/i18n/reducer'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { client } from '@client/utils/apolloClient'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { CreateFormDatasetMutation, Event } from '@client/utils/gateway'
+import { getBase64String } from '@client/utils/imageUtils'
+import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components/src/Button'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { Link } from '@opencrvs/components/lib/Link'
-import { Select } from '@opencrvs/components/lib/Select'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { Link } from '@opencrvs/components/lib/Link'
 import {
-  ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
+import { Select } from '@opencrvs/components/lib/Select'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Text } from '@opencrvs/components/lib/Text'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { Button } from '@opencrvs/components/src/Button'
 import { camelCase, debounce, isEmpty } from 'lodash'
 import * as React from 'react'
 import {
@@ -68,29 +83,14 @@ import {
   WrappedComponentProps as IntlShapeProp
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
-import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import {
-  Title,
-  Label,
-  RequiredToggleAction,
-  ToolTip,
   ConditionalToggleAction,
-  RegisterFormFieldIds
+  Label,
+  RegisterFormFieldIds,
+  RequiredToggleAction,
+  Title,
+  ToolTip
 } from './components'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import { Text } from '@opencrvs/components/lib/Text'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
-import { getBase64String } from '@client/utils/imageUtils'
-import { ResponsiveModal } from '@client/../../components/lib'
-import { client } from '@client/utils/apolloClient'
-import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
-import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
 

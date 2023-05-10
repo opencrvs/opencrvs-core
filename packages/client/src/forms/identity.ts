@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
-import { TEXT, IDynamicFieldTypeMapper, BIG_NUMBER } from '.'
 import { formMessages as messages } from '@client/i18n/messages'
+import { MessageDescriptor } from 'react-intl'
+import { BIG_NUMBER, IDynamicFieldTypeMapper, TEXT } from '.'
 
 export const NATIONAL_ID = 'NATIONAL_ID'
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'

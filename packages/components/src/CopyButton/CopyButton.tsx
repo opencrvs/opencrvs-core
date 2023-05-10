@@ -11,9 +11,9 @@
  */
 
 import React, { useState } from 'react'
-import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
+import { Text } from '../Text'
 
 type copiedValue = string | null
 type copyFn = (text: string, time: number | null) => Promise<boolean>

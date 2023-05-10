@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus, Event } from '@client/utils/gateway'
-import {
-  ActionState,
-  ActionContext,
-  ActionsModal,
-  Actions
-} from './ActionsModal'
-import { AppStore, createStore } from '@client/store'
-import { History } from 'history'
-import { createTestComponent, flushPromises } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { MockedResponse } from '@apollo/client/testing'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { AppStore, createStore } from '@client/store'
+import { createTestComponent, flushPromises } from '@client/tests/util'
+import { DraftStatus, Event } from '@client/utils/gateway'
+import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import React from 'react'
+import {
+  ActionContext,
+  Actions,
+  ActionsModal,
+  ActionState
+} from './ActionsModal'
 
 const inPreviewDraft: IFormDraft = {
   event: Event.Birth,

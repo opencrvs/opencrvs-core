@@ -11,10 +11,9 @@
  */
 import * as React from 'react'
 
-import styled, { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-import { isEqual } from 'lodash-es'
 import { selectCountryBackground } from '@client/offline/selectors'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 
 export interface IProps {
   children: React.ReactNode

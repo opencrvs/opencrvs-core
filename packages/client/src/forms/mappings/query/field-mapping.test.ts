@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormField } from '@client/forms'
 import {
   eventLocationNameQueryOfflineTransformer,
   identityToFieldTransformer
 } from '@client/forms/mappings/query/field-mappings'
-import { IFormField } from '@client/forms'
 import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
 
 describe('Query FieldMapping', () => {

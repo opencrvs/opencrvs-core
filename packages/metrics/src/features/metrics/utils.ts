@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { differenceInDays, eachMonthOfInterval } from 'date-fns'
+import {
+  fetchChildLocationsByParentId,
+  fetchFHIR,
+  fetchFromResource,
+  fetchLocation
+} from '@metrics/api'
+import { getApplicationConfig } from '@metrics/configApi'
+import {
+  CRUD_BIRTH_RATE_SEC,
+  FEMALE,
+  FEMALE_POPULATION_SEC,
+  JURISDICTION_TYPE_IDENTIFIER,
+  JURISDICTION_TYPE_SEC,
+  MALE,
+  MALE_POPULATION_SEC,
+  OPENCRVS_SPECIFICATION_URL,
+  TOTAL_POPULATION_SEC
+} from '@metrics/features/metrics/constants'
 import {
   IBirthKeyFigures,
   IEstimation
 } from '@metrics/features/metrics/metricsGenerator'
-import {
-  MALE,
-  FEMALE,
-  OPENCRVS_SPECIFICATION_URL,
-  CRUD_BIRTH_RATE_SEC,
-  TOTAL_POPULATION_SEC,
-  MALE_POPULATION_SEC,
-  FEMALE_POPULATION_SEC,
-  JURISDICTION_TYPE_SEC,
-  JURISDICTION_TYPE_IDENTIFIER
-} from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import {
-  fetchLocation,
-  fetchFromResource,
-  fetchFHIR,
-  fetchChildLocationsByParentId
-} from '@metrics/api'
-import { getApplicationConfig } from '@metrics/configApi'
+import { differenceInDays, eachMonthOfInterval } from 'date-fns'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'

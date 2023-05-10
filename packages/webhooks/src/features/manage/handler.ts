@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import {
-  getTokenPayload,
-  getSystem,
-  ISystem,
-  ITokenPayload,
-  generateChallenge
-} from '@webhooks/features/manage/service'
 import { internal } from '@hapi/boom'
-import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
+import * as Hapi from '@hapi/hapi'
+import {
+  generateChallenge,
+  getSystem,
+  getTokenPayload,
+  ISystem,
+  ITokenPayload
+} from '@webhooks/features/manage/service'
 import { logger } from '@webhooks/logger'
-import * as uuid from 'uuid/v4'
+import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
+import * as Joi from 'joi'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
+import * as uuid from 'uuid/v4'
 
 interface IHub {
   callback: string

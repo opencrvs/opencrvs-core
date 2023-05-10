@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createShallowRenderedComponent } from '@client/tests/util'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { createShallowRenderedComponent } from '@client/tests/util'
+import * as React from 'react'
 import { vi } from 'vitest'
 
 describe('image upload component', () => {

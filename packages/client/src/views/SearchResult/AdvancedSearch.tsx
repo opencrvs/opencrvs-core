@@ -13,28 +13,25 @@
 import React, { useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 
-import { injectIntl, useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/config'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { messages } from '@client/i18n/messages/views/config'
+import { injectIntl, useIntl } from 'react-intl'
 
-import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { Content, FormTabs } from '@client/../../components/lib'
+import { Accordion } from '@client/../../components/lib/Accordion'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { IDateRangePickerValue } from '@client/forms'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
-import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { goToAdvancedSearchResult } from '@client/navigation'
-import { pick } from 'lodash'
-import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
-import { Accordion } from '@client/../../components/lib/Accordion'
-import { LocationType } from '@client/utils/gateway'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import {
   getAccordionActiveStateMap,
   IBaseAdvancedSearchState,
@@ -42,8 +39,11 @@ import {
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
+import { LocationType } from '@client/utils/gateway'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { pick } from 'lodash'
 import styled from 'styled-components'
-import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 export enum TabId {
   BIRTH = 'birth',

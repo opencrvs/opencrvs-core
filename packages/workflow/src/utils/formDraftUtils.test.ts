@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import * as fetchAny from 'jest-fetch-mock'
-import {
-  getFormDraft,
-  checkFormDraftStatusToAddTestExtension
-} from '@workflow/utils/formDraftUtils'
-import { testFhirTaskBundle, mockFormDraft } from '@workflow/test/utils'
 import * as fhirModifier from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { mockFormDraft, testFhirTaskBundle } from '@workflow/test/utils'
+import {
+  checkFormDraftStatusToAddTestExtension,
+  getFormDraft
+} from '@workflow/utils/formDraftUtils'
+import { readFileSync } from 'fs'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const fetch = fetchAny as any
 let token: string

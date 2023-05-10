@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { Event, DraftStatus } from '@client/utils/gateway'
-import { useIntl } from 'react-intl'
 import {
-  messages,
-  draftStatusMessages
+  draftStatusMessages,
+  messages
 } from '@client/i18n/messages/views/formConfig'
-import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/Pill'
+import { IStoreState } from '@client/store'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import { DraftVersion, Value } from './components'
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()

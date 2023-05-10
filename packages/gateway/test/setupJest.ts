@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
+import { join } from 'path'
 // eslint-disable-next-line import/no-relative-parent-imports
 import { IDatabaseConnector } from '../src/features/user/database'
 

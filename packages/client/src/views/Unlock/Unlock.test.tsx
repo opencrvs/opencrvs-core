@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from '@client/tests/util'
-import { createStore } from '@client/store'
-import { Unlock } from '@client/views/Unlock/Unlock'
-import { storage } from '@client/storage'
-import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { storage } from '@client/storage'
+import { createStore } from '@client/store'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { vi, Mock } from 'vitest'
+import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { pinValidator } from '@client/views/Unlock/ComparePINs'
+import { Unlock } from '@client/views/Unlock/Unlock'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
 
 const clearPassword = (component: ReactWrapper) => {
   const pinInput = component.find('#pin-input').hostNodes().first()

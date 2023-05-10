@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BirthSection, ISerializedForm } from '@client/forms/index'
-import { formMessageDescriptors } from '@client/i18n/messages'
-import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import {
   birthDocumentForWhomFhirMapping,
   birthDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import { formMessageDescriptors } from '@client/i18n/messages'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export const birthRegisterForms: ISerializedForm = {
   sections: [

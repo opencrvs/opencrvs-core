@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import {
-  verifyUser,
-  storeRetrievalStepInformation,
-  RetrievalSteps,
-  RETRIEVAL_FLOW_USER_NAME,
-  RETRIEVAL_FLOW_PASSWORD
-} from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
+import {
+  RetrievalSteps,
+  RETRIEVAL_FLOW_PASSWORD,
+  RETRIEVAL_FLOW_USER_NAME,
+  storeRetrievalStepInformation,
+  verifyUser
+} from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 
 interface IVerifyUserPayload {
   mobile: string

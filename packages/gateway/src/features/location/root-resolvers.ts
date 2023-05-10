@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL } from '@gateway/constants'
-import { GQLResolver } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {

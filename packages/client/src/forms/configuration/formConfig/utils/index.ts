@@ -11,50 +11,50 @@
  */
 
 import {
-  IFormField,
-  IRadioOption,
-  ISelectOption,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  RADIO_GROUP,
-  SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  ISerializedForm,
+  IDocumentUploaderWithOptionsFormField,
+  IFormDataSet,
+  IFormField,
   IRadioGroupFormField,
   IRadioGroupWithNestedFieldsFormField,
+  IRadioOption,
   ISelectFormFieldWithOptions,
-  IDocumentUploaderWithOptionsFormField,
-  SerializedFormField,
-  IFormDataSet
+  ISelectOption,
+  ISerializedForm,
+  RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SELECT_WITH_OPTIONS,
+  SerializedFormField
 } from '@client/forms'
+import { FieldPosition } from '@client/forms/configuration'
+import { createCustomField } from '@client/forms/configuration/customUtils'
+import { getField } from '@client/forms/configuration/defaultUtils'
+import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import {
-  IQuestionConfig,
-  isDefaultQuestionConfig,
   getConfiguredQuestions,
   getIdentifiersFromFieldId,
+  ICustomQuestionConfig,
   ICustomSelectOption,
-  ICustomQuestionConfig
+  IQuestionConfig,
+  isDefaultQuestionConfig
 } from '@client/forms/questionConfig'
 import { CustomFieldType, Event, QuestionInput } from '@client/utils/gateway'
-import { FieldPosition } from '@client/forms/configuration'
-import { deserializeFormField } from '@client/forms/mappings/deserializer'
-import { createCustomField } from '@client/forms/configuration/customUtils'
-import {
-  isPreviewGroupConfigField,
-  IPreviewGroupConfigField
-} from './previewGroup'
+import { ISelectOption as IDataSourceOption } from '@opencrvs/components/lib/Select'
 import { ICustomConfigField, isCustomConfigField } from './customConfig'
 import {
-  IDefaultConfigField,
   defaultQuestionToConfigField,
-  isDefaultConfigField,
-  hasDefaultFieldChanged
+  hasDefaultFieldChanged,
+  IDefaultConfigField,
+  isDefaultConfigField
 } from './defaultConfig'
-import { getField } from '@client/forms/configuration/defaultUtils'
-import { ISelectOption as IDataSourceOption } from '@opencrvs/components/lib/Select'
+import {
+  IPreviewGroupConfigField,
+  isPreviewGroupConfigField
+} from './previewGroup'
 
-export * from './previewGroup'
 export * from './customConfig'
 export * from './defaultConfig'
+export * from './previewGroup'
 
 export type IConfigField =
   | IDefaultConfigField

@@ -9,37 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { TimeMounted } from '@client/components/TimeMounted'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
 import { ReviewSection } from '@client/forms'
+import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
+  formatUrl,
   goBack,
-  goToPageGroup,
   goToHomeTab,
-  formatUrl
+  goToPageGroup
 } from '@client/navigation'
-import { IStoreState } from '@client/store'
-import {
-  IDVerifier,
-  ICorrectorInfo
-} from '@client/views/CorrectionForm/IDVerifier'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
 import {
   CERTIFICATE_CORRECTION_REVIEW,
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
-import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
-import { TimeMounted } from '@client/components/TimeMounted'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IStoreState } from '@client/store'
 import { Event } from '@client/utils/gateway'
+import {
+  ICorrectorInfo,
+  IDVerifier
+} from '@client/views/CorrectionForm/IDVerifier'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
 
 interface INameField {
   firstNamesField: string

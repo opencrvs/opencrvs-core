@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { FindCursor, Document, MongoClient } from 'mongodb'
 import { createObjectCsvWriter as createCSV } from 'csv-writer'
-import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
+import * as DateFNS from 'date-fns'
 import * as fs from 'fs'
+import { Document, FindCursor, MongoClient } from 'mongodb'
 // eslint-disable-next-line import/no-relative-parent-imports
 import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '../constants'
 

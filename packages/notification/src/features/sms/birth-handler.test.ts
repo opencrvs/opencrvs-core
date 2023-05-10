@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import * as utils from '@notification/features/sms/utils'
 import { createServer } from '@notification/server'
-import * as fetchAny from 'jest-fetch-mock'
 import { translationsMock } from '@notification/tests/util'
+import { readFileSync } from 'fs'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const fetch = fetchAny as any
 describe('Verify birth handlers', () => {

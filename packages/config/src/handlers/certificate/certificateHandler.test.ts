@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@config/server'
 import Certificate, { ICertificateModel } from '@config/models/certificate'
-import * as fetchMock from 'jest-fetch-mock'
-import * as mockingoose from 'mockingoose'
-import * as jwt from 'jsonwebtoken'
+import { createServer } from '@config/server'
 import { readFileSync } from 'fs'
+import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import * as mockingoose from 'mockingoose'
 
 export enum Event {
   BIRTH = 'birth',

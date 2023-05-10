@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import {
   ApolloProvider as ApolloClientProvider,
   ApolloProviderProps
 } from '@apollo/client/react/context'
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import * as React from 'react'
 
 export function ApolloProvider(
   props: Omit<ApolloProviderProps<any>, 'client'> & {

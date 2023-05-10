@@ -10,22 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import {
-  IDeclarationData,
-  getCaptitalizedWord,
-  removeUnderscore
-} from './utils'
-import { IntlShape } from 'react-intl'
-import styled from 'styled-components'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import format from '@client/utils/date-formatting'
-import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages/constants'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { CERTIFIED, ISSUED, REGISTERED } from '@client/utils/constants'
+import format from '@client/utils/date-formatting'
 import { Summary } from '@opencrvs/components/lib/Summary'
+import React from 'react'
+import { IntlShape } from 'react-intl'
+import styled from 'styled-components'
+import {
+  getCaptitalizedWord,
+  IDeclarationData,
+  removeUnderscore
+} from './utils'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

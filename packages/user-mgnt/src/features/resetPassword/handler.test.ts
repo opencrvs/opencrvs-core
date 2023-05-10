@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as mockingoose from 'mockingoose'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
+import { createServer } from '@user-mgnt/server'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import * as mockingoose from 'mockingoose'
 import { Types } from 'mongoose'
 
 const sysAdminToken = jwt.sign(

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { connect } from 'react-redux'
 import { IntlProvider } from 'react-intl'
+import { connect } from 'react-redux'
 
+import { IntlMessages } from '@login/i18n/reducer'
 import { getLanguage, getMessages } from '@login/i18n/selectors'
 import { IStoreState } from '@login/store'
-import { IntlMessages } from '@login/i18n/reducer'
 
 type StateProps = {
   locale: string

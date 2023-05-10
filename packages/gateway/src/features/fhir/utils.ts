@@ -9,71 +9,68 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { v4 as uuid } from 'uuid'
+import { IAuthHeader } from '@gateway/common-types'
 import {
-  createPersonSection,
-  createPersonEntryTemplate,
-  createEncounterSection,
-  createEncounter,
-  createLocationResource,
-  createObservationEntryTemplate,
-  createSupportingDocumentsSection,
-  createDocRefTemplate,
-  createTaskRefTemplate,
-  createRelatedPersonTemplate,
-  createPaymentReconciliationTemplate,
-  createQuestionnaireResponseTemplate,
+  DOCUMENTS_URL,
+  FHIR_URL,
+  HEARTH_URL,
+  METRICS_URL,
+  SEARCH_URL
+} from '@gateway/constants'
+import {
+  ASSIGNED_EXTENSION_URL,
+  BIRTH_REG_NO,
+  DEATH_REG_NO,
+  DOWNLOADED_EXTENSION_URL,
+  EVENT_TYPE,
+  FHIR_OBSERVATION_CATEGORY_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE,
+  MARRIAGE_REG_NO,
+  OPENCRVS_SPECIFICATION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
+} from '@gateway/features/fhir/constants'
+import {
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  BIRTH_ENCOUNTER_CODE,
+  CERTIFICATE_CONTEXT_KEY,
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
-  CERTIFICATE_CONTEXT_KEY,
-  BIRTH_ENCOUNTER_CODE,
+  CORRECTION_CERTIFICATE_DOCS_CODE,
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
+  CORRECTION_CERTIFICATE_DOCS_TITLE,
+  createDocRefTemplate,
+  createEncounter,
+  createEncounterSection,
+  createLocationResource,
+  createObservationEntryTemplate,
+  createPaymentReconciliationTemplate,
+  createPersonEntryTemplate,
+  createPersonSection,
+  createPractitionerEntryTemplate,
+  createQuestionnaireResponseTemplate,
+  createRelatedPersonTemplate,
+  createSupportingDocumentsSection,
+  createTaskRefTemplate,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
   DEATH_ENCOUNTER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
-  createPractitionerEntryTemplate,
-  BIRTH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_CORRECTION_ENCOUNTER_CODE,
-  CORRECTION_CERTIFICATE_DOCS_CODE,
-  CORRECTION_CERTIFICATE_DOCS_TITLE,
-  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY,
   MARRIAGE_CORRECTION_ENCOUNTER_CODE,
   MARRIAGE_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
+import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import {
   ITemplatedBundle,
   ITemplatedComposition
 } from '@gateway/features/registration/fhir-builders'
-import fetch from 'node-fetch'
-import {
-  FHIR_URL,
-  SEARCH_URL,
-  METRICS_URL,
-  HEARTH_URL,
-  DOCUMENTS_URL
-} from '@gateway/constants'
-import { IAuthHeader } from '@gateway/common-types'
-import {
-  FHIR_OBSERVATION_CATEGORY_URL,
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE,
-  BIRTH_REG_NO,
-  DEATH_REG_NO,
-  DOWNLOADED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  MARRIAGE_REG_NO,
-  MARKED_AS_DUPLICATE,
-  MARKED_AS_NOT_DUPLICATE,
-  VERIFIED_EXTENSION_URL,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
-} from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
-import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
-import { URLSearchParams } from 'url'
-import { logger } from '@gateway/logger'
+import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -81,7 +78,10 @@ import {
   GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
-import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import { logger } from '@gateway/logger'
+import fetch from 'node-fetch'
+import { URLSearchParams } from 'url'
+import { v4 as uuid } from 'uuid'
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number

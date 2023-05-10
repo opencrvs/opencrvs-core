@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import Question, { FieldType, IQuestion } from '@config/models/question'
 import { createServer } from '@config/server'
-import Question, { IQuestion, FieldType } from '@config/models/question'
-import * as mockingoose from 'mockingoose'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import * as mockingoose from 'mockingoose'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin'] },

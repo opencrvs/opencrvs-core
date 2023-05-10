@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestComponent, createTestStore } from '@client/tests/util'
-import { DownloadButton } from './DownloadButton'
+import * as declarationReducer from '@client/declarations'
+import { DownloadAction } from '@client/forms'
 import { AppStore } from '@client/store'
+import { createTestComponent, createTestStore } from '@client/tests/util'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
-import { DownloadAction } from '@client/forms'
-import { ReactWrapper } from 'enzyme'
-import * as declarationReducer from '@client/declarations'
-import { vi, SpyInstance } from 'vitest'
+import { SpyInstance, vi } from 'vitest'
+import { DownloadButton } from './DownloadButton'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 

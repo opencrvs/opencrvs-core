@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, Meta } from '@storybook/react'
+import { Meta, Story } from '@storybook/react'
+import React from 'react'
 import styled from 'styled-components'
 import { Icon } from '../Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
-import React from 'react'
 
 interface IProps {
   id: string

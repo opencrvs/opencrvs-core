@@ -9,27 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
+import styled from '@client/styledComponents'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { Event } from '@client/utils/gateway'
 import {
-  IEstimationBase,
-  COMPLETENESS_RATE_REPORT_BASE
+  COMPLETENESS_RATE_REPORT_BASE,
+  IEstimationBase
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/ListTable'
-import { orderBy } from 'lodash'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { Table } from '@opencrvs/components/lib/Table/Table'
 import {
   GQLLocationWiseEstimationMetric,
   GQLMonthWiseEstimationMetric
 } from '@opencrvs/gateway/src/graphql/schema'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import styled from '@client/styledComponents'
-import { Table } from '@opencrvs/components/lib/Table/Table'
+import { orderBy } from 'lodash'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 
 interface ITableProps extends WrappedComponentProps {
   loading: boolean

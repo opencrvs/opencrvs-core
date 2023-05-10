@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import { invalidateToken } from '@auth/features/invalidateToken/service'
+import { logger } from '@auth/logger'
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { internal } from '@hapi/boom'
-import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
-import { logger } from '@auth/logger'
 
 interface IInvalidateTokenPayload {
   token: string

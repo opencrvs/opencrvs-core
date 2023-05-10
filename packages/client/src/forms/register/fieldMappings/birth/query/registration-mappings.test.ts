@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormField } from '@client/forms'
 import {
   changeHirerchyQueryTransformer,
   convertToLocal
 } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
-import { IFormField } from '@client/forms'
 
 describe('registration query mappings tests', () => {
   it('changeHierarchyQueryTransformer test', () => {

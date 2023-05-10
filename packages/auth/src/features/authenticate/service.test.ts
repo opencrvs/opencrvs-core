@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  verifyToken,
-  getStoredUserInformation
+  getStoredUserInformation,
+  verifyToken
 } from '@auth/features/authenticate/service'
 import { isLeft } from 'fp-ts/lib/Either'
 

@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import { AppStore } from '@client/store'
 import {
   createTestComponent,
   createTestStore,
   resizeWindow
 } from '@client/tests/util'
-import { AppStore } from '@client/store'
-import { DateRangePicker } from '@client/components/DateRangePicker'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
-import { Mock, vi } from 'vitest'
 import startOfMonth from 'date-fns/startOfMonth'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
 
 describe('date picker tests', () => {
   let component: ReactWrapper

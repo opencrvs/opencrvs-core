@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IDeclaration } from '@client/declarations'
-import { IntlShape, MessageDescriptor } from 'react-intl'
-import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
 import { IOfflineData } from '@client/offline/reducer'
-import { IAvailableCountries } from '@client/views/PrintCertificate/utils'
 import { UserDetails } from '@client/utils/userUtils'
+import { IAvailableCountries } from '@client/views/PrintCertificate/utils'
+import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export type OptionalData = IAvailableCountries[]
 

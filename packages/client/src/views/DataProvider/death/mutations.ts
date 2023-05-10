@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
+import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {

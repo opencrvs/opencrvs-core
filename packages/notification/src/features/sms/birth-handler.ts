@@ -10,15 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import {
   buildAndSendSMS,
   getTranslations,
   ISMSPayload
 } from '@notification/features/sms/utils'
-import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
+import { getDefaultLanguage } from '@notification/i18n/utils'
+import { logger } from '@notification/logger'
+import * as Joi from 'joi'
 
 export interface IInProgressPayload extends ISMSPayload {
   trackingId: string

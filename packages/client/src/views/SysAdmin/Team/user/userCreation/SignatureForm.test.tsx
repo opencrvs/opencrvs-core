@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { roleQueries } from '@client/forms/user/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String,
-  mockOfflineData,
-  validImageB64String,
-  mockOfflineDataDispatch,
-  mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
+  mockFetchRoleGraphqlOperation,
+  mockOfflineData,
+  mockOfflineDataDispatch,
   mockRoles,
-  mockUserGraphqlOperation
+  mockUserGraphqlOperation,
+  validImageB64String
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { roleQueries } from '@client/forms/user/query/queries'
-import { Mock, describe, expect } from 'vitest'
+import { describe, expect, Mock } from 'vitest'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()

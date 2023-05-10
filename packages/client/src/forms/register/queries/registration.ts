@@ -11,8 +11,8 @@
  */
 import { ApolloQueryResult, gql } from '@apollo/client'
 import {
-  GQLQuery,
-  GQLBirthRegistration
+  GQLBirthRegistration,
+  GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const FETCH_REGISTRATION = gql`

@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import { badRequest, internal } from '@hapi/boom'
 import {
   AUTH_URL,
-  SEARCH_URL,
-  USER_MANAGEMENT_URL,
+  COUNTRY_CONFIG_URL,
   METRICS_URL,
   NOTIFICATION_URL,
-  COUNTRY_CONFIG_URL,
+  SEARCH_URL,
+  USER_MANAGEMENT_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
+import { badRequest, internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 import fetch from 'node-fetch'
 
 export async function checkServiceHealth(url: string) {

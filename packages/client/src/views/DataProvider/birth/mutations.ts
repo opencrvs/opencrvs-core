@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
+import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_BIRTH_DECLARATION = gql`
   mutation createBirthRegistration($details: BirthRegistrationInput!) {

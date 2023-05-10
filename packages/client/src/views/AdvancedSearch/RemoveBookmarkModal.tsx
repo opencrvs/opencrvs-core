@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { useMutation } from '@apollo/client'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
+import { REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION } from '@client/profile/mutations'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { EMPTY_STRING } from '@client/utils/constants'
+import {
+  BookmarkedSeachItem,
+  RemoveBookmarkedAdvancedSearchMutation,
+  RemoveBookmarkedAdvancedSearchMutationVariables
+} from '@client/utils/gateway'
+import { Message } from '@client/views/AdvancedSearch/SaveBookmarkModal'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION } from '@client/profile/mutations'
-import {
-  RemoveBookmarkedAdvancedSearchMutation,
-  RemoveBookmarkedAdvancedSearchMutationVariables,
-  BookmarkedSeachItem
-} from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
-import { useMutation } from '@apollo/client'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { modifyUserDetails } from '@client/profile/profileActions'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { Button } from '@opencrvs/components/lib/Button'
-import { buttonMessages } from '@client/i18n/messages'
-import { Message } from '@client/views/AdvancedSearch/SaveBookmarkModal'
-import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 interface IRemoveBookmarkModalProps {
   showRemoveBookmarkModal: boolean

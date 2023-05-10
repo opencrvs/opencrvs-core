@@ -12,7 +12,7 @@
 
 import React from 'react'
 // import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Story, Meta } from '@storybook/react'
+import { Meta, Story } from '@storybook/react'
 import { BreadCrumb, IBreadCrumbData, IBreadCrumbProps } from './Breadcrumb'
 
 export default {

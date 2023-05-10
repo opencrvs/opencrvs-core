@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
+import { IFormData, IFormField } from '@client/forms'
 import { attachmentToFieldTransformer } from '@client/forms/mappings/query/field-mappings'
 import {
   birthDocumentForWhomFhirMapping,

@@ -11,13 +11,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { IAction, IActionObject } from '../types'
 import {
-  IWorkqueueRow,
-  IconWrapper,
+  ContentWrapper,
   Error,
-  ContentWrapper
+  IconWrapper,
+  IWorkqueueRow
 } from './WorkqueueRowDesktop'
-import { IActionObject, IAction } from '../types'
 
 const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};

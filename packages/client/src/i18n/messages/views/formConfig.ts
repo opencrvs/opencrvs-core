@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
-import { DeathSection, BirthSection } from '@client/forms'
+import { BirthSection, DeathSection } from '@client/forms'
 import { DraftStatus } from '@client/utils/gateway'
 import { Actions } from '@client/views/SysAdmin/Config/Forms/Home/ActionsModal'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {

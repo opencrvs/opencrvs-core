@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Loader, ILoader } from './Loader'
 import React from 'react'
+import { ILoader, Loader } from './Loader'
 
 const Template: Story<ILoader> = (args) => <Loader {...args} />
 

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { gql, InternalRefetchQueriesInclude } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
-import { InternalRefetchQueriesInclude, gql } from '@apollo/client'
 
 const RESEND_SMS_INVITE = gql`
   mutation resendSMSInvite($userId: String!) {

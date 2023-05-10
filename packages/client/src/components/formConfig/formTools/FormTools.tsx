@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, CustomFieldType } from '@client/utils/gateway'
+import { addCustomField } from '@client/forms/configuration/formConfig/actions'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
+import { CustomFieldType, Event } from '@client/utils/gateway'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
-import { useIntl, MessageDescriptor } from 'react-intl'
+import { flushSync } from 'react-dom'
+import { MessageDescriptor, useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
-import { addCustomField } from '@client/forms/configuration/formConfig/actions'
-import { flushSync } from 'react-dom'
 import { CenteredToggle } from './components'
 
 const TitleContainer = styled.div`

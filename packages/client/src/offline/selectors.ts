@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, IOfflineDataState } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
-import { merge } from 'lodash'
 import { UserDetails } from '@client/utils/userUtils'
+import { merge } from 'lodash'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline

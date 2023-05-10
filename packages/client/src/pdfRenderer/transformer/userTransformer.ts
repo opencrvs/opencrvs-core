@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape } from 'react-intl'
+import { userMessages } from '@client/i18n/messages'
 import {
   IFunctionTransformer,
-  TemplateTransformerData,
-  TransformerPayload,
   ILanguagePayload,
-  ILocationPayload
+  ILocationPayload,
+  TemplateTransformerData,
+  TransformerPayload
 } from '@client/pdfRenderer/transformer/types'
-import { userMessages } from '@client/i18n/messages'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { HumanName } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { IntlShape } from 'react-intl'
 
 export function getUserName(
   userDetails: Pick<

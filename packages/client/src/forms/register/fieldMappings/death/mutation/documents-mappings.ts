@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IFormField,
+  DeathSection,
   IFormData,
-  TransformedData,
-  DeathSection
+  IFormField,
+  TransformedData
 } from '@client/forms'
 import { fieldToAttachmentTransformer } from '@client/forms/mappings/mutation/field-mappings'
 

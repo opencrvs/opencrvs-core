@@ -9,53 +9,53 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IFormField,
-  IRadioGroupFormField,
-  ISelectOption,
-  IFormSectionData,
-  IContactPointPhone
-} from '@client/forms'
-import { IOfflineData } from '@client/offline/reducer'
-import { get, has } from 'lodash'
-import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import {
-  generateLocationName,
-  generateFullLocation
-} from '@client/utils/locationUtils'
-import {
-  GQLEventSearchSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLHumanName,
-  GQLAssignmentData,
-  GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { IDynamicValues } from '@client/navigation'
+  IContactPointPhone,
+  IFormField,
+  IFormSectionData,
+  IRadioGroupFormField,
+  ISelectOption
+} from '@client/forms'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {
   recordAuditMessages,
   regActionMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
+import { IDynamicValues } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
 import {
   EMPTY_STRING,
   FIELD_AGENT_ROLES,
   LANG_EN
 } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
 import {
   Event,
+  History,
+  HumanName,
   Maybe,
   RegAction,
   RegStatus,
-  User,
-  History,
-  HumanName
+  User
 } from '@client/utils/gateway'
+import {
+  generateFullLocation,
+  generateLocationName
+} from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  GQLAssignmentData,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchSet,
+  GQLHumanName,
+  GQLMarriageEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
+import { get, has } from 'lodash'
+import { IntlShape } from 'react-intl'
 
 export interface IDeclarationData {
   id: string

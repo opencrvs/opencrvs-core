@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
+import { client } from '@search/elasticsearch/client'
 import {
   indexComposition,
   searchByCompositionId,
@@ -30,20 +33,17 @@ import {
   VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
+  addEventLocation,
   findEntry,
+  findEntryResourceByUrl,
+  findExtension,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
-  getdeclarationJurisdictionIds,
-  addEventLocation,
-  findExtension
+  getdeclarationJurisdictionIds
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
-import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
-import { client } from '@search/elasticsearch/client'
 
 const BRIDE_CODE = 'bride-details'
 const GROOM_CODE = 'groom-details'

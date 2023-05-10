@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
+import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 
+import { loadContent } from '@login/utils/referenceApi'
 import {
   getAvailableLanguages,
   getDefaultLanguage,
   storeLanguage
 } from './utils'
-import { loadContent } from '@login/utils/referenceApi'
 
 export interface IntlMessages {
   [key: string]: string

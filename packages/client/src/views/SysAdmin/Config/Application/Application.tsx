@@ -9,22 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import styled from 'styled-components'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import {
-  ApplicationName,
-  Currency,
-  GovtLogo,
-  NIDNumPattern,
-  PhoneNumPattern,
-  LoginBackground
-} from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
 import {
   BirthDelayedFee,
   BirthDelayedRegistrationTarget,
@@ -40,11 +25,26 @@ import {
   DeathRegistrationTarget
 } from '@client/views/SysAdmin/Config/Application/Tabs/DeathProperties'
 import {
+  ApplicationName,
+  Currency,
+  GovtLogo,
+  LoginBackground,
+  NIDNumPattern,
+  PhoneNumPattern
+} from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
+import {
   MarriageDelayedFee,
   MarriageDelayedRegistrationTarget,
   MarriageFeeOnTime,
   MarriageRegistrationTarget
 } from '@client/views/SysAdmin/Config/Application/Tabs/MarriageProperties'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};

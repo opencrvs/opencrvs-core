@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
 import { Validation } from '@login/utils/validate'
+import { MessageDescriptor } from 'react-intl'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 

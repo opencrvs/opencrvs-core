@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormConfig } from '@client/forms'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { ILocation } from '@client/offline/reducer'
 import {
   CustomFieldType,
   DraftStatus,
@@ -21,7 +20,8 @@ import {
   SystemStatus,
   SystemType
 } from '@client/utils/gateway'
-import { ILocation } from '@client/offline/reducer'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='

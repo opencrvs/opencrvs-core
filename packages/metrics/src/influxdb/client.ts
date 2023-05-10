@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Influx from 'influx'
+import { IPoints } from '@metrics/features/registration'
 import {
   INFLUX_DB,
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
 import { logger } from '@metrics/logger'
-import { IPoints } from '@metrics/features/registration'
+import * as Influx from 'influx'
 import fetch from 'node-fetch'
 
 export const influx = new Influx.InfluxDB({

@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { fieldTransformers } from '@client/pdfRenderer/transformer/fieldTransformer'
-import { userTransformers } from '@client/pdfRenderer/transformer/userTransformer'
 import { offlineTransformers } from '@client/pdfRenderer/transformer/offlineTransformer'
+import { userTransformers } from '@client/pdfRenderer/transformer/userTransformer'
 import { IFunctionTransformer } from './types'
 
 /*

@@ -11,9 +11,9 @@
  */
 
 import React from 'react'
-import { Text } from '../Text'
-import { Stack } from '../Stack'
 import styled from 'styled-components'
+import { Stack } from '../Stack'
+import { Text } from '../Text'
 
 const HideOnLargeScreen = styled(Stack)`
   display: none;

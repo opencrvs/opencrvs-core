@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from 'styled-components'
-import { Spinner } from '@opencrvs/components'
-import { useDispatch, useSelector } from 'react-redux'
 import { configAnonymousUserLoaded } from '@client/offline/actions'
-import { referenceApi } from '@client/utils/referenceApi'
 import { IStoreState } from '@client/store'
+import { referenceApi } from '@client/utils/referenceApi'
+import { Spinner } from '@opencrvs/components'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Route, RouteProps } from 'react-router'
+import styled from 'styled-components'
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;

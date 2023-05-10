@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { sentenceCase } from '@client/utils/data-formatting'
 import {
   AddressCases,
   EventLocationAddressCases
 } from '@client/forms/configuration/administrative/addresses'
 import { IConditional, SerializedFormField } from '@client/forms/index'
+import { sentenceCase } from '@client/utils/data-formatting'
 
 export function getDependency(location: string, useCase: string) {
   switch (location) {

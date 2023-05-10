@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { logger } from '@user-mgnt/logger'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
-import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import { logger } from '@user-mgnt/logger'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import * as Joi from 'joi'
 import fetch from 'node-fetch'
 
 interface IResendSMSPayload {

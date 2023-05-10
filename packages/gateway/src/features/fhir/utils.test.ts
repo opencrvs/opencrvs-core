@@ -9,29 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  selectOrCreateDocRefResource,
-  selectOrCreateCollectorPersonResource,
-  removeDuplicatesFromComposition,
-  selectOrCreateInformantSection,
-  setInformantReference,
-  getDownloadedExtensionStatus
-} from '@gateway/features/fhir/utils'
+import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
 import {
   FATHER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE
 } from '@gateway/features/fhir/templates'
 import {
-  mockFhirBundle,
+  getDownloadedExtensionStatus,
+  removeDuplicatesFromComposition,
+  selectOrCreateCollectorPersonResource,
+  selectOrCreateDocRefResource,
+  selectOrCreateInformantSection,
+  setInformantReference
+} from '@gateway/features/fhir/utils'
+import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
+import { logger } from '@gateway/logger'
+import {
   mockComposition,
+  mockFhirBundle,
   mockTask
 } from '@gateway/utils/testUtils'
-import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
-import { clone, cloneDeep } from 'lodash'
-import { logger } from '@gateway/logger'
 import * as fetchAny from 'jest-fetch-mock'
-import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
+import { clone, cloneDeep } from 'lodash'
 
 const fetch = fetchAny as any
 

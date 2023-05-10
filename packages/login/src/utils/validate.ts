@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
-import { PrimitiveType } from 'intl-messageformat'
 import { messages } from '@login/i18n/messages/validations'
+import { PrimitiveType } from 'intl-messageformat'
+import { MessageDescriptor } from 'react-intl'
 export interface IValidationResult {
   message: MessageDescriptor
   props?: { [key: string]: PrimitiveType }

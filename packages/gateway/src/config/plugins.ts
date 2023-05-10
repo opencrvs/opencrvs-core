@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as JWT from 'hapi-auth-jwt2'
-import * as Pino from 'hapi-pino'
-import * as Sentry from '@sentry/node'
 import { SENTRY_DSN } from '@gateway/constants'
 import { logger } from '@gateway/logger'
 import * as Inert from '@hapi/inert'
 import * as Vision from '@hapi/vision'
+import * as Sentry from '@sentry/node'
+import * as JWT from 'hapi-auth-jwt2'
+import * as Pino from 'hapi-pino'
 import * as HapiSwagger from 'hapi-swagger'
 
 export const getPlugins = () => {

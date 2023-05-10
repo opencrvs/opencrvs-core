@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  generateTrackingIdForEvents,
-  convertStringToASCII,
-  sendEventNotification,
-  getMosipUINToken
-} from '@workflow/features/registration/utils'
+import { Events } from '@workflow/features/events/utils'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import {
+  convertStringToASCII,
+  generateTrackingIdForEvents,
+  getMosipUINToken,
+  sendEventNotification
+} from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import {
-  testFhirBundle,
-  testFhirBundleWithIdsForDeath,
-  officeMock,
   mosipDeceasedPatientMock,
-  mosipSuccessMock
+  mosipSuccessMock,
+  officeMock,
+  testFhirBundle,
+  testFhirBundleWithIdsForDeath
 } from '@workflow/test/utils'
-import { Events } from '@workflow/features/events/utils'
 import * as fetchAny from 'jest-fetch-mock'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 const fetch = fetchAny as any
 

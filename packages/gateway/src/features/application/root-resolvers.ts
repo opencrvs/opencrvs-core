@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { IApplicationConfigPayload } from '@gateway/features/application/type-resolvers'
+import { hasScope } from '@gateway/features/user/utils'
 import {
   GQLBirthInput,
+  GQLCountryLogoInput,
   GQLCurrencyInput,
   GQLDeathInput,
-  GQLCountryLogoInput,
   GQLLoginBackgroundInput,
-  GQLResolver,
-  GQLMarriageInput
+  GQLMarriageInput,
+  GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import { hasScope } from '@gateway/features/user/utils'
-import { IApplicationConfigPayload } from '@gateway/features/application/type-resolvers'
 
 export const resolvers: GQLResolver = {
   Mutation: {

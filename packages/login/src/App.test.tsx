@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestApp, wait } from '@login/tests/util'
+import { createTestApp } from '@login/tests/util'
 
 describe('Login app step one', () => {
   let app: any

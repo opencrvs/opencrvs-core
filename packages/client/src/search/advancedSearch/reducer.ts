@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as actions from '@client/search/advancedSearch/actions'
 import * as offlineActions from '@client/offline/actions'
+import * as actions from '@client/search/advancedSearch/actions'
 import { Loop, LoopReducer } from 'redux-loop'
 
 export type IAdvancedSearchParamState = {

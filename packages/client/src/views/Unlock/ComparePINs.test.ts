@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
-import * as bcrypt from 'bcryptjs'
 import { pinLoader } from '@client/views/Unlock/utils'
+import * as bcrypt from 'bcryptjs'
 import { vi } from 'vitest'
 
 describe('Compare two PINs', () => {

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import {
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
 import * as fetch from 'jest-fetch-mock'
-import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 
 const mockGet = jest.fn()
 jest.mock('apollo-datasource-rest', () => {

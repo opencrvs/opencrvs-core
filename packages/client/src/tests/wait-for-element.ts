@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable import/export */
-import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 
 const MAX_TIME = process.env.CI ? 10000 : 2000
 const INTERVAL = 10

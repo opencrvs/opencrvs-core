@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ILanguage } from '@client/i18n/reducer'
+import { LocationType } from '@client/offline/reducer'
 import {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
@@ -19,9 +21,7 @@ import {
   getJurisidictionType,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-import { LocationType } from '@client/offline/reducer'
 import { createIntl } from 'react-intl'
-import { ILanguage } from '@client/i18n/reducer'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {

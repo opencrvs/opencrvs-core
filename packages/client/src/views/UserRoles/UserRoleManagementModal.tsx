@@ -10,24 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useState } from 'react'
-import { Text } from '@opencrvs/components/lib/Text'
-import { ResponsiveModal, Select, Stack, TextInput } from '@opencrvs/components'
-import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
-import { useIntl } from 'react-intl'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
-import { getAvailableLanguages } from '@client/i18n/utils'
-import { useSelector } from 'react-redux'
-import { getLanguages } from '@client/i18n/selectors'
-import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
 import { messages } from '@client/i18n/messages/views/config'
-import _ from 'lodash'
+import { getLanguages } from '@client/i18n/selectors'
+import { getAvailableLanguages } from '@client/i18n/utils'
+import styled from '@client/styledComponents'
 import {
   ISystemRole,
   RolesInput
 } from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
+import { ResponsiveModal, Select, Stack, TextInput } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Text } from '@opencrvs/components/lib/Text'
+import _ from 'lodash'
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};

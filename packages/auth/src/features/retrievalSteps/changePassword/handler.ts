@@ -16,9 +16,9 @@ import { unauthorized } from '@hapi/boom'
 
 import { changePassword } from '@auth/features/retrievalSteps/changePassword/service'
 import {
+  deleteRetrievalStepInformation,
   getRetrievalStepInformation,
-  RetrievalSteps,
-  deleteRetrievalStepInformation
+  RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {

@@ -11,16 +11,16 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  TIME_FROM,
-  TIME_TO,
-  LOCATION_ID
-} from '@metrics/features/metrics/constants'
-import {
   fetchLocationWiseDeclarationsStarted,
+  getAvgTimeSpentOnAppByPractitioners,
   getNumberOfAppStartedByPractitioners,
-  getNumberOfRejectedAppStartedByPractitioners,
-  getAvgTimeSpentOnAppByPractitioners
+  getNumberOfRejectedAppStartedByPractitioners
 } from '@metrics/features/declarationsStarted/service'
+import {
+  LOCATION_ID,
+  TIME_FROM,
+  TIME_TO
+} from '@metrics/features/metrics/constants'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export async function declarationsStartedHandler(

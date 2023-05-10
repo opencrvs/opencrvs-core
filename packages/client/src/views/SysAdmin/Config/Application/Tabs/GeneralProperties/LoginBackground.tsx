@@ -10,11 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
-import { IStoreState } from '@client/store'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
 import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   callApplicationConfigMutation,
@@ -23,18 +22,13 @@ import {
   isWithinFileLength,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  FormTabs,
-  Link,
-  ListViewItemSimplified,
-  ResponsiveModal,
-  Stack,
-  Text,
-  Toast
-} from '@opencrvs/components/lib'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { IAttachmentValue } from '@client/forms'
+import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   ApplyButton,
   CancelButton,
@@ -45,14 +39,20 @@ import {
   Label,
   Message
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
-import { IAttachmentValue } from '@client/forms'
+import {
+  FormTabs,
+  Link,
+  ListViewItemSimplified,
+  ResponsiveModal,
+  Stack,
+  Text,
+  Toast
+} from '@opencrvs/components/lib'
 
-import { CountryLogo } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
 import { InputField } from '@client/components/form/InputField'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Select2 } from '@opencrvs/components/lib/Select/Select2'
+import styled from 'styled-components'
 
 export enum TabId {
   COLOUR = 'Colour',

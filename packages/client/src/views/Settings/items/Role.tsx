@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { useIntl } from 'react-intl'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 export function Role() {
   const intl = useIntl()

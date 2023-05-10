@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
+import { IDeclaration } from '@client/declarations'
+import { IOfflineData } from '@client/offline/reducer'
 import { commonVFS } from '@client/pdfRenderer/common_vfs'
 import { transformers } from '@client/pdfRenderer/transformer'
 import {
@@ -17,11 +18,10 @@ import {
   ISVGTemplate,
   OptionalData
 } from '@client/pdfRenderer/transformer/types'
-import { IntlShape } from 'react-intl'
-import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
+import { IntlShape } from 'react-intl'
 
 /*
   Converts template definition into actual PDF using defined transformers, declarationData and userDetails

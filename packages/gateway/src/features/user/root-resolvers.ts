@@ -19,10 +19,10 @@ import {
 import {
   getFullName,
   getUser,
+  getUserId,
   hasScope,
   inScope,
-  isTokenOwner,
-  getUserId
+  isTokenOwner
 } from '@gateway/features/user/utils'
 import {
   GQLHumanNameInput,
@@ -33,9 +33,9 @@ import {
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { validateAttachments } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
-import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {

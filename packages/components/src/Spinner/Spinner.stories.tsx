@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, Meta } from '@storybook/react'
-import { Spinner, ISpinner } from './Spinner'
+import { Meta, Story } from '@storybook/react'
 import React from 'react'
+import { ISpinner, Spinner } from './Spinner'
 
 const Template: Story<ISpinner> = (args) => <Spinner {...args} />
 

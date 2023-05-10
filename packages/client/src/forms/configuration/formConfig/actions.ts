@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ICustomConfigField, IConfigField, IDefaultConfigField } from './utils'
-import { IQuestionConfig } from '@client/forms/questionConfig'
-import { Event, CustomFieldType } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IQuestionConfig } from '@client/forms/questionConfig'
+import { CustomFieldType, Event } from '@client/utils/gateway'
+import { IConfigField, ICustomConfigField, IDefaultConfigField } from './utils'
 
 export const ADD_CUSTOM_FIELD = 'FORM/ADD_CUSTOM_FIELD'
 export type AddCustomFieldAction = {

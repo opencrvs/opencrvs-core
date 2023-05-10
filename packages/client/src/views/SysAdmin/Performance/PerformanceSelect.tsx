@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
   ISelect2Option,
   ISelect2Props,
   Select2
 } from '@opencrvs/components/lib/Select/Select2'
+import * as React from 'react'
 
 export interface IPerformanceSelectOption extends ISelect2Option {
   type?: string

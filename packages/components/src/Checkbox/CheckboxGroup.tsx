@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Checkbox } from './Checkbox'
 import styled from 'styled-components'
+import { Checkbox } from './Checkbox'
 
 const Wrapper = styled.div`
   margin-top: 8px;

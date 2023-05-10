@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import { Queue, QueueEvents, Worker, Job } from 'bullmq'
-import { EventEmitter } from 'events'
-import { logger } from '@webhooks/logger'
+import { QUEUE_NAME, REDIS_HOST } from '@webhooks/constants'
 import { getRedis } from '@webhooks/database'
+import { logger } from '@webhooks/logger'
 import { initWorker } from '@webhooks/processor'
+import { Job, Queue, QueueEvents, Worker } from 'bullmq'
+import { EventEmitter } from 'events'
 
 type QueueEventType = {
   jobId: string

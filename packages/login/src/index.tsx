@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createRoot } from 'react-dom/client'
-import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
-import { createStore } from './store'
+import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
+import * as LogRocket from 'logrocket'
+import * as React from 'react'
+import { createRoot } from 'react-dom/client'
+import { createStore } from './store'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as mongoose from 'mongoose'
 import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
 import Redis, * as IORedis from 'ioredis'
+import * as mongoose from 'mongoose'
 const db = mongoose.connection
 
 db.on('disconnected', () => {

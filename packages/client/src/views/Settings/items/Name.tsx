@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { useIntl } from 'react-intl'
-import { userMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import { useUserName } from '@client/utils/userUtils'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
 
 export function Name() {
   const intl = useIntl()

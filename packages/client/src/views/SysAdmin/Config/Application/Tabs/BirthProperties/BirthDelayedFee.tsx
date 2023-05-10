@@ -10,8 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/config'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { BirthActionId } from '@client/views/SysAdmin/Config/Application'
 import {
   ApplyButton,
   CancelButton,
@@ -22,16 +25,6 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { BirthActionId } from '@client/views/SysAdmin/Config/Application'
-import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/config'
-import { buttonMessages } from '@client/i18n/messages'
-import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   getCurrencySymbol,
@@ -40,6 +33,13 @@ import {
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Currency } from '@opencrvs/components/lib/Currency'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function BirthDelayedFee() {
   const intl = useIntl()

@@ -9,21 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { useIntl } from 'react-intl'
+import { convertToMSISDN } from '@client/forms/utils'
+import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
+import { sendVerifyCode } from '@client/profile/profileActions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
-import { convertToMSISDN } from '@client/forms/utils'
 import { queriesForUser } from '@client/views/Settings/queries'
-import { isNull } from 'lodash'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
 
 interface IProps {
   show: boolean

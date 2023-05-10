@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as elasticsearch from '@elastic/elasticsearch'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import {
   compareForBirthDuplication,
@@ -16,7 +17,6 @@ import {
   startContainer,
   stopContainer
 } from './test-util'
-import * as elasticsearch from '@elastic/elasticsearch'
 
 import { StartedElasticsearchContainer } from 'testcontainers'
 

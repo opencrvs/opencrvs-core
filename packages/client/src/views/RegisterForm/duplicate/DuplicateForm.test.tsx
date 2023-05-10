@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import { createDeclaration } from '@client/declarations'
-import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { createStore } from '@client/store'
 import { createTestComponent, selectOption } from '@client/tests/util'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
-import { ReactWrapper } from 'enzyme'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { vi, Mock, SpyInstance } from 'vitest'
+import { Event as DeclarationEvent } from '@client/utils/gateway'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { Mock, SpyInstance, vi } from 'vitest'
 
 const { store, history } = createStore()
 const mockHandler = vi.fn()

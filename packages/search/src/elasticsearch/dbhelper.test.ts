@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { client } from '@search/elasticsearch/client'
 import {
   indexComposition,
-  updateComposition,
-  searchByCompositionId
+  searchByCompositionId,
+  updateComposition
 } from '@search/elasticsearch/dbhelper'
-import { mockCompositionBody } from '@search/test/utils'
-import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
-import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
+import { mockCompositionBody } from '@search/test/utils'
 
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>

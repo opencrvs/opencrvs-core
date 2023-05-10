@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ComponentStory, ComponentMeta } from '@storybook/react'
-import { Alert } from './Alert'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import React, { useState } from 'react'
 import { Icon } from '../Icon'
+import { Alert } from './Alert'
 
 const Template: ComponentStory<typeof Alert> = (args) => {
   return <Alert {...args} />

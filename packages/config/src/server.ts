@@ -10,22 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
 import {
-  PORT,
-  HOST,
-  CHECK_INVALID_TOKEN,
-  CERT_PUBLIC_KEY_PATH,
   AUTH_URL,
+  CERT_PUBLIC_KEY_PATH,
+  CHECK_INVALID_TOKEN,
+  DEFAULT_TIMEOUT,
+  HOST,
   HOSTNAME,
-  DEFAULT_TIMEOUT
+  PORT
 } from '@config/config/constants'
-import getRoutes from '@config/config/routes'
-import getPlugins from '@config/config/plugins'
 import * as database from '@config/config/database'
+import getPlugins from '@config/config/plugins'
+import getRoutes from '@config/config/routes'
+import { logger } from '@config/logger'
+import * as Hapi from '@hapi/hapi'
 import { validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
-import { logger } from '@config/logger'
 
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

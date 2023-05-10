@@ -9,29 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { useIntl } from 'react-intl'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { getTheme } from '@opencrvs/components/lib/theme'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import {
-  ColumnContentAlignment,
-  COLUMNS,
-  Workqueue,
-  SORT_ORDER
-} from '@opencrvs/components/lib/Workqueue'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/notifications'
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import {
-  ConnectionError,
-  StatusSubmissionWaiting as StatusWaiting
-} from '@opencrvs/components/lib/icons'
-import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  IInProgressStatus,
+  INPROGRESS_STATUS,
+  IRetryStatus
+} from '@client/SubmissionController'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import {
   IconWithName,
@@ -39,20 +32,27 @@ import {
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import {
-  ALLOWED_STATUS_FOR_RETRY,
-  IInProgressStatus,
-  INPROGRESS_STATUS,
-  IRetryStatus
-} from '@client/SubmissionController'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { getScope } from '@client/profile/profileSelectors'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Spinner } from '@opencrvs/components/lib'
-import { EMPTY_STRING } from '@client/utils/constants'
+import {
+  ConnectionError,
+  StatusSubmissionWaiting as StatusWaiting
+} from '@opencrvs/components/lib/icons'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  SORT_ORDER,
+  Workqueue
+} from '@opencrvs/components/lib/Workqueue'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''

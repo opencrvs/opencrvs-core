@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
   MALE,
@@ -17,18 +16,19 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   calculateInterval,
+  EVENT_TYPE,
   fetchEstimateByLocation,
   fetchEstimateForTargetDaysByLocationId,
+  fillEmptyDataArrayByKey,
   generateEmptyBirthKeyFigure,
+  getRegistrationTargetDays,
   IPoint,
   LABEL_FOMRAT,
-  Location,
-  EVENT_TYPE,
-  fillEmptyDataArrayByKey,
-  getRegistrationTargetDays
+  Location
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
+import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import { csvToJSON } from '@metrics/utils/csvHelper'
 import { format } from 'date-fns'
 import fetch from 'node-fetch'

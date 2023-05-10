@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 import {
   indexComposition,
   searchByCompositionId,
@@ -42,10 +44,8 @@ import {
   findTaskIdentifier,
   getdeclarationJurisdictionIds
 } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
-import { client } from '@search/elasticsearch/client'
-import { logger } from '@search/logger'
 import { updateCompositionWithDuplicates } from '@search/features/registration/birth/service'
+import { logger } from '@search/logger'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'

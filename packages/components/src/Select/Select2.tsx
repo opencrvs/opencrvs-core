@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import ReactSelect, { components } from 'react-select'
-import styled from 'styled-components'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
+import styled from 'styled-components'
 import { ArrowDownBlue } from '../icons'
 
 export interface ISelect2Option {

@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { RouteScope } from '@search/config/routes'
 import {
   updateEventToAddAssignment,
   updateEventToRemoveAssignment
 } from '@search/features/registration/assignment/service'
 import { logger } from '@search/logger'
-import { internal } from '@hapi/boom'
-import * as Hapi from '@hapi/hapi'
 import { getTokenPayload } from '@search/utils/authUtils'
-import { RouteScope } from '@search/config/routes'
 
 export async function assignEventHandler(
   request: Hapi.Request,

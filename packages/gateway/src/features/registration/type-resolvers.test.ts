@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { typeResolvers } from '@gateway/features/registration/type-resolvers'
-import {
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE
-} from '@gateway/features/fhir/templates'
-import {
-  mockPatient,
-  mockDocumentReference,
-  mockUser,
-  mockTask,
-  mockTaskForDeath,
-  mockComposition,
-  mockObservations,
-  mockLocation,
-  mockRelatedPerson,
-  mockTaskForError,
-  mockCertificateComposition,
-  mockCertificate,
-  mockErrorComposition,
-  mockTaskDownloaded
-} from '@gateway/utils/testUtils'
-import { GQLRegAction } from '@gateway/graphql/schema'
-import { clone } from 'lodash'
-import * as fetchAny from 'jest-fetch-mock'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import {
+  CHILD_CODE,
+  FATHER_CODE,
+  MOTHER_CODE
+} from '@gateway/features/fhir/templates'
+import { typeResolvers } from '@gateway/features/registration/type-resolvers'
+import { GQLRegAction } from '@gateway/graphql/schema'
+import {
+  mockCertificate,
+  mockCertificateComposition,
+  mockComposition,
+  mockDocumentReference,
+  mockErrorComposition,
+  mockLocation,
+  mockObservations,
+  mockPatient,
+  mockRelatedPerson,
+  mockTask,
+  mockTaskDownloaded,
+  mockTaskForDeath,
+  mockTaskForError,
+  mockUser
+} from '@gateway/utils/testUtils'
+import * as fetchAny from 'jest-fetch-mock'
+import { clone } from 'lodash'
 
 const fetch = fetchAny as any
 const mockGet = jest.fn()

@@ -10,29 +10,27 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  Workqueue,
-  ColumnContentAlignment,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/Workqueue'
-import {
-  GQLHumanName,
-  GQLEventSearchResultSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
-import {
-  IDeclaration,
   DOWNLOAD_STATUS,
-  SUBMISSION_STATUS,
-  ITaskHistory
+  IDeclaration,
+  ITaskHistory,
+  SUBMISSION_STATUS
 } from '@client/declarations'
+import { DownloadAction } from '@client/forms'
 import {
-  goToPage as goToPageAction,
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages,
+  wqMessages
+} from '@client/i18n/messages'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import {
+  goToDeclarationRecordAudit,
   goToHomeTab,
-  goToDeclarationRecordAudit
+  goToPage as goToPageAction
 } from '@client/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -40,35 +38,20 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { ITheme, withTheme } from '@client/styledComponents'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { createNamesMap } from '@client/utils/data-formatting'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import {
-  buttonMessages,
-  constantsMessages,
-  dynamicConstantsMessages,
-  wqMessages
-} from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { DownloadAction } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { ITheme, withTheme } from '@client/styledComponents'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { IAction } from '@opencrvs/components/lib/common-types'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
@@ -76,8 +59,25 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { IAction } from '@opencrvs/components/lib/common-types'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  SORT_ORDER,
+  Workqueue
+} from '@opencrvs/components/lib/Workqueue'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchResultSet,
+  GQLHumanName,
+  GQLMarriageEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet

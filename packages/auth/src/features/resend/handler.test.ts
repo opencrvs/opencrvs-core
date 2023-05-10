@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServerWithEnvironment } from '@auth/tests/util'
 import { createServer } from '@auth/server'
+import { createServerWithEnvironment } from '@auth/tests/util'
 
 describe('resend handler receives a request', () => {
   let server: any

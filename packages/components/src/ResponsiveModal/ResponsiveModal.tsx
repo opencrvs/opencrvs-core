@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
+import { Cross } from '../icons'
 
 const ModalContainer = styled.div`
   position: fixed;

@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
-  formMessages as messages,
+  IProtectedAccountSetupData,
+  ISecurityQuestionAnswer,
+  ProtectedAccoutStep
+} from '@client/components/ProtectedAccount'
+import {
   buttonMessages,
-  userMessages,
-  QUESTION_KEYS
+  formMessages as messages,
+  QUESTION_KEYS,
+  userMessages
 } from '@client/i18n/messages'
-import styled from 'styled-components'
-import { InputError } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { Select } from '@opencrvs/components/lib/Select'
-import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  ProtectedAccoutStep,
-  IProtectedAccountSetupData,
-  ISecurityQuestionAnswer
-} from '@client/components/ProtectedAccount'
 import { Content } from '@opencrvs/components/lib/Content'
+import { InputError } from '@opencrvs/components/lib/InputField'
+import { Select } from '@opencrvs/components/lib/Select'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { at, find } from 'lodash'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import styled from 'styled-components'
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3

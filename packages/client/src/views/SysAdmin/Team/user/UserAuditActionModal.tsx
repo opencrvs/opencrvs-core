@@ -9,37 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  TertiaryButton,
-  DangerButton,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { messages } from '@client/i18n/messages/views/sysAdmin'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { LANG_EN } from '@client/utils/constants'
-import { IUserAuditForm } from '@client/user/user-audit'
-import { IStoreState } from '@client/store'
-import { connect } from 'react-redux'
-import { FormFieldGenerator } from '@client/components/form'
-import styled from '@client/styledComponents'
-import { IFormSectionData } from '@client/forms'
-import { hasFormError } from '@client/forms/utils'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { USER_AUDIT_ACTION } from '@client/user/queries'
-import { Dispatch } from 'redux'
-import {
-  showUserAuditSuccessToast,
-  showSubmitFormErrorToast
-} from '@client/notification/actions'
-import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
+import { FormFieldGenerator } from '@client/components/form'
+import { IFormSectionData } from '@client/forms'
+import { hasFormError } from '@client/forms/utils'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/sysAdmin'
+import {
+  showSubmitFormErrorToast,
+  showUserAuditSuccessToast
+} from '@client/notification/actions'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { USER_AUDIT_ACTION } from '@client/user/queries'
+import { IUserAuditForm } from '@client/user/user-audit'
+import { TOAST_MESSAGES } from '@client/user/userReducer'
+import { LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  DangerButton,
+  SuccessButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 const { useState, useEffect } = React
 

@@ -11,6 +11,8 @@
  */
 
 import { TEAM_SEARCH } from '@client/navigation/routes'
+import { checkAuth } from '@client/profile/profileActions'
+import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
   createTestApp,
@@ -20,16 +22,14 @@ import {
   mockUserResponse,
   registerScopeToken
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import { merge } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { TeamSearch } from './TeamSearch'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { checkAuth } from '@client/profile/profileActions'
 import { Mock, vi } from 'vitest'
-import { merge } from 'lodash'
-import { queries } from '@client/profile/queries'
+import { TeamSearch } from './TeamSearch'
 
 describe('Team search test', () => {
   let store: AppStore

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestComponent } from '@client/tests/util'
-import { DeclarationsStartedReport } from './DeclarationsStartedReport'
 import { createStore } from '@client/store'
-import * as React from 'react'
-import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { createTestComponent } from '@client/tests/util'
 import * as locationUtils from '@client/utils/locationUtils'
+import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { DeclarationsStartedReport } from './DeclarationsStartedReport'
 
 describe('Registration rates report', () => {
   const { store, history } = createStore()

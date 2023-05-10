@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IButtonSize, dimensionsMap } from '.'
 import styled from 'styled-components'
+import { dimensionsMap, IButtonSize } from '.'
 
 export enum ICON_ALIGNMENT {
   LEFT,

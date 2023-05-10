@@ -9,34 +9,34 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IAuthHeader } from '@gateway/common-types'
 import {
-  buildFHIRBundle,
-  updateFHIRTaskBundle,
-  taskBundleWithExtension,
-  checkUserAssignment
-} from '@gateway/features/registration/fhir-builders'
-import {
-  FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE,
   FHIR_OBSERVATION_CATEGORY_URL,
-  EVENT_TYPE
+  FHIR_SPECIFICATION_URL,
+  OPENCRVS_SPECIFICATION_URL
 } from '@gateway/features/fhir/constants'
 import {
-  BIRTH_TYPE_CODE,
-  BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
+  LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE,
-  LAST_LIVE_BIRTH_CODE
+  NUMBER_FOEATAL_DEATH_CODE
 } from '@gateway/features/fhir/templates'
-import * as _ from 'lodash'
-import { mockTask } from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
+import {
+  buildFHIRBundle,
+  checkUserAssignment,
+  taskBundleWithExtension,
+  updateFHIRTaskBundle
+} from '@gateway/features/registration/fhir-builders'
+import { mockTask } from '@gateway/utils/testUtils'
 import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import { IAuthHeader } from '@gateway/common-types'
 import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import * as _ from 'lodash'
 
 const fetch = fetchMock as fetchMock.FetchMock
 type AuthHeader = { Authorization?: string } & IAuthHeader

@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
-import { birthEventHandler } from '@search/features/registration/birth/handler'
-import { deathEventHandler } from '@search/features/registration/death/handler'
-import {
-  getAllDocumentsHandler,
-  getStatusWiseRegistrationCountHandler,
-  advancedRecordSearch,
-  searchAssignment,
-  searchForBirthDeDuplication,
-  searchForDeathDeDuplication
-} from '@search/features/search/handler'
-import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 import {
   assignEventHandler,
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
-import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
+import { birthEventHandler } from '@search/features/registration/birth/handler'
+import { deathEventHandler } from '@search/features/registration/death/handler'
+import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import { marriageEventHandler } from '@search/features/registration/marriage/handler'
+import {
+  advancedRecordSearch,
+  getAllDocumentsHandler,
+  getStatusWiseRegistrationCountHandler,
+  searchAssignment,
+  searchForBirthDeDuplication,
+  searchForDeathDeDuplication
+} from '@search/features/search/handler'
+import * as Joi from 'joi'
 
 export const enum RouteScope {
   DECLARE = 'declare',

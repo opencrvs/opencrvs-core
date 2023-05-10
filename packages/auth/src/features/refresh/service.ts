@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import { createToken, ITokenPayload } from '@auth/features/authenticate/service'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 export async function refreshToken(payload: ITokenPayload): Promise<string> {
   return createToken(

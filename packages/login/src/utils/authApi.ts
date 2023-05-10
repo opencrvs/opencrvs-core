@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as Sentry from '@sentry/react'
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 export interface ICodeVerifyData {
   nonce: string

@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { AppStore } from '@client/store'
 import {
   createRouterProps,
   createTestComponent,
   createTestStore
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { AppStore } from '@client/store'
-import { vi } from 'vitest'
-import React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { DashboardEmbedView } from './Dashboard'
 import { Activity } from '@opencrvs/components/lib/icons'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
+import { vi } from 'vitest'
+import { DashboardEmbedView } from './Dashboard'
 
 describe('Leaderboards component', () => {
   let component: ReactWrapper<{}, {}>

@@ -11,13 +11,13 @@
  */
 import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import styled from '@client/styledComponents'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Box } from '@opencrvs/components/lib/Box'
-import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
+import * as Sentry from '@sentry/react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const ErrorContainer = styled(Box)`
   display: flex;

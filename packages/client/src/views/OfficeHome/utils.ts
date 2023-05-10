@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
-import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
+import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import { orderBy } from 'lodash'
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet
   notificationTab: GQLEventSearchResultSet

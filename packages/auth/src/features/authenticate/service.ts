@@ -9,23 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
 import {
-  USER_MANAGEMENT_URL,
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
-  CONFIG_TOKEN_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+  CONFIG_TOKEN_EXPIRY_SECONDS,
+  METRICS_URL,
   PRODUCTION,
   QA_ENV,
-  METRICS_URL
+  USER_MANAGEMENT_URL
 } from '@auth/constants'
-import { resolve } from 'url'
-import { readFileSync } from 'fs'
-import { promisify } from 'util'
-import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
-import * as t from 'io-ts'
 import {
   generateVerificationCode,
   sendVerificationCode,
@@ -35,6 +29,12 @@ import { logger } from '@auth/logger'
 import { unauthorized } from '@hapi/boom'
 import { chainW, tryCatch } from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { readFileSync } from 'fs'
+import * as t from 'io-ts'
+import * as jwt from 'jsonwebtoken'
+import fetch from 'node-fetch'
+import { resolve } from 'url'
+import { promisify } from 'util'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)

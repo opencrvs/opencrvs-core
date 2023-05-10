@@ -9,76 +9,76 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
-  findCompositionSection,
-  findExtension,
-  fetchFHIR,
-  getTimeLoggedFromMetrics,
-  getStatusFromTask,
-  ITimeLoggedResponse,
-  getCertificatesFromTask,
-  getActionFromTask,
-  fetchTaskByCompositionIdFromHearth
-} from '@gateway/features/fhir/utils'
+  DUPLICATE_TRACKING_ID,
+  FHIR_SPECIFICATION_URL,
+  FLAGGED_AS_POTENTIAL_DUPLICATE,
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  OPENCRVS_SPECIFICATION_URL,
+  ORIGINAL_FILE_NAME_SYSTEM,
+  REQUESTING_INDIVIDUAL,
+  SYSTEM_FILE_NAME_SYSTEM
+} from '@gateway/features/fhir/constants'
 import {
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE,
   ATTACHMENT_DOCS_CODE,
-  BIRTH_ENCOUNTER_CODE,
-  BODY_WEIGHT_CODE,
-  BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
+  BIRTH_ENCOUNTER_CODE,
   BIRTH_REG_TYPE_CODE,
-  LAST_LIVE_BIRTH_CODE,
-  NUMBER_BORN_ALIVE_CODE,
-  NUMBER_FOEATAL_DEATH_CODE,
-  DECEASED_CODE,
-  INFORMANT_CODE,
-  DEATH_ENCOUNTER_CODE,
-  MANNER_OF_DEATH_CODE,
+  BIRTH_TYPE_CODE,
+  BODY_WEIGHT_CODE,
+  BRIDE_CODE,
   CAUSE_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE,
-  SPOUSE_CODE,
-  MALE_DEPENDENTS_ON_DECEASED_CODE,
-  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  DEATH_DESCRIPTION_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
+  CAUSE_OF_DEATH_METHOD_CODE,
+  CHILD_CODE,
+  DEATH_DESCRIPTION_CODE,
+  DEATH_ENCOUNTER_CODE,
+  DECEASED_CODE,
+  FATHER_CODE,
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  GROOM_CODE,
+  INFORMANT_CODE,
+  LAST_LIVE_BIRTH_CODE,
+  MALE_DEPENDENTS_ON_DECEASED_CODE,
+  MANNER_OF_DEATH_CODE,
   MARRIAGE_ENCOUNTER_CODE,
   MARRIAGE_TYPE_CODE,
-  BRIDE_CODE,
-  GROOM_CODE,
+  MOTHER_CODE,
+  NUMBER_BORN_ALIVE_CODE,
+  NUMBER_FOEATAL_DEATH_CODE,
+  SPOUSE_CODE,
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE
 } from '@gateway/features/fhir/templates'
 import {
-  GQLQuestionnaireQuestion,
-  GQLRegStatus,
-  GQLResolver
-} from '@gateway/graphql/schema'
+  fetchFHIR,
+  fetchTaskByCompositionIdFromHearth,
+  findCompositionSection,
+  findExtension,
+  getActionFromTask,
+  getCertificatesFromTask,
+  getStatusFromTask,
+  getTimeLoggedFromMetrics,
+  ITimeLoggedResponse
+} from '@gateway/features/fhir/utils'
 import {
-  ORIGINAL_FILE_NAME_SYSTEM,
-  SYSTEM_FILE_NAME_SYSTEM,
-  FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL,
-  REQUESTING_INDIVIDUAL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
-} from '@gateway/features/fhir/constants'
-import {
+  ITaskBundle,
   ITemplatedComposition,
-  SignatureExtensionPostfix,
-  ITaskBundle
+  SignatureExtensionPostfix
 } from '@gateway/features/registration/fhir-builders'
-import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { getSystem, getUser } from '@gateway/features/user/utils'
+import {
+  GQLQuestionnaireQuestion,
+  GQLRegStatus,
+  GQLResolver
+} from '@gateway/graphql/schema'
+import fetch from 'node-fetch'
+import * as validateUUID from 'uuid-validate'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {

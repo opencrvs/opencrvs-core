@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { MapPin, Location, Cross } from '@opencrvs/components/lib/icons'
-import { IStoreState } from '@client/store'
+import {
+  CancelableArea,
+  ContentWrapper,
+  ModalContainer as CommonModalContainer,
+  ModalHeader,
+  PickerButton,
+  TitleContent
+} from '@client/components/DateRangePicker'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { ILocation, LocationType } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import { generateLocations } from '@client/utils/locationUtils'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { colors } from '@opencrvs/components/lib/colors'
+import { Cross, Location, MapPin } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
   LocationSearch
 } from '@opencrvs/components/lib/LocationSearch'
-import { connect } from 'react-redux'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { colors } from '@opencrvs/components/lib/colors'
-import {
-  PickerButton,
-  ContentWrapper,
-  ModalContainer as CommonModalContainer,
-  ModalHeader,
-  TitleContent,
-  CancelableArea
-} from '@client/components/DateRangePicker'
-import styled from '@client/styledComponents'
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { connect } from 'react-redux'
 
 const { useState, useEffect } = React
 

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
-import React from 'react'
-import { Button } from '../Button'
 import { noop } from 'lodash'
+import React from 'react'
+import styled from 'styled-components'
+import { Button } from '../Button'
 
 const ToggleMenuContainer = styled.nav`
   position: relative;

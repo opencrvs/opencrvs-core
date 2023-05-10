@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/review'
+import styled from '@client/styledComponents'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Modal } from '@opencrvs/components/lib/Modal'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import styled from '@client/styledComponents'
-import { Modal } from '@opencrvs/components/lib/Modal'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { messages } from '@client/i18n/messages/views/review'
-import { buttonMessages } from '@client/i18n/messages'
 
 const PreviewButton = styled.a`
   text-decoration: underline;

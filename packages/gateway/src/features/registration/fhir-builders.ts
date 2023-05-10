@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
-import { v4 as uuid } from 'uuid'
+import { IAuthHeader } from '@gateway/common-types'
+import {
+  EVENT_TYPE,
+  FHIR_SPECIFICATION_URL,
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  OPENCRVS_SPECIFICATION_URL,
+  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
+} from '@gateway/features/fhir/constants'
 import {
   ATTACHMENT_CONTEXT_KEY,
   ATTACHMENT_DOCS_CODE,
@@ -21,6 +27,8 @@ import {
   BIRTH_REG_TYPE_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
+  BRIDE_CODE,
+  BRIDE_TITLE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_ESTABLISHED_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
@@ -35,11 +43,16 @@ import {
   FATHER_CODE,
   FATHER_TITLE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  GROOM_CODE,
+  GROOM_TITLE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
   LAST_LIVE_BIRTH_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   MANNER_OF_DEATH_CODE,
+  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
+  MARRIAGE_ENCOUNTER_CODE,
+  MARRIAGE_TYPE_CODE,
   MOTHER_CODE,
   MOTHER_TITLE,
   NUMBER_BORN_ALIVE_CODE,
@@ -50,18 +63,11 @@ import {
   OBSERVATION_CATEGORY_VSIGN_DESC,
   SPOUSE_CODE,
   SPOUSE_TITLE,
-  MARRIAGE_ENCOUNTER_CODE,
-  MARRIAGE_TYPE_CODE,
-  BRIDE_CODE,
-  BRIDE_TITLE,
-  GROOM_CODE,
-  GROOM_TITLE,
+  updateTaskTemplate,
   WITNESS_ONE_CODE,
   WITNESS_ONE_TITLE,
   WITNESS_TWO_CODE,
-  WITNESS_TWO_TITLE,
-  MARRIAGE_CORRECTION_ENCOUNTER_CODE,
-  updateTaskTemplate
+  WITNESS_TWO_TITLE
 } from '@gateway/features/fhir/templates'
 import {
   findBirthDuplicates,
@@ -85,27 +91,21 @@ import {
   selectOrCreateQuestionnaireResource,
   selectOrCreateRelatedPersonResource,
   selectOrCreateTaskRefResource,
+  selectOrCreateWitnessResource,
   setCertificateCollectorReference,
   setInformantReference,
   setObjectPropInResourceArray,
   setQuestionnaireItem,
-  selectOrCreateWitnessResource,
   uploadBase64ToMinio
 } from '@gateway/features/fhir/utils'
-import {
-  EVENT_TYPE,
-  FHIR_SPECIFICATION_URL,
-  HAS_SHOWED_VERIFIED_DOCUMENT,
-  OPENCRVS_SPECIFICATION_URL,
-  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
-} from '@gateway/features/fhir/constants'
-import { IAuthHeader } from '@gateway/common-types'
+import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
+import { v4 as uuid } from 'uuid'
 
 export enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',

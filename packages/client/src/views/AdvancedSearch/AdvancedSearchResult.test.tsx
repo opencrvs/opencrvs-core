@@ -10,28 +10,28 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import {
-  createTestComponent,
-  createRouterProps,
-  flushPromises,
-  userDetails
-} from '@client/tests/util'
-import { AdvancedSearchResult } from './AdvancedSearchResult'
-import { AppStore, createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
 import { formatUrl } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
-import { SEARCH_EVENTS } from '@client/search/queries'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import {
   BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION,
   REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION
 } from '@client/profile/mutations'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import { AppStore, createStore } from '@client/store'
+import {
+  createRouterProps,
+  createTestComponent,
+  flushPromises,
+  userDetails
+} from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import * as React from 'react'
+import { AdvancedSearchResult } from './AdvancedSearchResult'
 
 const graphqlMock = [
   {

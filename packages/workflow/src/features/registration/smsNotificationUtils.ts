@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
+import fetch from 'node-fetch'
 
 export enum InformantSMSNotificationName {
   birthInProgressSMS = 'birthInProgressSMS',

@@ -11,26 +11,25 @@
  */
 import {
   IDeclaration,
-  SUBMISSION_STATUS,
-  IPrintableDeclaration
+  IPrintableDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
-  IForm,
   IFormSectionData,
   MarriageSection
 } from '@client/forms'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { Event, History, RegStatus } from '@client/utils/gateway'
+import { getEvent } from '@client/views/PrintCertificate/utils'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
-import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (
   sectionData: IFormSectionData,

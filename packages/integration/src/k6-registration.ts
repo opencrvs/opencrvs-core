@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { group, check } from 'k6'
+import { check, group } from 'k6'
 import { post } from 'k6/http'
-import genReg from './gen-registration.js'
 import { API_URL } from './constants.js'
-import { fetchToken, chooseElementUsingRate } from './utils.js'
+import genReg from './gen-registration.js'
+import { chooseElementUsingRate, fetchToken } from './utils.js'
 
 export const options = {
   vus: 10,
@@ -27,7 +27,7 @@ export function setup() {
   }
 }
 
-export default data => {
+export default (data) => {
   group('Birth Registration', () => {
     const chosenToken = chooseElementUsingRate(data.tokens)
     const reg = genReg({ femaleRate: 0.45 })
@@ -38,7 +38,7 @@ export default data => {
       }
     })
     check(res, {
-      'is status 200': r => r.status === 200
+      'is status 200': (r) => r.status === 200
     })
   })
 }

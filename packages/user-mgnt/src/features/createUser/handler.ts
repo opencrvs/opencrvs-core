@@ -9,31 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { QA_ENV } from '@user-mgnt/constants'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   generateUsername,
+  getCatchmentAreaIdsByPrimaryOfficeId,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification,
-  getCatchmentAreaIdsByPrimaryOfficeId
+  sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
-  generateSaltedHash,
-  generateRandomPassword
+  generateRandomPassword,
+  generateSaltedHash
 } from '@user-mgnt/utils/hash'
 import {
-  statuses,
-  roleScopeMapping,
+  getUserId,
   hasDemoScope,
-  getUserId
+  roleScopeMapping,
+  statuses
 } from '@user-mgnt/utils/userUtils'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 export default async function createUser(
   request: Hapi.Request,

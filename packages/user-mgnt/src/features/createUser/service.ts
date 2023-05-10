@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import { logger } from '@user-mgnt/logger'
 import { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
-import { logger } from '@user-mgnt/logger'
 
 export const createFhirPractitioner = (
   user: IUser,

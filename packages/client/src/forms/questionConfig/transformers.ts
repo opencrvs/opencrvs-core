@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IDefaultQuestionConfig,
-  ICustomQuestionConfig,
-  IFieldIdentifiers,
-  getFieldIdentifiers,
-  IQuestionConfig,
-  getIdentifiersFromFieldId
-} from '.'
-import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection, ISerializedForm } from '@client/forms'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default/index'
 import {
   getField,
   getFieldId,
   getPrecedingDefaultFieldIdAcrossGroups
 } from '@client/forms/configuration/defaultUtils'
 import { Event, QuestionInput } from '@client/utils/gateway'
-import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default/index'
+import {
+  getFieldIdentifiers,
+  getIdentifiersFromFieldId,
+  ICustomQuestionConfig,
+  IDefaultQuestionConfig,
+  IFieldIdentifiers,
+  IQuestionConfig
+} from '.'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,

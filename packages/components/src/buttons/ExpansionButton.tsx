@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { MinusTransparent, PlusTransparent } from '../icons'
 import { Button, IButtonProps } from './Button'
-import { PlusTransparent, MinusTransparent } from '../icons'
 
 export const StyledButton = styled(Button)`
   border: none;

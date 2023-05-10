@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { getJurisidictionType, isUnderJurisdictionOfUser } from './utils'
-import { GQLLocationType } from '@opencrvs/gateway/src/graphql/schema'
 import { mockOfflineData } from '@client/tests/util'
+import { GQLLocationType } from '@opencrvs/gateway/src/graphql/schema'
+import { getJurisidictionType, isUnderJurisdictionOfUser } from './utils'
 
 describe('Performance util tests', () => {
   describe('getJurisidictionType tests', () => {

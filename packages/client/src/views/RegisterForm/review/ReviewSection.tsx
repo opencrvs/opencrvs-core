@@ -9,32 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  LinkButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   ISelectOption as SelectComponentOptions,
   Text,
   TextArea
 } from '@opencrvs/components/lib/'
-
-import { Alert } from '@opencrvs/components/lib/Alert'
 import {
-  DocumentViewer,
-  IDocumentViewerOptions
-} from '@opencrvs/components/lib/DocumentViewer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { FullBodyContent } from '@opencrvs/components/lib/Content'
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import * as React from 'react'
+
+import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
   BirthSection,
   CHECKBOX,
@@ -74,13 +69,13 @@ import {
   SUBSECTION,
   WARNING
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import {
   getBirthSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
 import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
 import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -121,6 +116,31 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { Event } from '@client/utils/gateway'
+import { generateLocations } from '@client/utils/locationUtils'
+import { IValidationResult } from '@client/utils/validate'
+import {
+  bytesToSize,
+  isCorrection,
+  isFileSizeExceeded
+} from '@client/views/CorrectionForm/utils'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
+import {
+  SignatureGenerator,
+  SignatureInputProps
+} from '@client/views/RegisterForm/review/SignatureGenerator'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { FullBodyContent } from '@opencrvs/components/lib/Content'
+import {
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/DocumentViewer'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
@@ -131,26 +151,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
-import { IValidationResult } from '@client/utils/validate'
-import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { generateLocations } from '@client/utils/locationUtils'
-import {
-  bytesToSize,
-  isCorrection,
-  isFileSizeExceeded
-} from '@client/views/CorrectionForm/utils'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
-import {
-  SignatureGenerator,
-  SignatureInputProps
-} from '@client/views/RegisterForm/review/SignatureGenerator'
-import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};

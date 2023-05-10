@@ -10,29 +10,40 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { goToUserProfile, IDynamicValues } from '@client/navigation'
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import { Table } from '@client/../../components/lib'
+import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
-  IForm,
-  IFormSection,
-  IFormField,
   BirthSection,
-  DeathSection
+  DeathSection,
+  IForm,
+  IFormField,
+  IFormSection
 } from '@client/forms'
+import {
+  CollectorRelationLabelArray,
+  CorrectorRelationLabelArray,
+  CorrectorRelationship
+} from '@client/forms/correction/corrector'
+import { CorrectionReason } from '@client/forms/correction/reason'
 import {
   constantsMessages,
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
-import { History, RegAction, RegStatus } from '@client/utils/gateway'
-import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { isEmpty, find, flatten, values } from 'lodash'
+import { messages } from '@client/i18n/messages/views/correction'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { goToUserProfile, IDynamicValues } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { History, RegAction, RegStatus } from '@client/utils/gateway'
+import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { find, flatten, isEmpty, values } from 'lodash'
+import React from 'react'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
   getFieldValue,
   getFormattedDate,
@@ -40,17 +51,6 @@ import {
   isSystemInitiated,
   isVerifiedAction
 } from './utils'
-import {
-  CollectorRelationLabelArray,
-  CorrectorRelationLabelArray,
-  CorrectorRelationship
-} from '@client/forms/correction/corrector'
-import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { CorrectionReason } from '@client/forms/correction/reason'
-import { Table } from '@client/../../components/lib'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History

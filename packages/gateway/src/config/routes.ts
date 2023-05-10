@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as glob from 'glob'
-import { join, resolve } from 'path'
+import {
+  eventNotificationHandler,
+  fhirBundleSchema,
+  validationFailedAction
+} from '@gateway/features/eventNotification/eventNotificationHandler'
 import healthCheckHandler, {
   querySchema as healthCheckQuerySchema,
   responseSchema as healthCheckResponseSchema
 } from '@gateway/features/healthCheck/handler'
 import {
   createLocationHandler,
+  fetchLocationHandler,
   requestSchema,
   updateLocationHandler,
-  updateSchema,
-  fetchLocationHandler
+  updateSchema
 } from '@gateway/features/restLocation/locationHandler'
-import {
-  eventNotificationHandler,
-  fhirBundleSchema,
-  validationFailedAction
-} from '@gateway/features/eventNotification/eventNotificationHandler'
+import * as glob from 'glob'
+import { join, resolve } from 'path'
 
 export const getRoutes = () => {
   const routes = [

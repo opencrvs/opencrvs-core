@@ -10,15 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IFormField,
-  IFormData,
   ICertificate,
-  TransformedData,
+  IFormData,
+  IFormField,
   IFormFieldMutationMapFunction,
-  DeathSection
+  TransformedData
 } from '@client/forms'
-import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
+import { cloneDeep } from 'lodash'
 
 export const fieldToDeceasedDateTransformation =
   (

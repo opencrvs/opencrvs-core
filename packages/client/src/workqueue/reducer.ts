@@ -9,38 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
-import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
-import { storage } from '@client/storage'
 import {
   getCurrentUserID,
-  IUserData,
   getUserData,
   IDeclaration,
+  IUserData,
   SUBMISSION_STATUS,
   updateWorkqueueData
 } from '@client/declarations'
-import { IStoreState } from '@client/store'
-import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
+import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { IStoreState } from '@client/store'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
+  GQLEventSearchResultSet,
+  GQLEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
+import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 import {
-  UpdateRegistrarWorkqueueAction,
-  UPDATE_REGISTRAR_WORKQUEUE,
-  WorkqueueActions,
-  updateRegistrarWorkqueueSuccessActionCreator,
-  updateRegistrarWorkqueueFailActionCreator,
+  getCurrentUserWorkqueueFailed,
+  getCurrentUserWorkqueuSuccess,
+  GET_WORKQUEUE_SUCCESS,
   IGetWorkqueueOfCurrentUserFailedAction,
   IGetWorkqueueOfCurrentUserSuccessAction,
-  getCurrentUserWorkqueuSuccess,
-  getCurrentUserWorkqueueFailed,
-  GET_WORKQUEUE_SUCCESS,
+  UpdateRegistrarWorkqueueAction,
+  updateRegistrarWorkqueueFailActionCreator,
+  updateRegistrarWorkqueueSuccessActionCreator,
+  UPDATE_REGISTRAR_WORKQUEUE,
   UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
-  UPDATE_WORKQUEUE_PAGINATION
+  UPDATE_WORKQUEUE_PAGINATION,
+  WorkqueueActions
 } from './actions'
 
 export interface IQueryData {

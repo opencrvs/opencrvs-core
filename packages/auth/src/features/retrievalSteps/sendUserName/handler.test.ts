@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as fetchAny from 'jest-fetch-mock'
-import { createServer } from '@auth/server'
 import {
-  storeRetrievalStepInformation,
-  RetrievalSteps
+  RetrievalSteps,
+  storeRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@auth/logger'
+import { createServer } from '@auth/server'
+import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as fetchAny.FetchMock
 

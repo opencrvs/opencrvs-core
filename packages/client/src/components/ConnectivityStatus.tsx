@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Online, Offline } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import { isNavigatorOnline } from '@client/utils'
+import { Offline, Online } from '@opencrvs/components/lib/icons'
+import * as React from 'react'
 
 const StyledOnline = styled.div`
   position: absolute;

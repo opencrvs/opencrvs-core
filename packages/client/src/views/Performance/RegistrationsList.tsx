@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ISearchLocation, Stack } from '@client/../../components/lib'
+import { AvatarSmall } from '@client/components/Avatar'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -21,11 +22,10 @@ import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  IDynamicValues,
+  goToTeamUserList,
   goToUserProfile,
-  goToTeamUserList
+  IDynamicValues
 } from '@client/navigation'
-import { AvatarSmall } from '@client/components/Avatar'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -48,6 +48,7 @@ import {
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
+import { Link } from '@opencrvs/components/lib/Link'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
@@ -59,7 +60,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { Link } from '@opencrvs/components/lib/Link'
 
 const ToolTipContainer = styled.span`
   text-align: center;

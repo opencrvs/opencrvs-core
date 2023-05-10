@@ -1,5 +1,5 @@
-import { ICertificateCorrectorDefinition } from '@client/views/CorrectionForm/VerifyCorrector'
 import { Event } from '@client/utils/gateway'
+import { ICertificateCorrectorDefinition } from '@client/views/CorrectionForm/VerifyCorrector'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public

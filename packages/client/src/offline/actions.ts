@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, IOfflineData } from '@client/offline/reducer'
-import { ILanguageState } from '@client/i18n/reducer'
-import {
-  ILocationDataResponse,
-  IFacilitiesDataResponse,
-  IContentResponse,
-  IApplicationConfigResponse,
-  IApplicationConfig,
-  ICertificateTemplateData,
-  IApplicationConfigAnonymous
-} from '@client/utils/referenceApi'
-import { User, System } from '@client/utils/gateway'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig, IFormDataSet } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IQuestionConfig } from '@client/forms/questionConfig'
+import { ILanguageState } from '@client/i18n/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { System } from '@client/utils/gateway'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  IApplicationConfigResponse,
+  ICertificateTemplateData,
+  IContentResponse,
+  IFacilitiesDataResponse,
+  ILocationDataResponse
+} from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'

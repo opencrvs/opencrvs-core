@@ -11,10 +11,10 @@
  */
 import { createServer } from '@metrics/server'
 
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import * as fetchMock from 'jest-fetch-mock'
 import { influx } from '@metrics/influxdb/client'
+import { readFileSync } from 'fs'
+import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 

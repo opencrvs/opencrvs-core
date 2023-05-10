@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
-import { NOTIFICATION_SERVICE_URL, JWT_ISSUER } from '@auth/constants'
-import { resolve } from 'url'
+import { JWT_ISSUER, NOTIFICATION_SERVICE_URL } from '@auth/constants'
 import { createToken } from '@auth/features/authenticate/service'
+import fetch from 'node-fetch'
+import { resolve } from 'url'
 
 export async function sendUserName(mobile: string, username: string) {
   const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')

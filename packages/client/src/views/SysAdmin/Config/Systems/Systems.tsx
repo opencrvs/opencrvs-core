@@ -41,6 +41,7 @@ import {
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
+import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -50,7 +51,6 @@ import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
-import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
 interface ToggleModal {
   modalVisible: boolean

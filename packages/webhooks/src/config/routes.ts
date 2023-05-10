@@ -11,17 +11,17 @@
  */
 
 import {
-  subscribeWebhooksHandler,
-  reqSubscribeWebhookSchema,
-  listWebhooksHandler,
-  deleteWebhookHandler,
-  deleteWebhookByClientIdHandler
-} from '@webhooks/features/manage/handler'
-import {
   birthRegisteredHandler,
   deathRegisteredHandler,
   marriageRegisteredHandler
 } from '@webhooks/features/event/handler'
+import {
+  deleteWebhookByClientIdHandler,
+  deleteWebhookHandler,
+  listWebhooksHandler,
+  reqSubscribeWebhookSchema,
+  subscribeWebhooksHandler
+} from '@webhooks/features/manage/handler'
 
 export const getRoutes = () => {
   const routes = [

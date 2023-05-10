@@ -11,10 +11,10 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  TIME_FROM,
-  TIME_TO,
+  EVENT,
   LOCATION_ID,
-  EVENT
+  TIME_FROM,
+  TIME_TO
 } from '@metrics/features/metrics/constants'
 import { getTotalPayments } from '@metrics/features/payments/service'
 

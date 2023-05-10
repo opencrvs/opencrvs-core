@@ -10,16 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  getSectionBySectionCode,
+  CAUSE_OF_DEATH_CODE,
+  FHIR_RESOURCE_TYPE,
+  getObservationValueByCode,
   getRegLastLocation,
   getRegLastOffice,
   getResourceByType,
-  getObservationValueByCode,
-  getTimeLoggedFromTask,
-  isNotification,
+  getSectionBySectionCode,
   getStartedByFieldAgent,
-  FHIR_RESOURCE_TYPE,
-  CAUSE_OF_DEATH_CODE
+  getTimeLoggedFromTask,
+  isNotification
 } from '@metrics/features/registration/fhirUtils'
 
 describe('fhirUtils', () => {

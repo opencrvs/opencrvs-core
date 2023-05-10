@@ -9,23 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getUserDetails } from '@client/profile/profileSelectors'
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import {
-  PERFORMANCE_DASHBOARD,
-  PERFORMANCE_HOME,
-  REGISTRAR_HOME
-} from '@client/navigation/routes'
-import { Redirect } from 'react-router'
 import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { UserDetails } from '@client/utils/userUtils'
+import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   NATIONAL_REGISTRAR_ROLES,
   NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { Redirect } from 'react-router'
 
 export function Home() {
   const userDetails = useSelector(getUserDetails)

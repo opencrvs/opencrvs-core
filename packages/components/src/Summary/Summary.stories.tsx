@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
 import { Summary } from './Summary'
-import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 export default {
   title: 'Data/Summary',

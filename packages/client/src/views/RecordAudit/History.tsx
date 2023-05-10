@@ -9,13 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import { AvatarSmall } from '@client/components/Avatar'
+import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { getLanguage } from '@client/i18n/selectors'
+import styled from '@client/styledComponents'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { Avatar, History, RegStatus, SystemType } from '@client/utils/gateway'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { Link } from '@opencrvs/components'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Divider } from '@opencrvs/components/lib/Divider'
+import { Box } from '@opencrvs/components/lib/icons/Box'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
-import { Divider } from '@opencrvs/components/lib/Divider'
-import styled from '@client/styledComponents'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
+import { CMethodParams } from './ActionButtons'
 import {
   getFormattedDate,
   getPageItems,
@@ -24,22 +40,6 @@ import {
   isSystemInitiated,
   isVerifiedAction
 } from './utils'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { CMethodParams } from './ActionButtons'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { getIndividualNameObj } from '@client/utils/userUtils'
-import { AvatarSmall } from '@client/components/Avatar'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
-import { useIntl } from 'react-intl'
-import { Box } from '@opencrvs/components/lib/icons/Box'
-import { v4 as uuid } from 'uuid'
-import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
-import { Link } from '@opencrvs/components'
-import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { getLanguage } from '@client/i18n/selectors'
-import { useSelector } from 'react-redux'
 
 const TableDiv = styled.div`
   overflow: auto;

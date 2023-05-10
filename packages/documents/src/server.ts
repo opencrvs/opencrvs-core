@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@documents/constants'
 import getPlugins from '@documents/config/plugins'
 import { getRoutes } from '@documents/config/routes'
-import { readFileSync } from 'fs'
-import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
 import {
-  defaultMinioBucketExists,
-  createDefaultMinioBucket
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@documents/constants'
+import {
+  createDefaultMinioBucket,
+  defaultMinioBucketExists
 } from '@documents/minio/client'
+import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
+import * as Hapi from '@hapi/hapi'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

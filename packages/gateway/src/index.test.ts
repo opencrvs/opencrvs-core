@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import { createServer } from '@gateway/server'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const fetch = fetchAny as fetchAny.FetchMock
 

@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import { createStore } from '@client/store'
 import {
   createTestComponent,
-  userDetails,
   flushPromises,
   getFileFromBase64String,
+  userDetails,
   validImageB64String
 } from '@client/tests/util'
-import { createStore } from '@client/store'
+import * as imageUtils from '@client/utils/imageUtils'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/ViewData'
 import { ReactWrapper } from 'enzyme'
-import { SEARCH_EVENTS } from '@client/search/queries'
-import { changeAvatarMutation, AvatarChangeModal } from './AvatarChangeModal'
-import * as imageUtils from '@client/utils/imageUtils'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { AvatarChangeModal, changeAvatarMutation } from './AvatarChangeModal'
 
 const graphqlMocks = [
   {

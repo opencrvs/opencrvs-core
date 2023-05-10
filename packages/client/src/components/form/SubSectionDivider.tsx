@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { formMessages } from '@client/i18n/messages'
 import {
   ISubSectionProps,
   SubSectionDivider as SubSectionDividerComponent
 } from '@opencrvs/components/lib/SubSectionDivider'
-import { formMessages } from '@client/i18n/messages'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 export const SubSectionDivider = injectIntl(function FormInputField(
   props: Omit<ISubSectionProps, 'optionalLabel'> & IntlShapeProps

@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as jwt from 'jsonwebtoken'
-import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { chainW, tryCatch } from 'fp-ts/Either'
 import { publicCert } from '@config/server'
+import { chainW, tryCatch } from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
+import * as t from 'io-ts'
+import * as jwt from 'jsonwebtoken'
 import * as decode from 'jwt-decode'
 
 const tokenPayload = t.type({

@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
 import { gql } from '@apollo/client'
-import Cropper from 'react-easy-crop'
-import { Point, Area, Size } from 'react-easy-crop/types'
 import { Mutation } from '@apollo/client/react/components'
-import styled from '@client/styledComponents'
+import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { connect } from 'react-redux'
-import { ImageLoader } from './ImageLoader'
+import styled from '@client/styledComponents'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
-import {
-  withOnlineStatus,
-  IOnlineStatusProps
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { withTheme } from 'styled-components'
-import { Square } from '@opencrvs/components/lib/icons'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Square } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import * as React from 'react'
+import Cropper from 'react-easy-crop'
+import { Area, Point, Size } from 'react-easy-crop/types'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { withTheme } from 'styled-components'
+import { ImageLoader } from './ImageLoader'
 
 const Container = styled.div`
   align-self: center;

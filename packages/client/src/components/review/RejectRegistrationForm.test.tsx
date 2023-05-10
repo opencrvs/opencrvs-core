@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { createDeclaration } from '@client/declarations'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/RejectRegistrationForm'
 import { Event } from '@client/utils/gateway'
-import { createDeclaration } from '@client/declarations'
+import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/RejectRegistrationForm'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { vi } from 'vitest'
 
 const { store, history } = createStore()

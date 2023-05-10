@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import * as fetchMock from 'jest-fetch-mock'
 import {
-  fetchFHIR,
   deleteFHIR,
+  fetchFHIR,
   IAuthHeader
 } from '@config/services/fhirService'
 import { HearthCollectionsName } from '@config/services/formDraftService'
+import { readFileSync } from 'fs'
+import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin', 'demo'] },

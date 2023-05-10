@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IPrintableDeclaration } from '@client/declarations'
 import {
   IFormData,
   IFormSectionGroup,
   IRadioGroupWithNestedFieldsFormField,
   ISelectOption
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
-import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
-import { IPrintableDeclaration } from '@client/declarations'
-import { IntlShape } from 'react-intl'
+import { getAvailableLanguages } from '@client/i18n/utils'
 import { IOfflineData } from '@client/offline/reducer'
+import { Event } from '@client/utils/gateway'
 import differenceInDays from 'date-fns/differenceInDays'
+import { IntlShape } from 'react-intl'
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365

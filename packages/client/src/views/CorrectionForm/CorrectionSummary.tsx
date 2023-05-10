@@ -9,57 +9,70 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { FormFieldGenerator } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import { connect } from 'react-redux'
-import { get, propertyOf } from 'lodash'
 import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
+  CorrectionSection,
+  IForm,
+  IFormData,
+  IFormField,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IPreviewGroup,
+  ReviewSection,
+  REVIEW_OVERRIDE_POSITION,
+  SubmissionAction
+} from '@client/forms'
+import { CorrectorRelationship } from '@client/forms/correction/corrector'
+import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
+import { CorrectionReason } from '@client/forms/correction/reason'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/correction'
+import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { getLanguage } from '@client/i18n/selectors'
 import {
   goBack,
   goToCertificateCorrection,
   goToHomeTab,
   goToPageGroup
 } from '@client/navigation'
-import { messages as registerMessages } from '@client/i18n/messages/views/register'
-import { messages } from '@client/i18n/messages/views/correction'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
-  IFormSection,
-  IFormField,
-  IForm,
-  IFormSectionGroup,
-  IFormSectionData,
-  CorrectionSection,
-  ReviewSection,
-  IFormData,
-  IPreviewGroup,
-  REVIEW_OVERRIDE_POSITION,
-  SubmissionAction
-} from '@client/forms'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SuccessButton,
-  SecondaryButton,
-  LinkButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { UserDetails } from '@client/utils/userUtils'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import {
+  ICON_ALIGNMENT,
+  LinkButton,
+  SecondaryButton,
+  SuccessButton
+} from '@opencrvs/components/lib/buttons'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Check, PaperClip } from '@opencrvs/components/lib/icons'
+import { Table } from '@opencrvs/components/lib/Table'
+import { get } from 'lodash'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { FormFieldGenerator } from '@client/components/form'
-import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
 import {
   getNestedFieldValue,
   getOverriddenFieldsListForPreview,
@@ -72,20 +85,6 @@ import {
   sectionHasError,
   updateDeclarationRegistrationWithCorrection
 } from './utils'
-import { IStoreState } from '@client/store'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getLanguage } from '@client/i18n/selectors'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { CorrectorRelationship } from '@client/forms/correction/corrector'
-import { CorrectionReason } from '@client/forms/correction/reason'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Location } from '@client/utils/gateway'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { UserDetails } from '@client/utils/userUtils'
 
 const SupportingDocument = styled.div`
   display: flex;

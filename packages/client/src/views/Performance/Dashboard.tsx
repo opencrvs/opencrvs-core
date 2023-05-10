@@ -11,16 +11,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { messages } from '@client/i18n/messages/views/dashboard'
+import { goBack, goToPerformanceHome } from '@client/navigation'
+import styled from '@client/styledComponents'
+import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import IframeResizer from 'iframe-resizer-react'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch } from 'react-redux'
-import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
-import { goBack, goToPerformanceHome } from '@client/navigation'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
-import IframeResizer from 'iframe-resizer-react'
-import { messages } from '@client/i18n/messages/views/dashboard'
 import { useLocation } from 'react-router'
 
 const StyledIFrame = styled(IframeResizer)`

@@ -10,9 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { useEffect, useRef, useState } from 'react'
-import { useIntl } from 'react-intl'
+import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
+import styled from '@client/styledComponents'
+import { getBase64String } from '@client/utils/imageUtils'
+import {
+  ApplyButton,
+  CancelButton
+} from '@client/views/SysAdmin/Config/Application/Components'
 import {
   ErrorText,
   ImageUploader,
@@ -23,14 +28,9 @@ import {
   SecondaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
-import { getBase64String } from '@client/utils/imageUtils'
-import {
-  ApplyButton,
-  CancelButton
-} from '@client/views/SysAdmin/Config/Application/Components'
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import { useEffect, useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
 import SignatureCanvas from 'react-signature-canvas'
 
 const InputWrapper = styled.div`

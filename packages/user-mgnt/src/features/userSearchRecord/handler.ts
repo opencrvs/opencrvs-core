@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { logger } from '@user-mgnt/logger'
-import User, { IUserModel, Event } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { logger } from '@user-mgnt/logger'
+import User, { Event, IUserModel } from '@user-mgnt/model/user'
 import * as Joi from 'joi'
 import * as uuid from 'uuid/v4'
 

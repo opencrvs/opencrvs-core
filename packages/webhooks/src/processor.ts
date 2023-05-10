@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { Worker } from 'bullmq'
 import * as IORedis from 'ioredis'
+import fetch from 'node-fetch'
 
 export interface IProcessData {
   url: string

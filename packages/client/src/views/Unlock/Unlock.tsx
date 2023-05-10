@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from 'styled-components'
+import { AvatarLarge } from '@client/components/Avatar'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/pin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -20,19 +20,19 @@ import { IStoreState } from '@client/store'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
+import { Box, Stack, Text, Toast } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import React from 'react'
 import {
   injectIntl,
   useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { buttonMessages, userMessages } from '@client/i18n/messages'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { AvatarLarge } from '@client/components/Avatar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import styled from 'styled-components'
 
 import { BackgroundWrapper } from '@client/views/common/Common'
 

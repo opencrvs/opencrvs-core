@@ -9,18 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
   createDeclaration,
-  IDeclaration,
-  storeDeclaration,
-  SUBMISSION_STATUS,
-  makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS,
-  modifyDeclaration
+  IDeclaration,
+  makeDeclarationReadyToDownload,
+  modifyDeclaration,
+  storeDeclaration,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
@@ -32,20 +31,21 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
+  flushPromises,
   mockUserResponse,
-  resizeWindow,
-  flushPromises
+  resizeWindow
 } from '@client/tests/util'
-import { merge } from 'lodash'
-import * as React from 'react'
-import { InProgress, SELECTOR_ID } from './InProgress'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { Event } from '@client/utils/gateway'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { formattedDuration } from '@client/utils/date-formatting'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { vi, Mock } from 'vitest'
+import { merge } from 'lodash'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
+import { InProgress, SELECTOR_ID } from './InProgress'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'

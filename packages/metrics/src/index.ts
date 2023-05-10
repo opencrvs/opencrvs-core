@@ -11,12 +11,12 @@
  */
 
 // eslint-disable-next-line import/no-unassigned-import
+import { createServer } from '@metrics/server'
 import '@opencrvs/commons/monitoring'
+import { PRODUCTION } from './constants'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-import { createServer } from '@metrics/server'
-import { PRODUCTION } from './constants'
 
 createServer().then((server) => {
   server.start().catch((err) => {

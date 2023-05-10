@@ -11,9 +11,9 @@
  */
 
 import { Meta, Story } from '@storybook/react'
-import { CopyButton, ICopyProps } from './CopyButton'
-import { Stack } from '../Stack'
 import React from 'react'
+import { Stack } from '../Stack'
+import { CopyButton, ICopyProps } from './CopyButton'
 
 const Template: Story<ICopyProps> = (args) => {
   return (

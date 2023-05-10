@@ -20,8 +20,8 @@ import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
-import { FieldAgentList } from './FieldAgentList'
 import { vi } from 'vitest'
+import { FieldAgentList } from './FieldAgentList'
 
 describe('Field agent list tests', () => {
   let component: ReactWrapper<{}, {}>

@@ -16,20 +16,21 @@ import {
 } from '@client/declarations'
 import {
   BirthSection,
-  ViewType,
+  DATE,
+  DeathSection,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  LOCATION_SEARCH_INPUT,
+  MarriageSection,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
-  DeathSection,
   TEXT,
-  LOCATION_SEARCH_INPUT,
-  DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  MarriageSection
+  ViewType
 } from '@client/forms'
-import { Event as DeclarationEvent } from '@client/utils/gateway'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import * as profileSelectors from '@client/profile/profileSelectors'
 import * as declarationSelectors from '@client/forms/register/declaration-selectors'
+import { formMessages } from '@client/i18n/messages'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { LocationType } from '@client/offline/reducer'
+import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -37,21 +38,20 @@ import {
   mockOfflineData,
   resizeWindow
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import { REJECTED } from '@client/utils/constants'
+import { Event as DeclarationEvent } from '@client/utils/gateway'
+import { phoneNumberFormat } from '@client/utils/validate'
 import {
   renderSelectDynamicLabel,
   ReviewSection
 } from '@client/views/RegisterForm/review/ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { v4 as uuid } from 'uuid'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
-import { phoneNumberFormat } from '@client/utils/validate'
-import { formMessages } from '@client/i18n/messages'
-import { LocationType } from '@client/offline/reducer'
-import { vi, Mock, SpyInstance } from 'vitest'
+import { v4 as uuid } from 'uuid'
+import { Mock, SpyInstance, vi } from 'vitest'
 
 const { store, history } = createStore()
 const mockHandler = vi.fn()

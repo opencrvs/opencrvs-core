@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { ComponentStory, ComponentMeta } from '@storybook/react'
-import { Icon } from './Icon'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
+import { Icon } from './Icon'
 
 const Template: ComponentStory<typeof Icon> = (args) => {
   return <Icon {...args} />

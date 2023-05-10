@@ -10,32 +10,32 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  createDeclaration,
+  IDeclaration,
+  IUserData,
+  storeDeclaration
+} from '@client/declarations'
+import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
+import { storage } from '@client/storage'
+import {
   createTestApp,
   flushPromises,
-  userDetails,
+  getFileFromBase64String,
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
-  setPageVisibility,
-  getFileFromBase64String,
-  validImageB64String,
+  goToSection,
   selectOption,
-  goToSection
+  setPageVisibility,
+  userDetails,
+  validImageB64String
 } from '@client/tests/util'
-import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
-import {
-  storeDeclaration,
-  createDeclaration,
-  IDeclaration,
-  IUserData
-} from '@client/declarations'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { storage } from '@client/storage'
-import { Event } from '@client/utils/gateway'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { vi, Mock } from 'vitest'
+import { Mock, vi } from 'vitest'
 
 describe('when user has starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {

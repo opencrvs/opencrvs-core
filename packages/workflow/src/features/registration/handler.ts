@@ -9,46 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
-import {
-  markBundleAsCertified,
-  markBundleAsValidated,
-  markEventAsRegistered,
-  modifyRegistrationBundle,
-  setTrackingId,
-  markBundleAsWaitingValidation,
-  updatePatientIdentifierWithRN,
-  touchBundle,
-  markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection,
-  validateDeceasedDetails,
-  makeTaskAnonymous,
-  markBundleAsIssued
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import {
-  getEventInformantName,
-  getFromFhir,
-  getPhoneNo,
-  getSharedContactMsisdn,
-  postToHearth,
-  generateEmptyBundle,
-  mergePatientIdentifier
-} from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  sendEventNotification,
-  sendRegisteredNotification,
-  isEventNonNotifiable
-} from '@workflow/features/registration/utils'
-import {
-  taskHasInput,
-  getTaskEventType
-} from '@workflow/features/task/fhir/utils'
-import { logger } from '@workflow/logger'
-import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import fetch from 'node-fetch'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   Events,
@@ -56,6 +18,44 @@ import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
 } from '@workflow/features/events/utils'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  makeTaskAnonymous,
+  markBundleAsCertified,
+  markBundleAsDeclarationUpdated,
+  markBundleAsIssued,
+  markBundleAsRequestedForCorrection,
+  markBundleAsValidated,
+  markBundleAsWaitingValidation,
+  markEventAsRegistered,
+  modifyRegistrationBundle,
+  setTrackingId,
+  touchBundle,
+  updatePatientIdentifierWithRN,
+  validateDeceasedDetails
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  generateEmptyBundle,
+  getEventInformantName,
+  getFromFhir,
+  getPhoneNo,
+  getSharedContactMsisdn,
+  mergePatientIdentifier,
+  postToHearth
+} from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  isEventNonNotifiable,
+  sendEventNotification,
+  sendRegisteredNotification
+} from '@workflow/features/registration/utils'
+import {
+  getTaskEventType,
+  taskHasInput
+} from '@workflow/features/task/fhir/utils'
+import { logger } from '@workflow/logger'
+import { getToken } from '@workflow/utils/authUtils'
+import fetch from 'node-fetch'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string

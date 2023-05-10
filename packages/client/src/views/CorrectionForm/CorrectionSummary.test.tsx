@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@client/store'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  createTestComponent,
-  mockDeclarationData,
-  createRouterProps,
-  flushPromises,
-  mockDeathDeclarationData,
-  getRegisterFormFromStore,
-  mockOfflineData
-} from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
-import { CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import {
+  DOWNLOAD_STATUS,
   IDeclaration,
-  storeDeclaration,
-  DOWNLOAD_STATUS
+  storeDeclaration
 } from '@client/declarations'
-import { CorrectionForm } from './CorrectionForm'
+import { CorrectionSection } from '@client/forms'
+import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { createStore } from '@client/store'
+import {
+  createRouterProps,
+  createTestComponent,
+  flushPromises,
+  getRegisterFormFromStore,
+  mockDeathDeclarationData,
+  mockDeclarationData,
+  mockOfflineData
+} from '@client/tests/util'
+import { draftToGqlTransformer } from '@client/transformer'
+import { Event } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { CorrectionForm } from './CorrectionForm'
 
 let wrapper: ReactWrapper<{}, {}>
 

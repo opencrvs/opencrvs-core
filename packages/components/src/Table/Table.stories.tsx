@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useState } from 'react'
-import { Table } from './Table'
 import { ComponentMeta } from '@storybook/react'
-import { SortArrow } from '../icons'
 import { orderBy } from 'lodash'
+import React, { useState } from 'react'
+import { SortArrow } from '../icons'
+import { Table } from './Table'
 
 export default {
   title: 'Data/Table',

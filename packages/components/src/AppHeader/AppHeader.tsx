@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
 import { grid } from '../grid'
-import { MobileHeader, IMobileHeaderProps } from './Mobile/MobileHeader'
+import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
+import { IMobileHeaderProps, MobileHeader } from './Mobile/MobileHeader'
 
 export interface IDomProps {
   id?: string

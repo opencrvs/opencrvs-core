@@ -14,22 +14,22 @@ import {
   searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
+import { searchForDeathDuplicates } from '@search/features/registration/deduplicate/service'
 import { createServer } from '@search/server'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
+  mockEncounterResponse,
   mockLocationResponse,
   mockMinimalDeathFhirBundle,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
-  mockUserModelResponse,
-  mockEncounterResponse
+  mockUserModelResponse
 } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { searchForDeathDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 

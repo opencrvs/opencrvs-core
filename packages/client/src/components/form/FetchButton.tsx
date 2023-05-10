@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { ApolloConsumer, ApolloError, ApolloQueryResult } from '@apollo/client'
 import styled from '@client/styledComponents'
-import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
+import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Success, Error } from '@opencrvs/components/lib/icons'
-import { IQuery } from '@opencrvs/client/src/forms'
 import { isNavigatorOnline } from '@client/utils'
+import { IQuery } from '@opencrvs/client/src/forms'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Error, Success } from '@opencrvs/components/lib/icons'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import * as Sentry from '@sentry/react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 
 interface IFetchButtonProps {
   id: string

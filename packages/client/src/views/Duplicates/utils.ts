@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { gql } from '@apollo/client'
-import { Registration, Maybe } from '@client/utils/gateway'
+import { Maybe, Registration } from '@client/utils/gateway'
 
 export type FetchDuplicateDeatilsQuery = {
   registration?: Maybe<Pick<Registration, 'trackingId'>>

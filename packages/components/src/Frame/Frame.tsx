@@ -14,8 +14,8 @@ import styled from 'styled-components'
 import { Layout, LayoutCentered } from './components/Layout'
 import { Section } from './components/Section'
 import {
-  SkipToContent,
-  MAIN_CONTENT_ANCHOR_ID
+  MAIN_CONTENT_ANCHOR_ID,
+  SkipToContent
 } from './components/SkipToContent'
 
 export interface IFrameProps {

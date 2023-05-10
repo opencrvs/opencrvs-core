@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
-import styled from 'styled-components'
+import {
+  IProtectedAccountSetupData,
+  ProtectedAccoutStep
+} from '@client/components/ProtectedAccount'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/userSetup'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
+import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import {
-  ProtectedAccoutStep,
-  IProtectedAccountSetupData
-} from '@client/components/ProtectedAccount'
-import { messages } from '@client/i18n/messages/views/userSetup'
-import { buttonMessages } from '@client/i18n/messages'
-import { Content } from '@opencrvs/components/lib/Content'
-import { EMPTY_STRING } from '@client/utils/constants'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};

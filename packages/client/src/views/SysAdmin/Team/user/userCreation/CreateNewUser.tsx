@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloClient } from '@apollo/client'
+import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import {
   IFormSection,
   IFormSectionData,
@@ -17,9 +19,12 @@ import {
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { goBack } from '@client/navigation'
+import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { gqlToDraftTransformer } from '@client/transformer'
 import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
@@ -30,15 +35,10 @@ import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm
 import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ApolloClient } from '@apollo/client'
-import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 
 interface IMatchParams {
   userId?: string

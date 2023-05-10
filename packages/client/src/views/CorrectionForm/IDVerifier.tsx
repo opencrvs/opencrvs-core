@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { identityNameMapper } from '@client/forms/identity'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { identityNameMapper } from '@client/forms/identity'
-import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import styled from '@client/styledComponents'
 import { formatLongDate } from '@client/utils/date-formatting'
+import {
+  DangerButton,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  SuccessButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IVerifierActionProps {
   positiveAction: {

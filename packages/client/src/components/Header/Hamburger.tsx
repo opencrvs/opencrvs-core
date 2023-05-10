@@ -9,19 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj } from '@client/utils/userUtils'
 import { Avatar } from '@client/components/Avatar'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { Role } from '@client/utils/gateway'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)

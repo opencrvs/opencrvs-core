@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import Sticky from 'react-stickynode'
-import { IFormTabs, FormTabs } from '@opencrvs/components/lib/FormTabs'
 import styled from '@client/styledComponents'
+import { FormTabs, IFormTabs } from '@opencrvs/components/lib/FormTabs'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import Sticky from 'react-stickynode'
 
 const StickyFormTabsContainer = styled.div`
   div.sticky-inner-wrapper {

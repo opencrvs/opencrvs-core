@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ElasticsearchContainer,
-  StartedElasticsearchContainer
-} from 'testcontainers'
+import * as elasticsearch from '@elastic/elasticsearch'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
 import {
   IBirthCompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
-import * as elasticsearch from '@elastic/elasticsearch'
-import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
+import {
+  ElasticsearchContainer,
+  StartedElasticsearchContainer
+} from 'testcontainers'
+import { searchForBirthDuplicates, searchForDeathDuplicates } from './service'
 
 export const ELASTIC_SEARCH_HTTP_PORT = 9200
 

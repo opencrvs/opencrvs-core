@@ -10,20 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  resolvers,
-  lookForComposition
-} from '@gateway/features/registration/root-resolvers'
-import {
+  ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
-import * as jwt from 'jsonwebtoken'
+import { findExtension, getStatusFromTask } from '@gateway/features/fhir/utils'
+import {
+  lookForComposition,
+  resolvers
+} from '@gateway/features/registration/root-resolvers'
+import { mockTaskBundle } from '@gateway/utils/testUtils'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
-import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 import { UserInputError } from 'apollo-server-hapi'
 const fetch = fetchAny as any

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from '@client/styledComponents'
-import { useIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
+import styled from '@client/styledComponents'
 import { Event } from '@client/utils/gateway'
+import React from 'react'
+import { useIntl } from 'react-intl'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};

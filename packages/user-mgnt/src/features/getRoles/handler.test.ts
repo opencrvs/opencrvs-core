@@ -11,8 +11,8 @@
  */
 import SystemRole from '@user-mgnt/model/systemRole'
 import { createServer } from '@user-mgnt/server'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
 
 let server: any
 

@@ -10,38 +10,38 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
+import {
   setTrackingId,
+  setupAuthorOnNotes,
+  setupLastRegLocation,
+  setupLastRegUser,
   setupRegistrationType,
   setupRegistrationWorkflow,
-  setupLastRegUser,
-  setupLastRegLocation,
-  setupAuthorOnNotes,
   validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
-import {
-  testFhirBundle,
-  testDeathFhirBundle,
-  testMarriageFhirBundle,
+  districtMock,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
-  districtMock,
-  upazilaMock,
-  unionMock,
-  officeMock,
-  mosipSuccessMock,
+  mosipBirthPatientBundleMock,
   mosipConfigMock,
   mosipDeceasedPatientMock,
-  mosipBirthPatientBundleMock,
-  mosipUpdatedDeceasedPatientMock
+  mosipSuccessMock,
+  mosipUpdatedDeceasedPatientMock,
+  officeMock,
+  testDeathFhirBundle,
+  testFhirBundle,
+  testMarriageFhirBundle,
+  unionMock,
+  upazilaMock
 } from '@workflow/test/utils'
-import { cloneDeep } from 'lodash'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { cloneDeep } from 'lodash'
 
 const fetch = fetchAny as any
 

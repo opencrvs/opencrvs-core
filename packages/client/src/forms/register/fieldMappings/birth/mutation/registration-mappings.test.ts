@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormField, TransformedData } from '@client/forms'
 import {
-  setBirthRegistrationSectionTransformer,
-  changeHirerchyMutationTransformer
+  changeHirerchyMutationTransformer,
+  setBirthRegistrationSectionTransformer
 } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
 import {
-  mockDeclarationData,
-  mockBirthRegistrationSectionData
+  mockBirthRegistrationSectionData,
+  mockDeclarationData
 } from '@client/tests/util'
-import { TransformedData, IFormField } from '@client/forms'
 import { cloneDeep } from 'lodash'
 
 describe('Birth registration mutation mapping related tests', () => {

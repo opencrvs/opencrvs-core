@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@gateway/constants'
 import {
   IInformantSMSNotification,
   INotificationMessages,
   NOTIFICATION_NAME_MAPPING_WITH_RESOURCE
 } from '@gateway/features/informantSMSNotifications/type-resolvers'
+import { hasScope } from '@gateway/features/user/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { URL } from 'url'
 

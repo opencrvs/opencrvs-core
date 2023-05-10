@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { certificateTemplateMutations } from '@client/certificate/mutations'
+import * as pdfRender from '@client/pdfRenderer'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -17,15 +18,14 @@ import {
   getFileFromBase64String,
   loginAsFieldAgent
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
-import createFetchMock from 'vitest-fetch-mock'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
-import { certificateTemplateMutations } from '@client/certificate/mutations'
-import { SpyInstance, vi } from 'vitest'
-import * as pdfRender from '@client/pdfRenderer'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { SpyInstance, vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock'
+import { CertificatesConfig } from './Certificates'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)

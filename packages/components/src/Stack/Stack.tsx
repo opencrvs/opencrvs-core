@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import type { Property } from 'csstype'
 import React from 'react'
 import styled from 'styled-components'
-import type { Property } from 'csstype'
 
 export interface IStackProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Gap between the stack items in pixels  */

@@ -9,31 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { getDefaultLanguage, HEARTH_URL } from '@workflow/constants'
+import { SECTION_CODE } from '@workflow/features/events/utils'
 import {
-  OPENCRVS_SPECIFICATION_URL,
   CHILD_SECTION_CODE,
-  RegStatus,
+  DECEASED_SECTION_CODE,
   EVENT_TYPE,
-  DECEASED_SECTION_CODE
+  OPENCRVS_SPECIFICATION_URL,
+  RegStatus
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
-  getTaskResource,
   findPersonEntry,
-  getSectionEntryBySectionCode
+  getSectionEntryBySectionCode,
+  getTaskResource
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
-import fetch, { RequestInit } from 'node-fetch'
 import {
   getComposition,
   getEventType,
   getPatientBySection
 } from '@workflow/features/registration/utils'
-import * as Hapi from '@hapi/hapi'
-import { logger } from '@workflow/logger'
-import { unionBy } from 'lodash'
-import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import { logger } from '@workflow/logger'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
+import { unionBy } from 'lodash'
+import fetch, { RequestInit } from 'node-fetch'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {

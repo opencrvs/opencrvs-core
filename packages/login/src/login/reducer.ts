@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { loop, LoopReducer, Cmd, Loop, RunCmd } from 'redux-loop'
-import { push } from 'connected-react-router'
 import * as actions from '@login/login/actions'
-import { authApi, IApplicationConfig } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'
-import { merge } from 'lodash'
 import { IStoreState } from '@login/store'
+import { authApi, IApplicationConfig } from '@login/utils/authApi'
+import { push } from 'connected-react-router'
+import { merge } from 'lodash'
+import { Cmd, loop, Loop, LoopReducer, RunCmd } from 'redux-loop'
 
 export type LoginState = {
   submitting: boolean

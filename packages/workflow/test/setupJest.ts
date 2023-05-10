@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { join } from 'path'
+import { informantSMSNotificationMock } from '@workflow/test/utils'
 import * as fetch from 'jest-fetch-mock'
-import {
-  informantSMSNotificationMock
-} from '@workflow/test/utils'
+import { join } from 'path'
 
 jest.mock('@workflow/features/registration/smsNotificationUtils', () => {
-  const actual = jest.requireActual('@workflow/features/registration/smsNotificationUtils')
+  const actual = jest.requireActual(
+    '@workflow/features/registration/smsNotificationUtils'
+  )
   return {
     ...actual,
     getInformantSMSNotification: jest

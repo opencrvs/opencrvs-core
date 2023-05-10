@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IPrintableDeclaration } from '@client/declarations'
+import { selectDeclaration } from '@client/declarations/selectors'
+import { constantsMessages } from '@client/i18n/messages'
+import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { goToHomeTab } from '@client/navigation'
+import { IStoreState } from '@client/store'
 import { AppBar, Frame, Icon } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
-import { constantsMessages } from '@client/i18n/messages'
+import React from 'react'
 import { useIntl } from 'react-intl'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { useParams } from 'react-router'
-import { IPrintableDeclaration } from '@client/declarations'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectDeclaration } from '@client/declarations/selectors'
-import { IStoreState } from '@client/store'
+import { useParams } from 'react-router'
 import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
-import { goBack, goToHomeTab } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
-import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 export function IssueCertificate() {
   const intl = useIntl()

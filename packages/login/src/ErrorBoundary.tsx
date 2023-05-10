@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Sentry from '@sentry/react'
 import * as React from 'react'
 import styled from 'styled-components'
-import * as Sentry from '@sentry/react'
 
 const ErrorMessage = styled.h1`
   text-align: center;

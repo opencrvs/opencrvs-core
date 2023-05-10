@@ -9,16 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
 import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
-import changePasswordHandler, {
-  changePasswordRequestSchema
-} from '@user-mgnt/features/changePassword/handler'
 import changeAvatarHandler, {
   changeAvatarRequestSchema
 } from '@user-mgnt/features/changeAvatar/handler'
+import changePasswordHandler, {
+  changePasswordRequestSchema
+} from '@user-mgnt/features/changePassword/handler'
+import changePhoneHandler, {
+  changePhoneRequestSchema
+} from '@user-mgnt/features/changePhone/handler'
+import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
+import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
 import getSystemRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
@@ -29,14 +35,54 @@ import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
 } from '@user-mgnt/features/getUserMobile/handler'
+import resendSMSInviteHandler, {
+  requestSchema as resendSMSRequestSchema
+} from '@user-mgnt/features/resendSMSInvite/handler'
+import resetPasswordSMSHandler, {
+  requestSchema as resetPasswordRequestSchema
+} from '@user-mgnt/features/resetPassword/handler'
 import searchUsers, {
   searchSchema
 } from '@user-mgnt/features/searchUsers/handler'
+import {
+  clientIdSchema,
+  deactivateSystem,
+  deleteSystem,
+  getAllSystemsHandler,
+  getSystemHandler,
+  getSystemRequestSchema,
+  getSystemResponseSchema,
+  reactivateSystem,
+  refreshSystemSecretHandler,
+  registerSystem,
+  reqRegisterSystemSchema,
+  reqUpdateSystemSchema,
+  resSystemSchema,
+  SystemSchema,
+  systemSecretRequestSchema,
+  updatePermissions,
+  verifySystemHandler,
+  verifySystemReqSchema,
+  verifySystemResSchema
+} from '@user-mgnt/features/system/handler'
+import updateRole, {
+  systemRoleResponseSchema,
+  systemRolesRequestSchema
+} from '@user-mgnt/features/updateRole/handler'
 import updateUser from '@user-mgnt/features/updateUser/handler'
 import {
   requestSchema as userAuditSchema,
   userAuditHandler
 } from '@user-mgnt/features/userAudit/handler'
+import usernameSMSReminderHandler, {
+  requestSchema as usernameSMSReminderRequestSchema
+} from '@user-mgnt/features/usernameSMSReminderInvite/handler'
+import {
+  createSearchHandler,
+  createSearchrequestSchema,
+  removeSearchHandler,
+  removeSearchrequestSchema
+} from '@user-mgnt/features/userSearchRecord/handler'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -49,57 +95,11 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
-import {
-  registerSystem,
-  reqRegisterSystemSchema,
-  deactivateSystem,
-  reactivateSystem,
-  clientIdSchema,
-  verifySystemHandler,
-  verifySystemReqSchema,
-  verifySystemResSchema,
-  getSystemRequestSchema,
-  getSystemResponseSchema,
-  getSystemHandler,
-  getAllSystemsHandler,
-  updatePermissions,
-  reqUpdateSystemSchema,
-  refreshSystemSecretHandler,
-  systemSecretRequestSchema,
-  resSystemSchema,
-  SystemSchema,
-  deleteSystem
-} from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
-import * as Hapi from '@hapi/hapi'
-import resendSMSInviteHandler, {
-  requestSchema as resendSMSRequestSchema
-} from '@user-mgnt/features/resendSMSInvite/handler'
-import usernameSMSReminderHandler, {
-  requestSchema as usernameSMSReminderRequestSchema
-} from '@user-mgnt/features/usernameSMSReminderInvite/handler'
-import changePhoneHandler, {
-  changePhoneRequestSchema
-} from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
-import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
-import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
-import {
-  createSearchHandler,
-  removeSearchHandler,
-  createSearchrequestSchema,
-  removeSearchrequestSchema
-} from '@user-mgnt/features/userSearchRecord/handler'
-import resetPasswordSMSHandler, {
-  requestSchema as resetPasswordRequestSchema
-} from '@user-mgnt/features/resetPassword/handler'
-import updateRole, {
-  systemRoleResponseSchema,
-  systemRolesRequestSchema
-} from '@user-mgnt/features/updateRole/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',

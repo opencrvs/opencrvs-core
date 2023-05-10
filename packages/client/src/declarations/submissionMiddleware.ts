@@ -9,40 +9,40 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Middleware, Action, createAction } from '@reduxjs/toolkit'
-import { IStoreState } from '@client/store'
+import { ApolloError } from '@apollo/client'
 import {
-  SUBMISSION_STATUS,
   deleteDeclaration,
+  ICertificate,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration,
-  ICertificate,
-  Payment
+  Payment,
+  SUBMISSION_STATUS,
+  writeDeclaration
 } from '@client/declarations'
-import { updateRegistrarWorkqueue } from '@client/workqueue'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { client } from '@client/utils/apolloClient'
-import {
-  getBirthMutation,
-  MARK_EVENT_AS_DUPLICATE
-} from '@client/views/DataProvider/birth/mutations'
-import { Event } from '@client/utils/gateway'
-import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
-import {
-  draftToGqlTransformer,
-  appendGqlMetadataFromDraft
-} from '@client/transformer'
-import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   showDuplicateRecordsToast,
   showUnassigned
 } from '@client/notification/actions'
+import { IStoreState } from '@client/store'
+import {
+  appendGqlMetadataFromDraft,
+  draftToGqlTransformer
+} from '@client/transformer'
+import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { ApolloError } from '@apollo/client'
+import { Event } from '@client/utils/gateway'
+import {
+  getBirthMutation,
+  MARK_EVENT_AS_DUPLICATE
+} from '@client/views/DataProvider/birth/mutations'
+import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
 import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutations'
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
+import { updateRegistrarWorkqueue } from '@client/workqueue'
+import { Action, createAction, Middleware } from '@reduxjs/toolkit'
+import { Dispatch } from 'redux'
 // eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
 

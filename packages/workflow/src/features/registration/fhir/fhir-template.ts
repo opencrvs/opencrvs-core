@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { v4 as uuid } from 'uuid'
 import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
+import { v4 as uuid } from 'uuid'
 
 export const INFORMANT_CODE = 'informant-details'
 

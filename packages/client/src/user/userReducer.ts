@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import {
   IForm,
   IFormSection,
@@ -18,6 +19,8 @@ import {
   UserSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { roleQueries } from '@client/forms/user/query/queries'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserErrorToast,
@@ -28,18 +31,15 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { gqlToDraftTransformer } from '@client/transformer'
 import { SEARCH_USERS } from '@client/user/queries'
-import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
+import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
+import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { Role, SystemRole } from '@client/utils/gateway'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
-import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
-import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
-import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { roleQueries } from '@client/forms/user/query/queries'
-import { Role, SystemRole } from '@client/utils/gateway'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'

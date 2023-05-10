@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
+import { goBack, goForward } from '@client/navigation'
+import {
+  HOME,
+  PERFORMANCE_HOME,
+  REGISTRAR_HOME
+} from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   FIELD_AGENT_ROLES,
@@ -20,13 +22,11 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import {
-  HOME,
-  PERFORMANCE_HOME,
-  REGISTRAR_HOME
-} from '@client/navigation/routes'
-import { goBack, goForward } from '@client/navigation'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
 
 export function HistoryNavigator({
   hideForward = false

@@ -17,9 +17,9 @@ jest.mock('mongoose', () => ({
   disconnect: () => {}
 }))
 
-import * as mongoose from 'mongoose'
 import { start, stop } from '@user-mgnt/database'
 import { logger } from '@user-mgnt/logger'
+import * as mongoose from 'mongoose'
 
 const wait = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time))

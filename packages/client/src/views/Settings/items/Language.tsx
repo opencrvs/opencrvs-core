@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { useIntl, FormattedMessage } from 'react-intl'
+import { changeLanguage as changeLanguageActionCreator } from '@client/i18n/actions'
 import {
-  userMessages,
   buttonMessages,
-  constantsMessages
+  constantsMessages,
+  userMessages
 } from '@client/i18n/messages'
-import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton,
-  Message,
-  Label
-} from '@client/views/Settings/items/components'
-import { useSelector, useDispatch } from 'react-redux'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Select } from '@opencrvs/components/lib/Select'
+import { getLanguage, getLanguages } from '@client/i18n/selectors'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { changeLanguage as changeLanguageActionCreator } from '@client/i18n/actions'
-import { getLanguage, getLanguages } from '@client/i18n/selectors'
+import {
+  DynamicHeightLinkButton,
+  Label,
+  LabelContainer,
+  Message,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Select } from '@opencrvs/components/lib/Select'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import * as React from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 
 interface ILanguageOptions {
   [key: string]: string

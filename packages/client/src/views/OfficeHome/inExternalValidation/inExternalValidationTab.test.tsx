@@ -10,22 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { checkAuth } from '@client/profile/profileActions'
 import {
   createTestComponent,
   createTestStore,
   resizeWindow
 } from '@client/tests/util'
-import { InExternalValidationTab } from './InExternalValidationTab'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import { checkAuth } from '@client/profile/profileActions'
-import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { ReactWrapper } from 'enzyme'
+import { readFileSync } from 'fs'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
+import * as jwt from 'jsonwebtoken'
+import * as React from 'react'
+import { Mock, vi } from 'vitest'
+import { InExternalValidationTab } from './InExternalValidationTab'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)

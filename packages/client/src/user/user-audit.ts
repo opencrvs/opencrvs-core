@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormField, RADIO_GROUP, TEXTAREA } from '@client/forms'
+import { conditionals } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
-import { conditionals } from '@client/forms/utils'
 
 export interface IUserAuditForm {
   fields: IFormField[]

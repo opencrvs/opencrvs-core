@@ -14,15 +14,15 @@ import * as Joi from 'joi'
 
 import { unauthorized } from '@hapi/boom'
 
-import { sendUserName } from '@auth/features/retrievalSteps/sendUserName/service'
-import {
-  getRetrievalStepInformation,
-  RetrievalSteps,
-  deleteRetrievalStepInformation
-} from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger } from '@auth/logger'
 import { PRODUCTION } from '@auth/constants'
 import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import { sendUserName } from '@auth/features/retrievalSteps/sendUserName/service'
+import {
+  deleteRetrievalStepInformation,
+  getRetrievalStepInformation,
+  RetrievalSteps
+} from '@auth/features/retrievalSteps/verifyUser/service'
+import { logger } from '@auth/logger'
 
 interface IPayload {
   nonce: string

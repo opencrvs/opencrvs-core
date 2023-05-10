@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
 import * as React from 'react'
+import styled from 'styled-components'
 
 export const TertiaryButton = styled(Button)`
   width: auto;

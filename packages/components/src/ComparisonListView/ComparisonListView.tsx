@@ -12,9 +12,9 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { Row } from './RowView'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
+import { Row } from './RowView'
 
 const Grid = styled.div<{ headingCount: number }>`
   display: grid;

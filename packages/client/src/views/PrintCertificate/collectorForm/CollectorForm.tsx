@@ -10,35 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Content } from '@opencrvs/components/lib/Content'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  modifyDeclaration,
-  storeDeclaration,
-  writeDeclaration,
-  IPrintableDeclaration,
-  ICertificate
-} from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  DownloadAction,
+  ICertificate,
+  IPrintableDeclaration,
+  modifyDeclaration,
+  storeDeclaration,
+  writeDeclaration
+} from '@client/declarations'
+import {
   IForm,
-  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -55,42 +50,38 @@ import {
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
-import { gqlToDraftTransformer } from '@client/transformer'
+import { Event } from '@client/utils/gateway'
 import {
-  QueryContext,
-  QueryProvider
-} from '@client/views/DataProvider/QueryProvider'
-import {
+  filterPrintInAdvancedOption,
   getEvent,
   getEventDate,
   getRegisteredDate,
-  isFreeOfCost,
   isCertificateForPrintInAdvance,
-  filterPrintInAdvancedOption
+  isFreeOfCost
 } from '@client/views/PrintCertificate/utils'
-import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
-import { flatten, cloneDeep } from 'lodash'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  certCollectorGroupForBirthAppWithoutFatherDetails,
+  certCollectorGroupForBirthAppWithoutMotherDetails,
+  certCollectorGroupForBirthAppWithoutParentDetails,
+  certCollectorGroupForBirthAppWithParentDetails
+} from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getRegisteringOfficeId } from '@client/utils/draftUtils'
+import { IValidationResult } from '@client/utils/validate'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { cloneDeep, flatten } from 'lodash'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { IValidationResult } from '@client/utils/validate'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  certCollectorGroupForBirthAppWithParentDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;

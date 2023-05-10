@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import styled from 'styled-components'
-import { useIntl } from 'react-intl'
-import { BodyContent, Content } from '@opencrvs/components/lib/Content'
-import { messages } from '@client/i18n/messages/views/config'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { Link } from '@client/../../components/lib'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Query } from '@client/components/Query'
-import { GET_TOTAL_VSEXPORT } from './queries'
+import { messages } from '@client/i18n/messages/views/config'
+import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
-import { Link } from '@client/../../components/lib'
-import { chunk, sortBy } from 'lodash'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { BodyContent, Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { chunk, sortBy } from 'lodash'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
+import { GET_TOTAL_VSEXPORT } from './queries'
 const DEFAULT_LIST_SIZE = 12
 
 const UserTable = styled(BodyContent)`

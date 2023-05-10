@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  TIME_FROM,
-  TIME_TO,
-  LOCATION_ID,
-  EVENT
-} from '@metrics/features/metrics/constants'
 import { getTotalCorrections } from '@metrics/features/corrections/service'
+import {
+  EVENT,
+  LOCATION_ID,
+  TIME_FROM,
+  TIME_TO
+} from '@metrics/features/metrics/constants'
 
 export async function totalCorrectionsHandler(
   request: Hapi.Request,

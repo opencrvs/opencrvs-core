@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { IconWeight } from 'phosphor-react'
 import * as React from 'react'
 import { colors } from '../colors'
 import * as icons from './all-icons'
-import { IconWeight } from 'phosphor-react'
 
 enum IconSize {
   small = 16,

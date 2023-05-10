@@ -11,13 +11,11 @@
  */
 import * as actions from '@login/login/actions'
 import { initialState } from '@login/login/reducer'
-import { createStore, AppStore } from '@login/store'
-import { resolve } from 'url'
-import { client } from '@login/utils/authApi'
+import { AppStore, createStore } from '@login/store'
 
 import {
-  getSubmissionError,
   getResentSMS,
+  getSubmissionError,
   getsubmitting
 } from '@login/login/selectors'
 import { mockState } from '@login/tests/util'

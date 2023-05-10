@@ -11,8 +11,8 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  IInProgressPayload,
   IDeclarationPayload,
+  IInProgressPayload,
   IRegistrationPayload,
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
@@ -20,9 +20,9 @@ import {
   buildAndSendSMS,
   getTranslations
 } from '@notification/features/sms/utils'
-import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
+import { getDefaultLanguage } from '@notification/i18n/utils'
+import { logger } from '@notification/logger'
 
 export async function sendDeathInProgressConfirmation(
   request: Hapi.Request,

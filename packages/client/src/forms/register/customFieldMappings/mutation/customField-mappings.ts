@@ -13,8 +13,8 @@
 import {
   IFormData,
   IFormField,
-  TransformedData,
-  IFormSectionData
+  IFormSectionData,
+  TransformedData
 } from '@client/forms'
 
 export const customFieldToQuestionnaireTransformer = (

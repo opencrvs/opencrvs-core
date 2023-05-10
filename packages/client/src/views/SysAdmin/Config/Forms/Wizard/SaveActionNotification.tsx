@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { SaveActionContext } from './SaveActionModal'
+import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
 import {
   ActionStatus,
-  NOTIFICATION_TYPE_MAP,
-  isNotifiable
+  isNotifiable,
+  NOTIFICATION_TYPE_MAP
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { useIntl } from 'react-intl'
-import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
 import { noop } from 'lodash'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { SaveActionContext } from './SaveActionModal'
 
 export function SaveActionNotification() {
   const intl = useIntl()

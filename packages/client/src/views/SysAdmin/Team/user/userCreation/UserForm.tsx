@@ -24,30 +24,30 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goBack,
   goToCreateUserSection,
   goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { selectSystemRoleMap } from '@client/user/selectors'
 import {
   clearUserFormData,
   ISystemRolesMap,
   modifyUserFormData
 } from '@client/user/userReducer'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Content } from '@opencrvs/components/lib/Content'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import { Content } from '@opencrvs/components/lib/Content'
-import { selectSystemRoleMap } from '@client/user/selectors'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};

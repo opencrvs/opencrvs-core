@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
-import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { getTokenPayload } from '@workflow/utils/authUtils'
+import fetch from 'node-fetch'
 
 export async function getUser(
   userId: string,

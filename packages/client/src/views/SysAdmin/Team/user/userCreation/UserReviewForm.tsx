@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloClient } from '@apollo/client'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
   FIELD_GROUP_TITLE,
@@ -22,16 +23,17 @@ import {
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField,
-  getListOfLocations
+  getListOfLocations,
+  getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
-  buttonMessages as messages,
-  userMessages,
   buttonMessages,
-  constantsMessages
+  buttonMessages as messages,
+  constantsMessages,
+  userMessages
 } from '@client/i18n/messages'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goBack,
   goToCreateUserSection,
@@ -40,39 +42,37 @@ import {
 } from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { draftToGqlTransformer } from '@client/transformer'
 import {
   modifyUserFormData,
   submitUserFormData
 } from '@client/user/userReducer'
+import { UserDetails } from '@client/utils/userUtils'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import {
-  PrimaryButton,
-  SuccessButton,
   ICON_ALIGNMENT,
-  LinkButton
+  LinkButton,
+  PrimaryButton,
+  SuccessButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ApolloClient } from '@apollo/client'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Check } from '@opencrvs/components/lib/icons'
+import {
+  IListViewItemSimplifiedProps,
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
 import { RouteComponentProps } from 'react-router'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
-import { Check } from '@opencrvs/components/lib/icons'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { UserDetails } from '@client/utils/userUtils'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified,
-  IListViewItemSimplifiedProps
-} from '@opencrvs/components/lib/ListViewSimplified'
+import { Dispatch } from 'redux'
 import styled from 'styled-components'
-import { Content } from '@opencrvs/components/lib/Content'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IUserReviewFormProps {
   userId?: string

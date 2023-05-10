@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import {
-  storeRetrievalStepInformation,
   getRetrievalStepInformation,
-  RetrievalSteps
+  RetrievalSteps,
+  storeRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { checkVerificationCode } from '@auth/features/verifyCode/service'
-import { unauthorized } from '@hapi/boom'
 import { logger } from '@auth/logger'
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 
 interface IVerifyNumberPayload {
   nonce: string

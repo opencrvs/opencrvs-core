@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable */
-import * as fs from 'fs'
-import * as chalk from 'chalk'
-import { messageKeys } from '@notification/i18n/messages'
 import { ILanguage } from '@notification/features/sms/utils'
+import { messageKeys } from '@notification/i18n/messages'
+import * as chalk from 'chalk'
+import * as fs from 'fs'
 
 interface IMessageKey {
   [key: string]: string

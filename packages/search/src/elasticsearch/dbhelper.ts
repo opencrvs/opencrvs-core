@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as elasticsearch from '@elastic/elasticsearch'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
-import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,

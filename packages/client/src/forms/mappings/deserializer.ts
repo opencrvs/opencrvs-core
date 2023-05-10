@@ -9,47 +9,47 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Validation } from '@client/utils/validate'
-import * as mutations from '@client/forms/mappings/mutation'
-import * as queries from '@client/forms/mappings/query'
 import * as labels from '@client/forms/mappings/label'
-import * as responseTransformers from '@client/forms/mappings/response-transformers'
+import * as mutations from '@client/forms/mappings/mutation'
 import * as graphQLQueries from '@client/forms/mappings/queries'
+import * as queries from '@client/forms/mappings/query'
+import * as responseTransformers from '@client/forms/mappings/response-transformers'
 import * as types from '@client/forms/mappings/type'
+import { Validation } from '@client/utils/validate'
 import * as validators from '@opencrvs/client/src/utils/validate'
 
 import {
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IDynamicFormFieldDefinitions,
   IForm,
-  ISerializedForm,
+  IFormField,
+  IFormFieldMutationMapFunction,
+  IFormFieldQueryMapFunction,
+  IFormFieldTemplateMapOperation,
+  IFormFieldWithDynamicDefinitions,
+  IFormSection,
   IFormSectionMutationMapFunction,
   IFormSectionQueryMapFunction,
-  IFormFieldQueryMapFunction,
-  IFormFieldMutationMapFunction,
-  IValidatorDescriptor,
-  ISerializedFormSection,
-  IFormSection,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  ISerializedDynamicFormFieldDefinitions,
-  IDynamicFormFieldDefinitions,
-  ValidationFactoryOperation,
-  IQueryDescriptor,
-  QueryFactoryOperation,
-  IMutationDescriptor,
-  MutationFactoryOperation,
-  FETCH_BUTTON,
-  IQueryMap,
-  ISerializedQueryMap,
   ILoaderButton,
-  IFormFieldWithDynamicDefinitions,
-  IFormField,
-  SELECT_WITH_OPTIONS,
-  ISelectFormFieldWithOptions,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
+  IMutationDescriptor,
+  IQueryDescriptor,
+  IQueryMap,
+  IQueryTemplateDescriptor,
   IRadioGroupWithNestedFieldsFormField,
-  SerializedFormField,
+  ISelectFormFieldWithOptions,
+  ISerializedDynamicFormFieldDefinitions,
+  ISerializedForm,
+  ISerializedFormSection,
+  ISerializedQueryMap,
   ITemplateDescriptor,
-  IFormFieldTemplateMapOperation,
-  IQueryTemplateDescriptor
+  IValidatorDescriptor,
+  MutationFactoryOperation,
+  QueryFactoryOperation,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SELECT_WITH_OPTIONS,
+  SerializedFormField,
+  ValidationFactoryOperation
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 

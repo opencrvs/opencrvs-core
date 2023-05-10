@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Line } from 'rc-progress'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Line } from 'rc-progress'
 
 const HeaderWrapper = styled.div`
   display: flex;

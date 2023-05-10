@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { logger } from '@config/config/logger'
+import {
+  conditionalSchema,
+  messageSchema
+} from '@config/handlers/question/createQuestion/handler'
 import Question, {
   IQuestion,
   IQuestionModel,
   validFieldType
 } from '@config/models/question'
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import {
-  conditionalSchema,
-  messageSchema
-} from '@config/handlers/question/createQuestion/handler'
 
 export default async function updateQuestion(
   request: Hapi.Request,

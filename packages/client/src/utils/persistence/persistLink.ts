@@ -12,8 +12,8 @@
 /**
  * Taken from https://github.com/TallerWebSolutions/apollo-cache-instorage
  */
-import { visit } from 'graphql'
 import { ApolloLink } from '@apollo/client'
+import { visit } from 'graphql'
 import traverse from 'traverse'
 
 import { extractPersistDirectivePaths } from '@client/utils/persistence/transform'

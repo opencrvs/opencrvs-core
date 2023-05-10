@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools'
 import { readFileSync } from 'fs'
+import { addMockFunctionsToSchema, makeExecutableSchema } from 'graphql-tools'
 
 const graphQLSchemaPath = `${process.cwd()}/src/tests/schema.graphql`
 const schemaString = readFileSync(graphQLSchemaPath).toString()

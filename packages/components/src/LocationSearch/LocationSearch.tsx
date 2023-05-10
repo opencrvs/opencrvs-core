@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Icon } from '../Icon'
 import { PrimaryButton } from '../buttons'
+import { Icon } from '../Icon'
 import { InputError } from '../InputField/InputError'
 
 const SEARCH_DEBOUNCE_DURATION = 300

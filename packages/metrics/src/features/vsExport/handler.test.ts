@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import vsExport from '@metrics/models/vsExports'
 import { createServer } from '@metrics/server'
 import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
-import vsExport from '@metrics/models/vsExports'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin'] },

@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from '@client/tests/util'
-import { LocationPicker } from './LocationPicker'
 import { AppStore, createStore } from '@client/store'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import React from 'react'
 import { vi } from 'vitest'
+import { LocationPicker } from './LocationPicker'
 
 describe('location picker tests', () => {
   let store: AppStore

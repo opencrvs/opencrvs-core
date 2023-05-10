@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { get } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
+import { get } from '@auth/database'
 
 export async function verifyToken(token: string) {
   const record = await get(`${INVALID_TOKEN_NAMESPACE}:${token}`)

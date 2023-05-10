@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IAuthHeader } from '@metrics/features/registration'
 import {
   fetchLocation,
   fetchPractitionerRole,
   fetchTaskHistory
 } from '@metrics/api'
+import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
+import { IAuthHeader } from '@metrics/features/registration'
 
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
-import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,

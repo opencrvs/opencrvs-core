@@ -10,10 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
+import {
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
+} from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -21,22 +25,18 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
-  mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  mockRoles
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { GET_USER, userQueries } from '@client/user/queries'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
-import {
-  REVIEW_USER_FORM,
-  REVIEW_USER_DETAILS
-} from '@client/navigation/routes'
-import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { vi, Mock, describe, expect } from 'vitest'
+import * as React from 'react'
+import { describe, expect, Mock, vi } from 'vitest'
 
 export const mockUsers = {
   data: {

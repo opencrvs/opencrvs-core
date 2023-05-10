@@ -9,35 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IDeclaration, IDuplicates } from '@client/declarations'
 import {
   IForm,
   IFormData,
-  TransformedData,
   IFormField,
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
+  IFormSection,
   IFormSectionData,
-  IFormSection
+  TransformedData
 } from '@client/forms'
+import { sectionTransformer } from '@client/forms/mappings/query'
 import {
   getConditionalActionsForField,
+  getSelectedRadioOptionWithNestedFields,
   getVisibleSectionGroupsBasedOnConditions,
-  stringifyFieldValue,
   isRadioGroupWithNestedField,
-  getSelectedRadioOptionWithNestedFields
+  stringifyFieldValue
 } from '@client/forms/utils'
-import { IDeclaration, IDuplicates } from '@client/declarations'
-import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
-import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
+  DuplicatesInfo,
   EventRegistration,
-  EventSearchSet,
-  DuplicatesInfo
+  EventSearchSet
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
+import { get } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,

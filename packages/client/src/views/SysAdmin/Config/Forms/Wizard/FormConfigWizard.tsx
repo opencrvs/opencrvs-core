@@ -9,42 +9,42 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
-import {
-  isDefaultConfigField,
-  isCustomConfigField
-} from '@client/forms/configuration/formConfig/utils'
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
-import { Redirect, useParams } from 'react-router'
-import { HOME } from '@client/navigation/routes'
-import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
-import { PrimaryButton, CircleButton } from '@opencrvs/components/lib/buttons'
-import { SettingsBlue } from '@opencrvs/components/lib/icons'
-import { EventTopBar } from '@opencrvs/components/lib/EventTopBar'
-import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
-import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { BirthSection, DeathSection, WizardSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
+import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
+import { FormTools } from '@client/components/formConfig/formTools/FormTools'
+import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
+import { BirthSection, DeathSection, WizardSection } from '@client/forms'
+import { FieldEnabled } from '@client/forms/configuration'
+import {
+  selectConfigFields,
+  selectFormDraft
+} from '@client/forms/configuration/formConfig/selectors'
+import {
+  isCustomConfigField,
+  isDefaultConfigField
+} from '@client/forms/configuration/formConfig/utils'
+import { buttonMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigHome, goToFormConfigWizard } from '@client/navigation'
+import { HOME } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import { AuthScope } from '@client/utils/authUtils'
+import { Event } from '@client/utils/gateway'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
-import { SaveActionModal, SaveActionContext } from './SaveActionModal'
-import { SaveActionNotification } from './SaveActionNotification'
+import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { EventTopBar } from '@opencrvs/components/lib/EventTopBar'
+import { SettingsBlue } from '@opencrvs/components/lib/icons'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import { Redirect, useParams } from 'react-router'
 import { FormConfigSettings } from './FormConfigSettings'
-import {
-  selectFormDraft,
-  selectConfigFields
-} from '@client/forms/configuration/formConfig/selectors'
-import { FieldEnabled } from '@client/forms/configuration'
+import { SaveActionContext, SaveActionModal } from './SaveActionModal'
+import { SaveActionNotification } from './SaveActionNotification'
 
 const Container = styled.div`
   display: flex;

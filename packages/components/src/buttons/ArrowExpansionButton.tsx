@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { KeyboardArrowDown, KeyboardArrowUp } from '../icons'
-import { StyledButton, IExpansionButtonProps } from './ExpansionButton'
+import { IExpansionButtonProps, StyledButton } from './ExpansionButton'
 
 export function ArrowExpansionButton(props: IExpansionButtonProps) {
   return (

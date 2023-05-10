@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
 import {
   FORGOTTEN_ITEMS,
   goToPhoneNumberVerificationForm,
@@ -20,6 +21,7 @@ import {
   IVerifySecurityAnswerResponse,
   QUESTION_KEYS
 } from '@login/utils/authApi'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -29,8 +31,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
-import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 
 const Actions = styled.div`
   padding: 32px 0;

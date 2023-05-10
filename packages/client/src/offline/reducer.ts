@@ -9,39 +9,39 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormConfig } from '@client/forms'
 import {
-  loop,
-  Cmd,
-  Loop,
-  liftState,
-  getModel,
-  getCmd,
-  RunCmd
-} from 'redux-loop'
+  IQuestionConfig,
+  isDefaultQuestionConfig
+} from '@client/forms/questionConfig'
+import { ILanguage } from '@client/i18n/reducer'
 import * as actions from '@client/offline/actions'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
+import { isNavigatorOnline } from '@client/utils'
+import { Event, System } from '@client/utils/gateway'
+import { filterLocations } from '@client/utils/locationUtils'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
   referenceApi
 } from '@client/utils/referenceApi'
-import { ILanguage } from '@client/i18n/reducer'
-import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig } from '@client/forms'
-import { Event, System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  IQuestionConfig,
-  isDefaultQuestionConfig
-} from '@client/forms/questionConfig'
-import { isOfflineDataLoaded } from './selectors'
-import {
-  IPDFTemplate,
-  ISVGTemplate
-} from '@client/pdfRenderer/transformer/types'
 import { find, isEmpty, merge } from 'lodash'
-import { isNavigatorOnline } from '@client/utils'
+import {
+  Cmd,
+  getCmd,
+  getModel,
+  liftState,
+  loop,
+  Loop,
+  RunCmd
+} from 'redux-loop'
+import { isOfflineDataLoaded } from './selectors'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 

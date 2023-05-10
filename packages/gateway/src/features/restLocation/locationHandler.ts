@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/utils'
-import * as Hapi from '@hapi/hapi'
 import { badRequest, conflict } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   composeFhirLocation,

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ContextFunction } from 'apollo-server-core'
+import { ApolloServer } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import * as fetch from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
-import { ContextFunction } from 'apollo-server-core'
-import { ApolloServer } from 'apollo-server-hapi'
+import { getApolloConfig } from './config'
 
 describe('Test apollo server config', () => {
   const token = jwt.sign(

@@ -11,10 +11,10 @@
  */
 require('dotenv').config()
 
-import { join } from 'path'
-import { writeFileSync, readFileSync } from 'fs'
-import { networkInterfaces, NetworkInterfaceInfo } from 'os'
+import { readFileSync, writeFileSync } from 'fs'
 import * as ngrok from 'ngrok'
+import { NetworkInterfaceInfo, networkInterfaces } from 'os'
+import { join } from 'path'
 
 function getNetworkAddress() {
   const interfaces = networkInterfaces()

@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { fonts, IFont } from '../fonts'
-import { colors, IColor } from '../colors'
 import styled, { css } from 'styled-components'
+import { colors, IColor } from '../colors'
+import { fonts, IFont } from '../fonts'
 
 export interface LinkProps
   extends React.HTMLProps<HTMLAnchorElement | HTMLButtonElement> {

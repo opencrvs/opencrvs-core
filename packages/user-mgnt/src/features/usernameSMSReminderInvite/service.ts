@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
-import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 
 export async function sendUserName(
   mobile: string,

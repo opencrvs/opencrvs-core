@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from 'styled-components'
-import { useIntl } from 'react-intl'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
-import { buttonMessages } from '@client/i18n/messages'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ProtectedAccoutStep,
-  IProtectedAccountSetupData
+  IProtectedAccountSetupData,
+  ProtectedAccoutStep
 } from '@client/components/ProtectedAccount'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
-import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 export const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};

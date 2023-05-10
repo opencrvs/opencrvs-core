@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  getTask,
-  getComposition
-} from '@metrics/features/registration/fhirUtils'
 import { fetchFHIR } from '@metrics/api'
+import {
+  EVENT_TYPE,
+  getRegistrationLateTargetDays,
+  getRegistrationTargetDays
+} from '@metrics/features/metrics/utils'
+import {
+  getComposition,
+  getTask
+} from '@metrics/features/registration/fhirUtils'
 import {
   differenceInDays,
   differenceInSeconds,
   differenceInYears
 } from 'date-fns'
-import {
-  EVENT_TYPE,
-  getRegistrationTargetDays,
-  getRegistrationLateTargetDays
-} from '@metrics/features/metrics/utils'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string

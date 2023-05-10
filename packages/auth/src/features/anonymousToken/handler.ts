@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { createToken } from '@auth/features/authenticate/service'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { createToken } from '@auth/features/authenticate/service'
 
 interface IAuthResponse {
   token: string

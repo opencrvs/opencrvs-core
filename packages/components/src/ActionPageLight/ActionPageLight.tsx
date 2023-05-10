@@ -11,9 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue, Cross } from '../icons'
-import { CircleButton } from '../buttons'
 import { AppBar, IAppBarProps } from '../AppBar'
+import { CircleButton } from '../buttons'
+import { BackArrowDeepBlue, Cross } from '../icons'
 const ActionContainer = styled.div`
   width: 100%;
 `

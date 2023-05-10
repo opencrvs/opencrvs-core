@@ -9,25 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { offlineDataReady } from '@client/offline/actions'
+import * as actions from '@client/profile/profileActions'
 import { AppStore, createStore } from '@client/store'
 import {
-  mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
+  mockLocalSysAdminUserResponse,
   mockOfflineDataDispatch,
   mockUserResponse
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { userMutations } from '@client/user/mutations'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { stringify } from 'query-string'
 import * as React from 'react'
+import { Mock, vi } from 'vitest'
 import { UserList } from './UserList'
-import { userMutations } from '@client/user/mutations'
-import * as actions from '@client/profile/profileActions'
-import { offlineDataReady } from '@client/offline/actions'
-import { vi, Mock } from 'vitest'
 
 describe('user list without admin scope', () => {
   let store: AppStore

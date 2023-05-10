@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import { withTheme } from 'styled-components'
-import { ITheme } from '../../theme'
 import { IDataPoint } from '../../chart-datapoint-types'
+import { ITheme } from '../../theme'
 
 export interface ICustomizedAxisTick {
   x: number

@@ -11,8 +11,8 @@
  */
 import { Meta, Story } from '@storybook/react'
 import React, { useState } from 'react'
-import { ExpandingMenu } from './ExpandingMenu'
 import { Hamburger } from '../icons'
+import { ExpandingMenu } from './ExpandingMenu'
 
 interface IUserDetails {
   name: string

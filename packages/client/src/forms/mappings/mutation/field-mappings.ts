@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IFormField,
-  IFormData,
-  IFormFieldValue,
   IAttachment,
-  TransformedData,
+  IFormData,
+  IFormField,
+  IFormFieldMutationMapFunction,
+  IFormFieldValue,
   IFormSectionData,
-  IFormFieldMutationMapFunction
+  TransformedData
 } from '@client/forms'
 import { set } from 'lodash'
 

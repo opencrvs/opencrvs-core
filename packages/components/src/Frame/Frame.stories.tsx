@@ -11,12 +11,12 @@
  */
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
+import { AppBar } from '../AppBar'
+import { Box } from '../Box'
+import { Content, ContentSize } from '../Content'
 import { EventTopBar } from '../EventTopBar'
 import { SideNav } from '../SideNavigation/LeftNavigation.stories'
 import { Frame } from './Frame'
-import { Content, ContentSize } from '../Content'
-import { Box } from '../Box'
-import { AppBar } from '../AppBar'
 
 export default {
   title: 'Layout/Frame',

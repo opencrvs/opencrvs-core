@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from 'styled-components'
-import { Alert } from '@opencrvs/components/lib/Alert'
 import { Query } from '@client/components/Query'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import React from 'react'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
-  FetchDuplicateDeatilsQuery,
-  createDuplicateDetailsQuery
+  createDuplicateDetailsQuery,
+  FetchDuplicateDeatilsQuery
 } from './utils'
 
 const WarningContainer = styled.div`

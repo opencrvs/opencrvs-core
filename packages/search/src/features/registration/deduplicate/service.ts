@@ -10,6 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import * as elasticsearch from '@elastic/elasticsearch'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { ISearchResponse } from '@search/elasticsearch/client'
 import {
   searchByCompositionId,
   updateComposition
@@ -19,19 +22,16 @@ import {
   ICompositionBody,
   IDeathCompositionBody
 } from '@search/elasticsearch/utils'
-import { get } from 'lodash'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
 import {
-  subYears,
-  addYears,
-  subMonths,
+  addDays,
   addMonths,
+  addYears,
   subDays,
-  addDays
+  subMonths,
+  subYears
 } from 'date-fns'
-import * as elasticsearch from '@elastic/elasticsearch'
+import { get } from 'lodash'
 
 export const removeDuplicate = async (
   bundle: fhir.Composition & { id: string },

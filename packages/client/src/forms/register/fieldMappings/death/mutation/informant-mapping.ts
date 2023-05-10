@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData, TransformedData } from '@client/forms'
+import { IFormData, IFormField, TransformedData } from '@client/forms'
 import {
   cloneDeep,
+  findIndex,
+  first,
+  isArray,
   keys,
-  omit,
   merge,
   mergeWith,
-  isArray,
-  first,
-  findIndex
+  omit
 } from 'lodash'
 
 export enum OBJECT_TYPE {

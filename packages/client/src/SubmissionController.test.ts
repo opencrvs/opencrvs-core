@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { SUBMISSION_STATUS } from '@client/declarations'
 import { AppStore, createStore } from '@client/store'
 import { SubmissionController } from '@client/SubmissionController'
-import { SUBMISSION_STATUS } from '@client/declarations'
-import { SubmissionAction } from './forms'
-import { flushPromises, ACTION_STATUS_MAP } from './tests/util'
-import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
 import { vi } from 'vitest'
+import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
+import { SubmissionAction } from './forms'
+import { ACTION_STATUS_MAP, flushPromises } from './tests/util'
 
 beforeEach(() => {
   Date.now = vi.fn(() => 1572408000000 + 2000000)

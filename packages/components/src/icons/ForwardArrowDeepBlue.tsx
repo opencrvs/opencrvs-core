@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { BackArrow } from './BackArrow'
 import styled from 'styled-components'
+import { BackArrow } from './BackArrow'
 
 export const ForwardArrowDeepBlue = styled(BackArrow)`
   transform: rotate(180deg);

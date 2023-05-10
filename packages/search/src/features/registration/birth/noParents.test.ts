@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
 import {
+  mockBirthFhirBundleWithoutParents,
   mockEncounterResponse,
-  mockUserModelResponse,
   mockLocationResponse,
-  mockBirthFhirBundleWithoutParents
+  mockUserModelResponse
 } from '@search/test/utils'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
 
+import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
-import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 jest.mock('@search/features/registration/deduplicate/service')

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import { FormConfigHome } from './FormConfigHome'
 import { DraftStatus } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
+import { FormConfigHome } from './FormConfigHome'
 
 let component: ReactWrapper<{}, {}>
 

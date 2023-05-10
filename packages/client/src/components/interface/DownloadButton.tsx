@@ -9,42 +9,42 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { IActionObject } from '@opencrvs/components/lib/Workqueue'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Button } from '@opencrvs/components/lib/Button'
-import { connect } from 'react-redux'
-import {
-  downloadDeclaration,
-  DOWNLOAD_STATUS,
-  unassignDeclaration,
-  deleteDeclaration as deleteDeclarationAction
-} from '@client/declarations'
-import { Action } from '@client/forms'
-import { Event, SystemRoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
   useApolloClient
 } from '@apollo/client'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
-import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
+import {
+  deleteDeclaration as deleteDeclarationAction,
+  downloadDeclaration,
+  DOWNLOAD_STATUS,
+  unassignDeclaration
+} from '@client/declarations'
+import { Action } from '@client/forms'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import {
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
-import { Dispatch } from 'redux'
-import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import { Event, SystemRoleType } from '@client/utils/gateway'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Download } from '@opencrvs/components/lib/icons'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { IActionObject } from '@opencrvs/components/lib/Workqueue'
+import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
+import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
+import { Dispatch } from 'redux'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {

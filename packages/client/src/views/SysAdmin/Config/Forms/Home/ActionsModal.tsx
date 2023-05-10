@@ -9,41 +9,41 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useContext } from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { useIntl, MessageDescriptor } from 'react-intl'
-import {
-  actionsModalTitleMessages,
-  actionsModalDescriptionMessages
-} from '@client/i18n/messages/views/formConfig'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  TertiaryButton,
-  SuccessButton,
-  DangerButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { useDispatch } from 'react-redux'
 import { Mutation } from '@apollo/client/react/components'
+import { BirthSection, DeathSection } from '@client/forms'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { DEFAULT_FORM_DRAFT } from '@client/forms/configuration/formDrafts/utils'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  actionsModalDescriptionMessages,
+  actionsModalTitleMessages
+} from '@client/i18n/messages/views/formConfig'
+import { goToFormConfigWizard } from '@client/navigation'
+import {
+  ChangeFormDraftStatusMutationVariables,
+  DeleteFormDraftMutationVariables,
+  DraftStatus,
+  Event,
+  Mutation as GQLMutation
+} from '@client/utils/gateway'
 import {
   CHANGE_FORM_DRAFT_STATUS,
   DELETE_FORM_DRAFT
 } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { DEFAULT_FORM_DRAFT } from '@client/forms/configuration/formDrafts/utils'
-import {
-  DraftStatus,
-  Event,
-  Mutation as GQLMutation,
-  DeleteFormDraftMutationVariables,
-  ChangeFormDraftStatusMutationVariables
-} from '@client/utils/gateway'
 import {
   ActionStatus,
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
-import { goToFormConfigWizard } from '@client/navigation'
-import { BirthSection, DeathSection } from '@client/forms'
+import {
+  DangerButton,
+  PrimaryButton,
+  SuccessButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import React, { useContext } from 'react'
+import { MessageDescriptor, useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
 export enum Actions {
   PUBLISH = 'PUBLISH',

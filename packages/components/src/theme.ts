@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { colors, gradients, shadows } from './colors'
-import { fonts, family as fontFamily } from './fonts'
+import { family as fontFamily, fonts } from './fonts'
 import { grid } from './grid'
 
 export const getTheme = () => ({

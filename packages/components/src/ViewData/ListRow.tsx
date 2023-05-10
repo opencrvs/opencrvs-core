@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Link } from '../Link'
 import { Button } from '../Button'
+import { Link } from '../Link'
 
 const Container = styled.div`
   display: flex;

@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import * as Recharts from 'recharts'
-import { ITheme } from '../theme'
 import styled, { withTheme } from 'styled-components'
+import { ITheme } from '../theme'
 
 const {
   CartesianGrid,

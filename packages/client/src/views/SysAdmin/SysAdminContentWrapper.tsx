@@ -11,13 +11,13 @@
  */
 
 import { MarginedHeader } from '@client/components/Header/Header'
+import { FixedNavigation } from '@client/components/interface/Navigation'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
 import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import * as React from 'react'
 import styled from 'styled-components'
-import { FixedNavigation } from '@client/components/interface/Navigation'
 
 const DynamicContainer = styled.div<{
   marginLeft?: number

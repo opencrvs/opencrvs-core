@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { createServer } from '@metrics/server'
 import * as api from '@metrics/api'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import * as fetchAny from 'jest-fetch-mock'
 import { testDeclaration } from '@metrics/features/registration/testUtils'
+import { createServer } from '@metrics/server'
+import { readFileSync } from 'fs'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 import { cloneDeep } from 'lodash'
 
 const fetch = fetchAny as any

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { formMessages } from '@client/i18n/messages'
 import {
   IInputFieldProps,
   InputField as InputFieldComponent
 } from '@opencrvs/components/lib/InputField'
-import { formMessages } from '@client/i18n/messages'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 export const InputField = injectIntl(function FormInputField(
   props: Omit<IInputFieldProps, 'optionalLabel'> & IntlShapeProps

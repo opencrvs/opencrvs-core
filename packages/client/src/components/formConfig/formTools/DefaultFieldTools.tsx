@@ -9,35 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import styled from '@client/styledComponents'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import { useIntl } from 'react-intl'
-import {
-  getContentKeys,
-  getCertificateHandlebar,
-  IDefaultConfigField,
-  IPreviewGroupConfigField,
-  getFirstFieldOfPreviewGroup,
-  isDefaultConfigField,
-  getFieldDefinition
-} from '@client/forms/configuration/formConfig/utils'
-import { useDispatch } from 'react-redux'
 import { fieldTypeLabel } from '@client/forms'
 import { FieldEnabled } from '@client/forms/configuration'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
-  Title,
-  Label,
+  getCertificateHandlebar,
+  getContentKeys,
+  getFieldDefinition,
+  getFirstFieldOfPreviewGroup,
+  IDefaultConfigField,
+  IPreviewGroupConfigField,
+  isDefaultConfigField
+} from '@client/forms/configuration/formConfig/utils'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import styled from '@client/styledComponents'
+import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
+import {
   CenteredToggle,
+  Label,
   RequiredToggleAction,
+  Title,
   ToolTip
 } from './components'
-import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const Container = styled.div`
   display: flex;

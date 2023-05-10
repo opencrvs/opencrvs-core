@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { createStore } from '@client/store'
 import { createTestComponent, userDetails } from '@client/tests/util'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
-import { createStore } from '@client/store'
-import { UserSetupReview } from './SetupReviewPage'
+import * as React from 'react'
 import { activateUserMutation } from './queries'
+import { UserSetupReview } from './SetupReviewPage'
 
 const { store, history } = createStore()
 

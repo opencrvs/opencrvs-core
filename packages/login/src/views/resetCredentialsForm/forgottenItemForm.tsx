@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
-import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Actions = styled.div`
   padding: 32px 0;

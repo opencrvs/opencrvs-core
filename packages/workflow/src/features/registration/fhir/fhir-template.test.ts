@@ -10,15 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  selectOrCreateTaskRefResource,
+  MOTHER_SECTION_CODE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
+import {
   findPersonEntry,
   getTaskResource,
-  isTask
+  isTask,
+  selectOrCreateTaskRefResource
 } from '@workflow/features/registration/fhir/fhir-template'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  MOTHER_SECTION_CODE
-} from '@workflow/features/registration/fhir/constants'
 import { testFhirBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 

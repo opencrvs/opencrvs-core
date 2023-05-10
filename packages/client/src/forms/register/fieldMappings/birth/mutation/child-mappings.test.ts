@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { TransformedData, IFormField } from '@client/forms'
+import { IFormField, TransformedData } from '@client/forms'
 import { birthEventLocationMutationTransformer } from './child-mappings'
 
 describe('Child section mutation mapping related tests', () => {

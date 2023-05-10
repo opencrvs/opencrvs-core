@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from 'styled-components'
 import ReactTooltip from 'react-tooltip'
+import styled from 'styled-components'
 import { InputDescriptor } from './InputDescriptor'
 
 export type IInputLabel = {

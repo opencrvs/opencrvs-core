@@ -13,38 +13,48 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event } from '@client/utils/gateway'
-import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
-  formMessages,
-  userMessages
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
+import { getLanguage } from '@client/i18n/selectors'
 import {
+  goToDeclarationRecordAudit,
   goToPerformanceHome,
-  goToWorkflowStatus,
   goToSearchResult,
-  goToDeclarationRecordAudit
+  goToWorkflowStatus
 } from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import format, { formattedDuration } from '@client/utils/date-formatting'
+import { Event } from '@client/utils/gateway'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { colors } from '@opencrvs/components/lib/colors'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Table } from '@opencrvs/components/lib/Table'
 import {
-  IColumn,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  IColumn
 } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLEventProgressSet,
   GQLHumanName,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema'
+import differenceInSeconds from 'date-fns/differenceInSeconds'
+import subYears from 'date-fns/subYears'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
@@ -53,21 +63,8 @@ import { connect, useSelector } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
-import format, { formattedDuration } from '@client/utils/date-formatting'
-import subYears from 'date-fns/subYears'
-import differenceInSeconds from 'date-fns/differenceInSeconds'
-import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
-import { colors } from '@opencrvs/components/lib/colors'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import register from '@client/registerServiceWorker'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { getLanguage } from '@client/i18n/selectors'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult

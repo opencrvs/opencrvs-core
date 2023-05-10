@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Warning } from '../icons'
 import styled from 'styled-components'
+import { Warning } from '../icons'
 import { Text } from '../Text'
 
 interface IErrorTextProps {

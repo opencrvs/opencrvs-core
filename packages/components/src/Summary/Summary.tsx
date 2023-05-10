@@ -11,8 +11,8 @@
  */
 
 import React from 'react'
-import { Row } from './components/Row'
 import styled from 'styled-components'
+import { Row } from './components/Row'
 
 const SummaryTable = styled.table`
   width: 100%;

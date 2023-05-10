@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IAttachmentValue, IFileValue } from '@client/forms'
+import { ITheme, withTheme } from '@client/styledComponents'
+import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
+import { Button } from '@opencrvs/components/lib/Button/Button'
+import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { Link } from '@opencrvs/components/lib/Link/Link'
+import { ISelectOption } from '@opencrvs/components/lib/Select'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import styled from 'styled-components'
-import { IFileValue, IAttachmentValue } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { withTheme, ITheme } from '@client/styledComponents'
-import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
-import { Link } from '@opencrvs/components/lib/Link/Link'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
-import { Button } from '@opencrvs/components/lib/Button/Button'
 
 const Wrapper = styled.div`
   margin: 8px 0px;

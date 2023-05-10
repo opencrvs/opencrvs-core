@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from './ListViewSimplified'
 import React from 'react'
-import { ToggleMenu } from '../ToggleMenu'
-import { AvatarSmall, AvatarLarge } from '../icons'
-import { Icon } from '../Icon'
-import { Pill } from '../Pill'
 import styled from 'styled-components'
-import { Link } from '../Link'
 import { Button } from '../Button'
+import { Icon } from '../Icon'
+import { AvatarLarge, AvatarSmall } from '../icons'
+import { Link } from '../Link'
+import { Pill } from '../Pill'
+import { ToggleMenu } from '../ToggleMenu'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from './ListViewSimplified'
 
 const Template: Story = ({ children, ...args }) => {
   return <ListViewSimplified {...args}>{children}</ListViewSimplified>

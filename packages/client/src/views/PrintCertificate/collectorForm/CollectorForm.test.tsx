@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { storeDeclaration } from '@client/declarations'
 import { AppStore, createStore } from '@client/store'
+import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
 import {
   createTestComponent,
-  selectOption,
   getFileFromBase64String,
-  validImageB64String,
   inValidImageB64String,
-  mockDeclarationData,
   mockDeathDeclarationData,
-  mockMarriageDeclarationData
+  mockDeclarationData,
+  mockMarriageDeclarationData,
+  selectOption,
+  validImageB64String
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
-import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
 import { createLocation, History } from 'history'
 import { merge } from 'lodash'
-import { Event } from '@client/utils/gateway'
-import { storeDeclaration } from '@client/declarations'
-import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
+import * as React from 'react'
 import { vi } from 'vitest'
+import { CollectorForm } from './CollectorForm'
 
 let store: AppStore
 let history: History

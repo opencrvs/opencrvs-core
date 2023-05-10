@@ -11,9 +11,9 @@
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
 import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
 

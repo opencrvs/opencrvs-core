@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Content } from './Content'
 import React, { ReactElement } from 'react'
-import { DeclarationIcon } from '../icons'
 import { Button } from '../Button'
+import { DeclarationIcon } from '../icons'
 import { Link } from '../Link'
+import { Content } from './Content'
 
 export default {
   title: 'Layout/Content',

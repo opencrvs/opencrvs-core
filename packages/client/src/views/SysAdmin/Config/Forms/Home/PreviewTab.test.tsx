@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createStore, AppStore } from '@client/store'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { AppStore, createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
+import { DraftStatus, Event } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import React from 'react'
 import {
-  ActionState,
-  defaultActionState,
   ActionContext,
-  ActionsModal
+  ActionsModal,
+  ActionState,
+  defaultActionState
 } from './ActionsModal'
 import { PreviewTab } from './PreviewTab'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus, Event } from '@client/utils/gateway'
-import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 
 let component: ReactWrapper<{}, {}>
 

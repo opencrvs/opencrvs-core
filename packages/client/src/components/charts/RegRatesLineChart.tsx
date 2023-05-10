@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/performance'
+import { Event } from '@client/utils/gateway'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
-import { messages } from '@client/i18n/messages/views/performance'
 import type { LegendProps } from 'recharts'
+import styled, { withTheme } from 'styled-components'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme

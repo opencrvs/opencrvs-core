@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import * as routes from '@client/navigation/routes'
 import {
-  PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@client/utils/constants'
-import * as routes from '@client/navigation/routes'
-import { matchPath } from 'react-router'
 import { Location } from 'history'
+import * as React from 'react'
+import { matchPath } from 'react-router'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 function isPathExactmatch(pathname: string, routesPath: string): boolean {
   const match = matchPath(pathname, routesPath)

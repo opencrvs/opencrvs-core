@@ -9,11 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useEffect, useState } from 'react'
+import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { Header } from '@client/components/Header/Header'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { Query } from '@client/components/Query'
+import {
+  DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
+import { DownloadAction } from '@client/forms'
+import { convertToMSISDN } from '@client/forms/utils'
+import {
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
+import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import {
   goToAdvancedSearch,
   goToDeclarationRecordAudit,
@@ -22,15 +37,19 @@ import {
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
-import { useIntl } from 'react-intl'
-import {
-  DOWNLOAD_STATUS,
-  getProcessingDeclarationIds,
-  IDeclaration,
-  SUBMISSION_STATUS
-} from '@client/declarations'
-import { IStoreState } from '@client/store'
+import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import {
+  advancedSearchPillKey,
+  getFormattedAdvanceSearchParamPills,
+  transformStoreDataToAdvancedSearchLocalState
+} from '@client/search/advancedSearch/utils'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
@@ -41,52 +60,32 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
-import {
-  buttonMessages,
-  constantsMessages,
-  dynamicConstantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
-import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { Redirect, RouteComponentProps } from 'react-router'
-import { ErrorText, Link, Pill } from '@client/../../components/lib'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import {
-  ColumnContentAlignment,
-  COLUMNS,
-  IAction,
-  Workqueue
-} from '@opencrvs/components/lib/Workqueue'
-import { transformData } from '@client/search/transformer'
-import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { Query } from '@client/components/Query'
-import { SEARCH_EVENTS } from '@client/search/queries'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 import {
   IconWithName,
   IconWithNameEvent,
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { convertToMSISDN } from '@client/forms/utils'
-import { DownloadAction } from '@client/forms'
-import { formattedDuration } from '@client/utils/date-formatting'
-import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
-import { getOfflineData } from '@client/offline/selectors'
-import { messages as headerMessages } from '@client/i18n/messages/views/header'
+import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
-  advancedSearchPillKey,
-  getFormattedAdvanceSearchParamPills,
-  transformStoreDataToAdvancedSearchLocalState
-} from '@client/search/advancedSearch/utils'
+  ColumnContentAlignment,
+  COLUMNS,
+  IAction,
+  Workqueue
+} from '@opencrvs/components/lib/Workqueue'
 import { omitBy } from 'lodash'
-import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
+import React, { useEffect, useState } from 'react'
+import { useIntl } from 'react-intl'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;

@@ -11,34 +11,34 @@
  */
 import React from 'react'
 
-import styled from '@client/styledComponents'
-import {
-  GQLLocation,
-  GQLIdentifier,
-  GQLPaymentMetric
-} from '@opencrvs/gateway/src/graphql/schema'
-import { Event } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { ILocation } from '@client/offline/reducer'
-import startOfMonth from 'date-fns/startOfMonth'
-import endOfMonth from 'date-fns/endOfMonth'
-import { getPercentage } from '@client/utils/data-formatting'
-import { FormattedNumber, IntlShape } from 'react-intl'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
-import { colors } from '@opencrvs/components/lib/colors'
-import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
+import { ILocation } from '@client/offline/reducer'
+import styled from '@client/styledComponents'
+import { getPercentage } from '@client/utils/data-formatting'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
+  CORRECTION_TOTALS,
   PERFORMANCE_METRICS,
-  PERFORMANCE_STATS,
-  CORRECTION_TOTALS
+  PERFORMANCE_STATS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
 } from '@client/views/SysAdmin/Performance/queries'
+import { colors } from '@opencrvs/components/lib/colors'
+import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import {
+  GQLIdentifier,
+  GQLLocation,
+  GQLPaymentMetric
+} from '@opencrvs/gateway/src/graphql/schema'
+import endOfMonth from 'date-fns/endOfMonth'
+import startOfMonth from 'date-fns/startOfMonth'
+import { FormattedNumber, IntlShape } from 'react-intl'
+import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { generateUsername, sendCredentialsNotification } from './service'
+import { logger } from '@user-mgnt/logger'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
-import * as mockingoose from 'mockingoose'
+import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import { logger } from '@user-mgnt/logger'
+import * as mockingoose from 'mockingoose'
+import { generateUsername, sendCredentialsNotification } from './service'
 
 const fetch = fetchMock as fetchMock.FetchMock
 const mockUsernameRecord = {

@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
+import { NetworkStatus } from '@apollo/client'
+import { SCREEN_LOCK } from '@client/components/ProtectedPage'
+import { setUserDetails } from '@client/profile/profileActions'
+import { storage } from '@client/storage'
 import { AppStore, createStore } from '@client/store'
 import { createTestComponent, flushPromises } from '@client/tests/util'
-import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { setUserDetails } from '@client/profile/profileActions'
-import { NetworkStatus } from '@apollo/client'
 import { userQueries } from '@client/user/queries'
-import { storage } from '@client/storage'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { Status, SystemRoleType } from '@client/utils/gateway'
+import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
+import React from 'react'
+import { Mock, vi } from 'vitest'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper

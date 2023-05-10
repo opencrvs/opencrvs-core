@@ -10,24 +10,41 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { CorrectionSection, UserSection, WizardSection } from '@client/forms'
 import {
+  ADVANCED_SEARCH,
+  ADVANCED_SEARCH_RESULT,
+  APPLICATION_CONFIG,
   CERTIFICATE_COLLECTOR,
+  CERTIFICATE_CONFIG,
+  CERTIFICATE_CORRECTION,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
+  DECLARATION_RECORD_AUDIT,
   DRAFT_BIRTH_INFORMANT_FORM,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
-  EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
+  EVENT_INFO,
+  FORM_CONFIG_HOME,
+  FORM_CONFIG_WIZARD,
   HOME,
+  INFORMANT_NOTIFICATION,
+  ISSUE_CERTIFICATE_PAYMENT,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
+  ORGANISATIONS_INDEX,
+  PERFORMANCE_DASHBOARD,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  ADVANCED_SEARCH,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_STATISTICS,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
+  REGISTRAR_HOME_TAB_PAGE,
   REVIEW_CERTIFICATE,
   REVIEW_USER_DETAILS,
   REVIEW_USER_FORM,
@@ -35,61 +52,44 @@ import {
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
   SELECT_DEATH_INFORMANT,
+  SELECT_MARRIAGE_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
+  SYSTEM_LIST,
   SYS_ADMIN_HOME_TAB,
   TEAM_SEARCH,
-  VERIFY_COLLECTOR,
-  WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CERTIFICATE_CONFIG,
-  APPLICATION_CONFIG,
-  CERTIFICATE_CORRECTION,
-  VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT,
-  FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE,
-  SYSTEM_LIST,
-  VS_EXPORTS,
-  VIEW_RECORD,
-  ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST,
-  PERFORMANCE_LEADER_BOARDS,
-  PERFORMANCE_STATISTICS,
-  PERFORMANCE_DASHBOARD,
   USER_ROLES_CONFIG,
-  ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION,
-  SELECT_MARRIAGE_INFORMANT,
-  ISSUE_COLLECTOR,
-  ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT
+  VERIFY_COLLECTOR,
+  VERIFY_CORRECTOR,
+  VIEW_RECORD,
+  VS_EXPORTS,
+  WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import {
-  NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import {
   goBack as back,
+  goForward as forward,
   push,
-  replace,
-  goForward as forward
+  replace
 } from 'connected-react-router'
-import { stringify } from 'query-string'
-import { Cmd, loop } from 'redux-loop'
-import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { UserDetails } from '@client/utils/userUtils'
+import { stringify } from 'query-string'
+import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
   [key: string]: any

@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { WatchQueryFetchPolicy } from '@apollo/client'
+import { Query } from '@client/components/Query'
 import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
-import { Query } from '@client/components/Query'
-import { WatchQueryFetchPolicy } from '@apollo/client'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IQueryProviderProps {
   event: Event

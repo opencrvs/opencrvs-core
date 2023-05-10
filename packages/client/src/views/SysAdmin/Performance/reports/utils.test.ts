@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  getValueWithPercentageString,
-  getLocationFromPartOfLocationId
-} from './utils'
 import { mockOfflineData } from '@client/tests/util'
+import {
+  getLocationFromPartOfLocationId,
+  getValueWithPercentageString
+} from './utils'
 
 describe('reports utils tests', () => {
   describe('getValueWithPercentage tests', () => {

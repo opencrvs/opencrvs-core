@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import * as Hapi from '@hapi/hapi'
+import { fromBuffer } from 'file-type'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
-import { fromBuffer } from 'file-type'
 
 export async function getUserAvatarHandler(
   request: Hapi.Request,

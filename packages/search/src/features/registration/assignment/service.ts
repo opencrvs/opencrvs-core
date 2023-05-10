@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
 import {
   getUser,
@@ -18,9 +20,7 @@ import {
   NAME_EN
 } from '@search/elasticsearch/utils'
 import { findName, findTaskExtension } from '@search/features/fhir/fhir-utils'
-import * as Hapi from '@hapi/hapi'
 import { getTokenPayload, ITokenPayload } from '@search/utils/authUtils'
-import { client } from '@search/elasticsearch/client'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
   const bundle = requestBundle.payload as fhir.Bundle

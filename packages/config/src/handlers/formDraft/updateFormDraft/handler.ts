@@ -10,16 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
-import * as Joi from 'joi'
-import FormDraft, {
-  validEvent,
-  DraftStatus,
-  IFormDraft
-} from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
+import FormDraft, {
+  DraftStatus,
+  IFormDraft,
+  validEvent
+} from '@config/models/formDraft'
 import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 
 const STATUS_TRANSITION: Record<DraftStatus, DraftStatus[]> = {
   [DraftStatus.DRAFT]: [DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED],

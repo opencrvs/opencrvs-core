@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
-import { ISerializedForm, DeathSection, TEXTAREA } from '@client/forms/index'
-import { formMessageDescriptors } from '@client/i18n/messages'
-import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { DeathSection, ISerializedForm, TEXTAREA } from '@client/forms/index'
 import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { formMessageDescriptors } from '@client/i18n/messages'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export const deathRegisterForms: ISerializedForm = {
   sections: [

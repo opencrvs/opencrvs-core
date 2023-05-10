@@ -12,8 +12,8 @@
 
 import { ISerializedForm } from '@client/forms'
 import { IFieldIdentifiers } from '@client/forms/questionConfig'
-import { FieldPosition } from '.'
 import { Event } from '@client/utils/gateway'
+import { FieldPosition } from '.'
 
 export function getSection(
   { sectionIndex }: IFieldIdentifiers,

@@ -9,26 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { useIntl } from 'react-intl'
 import { Header } from '@client/components/Header/Header'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Navigation } from '@client/components/interface/Navigation'
 import {
   constantsMessages,
   userMessages as messages
 } from '@client/i18n/messages'
-import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Language,
+  Name,
+  Password,
+  PhoneNumber,
+  PIN,
+  ProfileImage,
+  Role
+} from '@client/views/Settings/items'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import {
-  Name,
-  Role,
-  Language,
-  Password,
-  PIN,
-  PhoneNumber,
-  ProfileImage
-} from '@client/views/Settings/items'
+import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
 
 export function SettingsPage() {
   const intl = useIntl()

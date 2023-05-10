@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createRouterProps, createTestComponent } from '@client/tests/util'
-import { AdvancedSearchConfig } from './AdvancedSearch'
-import { createStore } from '@client/store'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { formatUrl } from '@client/navigation'
 import {
   ADVANCED_SEARCH,
   ADVANCED_SEARCH_RESULT
 } from '@client/navigation/routes'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { createStore } from '@client/store'
+import { createRouterProps, createTestComponent } from '@client/tests/util'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { AdvancedSearchConfig } from './AdvancedSearch'
 
 let testComponent: ReactWrapper
 beforeEach(async () => {

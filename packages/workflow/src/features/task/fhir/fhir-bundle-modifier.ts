@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
-  setupLastRegUser,
-  setupLastRegLocation,
+  checkForDuplicateStatusUpdate,
   setupAuthorOnNotes,
-  checkForDuplicateStatusUpdate
+  setupLastRegLocation,
+  setupLastRegUser
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 
 export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {

@@ -9,23 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { queries } from '@client/profile/queries'
 import {
   createTestComponent,
   flushPromises,
   mockUserResponse,
   userDetails
 } from '@client/tests/util'
-import { queries } from '@client/profile/queries'
 import { merge } from 'lodash'
+import * as React from 'react'
 
-import { createStore, AppStore } from '@client/store'
+import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import {
   checkAuth,
   getStorageUserDetailsSuccess
 } from '@client/profile/profileActions'
+import { AppStore, createStore } from '@client/store'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
-import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { History } from 'history'
 import { Mock } from 'vitest'
 

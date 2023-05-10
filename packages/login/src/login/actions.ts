@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { AxiosError } from 'axios'
-import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
-  IApplicationConfigResponse,
+  FORGOTTEN_ITEM,
+  PHONE_NUMBER_VERIFICATION,
+  RECOVERY_CODE_ENTRY,
+  SECURITY_QUESTION,
+  STEP_ONE,
+  SUCCESS,
+  UPDATE_PASSWORD
+} from '@login/navigation/routes'
+import {
   IApplicationConfig,
+  IApplicationConfigResponse,
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
 } from '@login/utils/authApi'
-import {
-  PHONE_NUMBER_VERIFICATION,
-  FORGOTTEN_ITEM,
-  RECOVERY_CODE_ENTRY,
-  SECURITY_QUESTION,
-  UPDATE_PASSWORD,
-  STEP_ONE,
-  SUCCESS
-} from '@login/navigation/routes'
+import { AxiosError } from 'axios'
+import { goBack as back, push, RouterAction } from 'connected-react-router'
 
 export const CONFIG_LOAD = 'login/CONFIG_LOAD'
 export const CONFIG_LOADED = 'login/CONFIG_LOADED'

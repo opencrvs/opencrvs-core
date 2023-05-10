@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { storage } from '@opencrvs/client/src/storage'
-import { FetchUserQuery, HumanName } from '@client/utils/gateway'
-import { createNamesMap } from './data-formatting'
-import { LANG_EN } from './constants'
-import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { FetchUserQuery, HumanName } from '@client/utils/gateway'
+import { storage } from '@opencrvs/client/src/storage'
+import { useSelector } from 'react-redux'
+import { LANG_EN } from './constants'
+import { createNamesMap } from './data-formatting'
 
 export const USER_DETAILS = 'USER_DETAILS'
 

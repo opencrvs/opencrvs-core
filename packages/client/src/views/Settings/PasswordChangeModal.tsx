@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { IStoreState } from '@opencrvs/client/src/store'
+import { gql } from '@apollo/client'
+import { Mutation } from '@apollo/client/react/components'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from '@client/styledComponents'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { gql } from '@apollo/client'
+import { UserDetails } from '@client/utils/userUtils'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
+import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { get } from 'lodash'
 import * as React from 'react'
-import { Mutation } from '@apollo/client/react/components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { UserDetails } from '@client/utils/userUtils'
 
 const Message = styled.div`
   margin-bottom: 16px;

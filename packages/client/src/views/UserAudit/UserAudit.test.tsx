@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import * as profileSelectors from '@client/profile/profileSelectors'
 import { AppStore } from '@client/store'
 import {
   createTestComponent,
@@ -17,17 +19,15 @@ import {
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { userMutations } from '@client/user/mutations'
+import { GET_USER } from '@client/user/queries'
+import { SystemRoleType } from '@client/utils/gateway'
+import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
-import { GET_USER } from '@client/user/queries'
-import { UserAudit } from '@client/views/UserAudit/UserAudit'
-import { userMutations } from '@client/user/mutations'
-import { vi, Mock } from 'vitest'
 import * as Router from 'react-router'
-import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { SystemRoleType } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { Mock, vi } from 'vitest'
 
 const useParams = Router.useParams as Mock
 

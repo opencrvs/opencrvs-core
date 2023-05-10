@@ -9,31 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape } from 'react-intl'
+import { IFormSectionData } from '@client/forms'
 import {
-  getValueFromDeclarationDataByKey,
+  IArithmeticOperationPayload,
+  IConditionExecutorPayload,
+  IDateFeildValuePayload,
+  IFeildValuePayload,
+  IFormattedFeildValuePayload,
+  IFunctionTransformer,
+  IInformantNameCondition,
+  IInformantNamePayload,
+  IIntLabelPayload,
+  INumberFeildConversionPayload,
+  IPersonIdentifierValuePayload,
+  TemplateTransformerData,
+  TransformerPayload
+} from '@client/pdfRenderer/transformer/types'
+import {
   getEventMessageDescription,
   getExecutorFieldValue,
-  getMatchedCondition
+  getMatchedCondition,
+  getValueFromDeclarationDataByKey
 } from '@client/pdfRenderer/transformer/utils'
-import {
-  IIntLabelPayload,
-  IConditionExecutorPayload,
-  IInformantNamePayload,
-  IFeildValuePayload,
-  INumberFeildConversionPayload,
-  IDateFeildValuePayload,
-  IFunctionTransformer,
-  TemplateTransformerData,
-  TransformerPayload,
-  IFormattedFeildValuePayload,
-  IPersonIdentifierValuePayload,
-  IInformantNameCondition,
-  IArithmeticOperationPayload
-} from '@client/pdfRenderer/transformer/types'
-import { IFormSectionData } from '@client/forms'
 import format from '@client/utils/date-formatting'
 import differenceInDays from 'date-fns/differenceInDays'
+import { IntlShape } from 'react-intl'
 
 export const fieldTransformers: IFunctionTransformer = {
   /*

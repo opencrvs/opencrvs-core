@@ -9,6 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import configHandler, {
+  getLoginConfigHandler,
+  updateApplicationConfig,
+  updateApplicationConfigHandler
+} from '@config/handlers/application/applicationConfigHandler'
 import {
   createCertificateHandler,
   deleteCertificateHandler,
@@ -19,32 +24,23 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
-import configHandler, {
-  getLoginConfigHandler,
-  updateApplicationConfig,
-  updateApplicationConfigHandler
-} from '@config/handlers/application/applicationConfigHandler'
-import createQuestionHandler, {
-  formDatasetSchema,
-  requestSchema as createQuestionReqSchema
-} from '@config/handlers/question/createQuestion/handler'
-import updateQuestionHandler, {
-  requestSchema as updateQuestionReqSchema
-} from '@config/handlers/question/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
+import {
+  createFormDatasetHandler,
+  getFormDatasetHandler
+} from '@config/handlers/formDataset/handler'
 import {
   createFormDraftHandler,
   requestSchema as createFormDraftReqSchema
 } from '@config/handlers/formDraft/createFormDraft/handler'
 import {
-  modifyDraftStatusHandler,
-  requestSchema as modifyFormDraftReqSchema
-} from '@config/handlers/formDraft/updateFormDraft/handler'
-import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
-import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import {
+  modifyDraftStatusHandler,
+  requestSchema as modifyFormDraftReqSchema
+} from '@config/handlers/formDraft/updateFormDraft/handler'
 import createInformantSMSNotificationHandler, {
   requestSchema as createInformantSMSNotificationReqSchema
 } from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
@@ -52,11 +48,15 @@ import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNo
 import updateInformantSMSNotificationHandler, {
   requestSchema as updateInformantSMSNotificationReqSchema
 } from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
+import createQuestionHandler, {
+  formDatasetSchema,
+  requestSchema as createQuestionReqSchema
+} from '@config/handlers/question/createQuestion/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
+import updateQuestionHandler, {
+  requestSchema as updateQuestionReqSchema
+} from '@config/handlers/question/updateQuestion/handler'
 import getSystems from '@config/handlers/system/systemHandler'
-import {
-  createFormDatasetHandler,
-  getFormDatasetHandler
-} from '@config/handlers/formDataset/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
