@@ -115,10 +115,10 @@ export function SaveActionModal() {
       show={status === ActionStatus.MODAL}
       handleClose={closeModal}
       actions={[
-        <SecondaryButton onClick={closeModal}>
+        <SecondaryButton key="close-modal-button" onClick={closeModal}>
           {intl.formatMessage(buttonMessages.cancel)}
         </SecondaryButton>,
-        <SaveActionButton comment={comment} />
+        <SaveActionButton key="save-action-button" comment={comment} />
       ]}
     >
       {intl.formatMessage(messages.saveDraftDescription)}

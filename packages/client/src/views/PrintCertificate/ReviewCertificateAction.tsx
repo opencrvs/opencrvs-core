@@ -29,7 +29,6 @@ import {
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
@@ -288,10 +287,15 @@ class ReviewCertificateActionComponent extends React.Component<
               : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
           }
           actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+            <CustomTertiaryButton
+              key="close-modal"
+              onClick={this.toggleModal}
+              id="close-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton
+              key="print-certificate"
               onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >

@@ -199,7 +199,7 @@ function FormConfigSettingsComponent() {
           <ListViewItemSimplified
             label={intl.formatMessage(messages.introductionSettings)}
             value={[
-              <span id="Introduction-page_value">
+              <span key="Introduction-page_value" id="Introduction-page_value">
                 {introductionPage
                   ? intl.formatMessage(messages.disable)
                   : intl.formatMessage(messages.enable)}
@@ -207,6 +207,7 @@ function FormConfigSettingsComponent() {
             ]}
             actions={[
               <Link
+                key="introduction-page-settings"
                 id={'introductionPageSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION)
@@ -222,6 +223,7 @@ function FormConfigSettingsComponent() {
             value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
             actions={[
               <Link
+                key="addresses-settings"
                 id={'addressesSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.ADDRESSES)
@@ -243,6 +245,7 @@ function FormConfigSettingsComponent() {
             }
             actions={[
               <Link
+                key="exact-date-of-birth-unknown-settings"
                 id={'exactDateOfBirthUnknownSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.DATE_OF_BIRTH_UNKNOWN)
@@ -266,6 +269,7 @@ function FormConfigSettingsComponent() {
             }
             actions={[
               <Link
+                key="informant-signature-settings"
                 id={'informantSignatureSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.INFORMANT_SIGNATURE)
