@@ -9,22 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Hapi from '@hapi/hapi'
+import { fetchDocuments } from '@gateway/features/fhir/utils'
 
-import * as React from 'react'
-import styled from 'styled-components'
-
-export interface INavigationGroup
-  extends React.HTMLAttributes<HTMLDivElement> {}
-
-const NavigationGroupContainer = styled.div`
-  padding: 6px;
-  box-shadow: 0px 8px 2px -8px ${({ theme }) => theme.colors.grey300};
-`
-
-interface IProps {
-  children?: React.ReactNode
-}
-
-export const NavigationGroup = (props: IProps) => {
-  return <NavigationGroupContainer>{props.children}</NavigationGroupContainer>
+export async function getPresignedMinioURLHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const fileName = request.params.fileName
+  const response = await fetchDocuments(
+    '/presigned-url',
+    { Authorization: request.headers.authorization },
+    'POST',
+    JSON.stringify({ fileName: fileName })
+  )
+  return response
 }
