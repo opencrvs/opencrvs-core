@@ -299,6 +299,7 @@ export enum AttachmentSubject {
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
+  FamilyHeads = 'FAMILY_HEADS',
   Father = 'FATHER',
   Groom = 'GROOM',
   InformantIdProof = 'INFORMANT_ID_PROOF',
@@ -306,7 +307,8 @@ export enum AttachmentSubject {
   MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
   Mother = 'MOTHER',
   Other = 'OTHER',
-  Parent = 'PARENT'
+  Parent = 'PARENT',
+  Witnesses = 'WITNESSES'
 }
 
 export enum AttachmentType {
@@ -318,12 +320,16 @@ export enum AttachmentType {
   MarriageNotice = 'MARRIAGE_NOTICE',
   MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   NationalId = 'NATIONAL_ID',
+  NationalPoliceId = 'NATIONAL_POLICE_ID',
   NotificationOfBirth = 'NOTIFICATION_OF_BIRTH',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   PoliceCertificateOfDeath = 'POLICE_CERTIFICATE_OF_DEATH',
   ProofOfAssignedResponsibility = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
   ProofOfLegalGuardianship = 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  RefugeeCard = 'REFUGEE_CARD',
+  ResidentCard = 'RESIDENT_CARD',
+  RetiredPoliceId = 'RETIRED_POLICE_ID',
   VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
 }
 
