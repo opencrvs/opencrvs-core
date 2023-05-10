@@ -1929,11 +1929,14 @@ export interface GQLDynamicOptionInput {
   jurisdictionType?: string
 }
 
+<<<<<<< HEAD
 export interface GQLMappingInput {
   mutation: GQLOperation
   query: GQLOperation
 }
 
+=======
+>>>>>>> 7d13fb3b3c398a217b73bd50a63bd389db66c017
 export interface GQLPayment {
   paymentId?: string
   type?: GQLPaymentType
