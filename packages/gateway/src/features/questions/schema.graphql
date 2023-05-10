@@ -43,6 +43,7 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS
   TIME
 }
 
@@ -65,6 +66,11 @@ input MappingInput {
   query: Operation!
 }
 
+input DynamicOptionInput {
+  resource: String
+  dependency: String!
+  jurisdictionType: String
+}
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -89,4 +95,5 @@ input QuestionInput {
   validator: [ValidatorInput!]
   mapping: MappingInput
   extraValue: String
+  dynamicOptions: DynamicOptionInput
 }

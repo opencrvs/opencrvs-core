@@ -47,7 +47,9 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   [CustomFieldType.Subsection]: messages.supportingCopy,
   [CustomFieldType.Paragraph]: messages.heading,
   [CustomFieldType.SelectWithOptions]: messages.customSelect,
-  [CustomFieldType.Time]: messages.time
+  [CustomFieldType.Time]: messages.time,
+  [CustomFieldType.SelectWithDynamicOptions]:
+    messages.customSelectWithDynamicOptions
 }
 
 type IRouteProps = {
@@ -106,7 +108,8 @@ export const FormTools = ({
                 /* TODO */
                 disabled={
                   fieldType === CustomFieldType.Paragraph ||
-                  fieldType === CustomFieldType.Subsection
+                  fieldType === CustomFieldType.Subsection ||
+                  fieldType === CustomFieldType.SelectWithDynamicOptions
                 }
               >
                 {intl.formatMessage(buttonMessages.add)}

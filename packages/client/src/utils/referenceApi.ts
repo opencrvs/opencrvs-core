@@ -226,6 +226,10 @@ function generateLocationResource(fhirLocation: fhir.Location): ILocation {
     fhirLocation.physicalType.coding[0].display
       ? fhirLocation.physicalType.coding[0].display
       : ''
+  loc.jurisdictionType =
+    fhirLocation.identifier?.find(
+      (id) => id.system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+    )?.value ?? ''
   loc.type =
     fhirLocation.type &&
     fhirLocation.type.coding &&
