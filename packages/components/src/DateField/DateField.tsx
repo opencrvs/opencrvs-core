@@ -39,7 +39,7 @@ interface IState {
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
-  width: 56px !important;
+  width: 58px !important;
   margin: 0 4px;
 
   &:first-of-type {

@@ -108,17 +108,17 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__option--is-selected {
-    background-color: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.copy};
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.white};
     &:active {
-      background: ${({ theme }) => theme.colors.grey200};
-      color: ${({ theme }) => theme.colors.copy};
+      background: ${({ theme }) => theme.colors.secondary};
+      color: ${({ theme }) => theme.colors.white};
     }
   }
 
   .react-select__menu {
     z-index: 2;
-    padding: 1px 4px;
+    padding: 0px 4px;
   }
 `
 
