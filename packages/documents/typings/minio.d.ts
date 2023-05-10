@@ -9,11 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const HOST = process.env.DOCUMENTS_HOST || '0.0.0.0'
-export const PORT = process.env.DOCUMENTS_PORT || 9050
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
-export const DEFAULT_TIMEOUT = 600000
-export const PRODUCTION = process.env.NODE_ENV === 'production'
+type Request = {
+  headers: {
+    host: string
+  }
+  protocol: string
+  method: string
+  path: string
+}
+
+declare module 'minio/dist/main/signing' {
+  export function presignSignatureV4(
+    request: Request,
+    accessKey: string,
+    secretKey: string,
+    sessionToken?: string,
+    region: string,
+    requestDate: Date,
+    expires: number
+  ): string
+}

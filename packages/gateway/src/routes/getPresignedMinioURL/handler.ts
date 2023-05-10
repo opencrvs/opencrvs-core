@@ -9,11 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const HOST = process.env.DOCUMENTS_HOST || '0.0.0.0'
-export const PORT = process.env.DOCUMENTS_PORT || 9050
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
-export const DEFAULT_TIMEOUT = 600000
-export const PRODUCTION = process.env.NODE_ENV === 'production'
+import * as Hapi from '@hapi/hapi'
+import { fetchDocuments } from '@gateway/features/fhir/utils'
+
+export async function getPresignedMinioURLHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const fileName = request.params.fileName
+  const response = await fetchDocuments(
+    '/presigned-url',
+    { Authorization: request.headers.authorization },
+    'POST',
+    JSON.stringify({ fileName: fileName })
+  )
+  return response
+}
