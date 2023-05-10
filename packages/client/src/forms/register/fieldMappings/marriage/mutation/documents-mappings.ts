@@ -20,12 +20,16 @@ import {
 export const marriageDocumentForWhomFhirMapping = {
   GROOM: 'GROOM',
   BRIDE: 'BRIDE',
-  MARRIAGE_NOTICE_PROOF: 'MARRIAGE_NOTICE_PROOF'
+  MARRIAGE_NOTICE_PROOF: 'MARRIAGE_NOTICE_PROOF',
+  FAMILY_HEADS: 'FAMILY_HEADS',
+  WITNESSES: 'WITNESSES'
 }
 
 export const marriageSectionMapping = {
   [MarriageSection.Registration]: [
-    marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF
+    marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF,
+    marriageDocumentForWhomFhirMapping.FAMILY_HEADS,
+    marriageDocumentForWhomFhirMapping.WITNESSES
   ],
   [MarriageSection.Groom]: [marriageDocumentForWhomFhirMapping.GROOM],
   [MarriageSection.Bride]: [marriageDocumentForWhomFhirMapping.BRIDE]
