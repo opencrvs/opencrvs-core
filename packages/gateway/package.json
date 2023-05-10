@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -28,7 +28,7 @@
     "@hapi/hapi": "^20.0.1",
     "@hapi/inert": "^7.0.0",
     "@hapi/vision": "^7.0.0",
-    "@opencrvs/commons": "^1.2.0",
+    "@opencrvs/commons": "^1.2.1",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
@@ -39,7 +39,6 @@
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",
     "bunyan": "^1.8.12",
-    "country-data": "^0.0.31",
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
     "file-type": "^16.5.3",
