@@ -66,8 +66,10 @@ export const Body = styled.div`
 `
 const Footer = styled.div`
   display: flex;
-  height: 72px;
-  padding-top: 24px;
+  padding: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 16px;
+  }
 `
 const HeaderBottom = styled.div`
   display: flex;
