@@ -802,6 +802,11 @@ export interface GQLRegistration {
   brideSignature?: string
   witnessOneSignature?: string
   witnessTwoSignature?: string
+  informantsSignatureURI?: string
+  groomSignatureURI?: string
+  brideSignatureURI?: string
+  witnessOneSignatureURI?: string
+  witnessTwoSignatureURI?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -950,6 +955,7 @@ export interface GQLAttachment {
   _fhirID?: string
   contentType?: string
   data?: string
+  uri?: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -1711,6 +1717,16 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  placeOfBirth?: string
+  childGender?: string
+  mothersFirstName?: string
+  mothersLastName?: string
+  fathersFirstName?: string
+  fathersLastName?: string
+  motherDateOfBirth?: string
+  fatherDateOfBirth?: string
+  motherIdentifier?: string
+  fatherIdentifier?: string
 }
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
@@ -1775,7 +1791,8 @@ export interface GQLAddressInput {
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
-  data: string
+  data?: string
+  uri?: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -6656,6 +6673,11 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   brideSignature?: RegistrationToBrideSignatureResolver<TParent>
   witnessOneSignature?: RegistrationToWitnessOneSignatureResolver<TParent>
   witnessTwoSignature?: RegistrationToWitnessTwoSignatureResolver<TParent>
+  informantsSignatureURI?: RegistrationToInformantsSignatureURIResolver<TParent>
+  groomSignatureURI?: RegistrationToGroomSignatureURIResolver<TParent>
+  brideSignatureURI?: RegistrationToBrideSignatureURIResolver<TParent>
+  witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>
+  witnessTwoSignatureURI?: RegistrationToWitnessTwoSignatureURIResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -6861,6 +6883,66 @@ export interface RegistrationToWitnessOneSignatureResolver<
 }
 
 export interface RegistrationToWitnessTwoSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToInformantsSignatureURIResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToGroomSignatureURIResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToBrideSignatureURIResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToWitnessOneSignatureURIResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToWitnessTwoSignatureURIResolver<
   TParent = any,
   TResult = any
 > {
@@ -7604,6 +7686,7 @@ export interface GQLAttachmentTypeResolver<TParent = any> {
   _fhirID?: AttachmentTo_fhirIDResolver<TParent>
   contentType?: AttachmentToContentTypeResolver<TParent>
   data?: AttachmentToDataResolver<TParent>
+  uri?: AttachmentToUriResolver<TParent>
   status?: AttachmentToStatusResolver<TParent>
   originalFileName?: AttachmentToOriginalFileNameResolver<TParent>
   systemFileName?: AttachmentToSystemFileNameResolver<TParent>
@@ -7641,6 +7724,15 @@ export interface AttachmentToContentTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AttachmentToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AttachmentToUriResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -10543,6 +10635,16 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
   operationHistories?: BirthEventSearchSetToOperationHistoriesResolver<TParent>
+  placeOfBirth?: BirthEventSearchSetToPlaceOfBirthResolver<TParent>
+  childGender?: BirthEventSearchSetToChildGenderResolver<TParent>
+  mothersFirstName?: BirthEventSearchSetToMothersFirstNameResolver<TParent>
+  mothersLastName?: BirthEventSearchSetToMothersLastNameResolver<TParent>
+  fathersFirstName?: BirthEventSearchSetToFathersFirstNameResolver<TParent>
+  fathersLastName?: BirthEventSearchSetToFathersLastNameResolver<TParent>
+  motherDateOfBirth?: BirthEventSearchSetToMotherDateOfBirthResolver<TParent>
+  fatherDateOfBirth?: BirthEventSearchSetToFatherDateOfBirthResolver<TParent>
+  motherIdentifier?: BirthEventSearchSetToMotherIdentifierResolver<TParent>
+  fatherIdentifier?: BirthEventSearchSetToFatherIdentifierResolver<TParent>
 }
 
 export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -10603,6 +10705,126 @@ export interface BirthEventSearchSetToRegistrationResolver<
 }
 
 export interface BirthEventSearchSetToOperationHistoriesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToPlaceOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToChildGenderResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMothersFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMothersLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFathersFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFathersLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMotherDateOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFatherDateOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToMotherIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface BirthEventSearchSetToFatherIdentifierResolver<
   TParent = any,
   TResult = any
 > {

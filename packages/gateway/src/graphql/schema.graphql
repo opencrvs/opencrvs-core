@@ -923,6 +923,11 @@ type Registration {
   brideSignature: String
   witnessOneSignature: String
   witnessTwoSignature: String
+  informantsSignatureURI: String
+  groomSignatureURI: String
+  brideSignatureURI: String
+  witnessOneSignatureURI: String
+  witnessTwoSignatureURI: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -1071,6 +1076,7 @@ type Attachment {
   _fhirID: ID
   contentType: String
   data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String
@@ -1807,6 +1813,16 @@ type BirthEventSearchSet implements EventSearchSet {
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+  placeOfBirth: String
+  childGender: String
+  mothersFirstName: String
+  mothersLastName: String
+  fathersFirstName: String
+  fathersLastName: String
+  motherDateOfBirth: String
+  fatherDateOfBirth: String
+  motherIdentifier: String
+  fatherIdentifier: String
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1871,7 +1887,8 @@ input AddressInput {
 input AttachmentInput {
   _fhirID: ID
   contentType: String
-  data: String!
+  data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String

@@ -57,6 +57,7 @@ services:
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - WEBHOOKS_URL=http://webhooks:2525/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
@@ -203,4 +204,5 @@ services:
       dockerfile: ./packages/documents/Dockerfile
     restart: unless-stopped
     environment:
+      - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040

@@ -85,9 +85,7 @@ describe('Change phone modal tests', () => {
     queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready
@@ -109,9 +107,7 @@ describe('Change phone modal tests', () => {
     queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: {
-            id: null
-          }
+          getUserByMobile: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready

@@ -54,3 +54,8 @@ services:
     environment:
       - QA_ENV=true
       - NODE_ENV=production
+
+  documents:
+    environment:
+      - QA_ENV=true
+      - NODE_ENV=production
