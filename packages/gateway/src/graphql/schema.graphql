@@ -581,11 +581,13 @@ input AdvancedSearchParametersInput {
   groomDoB: String
   groomDoBStart: String
   groomDoBEnd: String
+  groomIdentifier: String
   brideFirstNames: String
   brideFamilyName: String
   brideDoB: String
   brideDoBStart: String
   brideDoBEnd: String
+  brideIdentifier: String
   dateOfMarriage: String
   motherFirstNames: String
   motherFamilyName: String
@@ -1881,6 +1883,7 @@ type BirthEventSearchSet implements EventSearchSet {
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
+  deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
@@ -1892,6 +1895,8 @@ type MarriageEventSearchSet implements EventSearchSet {
   type: String
   brideName: [HumanName]
   groomName: [HumanName]
+  brideIdentifier: String
+  groomIdentifier: String
   dateOfMarriage: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
