@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_MONGO_URL } from '@metrics/constants'
+import { HEARTH_MONGO_URL, PRODUCTION } from '@metrics/constants'
 import { logger } from '@metrics/logger'
 import { subMinutes } from 'date-fns'
 import { MongoClient } from 'mongodb'
@@ -58,7 +58,11 @@ export async function refresh() {
 
 async function refreshPerformanceMaterialisedViews(client: MongoClient) {
   const db = client.db()
-  const lastUpdatedAt = subMinutes(new Date(), 5).toISOString()
+  const REFRESH_AFTER_IN_MINUTE = PRODUCTION ? 1440 : 5
+  const lastUpdatedAt = subMinutes(
+    new Date(),
+    REFRESH_AFTER_IN_MINUTE
+  ).toISOString()
   await db
     .collection('Task')
     .aggregate(
@@ -71,7 +75,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$businessStatus.coding' },
         {
           $match: {
-            'businessStatus.coding.code': { $in: ['CERTIFIED', 'REGISTERED'] }
+            'businessStatus.coding.code': {
+              $in: ['CERTIFIED', 'REGISTERED', 'ISSUED']
+            }
           }
         },
         {
@@ -455,7 +461,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -463,23 +469,23 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -500,7 +506,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             birthOrder: '$child.multipleBirthInteger',
             createdBy: '$firstTask.extensionsObject.regLastUser',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
@@ -642,7 +648,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -650,23 +656,23 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -674,11 +680,12 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$state' },
         {
           $project: {
+            _id: '$id',
             gender: '$child.gender',
             reason: '$reason.text',
             extensions: '$extensions',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             event: 'Birth',
             createdAt: {
