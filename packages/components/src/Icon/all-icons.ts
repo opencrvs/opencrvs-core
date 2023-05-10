@@ -11,6 +11,7 @@
  */
 
 export {
+  Activity,
   Archive,
   ArchiveTray,
   ArrowLeft,

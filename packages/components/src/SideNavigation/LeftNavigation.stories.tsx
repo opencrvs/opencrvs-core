@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { Meta } from '@storybook/react'
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { LeftNavigation, ILeftNavigationProps } from './LeftNavigation'
+import { Icon } from '../Icon'
+import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
+import { LeftNavigation } from './LeftNavigation'
 import { NavigationGroup } from './NavigationGroup'
 import { NavigationItem } from './NavigationItem'
-import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
-import { Icon } from '../Icon'
 
 export const SideNav = () => (
   <LeftNavigation
@@ -69,7 +69,7 @@ export const SideNav = () => (
 
 SideNav.args = {
   applicationName: 'OpenCRVS',
-  applicationVersion: '1.1.0',
+  applicationVersion: '1.3.0',
   buildVersion: 'Development'
 }
 
