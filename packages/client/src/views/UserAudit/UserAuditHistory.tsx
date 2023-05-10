@@ -100,7 +100,7 @@ export enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',
-  DATE = 'auditTime',
+  DATE = 'auditTime24',
   DEVICE = 'deviceIpAddress'
 }
 
@@ -325,7 +325,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
-        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
+        auditTime: format(
+          new Date(userAuditItem.time),
+          'MMMM dd, yyyy hh:mm a'
+        ),
+        auditTime24: format(new Date(userAuditItem.time), 'MMMM dd, yyyy HH:mm')
       }
     })
     return (
