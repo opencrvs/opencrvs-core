@@ -1412,9 +1412,9 @@ export interface GQLQuestionInput {
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
   validator?: Array<GQLValidatorInput>
-  dynamicOptions?: GQLDynamicOptionInput
   mapping?: GQLMappingInput
   extraValue?: string
+  dynamicOptions?: GQLDynamicOptionInput
 }
 
 export interface GQLSystemSettings {
@@ -1577,6 +1577,8 @@ export const enum GQLAttachmentSubject {
   PARENT = 'PARENT',
   GROOM = 'GROOM',
   BRIDE = 'BRIDE',
+  WITNESSES = 'WITNESSES',
+  FAMILY_HEADS = 'FAMILY_HEADS',
   CHILD_AGE = 'CHILD_AGE',
   DECEASED_ID_PROOF = 'DECEASED_ID_PROOF',
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
@@ -1923,20 +1925,17 @@ export interface GQLValidatorInput {
   parameters?: Array<number>
 }
 
+export interface GQLMappingInput {
+  mutation: GQLOperation
+  query: GQLOperation
+}
+
 export interface GQLDynamicOptionInput {
   resource?: string
   dependency: string
   jurisdictionType?: string
 }
 
-<<<<<<< HEAD
-export interface GQLMappingInput {
-  mutation: GQLOperation
-  query: GQLOperation
-}
-
-=======
->>>>>>> 7d13fb3b3c398a217b73bd50a63bd389db66c017
 export interface GQLPayment {
   paymentId?: string
   type?: GQLPaymentType
