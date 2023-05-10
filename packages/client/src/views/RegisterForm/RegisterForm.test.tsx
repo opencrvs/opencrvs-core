@@ -9,51 +9,50 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
-  createTestComponent,
-  selectOption,
-  mockDeclarationData,
-  mockDeathDeclarationData,
-  mockMarriageDeclarationData,
-  mockDeathDeclarationDataWithoutFirstNames,
-  getRegisterFormFromStore,
-  getReviewFormFromStore,
-  createTestStore,
-  flushPromises
-} from '@client/tests/util'
-import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
-import { ReactWrapper } from 'enzyme'
-import {
+  SUBMISSION_STATUS,
   createDeclaration,
   createReviewDeclaration,
-  storeDeclaration,
   setInitialDeclarations,
-  SUBMISSION_STATUS,
-  modifyDeclaration
+  storeDeclaration
 } from '@client/declarations'
-import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
 import {
+  createTestComponent,
+  createTestStore,
+  flushPromises,
+  getRegisterFormFromStore,
+  getReviewFormFromStore,
+  mockDeathDeclarationData,
+  mockDeathDeclarationDataWithoutFirstNames,
+  mockDeclarationData,
+  mockMarriageDeclarationData,
+  selectOption
+} from '@client/tests/util'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
+import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
-  REVIEW_EVENT_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  HOME,
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  DRAFT_MARRIAGE_FORM_PAGE
+  DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
+  HOME,
+  REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { v4 as uuid } from 'uuid'
 
-import { IFormData } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
-import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
-import { clone, cloneDeep } from 'lodash'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
+import { draftToGqlTransformer } from '@client/transformer'
 import { DECLARED } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
+import { IFormData } from '@opencrvs/client/src/forms'
+import { History } from 'history'
+import { clone, cloneDeep } from 'lodash'
 import { vi } from 'vitest'
 
 describe('when user is in the register form for birth event', () => {
@@ -306,7 +305,8 @@ describe('when user is in the register form for marriage event', () => {
     })
   })
   describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
+    /* Marriage form in Cameroon doesn't have the informant type selection */
+    it.skip('shows error if click continue without any value', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm

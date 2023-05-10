@@ -154,6 +154,7 @@ interface IFormMessages
   educationAttainmentNone: MessageDescriptor
   enterResponse: MessageDescriptor
   familyName: MessageDescriptor
+  firstNameFamilyName: MessageDescriptor
   marriedLastName: MessageDescriptor
   father: MessageDescriptor
   fatherFamilyName: MessageDescriptor
@@ -1174,6 +1175,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Last name',
     description: 'Label for family name text input',
     id: 'form.field.label.familyName'
+  },
+  firstNameFamilyName: {
+    defaultMessage: 'Name and surname',
+    description: 'Label for family name text input',
+    id: 'form.field.label.firstNameFamilyName'
   },
   marriedLastName: {
     defaultMessage: 'Married Last name (if different)',

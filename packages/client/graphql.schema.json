@@ -2756,6 +2756,12 @@
             "deprecationReason": null
           },
           {
+            "name": "FAMILY_HEADS",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "FATHER",
             "description": null,
             "isDeprecated": false,
@@ -2799,6 +2805,12 @@
           },
           {
             "name": "PARENT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WITNESSES",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -2863,6 +2875,12 @@
             "deprecationReason": null
           },
           {
+            "name": "NATIONAL_POLICE_ID",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "NOTIFICATION_OF_BIRTH",
             "description": null,
             "isDeprecated": false,
@@ -2894,6 +2912,24 @@
           },
           {
             "name": "PROOF_OF_LEGAL_GUARDIANSHIP",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REFUGEE_CARD",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RESIDENT_CARD",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RETIRED_POLICE_ID",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

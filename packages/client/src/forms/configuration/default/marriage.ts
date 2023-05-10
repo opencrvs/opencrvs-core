@@ -30,7 +30,12 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'who-is-applying-view-group',
           title: informantMessageDescriptors.marriageInformantTitle,
-          conditionals: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'true'
+            }
+          ],
           preventContinueIfError: true,
           showExitButtonOnly: true,
           fields: [
@@ -139,6 +144,10 @@ export const marriageRegisterForms: ISerializedForm = {
                   label: informantMessageDescriptors.bride
                 },
                 {
+                  value: 'OTHER_FAMILY_MEMBER',
+                  label: informantMessageDescriptors.otherFamilyMember
+                },
+                {
                   value: 'OTHER',
                   label: formMessageDescriptors.someoneElse
                 }
@@ -181,6 +190,42 @@ export const marriageRegisterForms: ISerializedForm = {
                   }
                 ],
                 BRIDE: [
+                  {
+                    name: 'registrationPhone',
+                    type: 'TEL',
+                    label: formMessageDescriptors.phoneNumber,
+                    required: true,
+                    initialValue: '',
+                    validator: [
+                      {
+                        operation: 'phoneNumberFormat'
+                      }
+                    ],
+                    mapping: {
+                      mutation: {
+                        operation: 'changeHirerchyMutationTransformer',
+                        parameters: [
+                          'registration.contactPhoneNumber',
+                          {
+                            operation: 'msisdnTransformer',
+                            parameters: ['registration.contactPhoneNumber']
+                          }
+                        ]
+                      },
+                      query: {
+                        operation: 'changeHirerchyQueryTransformer',
+                        parameters: [
+                          'registration.contactPhoneNumber',
+                          {
+                            operation: 'localPhoneTransformer',
+                            parameters: ['registration.contactPhoneNumber']
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                OTHER_FAMILY_MEMBER: [
                   {
                     name: 'registrationPhone',
                     type: 'TEL',
@@ -522,7 +567,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'familyNameEng',
               previewGroup: 'groomNameInEnglish',
               type: 'TEXT',
-              label: formMessageDescriptors.familyName,
+              label: formMessageDescriptors.firstNameFamilyName,
               maxLength: 32,
               required: true,
               initialValue: '',
@@ -796,7 +841,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'familyNameEng',
               previewGroup: 'brideNameInEnglish',
               type: 'TEXT',
-              label: formMessageDescriptors.familyName,
+              label: formMessageDescriptors.firstNameFamilyName,
               maxLength: 32,
               required: true,
               initialValue: '',

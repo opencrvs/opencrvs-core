@@ -20,7 +20,11 @@ const fieldNameMapping = {
   [marriageDocumentForWhomFhirMapping.GROOM]: 'uploadDocForGroom',
   [marriageDocumentForWhomFhirMapping.BRIDE]: 'uploadDocForBride',
   [marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF]:
-    'uploadDocForMarriageProof'
+    'uploadDocForMarriageProof',
+  [marriageDocumentForWhomFhirMapping.WITNESSES]:
+    'uploadDocForIdentityWitnesses',
+  [marriageDocumentForWhomFhirMapping.FAMILY_HEADS]:
+    'uploadDocForIdentityHeadsOfFamily'
 }
 
 export function marriageAttachmentToFieldTransformer(

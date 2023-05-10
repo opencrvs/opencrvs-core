@@ -1413,6 +1413,8 @@ export interface GQLQuestionInput {
   options?: Array<GQLCustomSelectOption>
   validator?: Array<GQLValidatorInput>
   dynamicOptions?: GQLDynamicOptionInput
+  mapping?: GQLMappingInput
+  extraValue?: string
 }
 
 export interface GQLSystemSettings {
@@ -1560,7 +1562,11 @@ export const enum GQLAttachmentType {
   VERBAL_AUTOPSY_REPORT = 'VERBAL_AUTOPSY_REPORT',
   CORONERS_REPORT = 'CORONERS_REPORT',
   MARRIAGE_NOTICE = 'MARRIAGE_NOTICE',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  RESIDENT_CARD = 'RESIDENT_CARD',
+  REFUGEE_CARD = 'REFUGEE_CARD',
+  NATIONAL_POLICE_ID = 'NATIONAL_POLICE_ID',
+  RETIRED_POLICE_ID = 'RETIRED_POLICE_ID'
 }
 
 export const enum GQLAttachmentSubject {
@@ -1923,6 +1929,11 @@ export interface GQLDynamicOptionInput {
   jurisdictionType?: string
 }
 
+export interface GQLMappingInput {
+  mutation: GQLOperation
+  query: GQLOperation
+}
+
 export interface GQLPayment {
   paymentId?: string
   type?: GQLPaymentType
@@ -1989,6 +2000,10 @@ export interface GQLMesssageDescriptorInput {
   id: string
   description?: string
   defaultMessage: string
+}
+
+export interface GQLOperation {
+  operation: string
 }
 
 export const enum GQLPaymentType {
