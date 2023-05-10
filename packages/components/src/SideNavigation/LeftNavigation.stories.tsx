@@ -22,7 +22,7 @@ import {
 import { NavigationGroupHeader } from './NavigationGroupHeader'
 import { recordGroup } from './NavigationGroupHeader.stories'
 import { NavigationItem } from './NavigationItem'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '../Icon'
 import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
 import { SettingsNavigation } from '../icons/SettingsNavigation'
 
