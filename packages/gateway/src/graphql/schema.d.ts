@@ -448,11 +448,13 @@ export interface GQLAdvancedSearchParametersInput {
   groomDoB?: string
   groomDoBStart?: string
   groomDoBEnd?: string
+  groomIdentifier?: string
   brideFirstNames?: string
   brideFamilyName?: string
   brideDoB?: string
   brideDoBStart?: string
   brideDoBEnd?: string
+  brideIdentifier?: string
   dateOfMarriage?: string
   motherFirstNames?: string
   motherFamilyName?: string
@@ -1732,6 +1734,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   id: string
   type?: string
+  deceasedGender?: string
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLDate
   registration?: GQLRegistrationSearchSet
@@ -1743,6 +1746,8 @@ export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
   type?: string
   brideName?: Array<GQLHumanName | null>
   groomName?: Array<GQLHumanName | null>
+  brideIdentifier?: string
+  groomIdentifier?: string
   dateOfMarriage?: GQLDate
   registration?: GQLRegistrationSearchSet
   operationHistories?: Array<GQLOperationHistorySearchSet | null>
@@ -10839,6 +10844,7 @@ export interface BirthEventSearchSetToFatherIdentifierResolver<
 export interface GQLDeathEventSearchSetTypeResolver<TParent = any> {
   id?: DeathEventSearchSetToIdResolver<TParent>
   type?: DeathEventSearchSetToTypeResolver<TParent>
+  deceasedGender?: DeathEventSearchSetToDeceasedGenderResolver<TParent>
   deceasedName?: DeathEventSearchSetToDeceasedNameResolver<TParent>
   dateOfDeath?: DeathEventSearchSetToDateOfDeathResolver<TParent>
   registration?: DeathEventSearchSetToRegistrationResolver<TParent>
@@ -10855,6 +10861,18 @@ export interface DeathEventSearchSetToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DeathEventSearchSetToDeceasedGenderResolver<
   TParent = any,
   TResult = any
 > {
@@ -10919,6 +10937,8 @@ export interface GQLMarriageEventSearchSetTypeResolver<TParent = any> {
   type?: MarriageEventSearchSetToTypeResolver<TParent>
   brideName?: MarriageEventSearchSetToBrideNameResolver<TParent>
   groomName?: MarriageEventSearchSetToGroomNameResolver<TParent>
+  brideIdentifier?: MarriageEventSearchSetToBrideIdentifierResolver<TParent>
+  groomIdentifier?: MarriageEventSearchSetToGroomIdentifierResolver<TParent>
   dateOfMarriage?: MarriageEventSearchSetToDateOfMarriageResolver<TParent>
   registration?: MarriageEventSearchSetToRegistrationResolver<TParent>
   operationHistories?: MarriageEventSearchSetToOperationHistoriesResolver<TParent>
@@ -10961,6 +10981,30 @@ export interface MarriageEventSearchSetToBrideNameResolver<
 }
 
 export interface MarriageEventSearchSetToGroomNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToBrideIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageEventSearchSetToGroomIdentifierResolver<
   TParent = any,
   TResult = any
 > {
