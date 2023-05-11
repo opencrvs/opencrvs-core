@@ -201,28 +201,36 @@ export async function fhirWorkflowEventHandler(
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
     case Events.DEATH_IN_PROGRESS_DEC:
-    case Events.MARRIAGE_IN_PROGRESS_DEC:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_IN_PROGRESS_DEC: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_NEW_DEC:
     case Events.DEATH_NEW_DEC:
-    case Events.MARRIAGE_NEW_DEC:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_NEW_DEC: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
-    case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await markEventAsWaitingValidationHandler(request, h, event)
+    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION: {
+      const { resBundle, payloadForInvokingValidation } =
+        await markEventAsWaitingValidationHandler(request, h, event)
+      response = resBundle
       validationResponse = await invokeRegistrationValidation(
-        response.payloadForInvokingValidation,
+        payloadForInvokingValidation,
         request.headers,
         getToken(request)
       )
@@ -230,6 +238,7 @@ export async function fhirWorkflowEventHandler(
         await triggerEvent(event, request.payload, request.headers)
       }
       break
+    }
     case Events.BIRTH_REQUEST_CORRECTION:
     case Events.DEATH_REQUEST_CORRECTION:
     case Events.MARRIAGE_REQUEST_CORRECTION:
@@ -238,17 +247,20 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION: {
+      const { resBundle, payloadForInvokingValidation } =
+        await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
       await invokeRegistrationValidation(
-        response.payloadForInvokingValidation,
+        payloadForInvokingValidation,
         request.headers,
         getToken(request)
       )
       break
+    }
     case Events.BIRTH_MARK_REINSTATED:
     case Events.DEATH_MARK_REINSTATED:
     case Events.MARRIAGE_MARK_REINSTATED:

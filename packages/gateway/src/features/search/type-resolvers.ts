@@ -240,6 +240,9 @@ export const searchTypeResolvers: GQLResolver = {
     operationHistories(resultSet: ISearchEventDataTemplate) {
       return resultSet._source.operationHistories
     },
+    deceasedGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
+    },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
     },
@@ -263,8 +266,14 @@ export const searchTypeResolvers: GQLResolver = {
     brideName(resultSet: ISearchEventDataTemplate) {
       return getBrideName(resultSet._source)
     },
+    brideIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.brideIdentifier) || null
+    },
     groomName(resultSet: ISearchEventDataTemplate) {
       return getGroomName(resultSet._source)
+    },
+    groomIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.groomIdentifier) || null
     },
     dateOfMarriage(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.marriageDate) || null

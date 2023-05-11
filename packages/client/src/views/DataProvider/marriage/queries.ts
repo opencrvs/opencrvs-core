@@ -127,15 +127,20 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         groomSignature
+        groomSignatureURI
         brideSignature
+        brideSignatureURI
         witnessOneSignature
+        witnessOneSignatureURI
         witnessTwoSignature
+        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId
         }
         attachments {
           data
+          uri
           type
           contentType
           subject
@@ -386,15 +391,20 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contactRelationship
         contactPhoneNumber
         groomSignature
+        groomSignatureURI
         brideSignature
+        brideSignatureURI
         witnessOneSignature
+        witnessOneSignatureURI
         witnessTwoSignature
+        witnessTwoSignatureURI
         duplicates {
           compositionId
           trackingId
         }
         attachments {
           data
+          uri
           type
           contentType
           subject
