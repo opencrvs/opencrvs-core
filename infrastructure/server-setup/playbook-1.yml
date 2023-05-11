@@ -27,6 +27,7 @@
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - disk_encryption_key is defined
           - country_config_path is defined
           - disk_encryption_key is defined
           - country_config_path is defined
