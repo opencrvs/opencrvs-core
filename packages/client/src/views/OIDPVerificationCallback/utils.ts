@@ -23,42 +23,42 @@ export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
   'oidp-verification-nonce'
 
 interface OIDPUserAddress {
-  formatted?: string
-  street_address?: string
-  locality?: string
-  region?: string
-  postal_code?: string
-  city?: string
-  country?: string
+  formatted?: string | null
+  street_address?: string | null
+  locality?: string | null
+  region?: string | null
+  postal_code?: string | null
+  city?: string | null
+  country?: string | null
 }
 
 interface oidpUserInfo {
   sub: string
-  name?: string
-  given_name?: string
-  family_name?: string
-  middle_name?: string
-  nickname?: string
-  preferred_username?: string
-  profile?: string
-  picture?: string
-  website?: string
-  email?: string
-  email_verified?: boolean
-  gender?: string
-  birthdate?: string
-  zoneinfo?: string
-  locale?: string
-  phone_number?: string
-  phone_number_verified?: boolean
-  address?: OIDPUserAddress
-  updated_at?: number
+  name?: string | null
+  given_name?: string | null
+  family_name?: string | null
+  middle_name?: string | null
+  nickname?: string | null
+  preferred_username?: string | null
+  profile?: string | null
+  picture?: string | null
+  website?: string | null
+  email?: string | null
+  email_verified?: boolean | null
+  gender?: string | null
+  birthdate?: string | null
+  zoneinfo?: string | null
+  locale?: string | null
+  phone_number?: string | null
+  phone_number_verified?: boolean | null
+  address?: OIDPUserAddress | null
+  updated_at?: number | null
 }
 
 interface UserInfo {
   oidpUserInfo: oidpUserInfo
-  districtFhirId?: string
-  stateFhirId?: string
+  districtFhirId?: string | null
+  stateFhirId?: string | null
 }
 
 export interface INidCallbackState {
@@ -100,16 +100,11 @@ export function addNidUserInfoToDeclaration(
     fieldsModifiedByNidUserInfo.push('familyNameEng')
   }
 
-  if (oidpUserInfo.address) {
-    const country = oidpUserInfo.address.country
-    if (!country) {
-      return
-    }
-
-    declarationDataSection['countryPrimary'] = country
+  if (oidpUserInfo.address?.country) {
+    declarationDataSection['countryPrimary'] = oidpUserInfo.address.country
     fieldsModifiedByNidUserInfo.push('countryPrimary')
 
-    if (isDefaultCountry(country)) {
+    if (isDefaultCountry(oidpUserInfo.address.country)) {
       //populate default country specific address fields
       if (nidUserInfo.stateFhirId) {
         declarationDataSection['StatePrimary'] = nidUserInfo.stateFhirId
@@ -178,7 +173,11 @@ export function generateNonce() {
   return uuid()
 }
 
-export function splitName(name = '') {
+export function splitName(name: string | undefined | null = '') {
+  if (!name) {
+    return { firstName: '', lastName: '' }
+  }
+
   const [firstName, ...lastName] = name.split(' ').filter(Boolean)
   return {
     firstName: firstName,

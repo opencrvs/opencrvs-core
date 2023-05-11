@@ -109,6 +109,9 @@ export const fetchUserInfo = async (accessToken: string) => {
 
   const response = await request.text()
   const decodedResponse = decodeUserInfoResponse(response)
+
+  logger.debug('OIDP user info response: ', JSON.stringify(decodedResponse))
+
   return pickUserInfo(decodedResponse)
 }
 
