@@ -42,7 +42,7 @@ describe('Username generation', () => {
   })
 
   it('generates valid username with given and family names with appended number', async () => {
-    const finderMock = (query: any) => {
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
       if (query.getQuery().username === 'je.doe') {
         return mockUser
       }

@@ -190,7 +190,7 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
-    const finderMock = (query: any) => {
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
       if (query.getQuery()._id === '12345') {
         return mockUser
       }
@@ -252,7 +252,7 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
 
-    const finderMock = (query: any) => {
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
       if (query.getQuery()._id === '12345') {
         return mockUser
       }
@@ -378,7 +378,7 @@ describe('updateUser handler', () => {
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
-    const finderMock = (query: any) => {
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
       if (query.getQuery()._id === '12345') {
         return mockUser
       }
