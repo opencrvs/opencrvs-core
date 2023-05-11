@@ -187,6 +187,7 @@ export function IssueCollectorForm({
     >
       <FormFieldGenerator
         id="collector"
+        key="collector"
         onChange={(values) => {
           handleChange(values, declaration)
         }}

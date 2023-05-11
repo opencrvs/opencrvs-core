@@ -48,7 +48,6 @@ export function setMarriageRegistrationSectionTransformer(
       transformedData[sectionId].brideSignature =
         draftData[sectionId].brideSignature
     }
-    
 
     if (draftData[sectionId].witnessOneSignatureURI) {
       transformedData[sectionId].witnessOneSignature =
@@ -65,7 +64,6 @@ export function setMarriageRegistrationSectionTransformer(
       transformedData[sectionId].witnessTwoSignature =
         draftData[sectionId].witnessTwoSignature
     }
-    
 
     if (!transformedData[sectionId].status) {
       transformedData[sectionId].status = [
