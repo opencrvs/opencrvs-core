@@ -29,8 +29,6 @@
           - elasticsearch_superuser_password is defined
           - disk_encryption_key is defined
           - country_config_path is defined
-          - disk_encryption_key is defined
-          - country_config_path is defined
           - encrypted_disk_size is defined
 
     - name: Setting global variables accessed by country configuration playbook

@@ -56,7 +56,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.OTHER
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -140,7 +140,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.OTHER
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
