@@ -100,7 +100,7 @@ export enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',
-  DATE = 'auditTimeStamp',
+  DATE = 'auditTimeValue',
   DEVICE = 'deviceIpAddress'
 }
 
@@ -329,7 +329,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           new Date(userAuditItem.time),
           'MMMM dd, yyyy hh:mm a'
         ),
-        auditTimeStamp: new Date(userAuditItem.time).getTime()
+        auditTimeValue: new Date(userAuditItem.time)
       }
     })
     return (
