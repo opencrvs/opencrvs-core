@@ -71,7 +71,7 @@ const getValidationErrors = {
     if (field.required) {
       validators.push(required(requiredErrorMessage))
     } else if (field.validateEmpty) {
-    } else if (!value) {
+    } else if (!value && value !== 0) {
       validators = []
     }
 
