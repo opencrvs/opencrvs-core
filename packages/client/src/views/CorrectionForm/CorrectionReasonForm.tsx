@@ -25,8 +25,7 @@ import {
 import {
   CorrectionSection,
   IFormSection,
-  IFormSectionData,
-  IForm
+  IFormSectionData
 } from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -129,6 +128,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         >
           <FormFieldGenerator
             id={group.id}
+            key={group.id}
             onChange={(values) => {
               modifyDeclaration(values, section, declaration)
             }}

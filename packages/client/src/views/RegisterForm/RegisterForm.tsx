@@ -832,6 +832,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
+                            key={activeSectionGroup.id}
                             onChange={(values) => {
                               debouncedModifyDeclaration(
                                 values,
