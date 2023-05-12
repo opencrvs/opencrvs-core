@@ -97,8 +97,9 @@ export const getFieldValue = (
   intl: IntlShape
 ) => {
   let original = value
-  // HotFix: The fieldObject that are receiving here is internationStatePrimary
-  // rather than statePrimary same for district
+  // HOTFIX: The name of the fieldObject that is being received
+  // here is internationalStatePrimary rather than statePrimary
+  // same for districts as well as the secondary address fields
   if (
     fieldObj.name.toLowerCase().includes('state') ||
     fieldObj.name.toLowerCase().includes('district')
