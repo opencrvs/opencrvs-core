@@ -79,6 +79,12 @@ export function addNidUserInfoToDeclaration(
   nidUserInfo: UserInfo
 ) {
   const oidpUserInfo = nidUserInfo.oidpUserInfo
+
+  // initialise the section (mother/father/informant) if it doesn't exist
+  if (!declaration.data[section]) {
+    declaration.data[section] = {}
+  }
+
   const declarationDataSection = declaration.data[section]
   const fieldsModifiedByNidUserInfo = []
   const splitFullName = splitName(oidpUserInfo.name)
