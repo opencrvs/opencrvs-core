@@ -9,32 +9,47 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { RadioGroup, IRadioGroupProps } from './RadioGroup'
+import { RadioButton } from './RadioButton'
+import React from 'react'
 
 export default {
-  title: 'Input/Radio/Radio group',
-  component: RadioGroup
+  title: 'Input/Radio/Radio',
+  component: RadioButton
 } as Meta
 
-const Template: Story<IRadioGroupProps> = (args) => <RadioGroup {...args} />
+type Value = string | number | boolean
 
-export const RadioGroupView = Template.bind({})
-RadioGroupView.args = {
-  options: [
-    {
-      label: 'Yes',
-      value: '1'
-    },
-    {
-      label: 'No',
-      value: '0'
-    }
-  ],
-  name: 'test-radio-group1',
-  onChange: (value: string) => {
-    alert(value)
-  },
-  value: '1'
+interface IRadioButton {
+  id: string
+  name: string
+  label: string
+  value: Value
+  selected?: string
+  disabled?: boolean
+  size?: string
+  onChange?: (value: Value) => void
+}
+
+const Template: Story<IRadioButton> = (args) => <RadioButton {...args} />
+
+export const RadioSmall = Template.bind({})
+RadioSmall.args = {
+  name: 'radio-button',
+  label: 'Birth',
+  value: 'Father',
+  id: 'Father',
+  selected: 'Father',
+  onChange: () => alert('checked')
+}
+
+export const RadioLarge = Template.bind({})
+RadioLarge.args = {
+  name: 'radio-button',
+  label: 'Birth',
+  value: 'Father',
+  size: 'large',
+  id: 'Father',
+  selected: 'Father',
+  onChange: () => alert('checked')
 }

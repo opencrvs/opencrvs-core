@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 import { logger } from '@user-mgnt/logger'
 
@@ -268,18 +267,16 @@ export async function generateUsername(
   }
 
   try {
-    const record = await UsernameRecord.findOne({
-      username: proposedUsername
-    }).exec()
-
-    if (record !== null) {
-      proposedUsername += record.count
-      await UsernameRecord.update(
-        { username: record.username },
-        { $set: { count: record.count + 1 } }
-      ).exec()
-    } else {
-      await UsernameRecord.create({ username: proposedUsername, count: 1 })
+    let usernameTaken = await checkUsername(proposedUsername)
+    let i = 1
+    const copyProposedName = proposedUsername
+    while (usernameTaken) {
+      if (existingUserName && existingUserName === proposedUsername) {
+        return proposedUsername
+      }
+      proposedUsername = copyProposedName + i
+      i += 1
+      usernameTaken = await checkUsername(proposedUsername)
     }
   } catch (err) {
     logger.error(`Failed username generation: ${err}`)
@@ -287,6 +284,11 @@ export async function generateUsername(
   }
 
   return proposedUsername
+}
+
+async function checkUsername(username: string) {
+  const user = await User.findOne({ username })
+  return !!user
 }
 
 export async function sendCredentialsNotification(
