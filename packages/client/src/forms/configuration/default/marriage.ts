@@ -1111,7 +1111,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessOneNameInEnglish',
               label: {
-                defaultMessage: 'Fullname',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness one name in english',
                 id: 'form.preview.group.label.witness.one.english.name'
               },
@@ -1268,7 +1268,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessTwoNameInEnglish',
               label: {
-                defaultMessage: 'Fullname',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness two name in english',
                 id: 'form.preview.group.label.witness.two.english.name'
               },

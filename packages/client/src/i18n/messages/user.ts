@@ -235,7 +235,7 @@ const messagesToDefine: IUserMessages = {
     id: 'userSetup.type.system'
   },
   labelEnglishName: {
-    defaultMessage: 'Fullname',
+    defaultMessage: 'Full name',
     description: 'English name label',
     id: 'settings.user.label.nameEN'
   },

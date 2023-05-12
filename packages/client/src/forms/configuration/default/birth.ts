@@ -1291,7 +1291,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'informantNameInEnglish',
               label: {
-                defaultMessage: "Informant's fullname",
+                defaultMessage: 'Full name',
                 description: "Label for informant's name in english",
                 id: 'form.preview.group.label.informant.english.name'
               },
@@ -1843,7 +1843,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'motherNameInEnglish',
               label: {
-                defaultMessage: 'Fullname',
+                defaultMessage: 'Full name',
                 description: "Group label for mother's name in english",
                 id: 'form.preview.group.label.mother.english.name'
               },
@@ -2367,7 +2367,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'fatherNameInEnglish',
               label: {
-                defaultMessage: "Father's fullname",
+                defaultMessage: 'Full name',
                 description: "Group label for father's name in english",
                 id: 'form.preview.group.label.father.english.name'
               },
