@@ -1029,6 +1029,7 @@ function requestWithStateWrapper(
         await fetchAllDuplicateDeclarations(data.data as Query)
       }
       await fetchAllMinioUrlsInAttachment(data.data as Query)
+      await fetchAllMinioUrlsForSignature(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
@@ -1054,6 +1055,48 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
 
   return Promise.all(urlsWithMinioPath)
 }
+
+async function fetchAllMinioUrlsForSignature(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
+
+  const signatureUrls = []
+  if (registration?.type === Event.Birth.toUpperCase()) {
+    if (registration?.informantsSignature) {
+      signatureUrls.push(registration?.informantsSignature)
+    }
+  } else if (registration?.type === Event.Death.toUpperCase()) {
+    if (registration?.informantsSignature) {
+      signatureUrls.push(registration?.informantsSignature)
+    }
+  } else if (registration?.type === Event.Marriage.toUpperCase()) {
+    if (registration?.brideSignature) {
+      signatureUrls.push(registration?.brideSignature)
+    }
+    if (registration?.groomSignature) {
+      signatureUrls.push(registration?.groomSignature)
+    }
+    if (registration?.witnessOneSignature) {
+      signatureUrls.push(registration?.witnessOneSignature)
+    }
+    if (registration?.witnessTwoSignature) {
+      signatureUrls.push(registration?.witnessTwoSignature)
+    }
+  }
+
+  if (signatureUrls.length === 0) {
+    return
+  }
+
+  const signaturesUrlsWithMinioPath = signatureUrls.map((data) =>
+    fetch(String(data)).then((res) => res.blob())
+  )
+
+  return Promise.all(signaturesUrlsWithMinioPath)
+}
+
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   const registration =
