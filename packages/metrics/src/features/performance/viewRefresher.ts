@@ -31,15 +31,15 @@ import * as Hapi from '@hapi/hapi'
 let updateInProgress = false
 let nextUpdateRequested = false
 
-export async function metabaseDataRefreshHandler(
+export async function performanceDataRefreshHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   refresh().catch((error) => {
-    logger.error(`Error on metabase data refresh triggered: ${error}`)
+    logger.error(`Error on performance data refresh triggered: ${error}`)
   })
   return h.response({
-    message: 'Successfully triggered metabase data refresh',
+    message: 'Successfully triggered performance data refresh',
     statusCode: 200
   })
 }

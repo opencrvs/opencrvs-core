@@ -75,7 +75,7 @@ import {
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
 import {
-  metabaseDataRefreshHandler,
+  performanceDataRefreshHandler,
   refresh
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV } from '@metrics/constants'
@@ -699,8 +699,8 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/refreshMetabaseData',
-      handler: metabaseDataRefreshHandler,
+      path: '/refreshPerformanceData',
+      handler: performanceDataRefreshHandler,
       config: {
         tags: ['api'],
         auth: false
