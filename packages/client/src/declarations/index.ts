@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query, SystemRoleType } from '@client/utils/gateway'
+import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -1047,8 +1047,10 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
     return
   }
   const urlsWithMinioPath = attachments
-    .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(String(a.data)))
+    .filter((a): a is Attachment =>
+      Boolean(a?.data && !isBase64FileString(a.data))
+    )
+    .map((a) => fetch(String(a.data)).then((res) => res.blob()))
 
   return Promise.all(urlsWithMinioPath)
 }
