@@ -241,14 +241,12 @@ export function updateTaskTemplate(
     throw new Error('Task has no businessStatus code')
   }
   task.businessStatus.coding[0].code = status
-  if (reason) {
-    if (!task.reason) {
-      task.reason = {
-        text: ''
-      }
+  if (!task.reason) {
+    task.reason = {
+      text: ''
     }
-    task.reason.text = reason || ''
   }
+  task.reason.text = reason || ''
   const statusReason: fhir.CodeableConcept = {
     text: comment || ''
   }

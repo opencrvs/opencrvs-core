@@ -371,8 +371,7 @@ const DeathSection = () => {
             'deceasedDoB',
             'deceasedFirstNames',
             'deceasedFamilyName',
-            'deceasedGender',
-            'placeOfDeath'
+            'deceasedGender'
           ])}
         />
       </Accordion>

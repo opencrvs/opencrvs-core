@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { messages } from '@client/i18n/messages/views/correction'
+import { Event } from '@client/utils/gateway'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death
@@ -109,7 +109,31 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       required: true,
       initialValue: '',
       validator: [],
-      options: CollectorRelationLabelArray,
+      options: [
+        { value: CorrectorRelationship.MOTHER, label: messages.mother },
+        { value: CorrectorRelationship.FATHER, label: messages.father },
+        { value: CorrectorRelationship.CHILD, label: messages.child },
+        {
+          value: CorrectorRelationship.LEGAL_GUARDIAN,
+          label: messages.legalGuardian
+        },
+        {
+          value: CorrectorRelationship.ANOTHER_AGENT,
+          label: messages.anotherRegOrFieldAgent
+        },
+        {
+          value: CorrectorRelationship.REGISTRAR,
+          label: messages.me
+        },
+        {
+          value: CorrectorRelationship.COURT,
+          label: messages.court
+        },
+        {
+          value: CorrectorRelationship.OTHER,
+          label: messages.others
+        }
+      ],
       nestedFields: {
         MOTHER: [],
         FATHER: [],

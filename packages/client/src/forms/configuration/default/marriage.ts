@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { ISerializedForm, MarriageSection } from '@client/forms/index'
-import { formMessageDescriptors } from '@client/i18n/messages'
-import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import {
   marriageDocumentForWhomFhirMapping,
   marriageDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
+import { formMessageDescriptors } from '@client/i18n/messages'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export const marriageRegisterForms: ISerializedForm = {
   sections: [
@@ -1014,19 +1014,6 @@ export const marriageRegisterForms: ISerializedForm = {
           id: 'witness-view-group',
           fields: [
             {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 1',
-                description: 'Witness 1 desc',
-                id: 'form.field.label.witness1'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validator: [],
-              conditionals: []
-            },
-            {
               name: 'firstNamesEng',
               previewGroup: 'witnessOneNameInEnglish',
               type: 'TEXT',
@@ -1176,19 +1163,6 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'witness-view-group',
           fields: [
-            {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 2',
-                description: 'Witness two desc',
-                id: 'form.field.label.witness2'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validator: [],
-              conditionals: []
-            },
             {
               name: 'firstNamesEng',
               previewGroup: 'witnessTwoNameInEnglish',

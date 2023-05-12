@@ -74,11 +74,13 @@ export interface IAdvancedSearchParam {
   groomDoB?: string
   groomDoBStart?: string
   groomDoBEnd?: string
+  groomIdentifier?: string
   brideFirstNames?: string
   brideFamilyName?: string
   brideDoB?: string
   brideDoBStart?: string
   brideDoBEnd?: string
+  brideIdentifier?: string
   dateOfMarriage?: string
 }
 

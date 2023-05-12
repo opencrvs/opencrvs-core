@@ -120,6 +120,11 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].informantsSignature =
       queryData[sectionId].informantsSignature
   }
+
+  if (queryData[sectionId].informantsSignatureURI) {
+    transformedData[sectionId].informantsSignatureURI =
+      queryData[sectionId].informantsSignatureURI
+  }
 }
 
 export function registrationNumberTransformer(
