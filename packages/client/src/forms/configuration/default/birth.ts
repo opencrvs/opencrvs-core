@@ -1843,7 +1843,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'motherNameInEnglish',
               label: {
-                defaultMessage: "Mother's English name",
+                defaultMessage: 'Fullname',
                 description: "Group label for mother's name in english",
                 id: 'form.preview.group.label.mother.english.name'
               },

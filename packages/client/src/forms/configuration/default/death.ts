@@ -1549,7 +1549,7 @@ export const deathRegisterForms: ISerializedForm = {
             {
               id: 'informantNameInEnglish',
               label: {
-                defaultMessage: "Informant's English name",
+                defaultMessage: 'Fullname',
                 description: "Label for informant's name in english",
                 id: 'form.preview.group.label.informant.english.name'
               },
