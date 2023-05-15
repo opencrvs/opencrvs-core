@@ -57,6 +57,7 @@ export interface ILocation {
   alias: string
   physicalType: string
   jurisdictionType?: string
+  statisticalId: string
   type: string
   partOf: string
   primary?: string

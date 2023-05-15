@@ -64,6 +64,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
   conditionals?: IConditionalConfig[]
+  optionCondition?: string
   validator?: IValidatorDescriptor[]
   hideInPreview?: boolean
   options?: Array<
@@ -93,6 +94,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   validator?: IValidatorDescriptor[]
   mapping?: IMapping
   hideInPreview?: boolean
+  optionCondition?: string
   dynamicOptions?: IDynamicOptions
 }
 

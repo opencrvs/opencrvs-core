@@ -402,6 +402,7 @@ type SerializedSelectFormFieldWithOptions = Omit<
   'options'
 > & {
   options: ISelectOption[] | { resource: string }
+  optionCondition?: string
 }
 
 type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
@@ -509,6 +510,7 @@ export interface IFormFieldBase {
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
   options: ISelectOption[]
+  optionCondition?: string
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
@@ -1087,6 +1089,7 @@ export interface Ii18nFormFieldBase {
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
+  optionCondition?: string
   options: SelectComponentOption[]
 }
 

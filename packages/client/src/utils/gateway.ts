@@ -1182,14 +1182,14 @@ export type LoginBackgroundInput = {
 
 export enum MannerOfDeath {
   Accident = 'ACCIDENT',
+  Assault = 'ASSAULT',
   Homicide = 'HOMICIDE',
+  Illness = 'ILLNESS',
   MannerUndetermined = 'MANNER_UNDETERMINED',
   NaturalCauses = 'NATURAL_CAUSES',
+  NaturalDisaster = 'NATURAL_DISASTER',
   Suicide = 'SUICIDE',
-  Illness = 'ILLNESS',
-  Assault = 'ASSAULT',
-  War = 'WAR',
-  NaturalDisater = 'NATURAL_DISASTER'
+  War = 'WAR'
 }
 
 export type MappingInput = {
@@ -2065,6 +2065,7 @@ export type QuestionInput = {
   label?: InputMaybe<Array<MesssageInput>>
   mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']

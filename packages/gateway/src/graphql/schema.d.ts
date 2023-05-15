@@ -1428,6 +1428,7 @@ export interface GQLQuestionInput {
   extraValue?: string
   dynamicOptions?: GQLDynamicOptionInput
   hideInPreview?: boolean
+  optionCondition?: string
 }
 
 export interface GQLSystemSettings {
