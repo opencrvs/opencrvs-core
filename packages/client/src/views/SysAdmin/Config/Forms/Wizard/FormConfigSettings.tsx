@@ -131,7 +131,7 @@ function FormConfigSettingsComponent() {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.DATE_OF_BIRTH_UNKNOWN]: dateOfBirthUnknown
               }
-            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            : modalName === ConfigActionType.INFORMANT_SIGNATURE
             ? {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.INFORMANT_SIGNATURE_REQUIRED]:
@@ -156,7 +156,7 @@ function FormConfigSettingsComponent() {
               })
             : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
             ? intl.formatMessage(messages.dateOfBirthUnknownSuccessNotification)
-            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            : modalName === ConfigActionType.INFORMANT_SIGNATURE
             ? intl.formatMessage(messages.informantSignatureSuccessNotification)
             : intl.formatMessage(messages.noOfAddressesSuccessNotification)
         )
@@ -184,7 +184,42 @@ function FormConfigSettingsComponent() {
     setRequiredForRegistration(!requiredForRegistration)
   }
 
+  React.useEffect(() => {
+    setIntroductionPage(
+      offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION
+    )
+    setNumberOfAddresses(offlineCountryConfiguration.config.ADDRESSES)
+    setDateOfBirthUnknown(
+      offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
+    )
+    setInformantSignature(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+    )
+    setRequiredForRegistration(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
+    )
+  }, [
+    offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION,
+    offlineCountryConfiguration.config.ADDRESSES,
+    offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN,
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE,
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
+  ])
+
   const toggleConfigModal = () => {
+    setNumberOfAddresses(offlineCountryConfiguration.config.ADDRESSES)
+    setIntroductionPage(
+      offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION
+    )
+    setDateOfBirthUnknown(
+      offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
+    )
+    setInformantSignature(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+    )
+    setRequiredForRegistration(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
+    )
     setShowModal(!showModal)
   }
 
