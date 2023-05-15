@@ -77,18 +77,25 @@ export default async function resetPasswordSMSHandler(
     return h.response().code(400)
   }
 
-  sendPasswordNotification(user.mobile, applicationName, randomPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendPasswordNotification(
+    applicationName,
+    randomPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   return h.response().code(200)
 }
 
 export async function sendPasswordNotification(
-  msisdn: string,
   applicationName: string,
   password: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  msisdn?: string,
+  emailForNotification?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}resetPasswordSMS`
   try {
@@ -97,7 +104,8 @@ export async function sendPasswordNotification(
       body: JSON.stringify({
         msisdn,
         applicationName,
-        password
+        password,
+        emailForNotification
       }),
       headers: {
         'Content-Type': 'application/json',

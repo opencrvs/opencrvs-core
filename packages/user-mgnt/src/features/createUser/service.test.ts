@@ -96,9 +96,15 @@ describe('User credentials notification', () => {
       })
     )
 
-    await sendCredentialsNotification('01730037449', 'Name1', 'Name2', {
-      Authorization: `Bearer ${token}`
-    })
+    await sendCredentialsNotification(
+      'Name1',
+      'Name2',
+      {
+        Authorization: `Bearer ${token}`
+      },
+      '01730037449',
+      'test@test.org'
+    )
 
     expect(spy).not.toHaveBeenCalled()
   })
@@ -109,9 +115,15 @@ describe('User credentials notification', () => {
       throw new Error('error')
     })
 
-    await sendCredentialsNotification('01730037449', 'Name1', 'Name2', {
-      Authorization: `Bearer ${token}`
-    })
+    await sendCredentialsNotification(
+      'Name1',
+      'Name2',
+      {
+        Authorization: `Bearer ${token}`
+      },
+      '01730037449',
+      'test@test.org'
+    )
 
     expect(spy).toHaveBeenCalled()
   })

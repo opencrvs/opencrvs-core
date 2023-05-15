@@ -421,7 +421,8 @@ type User {
   practitionerId: String!
   name: [HumanName!]!
   username: String
-  mobile: String!
+  mobile: String
+  emailForNotification: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
@@ -751,7 +752,8 @@ input UserInput {
   name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String!
+  mobile: String
+  emailForNotification: String
   systemRole: SystemRoleType!
   role: String
   email: String

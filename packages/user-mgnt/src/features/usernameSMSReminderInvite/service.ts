@@ -14,14 +14,15 @@ import { resolve } from 'url'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 
 export async function sendUserName(
-  mobile: string,
   username: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  mobile?: string,
+  emailForNotification?: string
 ) {
   const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ msisdn: mobile, username }),
+    body: JSON.stringify({ msisdn: mobile, username, emailForNotification }),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader

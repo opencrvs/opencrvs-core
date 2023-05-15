@@ -35,7 +35,10 @@ import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
-import { validateAttachments } from '@gateway/utils/validators'
+import {
+  validateAttachments,
+  validateNotificationDeliveryMethod
+} from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -248,6 +251,7 @@ export const resolvers: GQLResolver = {
       }
 
       try {
+        await validateNotificationDeliveryMethod(user)
         if (user.signature) {
           await validateAttachments([user.signature])
         }
@@ -267,8 +271,24 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status === 403) {
+        const errorResponse = await res.json()
+        const duplicateDataErrorMap = {
+          emailForNotification: {
+            errorPrefix: 'DUPLICATE_EMAIL',
+            conflictingValue: userPayload.emailForNotification
+          },
+          mobile: {
+            errorPrefix: 'DUPLICATE_MOBILE',
+            conflictingValue: userPayload.mobile
+          }
+        }
+
+        const dupplicateError =
+          duplicateDataErrorMap[errorResponse['errorThrowingProperty']]
         return await Promise.reject(
-          new Error(`DUPLICATE_MOBILE-${userPayload.mobile}`)
+          new Error(
+            `${dupplicateError.errorPrefix}-${dupplicateError.conflictingValue}`
+          )
         )
       } else if (res.status !== 201) {
         return await Promise.reject(
@@ -556,7 +576,8 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     role: user.role as string,
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
-    email: user.email || '',
+    email: '',
+    emailForNotification: user.emailForNotification,
     mobile: user.mobile as string,
     device: user.device as string,
     signature: user.signature

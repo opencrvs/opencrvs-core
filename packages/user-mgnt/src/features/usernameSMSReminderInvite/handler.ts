@@ -34,9 +34,14 @@ export default async function usernameSMSReminderHandler(
     throw unauthorized()
   }
 
-  await sendUserName(user.mobile, user.username, {
-    Authorization: request.headers.authorization
-  })
+  await sendUserName(
+    user.username,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

@@ -287,7 +287,8 @@ export interface GQLUser {
   practitionerId: string
   name: Array<GQLHumanName>
   username?: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
@@ -630,7 +631,8 @@ export interface GQLUserInput {
   name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -4994,6 +4996,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  emailForNotification?: UserToEmailForNotificationResolver<TParent>
   systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
@@ -5056,6 +5059,18 @@ export interface UserToUsernameResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToMobileResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserToEmailForNotificationResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

@@ -50,9 +50,15 @@ export default async function resendSMSInvite(
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, randomPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.username,
+    randomPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   return h.response().code(200)
 }

@@ -20,7 +20,9 @@ import {
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  ShowCreateUserDuplicateEmailErrorToast,
   ShowCreateUserErrorToast,
+  showCreateUserDuplicateEmailErrorToast,
   showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -234,6 +236,7 @@ type UserFormAction =
   | ISubmitFailedAction
   | profileActions.Action
   | ShowCreateUserErrorToast
+  | ShowCreateUserDuplicateEmailErrorToast
   | IRoleLoadedAction
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
@@ -394,7 +397,18 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
-      if (errorData.message.includes('DUPLICATE_MOBILE')) {
+      if (errorData.message.includes('DUPLICATE_EMAIL')) {
+        const emailForNotification = errorData.message.split('-')[1]
+        return loop(
+          { ...state, submitting: false, submissionError: false },
+          Cmd.action(
+            showCreateUserDuplicateEmailErrorToast(
+              TOAST_MESSAGES.FAIL,
+              emailForNotification
+            )
+          )
+        )
+      } else if (errorData.message.includes('DUPLICATE_MOBILE')) {
         const mobile = errorData.message.split('-')[1]
         return loop(
           { ...state, submitting: false, submissionError: false },
