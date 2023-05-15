@@ -198,29 +198,60 @@ describe('deduplication tests for death', () => {
 })
 
 describe('return empty array if data set is missing', () => {
-  it('should return the empty array for death duplication', async () => {
+  it('Death duplication: Return the empty array if deathDate, deceasedDoB is empty', async () => {
     await expect(
       compareForDeathDuplication(
         {
-          deceasedFirstNames: ['', ''],
-          deceasedFamilyName: ['', ''],
-          deceasedIdentifier: ['23412387', '23412387'],
-          deathDate: ['', ''],
-          deceasedDoB: ['', '']
+          deceasedFirstNames: ['John', 'Jhon'],
+          deceasedFamilyName: ['koly', 'koly'],
+          deathDate: ['2000-11-12', ''],
+          deceasedDoB: ['2020-11-12', '']
         },
         client
       )
     ).resolves.toHaveLength(0)
   })
-  it('should return the empty array for birth duplication', async () => {
+  it('Death duplication: Return the empty array if deceasedName is empty', async () => {
+    await expect(
+      compareForDeathDuplication(
+        {
+          deceasedFirstNames: ['John', ''],
+          deceasedFamilyName: ['koly', ''],
+          deceasedIdentifier: ['23412387', '23412387'],
+          deathDate: ['2000-11-12', '2000-11-17'],
+          deceasedDoB: ['2020-11-12', '2020-11-10']
+        },
+        client
+      )
+    ).resolves.toHaveLength(0)
+  })
+
+  it('Birth duplication: Return the empty array if the childName is empty', async () => {
     await expect(
       compareForBirthDuplication(
         {
-          childFirstNames: ['', ''],
-          childFamilyName: ['', ''],
-          motherFirstNames: ['', ''],
-          motherFamilyName: ['', ''],
-          motherDoB: ['', '']
+          childFirstNames: ['John', ''],
+          childFamilyName: ['Smith', ''],
+          childDoB: ['2011-11-11', '2014-11-01'],
+          motherFirstNames: ['Mother', 'Mother'],
+          motherFamilyName: ['Smith', 'Smith'],
+          motherDoB: ['2000-11-12', '2000-11-12']
+        },
+        client
+      )
+    ).resolves.toHaveLength(0)
+  })
+
+  it('Birth duplication: Return the empty array if the motherDoB, childDoB is empty', async () => {
+    await expect(
+      compareForBirthDuplication(
+        {
+          childFirstNames: ['John', 'Jhon'],
+          childFamilyName: ['Smith', 'Smith'],
+          childDoB: ['2011-11-11', ''],
+          motherDoB: ['2000-11-12', ''],
+          motherFirstNames: ['Mother', 'Mother'],
+          motherFamilyName: ['Smith', 'Smith']
         },
         client
       )

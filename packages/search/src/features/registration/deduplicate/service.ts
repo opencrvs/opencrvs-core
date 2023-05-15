@@ -66,11 +66,10 @@ export const searchForBirthDuplicates = async (
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
   if (
-    !body.childFirstNames ||
-    !body.childFamilyName ||
-    !body.motherFamilyName ||
-    !body.motherFirstNames ||
-    !body.motherDoB
+    (!body.childFirstNames && !body.childFamilyName) ||
+    (!body.motherFirstNames && !body.motherFamilyName) ||
+    !body.motherDoB ||
+    !body.childDoB
   ) {
     return []
   }
@@ -239,10 +238,8 @@ export const searchForDeathDuplicates = async (
   client: elasticsearch.Client
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
-
   if (
-    !body.deceasedFamilyName ||
-    !body.deceasedFirstNames ||
+    (!body.deceasedFirstNames && !body.deceasedFamilyName) ||
     !body.deceasedDoB ||
     !body.deathDate
   ) {
