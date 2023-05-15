@@ -42,6 +42,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
+  disableSubmit: boolean
 }
 
 const Container = styled.div`
@@ -315,7 +316,8 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl
+      intl,
+      disableSubmit
     } = this.props
 
     const isValidated = declarationToBeRegistered
@@ -397,7 +399,7 @@ class ReviewActionComponent extends React.Component<
                 id="submit_form"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded}
+                disabled={totalFileSizeExceeded || disableSubmit}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(

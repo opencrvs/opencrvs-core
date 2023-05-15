@@ -306,6 +306,7 @@ export interface IAttachmentValue {
   name?: string
   type: string
   data: string
+  uri?: string
 }
 
 export type IFormFieldMutationMapFunction = (
@@ -439,6 +440,7 @@ export type SerializedFormField = UnionOmit<
 }
 export interface IAttachment {
   data: string
+  uri?: string
   optionValues: string[]
   type: string
   title?: string

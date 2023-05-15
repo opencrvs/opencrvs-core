@@ -436,7 +436,9 @@ export async function markEventAsCertifiedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
@@ -453,7 +455,9 @@ export async function markEventAsIssuedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
     throw new Error(error)

@@ -47,6 +47,7 @@ import {
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -56,22 +57,13 @@ const TableDiv = styled.div`
 
 const HistoryHeader = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
 `
 
 const RecentActionsHolder = styled.div`
-  margin-top: 40px;
-  padding-top: 30px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-top: 24px;
-    padding-top: 24px;
-  }
+  margin-top: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.grey200};
-`
-
-const AlignedDateRangePicker = styled(DateRangePicker)`
-  position: absolute;
-  top: 6px;
 `
 
 const SectionTitle = styled.div`
@@ -108,7 +100,7 @@ export enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',
-  DATE = 'auditTime',
+  DATE = 'auditTimeValue',
   DEVICE = 'deviceIpAddress'
 }
 
@@ -333,7 +325,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
-        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
+        auditTime: format(
+          new Date(userAuditItem.time),
+          'MMMM dd, yyyy hh:mm a'
+        ),
+        auditTimeValue: new Date(userAuditItem.time)
       }
     })
     return (
@@ -387,10 +383,10 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         <>
           <>
             <HistoryHeader>
-              <SectionTitle>
+              <Text variant="h3" element="h3" color="copy">
                 {intl.formatMessage(messages.auditSectionTitle)}
-              </SectionTitle>
-              <AlignedDateRangePicker
+              </Text>
+              <DateRangePicker
                 startDate={timeStart}
                 endDate={timeEnd}
                 onDatesChange={({ startDate, endDate }) => {

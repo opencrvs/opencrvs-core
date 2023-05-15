@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createHash } from 'crypto'
-import * as uuid from 'uuid/v4'
+import * as bcrypt from 'bcryptjs'
 
 interface ISaltedHash {
   hash: string
@@ -35,14 +34,11 @@ export function generateRandomPassword(demoUser?: boolean) {
 }
 
 export function generateHash(content: string, salt: string): string {
-  const hash = createHash('sha512')
-  hash.update(salt)
-  hash.update(content)
-  return hash.digest('hex')
+  return bcrypt.hashSync(content, salt)
 }
 
 export function generateSaltedHash(password: string): ISaltedHash {
-  const salt = uuid()
+  const salt = bcrypt.genSaltSync(10)
   return {
     hash: generateHash(password, salt),
     salt
