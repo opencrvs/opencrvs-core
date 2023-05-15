@@ -59,3 +59,8 @@ services:
     environment:
       - QA_ENV=true
       - NODE_ENV=production
+
+  scheduler:
+    environment:
+    - QA_ENV=true
+    - NODE_ENV=production
