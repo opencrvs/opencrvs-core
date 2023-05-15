@@ -1418,6 +1418,7 @@ export interface GQLQuestionInput {
   mapping?: GQLMappingInput
   extraValue?: string
   dynamicOptions?: GQLDynamicOptionInput
+  hideInPreview?: boolean
 }
 
 export interface GQLSystemSettings {

@@ -152,6 +152,7 @@ export type AdvancedSearchParametersInput = {
   brideDoBStart?: InputMaybe<Scalars['String']>
   brideFamilyName?: InputMaybe<Scalars['String']>
   brideFirstNames?: InputMaybe<Scalars['String']>
+  brideIdentifier?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -195,6 +196,7 @@ export type AdvancedSearchParametersInput = {
   groomDoBStart?: InputMaybe<Scalars['String']>
   groomFamilyName?: InputMaybe<Scalars['String']>
   groomFirstNames?: InputMaybe<Scalars['String']>
+  groomIdentifier?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -671,6 +673,7 @@ export type Death = {
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['Date']>
+  deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1202,8 +1205,10 @@ export type Marriage = {
 
 export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
+  brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
   dateOfMarriage?: Maybe<Scalars['Date']>
+  groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -2044,6 +2049,7 @@ export type QuestionInput = {
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  hideInPreview?: InputMaybe<Scalars['Boolean']>
   initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
