@@ -1515,6 +1515,7 @@ input QuestionInput {
   mapping: MappingInput
   extraValue: String
   dynamicOptions: DynamicOptionInput
+  optionCondition: String
 }
 
 input SystemSettings {

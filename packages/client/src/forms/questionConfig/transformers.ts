@@ -121,6 +121,7 @@ export function questionsTransformer(
       conditionals,
       datasetId,
       options,
+      optionCondition,
       validator,
       extraValue,
       mapping,
@@ -147,6 +148,7 @@ export function questionsTransformer(
           conditionals,
           datasetId,
           options,
+          optionCondition,
           validator,
           extraValue,
           mapping,
@@ -162,6 +164,7 @@ export function questionsTransformer(
         precedingFieldId,
         validateEmpty: validateEmpty ?? false,
         conditionals: conditionals || undefined,
+        optionCondition: optionCondition || undefined,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
 
