@@ -152,6 +152,7 @@ export type AdvancedSearchParametersInput = {
   brideDoBStart?: InputMaybe<Scalars['String']>
   brideFamilyName?: InputMaybe<Scalars['String']>
   brideFirstNames?: InputMaybe<Scalars['String']>
+  brideIdentifier?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -195,6 +196,7 @@ export type AdvancedSearchParametersInput = {
   groomDoBStart?: InputMaybe<Scalars['String']>
   groomFamilyName?: InputMaybe<Scalars['String']>
   groomFirstNames?: InputMaybe<Scalars['String']>
+  groomIdentifier?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -671,6 +673,7 @@ export type Death = {
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['Date']>
+  deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1202,8 +1205,10 @@ export type Marriage = {
 
 export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
+  brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
   dateOfMarriage?: Maybe<Scalars['Date']>
+  groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -2049,6 +2054,7 @@ export type QuestionInput = {
   label?: InputMaybe<Array<MesssageInput>>
   mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
@@ -2183,7 +2189,6 @@ export type RegistrationInput = {
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
-  registrationOffice?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Array<InputMaybe<RegWorkflowInput>>>
   trackingId?: InputMaybe<Scalars['String']>
   type?: InputMaybe<RegistrationType>
@@ -2460,7 +2465,6 @@ export type User = {
   mobile: Scalars['String']
   name: Array<HumanName>
   practitionerId: Scalars['String']
-  primaryFacilityId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role: Role
   searches?: Maybe<Array<BookmarkedSeachItem>>
@@ -2515,7 +2519,6 @@ export type UserInput = {
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile: Scalars['String']
   name: Array<HumanNameInput>
-  primaryFacilityId?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
@@ -3346,7 +3349,6 @@ export type GetUserQuery = {
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
-    primaryFacilityId?: string | null
     creationDate: string
     device?: string | null
     name: Array<{

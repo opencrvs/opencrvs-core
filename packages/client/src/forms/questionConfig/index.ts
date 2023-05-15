@@ -64,6 +64,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
   conditionals?: IConditionalConfig[]
+  optionCondition?: string
   validator?: IValidatorDescriptor[]
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
@@ -91,6 +92,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   datasetId?: string
   validator?: IValidatorDescriptor[]
   mapping?: IMapping
+  optionCondition?: string
   dynamicOptions?: IDynamicOptions
 }
 
