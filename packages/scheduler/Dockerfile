@@ -11,7 +11,7 @@ ENV METRICS_URL=$METRICS_URL
 
 # Copy files
 COPY packages/scheduler/jobs/*.* ./jobs/
-COPY packages/scheduler/cronTabFiles/* ./cronTabFiles/
+COPY packages/scheduler/cronTabFile/crontab ./
 COPY packages/scheduler/start.sh .
 
 # create cron.log file

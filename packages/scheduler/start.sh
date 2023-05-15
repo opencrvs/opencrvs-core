@@ -1,14 +1,12 @@
 #!/bin/bash
 
-CRON_DIR="./cronTabFiles"
+# Select the crontab file based on the environment
+CRON_FILE="crontab"
 
-# Iterate through CRON_DIR files
-for file in $CRON_DIR/*; do
-    echo "Loading crontab file: $file"
-    crontab $file
-done
+echo "Loading crontab file: $CRON_FILE"
 
+# Load the crontab file
+crontab $CRON_FILE
 # Start cron
 echo "Starting cron..."
-
 crond -f

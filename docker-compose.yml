@@ -113,6 +113,7 @@ services:
       context: .
       dockerfile: ./packages/scheduler/Dockerfile
     environment:
+      - NODE_ENV=development
       - METRICS_URL=http://metrics:1050
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
   auth:
