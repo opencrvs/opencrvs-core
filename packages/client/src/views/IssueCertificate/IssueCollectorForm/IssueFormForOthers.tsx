@@ -205,6 +205,7 @@ export const IssueCollectorFormForOthers = ({
     >
       <FormFieldGenerator
         id="otherCollector"
+        key="otherCollector"
         onChange={(values) => {
           handleChange(values, declaration)
         }}
