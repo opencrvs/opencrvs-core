@@ -332,7 +332,12 @@ export enum AttachmentType {
   RefugeeCard = 'REFUGEE_CARD',
   ResidentCard = 'RESIDENT_CARD',
   RetiredPoliceId = 'RETIRED_POLICE_ID',
-  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
+  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT',
+  Requisition = 'REQUISITION',
+  CourtOrder = 'COURT_ORDER',
+  MarriageCertificate = 'MARRIAGE_CERTIFICATE',
+  RecognitionProof = 'RECOGNITION_PROOF',
+  AdoptionProof = 'ADOPTION_PROOF'
 }
 
 export enum AttendantType {
