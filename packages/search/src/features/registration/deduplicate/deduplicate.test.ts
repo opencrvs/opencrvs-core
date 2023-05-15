@@ -196,3 +196,34 @@ describe('deduplication tests for death', () => {
     })
   })
 })
+
+describe('return empty array if data set is missing', () => {
+  it('should return the empty array for death duplication', async () => {
+    await expect(
+      compareForDeathDuplication(
+        {
+          deceasedFirstNames: ['', ''],
+          deceasedFamilyName: ['', ''],
+          deceasedIdentifier: ['23412387', '23412387'],
+          deathDate: ['', ''],
+          deceasedDoB: ['', '']
+        },
+        client
+      )
+    ).resolves.toHaveLength(0)
+  })
+  it('should return the empty array for birth duplication', async () => {
+    await expect(
+      compareForBirthDuplication(
+        {
+          childFirstNames: ['', ''],
+          childFamilyName: ['', ''],
+          motherFirstNames: ['', ''],
+          motherFamilyName: ['', ''],
+          motherDoB: ['', '']
+        },
+        client
+      )
+    ).resolves.toHaveLength(0)
+  })
+})
