@@ -1182,7 +1182,11 @@ export enum MannerOfDeath {
   Homicide = 'HOMICIDE',
   MannerUndetermined = 'MANNER_UNDETERMINED',
   NaturalCauses = 'NATURAL_CAUSES',
-  Suicide = 'SUICIDE'
+  Suicide = 'SUICIDE',
+  Illness = 'ILLNESS',
+  Assault = 'ASSAULT',
+  War = 'WAR',
+  NaturalDisater = 'NATURAL_DISASTER'
 }
 
 export type MappingInput = {
