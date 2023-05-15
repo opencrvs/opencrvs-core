@@ -1028,8 +1028,15 @@ function requestWithStateWrapper(
       ) {
         await fetchAllDuplicateDeclarations(data.data as Query)
       }
-      await fetchAllMinioUrlsInAttachment(data.data as Query)
-      await fetchAllMinioUrlsForSignature(data.data as Query)
+      const attachmentURLs = getAllMinioUrlsInAttachment(data.data as Query)
+      const signatureURLs = getAllMinioUrlsForSignature(data.data as Query)
+      const allfetchableMinioURLs = [
+        ...(attachmentURLs ?? []),
+        ...(signatureURLs ?? [])
+      ]
+
+      allfetchableMinioURLs.map((url) => fetch(url).then((res) => res.blob()))
+
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
@@ -1037,7 +1044,7 @@ function requestWithStateWrapper(
   })
 }
 
-async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+function getAllMinioUrlsInAttachment(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
@@ -1051,52 +1058,36 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
     .filter((a): a is Attachment =>
       Boolean(a?.data && !isBase64FileString(a.data))
     )
-    .map((a) => fetch(String(a.data)).then((res) => res.blob()))
+    .map((a) => String(a.data))
 
-  return Promise.all(urlsWithMinioPath)
+  return urlsWithMinioPath
 }
 
-async function fetchAllMinioUrlsForSignature(queryResultData: Query) {
+function getAllMinioUrlsForSignature(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  const signatureUrls = []
-  if (registration?.type === Event.Birth.toUpperCase()) {
-    if (registration?.informantsSignature) {
-      signatureUrls.push(registration?.informantsSignature)
-    }
-  } else if (registration?.type === Event.Death.toUpperCase()) {
-    if (registration?.informantsSignature) {
-      signatureUrls.push(registration?.informantsSignature)
-    }
-  } else if (registration?.type === Event.Marriage.toUpperCase()) {
-    if (registration?.brideSignature) {
-      signatureUrls.push(registration?.brideSignature)
-    }
-    if (registration?.groomSignature) {
-      signatureUrls.push(registration?.groomSignature)
-    }
-    if (registration?.witnessOneSignature) {
-      signatureUrls.push(registration?.witnessOneSignature)
-    }
-    if (registration?.witnessTwoSignature) {
-      signatureUrls.push(registration?.witnessTwoSignature)
-    }
-  }
+  const signatureUrls = (
+    [
+      'informantsSignature',
+      'brideSignature',
+      'groomSignature',
+      'witnessOneSignature',
+      'witnessTwoSignature'
+    ] as const
+  )
+
+    .map((propertyKey) => registration?.[propertyKey])
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 
   if (signatureUrls.length === 0) {
     return
   }
 
-  const signaturesUrlsWithMinioPath = signatureUrls.map((data) =>
-    fetch(String(data)).then((res) => res.blob())
-  )
-
-  return Promise.all(signaturesUrlsWithMinioPath)
+  return signatureUrls
 }
-
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   const registration =
