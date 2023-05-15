@@ -96,4 +96,5 @@ input QuestionInput {
   mapping: MappingInput
   extraValue: String
   dynamicOptions: DynamicOptionInput
+  hideInPreview: Boolean
 }

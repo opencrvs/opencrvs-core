@@ -106,6 +106,7 @@ export function questionsTransformer(
       placeholder,
       description,
       tooltip,
+      hideInPreview,
       unit,
       errorMessage,
       validateEmpty,
@@ -132,6 +133,7 @@ export function questionsTransformer(
           label,
           placeholder,
           description,
+          hideInPreview,
           validateEmpty,
           tooltip,
           unit,
@@ -162,6 +164,7 @@ export function questionsTransformer(
         precedingFieldId,
         validateEmpty: validateEmpty ?? false,
         conditionals: conditionals || undefined,
+        hideInPreview: hideInPreview ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
 
