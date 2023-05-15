@@ -1010,6 +1010,10 @@ enum MannerOfDeath {
   SUICIDE
   HOMICIDE
   MANNER_UNDETERMINED
+  ILLNESS
+  ASSAULT
+  WAR
+  NATURAL_DISASTER
 }
 
 enum CauseOfDeathMethodType {
