@@ -97,4 +97,5 @@ input QuestionInput {
   extraValue: String
   dynamicOptions: DynamicOptionInput
   hideInPreview: Boolean
+  optionCondition: String
 }

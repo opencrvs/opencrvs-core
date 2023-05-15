@@ -17527,6 +17527,18 @@
             "deprecationReason": null
           },
           {
+            "name": "optionCondition",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "options",
             "description": null,
             "type": {
@@ -18824,18 +18836,6 @@
           },
           {
             "name": "registrationNumber",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "registrationOffice",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -21183,18 +21183,6 @@
             "deprecationReason": null
           },
           {
-            "name": "primaryFacilityId",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "primaryOffice",
             "description": null,
             "args": [],
@@ -21770,18 +21758,6 @@
                   }
                 }
               }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "primaryFacilityId",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,

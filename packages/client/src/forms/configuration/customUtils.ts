@@ -84,7 +84,8 @@ export function createCustomField({
   validator,
   mapping,
   hideInPreview,
-  dynamicOptions
+  dynamicOptions,
+  optionCondition
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -94,6 +95,7 @@ export function createCustomField({
     type: fieldType,
     extraValue,
     hideInPreview,
+    optionCondition,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: initialValue || '',
     validator: validator || [],

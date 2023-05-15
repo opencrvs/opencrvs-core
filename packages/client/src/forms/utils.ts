@@ -44,7 +44,8 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
-  IContactPoint
+  IContactPoint,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -308,10 +309,21 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithDynamicOptions,
+  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData
 ) => {
+  if (field.type === SELECT_WITH_OPTIONS) {
+    if (field.optionCondition) {
+      return field.options.filter((option: ISelectOption) =>
+        // eslint-disable-next-line no-eval
+        eval(field.optionCondition!)
+      )
+    }
+
+    return field.options
+  }
+
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   if (!field.dynamicOptions.dependency) {
     throw new Error(

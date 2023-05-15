@@ -2055,6 +2055,7 @@ export type QuestionInput = {
   label?: InputMaybe<Array<MesssageInput>>
   mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
@@ -2189,7 +2190,6 @@ export type RegistrationInput = {
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
-  registrationOffice?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Array<InputMaybe<RegWorkflowInput>>>
   trackingId?: InputMaybe<Scalars['String']>
   type?: InputMaybe<RegistrationType>
@@ -2466,7 +2466,6 @@ export type User = {
   mobile: Scalars['String']
   name: Array<HumanName>
   practitionerId: Scalars['String']
-  primaryFacilityId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role: Role
   searches?: Maybe<Array<BookmarkedSeachItem>>
@@ -2521,7 +2520,6 @@ export type UserInput = {
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile: Scalars['String']
   name: Array<HumanNameInput>
-  primaryFacilityId?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
@@ -3352,7 +3350,6 @@ export type GetUserQuery = {
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
-    primaryFacilityId?: string | null
     creationDate: string
     device?: string | null
     name: Array<{
