@@ -19,13 +19,15 @@ const { fromBuffer } = fileTypePKG
 export const MINIO_HOST = process.env.MINIO_HOST || 'localhost'
 export const MINIO_PORT = process.env.MINIO_PORT || 3535
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
+export const DEFAULT_MINIO_ACCESS_KEY = 'minioadmin'
+export const DEFAULT_MINIO_SECRET_KEY = 'minioadmin'
 
 export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
   port: Number(MINIO_PORT),
   useSSL: false,
-  accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin'
+  accessKey: process.env.MINIO_ACCESS_KEY || DEFAULT_MINIO_ACCESS_KEY,
+  secretKey: process.env.MINIO_SECRET_KEY || DEFAULT_MINIO_SECRET_KEY
 })
 
 export async function uploadBase64ToMinio(fileData) {

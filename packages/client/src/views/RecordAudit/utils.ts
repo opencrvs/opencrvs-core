@@ -97,6 +97,18 @@ export const getFieldValue = (
   intl: IntlShape
 ) => {
   let original = value
+  // HOTFIX: The name of the fieldObject that is being received
+  // here is internationalStatePrimary rather than statePrimary
+  // same for districts as well as the secondary address fields
+  if (
+    fieldObj.name.toLowerCase().includes('state') ||
+    fieldObj.name.toLowerCase().includes('district')
+  ) {
+    if (value && offlineData.locations?.[value]) {
+      return offlineData.locations[value].name
+    }
+  }
+
   if (has(fieldObj, 'dynamicOptions')) {
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)

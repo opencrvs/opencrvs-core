@@ -33,6 +33,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
+import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
   NATIONAL_ID_TEXT,
@@ -176,7 +177,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon name="List" size="medium" color="primary" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ],
@@ -194,7 +195,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -227,7 +228,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -250,7 +251,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ]
@@ -263,7 +264,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon name="List" size="medium" color="primary" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ]
@@ -283,7 +284,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Icon name="List" size="medium" color="primary" />,
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -563,7 +564,7 @@ export const Header = connect(
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
-  margin-left: 249px;
+  margin-left: 282px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0;

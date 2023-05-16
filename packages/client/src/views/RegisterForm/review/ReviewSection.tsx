@@ -454,21 +454,34 @@ const renderValue = (
         resource: 'locations',
         initialValue: 'agentDefault'
       }
-      if (field.name.includes('Secondary')) {
-        dynamicOption.dependency = [
-          'internationalStateSecondary',
-          'stateSecondary'
-        ].includes(field.name)
-          ? 'countrySecondary'
-          : 'stateSecondary'
-      } else {
-        dynamicOption.dependency = [
-          'internationalStatePrimary',
-          'statePrimary'
-        ].includes(field.name)
-          ? 'countryPrimary'
-          : 'statePrimary'
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    if (sectionData.countrySecondary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStateSecondary',
+        'stateSecondary'
+      ].includes(field.name)
+        ? 'countrySecondary'
+        : 'stateSecondary'
 
       return renderSelectDynamicLabel(
         value,
@@ -841,12 +854,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
-        const documentData = !isBase64FileString(document.data)
-          ? `${window.config.MINIO_URL}${document.data}`
-          : document.data
-
         documentOptions.push({
-          value: documentData,
+          value: document.data,
           label
         })
         selectOptions.push({
@@ -1516,14 +1525,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    previewImageTransformed.data = isBase64FileString(
-      previewImageTransformed.data
-    )
-      ? previewImageTransformed.data
-      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
-
-    this.setState({ previewImage: previewImageTransformed as IFileValue })
+    this.setState({ previewImage: previewImage as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {

@@ -969,19 +969,6 @@ export const marriageRegisterForms: ISerializedForm = {
           id: 'witness-view-group',
           fields: [
             {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 1',
-                description: 'Witness 1 desc',
-                id: 'form.field.label.witness1'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validate: [],
-              conditionals: []
-            },
-            {
               name: 'firstNamesEng',
               previewGroup: 'witnessOneNameInEnglish',
               type: 'TEXT',
@@ -1131,19 +1118,6 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'witness-view-group',
           fields: [
-            {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 2',
-                description: 'Witness two desc',
-                id: 'form.field.label.witness2'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validate: [],
-              conditionals: []
-            },
             {
               name: 'firstNamesEng',
               previewGroup: 'witnessTwoNameInEnglish',
