@@ -571,11 +571,13 @@ input AdvancedSearchParametersInput {
   groomDoB: String
   groomDoBStart: String
   groomDoBEnd: String
+  groomIdentifier: String
   brideFirstNames: String
   brideFamilyName: String
   brideDoB: String
   brideDoBStart: String
   brideDoBEnd: String
+  brideIdentifier: String
   dateOfMarriage: String
   motherFirstNames: String
   motherFamilyName: String
@@ -927,6 +929,11 @@ type Registration {
   brideSignature: String
   witnessOneSignature: String
   witnessTwoSignature: String
+  informantsSignatureURI: String
+  groomSignatureURI: String
+  brideSignatureURI: String
+  witnessOneSignatureURI: String
+  witnessTwoSignatureURI: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -1010,6 +1017,10 @@ enum MannerOfDeath {
   SUICIDE
   HOMICIDE
   MANNER_UNDETERMINED
+  ILLNESS
+  ASSAULT
+  WAR
+  NATURAL_DISASTER
 }
 
 enum CauseOfDeathMethodType {
@@ -1075,6 +1086,7 @@ type Attachment {
   _fhirID: ID
   contentType: String
   data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String
@@ -1512,6 +1524,8 @@ input QuestionInput {
   mapping: MappingInput
   extraValue: String
   dynamicOptions: DynamicOptionInput
+  hideInPreview: Boolean
+  optionCondition: String
 }
 
 input SystemSettings {
@@ -1664,6 +1678,11 @@ enum AttachmentType {
   REFUGEE_CARD
   NATIONAL_POLICE_ID
   RETIRED_POLICE_ID
+  REQUISITION
+  COURT_ORDER
+  MARRIAGE_CERTIFICATE
+  RECOGNITION_PROOF
+  ADOPTION_PROOF
 }
 
 enum AttachmentSubject {
@@ -1842,6 +1861,7 @@ type BirthEventSearchSet implements EventSearchSet {
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
+  deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
@@ -1853,6 +1873,8 @@ type MarriageEventSearchSet implements EventSearchSet {
   type: String
   brideName: [HumanName]
   groomName: [HumanName]
+  brideIdentifier: String
+  groomIdentifier: String
   dateOfMarriage: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
@@ -1901,7 +1923,8 @@ input AddressInput {
 input AttachmentInput {
   _fhirID: ID
   contentType: String
-  data: String!
+  data: String
+  uri: String
   status: String
   originalFileName: String
   systemFileName: String

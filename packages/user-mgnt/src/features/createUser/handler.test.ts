@@ -11,7 +11,6 @@
  */
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -99,10 +98,6 @@ describe('createUser handler', () => {
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
       ['', { status: 200 }]
     )
-
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'save')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -258,18 +253,12 @@ describe('createUser handler', () => {
   it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 202 }],
+      ['', { status: 202 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(
-      { username: 'jw.doe', count: 1 },
-      'findOne'
-    )
-    mockingoose(UsernameRecord).toReturn(
-      new Error('Failed to update'),
-      'update'
-    )
-
+    mockingoose(User).toReturn(new Error(), 'findOne')
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',

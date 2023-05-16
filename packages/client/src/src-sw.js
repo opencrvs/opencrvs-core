@@ -96,7 +96,7 @@ workbox.routing.registerRoute(
 // This caches the minio urls
 workbox.routing.registerRoute(
   /https(.+)minio\.(.+)\/ocrvs\/+/,
-  new workbox.strategies.NetworkFirst()
+  new workbox.strategies.CacheFirst()
 )
 
 /*

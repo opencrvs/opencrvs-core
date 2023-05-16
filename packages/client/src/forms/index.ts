@@ -306,6 +306,7 @@ export interface IAttachmentValue {
   name?: string
   type: string
   data: string
+  uri?: string
 }
 
 export type IFormFieldMutationMapFunction = (
@@ -401,6 +402,7 @@ type SerializedSelectFormFieldWithOptions = Omit<
   'options'
 > & {
   options: ISelectOption[] | { resource: string }
+  optionCondition?: string
 }
 
 type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
@@ -439,6 +441,7 @@ export type SerializedFormField = UnionOmit<
 }
 export interface IAttachment {
   data: string
+  uri?: string
   optionValues: string[]
   type: string
   title?: string
@@ -507,6 +510,7 @@ export interface IFormFieldBase {
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
   options: ISelectOption[]
+  optionCondition?: string
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
@@ -1085,6 +1089,7 @@ export interface Ii18nFormFieldBase {
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
+  optionCondition?: string
   options: SelectComponentOption[]
 }
 

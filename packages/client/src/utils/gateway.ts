@@ -152,6 +152,7 @@ export type AdvancedSearchParametersInput = {
   brideDoBStart?: InputMaybe<Scalars['String']>
   brideFamilyName?: InputMaybe<Scalars['String']>
   brideFirstNames?: InputMaybe<Scalars['String']>
+  brideIdentifier?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -195,6 +196,7 @@ export type AdvancedSearchParametersInput = {
   groomDoBStart?: InputMaybe<Scalars['String']>
   groomFamilyName?: InputMaybe<Scalars['String']>
   groomFirstNames?: InputMaybe<Scalars['String']>
+  groomIdentifier?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -277,19 +279,21 @@ export type Attachment = {
   subject?: Maybe<AttachmentSubject>
   systemFileName?: Maybe<Scalars['String']>
   type?: Maybe<AttachmentType>
+  uri?: Maybe<Scalars['String']>
 }
 
 export type AttachmentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   contentType?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
-  data: Scalars['String']
+  data?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
   subject?: InputMaybe<AttachmentSubject>
   systemFileName?: InputMaybe<Scalars['String']>
   type?: InputMaybe<AttachmentType>
+  uri?: InputMaybe<Scalars['String']>
 }
 
 export enum AttachmentSubject {
@@ -330,7 +334,12 @@ export enum AttachmentType {
   RefugeeCard = 'REFUGEE_CARD',
   ResidentCard = 'RESIDENT_CARD',
   RetiredPoliceId = 'RETIRED_POLICE_ID',
-  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
+  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT',
+  Requisition = 'REQUISITION',
+  CourtOrder = 'COURT_ORDER',
+  MarriageCertificate = 'MARRIAGE_CERTIFICATE',
+  RecognitionProof = 'RECOGNITION_PROOF',
+  AdoptionProof = 'ADOPTION_PROOF'
 }
 
 export enum AttendantType {
@@ -675,6 +684,7 @@ export type Death = {
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['Date']>
+  deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1177,10 +1187,14 @@ export type LoginBackgroundInput = {
 
 export enum MannerOfDeath {
   Accident = 'ACCIDENT',
+  Assault = 'ASSAULT',
   Homicide = 'HOMICIDE',
+  Illness = 'ILLNESS',
   MannerUndetermined = 'MANNER_UNDETERMINED',
   NaturalCauses = 'NATURAL_CAUSES',
-  Suicide = 'SUICIDE'
+  NaturalDisaster = 'NATURAL_DISASTER',
+  Suicide = 'SUICIDE',
+  War = 'WAR'
 }
 
 export type MappingInput = {
@@ -1206,8 +1220,10 @@ export type Marriage = {
 
 export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
+  brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
   dateOfMarriage?: Maybe<Scalars['Date']>
+  groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -2048,11 +2064,13 @@ export type QuestionInput = {
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  hideInPreview?: InputMaybe<Scalars['Boolean']>
   initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
   mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
@@ -2132,6 +2150,7 @@ export type Registration = {
   attachments?: Maybe<Array<Maybe<Attachment>>>
   book?: Maybe<Scalars['String']>
   brideSignature?: Maybe<Scalars['String']>
+  brideSignatureURI?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   contact?: Maybe<Scalars['String']>
   contactPhoneNumber?: Maybe<Scalars['String']>
@@ -2139,10 +2158,12 @@ export type Registration = {
   draftId?: Maybe<Scalars['String']>
   duplicates?: Maybe<Array<Maybe<DuplicatesInfo>>>
   groomSignature?: Maybe<Scalars['String']>
+  groomSignatureURI?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
   informantsSignature?: Maybe<Scalars['String']>
+  informantsSignatureURI?: Maybe<Scalars['String']>
   mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
@@ -2152,7 +2173,9 @@ export type Registration = {
   trackingId?: Maybe<Scalars['String']>
   type?: Maybe<RegistrationType>
   witnessOneSignature?: Maybe<Scalars['String']>
+  witnessOneSignatureURI?: Maybe<Scalars['String']>
   witnessTwoSignature?: Maybe<Scalars['String']>
+  witnessTwoSignatureURI?: Maybe<Scalars['String']>
 }
 
 export type RegistrationCountResult = {
@@ -3716,6 +3739,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
+      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3728,6 +3752,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -4041,6 +4066,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contact?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
+      informantsSignatureURI?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
@@ -4432,6 +4458,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
+      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4443,6 +4470,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -4734,6 +4762,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
+      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -5132,9 +5161,13 @@ export type FetchMarriageRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       groomSignature?: string | null
+      groomSignatureURI?: string | null
       brideSignature?: string | null
+      brideSignatureURI?: string | null
       witnessOneSignature?: string | null
+      witnessOneSignatureURI?: string | null
       witnessTwoSignature?: string | null
+      witnessTwoSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -5147,6 +5180,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null
@@ -5432,9 +5466,13 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       groomSignature?: string | null
+      groomSignatureURI?: string | null
       brideSignature?: string | null
+      brideSignatureURI?: string | null
       witnessOneSignature?: string | null
+      witnessOneSignatureURI?: string | null
       witnessTwoSignature?: string | null
+      witnessTwoSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -5447,6 +5485,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
+        uri?: string | null
         type?: AttachmentType | null
         contentType?: string | null
         subject?: AttachmentSubject | null

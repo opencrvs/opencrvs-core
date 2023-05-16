@@ -891,7 +891,17 @@ class FormSectionComponent extends React.Component<Props> {
           }
 
           const withDynamicallyGeneratedFields =
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_OPTIONS
+              ? ({
+                  ...field,
+                  type: SELECT_WITH_OPTIONS,
+                  options: getFieldOptions(
+                    field as ISelectFormFieldWithOptions,
+                    values,
+                    offlineCountryConfig
+                  )
+                } as ISelectFormFieldWithOptions)
+              : field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
                   ...field,
                   type: SELECT_WITH_OPTIONS,

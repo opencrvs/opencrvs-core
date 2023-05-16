@@ -205,6 +205,7 @@ export const parsedLocations = {
     alias: 'Central',
     status: 'active',
     physicalType: 'Jurisdiction',
+    statisticalId: 'AWn3s2RqgAN',
     jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
@@ -215,6 +216,7 @@ export const parsedLocations = {
     alias: 'Sulaka',
     status: 'active',
     physicalType: 'Jurisdiction',
+    statisticalId: 'KozcEjeTyuD',
     jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
@@ -474,6 +476,7 @@ export const parsedFacilities = {
     physicalType: 'Building',
     jurisdictionType: '',
     type: 'CRVS_OFFICE',
+    statisticalId: '',
     partOf: 'Location/56eafead-7264-4c22-aa38-3dc75ad061b4'
   },
   '964d9765-dc96-4c7e-81ec-0a5572d4ea68': {
@@ -484,6 +487,7 @@ export const parsedFacilities = {
     physicalType: 'Building',
     jurisdictionType: '',
     type: 'CRVS_OFFICE',
+    statisticalId: '',
     partOf: 'Location/6f0ae45f-eefa-4b9e-9224-159e66bbee26'
   },
   '3ab39ce5-6d03-4149-8ae2-9f4f0baeadf8': {
@@ -494,6 +498,7 @@ export const parsedFacilities = {
     physicalType: 'Building',
     jurisdictionType: '',
     type: 'HEALTH_FACILITY',
+    statisticalId: '',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
   },
   '7599ea22-0df3-4cd9-9d15-8868487deb4d': {
@@ -504,6 +509,7 @@ export const parsedFacilities = {
     physicalType: 'Building',
     jurisdictionType: '',
     type: 'HEALTH_FACILITY',
+    statisticalId: '',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
   }
 }
@@ -580,7 +586,6 @@ export const mockFetchConfig = {
     CONFIG_API_URL: 'http://localhost:2021',
     LOGIN_URL: 'http://localhost:3020',
     AUTH_URL: 'http://localhost:4040',
-    MINIO_URL: 'http://localhost:3535',
     RESOURCES_URL: 'http://localhost:3040',
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
