@@ -184,28 +184,6 @@ function FormConfigSettingsComponent() {
     setRequiredForRegistration(!requiredForRegistration)
   }
 
-  React.useEffect(() => {
-    setIntroductionPage(
-      offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION
-    )
-    setNumberOfAddresses(offlineCountryConfiguration.config.ADDRESSES)
-    setDateOfBirthUnknown(
-      offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
-    )
-    setInformantSignature(
-      offlineCountryConfiguration.config.INFORMANT_SIGNATURE
-    )
-    setRequiredForRegistration(
-      offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
-    )
-  }, [
-    offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION,
-    offlineCountryConfiguration.config.ADDRESSES,
-    offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN,
-    offlineCountryConfiguration.config.INFORMANT_SIGNATURE,
-    offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
-  ])
-
   const toggleConfigModal = () => {
     setNumberOfAddresses(offlineCountryConfiguration.config.ADDRESSES)
     setIntroductionPage(
@@ -235,7 +213,8 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.introductionSettings)}
             value={[
               <span key="Introduction-page_value" id="Introduction-page_value">
-                {introductionPage
+                {offlineCountryConfiguration.config
+                  .HIDE_EVENT_REGISTER_INFORMATION
                   ? intl.formatMessage(messages.disable)
                   : intl.formatMessage(messages.enable)}
               </span>
@@ -255,7 +234,11 @@ function FormConfigSettingsComponent() {
           />
           <ListViewItemSimplified
             label={intl.formatMessage(messages.addressesSettings)}
-            value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
+            value={
+              <span id="numberOfAddresses">
+                {offlineCountryConfiguration.config.ADDRESSES}
+              </span>
+            }
             actions={[
               <Link
                 key="addresses-settings"
@@ -273,7 +256,7 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.exactDateOfBirthUnknownSettings)}
             value={
               <span id="exactDateOfBirthUnknown">
-                {dateOfBirthUnknown
+                {offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
                   ? intl.formatMessage(messages.enable)
                   : intl.formatMessage(messages.disable)}
               </span>
@@ -295,9 +278,10 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.informantSignatureSettings)}
             value={
               <span id="informantSignature">
-                {!informantSignature
+                {!offlineCountryConfiguration.config.INFORMANT_SIGNATURE
                   ? intl.formatMessage(messages.disable)
-                  : requiredForRegistration
+                  : offlineCountryConfiguration.config
+                      .INFORMANT_SIGNATURE_REQUIRED
                   ? intl.formatMessage(messages.enableAndRequired)
                   : intl.formatMessage(messages.enable)}
               </span>
