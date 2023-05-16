@@ -352,12 +352,7 @@ export const checkMarriageDate =
     }
 
     const mDate = new Date(cast)
-    // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
-    if (mDate > new Date()) {
-      return {
-        message: messages.dateFormat
-      }
-    }
+
     const groomDOB =
       drafts && drafts.groom && String(drafts.groom.groomBirthDate)
     const brideDOB =
