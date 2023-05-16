@@ -1014,7 +1014,7 @@ function createRequestForDeclaration(
 }
 
 function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<any>>,
+  mainRequest: Promise<ApolloQueryResult<Query>>,
   getState: () => IStoreState,
   client: ApolloClient<{}>
 ) {
@@ -1026,16 +1026,16 @@ function requestWithStateWrapper(
       if (
         !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
       ) {
-        await fetchAllDuplicateDeclarations(data.data as Query)
+        await fetchAllDuplicateDeclarations(data.data)
       }
-      const attachmentURLs = getAllMinioUrlsInAttachment(data.data as Query)
-      const signatureURLs = getAllMinioUrlsForSignature(data.data as Query)
-      const allfetchableMinioURLs = [
-        ...(attachmentURLs ?? []),
-        ...(signatureURLs ?? [])
+      const allfetchableURLs = [
+        ...getAttachmentUrls(data.data),
+        ...getSignatureUrls(data.data)
       ]
 
-      allfetchableMinioURLs.map((url) => fetch(url).then((res) => res.blob()))
+      await Promise.all(
+        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
+      )
 
       resolve({ data, store, client })
     } catch (error) {
@@ -1044,32 +1044,25 @@ function requestWithStateWrapper(
   })
 }
 
-function getAllMinioUrlsInAttachment(queryResultData: Query) {
+function getAttachmentUrls(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  const attachments = registration?.attachments
-  if (!attachments) {
-    return
-  }
-  const urlsWithMinioPath = attachments
-    .filter((a): a is Attachment =>
-      Boolean(a?.data && !isBase64FileString(a.data))
-    )
-    .map((a) => String(a.data))
-
-  return urlsWithMinioPath
+  return (registration?.attachments ?? [])
+    .filter((a): a is Attachment => Boolean(a))
+    .map((a) => a.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
-function getAllMinioUrlsForSignature(queryResultData: Query) {
+function getSignatureUrls(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  const signatureUrls = (
+  return (
     [
       'informantsSignature',
       'brideSignature',
@@ -1078,15 +1071,8 @@ function getAllMinioUrlsForSignature(queryResultData: Query) {
       'witnessTwoSignature'
     ] as const
   )
-
     .map((propertyKey) => registration?.[propertyKey])
     .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  if (signatureUrls.length === 0) {
-    return
-  }
-
-  return signatureUrls
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
