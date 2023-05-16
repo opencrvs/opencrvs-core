@@ -331,6 +331,22 @@ export class SearchTool extends React.Component<IProps, IState> {
     }
   }
 
+  private inputRef = React.createRef<HTMLInputElement>()
+
+  componentDidMount() {
+    this.inputRef.current?.addEventListener('wheel', this.handleWheel, {
+      passive: false
+    })
+  }
+
+  componentWillUnmount() {
+    this.inputRef.current?.removeEventListener('wheel', this.handleWheel)
+  }
+
+  handleWheel = (event: WheelEvent) => {
+    event.preventDefault()
+  }
+
   render() {
     const { placeHolderText, value } = this.state.selectedSearchType
     return (
@@ -347,6 +363,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           </Button>
           <SearchInput
             id="searchText"
+            ref={this.inputRef}
             type={value === 'phone' ? 'number' : 'text'}
             autoComplete="off"
             placeholder={placeHolderText}
