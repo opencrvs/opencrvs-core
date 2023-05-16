@@ -59,8 +59,13 @@ const Wrapper = styled.form`
   color: ${({ theme }) => theme.colors.primary};
   padding: 0px 8px 0px 4px;
   position: relative;
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `
-const SearchTextInput = styled.input`
+const SearchInput = styled.input`
   border: none;
   margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
@@ -327,7 +332,7 @@ export class SearchTool extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { placeHolderText } = this.state.selectedSearchType
+    const { placeHolderText, value } = this.state.selectedSearchType
     return (
       <SearchBox className={this.props.className}>
         <Wrapper onSubmit={this.search}>
@@ -340,13 +345,14 @@ export class SearchTool extends React.Component<IProps, IState> {
           >
             <Icon color="currentColor" name="MagnifyingGlass" size="large" />
           </Button>
-          <SearchTextInput
+          <SearchInput
             id="searchText"
-            type="text"
+            type={value === 'phone' ? 'number' : 'text'}
             autoComplete="off"
             placeholder={placeHolderText}
             onChange={this.onChangeHandler}
             value={this.state.searchParam}
+            maxLength={200}
           />
           {this.state.searchParam && (
             <ClearTextIcon onClick={this.onClearTextHandler} />
