@@ -1738,12 +1738,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             !declaration.data.registration?.informantsSignature
           )
         } else if (event === Event.Marriage) {
-          return (
-            !declaration.data.registration?.groomSignature ||
-            !declaration.data.registration?.brideSignature ||
-            !declaration.data.registration?.witnessOneSignature ||
-            !declaration.data.registration?.witnessTwoSignature
-          )
+          return false
         }
       }
     }
@@ -1836,7 +1831,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'bride_signature',
           declaration.data.registration?.brideSignature as string,
           intl.formatMessage(messages.brideSignature),
-          true
+          false
         )
 
         const groomSignatureInputPros = generateSignatureProps(
@@ -1844,7 +1839,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'groom_signature',
           declaration.data.registration?.groomSignature as string,
           intl.formatMessage(messages.groomSignature),
-          true
+          false
         )
 
         const witnessOneSignatureInputPros = generateSignatureProps(
@@ -1852,7 +1847,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'witness_one_signature',
           declaration.data.registration?.witnessOneSignature as string,
           intl.formatMessage(messages.witnessOneSignature),
-          true
+          false
         )
 
         const witnessTwoSignatureInputPros = generateSignatureProps(
@@ -1860,7 +1855,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           'witness_two_signature',
           declaration.data.registration?.witnessTwoSignature as string,
           intl.formatMessage(messages.witnessTwoSignature),
-          true
+          false
         )
 
         return (
