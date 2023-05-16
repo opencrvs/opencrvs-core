@@ -359,7 +359,7 @@ describe('edit user tests', () => {
                 alias: 'স্যাম্পল লোকেশান'
               }
             ],
-            signature: null,
+            signature: 'base64-data',
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
           }
