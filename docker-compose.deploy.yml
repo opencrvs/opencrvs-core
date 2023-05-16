@@ -709,8 +709,6 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
   scheduler:
-    environment:
-      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
     deploy:
       replicas: 1
       labels:
