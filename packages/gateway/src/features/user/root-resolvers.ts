@@ -274,20 +274,20 @@ export const resolvers: GQLResolver = {
         const errorResponse = await res.json()
         const duplicateDataErrorMap = {
           emailForNotification: {
-            errorPrefix: 'DUPLICATE_EMAIL',
+            field: 'emailForNotification',
             conflictingValue: userPayload.emailForNotification
           },
           mobile: {
-            errorPrefix: 'DUPLICATE_MOBILE',
+            field: 'mobile',
             conflictingValue: userPayload.mobile
           }
         }
 
-        const dupplicateError =
-          duplicateDataErrorMap[errorResponse['errorThrowingProperty']]
         return await Promise.reject(
           new Error(
-            `${dupplicateError.errorPrefix}-${dupplicateError.conflictingValue}`
+            JSON.stringify(
+              duplicateDataErrorMap[errorResponse['errorThrowingProperty']]
+            )
           )
         )
       } else if (res.status !== 201) {

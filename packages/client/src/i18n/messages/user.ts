@@ -504,7 +504,7 @@ const messagesToDefine: IUserMessages = {
     defaultMessage:
       '{email} is already used by another user. Please use a different email',
     description:
-      'This error messege shows when user try to input already exsisted email',
+      'This error message shows when user tries to input an already existing email',
     id: 'system.user.duplicateEmailError'
   },
   enterPinLabel: {

@@ -42,6 +42,7 @@ import { Role, SystemRole } from '@client/utils/gateway'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { isValidJsonString } from '@client/utils/userUtils'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -397,29 +398,43 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
-      if (errorData.message.includes('DUPLICATE_EMAIL')) {
-        const emailForNotification = errorData.message.split('-')[1]
-        return loop(
-          { ...state, submitting: false, submissionError: false },
-          Cmd.action(
-            showCreateUserDuplicateEmailErrorToast(
-              TOAST_MESSAGES.FAIL,
-              emailForNotification
+
+      if (isValidJsonString(errorData.message)) {
+        const duplicateError = JSON.parse(errorData.message)
+        if (duplicateError) {
+          if (
+            duplicateError.field &&
+            duplicateError.field === 'emailForNotification'
+          ) {
+            return loop(
+              { ...state, submitting: false, submissionError: false },
+              Cmd.action(
+                showCreateUserDuplicateEmailErrorToast(
+                  TOAST_MESSAGES.FAIL,
+                  duplicateError.conflictingValue
+                )
+              )
             )
-          )
-        )
-      } else if (errorData.message.includes('DUPLICATE_MOBILE')) {
-        const mobile = errorData.message.split('-')[1]
-        return loop(
-          { ...state, submitting: false, submissionError: false },
-          Cmd.action(showCreateUserErrorToast(TOAST_MESSAGES.FAIL, mobile))
-        )
-      } else {
-        return loop(
-          { ...state, submitting: false, submissionError: true },
-          Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
-        )
+          } else if (
+            duplicateError.field &&
+            duplicateError.field === 'mobile'
+          ) {
+            return loop(
+              { ...state, submitting: false, submissionError: false },
+              Cmd.action(
+                showCreateUserErrorToast(
+                  TOAST_MESSAGES.FAIL,
+                  duplicateError.conflictingValue
+                )
+              )
+            )
+          }
+        }
       }
+      return loop(
+        { ...state, submitting: false, submissionError: true },
+        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+      )
 
     case ROLES_LOADED:
       const { systemRoles } = action.payload
