@@ -48,7 +48,6 @@ services:
   #    - '1358:1358'
   #  links:
   #    - elasticsearch
-
   minio:
     ports:
       - '3535:3535'

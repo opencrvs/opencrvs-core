@@ -13,7 +13,9 @@ import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
   MOSIP_TOKEN_SEEDER_URL,
-  HEARTH_URL
+  HEARTH_URL,
+  APPLICATION_CONFIG_URL,
+  OSIA_NOTIFICATION_SERVICE_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -488,6 +490,68 @@ export interface IMosipSeederResponse {
   transactionID: string
   response: IMosipSeederResponseContent
   errors: IMosipErrors[]
+}
+
+interface Integration {
+  name: string
+  status: string
+  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
+}
+
+const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
+export async function isIntegratingSystemOSIAEnabled(authHeader: {
+  Authorization: string
+}) {
+  const res = await fetch(`${APPLICATION_CONFIG_URL}integrationConfig`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(`Could not fetch config, ${res.statusText} ${res.status}`)
+  }
+
+  const configResponse: Integration[] | undefined = await res.json()
+
+  const isEnabled = configResponse?.find((integration) => {
+    return integration.name === 'OSIA' && integration.status === statuses.ACTIVE
+  })
+
+  return isEnabled
+}
+
+interface OSIATopicPublicPayload {
+  source: string
+  uin?: string
+  uin1?: string
+  uin2?: string
+}
+
+export function invokeOSIARegistrationNotificationAPI(
+  payload: OSIATopicPublicPayload
+) {
+  try {
+    fetch(`${OSIA_NOTIFICATION_SERVICE_URL}osia-topic-notification`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  } catch (err) {
+    throw new Error(
+      `Unable to send registration topic notification to OSIA: ${err}`
+    )
+  }
 }
 
 export async function getMosipUINToken(

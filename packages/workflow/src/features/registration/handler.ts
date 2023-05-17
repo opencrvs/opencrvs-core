@@ -23,7 +23,8 @@ import {
   markBundleAsRequestedForCorrection,
   validateDeceasedDetails,
   makeTaskAnonymous,
-  markBundleAsIssued
+  markBundleAsIssued,
+  getParentsNID
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -37,7 +38,9 @@ import {
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  isIntegratingSystemOSIAEnabled,
+  invokeOSIARegistrationNotificationAPI
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -47,7 +50,11 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  FATHER_SECTION_CODE,
+  MOTHER_SECTION_CODE
+} from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
@@ -368,6 +375,27 @@ export async function markEventAsRegisteredCallbackHandler(
     }
     await sendBundleToHearth(bundle)
     //TODO: We have to configure sms and identify informant for marriage event
+    const osiaEnabled = await isIntegratingSystemOSIAEnabled({
+      Authorization: request.headers.authorization
+    })
+    if (osiaEnabled && event === EVENT_TYPE.BIRTH && osiaUinVidNid) {
+      const mothersUIN = await getParentsNID(
+        composition,
+        MOTHER_SECTION_CODE,
+        'id'
+      )
+      const fathersUIN = await getParentsNID(
+        composition,
+        FATHER_SECTION_CODE,
+        'id'
+      )
+      await invokeOSIARegistrationNotificationAPI({
+        source: 'OpenCRVS',
+        uin: `${osiaUinVidNid}`, // UIN of child
+        uin1: `${mothersUIN}`, // UIN of first parent
+        uin2: `${fathersUIN}` // UIN of second parent
+      })
+    }
     if (event !== EVENT_TYPE.MARRIAGE) {
       const phoneNo = await getPhoneNo(task, event)
       const informantName = await getEventInformantName(composition, event)

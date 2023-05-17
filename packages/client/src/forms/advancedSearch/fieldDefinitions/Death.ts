@@ -140,50 +140,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
           label: formMessageDescriptors.sexUnknown
         }
       ]
-    },
-    {
-      name: 'placeOfDeath',
-      customisable: false,
-      type: 'SELECT_WITH_OPTIONS',
-      ignoreFieldLabelOnErrorMessage: true,
-      label: formMessageDescriptors.placeOfDeath,
-      required: false,
-      initialValue: '',
-      validate: [],
-      placeholder: formMessageDescriptors.formSelectPlaceholder,
-      options: [
-        {
-          value: 'HEALTH_FACILITY',
-          label: formMessageDescriptors.healthInstitution
-        },
-        {
-          value: 'PRIVATE_HOME',
-          label: formMessageDescriptors.privateHome
-        },
-        {
-          value: 'OTHER',
-          label: formMessageDescriptors.otherInstitution
-        }
-      ]
-    },
-    {
-      name: 'eventCountry',
-      customisable: false,
-      type: 'SELECT_WITH_OPTIONS',
-      label: {
-        defaultMessage: 'Country',
-        description: 'Title for the country select',
-        id: 'form.field.label.country'
-      },
-      required: false,
-      initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
-      placeholder: {
-        defaultMessage: 'Select',
-        description: 'Placeholder text for a select',
-        id: 'form.field.select.placeholder'
-      },
-      options: countries
     }
   ]
 }

@@ -308,7 +308,6 @@ export async function verifySystemHandler(
     status: system.status,
     id: system.id
   }
-
   return response
 }
 

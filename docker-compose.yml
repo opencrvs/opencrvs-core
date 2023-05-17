@@ -114,6 +114,7 @@ services:
       context: .
       dockerfile: ./packages/scheduler/Dockerfile
     environment:
+      - NODE_ENV=development
       - METRICS_URL=http://metrics:1050
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
@@ -206,4 +207,5 @@ services:
       dockerfile: ./packages/documents/Dockerfile
     restart: unless-stopped
     environment:
+      - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040

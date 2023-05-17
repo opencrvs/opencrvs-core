@@ -150,12 +150,8 @@ export const SupportingDocumentsView = (props: IProps) => {
           return true
         }
 
-        const documentData = !isBase64FileString(document.data)
-          ? `${window.config.MINIO_URL}${document.data}`
-          : document.data
-
         documentOptions.push({
-          value: documentData,
+          value: document.data,
           label
         })
         selectOptions.push({
@@ -203,14 +199,7 @@ export const SupportingDocumentsView = (props: IProps) => {
   }
 
   const selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    previewImageTransformed.data = isBase64FileString(
-      previewImageTransformed.data
-    )
-      ? previewImageTransformed.data
-      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
-
-    setPreviewImage(previewImageTransformed as IFileValue)
+    setPreviewImage(previewImage as IFileValue)
   }
 
   const getAllAttachmentInPreviewList = () => {

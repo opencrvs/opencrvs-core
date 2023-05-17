@@ -40,3 +40,5 @@ export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
 export const DEFAULT_TIMEOUT = 600000
+export const OSIA_NOTIFICATION_SERVICE_URL =
+  'http://localhost:8030/v1/topics/CR/publish?subject=liveBirth'

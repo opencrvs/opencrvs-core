@@ -714,6 +714,27 @@ export async function updatePatientIdentifierWithRN(
   )
 }
 
+export async function getParentsNID(
+  composition: fhir.Composition,
+  sectionCode: string,
+  identifierType: string
+): Promise<string | null> {
+  const section = getSectionEntryBySectionCode(composition, sectionCode)
+  const patient = await getFromFhir(`/${section.reference}`)
+  if (patient.identifier) {
+    const nidIndentifier = patient.identifier.find(
+      (identifier: { type: string }) => identifier.type === identifierType
+    )
+    if (nidIndentifier) {
+      return nidIndentifier.value
+    } else {
+      return null
+    }
+  } else {
+    return null
+  }
+}
+
 interface Integration {
   name: string
   status: string
