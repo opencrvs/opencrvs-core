@@ -24,7 +24,9 @@ const fieldNameMapping = {
   [deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF]:
     'uploadDocForDeceasedDeath',
   [deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF]:
-    'uploadDocForCauseOfDeath'
+    'uploadDocForCauseOfDeath',
+  [deathDocumentForWhomFhirMapping.WITNESS_ONE]: 'uploadDocForWitnessOne',
+  [deathDocumentForWhomFhirMapping.WITNESS_TWO]: 'uploadDocForWitnessTwo'
 }
 
 export function deathAttachmentToFieldTransformer(

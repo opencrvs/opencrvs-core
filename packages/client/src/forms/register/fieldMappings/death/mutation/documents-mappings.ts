@@ -21,14 +21,18 @@ export const deathDocumentForWhomFhirMapping = {
   DECEASED_ID_PROOF: 'DECEASED_ID_PROOF',
   DECEASED_DEATH_PROOF: 'DECEASED_DEATH_PROOF',
   DECEASED_DEATH_CAUSE_PROOF: 'DECEASED_DEATH_CAUSE_PROOF',
-  INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF'
+  INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF',
+  WITNESS_ONE: 'WITNESS_ONE',
+  WITNESS_TWO: 'WITNESS_TWO'
 }
 
 export const deathSectionMapping = {
   [DeathSection.Deceased]: [
     deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF,
     deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
-    deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF
+    deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
+    deathDocumentForWhomFhirMapping.WITNESS_ONE,
+    deathDocumentForWhomFhirMapping.WITNESS_TWO
   ],
   [DeathSection.Informant]: [deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]
 }
