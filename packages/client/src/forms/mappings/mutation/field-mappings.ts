@@ -142,8 +142,9 @@ export const nidVerificationFieldToIdentityTransformer = (
   if (existingIdentity) {
     const modifiedFields = draftData[sectionId][
       'fieldsModifiedByNidUserInfo'
-    ] as string[]
-    existingIdentity['fieldsModifiedByIdentity'] = modifiedFields.join(',')
+    ] as string[] | undefined
+    existingIdentity['fieldsModifiedByIdentity'] =
+      modifiedFields?.join(',') ?? ''
   }
   return transformedData
 }
