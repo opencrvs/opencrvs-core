@@ -83,6 +83,7 @@ export function createCustomField({
   extraValue,
   validator,
   mapping,
+  helperText,
   hideInPreview,
   dynamicOptions,
   optionCondition
@@ -95,6 +96,7 @@ export function createCustomField({
     type: fieldType,
     extraValue,
     hideInPreview,
+    helperText: helperText && getDefaultLanguageMessage(helperText),
     optionCondition,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: initialValue || '',

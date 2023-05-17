@@ -1495,6 +1495,7 @@ input QuestionInput {
   label: [MesssageInput!]
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
+  helperText: [MesssageInput!]
   tooltip: [MesssageInput!]
   unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
