@@ -707,9 +707,6 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['informant.informantID']
                 }
               ],
-              conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationEnabled
-              ],
               mapping: {
                 template: {
                   fieldName: 'deceasedNID',
@@ -725,40 +722,6 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['id', 'NATIONAL_ID']
                 }
               }
-            },
-            {
-              name: 'deceasedNidVerification',
-              type: 'NID_VERIFICATION_BUTTON',
-              label: formMessageDescriptors.iDTypeNationalID,
-              required: true,
-              customisable: true,
-              initialValue: '',
-              validate: [],
-              conditionals: [
-                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
-                {
-                  action: 'disable',
-                  expression: `values.deceasedNidVerification`
-                }
-              ],
-              mapping: {
-                mutation: {
-                  operation: 'fieldValueNestingTransformer',
-                  parameters: [
-                    'individual',
-                    {
-                      operation: 'nidVerificationFieldToIdentityTransformer'
-                    }
-                  ]
-                },
-                query: {
-                  operation: 'nestedIdentityValueToFieldTransformer',
-                  parameters: ['individual']
-                }
-              },
-              labelForVerified: formMessageDescriptors.nidVerified,
-              labelForUnverified: formMessageDescriptors.nidNotVerified,
-              labelForOffline: formMessageDescriptors.nidOffline
             },
             {
               name: 'birthDate',
@@ -1383,7 +1346,9 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['deceased.iD']
                 }
               ],
-              conditionals: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationEnabled
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1411,6 +1376,40 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['id', 'NATIONAL_ID', 'individual']
                 }
               }
+            },
+            {
+              name: 'informantNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validate: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
             },
             {
               name: 'informantBirthDate',
