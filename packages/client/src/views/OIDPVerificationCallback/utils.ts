@@ -60,6 +60,7 @@ interface UserInfo {
   oidpUserInfo: oidpUserInfo
   districtFhirId?: string | null
   stateFhirId?: string | null
+  locationLevel3FhirId?: string | null
 }
 
 export interface INidCallbackState {
@@ -123,11 +124,10 @@ export function addNidUserInfoToDeclaration(
         declarationDataSection['districtPrimary'] = nidUserInfo.districtFhirId
         fieldsModifiedByNidUserInfo.push('districtPrimary')
       }
-
-      if (oidpUserInfo.address.city) {
-        declarationDataSection['cityUrbanOptionPrimary'] =
-          oidpUserInfo.address.city
-        fieldsModifiedByNidUserInfo.push('cityUrbanOptionPrimary')
+      if (nidUserInfo.locationLevel3FhirId) {
+        declarationDataSection['locationLevel3Primary'] =
+          nidUserInfo.locationLevel3FhirId
+        fieldsModifiedByNidUserInfo.push('locationLevel3Primary')
       }
       if (oidpUserInfo.address.street_address) {
         declarationDataSection['addressLine2UrbanOptionPrimary'] =
@@ -152,9 +152,9 @@ export function addNidUserInfoToDeclaration(
         fieldsModifiedByNidUserInfo.push('internationalDistrictPrimary')
       }
       if (oidpUserInfo.address.city) {
-        declarationDataSection['internationalCityPrimary'] =
+        declarationDataSection['locationLevel3Primary'] =
           oidpUserInfo.address.city
-        fieldsModifiedByNidUserInfo.push('internationalCityPrimary')
+        fieldsModifiedByNidUserInfo.push('locationLevel3Primary')
       }
       if (oidpUserInfo.address.street_address) {
         declarationDataSection['internationalAddressLine1Primary'] =

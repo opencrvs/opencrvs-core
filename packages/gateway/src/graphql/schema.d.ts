@@ -554,6 +554,7 @@ export interface GQLUserInfo {
   oidpUserInfo?: GQLOIDPUserInfo
   districtFhirId?: string
   stateFhirId?: string
+  locationLevel3FhirId?: string
 }
 
 export interface GQLNotificationInput {
@@ -6328,6 +6329,7 @@ export interface GQLUserInfoTypeResolver<TParent = any> {
   oidpUserInfo?: UserInfoToOidpUserInfoResolver<TParent>
   districtFhirId?: UserInfoToDistrictFhirIdResolver<TParent>
   stateFhirId?: UserInfoToStateFhirIdResolver<TParent>
+  locationLevel3FhirId?: UserInfoToLocationLevel3FhirIdResolver<TParent>
 }
 
 export interface UserInfoToOidpUserInfoResolver<TParent = any, TResult = any> {
@@ -6352,6 +6354,18 @@ export interface UserInfoToDistrictFhirIdResolver<
 }
 
 export interface UserInfoToStateFhirIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserInfoToLocationLevel3FhirIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

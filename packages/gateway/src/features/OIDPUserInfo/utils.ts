@@ -73,7 +73,10 @@ const pickUserInfo = async (userInfo: OIDPUserInfo) => {
       (await findAdminStructureLocationWithGeocode(userInfo.address.locality)),
     stateFhirId:
       userInfo.address?.region &&
-      (await findAdminStructureLocationWithGeocode(userInfo.address.region))
+      (await findAdminStructureLocationWithGeocode(userInfo.address.region)),
+    locationLevel3FhirId:
+      userInfo.address?.city &&
+      (await findAdminStructureLocationWithGeocode(userInfo.address.city))
   }
 }
 
