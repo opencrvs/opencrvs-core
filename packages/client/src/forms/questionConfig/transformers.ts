@@ -15,7 +15,8 @@ import {
   IFieldIdentifiers,
   getFieldIdentifiers,
   IQuestionConfig,
-  getIdentifiersFromFieldId
+  getIdentifiersFromFieldId,
+  IMessage
 } from '.'
 import {
   ISerializedForm,
@@ -32,6 +33,7 @@ import { CustomSelectOption, Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default/index'
 import { MessageDescriptor } from 'react-intl'
+import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
@@ -107,6 +109,7 @@ export function questionsTransformer(
       description,
       tooltip,
       hideInPreview,
+      helperText,
       unit,
       errorMessage,
       validateEmpty,
@@ -139,6 +142,7 @@ export function questionsTransformer(
           tooltip,
           unit,
           errorMessage,
+          helperText,
           maxLength,
           inputWidth,
           fieldName,
@@ -173,6 +177,12 @@ export function questionsTransformer(
 
       if (validator && validator.length > 0) {
         defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
+      }
+
+      if (helperText) {
+        defaultQuestionConfig.helperText = getDefaultLanguageMessage(
+          helperText as IMessage[]
+        )
       }
 
       if (options) {
