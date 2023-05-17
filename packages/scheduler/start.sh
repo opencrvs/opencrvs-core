@@ -9,4 +9,4 @@ echo "Loading crontab file: $CRON_FILE"
 crontab $CRON_FILE
 # Start cron
 echo "Starting cron..."
-crond -f
+crond -f -l 2
