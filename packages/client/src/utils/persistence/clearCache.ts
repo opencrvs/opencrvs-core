@@ -1,8 +1,8 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import isBefore from 'date-fns/isBefore'
+import lastDayOfMonth from 'date-fns/lastDayOfMonth'
 import subMonths from 'date-fns/subMonths'
 import subYears from 'date-fns/subYears'
-import lastDayOfMonth from 'date-fns/lastDayOfMonth'
-import isBefore from 'date-fns/isBefore'
 
 /**
  * Removes old cache entries
@@ -40,4 +40,7 @@ export const clearOldCacheEntries = (
     // eslint-disable-next-line no-console
     console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
   }
+
+  // Purge all items in cache that don't get referenced from anywhere anymore
+  client.cache.gc()
 }
