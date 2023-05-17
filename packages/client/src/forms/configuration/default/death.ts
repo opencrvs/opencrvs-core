@@ -727,7 +727,7 @@ export const deathRegisterForms: ISerializedForm = {
               }
             },
             {
-              name: 'informantNidVerification',
+              name: 'deceasedNidVerification',
               type: 'NID_VERIFICATION_BUTTON',
               label: formMessageDescriptors.iDTypeNationalID,
               required: true,
@@ -738,7 +738,7 @@ export const deathRegisterForms: ISerializedForm = {
                 nidIntegrationConditionals.hideIfNidIntegrationDisabled,
                 {
                   action: 'disable',
-                  expression: `values.informantNidVerification`
+                  expression: `values.deceasedNidVerification`
                 }
               ],
               mapping: {
@@ -770,6 +770,10 @@ export const deathRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('birthDate')`
                 }
               ],
               validate: [
@@ -869,7 +873,13 @@ export const deathRegisterForms: ISerializedForm = {
                   operation: 'nameToFieldTransformer',
                   parameters: ['en', 'firstNames']
                 }
-              }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                }
+              ]
             },
             {
               name: 'familyNameEng',
@@ -898,7 +908,13 @@ export const deathRegisterForms: ISerializedForm = {
                   operation: 'nameToFieldTransformer',
                   parameters: ['en', 'familyName']
                 }
-              }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
+                }
+              ]
             },
             {
               name: 'gender',

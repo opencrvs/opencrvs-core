@@ -15,6 +15,7 @@ import { isDefaultCountry } from '@client/forms/utils'
 import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import formatDate from '@client/utils/date-formatting'
+import { camelCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 import { v4 as uuid } from 'uuid'
@@ -90,11 +91,13 @@ export function addNidUserInfoToDeclaration(
   const splitFullName = splitName(oidpUserInfo.name)
 
   if (oidpUserInfo.birthdate) {
-    declarationDataSection[`${section}BirthDate`] = formatDate(
+    // Deceased don't have "deceased" -prefix
+    const dataSection = section === 'deceased' ? '' : section
+    declarationDataSection[camelCase(`${dataSection}BirthDate`)] = formatDate(
       new Date(oidpUserInfo.birthdate),
       'yyyy-MM-dd'
     )
-    fieldsModifiedByNidUserInfo.push(`${section}BirthDate`)
+    fieldsModifiedByNidUserInfo.push(camelCase(`${dataSection}BirthDate`))
   }
 
   if (splitFullName.firstName) {
@@ -113,8 +116,8 @@ export function addNidUserInfoToDeclaration(
     if (isDefaultCountry(oidpUserInfo.address.country)) {
       //populate default country specific address fields
       if (nidUserInfo.stateFhirId) {
-        declarationDataSection['StatePrimary'] = nidUserInfo.stateFhirId
-        fieldsModifiedByNidUserInfo.push('StatePrimary')
+        declarationDataSection['statePrimary'] = nidUserInfo.stateFhirId
+        fieldsModifiedByNidUserInfo.push('statePrimary')
       }
       if (nidUserInfo.districtFhirId) {
         declarationDataSection['districtPrimary'] = nidUserInfo.districtFhirId

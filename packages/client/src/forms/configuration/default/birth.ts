@@ -2187,7 +2187,7 @@ export const birthRegisterForms: ISerializedForm = {
                 },
                 {
                   action: 'disable',
-                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('fatherBirthDate')`
                 }
               ],
               mapping: {
