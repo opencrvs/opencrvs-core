@@ -12,10 +12,7 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import {
-  ICertificateSVGPayload,
-  IGetCertificatePayload
-} from '@gateway/features/certificate/type-resolvers'
+import { IGetCertificatePayload } from '@gateway/features/certificate/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
@@ -60,7 +57,7 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async createOrUpdateCertificateSVG(
       _,
-      { certificateSVG = {} },
+      { certificateSVG },
       { headers: authHeader }
     ) {
       // Only natlsysadmin should be able to create certificate
@@ -72,21 +69,10 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const certificateSVGPayload: ICertificateSVGPayload = {
-        id: certificateSVG.id as string,
-        svgCode: certificateSVG.svgCode as string,
-        svgFilename: certificateSVG.svgFilename as string,
-        svgDateUpdated: certificateSVG.svgDateUpdated as number,
-        svgDateCreated: certificateSVG.svgDateCreated as number,
-        user: certificateSVG.user as string,
-        status: certificateSVG.status as string,
-        event: certificateSVG.event as string
-      }
-
-      const action = certificateSVGPayload.id ? 'update' : 'create'
+      const action = certificateSVG.id ? 'update' : 'create'
       const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {
         method: 'POST',
-        body: JSON.stringify(certificateSVGPayload),
+        body: JSON.stringify(certificateSVG),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

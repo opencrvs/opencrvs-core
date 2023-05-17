@@ -15,7 +15,7 @@ type CertificateSVG {
   svgDateUpdated: String!
   svgDateCreated: String!
   user: String!
-  event: String!
+  event: Event!
   status: String!
 }
 
@@ -26,13 +26,13 @@ input CertificateSVGInput {
   svgDateUpdated: Int
   svgDateCreated: Int
   user: String!
-  event: String!
+  event: Event!
   status: String!
 }
 
 type Query {
-  getCertificateSVG(status: String, event: String): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG]
+  getCertificateSVG(status: String, event: Event): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG!]
 }
 
 type Mutation {

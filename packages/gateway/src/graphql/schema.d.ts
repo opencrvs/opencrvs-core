@@ -51,7 +51,7 @@ export interface GQLQuery {
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
-  getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
+  getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   getFormDraft?: Array<GQLFormDraft>
   fetchSystem?: GQLSystem
   getFormDataset?: Array<GQLFormDataset>
@@ -507,8 +507,14 @@ export interface GQLCertificateSVG {
   svgDateUpdated: string
   svgDateCreated: string
   user: string
-  event: string
+  event: GQLEvent
   status: string
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death',
+  marriage = 'marriage'
 }
 
 export interface GQLFormDraft {
@@ -675,7 +681,7 @@ export interface GQLCertificateSVGInput {
   svgDateUpdated?: number
   svgDateCreated?: number
   user: string
-  event: string
+  event: GQLEvent
   status: string
 }
 
@@ -1141,12 +1147,6 @@ export interface GQLEventSearchSetNameMap {
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
   MarriageEventSearchSet: GQLMarriageEventSearchSet
-}
-
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death',
-  marriage = 'marriage'
 }
 
 export interface GQLEventProgressSet {
@@ -2775,7 +2775,7 @@ export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
 
 export interface QueryToGetCertificateSVGArgs {
   status?: string
-  event?: string
+  event?: GQLEvent
 }
 export interface QueryToGetCertificateSVGResolver<
   TParent = any,
