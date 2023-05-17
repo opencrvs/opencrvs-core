@@ -59,11 +59,6 @@ const Wrapper = styled.form`
   color: ${({ theme }) => theme.colors.primary};
   padding: 0px 8px 0px 4px;
   position: relative;
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 `
 const SearchInput = styled.input`
   border: none;
@@ -331,22 +326,6 @@ export class SearchTool extends React.Component<IProps, IState> {
     }
   }
 
-  private inputRef = React.createRef<HTMLInputElement>()
-
-  componentDidMount() {
-    this.inputRef.current?.addEventListener('wheel', this.handleWheel, {
-      passive: false
-    })
-  }
-
-  componentWillUnmount() {
-    this.inputRef.current?.removeEventListener('wheel', this.handleWheel)
-  }
-
-  handleWheel = (event: WheelEvent) => {
-    event.preventDefault()
-  }
-
   render() {
     const { placeHolderText, value } = this.state.selectedSearchType
     return (
@@ -363,8 +342,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           </Button>
           <SearchInput
             id="searchText"
-            ref={this.inputRef}
-            type={value === 'phone' ? 'number' : 'text'}
+            type={value === 'phone' ? 'tel' : 'text'}
             autoComplete="off"
             placeholder={placeHolderText}
             onChange={this.onChangeHandler}
