@@ -39,13 +39,15 @@ export type FetchTokenProps = {
   grantType?: string
 }
 
-const searchLocationFromHearth = (name: string) =>
+const searchLocationFromHearth = (geocode: string) =>
   fetchFromHearth<fhir.Bundle>(
-    `/location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
+    `/location?${new URLSearchParams({
+      identifer: `ADMIN_STRUCTURE_${geocode}`
+    })}`
   )
 
-const findAdminStructureLocationWithName = async (name: string) => {
-  const fhirBundleLocations = await searchLocationFromHearth(name)
+const findAdminStructureLocationWithGeocode = async (geocode: string) => {
+  const fhirBundleLocations = await searchLocationFromHearth(geocode)
 
   if ((fhirBundleLocations.entry?.length ?? 0) > 1) {
     throw new Error(
@@ -54,7 +56,9 @@ const findAdminStructureLocationWithName = async (name: string) => {
   }
 
   if ((fhirBundleLocations.entry?.length ?? 0) === 0) {
-    logger.warn('No admin structure location found with the name: ' + name)
+    logger.warn(
+      'No admin structure location found with the geocode: ' + geocode
+    )
     return null
   }
 
@@ -66,10 +70,10 @@ const pickUserInfo = async (userInfo: OIDPUserInfo) => {
     oidpUserInfo: userInfo,
     districtFhirId:
       userInfo.address?.locality &&
-      (await findAdminStructureLocationWithName(userInfo.address.locality)),
+      (await findAdminStructureLocationWithGeocode(userInfo.address.locality)),
     stateFhirId:
       userInfo.address?.region &&
-      (await findAdminStructureLocationWithName(userInfo.address.region))
+      (await findAdminStructureLocationWithGeocode(userInfo.address.region))
   }
 }
 
