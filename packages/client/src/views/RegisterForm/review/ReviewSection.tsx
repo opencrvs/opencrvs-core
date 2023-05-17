@@ -946,8 +946,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  isVisibleField(field: IFormField, section: IFormSection) {
-    const { draft, offlineCountryConfiguration } = this.props
+  isVisibleField(
+    draft: IDeclaration,
+    field: IFormField,
+    section: IFormSection
+  ) {
+    const { offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
@@ -990,6 +994,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getRenderableField(
+    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -997,7 +1002,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { draft: declaration, intl } = this.props
+    const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -1137,6 +1142,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getPreviewGroupsField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
@@ -1145,22 +1151,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    const { draft } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
       const baseTag = field.previewGroup
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
-        if (this.isVisibleField(field, section) && !this.isViewOnly(field)) {
+        if (
+          this.isVisibleField(draft, field, section) &&
+          !this.isViewOnly(field)
+        ) {
           if (field.previewGroup === baseTag) {
             taggedFields.push(field)
           }
           for (const index in field.nestedFields) {
             field.nestedFields[index].forEach((tempField) => {
               if (
-                this.isVisibleField(tempField, section) &&
+                this.isVisibleField(draft, tempField, section) &&
                 !this.isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
               ) {
@@ -1253,6 +1260,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
 
       return this.getRenderableField(
+        draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -1330,15 +1338,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getSinglePreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const {
-      draft: { data, originalData }
-    } = this.props
+    const { data, originalData } = draft
 
     let value = this.getValueOrError(
       section,
@@ -1372,6 +1379,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return this.getRenderableField(
+      draft,
       section,
       group,
       field.label,
@@ -1382,17 +1390,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getNestedPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection
   ) {
-    const { draft } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
-      this.getSinglePreviewField(section, group, field, sectionErrors, true)
+      this.getSinglePreviewField(
+        draft,
+        section,
+        group,
+        field,
+        sectionErrors,
+        true
+      )
     )
     ;(
       (field.nestedFields &&
@@ -1408,6 +1423,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (nestedField.previewGroup) {
         nestedItems.push(
           this.getPreviewGroupsField(
+            draft,
             section,
             group,
             nestedField,
@@ -1423,6 +1439,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         nestedItems.push(
           this.getRenderableField(
+            draft,
             section,
             group,
             nestedField.label,
@@ -1442,6 +1459,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverriddenFieldsListForPreview(
+    draft: IDeclaration,
     formSections: IFormSection[]
   ): IFormField[] {
     const overriddenFields = formSections
@@ -1470,7 +1488,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })
               .filter((field) => !Boolean(field.hideInPreview))
               .filter((field) => Boolean(field.reviewOverrides))
-              .filter((field) => this.isVisibleField(field, section))
+              .filter((field) => this.isVisibleField(draft, field, section))
           })
           .filter((item) => item.length)
       })
@@ -1479,6 +1497,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverRiddenPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -1498,6 +1517,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ) as IFormSection
 
     const result = this.getSinglePreviewField(
+      draft,
       residingSection,
       group,
       overriddenField,
@@ -1612,9 +1632,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
   ) => {
-    const { intl, draft } = this.props
-    const overriddenFields =
-      this.getOverriddenFieldsListForPreview(formSections)
+    const { intl } = this.props
+    const draft = addSameAddressValues(this.props.draft)
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      draft,
+      formSections
+    )
     let tempItem: any
     return formSections.map((section) => {
       let items: any[] = []
@@ -1628,30 +1651,33 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group.fields
           .filter(
             (field) =>
-              this.isVisibleField(field, section) && !this.isViewOnly(field)
+              this.isVisibleField(draft, field, section) &&
+              !this.isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
+                  draft,
                   section,
                   group,
                   field,
                   visitedTags,
                   errorsOnFields,
                   draft.data[section.id],
-                  (draft.originalData && draft.originalData[section.id]) ||
-                    undefined
+                  draft.originalData?.[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
+                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
               : this.getSinglePreviewField(
+                  draft,
                   section,
                   group,
                   field,
@@ -1660,6 +1686,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
+                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -2173,81 +2200,55 @@ function fatherDoesNotExistAndStateIsFather(
 }
 
 function addSameAddressValues(draft: IDeclaration) {
-  const draftEvent = draft.event
-  const modifier =
-    draftEvent === 'birth'
-      ? 'father'
-      : draftEvent === 'death'
-      ? 'informant'
-      : null
-  const addressNames = getAddressCaseFields(
+  if (draft.event === Event.Marriage) {
+    return draft
+  }
+  /*
+   *  Address of y is same as x
+   */
+  const [xSection, ySection] =
+    draft.event === Event.Birth
+      ? (['mother', 'father'] as const)
+      : (['deceased', 'informant'] as const)
+
+  const fieldNames = getAddressCaseFields(
     AddressCases.PRIMARY_ADDRESS,
     true
   ).map((address) => address.name)
-  let modifiedDraft
 
-  if (!modifier) return draft
+  const modifiedDraft = {
+    ...draft
+  }
 
-  const isPrimaryAddressSameAsOtherPrimary =
-    draft.data[modifier]?.primaryAddressSameAsOtherPrimary
-
-  if (isPrimaryAddressSameAsOtherPrimary) {
-    modifiedDraft = {
-      ...draft,
-      data: {
-        ...draft.data,
-        ...(modifier === 'father' && {
-          father: {
-            ...draft.data.father,
-            ...pick(draft.data.mother, addressNames)
-          }
-        }),
-        ...(modifier === 'informant' && {
-          informant: {
-            ...draft.data.informant,
-            ...pick(draft.data.deceased, addressNames)
-          }
-        })
+  if (modifiedDraft.data[ySection]?.primaryAddressSameAsOtherPrimary) {
+    modifiedDraft.data = {
+      ...modifiedDraft.data,
+      [ySection]: {
+        ...modifiedDraft.data[ySection],
+        ...pick(draft.data[xSection], fieldNames)
       }
     }
-    modifiedDraft.data[modifier]!.primaryAddressSameAsOtherPrimary = false
+    modifiedDraft.data[ySection].primaryAddressSameAsOtherPrimary = false
   }
-
-  const isPrimaryAddressSameAsOtherPrimaryForOriginal =
-    draft.originalData &&
-    draft.originalData[modifier]?.primaryAddressSameAsOtherPrimary
 
   if (
-    isPrimaryAddressSameAsOtherPrimaryForOriginal &&
-    modifiedDraft?.originalData
+    modifiedDraft.originalData?.[ySection]?.primaryAddressSameAsOtherPrimary
   ) {
     modifiedDraft.originalData = {
-      ...modifiedDraft?.originalData,
-      ...(modifier === 'father' && {
-        father: {
-          ...modifiedDraft.originalData.father,
-          ...pick(modifiedDraft.originalData.mother, addressNames)
-        }
-      }),
-      ...(modifier === 'informant' && {
-        informant: {
-          ...modifiedDraft?.originalData.informant,
-          ...pick(modifiedDraft?.originalData.deceased, addressNames)
-        }
-      })
+      ...modifiedDraft.originalData,
+      [ySection]: {
+        ...modifiedDraft.originalData[ySection],
+        ...pick(modifiedDraft.originalData[xSection], fieldNames)
+      }
     }
-    modifiedDraft.originalData[modifier].primaryAddressSameAsOtherPrimary =
+    modifiedDraft.originalData[ySection].primaryAddressSameAsOtherPrimary =
       false
-
-    return modifiedDraft
   }
-
-  return draft
+  return modifiedDraft
 }
 
 export const ReviewSection = connect(
-  (state: IStoreState, props: { draft: IDeclaration }) => ({
-    draft: addSameAddressValues(props.draft),
+  (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
     registrationSection: getBirthSection(state, BirthSection.Registration),
     documentsSection: getBirthSection(state, BirthSection.Documents),
