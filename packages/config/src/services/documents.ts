@@ -43,7 +43,7 @@ export async function getDocumentUrl(fileUri: string, authHeader: IAuthHeader) {
       ...authHeader,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ filename: fileUri })
+    body: JSON.stringify({ fileUri })
   })
   if (!res.ok) {
     logger.error(await res.json())

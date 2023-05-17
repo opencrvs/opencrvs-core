@@ -508,7 +508,12 @@ export interface GQLCertificateSVG {
   svgDateCreated: string
   user: string
   event: GQLEvent
-  status: string
+  status: GQLCertificateStatus
+}
+
+export const enum GQLCertificateStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
 export const enum GQLEvent {
@@ -682,7 +687,7 @@ export interface GQLCertificateSVGInput {
   svgDateCreated?: number
   user: string
   event: GQLEvent
-  status: string
+  status: GQLCertificateStatus
 }
 
 export interface GQLApplicationConfiguration {
@@ -2774,8 +2779,8 @@ export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetCertificateSVGArgs {
-  status?: string
-  event?: GQLEvent
+  status: GQLCertificateStatus
+  event: GQLEvent
 }
 export interface QueryToGetCertificateSVGResolver<
   TParent = any,

@@ -12,26 +12,14 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import { IGetCertificatePayload } from '@gateway/features/certificate/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getCertificateSVG(
-      _,
-      { status = null, event = null },
-      { headers: authHeader }
-    ) {
-      let payload: IGetCertificatePayload = {}
-      if (status) {
-        payload = { ...payload, status }
-      }
-      if (event) {
-        payload = { ...payload, event }
-      }
+    async getCertificateSVG(_, filters, { headers: authHeader }) {
       const res = await fetch(`${APPLICATION_CONFIG_URL}getCertificate`, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(filters),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

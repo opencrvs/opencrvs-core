@@ -10,10 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-export interface IGetCertificatePayload {
-  status?: string
-  event?: string
-}
 
 export interface ICertificateSVG {
   _id: string

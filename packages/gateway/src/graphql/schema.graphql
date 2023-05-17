@@ -146,7 +146,7 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: String, event: Event): CertificateSVG
+  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG!]
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
@@ -629,7 +629,12 @@ type CertificateSVG {
   svgDateCreated: String!
   user: String!
   event: Event!
-  status: String!
+  status: CertificateStatus!
+}
+
+enum CertificateStatus {
+  ACTIVE
+  INACTIVE
 }
 
 enum Event {
@@ -803,7 +808,7 @@ input CertificateSVGInput {
   svgDateCreated: Int
   user: String!
   event: Event!
-  status: String!
+  status: CertificateStatus!
 }
 
 type ApplicationConfiguration {

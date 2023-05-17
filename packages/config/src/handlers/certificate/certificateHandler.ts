@@ -24,6 +24,7 @@ import { RouteScope } from '@config/config/routes'
 import { pipe } from 'fp-ts/lib/function'
 import { getDocumentUrl, uploadDocument } from '@config/services/documents'
 import { IAuthHeader } from '@config/services/fhirService'
+import type { LeanDocument } from 'mongoose'
 
 interface IActivePayload {
   status: Status
@@ -31,7 +32,7 @@ interface IActivePayload {
 }
 
 async function certificateWithDocumentUrl(
-  certificate: ICertificateModel,
+  certificate: LeanDocument<ICertificateModel>,
   authheader: IAuthHeader
 ) {
   return {
@@ -45,14 +46,16 @@ export async function getCertificateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { status, event } = request.payload as IActivePayload
-  const certificate: ICertificateModel | null = await Certificate.findOne({
+  const certificate = await Certificate.findOne({
     status: status,
     event: event
-  })
+  }).lean()
 
   return (
     certificate &&
-    certificateWithDocumentUrl(certificate, request.headers.authorization)
+    certificateWithDocumentUrl(certificate, {
+      Authorization: request.headers.authorization
+    })
   )
 }
 
@@ -76,10 +79,12 @@ export async function getActiveCertificatesHandler(
     const activeCertificates = await Certificate.find({
       status: Status.ACTIVE,
       event: { $in: [Event.BIRTH, Event.DEATH, Event.MARRIAGE] }
-    })
+    }).lean()
     return Promise.all(
       activeCertificates.map((cert) =>
-        certificateWithDocumentUrl(cert, request.headers.authorization)
+        certificateWithDocumentUrl(cert, {
+          Authorization: request.headers.authorization
+        })
       )
     )
   }

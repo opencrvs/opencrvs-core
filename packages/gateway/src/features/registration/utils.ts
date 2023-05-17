@@ -21,7 +21,7 @@ export async function getPresignedUrlFromUri(
     '/presigned-url',
     authHeader,
     'POST',
-    JSON.stringify({ fileName: fileUri })
+    JSON.stringify({ fileUri })
   )) as { presignedURL: string }
   return response.presignedURL
 }
