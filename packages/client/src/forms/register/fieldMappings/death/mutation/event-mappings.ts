@@ -169,7 +169,6 @@ export function setDeathRegistrationSectionTransformer(
     }
   }
 
-
   if (draftData[sectionId].informantsSignatureURI) {
     transformedData[sectionId].informantsSignature =
       draftData[sectionId].informantsSignatureURI

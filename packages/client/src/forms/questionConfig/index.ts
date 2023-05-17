@@ -66,6 +66,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   conditionals?: IConditionalConfig[]
   optionCondition?: string
   validator?: IValidatorDescriptor[]
+  helperText?: Message
   hideInPreview?: boolean
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
@@ -78,6 +79,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
+  helperText?: IMessage[]
   unit?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]

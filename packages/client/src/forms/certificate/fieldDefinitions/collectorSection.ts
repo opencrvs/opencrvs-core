@@ -737,7 +737,7 @@ export const collectMarriageCertificateFormSection: IFormSection = {
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.informantsRelationWithDeceased,
+          label: formMessages.relationshipToSpouses,
           required: true,
           initialValue: '',
           validator: [

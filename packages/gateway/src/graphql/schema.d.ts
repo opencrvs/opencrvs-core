@@ -1407,6 +1407,7 @@ export interface GQLQuestionInput {
   label?: Array<GQLMesssageInput>
   placeholder?: Array<GQLMesssageInput>
   description?: Array<GQLMesssageInput>
+  helperText?: Array<GQLMesssageInput>
   tooltip?: Array<GQLMesssageInput>
   unit?: Array<GQLMesssageInput>
   errorMessage?: Array<GQLMesssageInput>
