@@ -57,6 +57,7 @@ services:
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - WEBHOOKS_URL=http://webhooks:2525/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - OSIA_SERVICE_VERSION=v1
@@ -150,6 +151,7 @@ services:
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - MINIO_URL=http://minio:9000
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true

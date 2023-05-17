@@ -37,7 +37,7 @@ export function Icon({
   weight = 'bold',
   ...rest
 }: IconProps) {
-  const IconComponent = icons['' + name]
+  const IconComponent = icons[name]
   return (
     <IconComponent
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
@@ -47,9 +47,3 @@ export function Icon({
     />
   )
 }
-
-// ChevronRight = CaretRight
-// ChevronDown = CaretDown
-// Search = MagnifyingGlass
-// MessageCircle = ChatCircle
-// LogOut = SignOut

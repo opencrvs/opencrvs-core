@@ -79,7 +79,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        node-version: [14.18.0]
+        node-version: [16.20.0]
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
@@ -246,4 +246,4 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:demo farajaland-demo.opencrvs.org v1.2.0 v1.2.0 opencrvs-farajaland 1
+          yarn deploy:demo farajaland-demo.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1

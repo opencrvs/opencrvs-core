@@ -20,6 +20,7 @@ import {
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
+import { logger } from '@gateway/logger'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -188,6 +189,57 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
+    },
+    placeOfBirth(resultSet: ISearchEventDataTemplate) {
+      if (resultSet._source && resultSet._source.eventLocationId) {
+        logger.info(
+          `resultSet._source.eventLocationId,
+          ${resultSet._source.eventLocationId}`
+        )
+      }
+      if (resultSet._source && resultSet._source.eventJurisdictionIds) {
+        logger.info(
+          `resultSet._source.eventJurisdictionIds,
+          ${JSON.stringify(resultSet._source.eventJurisdictionIds)}`
+        )
+      }
+      return (
+        (resultSet._source && resultSet._source.eventLocationId) ||
+        (resultSet._source &&
+          resultSet._source.eventJurisdictionIds &&
+          resultSet._source.eventJurisdictionIds.length > 0 &&
+          resultSet._source.eventJurisdictionIds[
+            resultSet._source.eventJurisdictionIds.length - 1
+          ]) ||
+        null
+      )
+    },
+    childGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
+    },
+    mothersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFirstNames) || null
+    },
+    mothersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherFamilyName) || null
+    },
+    fathersFirstName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFirstNames) || null
+    },
+    fathersLastName(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherFamilyName) || null
+    },
+    motherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherDoB) || null
+    },
+    fatherDateOfBirth(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherDoB) || null
+    },
+    motherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.motherIdentifier) || null
+    },
+    fatherIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.fatherIdentifier) || null
     }
   },
   DeathEventSearchSet: {
@@ -202,6 +254,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     operationHistories(resultSet: ISearchEventDataTemplate) {
       return resultSet._source.operationHistories
+    },
+    deceasedGender(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.gender) || null
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
@@ -226,8 +281,14 @@ export const searchTypeResolvers: GQLResolver = {
     brideName(resultSet: ISearchEventDataTemplate) {
       return getBrideName(resultSet._source)
     },
+    brideIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.brideIdentifier) || null
+    },
     groomName(resultSet: ISearchEventDataTemplate) {
       return getGroomName(resultSet._source)
+    },
+    groomIdentifier(resultSet: ISearchEventDataTemplate) {
+      return (resultSet._source && resultSet._source.groomIdentifier) || null
     },
     dateOfMarriage(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.marriageDate) || null

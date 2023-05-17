@@ -14,10 +14,13 @@ import {
   subscribeWebhooksHandler,
   reqSubscribeWebhookSchema,
   listWebhooksHandler,
-  deleteWebhookHandler
+  deleteWebhookHandler,
+  deleteWebhookByClientIdHandler
 } from '@webhooks/features/manage/handler'
 import {
+  birthCertifiedHandler,
   birthRegisteredHandler,
+  deathCertifiedHandler,
   deathRegisteredHandler,
   marriageRegisteredHandler
 } from '@webhooks/features/event/handler'
@@ -72,6 +75,15 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/deleteWebhooksByClientId', // Used when deleting a system through the admin UI
+      handler: deleteWebhookByClientIdHandler,
+      config: {
+        tags: ['api'],
+        description: 'Delete webhooks by client id'
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/mark-registered',
       handler: birthRegisteredHandler,
       config: {
@@ -95,6 +107,24 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Dispatches a webhook for the marriage registration event'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-certified',
+      handler: birthCertifiedHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the birth certified event'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-certified',
+      handler: deathCertifiedHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the death certified event'
       }
     }
   ]

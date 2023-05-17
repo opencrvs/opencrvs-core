@@ -1137,3 +1137,27 @@ export const plainInputTransformer = (
     transformedData[sectionId][field.name] = queryData[field.name] || ''
   }
 }
+
+export const identityToChildOsiaUinTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  if (queryData[sectionId] && queryData[sectionId].identifier) {
+    const existingIdentity = queryData[sectionId].identifier.find(
+      (identity: fhir.Identifier) =>
+        //@ts-ignore
+        identity.type === IdentityIdType.OsiaUinVidNid
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'childOsiaUin'
+    ] = (existingIdentity && existingIdentity['id']) || EMPTY_STRING
+  }
+
+  return transformedData
+}

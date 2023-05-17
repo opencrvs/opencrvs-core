@@ -16,7 +16,7 @@ import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -90,31 +90,29 @@ import { InformativeRadioGroup } from '@client/views/PrintCertificate/Informativ
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
-  injectIntl,
   FormattedMessage,
   MessageDescriptor,
   useIntl
 } from 'react-intl'
 import {
-  withFormik,
   FastField,
   Field,
   FormikProps,
   FieldProps,
   FormikTouched,
-  FormikValues
+  FormikValues,
+  Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
 import { isEqual, flatten } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
-import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { connect } from 'react-redux'
 import {
   dynamicDispatch,
   IDeclaration,
   writeDeclaration
 } from '@client/declarations'
+import { useDispatch, useSelector } from 'react-redux'
 import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
@@ -126,9 +124,10 @@ import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { match, useRouteMatch } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { useVerifyNationalIdQuery } from '@client/forms/register/queries/useVerifyNationalIdQuery'
+import { getDraftsState } from '@client/declarations/selectors'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -516,7 +515,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === WARNING) {
-    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+    return <ErrorText>{fieldDefinition.label}</ErrorText>
   }
 
   if (fieldDefinition.type === LINK) {
@@ -715,15 +714,13 @@ interface IStateProps {
 
 interface IDispatchProps {
   dynamicDispatch: typeof dynamicDispatch
-  writeDeclaration: typeof writeDeclaration
 }
 
 type Props = IFormSectionProps &
   IStateProps &
   IDispatchProps &
   FormikProps<IFormSectionData> &
-  IntlShapeProps &
-  RouteComponentProps
+  IntlShapeProps & { match: match }
 
 export interface ITouchedNestedFields {
   value: boolean
@@ -858,31 +855,12 @@ class FormSectionComponent extends React.Component<Props> {
     const language = this.props.intl.locale
 
     const errors = this.props.errors as unknown as Errors
-    /*
-     * HACK
-     *
-     * No idea why, but when "fields" prop is changed from outside,
-     * "values" still reflect the old version for one render.
-     *
-     * This causes React to throw an error. You can see this happening by doing:
-     *
-     * if (fields.length > Object.keys(values).length) {
-     *   console.log({ fields, values })
-     * }
-     *
-     * 22.8.2019
-     *
-     * This might be because of setState not used with the function syntax
-     */
 
-    const fieldsWithValuesDefined = fields.filter(
-      (field) => values[field.name] !== undefined
-    )
     const sectionName = this.props.id.split('-')[0]
 
     return (
       <section>
-        {fieldsWithValuesDefined.map((field) => {
+        {fields.map((field) => {
           let error: string
           const fieldErrors = errors[field.name] && errors[field.name].errors
 
@@ -1004,7 +982,7 @@ class FormSectionComponent extends React.Component<Props> {
                     }
                     saveDraftAndRedirectToNidIntegration(
                       declaration,
-                      this.props.writeDeclaration,
+                      writeDeclaration,
                       offlineCountryConfig,
                       matchParams.declarationId,
                       matchParams.pageId,
@@ -1181,31 +1159,42 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
-const FormFieldGeneratorWithFormik = withFormik<
-  IFormSectionProps & IStateProps & IDispatchProps & RouteComponentProps,
-  IFormSectionData
->({
-  mapPropsToValues: (props) =>
-    props.initialValues
-      ? props.initialValues
-      : mapFieldsToValues(props.fields, props.userDetails),
-  handleSubmit: (values) => {},
-  validate: (values, props: IFormSectionProps & IStateProps) =>
-    getValidationErrorsForForm(
-      props.fields,
-      values,
-      props.offlineCountryConfig,
-      props.draftData,
-      props.requiredErrorMessage
-    )
-})(injectIntl(FormSectionComponent))
+export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const userDetails = useSelector(getUserDetails)
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const match = useRouteMatch()
+  const { declarations } = useSelector(getDraftsState)
 
-export const FormFieldGenerator = connect(
-  (state: IStoreState, ownProps: IFormSectionProps) => ({
-    ...ownProps,
-    offlineCountryConfig: getOfflineData(state),
-    userDetails: getUserDetails(state),
-    declarations: state.declarationsState.declarations
-  }),
-  { dynamicDispatch, writeDeclaration }
-)(withRouter(FormFieldGeneratorWithFormik))
+  return (
+    <Formik<IFormSectionData>
+      initialValues={
+        props.initialValues ?? mapFieldsToValues(props.fields, userDetails)
+      }
+      onSubmit={() => {}}
+      validate={(values) =>
+        getValidationErrorsForForm(
+          props.fields,
+          values,
+          offlineCountryConfig,
+          props.draftData,
+          props.requiredErrorMessage
+        )
+      }
+    >
+      {(formikProps) => (
+        <FormSectionComponent
+          {...props}
+          {...formikProps}
+          intl={intl}
+          offlineCountryConfig={offlineCountryConfig}
+          userDetails={userDetails}
+          dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
+          match={match}
+          declarations={declarations}
+        />
+      )}
+    </Formik>
+  )
+}

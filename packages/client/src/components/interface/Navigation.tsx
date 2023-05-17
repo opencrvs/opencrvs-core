@@ -898,7 +898,9 @@ export const NavigationView = (props: IFullProps) => {
                       />
                       <NavigationItem
                         icon={() => <Icon name="ChartBar" size="medium" />}
-                        label={intl.formatMessage(navigationMessages['report'])}
+                        label={intl.formatMessage(
+                          navigationMessages['performance']
+                        )}
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
