@@ -79,5 +79,6 @@ export const OIDP_CLIENT_PRIVATE_KEY =
 export const OIDP_JWT_AUD_CLAIM = process.env.NATIONAL_ID_OIDP_JWT_AUD_CLAIM
 
 // The following constants are used for an OSIA integration
-export const OSIA_REST_URL = process.env.NATIONAL_ID_OSIA_REST_URL
+export const OSIA_REST_URL =
+  process.env.NATIONAL_ID_OSIA_REST_URL || 'http://localhost:8010/pr'
 export const OSIA_SERVICE_VERSION = process.env.OSIA_SERVICE_VERSION || 'v1'

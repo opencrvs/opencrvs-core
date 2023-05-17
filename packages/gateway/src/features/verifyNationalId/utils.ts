@@ -10,12 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { OSIA_REST_URL } from '@gateway/constants'
+import { OSIA_REST_URL, OSIA_SERVICE_VERSION } from '@gateway/constants'
 import fetch from 'node-fetch'
 
 const OSIA_USERINFO_ENDPOINT = (nationalId: string) =>
   OSIA_REST_URL &&
-  new URL(`v1/persons/${nationalId}/match`, OSIA_REST_URL).toString()
+  new URL(
+    `${OSIA_SERVICE_VERSION}/persons/${nationalId}`,
+    OSIA_REST_URL
+  ).toString()
 
 export const verifyUserInfoWithOSIA = async ({
   nationalId,
@@ -28,6 +31,7 @@ export const verifyUserInfoWithOSIA = async ({
   lastName: string
   birthDate: string
 }) => {
+  console.log('MY URL: ', OSIA_USERINFO_ENDPOINT(nationalId))
   const request = await fetch(OSIA_USERINFO_ENDPOINT(nationalId)!, {
     method: 'POST',
     headers: {
