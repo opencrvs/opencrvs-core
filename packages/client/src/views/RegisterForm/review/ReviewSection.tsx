@@ -113,7 +113,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -2225,7 +2225,7 @@ function addSameAddressValues(draft: IDeclaration) {
       ...modifiedDraft.data,
       [ySection]: {
         ...modifiedDraft.data[ySection],
-        ...pick(draft.data[xSection], fieldNames)
+        ...pick(modifiedDraft.data[xSection], fieldNames)
       }
     }
     modifiedDraft.data[ySection].primaryAddressSameAsOtherPrimary = false
