@@ -144,6 +144,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
         >
           <FormFieldGenerator
             id={group.id}
+            key={group.id}
             onChange={(values) => {
               modifyDeclaration(values, section, declaration)
             }}
