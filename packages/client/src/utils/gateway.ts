@@ -312,7 +312,9 @@ export enum AttachmentSubject {
   Mother = 'MOTHER',
   Other = 'OTHER',
   Parent = 'PARENT',
-  Witnesses = 'WITNESSES'
+  Witnesses = 'WITNESSES',
+  WitnessOne = 'WITNESS_ONE',
+  WitnessTwo = 'WITNESS_TWO'
 }
 
 export enum AttachmentType {
