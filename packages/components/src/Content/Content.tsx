@@ -40,7 +40,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 24px;
+  padding: 0 20px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
@@ -66,7 +66,7 @@ export const Body = styled.div`
 `
 const Footer = styled.div`
   display: flex;
-  padding: 24px;
+  padding: 24px 20px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 16px;
   }
@@ -149,7 +149,7 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '16px 24px')};
+  padding: ${(props) => (props.noPadding ? 0 : '16px 20px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: ${(props) => (props.noPadding ? 0 : '16px')};
   }
