@@ -20,16 +20,16 @@ import {
 import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
 
-interface IResendSMSPayload {
+interface IResendInvitePayload {
   userId: string
 }
 
-export default async function resendSMSInvite(
+export default async function resendInvite(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   let randomPassword = null
-  const { userId } = request.payload as IResendSMSPayload
+  const { userId } = request.payload as IResendInvitePayload
 
   const user = await User.findById(userId)
 
@@ -50,9 +50,16 @@ export default async function resendSMSInvite(
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, randomPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.name,
+    user.username,
+    randomPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.email
+  )
 
   return h.response().code(200)
 }

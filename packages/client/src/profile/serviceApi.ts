@@ -13,15 +13,42 @@ import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
+
+export enum EmailTemplateType {
+  ONBOARDING_INVITE = 'onboarding-invite',
+  TWO_FACTOR_AUTHENTICATION = '2-factor-authentication',
+  CHANGE_PHONE_NUMBER = 'change-phone-number',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'password-reset-by-system-admin',
+  PASSWORD_RESET = 'password-reset',
+  USERNAME_REMINDER = 'username-reminder',
+  USERNAME_UPDATED = 'username-updated'
+}
+
+export enum SMSTemplateType {
+  AUTHENTICATION_CODE_NOTIFICATION = 'authenticationCodeNotification',
+  USER_CREDENTIALS_NOTIFICATION = 'userCredentialsNotification',
+  RETIEVE_USERNAME_NOTIFICATION = 'retieveUserNameNotification',
+  UPDATE_USERNAME_NOTIFICATION = 'updateUserNameNotification',
+  RESET_USER_PASSWORD_NOTIFICATION = 'resetUserPasswordNotification'
+}
+
 export interface ISendVerifyCodeData {
-  phoneNumber: string
+  userFullName: {
+    use: string
+    family: string
+    given: string[]
+  }[]
+  templateName: EmailTemplateType | SMSTemplateType
+  phoneNumber?: string
+  email?: string
 }
 
 export interface ISendVerifyCodeResponse {
   userId: string
   nonce: string
-  mobile: string
   status: string
+  mobile?: string
+  email?: string
 }
 
 export const client = axios.create({

@@ -25,7 +25,7 @@ import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box } from '@login/../../components/lib/Box'
 import {
-  getResentSMS,
+  getResentAuthenticationCode,
   getStepOneDetails,
   getSubmissionError,
   getsubmitting,
@@ -36,6 +36,7 @@ import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
+import { EmailTemplateType, SMSTemplateType } from '@login/utils/authApi'
 
 const FORM_NAME = 'STEP_TWO'
 
@@ -46,7 +47,7 @@ export function StepTwoContainer() {
   const submitting = useSelector(getsubmitting)
 
   const submissionError = useSelector(getSubmissionError)
-  const resentSMS = useSelector(getResentSMS)
+  const resentAuthenticationCode = useSelector(getResentAuthenticationCode)
 
   const stepOneDetails = useSelector(getStepOneDetails)
   const intl = useIntl()
@@ -71,13 +72,19 @@ export function StepTwoContainer() {
     '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
   )
   const field = stepTwoFields.code
+  //markme TWO_FACTOR_AUTHENTICATION
+
+  const templateName =
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+      ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
+      : EmailTemplateType.TWO_FACTOR_AUTHENTICATION
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
         <LogoContainer>
           <CountryLogo size="small" src={logo} />
         </LogoContainer>
-        {resentSMS ? (
+        {resentAuthenticationCode ? (
           <React.Fragment>
             <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
@@ -155,7 +162,7 @@ export function StepTwoContainer() {
                   type="tertiary"
                   onClick={(e) => {
                     e.preventDefault()
-                    dispatch(actions.resendSMS())
+                    dispatch(actions.resendAuthenticationCode(templateName))
                   }}
                   id="login-mobile-resend"
                 >

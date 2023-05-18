@@ -14,7 +14,11 @@ import {
   goToPhoneNumberVerificationForm,
   goToSecurityQuestionForm
 } from '@login/login/actions'
-import { authApi } from '@login/utils/authApi'
+import {
+  EmailTemplateType,
+  SMSTemplateType,
+  authApi
+} from '@login/utils/authApi'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -48,7 +52,7 @@ interface State {
   recoveryCode: string
   touched: boolean
   error: boolean
-  resentSMS: boolean
+  resentAuthenticationCode: boolean
 }
 
 type Props = BaseProps & WrappedComponentProps
@@ -60,7 +64,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
       recoveryCode: '',
       touched: false,
       error: true,
-      resentSMS: false
+      resentAuthenticationCode: false
     }
   }
 
@@ -69,7 +73,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
       error: value.length !== 6,
       recoveryCode: value,
       touched: true,
-      resentSMS: false
+      resentAuthenticationCode: false
     })
   }
 
@@ -95,15 +99,26 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     }
   }
 
-  resendSMS = async () => {
-    await authApi.resendSMS(this.props.location.state.nonce, true)
-    this.setState({ resentSMS: true })
+  resendAuthenticationCode = async (
+    templateName: EmailTemplateType | SMSTemplateType
+  ) => {
+    await authApi.resendAuthenticationCode(
+      this.props.location.state.nonce,
+      templateName,
+      true
+    )
+    this.setState({ resentAuthenticationCode: true })
   }
+
   render() {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
-
-    const { resentSMS } = this.state
+    const { resentAuthenticationCode } = this.state
+    //markme PASSWORD_RESET
+    const templateName =
+      window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
+        : EmailTemplateType.PASSWORD_RESET
 
     return (
       <>
@@ -114,7 +129,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
           <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
-            {resentSMS && (
+            {resentAuthenticationCode && (
               <>
                 <Title>{intl.formatMessage(messages.codeResentTitle)}</Title>
                 {intl.formatMessage(messages.resentSMS, {
@@ -122,7 +137,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 })}
               </>
             )}
-            {!resentSMS && (
+            {!resentAuthenticationCode && (
               <>
                 <Title>
                   {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
@@ -133,7 +148,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               </>
             )}{' '}
             <LinkButton
-              onClick={this.resendSMS}
+              onClick={() => {
+                this.resendAuthenticationCode(templateName)
+              }}
               id="retrieve-login-mobile-resend"
               type="button"
             >

@@ -131,7 +131,7 @@ describe('Verify user handlers', () => {
       fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
-        url: '/retrieveUserNameSMS',
+        url: '/retrieveUserName',
         payload: {
           msisdn: '447789778823',
           username: 'anik'
@@ -157,7 +157,7 @@ describe('Verify user handlers', () => {
       fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
-        url: '/retrieveUserNameSMS',
+        url: '/retrieveUserName',
         payload: {
           msisdn: '447789778823'
         },
@@ -186,7 +186,7 @@ describe('Verify user handlers', () => {
       fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
-        url: '/retrieveUserNameSMS',
+        url: '/retrieveUserName',
         payload: {
           msisdn: '447789778823',
           username: 'anik'
@@ -371,7 +371,7 @@ describe('Verify user handlers', () => {
       expect(res.statusCode).toBe(500)
     })
   })
-  describe('sendResetPasswordSMS', () => {
+  describe('sendResetPasswordInvite', () => {
     it('returns OK if the sms gets sent', async () => {
       server = await createServerWithEnvironment({ SMS_PROVIDER: 'clickatell' })
 
@@ -388,10 +388,9 @@ describe('Verify user handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resetPasswordSMS',
+        url: '/resetPasswordInvite',
         payload: {
           msisdn: '447789778823',
-          applicationName: 'opencrvs',
           password: 'B123456'
         },
         headers: {
@@ -415,7 +414,7 @@ describe('Verify user handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resetPasswordSMS',
+        url: '/resetPasswordInvite',
         payload: {
           msisdn: '447789778823',
           password: 'B123456'
@@ -445,10 +444,9 @@ describe('Verify user handlers', () => {
       fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resetPasswordSMS',
+        url: '/resetPasswordInvite',
         payload: {
           msisdn: '447789778823',
-          applicationName: 'opencrvs',
           password: 'B123456'
         },
         headers: {

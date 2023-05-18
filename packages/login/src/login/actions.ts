@@ -16,7 +16,9 @@ import {
   IApplicationConfig,
   IAuthenticateResponse,
   IAuthenticationData,
-  ITokenResponse
+  ITokenResponse,
+  EmailTemplateType,
+  SMSTemplateType
 } from '@login/utils/authApi'
 import {
   PHONE_NUMBER_VERIFICATION,
@@ -40,9 +42,11 @@ export const VERIFY_CODE = 'login/VERIFY_CODE'
 export const VERIFY_CODE_COMPLETED = 'login/VERIFY_CODE_COMPLETED'
 export const VERIFY_CODE_FAILED = 'login/VERIFY_CODE_FAILED'
 
-export const RESEND_SMS = 'login/RESEND_SMS'
-export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
-export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
+export const RESEND_AUTHENTICATION_CODE = 'login/RESEND_AUTHENTICATION_CODE'
+export const RESEND_AUTHENTICATION_CODE_COMPLETED =
+  'login/RESEND_AUTHENTICATION_CODE_COMPLETED'
+export const RESEND_AUTHENTICATION_CODE_FAILED =
+  'login/RESEND_AUTHENTICATION_CODE_FAILED'
 export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
 export const AUTHENTICATE_RESET = 'login/AUTHENTICATE_RESET'
 export const GOTO_APP = 'login/GOTO_APP'
@@ -91,17 +95,18 @@ export type AuthenticationFailedAction = {
   payload: AxiosError
 }
 
-export type ResendSMSAction = {
-  type: typeof RESEND_SMS
+export type ResendAuthenticationCodeAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE
+  payload: EmailTemplateType | SMSTemplateType
 }
 
-export type ResendSMSCompleteAction = {
-  type: typeof RESEND_SMS_COMPLETED
+export type ResendAuthenticationCodeCompleteAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE_COMPLETED
   payload: IAuthenticateResponse
 }
 
-export type ResendSMSFailedAction = {
-  type: typeof RESEND_SMS_FAILED
+export type ResendAuthenticationCodeFailedAction = {
+  type: typeof RESEND_AUTHENTICATION_CODE_FAILED
   payload: Error
 }
 
@@ -138,9 +143,9 @@ export type Action =
   | AuthenticationDataAction
   | AuthenticateResponseAction
   | AuthenticationFailedAction
-  | ResendSMSAction
-  | ResendSMSCompleteAction
-  | ResendSMSFailedAction
+  | ResendAuthenticationCodeAction
+  | ResendAuthenticationCodeCompleteAction
+  | ResendAuthenticationCodeFailedAction
   | VerifyCodeAction
   | VerifyCodeCompleteAction
   | VerifyCodeFailedAction
@@ -206,23 +211,28 @@ export const failAuthentication = (
   payload: error
 })
 
-export const resendSMS = (): ResendSMSAction => ({
-  type: RESEND_SMS
+export const resendAuthenticationCode = (
+  templateName: EmailTemplateType | SMSTemplateType
+): ResendAuthenticationCodeAction => ({
+  type: RESEND_AUTHENTICATION_CODE,
+  payload: templateName
 })
 
 export interface IVerifyCodeNumbers {
   code: string
 }
 
-export const completeSMSResend = (
+export const completeAuthenticationCodeResend = (
   response: IAuthenticateResponse
-): ResendSMSCompleteAction => ({
-  type: RESEND_SMS_COMPLETED,
+): ResendAuthenticationCodeCompleteAction => ({
+  type: RESEND_AUTHENTICATION_CODE_COMPLETED,
   payload: response
 })
 
-export const failSMSResend = (error: AxiosError): ResendSMSFailedAction => ({
-  type: RESEND_SMS_FAILED,
+export const failAuthenticationCodeResend = (
+  error: AxiosError
+): ResendAuthenticationCodeFailedAction => ({
+  type: RESEND_AUTHENTICATION_CODE_FAILED,
   payload: error
 })
 

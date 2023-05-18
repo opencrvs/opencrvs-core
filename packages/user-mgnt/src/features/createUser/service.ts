@@ -292,10 +292,12 @@ async function checkUsername(username: string) {
 }
 
 export async function sendCredentialsNotification(
-  msisdn: string,
+  userFullName: IUserName[],
   username: string,
   password: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  msisdn?: string,
+  email?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
@@ -305,8 +307,10 @@ export async function sendCredentialsNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
+        email,
         username,
-        password
+        password,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -319,9 +323,11 @@ export async function sendCredentialsNotification(
 }
 
 export async function sendUpdateUsernameNotification(
-  msisdn: string,
+  userFullName: IUserName[],
   username: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  msisdn: string,
+  email: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
@@ -331,7 +337,9 @@ export async function sendUpdateUsernameNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        username
+        email,
+        username,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',

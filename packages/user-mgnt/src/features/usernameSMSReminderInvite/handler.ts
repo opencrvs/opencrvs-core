@@ -22,7 +22,7 @@ interface IResendUsernameSMSPayload {
   userId: string
 }
 
-export default async function usernameSMSReminderHandler(
+export default async function usernameReminderHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -34,9 +34,15 @@ export default async function usernameSMSReminderHandler(
     throw unauthorized()
   }
 
-  await sendUserName(user.mobile, user.username, {
-    Authorization: request.headers.authorization
-  })
+  await sendUserName(
+    user.username,
+    user.name,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.email
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

@@ -18,7 +18,8 @@ import {
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
   QA_ENV,
-  METRICS_URL
+  METRICS_URL,
+  USER_NOTIFICATION_DELIVERY_METHOD
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -27,6 +28,8 @@ import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
 import {
+  EmailTemplateType,
+  SMSTemplateType,
   generateVerificationCode,
   sendVerificationCode,
   storeVerificationCode
@@ -44,9 +47,15 @@ const sign = promisify(jwt.sign) as (
   secretOrPrivateKey: jwt.Secret,
   options?: jwt.SignOptions
 ) => Promise<string>
-
+export interface IUserName {
+  use: string
+  family: string
+  given: string[]
+}
 export interface IAuthentication {
-  mobile: string
+  name: IUserName[]
+  mobile?: string
+  email?: string
   userId: string
   status: string
   scope: string[]
@@ -79,14 +88,14 @@ export async function authenticate(
   if (res.status !== 200) {
     throw Error(res.statusText)
   }
-
   const body = await res.json()
-
   return {
+    name: body.name,
     userId: body.id,
     scope: body.scope,
     status: body.status,
-    mobile: body.mobile
+    mobile: body.mobile,
+    email: body.email
   }
 }
 
@@ -137,13 +146,15 @@ export async function createToken(
 
 export async function storeUserInformation(
   nonce: string,
+  userFullName: IUserName[],
   userId: string,
   scope: string[],
-  mobile: string
+  mobile?: string,
+  email?: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, scope, mobile })
+    JSON.stringify({ userId, scope, userFullName, mobile, email })
   )
 }
 
@@ -152,13 +163,17 @@ export async function getStoredUserInformation(nonce: string) {
   if (record === null) {
     throw new UserInfoNotFoundError('user not found')
   }
-  return JSON.parse(record)
+  const parsedUserData = JSON.parse(record)
+  return parsedUserData
 }
 
 export async function generateAndSendVerificationCode(
   nonce: string,
-  mobile: string,
-  scope: string[]
+  scope: string[],
+  templateName: EmailTemplateType | SMSTemplateType,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
   logger.info(
@@ -172,21 +187,37 @@ export async function generateAndSendVerificationCode(
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
-    verificationCode = await generateVerificationCode(nonce, mobile)
+    verificationCode = await generateVerificationCode(nonce)
   }
   if (!PRODUCTION || QA_ENV) {
-    logger.info(
-      `Sending a verification SMS,
-        ${JSON.stringify({
-          mobile: mobile,
-          verificationCode
-        })}`
-    )
+    if (USER_NOTIFICATION_DELIVERY_METHOD === 'sms') {
+      logger.info(
+        `Sending a verification SMS,
+          ${JSON.stringify({
+            mobile: mobile,
+            verificationCode
+          })}`
+      )
+    } else if (USER_NOTIFICATION_DELIVERY_METHOD === 'email') {
+      logger.info(
+        `Sending a verification email,
+          ${JSON.stringify({
+            email: email,
+            verificationCode
+          })}`
+      )
+    }
   } else {
     if (isDemoUser) {
       throw unauthorized()
     } else {
-      await sendVerificationCode(mobile, verificationCode)
+      await sendVerificationCode(
+        verificationCode,
+        templateName,
+        userFullName,
+        mobile,
+        email
+      )
     }
   }
 }

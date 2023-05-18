@@ -117,9 +117,16 @@ export default async function createUser(
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.name,
+    user.username,
+    autoGenPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.email
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

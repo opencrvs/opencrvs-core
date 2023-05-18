@@ -17,17 +17,23 @@ import {
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
 import { getRetrievalStepInformation } from '@auth/features/retrievalSteps/verifyUser/service'
+import {
+  EmailTemplateType,
+  SMSTemplateType
+} from '@auth/features/verifyCode/service'
 
-interface IRefreshPayload {
+interface IResendNotificationPayload {
   nonce: string
+  templateName: EmailTemplateType | SMSTemplateType
   retrievalFlow?: boolean
 }
 
-export default async function refreshHandler(
+export default async function resendNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { nonce, retrievalFlow } = request.payload as IRefreshPayload
+  const { nonce, retrievalFlow, templateName } =
+    request.payload as IResendNotificationPayload
 
   let userInformation
   try {
@@ -38,15 +44,23 @@ export default async function refreshHandler(
     return unauthorized()
   }
 
-  const { mobile, scope } = userInformation
+  const { scope, userFullName, mobile, email } = userInformation
 
-  await generateAndSendVerificationCode(nonce, mobile, scope)
+  await generateAndSendVerificationCode(
+    nonce,
+    scope,
+    templateName,
+    userFullName,
+    mobile,
+    email
+  )
 
   return { nonce }
 }
 
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
+  templateName: Joi.string().required(),
   retrievalFlow: Joi.boolean().optional()
 })
 export const responseSchma = Joi.object({

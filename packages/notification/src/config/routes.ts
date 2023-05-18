@@ -33,7 +33,7 @@ import {
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema,
   authCodeNotificationSchema,
-  sendResetPasswordSMS,
+  sendResetPasswordInvite,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
 
@@ -234,8 +234,8 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/resetPasswordSMS',
-      handler: sendResetPasswordSMS,
+      path: '/resetPasswordInvite',
+      handler: sendResetPasswordInvite,
       config: {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
@@ -249,7 +249,7 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/retrieveUserNameSMS',
+      path: '/retrieveUserName',
       handler: retrieveUserName,
       config: {
         tags: ['api'],

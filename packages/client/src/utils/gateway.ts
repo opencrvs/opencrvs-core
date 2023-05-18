@@ -152,6 +152,7 @@ export type AdvancedSearchParametersInput = {
   brideDoBStart?: InputMaybe<Scalars['String']>
   brideFamilyName?: InputMaybe<Scalars['String']>
   brideFirstNames?: InputMaybe<Scalars['String']>
+  brideIdentifier?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -195,6 +196,7 @@ export type AdvancedSearchParametersInput = {
   groomDoBStart?: InputMaybe<Scalars['String']>
   groomFamilyName?: InputMaybe<Scalars['String']>
   groomFirstNames?: InputMaybe<Scalars['String']>
+  groomIdentifier?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -669,6 +671,7 @@ export type Death = {
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['Date']>
+  deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1188,8 +1191,10 @@ export type Marriage = {
 
 export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
+  brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
   dateOfMarriage?: Maybe<Scalars['Date']>
+  groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1344,15 +1349,15 @@ export type Mutation = {
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   requestMarriageRegistrationCorrection: Scalars['ID']
-  resendSMSInvite?: Maybe<Scalars['String']>
-  resetPasswordSMS?: Maybe<Scalars['String']>
+  resendInvite?: Maybe<Scalars['String']>
+  resetPasswordInvite?: Maybe<Scalars['String']>
   toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
   updateRole: Response
-  usernameSMSReminder?: Maybe<Scalars['String']>
+  usernameReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
 
@@ -1572,12 +1577,11 @@ export type MutationRequestMarriageRegistrationCorrectionArgs = {
   id: Scalars['ID']
 }
 
-export type MutationResendSmsInviteArgs = {
+export type MutationResendInviteArgs = {
   userId: Scalars['String']
 }
 
-export type MutationResetPasswordSmsArgs = {
-  applicationName: Scalars['String']
+export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
 }
 
@@ -1607,7 +1611,7 @@ export type MutationUpdateRoleArgs = {
   systemRole?: InputMaybe<SystemRoleInput>
 }
 
-export type MutationUsernameSmsReminderArgs = {
+export type MutationUsernameReminderArgs = {
   userId: Scalars['String']
 }
 
@@ -2918,6 +2922,7 @@ export type FetchUserQuery = {
     username?: string | null
     practitionerId: string
     mobile: string
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     role: {
@@ -3199,32 +3204,31 @@ export type SearchEventsQuery = {
   } | null
 }
 
-export type ResendSmsInviteMutationVariables = Exact<{
+export type ResendInviteMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type ResendSmsInviteMutation = {
+export type ResendInviteMutation = {
   __typename?: 'Mutation'
-  resendSMSInvite?: string | null
+  resendInvite?: string | null
 }
 
-export type UsernameSmsReminderMutationVariables = Exact<{
+export type UsernameReminderMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type UsernameSmsReminderMutation = {
+export type UsernameReminderMutation = {
   __typename?: 'Mutation'
-  usernameSMSReminder?: string | null
+  usernameReminder?: string | null
 }
 
-export type ResetPasswordSmsMutationVariables = Exact<{
+export type ResetPasswordInviteMutationVariables = Exact<{
   userId: Scalars['String']
-  applicationName: Scalars['String']
 }>
 
-export type ResetPasswordSmsMutation = {
+export type ResetPasswordInviteMutation = {
   __typename?: 'Mutation'
-  resetPasswordSMS?: string | null
+  resetPasswordInvite?: string | null
 }
 
 export type SearchUsersQueryVariables = Exact<{
@@ -7569,6 +7573,7 @@ export type GetUserByMobileQuery = {
     id: string
     username?: string | null
     mobile: string
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'Role'; _id: string }

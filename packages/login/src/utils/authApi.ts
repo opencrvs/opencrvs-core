@@ -65,6 +65,24 @@ export enum QUESTION_KEYS {
   FIRST_CHILD_NAME = 'FIRST_CHILD_NAME'
 }
 
+export enum EmailTemplateType {
+  ONBOARDING_INVITE = 'onboarding-invite',
+  TWO_FACTOR_AUTHENTICATION = '2-factor-authentication',
+  CHANGE_PHONE_NUMBER = 'change-phone-number',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'password-reset-by-system-admin',
+  PASSWORD_RESET = 'password-reset',
+  USERNAME_REMINDER = 'username-reminder',
+  USERNAME_UPDATED = 'username-updated'
+}
+
+export enum SMSTemplateType {
+  AUTHENTICATION_CODE_NOTIFICATION = 'authenticationCodeNotification',
+  USER_CREDENTIALS_NOTIFICATION = 'userCredentialsNotification',
+  RETIEVE_USERNAME_NOTIFICATION = 'retieveUserNameNotification',
+  UPDATE_USERNAME_NOTIFICATION = 'updateUserNameNotification',
+  RESET_USER_PASSWORD_NOTIFICATION = 'resetUserPasswordNotification'
+}
+
 export interface ITokenResponse {
   token: string
 }
@@ -105,11 +123,18 @@ const authenticate = (data: IAuthenticationData) => {
   })
 }
 
-const resendSMS = (nonce: string, retrievalFlow = false) => {
+const resendAuthenticationCode = (
+  nonce: string,
+  templateName: EmailTemplateType | SMSTemplateType,
+  retrievalFlow = false
+) => {
   return request({
-    url: new URL('/resendSms', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      '/resendAuthenticationCode',
+      window.config.AUTH_API_URL
+    ).toString(),
     method: 'POST',
-    data: { nonce, retrievalFlow }
+    data: { nonce, templateName, retrievalFlow }
   })
 }
 
@@ -192,7 +217,7 @@ export const authApi = {
   request,
   authenticate,
   verifyCode,
-  resendSMS,
+  resendAuthenticationCode,
   verifyNumber,
   verifyUser,
   verifySecurityAnswer,

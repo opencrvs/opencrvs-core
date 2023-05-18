@@ -12,29 +12,38 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
-  buildAndSendSMS,
-  getTranslations,
-  ISMSPayload
+  IMessageRecipient,
+  sendNotification
 } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
+import { USER_NOTIFICATION_DELIVERY_METHOD } from '@notification/constants'
 
-interface ICredentialsPayload extends ISMSPayload {
+export const emailTemplateName = {
+  onBoardingInvite: 'onboarding-invite',
+  twoFactorAuthentication: '2-factor-authentication',
+  changePhoneNumber: 'change-phone-number',
+  passwordResetBySystemAdmin: 'password-reset-by-system-admin',
+  passwordReset: 'password-reset',
+  usernameReminder: 'username-reminder',
+  usernameUpdated: 'username-updated'
+}
+
+interface ICredentialsPayload extends IMessageRecipient {
   username: string
   password: string
 }
-interface IResetPasswordPayload extends ISMSPayload {
-  applicationName: string
+interface IResetPasswordPayload extends IMessageRecipient {
   password: string
 }
 
-interface IRetrieveUserNamePayload extends ISMSPayload {
+interface IRetrieveUserNamePayload extends IMessageRecipient {
   username: string
 }
 
-interface IUserAuthCodePayload extends ISMSPayload {
+interface IUserAuthCodePayload extends IMessageRecipient {
   code: string
+  templateName: string
 }
 
 export async function sendUserCredentials(
@@ -44,43 +53,49 @@ export async function sendUserCredentials(
   const payload = request.payload as ICredentialsPayload
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.userCredentialsNotification,
-    {
-      username: payload.username,
-      password: payload.password
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+      ? messageKeys.userCredentialsNotification
+      : emailTemplateName.onBoardingInvite
+  const recipient =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
+      ? payload.email
+      : payload.msisdn!
+
+  const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+  // Extract the firstNames
+  const firstNames = nameObject?.given[0] as string
+
+  await sendNotification(request, templateName, recipient, {
+    firstNames,
+    username: payload.username,
+    password: payload.password
+  })
   return h.response().code(200)
 }
 
-export async function sendResetPasswordSMS(
+export async function sendResetPasswordInvite(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IResetPasswordPayload
-  logger.info(`Application name: ${payload.applicationName}`)
   logger.info(`Password: ${payload.password}`)
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.resetUserPasswordNotification,
-    {
-      applicationName: payload.applicationName,
-      password: payload.password
-    },
-    getDefaultLanguage()
-  )
+  const templateName =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+      ? messageKeys.resetUserPasswordNotification
+      : emailTemplateName.passwordReset
+  const recipient =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
+      ? payload.email
+      : payload.msisdn!
+  const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+  // Extract the firstNames
+  const firstNames = nameObject?.given[0] as string
 
-  await buildAndSendSMS(request, payload.msisdn, message)
+  await sendNotification(request, templateName, recipient, {
+    firstNames,
+    password: payload.password
+  })
   return h.response().code(200)
 }
 
@@ -90,18 +105,22 @@ export async function retrieveUserName(
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.retieveUserNameNotification,
-    {
-      username: payload.username
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+      ? messageKeys.retieveUserNameNotification
+      : emailTemplateName.usernameReminder
+  const recipient =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
+      ? payload.email
+      : payload.msisdn!
+  const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+  // Extract the firstNames
+  const firstNames = nameObject?.given[0] as string
+
+  await sendNotification(request, templateName, recipient, {
+    firstNames,
+    username: payload.username
+  })
   return h.response().code(200)
 }
 
@@ -111,18 +130,19 @@ export async function sendUserAuthenticationCode(
 ) {
   const payload = request.payload as IUserAuthCodePayload
   logger.info(`Authentication Code: ${payload.code}`)
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.authenticationCodeNotification,
-    {
-      authCode: payload.code
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const recipient =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
+      ? payload.email
+      : payload.msisdn!
+
+  const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+
+  // Extract the firstNames
+  const firstNames = nameObject?.given[0] as string
+  await sendNotification(request, payload.templateName, recipient, {
+    firstNames,
+    authCode: payload.code
+  })
   return h.response().code(200)
 }
 
@@ -132,39 +152,75 @@ export async function updateUserName(
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.updateUserNameNotification,
-    {
-      username: payload.username
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+      ? messageKeys.updateUserNameNotification
+      : emailTemplateName.usernameUpdated
+  const recipient =
+    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
+      ? payload.email
+      : payload.msisdn!
+  const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+  // Extract the firstNames
+  const firstNames = nameObject?.given[0] as string
+
+  await sendNotification(request, templateName, recipient, {
+    firstNames,
+    username: payload.username
+  })
   return h.response().code(200)
 }
 
 export const userCredentialsNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
+  msisdn: Joi.string().allow('').optional(),
+  email: Joi.string().allow('').optional(),
   username: Joi.string().required(),
-  password: Joi.string().required()
+  password: Joi.string().required(),
+  userFullName: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  )
 })
 
 export const userPasswordResetNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
-  applicationName: Joi.string().required(),
-  password: Joi.string().required()
+  msisdn: Joi.string().allow('').optional(),
+  email: Joi.string().allow('').optional(),
+  password: Joi.string().required(),
+  userFullName: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  )
 })
 
 export const retrieveUserNameNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
-  username: Joi.string().required()
+  msisdn: Joi.string().allow('').optional(),
+  email: Joi.string().allow('').optional(),
+  username: Joi.string().required(),
+  userFullName: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  )
 })
 
 export const authCodeNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
-  code: Joi.string().required()
+  msisdn: Joi.string().allow('').optional(),
+  email: Joi.string().allow('').optional(),
+  code: Joi.string().required(),
+  templateName: Joi.string().required(),
+  userFullName: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  )
 })

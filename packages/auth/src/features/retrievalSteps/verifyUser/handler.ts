@@ -19,8 +19,13 @@ import {
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
-import { generateNonce } from '@auth/features/verifyCode/service'
+import {
+  EmailTemplateType,
+  SMSTemplateType,
+  generateNonce
+} from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
+import { USER_NOTIFICATION_DELIVERY_METHOD } from '@auth/constants'
 
 interface IVerifyUserPayload {
   mobile: string
@@ -38,7 +43,6 @@ export default async function verifyUserHandler(
 ): Promise<IVerifyUserResponse> {
   const payload = request.payload as IVerifyUserPayload
   let result
-
   try {
     result = await verifyUser(payload.mobile)
   } catch (err) {
@@ -57,7 +61,20 @@ export default async function verifyUserHandler(
   )
 
   if (!isUserNameRetrievalFlow) {
-    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    const templateName =
+      USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
+        : EmailTemplateType.PASSWORD_RESET
+
+    //markme PASSWORD_RESET
+    await generateAndSendVerificationCode(
+      nonce,
+      result.scope,
+      templateName,
+      result.userFullName,
+      result.mobile,
+      result.email
+    )
   }
 
   const response: IVerifyUserResponse = {

@@ -16,7 +16,8 @@ import {
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
   NOTIFICATION_URL,
   PRODUCTION,
-  QA_ENV
+  QA_ENV,
+  USER_NOTIFICATION_DELIVERY_METHOD
 } from '@gateway/constants'
 import { del, get, set } from '@gateway/features/user/database'
 import * as crypto from 'crypto'
@@ -42,12 +43,22 @@ type SixDigitVerificationCode = string
 interface ISendVerifyCodeResponse {
   userId: string
   nonce: string
-  mobile: string
   status: string
+  mobile?: string
+  email?: string
+}
+
+interface IUserName {
+  use: string
+  family: string
+  given: string[]
 }
 
 interface ISendVerifyCodePayload {
-  phoneNumber: string
+  userFullName: IUserName[]
+  templateName: string
+  phoneNumber?: string
+  email?: string
 }
 
 export async function storeVerificationCode(nonce: string, code: string) {
@@ -55,13 +66,11 @@ export async function storeVerificationCode(nonce: string, code: string) {
     code,
     createdAt: Date.now()
   }
-
   await set(`verification_${nonce}`, JSON.stringify(codeDetails))
 }
 
-export async function generateVerificationCode(
-  nonce: string,
-  mobile: string
+export async function generateAndStoreVerificationCode(
+  nonce: string
 ): Promise<SixDigitVerificationCode> {
   const code = crypto.randomInt(100000, 999999).toString()
   await storeVerificationCode(nonce, code)
@@ -110,19 +119,26 @@ export function generateNonce() {
 }
 
 export async function sendVerificationCode(
-  mobile: string,
   verificationCode: string,
-  token: string
+  token: string,
+  templateName: string,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    code: verificationCode
+    email,
+    code: verificationCode,
+    templateName,
+    userFullName
   }
 
   await fetch(resolve(NOTIFICATION_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   })
@@ -132,9 +148,12 @@ export async function sendVerificationCode(
 
 export async function generateAndSendVerificationCode(
   nonce: string,
-  mobile: string,
   scope: string[],
-  token: string
+  token: string,
+  templateName: string,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
   logger.info(
@@ -148,21 +167,38 @@ export async function generateAndSendVerificationCode(
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
-    verificationCode = await generateVerificationCode(nonce, mobile)
+    verificationCode = await generateAndStoreVerificationCode(nonce)
   }
   if (!PRODUCTION || QA_ENV) {
-    logger.info(
-      `Sending a verification SMS ,
-        ${JSON.stringify({
-          mobile: mobile,
-          verificationCode
-        })}`
-    )
+    if (USER_NOTIFICATION_DELIVERY_METHOD === 'sms') {
+      logger.info(
+        `Sending a verification SMS ,
+          ${JSON.stringify({
+            mobile: mobile,
+            verificationCode
+          })}`
+      )
+    } else if (USER_NOTIFICATION_DELIVERY_METHOD === 'email') {
+      logger.info(
+        `Sending a verification SMS ,
+          ${JSON.stringify({
+            email: email,
+            verificationCode
+          })}`
+      )
+    }
   } else {
     if (isDemoUser) {
       throw unauthorized()
     } else {
-      await sendVerificationCode(mobile, verificationCode, token)
+      await sendVerificationCode(
+        verificationCode,
+        token,
+        templateName,
+        userFullName,
+        mobile,
+        email
+      )
     }
   }
 }
@@ -172,7 +208,7 @@ export default async function sendVerifyCodeHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ISendVerifyCodePayload
-  const { phoneNumber } = payload
+  const { userFullName, phoneNumber, templateName, email } = payload
   const token = request.headers.authorization.replace('Bearer ', '') as string
   const decodedOrError = verifyToken(token)
   if (decodedOrError._tag === 'Left') {
@@ -184,22 +220,42 @@ export default async function sendVerifyCodeHandler(
   const response: ISendVerifyCodeResponse = {
     userId,
     nonce,
+    status: 'Success',
     mobile: phoneNumber,
-    status: 'Success'
+    email
   }
-  await generateAndSendVerificationCode(nonce, phoneNumber, scope, token)
+  //markme change phone number
+  await generateAndSendVerificationCode(
+    nonce,
+    scope,
+    token,
+    templateName,
+    userFullName,
+    phoneNumber,
+    email
+  )
   return h.response(response).code(201)
 }
 
 export const requestSchema = Joi.object({
-  phoneNumber: Joi.string()
+  userFullName: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  ),
+  templateName: Joi.string(),
+  phoneNumber: Joi.string(),
+  email: Joi.string()
 })
 
 export const responseSchema = Joi.object({
   userId: Joi.string(),
   nonce: Joi.string(),
+  status: Joi.string(),
   mobile: Joi.string(),
-  status: Joi.string()
+  email: Joi.string()
 })
 
 const tokenPayload = t.type({

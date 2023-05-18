@@ -75,11 +75,11 @@ import verifyUserHandler, {
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
 import * as Hapi from '@hapi/hapi'
-import resendSMSInviteHandler, {
-  requestSchema as resendSMSRequestSchema
-} from '@user-mgnt/features/resendSMSInvite/handler'
-import usernameSMSReminderHandler, {
-  requestSchema as usernameSMSReminderRequestSchema
+import resendInviteHandler, {
+  requestSchema as resendInviteRequestSchema
+} from '@user-mgnt/features/resendInvite/handler'
+import usernameReminderHandler, {
+  requestSchema as usernameReminderRequestSchema
 } from '@user-mgnt/features/usernameSMSReminderInvite/handler'
 import changePhoneHandler, {
   changePhoneRequestSchema
@@ -93,7 +93,7 @@ import {
   createSearchrequestSchema,
   removeSearchrequestSchema
 } from '@user-mgnt/features/userSearchRecord/handler'
-import resetPasswordSMSHandler, {
+import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
 import updateRole, {
@@ -504,14 +504,14 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/resendSMSInvite',
-      handler: resendSMSInviteHandler,
+      path: '/resendInvite',
+      handler: resendInviteHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: resendSMSRequestSchema
+          payload: resendInviteRequestSchema
         },
         description:
           'Resend sms for given mobile number and make the corresponding user pending'
@@ -519,14 +519,14 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/usernameSMSReminder',
-      handler: usernameSMSReminderHandler,
+      path: '/usernameReminder',
+      handler: usernameReminderHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: usernameSMSReminderRequestSchema
+          payload: usernameReminderRequestSchema
         },
         description:
           'Resend sms for given username and make the corresponding user pending'
@@ -534,8 +534,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/resetPasswordSMS',
-      handler: resetPasswordSMSHandler,
+      path: '/resetPasswordInvite',
+      handler: resetPasswordInviteHandler,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]

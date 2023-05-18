@@ -17,7 +17,7 @@ import { client } from '@login/utils/authApi'
 
 import {
   getSubmissionError,
-  getResentSMS,
+  getResentAuthenticationCode,
   getsubmitting
 } from '@login/login/selectors'
 import { mockState } from '@login/tests/util'
@@ -51,7 +51,7 @@ describe('reducer', () => {
       ...initialState,
       submitting: true,
       submissionError: false,
-      resentSMS: false,
+      resentAuthenticationCode: false,
       stepOneDetails: {
         username: '+447111111111',
         password: 'test'
@@ -73,7 +73,7 @@ describe('reducer', () => {
       ...initialState,
       submitting: false,
       submissionError: false,
-      resentSMS: false,
+      resentAuthenticationCode: false,
       authenticationDetails: {
         nonce: '1234'
       }
@@ -93,27 +93,27 @@ describe('reducer', () => {
       ...initialState,
       submitting: false,
       submissionError: false,
-      resentSMS: false
+      resentAuthenticationCode: false
     }
     const action = {
-      type: actions.RESEND_SMS
+      type: actions.RESEND_AUTHENTICATION_CODE
     }
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
-  it('updates the state when nonce is returned from the resendSMS service', () => {
+  it('updates the state when nonce is returned from the resendAuthenticationCode service', () => {
     const expectedState = {
       ...initialState,
       submitting: false,
       submissionError: false,
-      resentSMS: true,
+      resentAuthenticationCode: true,
       authenticationDetails: {
         nonce: '1234',
         mobile: ''
       }
     }
     const action = {
-      type: actions.RESEND_SMS_COMPLETED,
+      type: actions.RESEND_AUTHENTICATION_CODE_COMPLETED,
       payload: {
         nonce: '1234'
       }
@@ -121,14 +121,14 @@ describe('reducer', () => {
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
-  it('updates the state when resendSMS service failed', () => {
+  it('updates the state when resendAuthenticationCode service failed', () => {
     const expectedState = {
       ...initialState,
-      resentSMS: false,
+      resentAuthenticationCode: false,
       submissionError: true
     }
     const action = {
-      type: actions.RESEND_SMS_FAILED,
+      type: actions.RESEND_AUTHENTICATION_CODE_FAILED,
       payload: 503
     }
     store.dispatch(action)
@@ -140,7 +140,7 @@ describe('reducer', () => {
       ...initialState,
       submitting: true,
       submissionError: false,
-      resentSMS: false
+      resentAuthenticationCode: false
     }
 
     const action = {
@@ -200,9 +200,11 @@ describe('selectors', () => {
     const submissionError = false
     expect(getSubmissionError(mockState)).toEqual(submissionError)
   })
-  it('returns resentSMS boolean', () => {
-    const resentSMS = false
-    expect(getResentSMS(mockState)).toEqual(resentSMS)
+  it('returns getResentAuthenticationCode boolean', () => {
+    const resentAuthenticationCode = false
+    expect(getResentAuthenticationCode(mockState)).toEqual(
+      resentAuthenticationCode
+    )
   })
   it('returns submitting boolean', () => {
     const submitting = false

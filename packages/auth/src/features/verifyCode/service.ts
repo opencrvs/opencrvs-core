@@ -18,11 +18,29 @@ import {
 } from '@auth/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { createToken } from '@auth/features/authenticate/service'
+import { IUserName, createToken } from '@auth/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
   createdAt: number
+}
+
+export enum EmailTemplateType {
+  ONBOARDING_INVITE = 'onboarding-invite',
+  TWO_FACTOR_AUTHENTICATION = '2-factor-authentication',
+  CHANGE_PHONE_NUMBER = 'change-phone-number',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'password-reset-by-system-admin',
+  PASSWORD_RESET = 'password-reset',
+  USERNAME_REMINDER = 'username-reminder',
+  USERNAME_UPDATED = 'username-updated'
+}
+
+export enum SMSTemplateType {
+  AUTHENTICATION_CODE_NOTIFICATION = 'authenticationCodeNotification',
+  USER_CREDENTIALS_NOTIFICATION = 'userCredentialsNotification',
+  RETIEVE_USERNAME_NOTIFICATION = 'retieveUserNameNotification',
+  UPDATE_USERNAME_NOTIFICATION = 'updateUserNameNotification',
+  RESET_USER_PASSWORD_NOTIFICATION = 'resetUserPasswordNotification'
 }
 
 type SixDigitVerificationCode = string
@@ -37,8 +55,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
 }
 
 export async function generateVerificationCode(
-  nonce: string,
-  mobile: string
+  nonce: string
 ): Promise<SixDigitVerificationCode> {
   const code = crypto.randomInt(100000, 999999).toString()
   await storeVerificationCode(nonce, code)
@@ -57,14 +74,19 @@ export function generateNonce() {
 }
 
 export async function sendVerificationCode(
-  mobile: string,
-  verificationCode: string
+  verificationCode: string,
+  templateName: EmailTemplateType | SMSTemplateType,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    code: verificationCode
+    email,
+    code: verificationCode,
+    templateName,
+    userFullName
   }
-
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),

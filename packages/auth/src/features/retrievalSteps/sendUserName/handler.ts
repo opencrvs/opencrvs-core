@@ -49,6 +49,12 @@ export default async function sendUserNameHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
   if (!PRODUCTION || isDemoUser) {
+    await sendUserName(
+      retrievalStepInformation.username,
+      retrievalStepInformation.userFullName,
+      retrievalStepInformation.mobile,
+      retrievalStepInformation.email
+    )
     logger.info(
       `Sending a verification SMS,
         ${JSON.stringify({
@@ -58,8 +64,10 @@ export default async function sendUserNameHandler(
     )
   } else {
     await sendUserName(
+      retrievalStepInformation.username,
+      retrievalStepInformation.userFullName,
       retrievalStepInformation.mobile,
-      retrievalStepInformation.username
+      retrievalStepInformation.email
     )
   }
 

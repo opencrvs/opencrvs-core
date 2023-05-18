@@ -15,11 +15,20 @@ import {
   authenticate,
   storeUserInformation,
   createToken,
-  generateAndSendVerificationCode
+  generateAndSendVerificationCode,
+  IAuthentication
 } from '@auth/features/authenticate/service'
-import { generateNonce } from '@auth/features/verifyCode/service'
+import {
+  EmailTemplateType,
+  SMSTemplateType,
+  generateNonce
+} from '@auth/features/verifyCode/service'
 import { unauthorized, forbidden } from '@hapi/boom'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import {
+  WEB_USER_JWT_AUDIENCES,
+  JWT_ISSUER,
+  USER_NOTIFICATION_DELIVERY_METHOD
+} from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -28,7 +37,8 @@ interface IAuthPayload {
 
 interface IAuthResponse {
   nonce: string
-  mobile: string
+  mobile?: string
+  email?: string
   status: string
   token?: string
 }
@@ -38,7 +48,7 @@ export default async function authenticateHandler(
   h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
-  let result
+  let result: IAuthentication
   const { username, password } = payload
   try {
     result = await authenticate(username.trim(), password)
@@ -52,6 +62,7 @@ export default async function authenticateHandler(
   const nonce = generateNonce()
   const response: IAuthResponse = {
     mobile: result.mobile,
+    email: result.email,
     status: result.status,
     nonce
   }
@@ -68,12 +79,27 @@ export default async function authenticateHandler(
   } else {
     await storeUserInformation(
       nonce,
+      result.name,
       result.userId,
       result.scope,
-      result.mobile
+      result.mobile,
+      result.email
     )
 
-    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    const templateName =
+      USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
+        : EmailTemplateType.TWO_FACTOR_AUTHENTICATION
+
+    //markme TWO_FACTOR_AUTHENTICATION
+    await generateAndSendVerificationCode(
+      nonce,
+      result.scope,
+      templateName,
+      result.name,
+      result.mobile,
+      result.email
+    )
   }
   return response
 }
@@ -86,6 +112,7 @@ export const requestSchema = Joi.object({
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
   mobile: Joi.string(),
+  email: Joi.string(),
   status: Joi.string(),
   token: Joi.string().optional()
 })

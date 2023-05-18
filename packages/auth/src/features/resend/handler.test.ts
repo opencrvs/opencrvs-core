@@ -31,7 +31,7 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345',
           retrievalFlow: true
@@ -58,7 +58,7 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345'
         }
@@ -82,7 +82,7 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
           nonce: '67890'
         }

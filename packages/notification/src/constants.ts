@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 export const HOST = process.env.HOST || 'localhost'
 export const PORT = process.env.PORT || 2020
+
+export const USER_NOTIFICATION_DELIVERY_METHOD =
+  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
 
 /*
   For these locales sms content will not be sent as unicoded payload

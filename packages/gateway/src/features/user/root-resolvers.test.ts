@@ -1112,7 +1112,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('resendSMSInvite mutation', () => {
+  describe('resendInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1147,7 +1147,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
@@ -1163,7 +1163,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
@@ -1178,7 +1178,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resendSMSInvite(
+      const res = await resolvers.Mutation.resendInvite(
         {},
         {
           userId: '123'
@@ -1190,7 +1190,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('usernameSMSReminder mutation', () => {
+  describe('usernameReminder mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1225,7 +1225,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
@@ -1241,7 +1241,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
@@ -1256,7 +1256,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.usernameSMSReminder(
+      const res = await resolvers.Mutation.usernameReminder(
         {},
         {
           userId: '123'
@@ -1268,7 +1268,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('resetPasswordSMS mutation', () => {
+  describe('resetPasswordInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1303,11 +1303,10 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
           authHeaderRegAgent
         )
@@ -1320,11 +1319,10 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
           { headers: authHeaderSysAdmin }
         )
@@ -1336,11 +1334,10 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resetPasswordSMS(
+      const res = await resolvers.Mutation.resetPasswordInvite(
         {},
         {
-          userId: '123',
-          applicationName: 'opencrvs'
+          userId: '123'
         },
         { headers: authHeaderSysAdmin }
       )
