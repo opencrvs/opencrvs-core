@@ -315,10 +315,9 @@ export const getFieldOptions = (
 ) => {
   if (field.type === SELECT_WITH_OPTIONS) {
     if (field.optionCondition) {
-      return field.options.filter((option: ISelectOption) =>
-        // eslint-disable-next-line no-eval
-        eval(field.optionCondition!)
-      )
+      // eslint-disable-next-line no-eval
+      const conditionEvaluator = eval(field.optionCondition!)
+      return field.options.filter(conditionEvaluator)
     }
 
     return field.options
