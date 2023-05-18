@@ -129,7 +129,8 @@ export function questionsTransformer(
       validator,
       extraValue,
       mapping,
-      dynamicOptions
+      dynamicOptions,
+      hideHeader
     }) => {
       if (custom) {
         return {
@@ -158,7 +159,8 @@ export function questionsTransformer(
           validator,
           extraValue,
           mapping,
-          dynamicOptions
+          dynamicOptions,
+          hideHeader
         } as ICustomQuestionConfig
       }
 

@@ -98,6 +98,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   hideInPreview?: boolean
   optionCondition?: string
   dynamicOptions?: IDynamicOptions
+  hideHeader?: boolean
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

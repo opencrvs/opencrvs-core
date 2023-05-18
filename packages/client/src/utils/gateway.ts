@@ -2050,6 +2050,7 @@ export type QuestionInput = {
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
   helperText?: InputMaybe<Array<MesssageInput>>
+  hideHeader?: InputMaybe<Scalars['Boolean']>
   hideInPreview?: InputMaybe<Scalars['Boolean']>
   initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
