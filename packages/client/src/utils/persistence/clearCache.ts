@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { IDeclaration } from '@client/declarations'
 import isBefore from 'date-fns/isBefore'
 import lastDayOfMonth from 'date-fns/lastDayOfMonth'
 import subMonths from 'date-fns/subMonths'
@@ -23,15 +24,15 @@ import subYears from 'date-fns/subYears'
 export const clearOldCacheEntries = (
   client: ApolloClient<NormalizedCacheObject>
 ) => {
-  const evictBeforeThisDate = lastDayOfMonth(
-    subMonths(subYears(new Date(), 1), 2)
-  )
-
   const cache = client.cache.extract()
   const cacheEntries = cache['ROOT_QUERY']
   if (!cacheEntries) {
     return
   }
+
+  const evictBeforeThisDate = lastDayOfMonth(
+    subMonths(subYears(new Date(), 1), 2)
+  )
 
   const cacheKeysToEvict = Object.keys(cacheEntries).filter((key) => {
     // Finds ISO date string from a key like
@@ -44,6 +45,52 @@ export const clearOldCacheEntries = (
 
     const timeStart = new Date(timeStartString)
     return isBefore(timeStart, evictBeforeThisDate)
+  })
+
+  for (const toEvictKey of cacheKeysToEvict) {
+    delete cacheEntries[toEvictKey]
+    // eslint-disable-next-line no-console
+    console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
+  }
+
+  // Purge all items in cache that don't get referenced from anywhere anymore
+  client.cache.gc()
+}
+
+/**
+ * Removes view record cache entries that aren't referenced anymore
+ */
+export const clearUnusedViewRecordCacheEntries = (
+  client: ApolloClient<NormalizedCacheObject>,
+  currentDeclarations: IDeclaration[]
+) => {
+  const cache = client.cache.extract()
+  const cacheEntries = cache['ROOT_QUERY']
+  if (!cacheEntries) {
+    return
+  }
+
+  const toBePreservedDuplicateIds = new Set(
+    currentDeclarations.flatMap((declaration) =>
+      (declaration.duplicates ?? []).map((duplicate) => duplicate.compositionId)
+    )
+  )
+
+  const cacheKeysToEvict = Object.keys(cacheEntries).filter((key) => {
+    // Finds the record id from the cache key
+    // fetchRegistrationForViewing({"id":"0c121971-4e90-4682-be5e-cff39cc897d6"})@persist
+    const recordId =
+      /^fetchRegistrationForViewing\({"id":"(.+)"}\)@persist$/g.exec(key)?.[1]
+
+    if (!recordId) {
+      return false
+    }
+
+    if (toBePreservedDuplicateIds.has(recordId)) {
+      return false
+    }
+
+    return true
   })
 
   for (const toEvictKey of cacheKeysToEvict) {

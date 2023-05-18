@@ -239,7 +239,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
       }
       updateWorkqueue(getState(), dispatch)
-      dispatch(deleteDeclaration(declaration.id))
+      dispatch(deleteDeclaration(declaration.id, client))
     } catch (error) {
       if (!(error instanceof ApolloError)) {
         updateDeclaration(dispatch, {
@@ -258,7 +258,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             trackingId: declaration.data.registration.trackingId as string
           })
         )
-        dispatch(deleteDeclaration(declaration.id))
+        dispatch(deleteDeclaration(declaration.id, client))
         return
       }
       updateDeclaration(dispatch, {
