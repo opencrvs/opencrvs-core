@@ -98,8 +98,7 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE,
-  EMPTY_STRING
+  ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -200,7 +199,6 @@ type DispatchProps = {
 type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
-  setAllFieldsDirty: boolean
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
   scope: Scope | null
@@ -605,11 +603,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     return eventTopBarProps
   }
+  setAllFieldsDirty = () =>
+    this.props.declaration.visitedGroupIds?.some(
+      (visitedGroup) =>
+        visitedGroup.sectionId === this.props.activeSection.id &&
+        visitedGroup.groupId === this.props.activeSectionGroup.id
+    ) ?? false
 
   render() {
     const {
       intl,
-      setAllFieldsDirty,
       fieldsToShowValidationErrors,
       declaration,
       registerForm,
@@ -833,6 +836,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
+                            key={activeSectionGroup.id}
                             onChange={(values) => {
                               debouncedModifyDeclaration(
                                 values,
@@ -840,7 +844,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 declaration
                               )
                             }}
-                            setAllFieldsDirty={setAllFieldsDirty}
+                            setAllFieldsDirty={this.setAllFieldsDirty()}
                             fieldsToShowValidationErrors={
                               fieldsToShowValidationErrors
                             }
@@ -1087,7 +1091,6 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ...activeSectionGroup,
       fields
     },
-    setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state)

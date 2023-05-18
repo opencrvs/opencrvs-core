@@ -1314,7 +1314,7 @@ describe('unassigned action handler', () => {
   })
 })
 
-/*describe('markEventAsWaitingValidationHandler', () => {
+describe('markEventAsWaitingValidationHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1325,7 +1325,8 @@ describe('unassigned action handler', () => {
       // For triggering DECLARATION_UPDATED event
       [JSON.stringify({}), { status: 200 }],
       // This is needed only for the bundle with input output
-      ...getMarkBundleAndPostToHearthMockResponses
+      ...getMarkBundleAndPostToHearthMockResponses,
+      [hearthResponseMock, { status: 200 }]
     )
   })
 
@@ -1371,7 +1372,7 @@ describe('unassigned action handler', () => {
     })
     expect(res.statusCode).toBe(200)
   })
-})*/
+})
 
 describe('markEventAsRequestedForCorrection handler', () => {
   let server: any
