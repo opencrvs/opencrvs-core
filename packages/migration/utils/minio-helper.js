@@ -46,6 +46,15 @@ export async function uploadBase64ToMinio(fileData) {
   }
 }
 
+export async function uploadSvgToMinio(svgCode) {
+  const ref = uuid()
+  const fileName = `${ref}.svg`
+  await minioClient.putObject(MINIO_BUCKET, fileName, svgCode, {
+    'content-type': 'image/svg+xml'
+  })
+  return `/${MINIO_BUCKET}/${fileName}`
+}
+
 export function isBase64FileString(fileData) {
   if (fileData === '' || fileData.trim() === '') {
     return false
