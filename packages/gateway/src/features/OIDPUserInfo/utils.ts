@@ -41,7 +41,7 @@ export type FetchTokenProps = {
 
 const searchLocationFromHearth = (name: string) =>
   fetchFromHearth<fhir.Bundle>(
-    `/location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
+    `/Location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
   )
 
 const findAdminStructureLocationWithName = async (name: string) => {

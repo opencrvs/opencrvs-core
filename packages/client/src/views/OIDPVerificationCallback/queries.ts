@@ -56,6 +56,7 @@ export const GET_OIDP_USER_INFO = gql`
       }
       districtFhirId
       stateFhirId
+      locationLevel3FhirId
     }
   }
 `
