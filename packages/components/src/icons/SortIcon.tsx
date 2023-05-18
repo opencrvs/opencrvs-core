@@ -26,17 +26,16 @@ export const SortIcon = ({ isSorted, isDescending }: ISortIcon) => {
     return (
       <Rotate isDescending={isDescending}>
         <svg
-          width="13"
-          height="8"
-          viewBox="0 0 13 8"
-          fill="none"
+          width="10"
+          height="6"
+          viewBox="0 0 12 8"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
             fillRule="evenodd"
             clipRule="evenodd"
             d="M7.40698 6.82584C6.99907 7.19817 6.3398 7.1959 5.93446 6.82078L1.10095 2.34755C0.447086 1.74243 0.915189 0.713215 1.84282 0.716404L11.5405 0.749736C12.4681 0.752924 12.9291 1.78533 12.2711 2.38595L7.40698 6.82584Z"
-            fill="#222222"
+            fill="currentColor"
           />
         </svg>
       </Rotate>
@@ -44,17 +43,16 @@ export const SortIcon = ({ isSorted, isDescending }: ISortIcon) => {
   } else {
     return (
       <svg
-        width="12"
-        height="8"
+        width="10"
+        height="6"
         viewBox="0 0 12 8"
-        fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
           fillRule="evenodd"
           clipRule="evenodd"
           d="M6.70581 6.82584C6.2979 7.19817 5.63863 7.1959 5.23329 6.82078L0.399778 2.34755C-0.254085 1.74243 0.214017 0.713215 1.14165 0.716404L10.8393 0.749736C11.7669 0.752924 12.228 1.78533 11.57 2.38595L6.70581 6.82584Z"
-          fill="#CCCCCC"
+          fill="currentColor"
         />
       </svg>
     )

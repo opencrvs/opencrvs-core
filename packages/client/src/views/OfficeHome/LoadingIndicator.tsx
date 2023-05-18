@@ -11,28 +11,12 @@
  */
 import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ConnectionError } from '@opencrvs/components/lib/icons'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'
 import { isNavigatorOnline } from '@client/utils'
 
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-  margin-top: 100px;
-`
-
-const ConnectivityContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-`
-const NoConnectivity = styled(ConnectionError)`
-  width: 24px;
-  margin-right: 8px;
-`
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -41,29 +25,13 @@ const Wrapper = styled.div`
 
 const LoadingContainer = styled.div`
   width: 100%;
-  padding-left: 8px;
+  padding-right: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: flex;
     padding-left: 0px;
     margin: auto;
     align-items: center;
     justify-content: center;
-  }
-`
-const Text = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-`
-
-const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
-  padding-top: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    position: ${({ noDeclaration }) => (noDeclaration ? `fixed` : `relative`)};
-    left: 0;
-    right: 0;
-    padding-top: 0;
-    padding-bottom: 16px;
-    ${({ noDeclaration }) => (noDeclaration ? `top:55%; padding: 0;` : ``)}
   }
 `
 
@@ -78,29 +46,21 @@ type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 export class LoadingIndicatorComp extends React.Component<IProps> {
   render() {
     const { loading, noDeclaration, hasError, intl } = this.props
+    const hasContent =
+      (loading && this.props.isOnline) || hasError || !this.props.isOnline
 
     return (
-      <Wrapper>
+      <Wrapper style={{ display: hasContent ? 'flex' : 'none' }}>
         {this.props.isOnline && loading && (
           <LoadingContainer>
-            <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
+            <Spinner id="Spinner" size={20} baseColor="#4C68C1" />
           </LoadingContainer>
         )}
-        <MobileViewContainer noDeclaration={noDeclaration}>
-          {this.props.isOnline && hasError && (
-            <ErrorText id="search-result-error-text-count">
-              {intl.formatMessage(errorMessages.queryError)}
-            </ErrorText>
-          )}
-          {!this.props.isOnline && (
-            <ConnectivityContainer>
-              <NoConnectivity />
-              <Text id="wait-connection-text">
-                {intl.formatMessage(constantsMessages.noConnection)}
-              </Text>
-            </ConnectivityContainer>
-          )}
-        </MobileViewContainer>
+        {this.props.isOnline && hasError && (
+          <Toast type="error" id="search-result-error-text-count">
+            {intl.formatMessage(errorMessages.queryError)}
+          </Toast>
+        )}
       </Wrapper>
     )
   }

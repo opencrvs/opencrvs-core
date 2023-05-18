@@ -31,27 +31,28 @@ export interface IWorkqueueRow {
   hideLastBorder?: boolean
 }
 
-const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
+const Container = styled.div<{ hideLastBorder?: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
+  height: 56px;
+  padding: 0 20px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   &:last-child {
     ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
   }
-
-  height: 72px;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.grey100};
+  }
 `
 
-export const RowWrapper = styled.div<{
-  clickable?: boolean
-}>`
+export const RowWrapper = styled.div`
   width: 100%;
-  padding: 0 16px;
   display: flex;
   align-items: center;
-  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 export const ContentWrapper = styled.div<{
@@ -68,7 +69,7 @@ export const ContentWrapper = styled.div<{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 4px 0;
+  padding-right: 16px;
 `
 
 export const Error = styled.span`
@@ -83,14 +84,11 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {
-        const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
+          <Container key={index} hideLastBorder={props.hideLastBorder}>
             <RowWrapper
               id={'row_' + index}
-              clickable={clickable}
               onClick={() =>
-                clickable &&
                 props.getRowClickHandler(
                   item.rowClickHandler as IActionObject[]
                 )()
@@ -135,7 +133,7 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
                 }
               })}
             </RowWrapper>
-          </StyledBox>
+          </Container>
         )
       })}
     </>

@@ -102,6 +102,14 @@ export const ActionPageWrapper = styled.div`
   overflow-y: scroll;
 `
 
+const LoadingContainer = styled.div`
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  padding: 0px 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+`
+
 export function getRejectionReasonDisplayValue(reason: string) {
   switch (reason.toLowerCase()) {
     case 'duplicate':
@@ -502,6 +510,7 @@ export class SearchResultView extends React.Component<
                   title={intl.formatMessage(messages.searchResultFor, {
                     param: searchText
                   })}
+                  loading={loading}
                   isMobileSize={
                     this.state.width < this.props.theme.grid.breakpoints.lg
                   }
@@ -511,9 +520,9 @@ export class SearchResultView extends React.Component<
                   noContent={total < 1 && !loading}
                 >
                   {loading ? (
-                    <div id="search_loader">
+                    <LoadingContainer id="search_loader">
                       <LoadingIndicator loading={true} />
-                    </div>
+                    </LoadingContainer>
                   ) : error ? (
                     <ErrorText id="search-result-error-text">
                       {intl.formatMessage(errorMessages.queryError)}
@@ -537,7 +546,6 @@ export class SearchResultView extends React.Component<
                           noResultText={intl.formatMessage(
                             constantsMessages.noResults
                           )}
-                          hideLastBorder={true}
                         />
                       </>
                     )

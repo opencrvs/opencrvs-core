@@ -24,20 +24,20 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  background-color: ${({ theme }) => theme.colors.grey100};
-  ${({ theme }) => theme.fonts.bold14};
+  background-color: ${({ theme }) => theme.colors.white};
   height: 36px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  padding: 0 20px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 export const NoResultText = styled.div`
+  padding: 16px 20px;
+  height: 56px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
@@ -46,6 +46,7 @@ export const NoResultText = styled.div`
     left: 0;
     right: 0;
     top: 50%;
+    border: 0;
     text-align: center;
   }
 `
@@ -76,11 +77,20 @@ const ColumnContainer = styled.div<{
 `
 
 const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
+  color: ${({ theme }) => theme.colors.grey400};
+  ${({ theme }) => theme.fonts.bold12};
+  text-transform: uppercase;
   align-self: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   width: 100%;
   display: flex;
   gap: 8px;
   align-items: center;
+  &:hover {
+    color: ${({ theme }) => theme.colors.grey500};
+  }
+  &:active {
+    color: ${({ theme }) => theme.colors.grey600};
+  }
 `
 
 const ActionWrapper = styled(ContentWrapper)`
@@ -191,34 +201,32 @@ export class WorkqueueComp extends React.Component<
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
-        {content.length > 0 &&
-          width > grid.breakpoints.lg &&
-          !hideTableHeader && (
-            <TableHeader>
-              {columns.map((preference, index) => (
-                <ColumnContainer
-                  key={index}
-                  width={preference.width}
-                  onClick={
-                    preference.sortFunction
-                      ? () => preference.sortFunction!(preference.key)
-                      : undefined
-                  }
-                  clickable={Boolean(preference.sortFunction)}
-                >
-                  <ColumnTitleWrapper>
-                    {preference.label && preference.label}
-                    {preference.sortFunction && (
-                      <SortIcon
-                        isSorted={Boolean(preference.isSorted)}
-                        isDescending={sortOrder === SORT_ORDER.DESCENDING}
-                      />
-                    )}
-                  </ColumnTitleWrapper>
-                </ColumnContainer>
-              ))}
-            </TableHeader>
-          )}
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
+          <TableHeader>
+            {columns.map((preference, index) => (
+              <ColumnContainer
+                key={index}
+                width={preference.width}
+                onClick={
+                  preference.sortFunction
+                    ? () => preference.sortFunction!(preference.key)
+                    : undefined
+                }
+                clickable={Boolean(preference.sortFunction)}
+              >
+                <ColumnTitleWrapper>
+                  {preference.label && preference.label}
+                  {preference.sortFunction && (
+                    <SortIcon
+                      isSorted={Boolean(preference.isSorted)}
+                      isDescending={sortOrder === SORT_ORDER.DESCENDING}
+                    />
+                  )}
+                </ColumnTitleWrapper>
+              </ColumnContainer>
+            ))}
+          </TableHeader>
+        )}
         {!isMobileView ? (
           <WorkqueueRowDesktop
             columns={this.props.columns}

@@ -101,6 +101,14 @@ const SearchParamContainer = styled.div`
   }
 `
 
+const LoadingContainer = styled.div`
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  padding: 0px 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+`
+
 type QueryData = SearchEventsQuery['searchEvents']
 
 interface IBaseSearchResultProps {
@@ -450,9 +458,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 showTitleOnMobile={true}
               >
                 {loading ? (
-                  <div id="advanced-search_loader">
+                  <LoadingContainer id="advanced-search_loader">
                     <LoadingIndicator loading={true} />
-                  </div>
+                  </LoadingContainer>
                 ) : error ? (
                   <ErrorText id="advanced-search-result-error-text">
                     {intl.formatMessage(errorMessages.queryError)}

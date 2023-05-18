@@ -14,6 +14,8 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import styled from 'styled-components'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { SyncedIndicator } from '@opencrvs/components/lib/SyncedIndicator'
 import {
   LoadingIndicator,
   withOnlineStatus,
@@ -39,9 +41,13 @@ interface IContentWrapper {
 
 type IProps = IContentWrapper & IOnlineStatusProps
 
+const BodyContainer = styled.div`
+  height: auto;
+`
+
 const TabBarContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  padding-left: 20px;
+  padding-left: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
@@ -49,49 +55,43 @@ const MobileChildrenContainer = styled.div`
   margin: 20px 16px 0;
 `
 
-const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
-  height: auto;
+const WorkqueueFooter = styled.div`
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
+  padding: 0px 8px 0px 24px;
 `
 
 const Body = (props: IProps) => {
-  const {
-    isShowPagination,
-    paginationId,
-    totalPages,
-    onPageChange,
-    loading,
-    error,
-    isOnline,
-    noContent
-  } = props
+  const { paginationId, totalPages, onPageChange, loading, error, noContent } =
+    props
   return (
     <>
       {props.children}
-      <PaginationLoaderContainer isShowPagination={isShowPagination}>
-        {noContent && !loading && (
+      <BodyContainer>
+        {noContent && (
           <NoResultText id="no-record">{props.noResultText}</NoResultText>
         )}
-        {isShowPagination &&
-          paginationId &&
-          totalPages &&
-          onPageChange &&
-          isOnline && (
+        <WorkqueueFooter>
+          <Stack direction="row" justifyContent="space-between">
+            <SyncedIndicator
+              isLoading={loading ? true : false}
+              hasError={error ? true : false}
+            />
             <Pagination
               currentPage={paginationId}
               totalPages={totalPages}
               onPageChange={onPageChange}
             />
-          )}
-        <LoadingIndicator
-          loading={loading ? true : false}
-          hasError={error ? true : false}
-          noDeclaration={noContent}
-        />
-      </PaginationLoaderContainer>
+            {/* <LoadingIndicator
+              loading={loading ? true : false}
+              hasError={error ? true : false}
+              noDeclaration={noContent}
+            /> */}
+          </Stack>
+        </WorkqueueFooter>
+      </BodyContainer>
     </>
   )
 }
-
 const WQContentWrapperComp = (props: IProps) => {
   return (
     <>
@@ -111,6 +111,7 @@ const WQContentWrapperComp = (props: IProps) => {
           tabBarContent={props.tabBarContent}
           topActionButtons={props.topActionButtons}
           showTitleOnMobile={props.showTitleOnMobile}
+          noPadding
         >
           <Body {...props} />
         </Content>

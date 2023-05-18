@@ -24,7 +24,8 @@ import { Link } from '@opencrvs/components/lib/Link'
 const Flex = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  padding: 0 2px;
+  gap: 12px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     align-items: flex-start;
   }

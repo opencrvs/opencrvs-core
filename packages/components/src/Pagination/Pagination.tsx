@@ -48,8 +48,7 @@ const MobileWrapper = styled.div`
 `
 
 const PaginationContainer = styled.div`
-  margin-top: 8px;
-  padding: 8px;
+  padding: 4px 12px;
   color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;
@@ -143,11 +142,13 @@ export class Pagination extends React.Component<IPaginationProps> {
   renderPages(size: IPaginationVariant) {
     const { totalPages } = this.props
     const currentPage = this.currentPage()
-
     if (currentPage > totalPages) {
       this.changePage(totalPages)
     }
-    const pages = this.paginationRow(currentPage, totalPages, 1)
+    let pages = this.paginationRow(currentPage, totalPages, 1)
+    if (pages.length < 1) {
+      pages = [1]
+    }
     return (
       <PaginationContainer id="pagination">
         <CircleButton
@@ -194,10 +195,14 @@ export class Pagination extends React.Component<IPaginationProps> {
   }
 
   render() {
+    const { totalPages } = this.props
+
     return (
       <PaginationWrapper id="pagination_container">
         <DesktopWrapper>{this.renderPages('small')}</DesktopWrapper>
-        <MobileWrapper>{this.renderPages('large')}</MobileWrapper>
+        <MobileWrapper>
+          {totalPages > 1 ? this.renderPages('large') : null}
+        </MobileWrapper>
       </PaginationWrapper>
     )
   }
