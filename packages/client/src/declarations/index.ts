@@ -26,6 +26,7 @@ import {
   IFormFieldValue,
   SubmissionAction
 } from '@client/forms'
+import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -52,7 +53,6 @@ import {
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -1015,7 +1015,7 @@ function createRequestForDeclaration(
 }
 
 function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<any>>,
+  mainRequest: Promise<ApolloQueryResult<Query>>,
   getState: () => IStoreState,
   client: ApolloClient<{}>
 ) {
@@ -1027,9 +1027,17 @@ function requestWithStateWrapper(
       if (
         !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
       ) {
-        await fetchAllDuplicateDeclarations(data.data as Query)
+        await fetchAllDuplicateDeclarations(data.data)
       }
-      await fetchAllMinioUrlsInAttachment(data.data as Query)
+      const allfetchableURLs = [
+        ...getAttachmentUrls(data.data),
+        ...getSignatureUrls(data.data)
+      ]
+
+      await Promise.all(
+        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
+      )
+
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
@@ -1037,21 +1045,35 @@ function requestWithStateWrapper(
   })
 }
 
-async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+function getAttachmentUrls(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  const attachments = registration?.attachments
-  if (!attachments) {
-    return
-  }
-  const urlsWithMinioPath = attachments
-    .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
+  return (registration?.attachments ?? [])
+    .filter((a): a is Attachment => Boolean(a))
+    .map((a) => a.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+}
 
-  return Promise.all(urlsWithMinioPath)
+function getSignatureUrls(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
+
+  return (
+    [
+      'informantsSignature',
+      'brideSignature',
+      'groomSignature',
+      'witnessOneSignature',
+      'witnessTwoSignature'
+    ] as const
+  )
+    .map((propertyKey) => registration?.[propertyKey])
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1878,11 +1900,8 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
-  )
   navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioFullUrls
+    minioUrls: minioUrls
   })
 }
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {

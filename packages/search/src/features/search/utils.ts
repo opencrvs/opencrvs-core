@@ -261,6 +261,22 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.brideIdentifier) {
+    must.push({
+      match: {
+        brideIdentifier: params.brideIdentifier
+      }
+    })
+  }
+
+  if (params.groomIdentifier) {
+    must.push({
+      match: {
+        groomIdentifier: params.groomIdentifier
+      }
+    })
+  }
+
   if (params.dateOfMarriage) {
     must.push({
       multi_match: {
