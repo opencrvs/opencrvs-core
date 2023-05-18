@@ -10,21 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ApolloClient,
-  ApolloError,
-  ApolloQueryResult,
-  InternalRefetchQueriesInclude
-} from '@apollo/client'
-import {
   Action as DeclarationAction,
+  SubmissionAction,
   DownloadAction,
-  FieldValueMap,
-  IAttachmentValue,
-  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue,
-  SubmissionAction
+  IContactPoint,
+  FieldValueMap,
+  IAttachmentValue
 } from '@client/forms'
 import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -34,12 +28,6 @@ import {
   IDynamicValues
 } from '@client/navigation'
 import {
-  showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast
-} from '@client/notification/actions'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
@@ -47,35 +35,46 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
-  draftToGqlTransformer,
-  gqlToDraftTransformer
+  gqlToDraftTransformer,
+  draftToGqlTransformer
 } from '@client/transformer'
-import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { UserDetails } from '@client/utils/userUtils'
-import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import {
-  IQueryData,
-  IWorkqueue,
-  updateRegistrarWorkqueue,
-  UpdateRegistrarWorkqueueAction
-} from '@client/workqueue'
-import {
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
   GQLEventSearchResultSet,
   GQLEventSearchSet,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLRegistrationSearchSet,
   GQLHumanName,
-  GQLMarriageEventSearchSet,
-  GQLRegistrationSearchSet
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
-import { difference } from 'lodash'
+import {
+  ApolloClient,
+  ApolloError,
+  ApolloQueryResult,
+  InternalRefetchQueriesInclude
+} from '@apollo/client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import {
+  showDownloadDeclarationFailedToast,
+  ShowDownloadDeclarationFailedToast
+} from '@client/notification/actions'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
+import {
+  UpdateRegistrarWorkqueueAction,
+  updateRegistrarWorkqueue,
+  IQueryData,
+  IWorkqueue
+} from '@client/workqueue'
+import { isBase64FileString } from '@client/utils/commonUtils'
+import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -1216,25 +1215,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       }
     case DELETE_DECLARATION: {
       const { declarationId } = action.payload
-
-      const allDuplicates = getAllDuplicatesFromDeclarations(state.declarations)
-      const allDuplicatesAfterDeletion = getAllDuplicatesFromDeclarations(
-        state.declarations.filter(
-          (declaration) => declaration.id !== declarationId
-        )
-      )
-      const garbageDeclarations = difference(
-        allDuplicates,
-        allDuplicatesAfterDeletion
-      )
-      const garbageCollectedDeclarations = state.declarations.filter(
-        (declaration) => !garbageDeclarations.includes(declaration.id)
-      )
-
       return loop(
         {
           ...state,
-          declarations: garbageCollectedDeclarations.map((declaration) =>
+          declarations: state.declarations.map((declaration) =>
             declaration.id === declarationId
               ? { ...declaration, writingDraft: true }
               : declaration
@@ -1255,13 +1239,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         getMinioUrlsFromDeclaration(declarationToDelete)
 
       postMinioUrlsToServiceWorker(declarationMinioUrls)
-
-      // garbage collect any duplicate declarations that are no longer referenced from anywhere
-
-      // const declarations = garbageCollectDuplicateDeclarations(
-      //   state.declarations
-      // )
-
       return {
         ...state,
         declarations: state.declarations.filter(
@@ -1851,27 +1828,6 @@ export function filterProcessingDeclarations(
     totalItems: filteredTotal
   }
 }
-
-function getAllDuplicatesFromDeclarations(declarations: IDeclaration[]) {
-  return declarations.flatMap(
-    (declaration) =>
-      declaration.duplicates?.map((duplicate) => duplicate.compositionId) ?? []
-  )
-}
-
-// function garbageCollectDeclarations(declarations: IDeclaration[]) {
-//   const allDuplicates = getAllDuplicatesFromDeclarations(declarations)
-//   const allDuplicatesAfterDeletion = getAllDuplicatesFromDeclarations(
-//     declarations.filter(({ id }) => id !== action.payload)
-//   )
-//   const garbageDeclarations = difference(
-//     allDuplicates,
-//     allDuplicatesAfterDeletion
-//   )
-//   return declarations.filter(
-//     (declaration) => !garbageDeclarations.includes(declaration.id)
-//   )
-// }
 
 export function getMinioUrlsFromDeclaration(
   declaration: IDeclaration | undefined
