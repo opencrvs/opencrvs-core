@@ -53,7 +53,9 @@ export const deathDocumentTypeFhirMapping = {
   BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
   NATIONAL_ID: 'NATIONAL_ID',
   PASSPORT: 'PASSPORT',
-  OTHER: 'OTHER'
+  OTHER: 'OTHER',
+  REQUISITION: 'REQUISITION',
+  COURT_ORDER: 'COURT_ORDER'
 }
 
 export function deathFieldToAttachmentTransformer(
