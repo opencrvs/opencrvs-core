@@ -65,6 +65,11 @@ const PageNumberButton = styled(Button)`
   height: 24px;
 `
 
+const DotsButton = styled(Button)`
+  height: 24px;
+  pointer-events: none; // Disable click events on the dots
+`
+
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
     size && size === 'large' ? theme.fonts.h4 : theme.fonts.bold12};
@@ -150,22 +155,35 @@ export class Pagination extends React.Component<IPaginationProps> {
           <Icon color="grey400" name="ChevronLeft" size="small" />
         </Button>
         <StyledPagination>
-          {pages.map((page, id) => (
-            <PageNumberButton
-              key={id}
-              type="tertiary"
-              size="small"
-              id={`page-number-${id}`}
-              onClick={() => this.changePage(page)}
-            >
-              <StyledPageNumber
-                size={size}
-                isCurrentPage={typeof page === 'number' && page === currentPage}
+          {pages.map((page, id) => {
+            if (page === '...') {
+              return (
+                <DotsButton key={id} type="tertiary" size="small" disabled>
+                  <StyledPageNumber size={size} isCurrentPage={false}>
+                    {page}
+                  </StyledPageNumber>
+                </DotsButton>
+              )
+            }
+            return (
+              <PageNumberButton
+                key={id}
+                type="tertiary"
+                size="small"
+                id={`page-number-${id}`}
+                onClick={() => this.changePage(page)}
               >
-                {page}
-              </StyledPageNumber>
-            </PageNumberButton>
-          ))}
+                <StyledPageNumber
+                  size={size}
+                  isCurrentPage={
+                    typeof page === 'number' && page === currentPage
+                  }
+                >
+                  {page}
+                </StyledPageNumber>
+              </PageNumberButton>
+            )
+          })}
         </StyledPagination>
         <Button
           type="icon"
