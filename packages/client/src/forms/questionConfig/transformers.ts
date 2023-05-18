@@ -174,6 +174,7 @@ export function questionsTransformer(
         conditionals: conditionals || undefined,
         hideInPreview: hideInPreview ?? false,
         optionCondition: optionCondition || undefined,
+        hideHeader: hideHeader ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
 

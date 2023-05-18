@@ -67,6 +67,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   optionCondition?: string
   validator?: IValidatorDescriptor[]
   helperText?: Message
+  hideHeader?: boolean
   hideInPreview?: boolean
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
