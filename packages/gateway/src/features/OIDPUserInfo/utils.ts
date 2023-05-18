@@ -39,15 +39,13 @@ export type FetchTokenProps = {
   grantType?: string
 }
 
-const searchLocationFromHearth = (geocode: string) =>
+const searchLocationFromHearth = (name: string) =>
   fetchFromHearth<fhir.Bundle>(
-    `/location?${new URLSearchParams({
-      identifer: `ADMIN_STRUCTURE_${geocode}`
-    })}`
+    `/location?${new URLSearchParams({ name, type: 'ADMIN_STRUCTURE' })}`
   )
 
-const findAdminStructureLocationWithGeocode = async (geocode: string) => {
-  const fhirBundleLocations = await searchLocationFromHearth(geocode)
+const findAdminStructureLocationWithName = async (name: string) => {
+  const fhirBundleLocations = await searchLocationFromHearth(name)
 
   if ((fhirBundleLocations.entry?.length ?? 0) > 1) {
     throw new Error(
@@ -56,9 +54,7 @@ const findAdminStructureLocationWithGeocode = async (geocode: string) => {
   }
 
   if ((fhirBundleLocations.entry?.length ?? 0) === 0) {
-    logger.warn(
-      'No admin structure location found with the geocode: ' + geocode
-    )
+    logger.warn('No admin structure location found with the name: ' + name)
     return null
   }
 
@@ -66,17 +62,24 @@ const findAdminStructureLocationWithGeocode = async (geocode: string) => {
 }
 
 const pickUserInfo = async (userInfo: OIDPUserInfo) => {
+  const stateFhirId =
+    userInfo.address?.country &&
+    (await findAdminStructureLocationWithName(userInfo.address.country))
+
+  // TODO: Remove this once we get a proper country code from E-Signet
+  if (userInfo.address) {
+    userInfo.address.country = 'IND'
+  }
+
   return {
     oidpUserInfo: userInfo,
+    stateFhirId,
     districtFhirId:
-      userInfo.address?.locality &&
-      (await findAdminStructureLocationWithGeocode(userInfo.address.locality)),
-    stateFhirId:
       userInfo.address?.region &&
-      (await findAdminStructureLocationWithGeocode(userInfo.address.region)),
+      (await findAdminStructureLocationWithName(userInfo.address.region)),
     locationLevel3FhirId:
-      userInfo.address?.city &&
-      (await findAdminStructureLocationWithGeocode(userInfo.address.city))
+      userInfo.address?.locality &&
+      (await findAdminStructureLocationWithName(userInfo.address.locality))
   }
 }
 
