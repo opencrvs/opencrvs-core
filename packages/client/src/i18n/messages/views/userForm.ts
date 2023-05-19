@@ -25,6 +25,12 @@ export const messages = {
     description: 'The title of user form',
     id: 'form.section.user.title'
   },
+  titleHelperText: {
+    defaultMessage:
+      'This is the title that the user wants to appear with their name in the "Declared By" section on the certificate. For example, Nurse at Guerrison Hospital.',
+    description: 'The helper text for user title field',
+    id: 'form.section.user.title.helperText'
+  },
   userFormReviewTitle: {
     defaultMessage: 'Please review the new users details',
     description: 'The title of the review page of the user form',
