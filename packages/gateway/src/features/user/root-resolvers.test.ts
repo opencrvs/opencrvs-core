@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
-import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -764,7 +764,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
@@ -785,7 +785,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -805,7 +805,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
