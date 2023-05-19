@@ -93,6 +93,7 @@ describe('download button tests', () => {
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
+        client = createClient(store)
         testComponent = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
@@ -109,7 +110,7 @@ describe('download button tests', () => {
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
-          { store, history }
+          { store, history, apolloClient: client }
         )
       })
 
