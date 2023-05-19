@@ -117,7 +117,7 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
       const { client, persistor } = await createPersistentClient(store)
       setPersistor(persistor)
       setClient(client)
-      clearOldCacheEntries(client)
+      clearOldCacheEntries(client.cache)
     }
 
     // skipping the persistent client in tests for now

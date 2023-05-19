@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { ApolloCache, NormalizedCacheObject } from '@apollo/client'
 import { IDeclaration } from '@client/declarations'
 import isBefore from 'date-fns/isBefore'
-import lastDayOfMonth from 'date-fns/lastDayOfMonth'
+import endOfMonth from 'date-fns/endOfMonth'
 import subMonths from 'date-fns/subMonths'
 import subYears from 'date-fns/subYears'
 
@@ -22,17 +22,16 @@ import subYears from 'date-fns/subYears'
  * Based on requirements in OCRVS-5151, e.g. when we get to the May 2023, we clear out March 2022 and older values
  */
 export const clearOldCacheEntries = (
-  client: ApolloClient<NormalizedCacheObject>
+  cache: ApolloCache<NormalizedCacheObject>,
+  currentDate = new Date()
 ) => {
-  const cache = client.cache.extract()
-  const cacheEntries = cache['ROOT_QUERY']
+  const cacheState = cache.extract()
+  const cacheEntries = cacheState['ROOT_QUERY']
   if (!cacheEntries) {
     return
   }
 
-  const evictBeforeThisDate = lastDayOfMonth(
-    subMonths(subYears(new Date(), 1), 2)
-  )
+  const evictBeforeThisDate = endOfMonth(subMonths(subYears(currentDate, 1), 2))
 
   const cacheKeysToEvict = Object.keys(cacheEntries).filter((key) => {
     // Finds ISO date string from a key like
@@ -48,24 +47,24 @@ export const clearOldCacheEntries = (
   })
 
   for (const toEvictKey of cacheKeysToEvict) {
-    delete cacheEntries[toEvictKey]
     // eslint-disable-next-line no-console
     console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
+    cache.evict({ id: 'ROOT_QUERY', fieldName: toEvictKey })
   }
 
   // Purge all items in cache that don't get referenced from anywhere anymore
-  client.cache.gc()
+  cache.gc()
 }
 
 /**
  * Removes view record cache entries that aren't referenced anymore
  */
 export const clearUnusedViewRecordCacheEntries = (
-  client: ApolloClient<NormalizedCacheObject>,
-  currentDeclarations: IDeclaration[]
+  cache: ApolloCache<NormalizedCacheObject>,
+  currentDeclarations: Pick<IDeclaration, 'id' | 'duplicates'>[]
 ) => {
-  const cache = client.cache.extract()
-  const cacheEntries = cache['ROOT_QUERY']
+  const cacheState = cache.extract()
+  const cacheEntries = cacheState['ROOT_QUERY']
   if (!cacheEntries) {
     return
   }
@@ -94,11 +93,11 @@ export const clearUnusedViewRecordCacheEntries = (
   })
 
   for (const toEvictKey of cacheKeysToEvict) {
-    delete cacheEntries[toEvictKey]
     // eslint-disable-next-line no-console
     console.debug('[Clear Apollo cache]', 'Evicting', toEvictKey)
+    cache.evict({ id: 'ROOT_QUERY', fieldName: toEvictKey })
   }
 
   // Purge all items in cache that don't get referenced from anywhere anymore
-  client.cache.gc()
+  cache.gc()
 }

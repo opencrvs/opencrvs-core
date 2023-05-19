@@ -1254,7 +1254,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       )
 
       clearUnusedViewRecordCacheEntries(
-        action.payload.client,
+        action.payload.client.cache,
         declarationsWithoutDeleted
       )
 
