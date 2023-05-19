@@ -112,7 +112,7 @@ export async function checkVerificationCode(
   const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
 
   if (!codeDetails) {
-    throw new Error('sms code not found')
+    throw new Error('Auth code not found')
   }
 
   const codeExpired =
@@ -120,11 +120,11 @@ export async function checkVerificationCode(
     CONFIG_SMS_CODE_EXPIRY_SECONDS
 
   if (code !== codeDetails.code) {
-    throw new Error('sms code invalid')
+    throw new Error('Auth code invalid')
   }
 
   if (codeExpired) {
-    throw new Error('sms code expired')
+    throw new Error('Auth code expired')
   }
 }
 
