@@ -91,7 +91,6 @@ export default async function authenticateHandler(
         ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
         : EmailTemplateType.TWO_FACTOR_AUTHENTICATION
 
-    //markme TWO_FACTOR_AUTHENTICATION
     await generateAndSendVerificationCode(
       nonce,
       result.scope,

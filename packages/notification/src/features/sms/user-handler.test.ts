@@ -45,6 +45,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/userCredentialsSMS',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           username: 'anik',
           password: 'B123456'
@@ -84,7 +91,7 @@ describe('Verify user handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -102,6 +109,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/userCredentialsSMS',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           username: 'anik',
           password: 'B123456'
@@ -134,13 +148,19 @@ describe('Verify user handlers', () => {
         url: '/retrieveUserName',
         payload: {
           msisdn: '447789778823',
-          username: 'anik'
+          username: 'anik',
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ]
         },
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no username', async () => {
@@ -159,6 +179,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/retrieveUserName',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823'
         },
         headers: {
@@ -170,7 +197,7 @@ describe('Verify user handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -188,6 +215,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/retrieveUserName',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           username: 'anik'
         },
@@ -218,6 +252,14 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/authenticationCode',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
+          templateName: 'sendUserAuthenticationCode',
           msisdn: '447789778823',
           code: '000000'
         },
@@ -244,6 +286,14 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/authenticationCode',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
+          templateName: 'sendUserAuthenticationCode',
           msisdn: '447789778823'
         },
         headers: {
@@ -255,7 +305,7 @@ describe('Verify user handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -273,6 +323,14 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/authenticationCode',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
+          templateName: 'sendUserAuthenticationCode',
           msisdn: '447789778823',
           code: '000000'
         },
@@ -303,6 +361,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/updateUserNameSMS',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           username: 'anik'
         },
@@ -329,6 +394,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/updateUserNameSMS',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823'
         },
         headers: {
@@ -340,7 +412,7 @@ describe('Verify user handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -358,6 +430,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/updateUserNameSMS',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           username: 'anik'
         },
@@ -390,6 +469,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/resetPasswordInvite',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           password: 'B123456'
         },
@@ -400,35 +486,10 @@ describe('Verify user handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('returns 400 if called with no application name', async () => {
-      const token = jwt.sign(
-        { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:notification-user'
-        }
-      )
-      fetch.mockResponse(JSON.stringify(translationsMock))
 
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/resetPasswordInvite',
-        payload: {
-          msisdn: '447789778823',
-          password: 'B123456'
-        },
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(400)
-    })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -446,6 +507,13 @@ describe('Verify user handlers', () => {
         method: 'POST',
         url: '/resetPasswordInvite',
         payload: {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           msisdn: '447789778823',
           password: 'B123456'
         },

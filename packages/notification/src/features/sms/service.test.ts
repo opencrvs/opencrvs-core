@@ -19,7 +19,15 @@ describe('.sendSMS()', () => {
   it('should check it the message has been initiated or not', async () => {
     const logSpy = jest.spyOn(logger, 'info')
     fetch.once('Success')
-    await expect(notifyCountryConfig('+27845555555', 'test', 'Bearer token...'))
+    await expect(
+      notifyCountryConfig(
+        'templateName',
+        '27845555555',
+        { test: 'test' },
+        'Bearer token...',
+        'en'
+      )
+    )
     expect(logSpy).toBeCalledTimes(2)
   })
 
@@ -27,7 +35,13 @@ describe('.sendSMS()', () => {
     const logSpy = jest.spyOn(logger, 'error')
     fetch.mockRejectOnce(new Error('something broke :('))
     await expect(
-      notifyCountryConfig('+27845555555', 'test', 'Bearer token...')
+      notifyCountryConfig(
+        'templateName',
+        '27845555555',
+        { test: 'test' },
+        'Bearer token...',
+        'en'
+      )
     ).rejects.toThrow()
     expect(logSpy).toHaveBeenLastCalledWith(new Error('something broke :('))
   })

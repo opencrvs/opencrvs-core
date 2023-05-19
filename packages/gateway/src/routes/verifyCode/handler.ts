@@ -224,7 +224,6 @@ export default async function sendVerifyCodeHandler(
     mobile: phoneNumber,
     email
   }
-  //markme change phone number
   await generateAndSendVerificationCode(
     nonce,
     scope,

@@ -114,7 +114,6 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
     const { resentAuthenticationCode } = this.state
-    //markme PASSWORD_RESET
     const templateName =
       window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
         ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION

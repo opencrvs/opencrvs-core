@@ -66,7 +66,6 @@ export default async function verifyUserHandler(
         ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
         : EmailTemplateType.PASSWORD_RESET
 
-    //markme PASSWORD_RESET
     await generateAndSendVerificationCode(
       nonce,
       result.scope,

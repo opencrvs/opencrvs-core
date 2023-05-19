@@ -72,8 +72,6 @@ export function StepTwoContainer() {
     '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
   )
   const field = stepTwoFields.code
-  //markme TWO_FACTOR_AUTHENTICATION
-
   const templateName =
     window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
       ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
