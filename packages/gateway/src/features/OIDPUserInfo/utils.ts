@@ -66,11 +66,6 @@ const pickUserInfo = async (userInfo: OIDPUserInfo) => {
     userInfo.address?.country &&
     (await findAdminStructureLocationWithName(userInfo.address.country))
 
-  // TODO: Remove this once we get a proper country code from E-Signet
-  if (userInfo.address) {
-    userInfo.address.country = 'IND'
-  }
-
   return {
     oidpUserInfo: userInfo,
     stateFhirId,

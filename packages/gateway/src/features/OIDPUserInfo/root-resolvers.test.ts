@@ -59,71 +59,17 @@ describe('get user info from OIDP national id integration', () => {
       .mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
-          id: 'c6f0f99f-ad27-4e6e-9705-a320c1eb3423',
-          meta: {
-            lastUpdated: '2023-03-10T11:55:07.461+00:00'
-          },
+          id: '34abc0a0-912d-4b8b-97fd-def9a2321b0f',
+          meta: { lastUpdated: '2023-05-19T15:39:21.599+00:00' },
           type: 'searchset',
-          total: 1,
+          total: 0,
           link: [
             {
               relation: 'self',
-              url: 'http://localhost:7070/location?name=Ibombo&type=ADMIN_STRUCTURE'
+              url: 'http://localhost:7070/location?name=Farajaland'
             }
           ],
-          entry: [
-            {
-              fullUrl:
-                'http://localhost:7070/location/ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0/_history/5127621b-de2a-4bd2-b530-6413924f2ed2',
-              resource: {
-                resourceType: 'Location',
-                identifier: [
-                  {
-                    system: 'http://opencrvs.org/specs/id/statistical-code',
-                    value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
-                  },
-                  {
-                    system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                    value: 'DISTRICT'
-                  }
-                ],
-                name: 'Ibombo',
-                alias: ['Ibombo'],
-                description: 'oEBf29y8JP8',
-                status: 'active',
-                mode: 'instance',
-                partOf: {
-                  reference: 'Location/5dd96001-7c94-4eeb-b96e-8a987957f7a2'
-                },
-                type: {
-                  coding: [
-                    {
-                      system: 'http://opencrvs.org/specs/location-type',
-                      code: 'ADMIN_STRUCTURE'
-                    }
-                  ]
-                },
-                physicalType: {
-                  coding: [
-                    {
-                      code: 'jdn',
-                      display: 'Jurisdiction'
-                    }
-                  ]
-                },
-                extension: [],
-                meta: {
-                  lastUpdated: '2023-01-18T12:54:05.324+00:00',
-                  versionId: '5127621b-de2a-4bd2-b530-6413924f2ed2'
-                },
-                id: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0'
-              },
-              request: {
-                method: 'PUT',
-                url: 'Location/ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0'
-              }
-            }
-          ]
+          entry: []
         })
       )
       .mockResponseOnce(
@@ -196,6 +142,76 @@ describe('get user info from OIDP national id integration', () => {
           ]
         })
       )
+      .mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: 'c6f0f99f-ad27-4e6e-9705-a320c1eb3423',
+          meta: {
+            lastUpdated: '2023-03-10T11:55:07.461+00:00'
+          },
+          type: 'searchset',
+          total: 1,
+          link: [
+            {
+              relation: 'self',
+              url: 'http://localhost:7070/location?name=Ibombo&type=ADMIN_STRUCTURE'
+            }
+          ],
+          entry: [
+            {
+              fullUrl:
+                'http://localhost:7070/location/ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0/_history/5127621b-de2a-4bd2-b530-6413924f2ed2',
+              resource: {
+                resourceType: 'Location',
+                identifier: [
+                  {
+                    system: 'http://opencrvs.org/specs/id/statistical-code',
+                    value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+                  },
+                  {
+                    system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                    value: 'DISTRICT'
+                  }
+                ],
+                name: 'Ibombo',
+                alias: ['Ibombo'],
+                description: 'oEBf29y8JP8',
+                status: 'active',
+                mode: 'instance',
+                partOf: {
+                  reference: 'Location/5dd96001-7c94-4eeb-b96e-8a987957f7a2'
+                },
+                type: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/location-type',
+                      code: 'ADMIN_STRUCTURE'
+                    }
+                  ]
+                },
+                physicalType: {
+                  coding: [
+                    {
+                      code: 'jdn',
+                      display: 'Jurisdiction'
+                    }
+                  ]
+                },
+                extension: [],
+                meta: {
+                  lastUpdated: '2023-01-18T12:54:05.324+00:00',
+                  versionId: '5127621b-de2a-4bd2-b530-6413924f2ed2'
+                },
+                id: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0'
+              },
+              request: {
+                method: 'PUT',
+                url: 'Location/ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0'
+              }
+            }
+          ]
+        })
+      )
 
     const data = await resolvers.Query.getOIDPUserInfo(
       {},
@@ -209,16 +225,19 @@ describe('get user info from OIDP national id integration', () => {
     expect(fetch.mock.calls[0][0]).toMatch(/oauth\/token$/)
     expect(fetch.mock.calls[1][0]).toMatch(/oidc\/userinfo$/)
     expect(fetch.mock.calls[2][0]).toMatch(
-      /location\?name=Ibombo&type=ADMIN_STRUCTURE$/
+      /Location\?name=Farajaland&type=ADMIN_STRUCTURE$/
     )
     expect(fetch.mock.calls[3][0]).toMatch(
-      /location\?name=Central&type=ADMIN_STRUCTURE$/
+      /Location\?name=Central&type=ADMIN_STRUCTURE$/
     )
-
+    expect(fetch.mock.calls[4][0]).toMatch(
+      /Location\?name=Ibombo&type=ADMIN_STRUCTURE$/
+    )
     expect(data).toEqual({
       oidpUserInfo: jwtPayload,
-      districtFhirId: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-      stateFhirId: '5dd96001-7c94-4eeb-b96e-8a987957f7a2'
+      districtFhirId: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+      locationLevel3FhirId: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+      stateFhirId: null
     })
   })
 
