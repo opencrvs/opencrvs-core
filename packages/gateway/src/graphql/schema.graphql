@@ -1527,6 +1527,7 @@ input QuestionInput {
   dynamicOptions: DynamicOptionInput
   hideInPreview: Boolean
   optionCondition: String
+  hideHeader: Boolean
 }
 
 input SystemSettings {
