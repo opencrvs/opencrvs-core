@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import {
+  CertificatesPayload,
+  ILocation,
+  IOfflineData
+} from '@client/offline/reducer'
 import { ILanguageState } from '@client/i18n/reducer'
 import {
   ILocationDataResponse,
@@ -86,6 +90,17 @@ export type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
+export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
+export type CertificatesLoadedAction = {
+  type: typeof CERTIFICATES_LOADED
+  payload: CertificatesPayload
+}
+
+export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+export type CertificatesLoadFailedAction = {
+  type: typeof CERTIFICATES_LOAD_FAILED
+  payload: Error
+}
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
@@ -203,6 +218,20 @@ export const configLoaded = (
 ): ApplicationConfigLoadedAction => ({
   type: APPLICATION_CONFIG_LOADED,
   payload: payload
+})
+
+export const certificatesLoaded = (
+  payload: CertificatesPayload
+): CertificatesLoadedAction => ({
+  type: CERTIFICATES_LOADED,
+  payload
+})
+
+export const certificatesLoadFailed = (
+  payload: CertificatesLoadFailedAction['payload']
+): CertificatesLoadFailedAction => ({
+  type: CERTIFICATES_LOAD_FAILED,
+  payload
 })
 
 export const configAnonymousUserLoaded = (payload: {
@@ -325,6 +354,8 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | CertificatesLoadedAction
+  | CertificatesLoadFailedAction
   | UpdateOfflineSystemsAction
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction

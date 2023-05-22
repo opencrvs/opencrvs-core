@@ -24,6 +24,7 @@ import { storage } from '@client/storage'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
+  ICertificateTemplateData,
   referenceApi
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
@@ -42,6 +43,7 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { find, isEmpty, merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
+import { getToken } from '@client/utils/authUtils'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -110,6 +112,42 @@ function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
     }
   })
   return languages
+}
+
+export type CertificatesPayload = Awaited<ReturnType<typeof loadCertificates>>
+
+async function loadCertificates(
+  savedCertificates: IOfflineData['templates']['certificates'],
+  fetchedCertificates: ICertificateTemplateData[]
+) {
+  return await Promise.all(
+    fetchedCertificates.map(async (cert) => {
+      const { svgCode: url, event } = cert
+      const res = await fetch(url, {
+        headers: {
+          Authorization: getToken(),
+          'If-None-Match': savedCertificates?.[event].hash ?? ''
+        }
+      })
+      if (res.status === 304) {
+        return {
+          ...cert,
+          svgCode: savedCertificates![event].definition,
+          hash: savedCertificates![event].hash!
+        }
+      }
+      if (!res.ok) {
+        return Promise.reject(
+          new Error(`Fetching certificate for "${event}" failed`)
+        )
+      }
+      return res.text().then((svgCode) => ({
+        ...cert,
+        svgCode,
+        hash: res.headers.get('etag')!
+      }))
+    })
+  )
 }
 
 function extractMessages(questions: IQuestionConfig[], language: string) {
@@ -441,35 +479,21 @@ function reducer(
         deathCertificateTemplate &&
         marriageCertificateTemplate
       ) {
-        const certificatesTemplates = {
-          birth: {
-            id: birthCertificateTemplate.id,
-            definition: birthCertificateTemplate.svgCode,
-            fileName: birthCertificateTemplate.svgFilename,
-            lastModifiedDate: birthCertificateTemplate.svgDateUpdated
+        return loop(
+          {
+            ...state,
+            offlineData: {
+              ...state.offlineData,
+              config,
+              formConfig,
+              systems
+            }
           },
-          death: {
-            id: deathCertificateTemplate.id,
-            definition: deathCertificateTemplate.svgCode,
-            fileName: deathCertificateTemplate.svgFilename,
-            lastModifiedDate: deathCertificateTemplate.svgDateUpdated
-          },
-          marriage: {
-            id: marriageCertificateTemplate.id,
-            definition: marriageCertificateTemplate.svgCode,
-            fileName: marriageCertificateTemplate.svgFilename,
-            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated
-          }
-        }
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          formConfig,
-          systems,
-          templates: {
-            certificates: certificatesTemplates
-          }
-        }
+          Cmd.run(loadCertificates, {
+            successActionCreator: actions.certificatesLoaded,
+            args: [state.offlineData.templates?.certificates, certificates]
+          })
+        )
       } else {
         newOfflineData = {
           ...state.offlineData,
@@ -493,6 +517,63 @@ function reducer(
       }
     }
 
+    case actions.CERTIFICATES_LOADED: {
+      const certificates = action.payload
+      const birthCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Birth
+      )
+
+      const deathCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Death
+      )
+
+      const marriageCertificateTemplate = certificates.find(
+        ({ event }) => event === Event.Marriage
+      )
+      if (
+        birthCertificateTemplate &&
+        deathCertificateTemplate &&
+        marriageCertificateTemplate
+      ) {
+        const certificatesTemplates = {
+          birth: {
+            id: birthCertificateTemplate.id,
+            definition: birthCertificateTemplate.svgCode,
+            fileName: birthCertificateTemplate.svgFilename,
+            lastModifiedDate: birthCertificateTemplate.svgDateUpdated,
+            hash: birthCertificateTemplate.hash
+          },
+          death: {
+            id: deathCertificateTemplate.id,
+            definition: deathCertificateTemplate.svgCode,
+            fileName: deathCertificateTemplate.svgFilename,
+            lastModifiedDate: deathCertificateTemplate.svgDateUpdated,
+            hash: deathCertificateTemplate.hash
+          },
+          marriage: {
+            id: marriageCertificateTemplate.id,
+            definition: marriageCertificateTemplate.svgCode,
+            fileName: marriageCertificateTemplate.svgFilename,
+            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated,
+            hash: marriageCertificateTemplate.hash
+          }
+        }
+        const newOfflineData = {
+          ...state.offlineData,
+          templates: {
+            certificates: certificatesTemplates
+          }
+        }
+        return {
+          ...state,
+          offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+          offlineData: newOfflineData
+        }
+      }
+      return state
+    }
+
+    case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
       return loop(
         {
