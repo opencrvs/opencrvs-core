@@ -398,37 +398,37 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
+      const duplicateErrorFromGQL = errorData?.graphQLErrors?.find(
+        (gqlErr) => gqlErr.extensions.duplicateNotificationMethodError
+      )
 
-      if (isValidJsonString(errorData.message)) {
-        const duplicateError = JSON.parse(errorData.message)
-        if (duplicateError) {
-          if (
-            duplicateError.field &&
-            duplicateError.field === 'emailForNotification'
-          ) {
-            return loop(
-              { ...state, submitting: false, submissionError: false },
-              Cmd.action(
-                showCreateUserDuplicateEmailErrorToast(
-                  TOAST_MESSAGES.FAIL,
-                  duplicateError.conflictingValue
-                )
+      if (duplicateErrorFromGQL) {
+        const duplicateError =
+          duplicateErrorFromGQL.extensions.duplicateNotificationMethodError
+
+        if (
+          duplicateError.field &&
+          duplicateError.field === 'emailForNotification'
+        ) {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserDuplicateEmailErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
               )
             )
-          } else if (
-            duplicateError.field &&
-            duplicateError.field === 'mobile'
-          ) {
-            return loop(
-              { ...state, submitting: false, submissionError: false },
-              Cmd.action(
-                showCreateUserErrorToast(
-                  TOAST_MESSAGES.FAIL,
-                  duplicateError.conflictingValue
-                )
+          )
+        } else if (duplicateError.field && duplicateError.field === 'mobile') {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
               )
             )
-          }
+          )
         }
       }
       return loop(

@@ -61,12 +61,3 @@ export function useUserName() {
     return getUserName(userDetails)
   })
 }
-
-export function isValidJsonString(jsonString: string): boolean {
-  try {
-    JSON.parse(jsonString)
-    return true
-  } catch (error) {
-    return false
-  }
-}
