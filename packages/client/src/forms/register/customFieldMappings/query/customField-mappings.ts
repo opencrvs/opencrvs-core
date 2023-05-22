@@ -10,25 +10,54 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { IFormData, IFormField, IQuestionnaireQuestion } from '@client/forms'
+import {
+  IFormData,
+  IFormField,
+  IQuestionnaireQuestion,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS
+} from '@client/forms'
+import { getFieldOptions } from '@client/forms/utils'
+import { IOfflineData } from '@client/offline/reducer'
 
 export function questionnaireToCustomFieldTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
-  field: IFormField
+  field: IFormField,
+  _: IFormField,
+  offlineCountryConfig?: IOfflineData
 ) {
-  if (queryData.questionnaire) {
-    const selectedQuestion: IQuestionnaireQuestion =
-      queryData.questionnaire.filter(
-        (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
-      )[0]
-    if (selectedQuestion) {
-      /* transformedData[sectionId] is undefined when mapping templates */
-      if (!transformedData[sectionId]) {
-        transformedData[sectionId] = {}
-      }
+  if (!queryData.questionnaire) {
+    return
+  }
+  const selectedQuestion: IQuestionnaireQuestion =
+    queryData.questionnaire.filter(
+      (question: IQuestionnaireQuestion) =>
+        question.fieldId === field.customQuesstionMappingId
+    )[0]
+
+  if (selectedQuestion) {
+    /* transformedData[sectionId] is undefined when mapping templates */
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    if (
+      field.custom &&
+      offlineCountryConfig &&
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS
+    ) {
+      const options = getFieldOptions(field, queryData, offlineCountryConfig)
+      transformedData[sectionId][field.name] =
+        options
+          .find((option) => option.value === selectedQuestion.value)
+          ?.label.defaultMessage?.toString() || selectedQuestion.value
+    } else if (field.custom && field.type === SELECT_WITH_OPTIONS) {
+      transformedData[sectionId][field.name] =
+        field.options
+          .find((option) => option.value === selectedQuestion.value)
+          ?.label.defaultMessage?.toString() || selectedQuestion.value
+    } else {
       transformedData[sectionId][field.name] = selectedQuestion.value
     }
   }
