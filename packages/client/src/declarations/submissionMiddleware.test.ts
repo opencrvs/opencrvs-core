@@ -44,6 +44,7 @@ describe('Submission middleware', () => {
     mutateSpy = vi
       .spyOn(client, 'mutate')
       .mockImplementation(() => Promise.resolve({}))
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
@@ -158,7 +159,7 @@ describe('Submission middleware', () => {
           submissionStatus: ACTION_STATUS_MAP[submissionAction]
         })
         await middleware(action)
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        vi.runAllTimers()
         expect(mutateSpy.mock.calls.length).toBe(1)
         expect(dispatch.mock.calls.length).toBe(4)
         if (
