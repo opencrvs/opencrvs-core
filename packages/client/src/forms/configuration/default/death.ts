@@ -1255,7 +1255,7 @@ export const deathRegisterForms: ISerializedForm = {
       id: DeathSection.Informant,
       viewType: 'form',
       name: formMessageDescriptors.informantName,
-      title: formMessageDescriptors.informantTitle,
+      title: formMessageDescriptors.deathInformantTitle,
       hasDocumentSection: true,
       groups: [
         {
