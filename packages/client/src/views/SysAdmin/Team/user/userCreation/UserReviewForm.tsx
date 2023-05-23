@@ -335,7 +335,7 @@ class UserReviewFormComponent extends React.Component<
           <Container>
             {this.transformSectionData().map((sec, index) => {
               return (
-                <React.Fragment key={index}>
+                <>
                   <ListViewSimplified>
                     {sec.items.map((item, index) => {
                       return (
@@ -348,7 +348,7 @@ class UserReviewFormComponent extends React.Component<
                       )
                     })}
                   </ListViewSimplified>
-                </React.Fragment>
+                </>
               )
             })}
             <Action>{actionComponent}</Action>

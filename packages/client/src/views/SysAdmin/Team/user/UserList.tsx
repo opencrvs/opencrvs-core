@@ -644,7 +644,6 @@ function UserListComponent(props: IProps) {
     if (!getViewOnly(locationId, userDetails, onlyNational)) {
       buttons.push(
         <LocationPicker
-          key={`location-picker-${locationId}`}
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
             props.goToTeamUserList(locationId)
@@ -652,13 +651,7 @@ function UserListComponent(props: IProps) {
           requiredLocationTypes={'CRVS_OFFICE'}
         />
       )
-      buttons.push(
-        <AddUserIcon
-          id="add-user"
-          key={`add-user-${locationId}`}
-          onClick={onClickAddUser}
-        />
-      )
+      buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)
     }
     return buttons
   }
