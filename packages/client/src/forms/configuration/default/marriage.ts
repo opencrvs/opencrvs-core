@@ -359,6 +359,35 @@ export const marriageRegisterForms: ISerializedForm = {
           {
             fieldName: 'witnessTwoSignature',
             operation: 'witnessTwoSignatureTransformer'
+          },
+          {
+            fieldName: 'qrCode',
+            operation: 'QRCodeTransformerTransformer'
+          },
+          {
+            fieldName: 'registrar',
+            operation: 'userTransformer',
+            parameters: ['REGISTERED']
+          },
+          {
+            fieldName: 'registrationAgent',
+            operation: 'userTransformer',
+            parameters: ['VALIDATED']
+          },
+          {
+            fieldName: 'registrationDivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['division']
+          },
+          {
+            fieldName: 'registrationRegion',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['region']
+          },
+          {
+            fieldName: 'registrationSubdivision',
+            operation: 'registrationAddressUserTransformer',
+            parameters: ['subdivision']
           }
         ],
         mutation: {
