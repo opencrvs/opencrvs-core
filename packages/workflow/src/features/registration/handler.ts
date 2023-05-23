@@ -40,7 +40,7 @@ import {
   sendRegisteredNotification,
   isEventNonNotifiable,
   isIntegratingSystemOSIAEnabled,
-  invokeOSIARegistrationNotificationAPI
+  createOsiaTopicAndNotificationAPICall
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -298,6 +298,8 @@ export async function markEventAsRegisteredCallbackHandler(
     OSIA_UIN_VID_NID: osiaUinVidNid
   } = request.payload as IEventRegistrationCallbackPayload
 
+  const osiaUinVidNidWithoutQuotes = osiaUinVidNid?.split('"').join('')
+
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
   }
@@ -344,18 +346,18 @@ export async function markEventAsRegisteredCallbackHandler(
     )
 
     // if birth event, then add OSIA_UIN_NID_VID to child identifier if it's available in payload
-    if (event === EVENT_TYPE.BIRTH && osiaUinVidNid) {
+    if (event === EVENT_TYPE.BIRTH && osiaUinVidNidWithoutQuotes) {
       const osiaIdentifier = patients[0]?.identifier?.find(
         //@ts-ignore
         (identifier) => identifier.type === 'OSIA_UIN_VID_NID'
       )
       if (osiaIdentifier) {
-        osiaIdentifier.value = osiaUinVidNid
+        osiaIdentifier.value = osiaUinVidNidWithoutQuotes
       } else {
         patients[0]?.identifier?.push({
           // @ts-ignore
           type: 'OSIA_UIN_VID_NID',
-          value: osiaUinVidNid
+          value: osiaUinVidNidWithoutQuotes
         })
       }
     }
@@ -378,22 +380,26 @@ export async function markEventAsRegisteredCallbackHandler(
     const osiaEnabled = await isIntegratingSystemOSIAEnabled({
       Authorization: request.headers.authorization
     })
-    if (osiaEnabled && event === EVENT_TYPE.BIRTH && osiaUinVidNid) {
+    if (
+      osiaEnabled &&
+      event === EVENT_TYPE.BIRTH &&
+      osiaUinVidNidWithoutQuotes
+    ) {
       const mothersUIN = await getParentsNID(
         composition,
         MOTHER_SECTION_CODE,
-        'id'
+        'NATIONAL_ID'
       )
       const fathersUIN = await getParentsNID(
         composition,
         FATHER_SECTION_CODE,
-        'id'
+        'NATIONAL_ID'
       )
-      await invokeOSIARegistrationNotificationAPI({
+      await createOsiaTopicAndNotificationAPICall({
         source: 'OpenCRVS',
-        uin: `${osiaUinVidNid}`, // UIN of child
-        uin1: `${mothersUIN}`, // UIN of first parent
-        uin2: `${fathersUIN}` // UIN of second parent
+        uin: osiaUinVidNidWithoutQuotes, // UIN of child
+        uin1: mothersUIN, // UIN of first parent
+        uin2: fathersUIN // UIN of second parent
       })
     }
     if (event !== EVENT_TYPE.MARRIAGE) {

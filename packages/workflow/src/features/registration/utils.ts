@@ -15,7 +15,8 @@ import {
   MOSIP_TOKEN_SEEDER_URL,
   HEARTH_URL,
   APPLICATION_CONFIG_URL,
-  OSIA_NOTIFICATION_SERVICE_URL
+  OSIA_NOTIFICATION_SERVICE_URL,
+  OSIA_TOPIC_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -523,7 +524,10 @@ export async function isIntegratingSystemOSIAEnabled(authHeader: {
   const configResponse: Integration[] | undefined = await res.json()
 
   const isEnabled = configResponse?.find((integration) => {
-    return integration.name === 'OSIA' && integration.status === statuses.ACTIVE
+    return (
+      integration.integratingSystemType === 'OSIA' &&
+      integration.status === statuses.ACTIVE
+    )
   })
 
   return isEnabled
@@ -536,17 +540,33 @@ interface OSIATopicPublicPayload {
   uin2?: string
 }
 
-export function invokeOSIARegistrationNotificationAPI(
+export async function createOsiaTopicAndNotificationAPICall(
   payload: OSIATopicPublicPayload
 ) {
   try {
-    fetch(`${OSIA_NOTIFICATION_SERVICE_URL}osia-topic-notification`, {
+    const response = await fetch(`${OSIA_TOPIC_URL}`, {
       method: 'POST',
-      body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json'
       }
     })
+    if (!response.ok) {
+      throw new Error('Something went wrong creating the OSIA topic')
+    }
+
+    try {
+      await fetch(`${OSIA_NOTIFICATION_SERVICE_URL}`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    } catch (err) {
+      throw new Error(
+        `Unable to send registration topic notification to OSIA: ${err}`
+      )
+    }
   } catch (err) {
     throw new Error(
       `Unable to send registration topic notification to OSIA: ${err}`

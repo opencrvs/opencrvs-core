@@ -16,7 +16,7 @@ import fetch from 'node-fetch'
 const OSIA_USERINFO_ENDPOINT = (nationalId: string) =>
   OSIA_REST_URL &&
   new URL(
-    `${OSIA_SERVICE_VERSION}/persons/${nationalId}`,
+    `${OSIA_SERVICE_VERSION}/persons/${nationalId}/match`,
     OSIA_REST_URL
   ).toString()
 
@@ -31,7 +31,6 @@ export const verifyUserInfoWithOSIA = async ({
   lastName: string
   birthDate: string
 }) => {
-  console.log('MY URL: ', OSIA_USERINFO_ENDPOINT(nationalId))
   const request = await fetch(OSIA_USERINFO_ENDPOINT(nationalId)!, {
     method: 'POST',
     headers: {

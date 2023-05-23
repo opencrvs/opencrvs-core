@@ -718,9 +718,10 @@ export async function getParentsNID(
   composition: fhir.Composition,
   sectionCode: string,
   identifierType: string
-): Promise<string | null> {
+): Promise<string> {
   const section = getSectionEntryBySectionCode(composition, sectionCode)
   const patient = await getFromFhir(`/${section.reference}`)
+
   if (patient.identifier) {
     const nidIndentifier = patient.identifier.find(
       (identifier: { type: string }) => identifier.type === identifierType
@@ -728,10 +729,10 @@ export async function getParentsNID(
     if (nidIndentifier) {
       return nidIndentifier.value
     } else {
-      return null
+      return ''
     }
   } else {
-    return null
+    return ''
   }
 }
 

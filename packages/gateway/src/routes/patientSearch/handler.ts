@@ -165,6 +165,7 @@ export const requestSchemaForPersons = Joi.object({
 }).or(...validAttributes)
 
 export const requestQuerySchemaForPerson = Joi.object({
+  transactionId: Joi.string(),
   attributeNames: Joi.array().items(Joi.string()).min(1).single().required()
 })
 
