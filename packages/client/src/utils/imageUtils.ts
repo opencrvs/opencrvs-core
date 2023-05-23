@@ -117,3 +117,14 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
     data: canvas.toDataURL('image/jpeg')
   }
 }
+
+export const urlToBase64 = (url: string) => {
+  return fetch(url)
+    .then((response) => response.arrayBuffer())
+    .then((buffer) => {
+      const binary = Array.from(new Uint8Array(buffer))
+        .map((byte) => String.fromCharCode(byte))
+        .join('')
+      return `data:image/png;base64,${btoa(binary)}`
+    })
+}
