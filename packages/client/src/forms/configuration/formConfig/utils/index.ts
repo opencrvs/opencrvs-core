@@ -176,6 +176,13 @@ export function generateConfigFields(
           if (!index) return [currentConfigField]
           const previousConfigField = configFields[configFields.length - 1]
           if (
+            /**
+             *
+             * Bypass handle preview group for
+             * question config in case of custom question
+             *
+             */
+            !isCustomConfigField(currentConfigField) &&
             isPreviewGroupConfigField(previousConfigField) &&
             isPreviewGroupConfigField(currentConfigField) &&
             previousConfigField.previewGroup === currentConfigField.previewGroup

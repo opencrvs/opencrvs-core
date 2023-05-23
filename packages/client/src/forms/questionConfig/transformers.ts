@@ -130,7 +130,8 @@ export function questionsTransformer(
       extraValue,
       mapping,
       dynamicOptions,
-      hideHeader
+      hideHeader,
+      previewGroup
     }) => {
       if (custom) {
         return {
@@ -160,7 +161,8 @@ export function questionsTransformer(
           extraValue,
           mapping,
           dynamicOptions,
-          hideHeader
+          hideHeader,
+          previewGroup
         } as ICustomQuestionConfig
       }
 

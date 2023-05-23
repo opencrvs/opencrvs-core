@@ -2061,6 +2061,7 @@ export type QuestionInput = {
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
+  previewGroup?: InputMaybe<Scalars['String']>
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
   unit?: InputMaybe<Array<MesssageInput>>
