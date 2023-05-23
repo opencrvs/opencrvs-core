@@ -66,6 +66,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   conditionals?: IConditionalConfig[]
   optionCondition?: string
   validator?: IValidatorDescriptor[]
+  label?: Message
   helperText?: Message
   hideHeader?: boolean
   hideInPreview?: boolean

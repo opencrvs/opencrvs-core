@@ -183,6 +183,11 @@ export function questionsTransformer(
       if (validator && validator.length > 0) {
         defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
       }
+      if (label && label.length > 0) {
+        defaultQuestionConfig.label = getDefaultLanguageMessage(
+          label as IMessage[]
+        )
+      }
 
       if (helperText) {
         defaultQuestionConfig.helperText = getDefaultLanguageMessage(
