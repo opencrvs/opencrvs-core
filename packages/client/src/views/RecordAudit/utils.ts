@@ -165,20 +165,11 @@ export const getLocation = (
       declaration.data?.deathEvent?.internationalState?.toString() ||
       EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
-    locationType =
-      declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
-    locationId =
-      declaration.data?.child?.birthLocation?.toString() || EMPTY_STRING
+    if (declaration.data?.child?.placeOfBirthNotOnTheList) {
+      return declaration.data?.child.placeOfBirthOther || EMPTY_STRING
+    }
 
-    district = declaration.data?.child?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.child?.state?.toString() || EMPTY_STRING
-    country = declaration.data?.child?.country?.toString() || EMPTY_STRING
-
-    // when address is outside of default country
-    internationalDistrict =
-      declaration.data?.child?.internationalDistrict?.toString() || EMPTY_STRING
-    internationalState =
-      declaration.data?.child?.internationalState?.toString() || EMPTY_STRING
+    return declaration.data?.child.placeOfBirthLocality || EMPTY_STRING
   } else if (declaration.event === Event.Marriage) {
     district =
       declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
