@@ -280,8 +280,8 @@ function GeneratedInputField({
         files={value as IAttachmentValue}
         error={error}
         onComplete={(file) => {
-          onSetFieldValue(fieldDefinition.name, file)
           setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+          onSetFieldValue(fieldDefinition.name, file)
         }}
         onUploadingStateChanged={onUploadingStateChanged}
         requiredErrorMessage={requiredErrorMessage}

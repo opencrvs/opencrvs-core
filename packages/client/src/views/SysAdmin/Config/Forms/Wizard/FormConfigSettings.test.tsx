@@ -27,7 +27,7 @@ beforeEach(async () => {
         resolve({
           data: {
             updateApplicationConfig: {
-              HIDE_EVENT_REGISTER_INFORMATION: false,
+              HIDE_EVENT_REGISTER_INFORMATION: true,
               ADDRESSES: 1
             }
           }
