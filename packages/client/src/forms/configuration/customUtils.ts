@@ -87,7 +87,8 @@ export function createCustomField({
   hideInPreview,
   dynamicOptions,
   optionCondition,
-  hideHeader
+  hideHeader,
+  previewGroup
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -99,6 +100,7 @@ export function createCustomField({
     hideInPreview,
     helperText: helperText && getDefaultLanguageMessage(helperText),
     optionCondition,
+    previewGroup,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: initialValue || '',
     validator: validator || [],
