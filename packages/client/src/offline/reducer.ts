@@ -114,39 +114,46 @@ function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
   return languages
 }
 
-export type CertificatesPayload = Awaited<ReturnType<typeof loadCertificates>>
+export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
+
+async function loadCertificate(
+  savedCertificate: ISVGTemplate | undefined,
+  certificate: ICertificateTemplateData
+) {
+  const { svgCode: url, event } = certificate
+  const res = await fetch(url, {
+    headers: {
+      Authorization: getToken(),
+      'If-None-Match': savedCertificate?.hash ?? ''
+    }
+  })
+  if (res.status === 304) {
+    return {
+      ...certificate,
+      svgCode: savedCertificate!.definition,
+      hash: savedCertificate!.hash!
+    }
+  }
+  if (!res.ok) {
+    return Promise.reject(
+      new Error(`Fetching certificate for "${event}" failed`)
+    )
+  }
+  return res.text().then((svgCode) => ({
+    ...certificate,
+    svgCode,
+    hash: res.headers.get('etag')!
+  }))
+}
 
 async function loadCertificates(
   savedCertificates: IOfflineData['templates']['certificates'],
   fetchedCertificates: ICertificateTemplateData[]
 ) {
   return await Promise.all(
-    fetchedCertificates.map(async (cert) => {
-      const { svgCode: url, event } = cert
-      const res = await fetch(url, {
-        headers: {
-          Authorization: getToken(),
-          'If-None-Match': savedCertificates?.[event].hash ?? ''
-        }
-      })
-      if (res.status === 304) {
-        return {
-          ...cert,
-          svgCode: savedCertificates![event].definition,
-          hash: savedCertificates![event].hash!
-        }
-      }
-      if (!res.ok) {
-        return Promise.reject(
-          new Error(`Fetching certificate for "${event}" failed`)
-        )
-      }
-      return res.text().then((svgCode) => ({
-        ...cert,
-        svgCode,
-        hash: res.headers.get('etag')!
-      }))
-    })
+    fetchedCertificates.map((cert) =>
+      loadCertificate(savedCertificates?.[cert.event], cert)
+    )
   )
 }
 
@@ -377,26 +384,43 @@ function reducer(
     case actions.UPDATE_OFFLINE_CERTIFICATE: {
       const { templates } = state.offlineData
       const { certificate } = action.payload
-      if (!templates || !templates.certificates) return state
-      else
-        return {
-          ...state,
-          offlineData: {
-            ...state.offlineData,
-            templates: {
-              ...templates,
-              certificates: {
-                ...templates.certificates,
-                [certificate.event]: {
-                  ...templates.certificates[certificate.event],
-                  definition: certificate.svgCode,
-                  fileName: certificate.svgFilename,
-                  lastModifiedDate: certificate.svgDateUpdated
-                }
+      if (!templates || !templates.certificates) {
+        return state
+      }
+      return loop(
+        state,
+        Cmd.run(loadCertificate, {
+          successActionCreator: actions.certificateLoaded,
+          failActionCreator: actions.certificateLoadFailed,
+          args: [templates.certificates[certificate.event], certificate]
+        })
+      )
+    }
+    case actions.CERTIFICATE_LOADED: {
+      const { templates } = state.offlineData
+      const certificate = action.payload
+      if (!templates || !templates.certificates) {
+        return state
+      }
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...templates,
+            certificates: {
+              ...templates.certificates,
+              [certificate.event]: {
+                ...templates.certificates[certificate.event],
+                definition: certificate.svgCode,
+                fileName: certificate.svgFilename,
+                lastModifiedDate: certificate.svgDateUpdated,
+                hash: certificate.hash
               }
             }
           }
         }
+      }
     }
     case actions.UPDATE_OFFLINE_CONFIG: {
       merge(window.config, action.payload.config)

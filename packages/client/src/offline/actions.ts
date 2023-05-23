@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  CertificatesPayload,
+  CertificatePayload,
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
@@ -24,7 +24,7 @@ import {
   ICertificateTemplateData,
   IApplicationConfigAnonymous
 } from '@client/utils/referenceApi'
-import { User, System } from '@client/utils/gateway'
+import { System } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
@@ -90,10 +90,22 @@ export type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
+export const CERTIFICATE_LOADED = 'OFFLINE/CERTIFICATE_LOADED'
+export type CertificateLoadedAction = {
+  type: typeof CERTIFICATE_LOADED
+  payload: CertificatePayload
+}
+
+export const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
+export type CertificateLoadFailedAction = {
+  type: typeof CERTIFICATE_LOAD_FAILED
+  payload: Error
+}
+
 export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
 export type CertificatesLoadedAction = {
   type: typeof CERTIFICATES_LOADED
-  payload: CertificatesPayload
+  payload: CertificatePayload[]
 }
 
 export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
@@ -220,8 +232,22 @@ export const configLoaded = (
   payload: payload
 })
 
+export const certificateLoaded = (
+  payload: CertificatePayload
+): CertificateLoadedAction => ({
+  type: CERTIFICATE_LOADED,
+  payload
+})
+
+export const certificateLoadFailed = (
+  payload: CertificateLoadFailedAction['payload']
+): CertificateLoadFailedAction => ({
+  type: CERTIFICATE_LOAD_FAILED,
+  payload
+})
+
 export const certificatesLoaded = (
-  payload: CertificatesPayload
+  payload: CertificatePayload[]
 ): CertificatesLoadedAction => ({
   type: CERTIFICATES_LOADED,
   payload
@@ -354,6 +380,8 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | CertificateLoadedAction
+  | CertificateLoadFailedAction
   | CertificatesLoadedAction
   | CertificatesLoadFailedAction
   | UpdateOfflineSystemsAction
