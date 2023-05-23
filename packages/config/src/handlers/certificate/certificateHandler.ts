@@ -109,7 +109,12 @@ export async function createCertificateHandler(
   })
   // save new certificate
   try {
-    const certificateResponse = await Certificate.create(newCertificate)
+    const certificateResponse = await Certificate.create(newCertificate).then(
+      (cert) =>
+        certificateWithDocumentUrl(cert, {
+          Authorization: request.headers.authorization
+        })
+    )
     return h.response(certificateResponse).code(201)
   } catch (err) {
     logger.error(err)
@@ -124,8 +129,9 @@ export async function updateCertificateHandler(
 ) {
   try {
     const certificate = request.payload as ICertificateModel
-    const existingCertificate: ICertificateModel | null =
-      await Certificate.findOne({ _id: certificate.id })
+    const existingCertificate = await Certificate.findOne({
+      _id: certificate.id
+    }).lean()
     if (!existingCertificate) {
       throw badRequest(`No certificate found by given id: ${certificate.id}`)
     }
@@ -142,7 +148,13 @@ export async function updateCertificateHandler(
       { _id: existingCertificate._id },
       existingCertificate
     )
-    return h.response(existingCertificate).code(201)
+    const withDocumentUrl = await certificateWithDocumentUrl(
+      existingCertificate,
+      {
+        Authorization: request.headers.authorization
+      }
+    )
+    return h.response(withDocumentUrl).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
