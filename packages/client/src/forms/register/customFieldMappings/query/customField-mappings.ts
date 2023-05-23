@@ -11,6 +11,7 @@
  */
 
 import {
+  CHECKBOX,
   IFormData,
   IFormField,
   IQuestionnaireQuestion,
@@ -37,28 +38,41 @@ export function questionnaireToCustomFieldTransformer(
         question.fieldId === field.customQuesstionMappingId
     )[0]
 
-  if (selectedQuestion) {
-    /* transformedData[sectionId] is undefined when mapping templates */
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-    if (
-      field.custom &&
-      offlineCountryConfig &&
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS
-    ) {
+  /* transformedData[sectionId] is undefined when mapping templates */
+  if (!selectedQuestion) {
+    return
+  }
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (!field.custom) {
+    transformedData[sectionId][field.name] = selectedQuestion.value
+    return
+  }
+
+  switch (field.type) {
+    case SELECT_WITH_DYNAMIC_OPTIONS:
+      if (!offlineCountryConfig) {
+        return
+      }
       const options = getFieldOptions(field, queryData, offlineCountryConfig)
       transformedData[sectionId][field.name] =
         options
           .find((option) => option.value === selectedQuestion.value)
           ?.label.defaultMessage?.toString() || selectedQuestion.value
-    } else if (field.custom && field.type === SELECT_WITH_OPTIONS) {
+      break
+    case SELECT_WITH_OPTIONS:
       transformedData[sectionId][field.name] =
         field.options
           .find((option) => option.value === selectedQuestion.value)
           ?.label.defaultMessage?.toString() || selectedQuestion.value
-    } else {
+      break
+    case CHECKBOX:
+      transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
+      break
+
+    default:
       transformedData[sectionId][field.name] = selectedQuestion.value
-    }
   }
 }
