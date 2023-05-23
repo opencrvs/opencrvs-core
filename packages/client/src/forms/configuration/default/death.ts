@@ -1271,6 +1271,15 @@ export const deathRegisterForms: ISerializedForm = {
                 }
               }
             }
+          ],
+          previewGroups: [
+            {
+              id: 'placeOfDeathAddress',
+              label: {
+                id: 'form.field.label.placeOfDeath',
+                defaultMessage: 'Place of death'
+              }
+            }
           ]
         }
       ]

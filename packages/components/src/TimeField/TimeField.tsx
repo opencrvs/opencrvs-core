@@ -48,7 +48,29 @@ export type ITimeFieldProps = IProps &
   Omit<ITextInputProps, 'onChange' | 'value'>
 
 function getFormattedValue(time: { hh: string; mm: string }) {
-  return `${time.hh.padStart(2, '0')}-${time.mm.padStart(2, '0')}`
+  return `${time.hh.padStart(2, '0')}:${time.mm.padStart(2, '0')}`
+}
+
+function isValidMinutes(minutes: string) {
+  if (minutes.length !== 2) {
+    return false
+  }
+  const parsed = Number(minutes)
+  if (isNaN(parsed)) {
+    return false
+  }
+  return parsed >= 0 && parsed <= 59
+}
+
+function isValidHours(hours: string) {
+  if (hours.length !== 2) {
+    return false
+  }
+  const parsed = Number(hours)
+  if (isNaN(parsed)) {
+    return false
+  }
+  return parsed >= 0 && parsed <= 23
 }
 
 export function TimeField(props: ITimeFieldProps) {
@@ -69,14 +91,22 @@ export function TimeField(props: ITimeFieldProps) {
 
   React.useEffect(() => {
     function getInitialState(time: string): IState {
-      const dateSegmentVals = time.split('-')
+      const dateSegmentVals = time.split(':')
       return {
         hh: dateSegmentVals[0],
         mm: dateSegmentVals[1]
       }
     }
 
-    const isValidTime = (time: string) => time.split('-').length === 2
+    const isValidTime = (time: string) => {
+      const parts = time.split(':')
+
+      if (parts.length !== 2) {
+        return false
+      }
+
+      return isValidHours(parts[0]) && isValidMinutes(parts[1])
+    }
 
     if (props.value && isValidTime(props.value)) {
       setState(getInitialState(props.value))
@@ -99,8 +129,20 @@ export function TimeField(props: ITimeFieldProps) {
       setState((state) => ({ ...state, mm: val }))
     }
   }
+
+  function padStart(part: 'hh' | 'mm') {
+    return (event: React.FocusEvent<HTMLInputElement>) => {
+      const val = event.target.value
+      if (part === 'hh') {
+        setState((state) => ({ ...state, hh: val.padStart(2, '0') }))
+      } else if (part === 'mm') {
+        setState((state) => ({ ...state, mm: val.padStart(2, '0') }))
+      }
+    }
+  }
+
   React.useEffect(() => {
-    if (state.hh && state.mm) {
+    if (isValidHours(state.hh) && isValidMinutes(state.mm)) {
       onChange(getFormattedValue(state))
     }
   }, [state, onChange])
@@ -121,6 +163,7 @@ export function TimeField(props: ITimeFieldProps) {
         max={31}
         value={state.hh}
         onChange={change}
+        onBlur={padStart('hh')}
         onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
           event.currentTarget.blur()
         }}
@@ -139,6 +182,7 @@ export function TimeField(props: ITimeFieldProps) {
         max={31}
         value={state.mm}
         onChange={change}
+        onBlur={padStart('mm')}
         onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
           event.currentTarget.blur()
         }}

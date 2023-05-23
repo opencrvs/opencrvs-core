@@ -99,4 +99,6 @@ input QuestionInput {
   dynamicOptions: DynamicOptionInput
   hideInPreview: Boolean
   optionCondition: String
+  hideHeader: Boolean
+  previewGroup: String
 }

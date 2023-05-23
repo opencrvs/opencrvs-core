@@ -990,6 +990,13 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.nameInEnglishPreviewGroup,
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'placeOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
             }
           ]
         }

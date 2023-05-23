@@ -196,6 +196,7 @@ export const userSectionFormType: ISerializedFormSection = {
           required: true,
           hidden: false,
           hideValueInPreview: false,
+          helperText: userFormMessages.titleHelperText,
           initialValue: '',
           validator: [],
           conditionals: []

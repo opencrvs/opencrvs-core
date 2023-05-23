@@ -129,7 +129,9 @@ export function questionsTransformer(
       validator,
       extraValue,
       mapping,
-      dynamicOptions
+      dynamicOptions,
+      hideHeader,
+      previewGroup
     }) => {
       if (custom) {
         return {
@@ -158,7 +160,9 @@ export function questionsTransformer(
           validator,
           extraValue,
           mapping,
-          dynamicOptions
+          dynamicOptions,
+          hideHeader,
+          previewGroup
         } as ICustomQuestionConfig
       }
 
@@ -172,6 +176,7 @@ export function questionsTransformer(
         conditionals: conditionals || undefined,
         hideInPreview: hideInPreview ?? false,
         optionCondition: optionCondition || undefined,
+        hideHeader: hideHeader ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
 
