@@ -1010,7 +1010,7 @@ export const birthRegisterForms: ISerializedForm = {
         description: 'Form section name for Informant',
         id: 'form.section.informant.name'
       },
-      title: formMessageDescriptors.informantTitle,
+      title: formMessageDescriptors.birthInformantTitle,
       hasDocumentSection: true,
       groups: [
         {
