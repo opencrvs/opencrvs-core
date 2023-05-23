@@ -2427,10 +2427,11 @@ export type User = {
   creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
+  emailForNotification?: Maybe<Scalars['String']>
   id: Scalars['ID']
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
-  mobile: Scalars['String']
+  mobile?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
@@ -2483,9 +2484,10 @@ export type UserInput = {
   catchmentArea?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   device?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
+  emailForNotification?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
-  mobile: Scalars['String']
+  mobile?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
@@ -2917,7 +2919,7 @@ export type FetchUserQuery = {
     creationDate: string
     username?: string | null
     practitionerId: string
-    mobile: string
+    mobile?: string | null
     systemRole: SystemRoleType
     status: Status
     role: {
@@ -3243,7 +3245,7 @@ export type SearchUsersQuery = {
       id: string
       username?: string | null
       systemRole: SystemRoleType
-      mobile: string
+      mobile?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -3307,7 +3309,9 @@ export type GetUserQuery = {
     __typename?: 'User'
     id: string
     username?: string | null
-    mobile: string
+    mobile?: string | null
+    email?: string | null
+    emailForNotification?: string | null
     systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
@@ -7568,7 +7572,7 @@ export type GetUserByMobileQuery = {
     __typename?: 'User'
     id: string
     username?: string | null
-    mobile: string
+    mobile?: string | null
     systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'Role'; _id: string }

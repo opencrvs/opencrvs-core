@@ -96,6 +96,7 @@ interface IUserMessages
   systemLanguage: MessageDescriptor
   profileImage: MessageDescriptor
   duplicateUserMobileErrorMessege: MessageDescriptor
+  duplicateUserEmailErrorMessege: MessageDescriptor
   enterPinLabel: MessageDescriptor
 }
 interface IDynamicUserMessages
@@ -498,6 +499,13 @@ const messagesToDefine: IUserMessages = {
     description:
       'This error messege shows when user try to input already exsisted mobile number',
     id: 'system.user.duplicateMobileError'
+  },
+  duplicateUserEmailErrorMessege: {
+    defaultMessage:
+      '{email} is already used by another user. Please use a different email',
+    description:
+      'This error message shows when user tries to input an already existing email',
+    id: 'system.user.duplicateEmailError'
   },
   enterPinLabel: {
     id: 'system.user.unlock.pinLabel',

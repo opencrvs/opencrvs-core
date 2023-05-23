@@ -91,6 +91,7 @@ export const GET_USER = gql`
       }
       username
       mobile
+      emailForNotification
       identifier {
         system
         value
