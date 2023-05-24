@@ -136,9 +136,11 @@ export async function updateCertificateHandler(
       throw badRequest(`No certificate found by given id: ${certificate.id}`)
     }
     // Update existing certificate's fields
-    existingCertificate.svgCode = await uploadDocument(certificate.svgCode, {
-      Authorization: request.headers.authorization
-    })
+    if (certificate.svgCode) {
+      existingCertificate.svgCode = await uploadDocument(certificate.svgCode, {
+        Authorization: request.headers.authorization
+      })
+    }
     existingCertificate.svgFilename = certificate.svgFilename
     existingCertificate.svgDateUpdated = Date.now()
     existingCertificate.user = certificate.user
