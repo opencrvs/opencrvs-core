@@ -358,9 +358,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               fields={this.group.fields}
               draftData={declaration.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
-              requiredErrorMessage={
-                messages.correctionSummaryproofOfPaymentError
-              }
+              requiredErrorMessage={messages.correctionRequiredLabel}
             />
           </Content>
         </ActionPageLight>
