@@ -116,7 +116,7 @@ export function createCustomField({
     }),
     dynamicOptions: {},
     hideHeader,
-    mapping: mapping || {
+    mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
       },
@@ -125,8 +125,9 @@ export function createCustomField({
       },
       template: {
         fieldName: createCustomFieldHandlebarName(fieldId),
-        operation: 'questionnaireToCustomFieldTransformer'
-      }
+        operation: 'questionnaireToTemplateFieldTransformer'
+      },
+      ...(mapping || {})
     }
   }
 
