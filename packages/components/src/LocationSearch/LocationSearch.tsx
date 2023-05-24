@@ -194,7 +194,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
     })
     if (this.props.onBlur && this.props.searchHandler) {
       this.props.searchHandler({
-        id: this.state.selectedText ? '0' : '',
+        id: '',
         searchableText: this.state.selectedText || '',
         displayLabel: this.state.selectedText || ''
       })

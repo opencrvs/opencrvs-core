@@ -135,10 +135,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
   modifyData = (values: any) => {
     const { formData } = this.props
-    if (
-      values['registrationOffice'] !== '0' &&
-      values['registrationOffice'] !== ''
-    ) {
+    if (values['registrationOffice'] !== '') {
       if (values.role) {
         const getSystemRoles = this.props.systemRoleMap
         values.systemRole = getSystemRoles[values.role]

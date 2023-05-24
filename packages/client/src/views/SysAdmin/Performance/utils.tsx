@@ -196,11 +196,11 @@ export function isUnderJurisdictionOfUser(
 ) {
   if (!jurisdictionLocation) return false
 
-  while (locationId !== jurisdictionLocation && locationId !== '0') {
+  while (locationId !== jurisdictionLocation && locationId !== '') {
     locationId = locations[locationId].partOf.split('/')[1]
   }
 
-  return locationId !== '0'
+  return locationId !== ''
 }
 
 export function getPrimaryLocationIdOfOffice(
