@@ -20,6 +20,10 @@ describe('Performance util tests', () => {
       const mockLocationData = {
         id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
         type: 'ADMIN_STRUCTURE' as GQLLocationType,
+        name: 'Ibombo District Office',
+        status: 'active',
+        partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+        alias: ['Ibombo District Office'],
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/jurisdiction-type',
@@ -35,6 +39,10 @@ describe('Performance util tests', () => {
       const mockFacilitiesData = {
         id: 'e7fa94ba-5582-48f9-ba43-cf41d88253c6',
         type: 'CRVS_OFFICE' as GQLLocationType,
+        name: 'Ibombo District Office',
+        status: 'active',
+        partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+        alias: ['Ibombo District Office'],
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/internal-id',

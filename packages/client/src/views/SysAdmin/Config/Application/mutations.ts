@@ -48,6 +48,7 @@ const applicationConfigMutation = gql`
           LATE
           DELAYED
         }
+        PRINT_IN_ADVANCE
       }
       DEATH {
         REGISTRATION_TARGET
@@ -55,6 +56,15 @@ const applicationConfigMutation = gql`
           ON_TIME
           DELAYED
         }
+        PRINT_IN_ADVANCE
+      }
+      MARRIAGE {
+        REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          DELAYED
+        }
+        PRINT_IN_ADVANCE
       }
     }
   }

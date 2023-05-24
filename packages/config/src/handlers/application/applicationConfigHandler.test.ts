@@ -59,6 +59,13 @@ const mockConfig = {
       DELAYED: 0
     }
   },
+  MARRIAGE: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
+  },
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
@@ -101,7 +108,7 @@ describe('applicationHandler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/loginConfig'
+      url: '/publicConfig'
     })
     expect(res.statusCode).toBe(200)
   })

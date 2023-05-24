@@ -65,6 +65,19 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         use
       }
     }
+    ... on MarriageEventSearchSet {
+      dateOfMarriage
+      brideName {
+        firstNames
+        familyName
+        use
+      }
+      groomName {
+        firstNames
+        familyName
+        use
+      }
+    }
   }
 `
 
@@ -81,12 +94,17 @@ export const REGISTRATION_HOME_QUERY = gql`
     $approvalSkip: Int
     $externalValidationSkip: Int
     $printSkip: Int
+    $issueSkip: Int
   ) {
     inProgressTab: searchEvents(
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
-        compositionType: ["birth-declaration", "death-declaration"]
+        compositionType: [
+          "birth-declaration"
+          "death-declaration"
+          "marriage-declaration"
+        ]
       }
       count: $pageSize
       skip: $inProgressSkip
@@ -100,7 +118,11 @@ export const REGISTRATION_HOME_QUERY = gql`
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
-        compositionType: ["birth-notification", "death-notification"]
+        compositionType: [
+          "birth-notification"
+          "death-notification"
+          "marriage-notification"
+        ]
       }
       count: $pageSize
       skip: $healthSystemSkip
@@ -171,6 +193,19 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $printSkip
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    issueTab: searchEvents(
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["CERTIFIED"]
+      }
+      count: $pageSize
+      skip: $issueSkip
     ) {
       totalItems
       results {

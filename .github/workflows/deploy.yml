@@ -65,7 +65,7 @@ on:
           - qa
           - production
           - config
-          - migrate
+          - demo
       core-image-tag:
         description: Core DockerHub image tag
         required: false
@@ -79,7 +79,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        node-version: [14.18.0]
+        node-version: [16.20.0]
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
@@ -220,8 +220,8 @@ jobs:
         run: |
           yarn deploy:config --host=farajaland-config.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
 
-      - name: Deploy to migrate
-        if: ${{ github.event.inputs.environment == 'migrate' }}
+      - name: Deploy to demo
+        if: ${{ github.event.inputs.environment == 'demo' }}
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -238,4 +238,4 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:prod --host=farajaland-migrate.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
+          yarn deploy:prod --host=farajaland-migrate.opencrvs.org --version=v1.2.0 --country_config_version=v1.2.0 --country_config_path=opencrvs-farajaland --replicas=1

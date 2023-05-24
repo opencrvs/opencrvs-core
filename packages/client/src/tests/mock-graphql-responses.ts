@@ -215,8 +215,8 @@ export const birthDeclarationForReview = {
       },
       user: {
         id: '6241918dd6dc544f60d8f73a',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        role: 'CHAIRMAN',
+        systemRole: 'LOCAL_REGISTRAR',
         name: [
           {
             firstNames: 'Kennedy',
@@ -251,8 +251,8 @@ export const birthDeclarationForReview = {
       },
       user: {
         id: '6241918dd6dc544f60d8f738',
-        type: 'CHA',
-        role: 'FIELD_AGENT',
+        role: 'CHA',
+        systemRole: 'FIELD_AGENT',
         name: [
           {
             firstNames: 'Kalusha',
@@ -444,8 +444,8 @@ export const deathDeclarationForReview = {
       },
       user: {
         id: '6241918dd6dc544f60d8f73a',
-        type: 'CHAIRMAN',
-        role: 'LOCAL_REGISTRAR',
+        role: 'CHAIRMAN',
+        systemRole: 'LOCAL_REGISTRAR',
         name: [
           {
             firstNames: 'Kennedy',
@@ -480,8 +480,8 @@ export const deathDeclarationForReview = {
       },
       user: {
         id: '6241918dd6dc544f60d8f738',
-        type: 'CHA',
-        role: 'FIELD_AGENT',
+        role: 'CHA',
+        systemRole: 'FIELD_AGENT',
         name: [
           {
             firstNames: 'Kalusha',
@@ -679,8 +679,8 @@ export const lateBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -716,8 +716,8 @@ export const lateBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -756,8 +756,8 @@ export const lateBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -902,8 +902,8 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -939,8 +939,8 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -979,8 +979,8 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1240,8 +1240,8 @@ export const lateBirthCertificationResponseWithFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1277,8 +1277,8 @@ export const lateBirthCertificationResponseWithFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1317,8 +1317,8 @@ export const lateBirthCertificationResponseWithFather = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1517,8 +1517,8 @@ export const onTimeBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1554,8 +1554,8 @@ export const onTimeBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1590,8 +1590,8 @@ export const onTimeBirthCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1854,8 +1854,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1891,8 +1891,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1927,8 +1927,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -1963,8 +1963,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -2013,8 +2013,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f73a',
-                type: 'CHAIRMAN',
-                role: 'LOCAL_REGISTRAR',
+                role: 'CHAIRMAN',
+                systemRole: 'LOCAL_REGISTRAR',
                 name: [
                   {
                     firstNames: 'Kennedy',
@@ -2049,8 +2049,8 @@ export const deathCertificationResponse = [
               },
               user: {
                 id: '6241918dd6dc544f60d8f738',
-                type: 'CHA',
-                role: 'FIELD_AGENT',
+                role: 'CHA',
+                systemRole: 'FIELD_AGENT',
                 name: [
                   {
                     firstNames: 'Kalusha',

@@ -27,3 +27,12 @@ export const REQUEST_DEATH_REG_CORRECTION = gql`
     requestDeathRegistrationCorrection(id: $id, details: $details)
   }
 `
+
+export const REQUEST_MARRIAGE_REG_CORRECTION = gql`
+  mutation requestMarriageRegistrationCorrection(
+    $id: ID!
+    $details: MarriageRegistrationInput!
+  ) {
+    requestMarriageRegistrationCorrection(id: $id, details: $details)
+  }
+`

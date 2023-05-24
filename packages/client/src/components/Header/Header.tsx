@@ -33,6 +33,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
+import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
   NATIONAL_ID_TEXT,
@@ -46,16 +47,10 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  ArrowBack,
-  Plus,
-  SearchDark,
-  Activity,
-  SearchBlue,
-  AddUser
-} from '@opencrvs/components/lib/icons'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { Button } from '@opencrvs/components/lib/Button'
+
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -78,11 +73,9 @@ import {
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
-import { Hamburger } from './Hamburger'
-import { Event } from '@client/utils/gateway'
 
 type IStateProps = {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   language: string
 }
 
@@ -142,24 +135,6 @@ enum ACTIVE_MENU_ITEM {
   INTEGRATION
 }
 
-const StyledPrimaryButton = styled(PrimaryButton)`
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:focus {
-    background: ${({ theme }) => theme.colors.yellow};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-`
-
 const Search = styled(SearchTool)`
   position: static;
   left: calc(50% - 624px / 2 + 24px);
@@ -208,7 +183,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         ],
         mobileRight: [
           {
-            icon: () => <Activity stroke={theme.colors.primary} />,
+            icon: () => <Icon name="Activity" size="medium" color="primary" />,
             handler: () =>
               this.props.mapPerformanceClickHandler &&
               this.props.mapPerformanceClickHandler()
@@ -226,12 +201,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ],
           mobileRight: [
             {
-              icon: () => <SearchBlue />,
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
               handler: () =>
                 this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -243,8 +222,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ]
         }
       } else if (
-        this.props.userDetails?.role &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role)
+        this.props.userDetails?.systemRole &&
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
       ) {
         return {
           mobileLeft: [
@@ -255,7 +234,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ],
           mobileRight: [
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -277,8 +258,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      this.props.userDetails?.role &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+      this.props.userDetails?.systemRole &&
+      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
     ) {
       return {
         mobileLeft: [
@@ -309,7 +290,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ],
           mobileRight: [
             {
-              icon: () => <SearchDark />,
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
               handler: () => this.props.goToSearch()
             }
           ]
@@ -324,7 +307,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   isLandingPage = () => {
-    const role = this.props.userDetails && this.props.userDetails.role
+    const role = this.props.userDetails && this.props.userDetails.systemRole
     const location = this.props.history.location.pathname
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
@@ -349,36 +332,31 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
-        invertIcon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <Icon name="Award" size="small" />,
-        invertIcon: <Icon name="Award" size="small" />,
+        icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <Icon name="CreditCard" size="small" />,
-        invertIcon: <Icon name="CreditCard" />,
+        icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
-        invertIcon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
-        invertIcon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
@@ -401,7 +379,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
         navigationList={
-          FIELD_AGENT_ROLES.includes(this.props.userDetails?.role as string)
+          FIELD_AGENT_ROLES.includes(
+            this.props.userDetails?.systemRole as string
+          )
             ? undefined
             : navigationList
         }
@@ -414,8 +394,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToTeamView(props: IFullProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToTeamSearchAction()
       } else {
         return goToTeamUserListAction(
@@ -427,8 +407,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToPerformanceView(props: IFullProps) {
     const { userDetails, goToPerformanceHomeAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
@@ -476,16 +456,19 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         element: (
           <>
             {!(
-              this.props.userDetails?.role &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+              this.props.userDetails?.systemRole &&
+              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
             ) && (
               <HeaderCenter>
-                <StyledPrimaryButton
+                <Button
+                  type="iconPrimary"
+                  size="medium"
                   key="newEvent"
                   id="header_new_event"
                   onClick={this.props.goToEvents}
-                  icon={() => <Plus />}
-                />
+                >
+                  <Icon name="Plus" size="medium" />
+                </Button>
 
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>
@@ -504,8 +487,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (
       activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+      (NATL_ADMIN_ROLES.includes(
+        this.props.userDetails?.systemRole as string
+      ) ||
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
     ) {
       rightMenu = [
         {
@@ -579,7 +564,7 @@ export const Header = connect(
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
-  margin-left: 249px;
+  margin-left: 282px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0;

@@ -80,7 +80,9 @@ export function DeathDelayedFee() {
             FEE: {
               ON_TIME: offlineCountryConfiguration.config.DEATH.FEE.ON_TIME,
               DELAYED: parseFloat(deathDelayedFee.replace(/,/g, ''))
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.DEATH.PRINT_IN_ADVANCE
           }
         },
         dispatch,

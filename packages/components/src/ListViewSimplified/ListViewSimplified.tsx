@@ -153,7 +153,7 @@ export function ListViewItemSimplified({
   compactLabel
 }: IListViewItemSimplifiedProps) {
   return (
-    <>
+    <React.Fragment>
       {image && (
         <ImageContainer className={className} data-test-id="list-view-image">
           {image}
@@ -187,7 +187,7 @@ export function ListViewItemSimplified({
         <MobileActionsContainer>{actions}</MobileActionsContainer>
         {value && <MobileValueContainer>{value}</MobileValueContainer>}
       </MobileContainer>
-    </>
+    </React.Fragment>
   )
 }
 

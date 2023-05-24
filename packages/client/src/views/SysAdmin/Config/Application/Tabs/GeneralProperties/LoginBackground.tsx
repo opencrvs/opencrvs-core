@@ -165,7 +165,7 @@ export const LoginBackground = () => {
   }
 
   async function backgroundMutationHandler() {
-    if (!isWithinFileLength(backgroundImage)) {
+    if (!hexValue && !isWithinFileLength(backgroundImage)) {
       setErrorMessages(
         intl.formatMessage(messages.backgroundImageFileLimitError)
       )
@@ -322,7 +322,7 @@ export const LoginBackground = () => {
                 label={backgroundFile.name ? backgroundFile.name : ''}
                 disableDeleteInPreview={false}
                 name={intl.formatMessage(messages.loginBackgroundLabel)}
-                allowedDocType={['image/png', 'image/svg']}
+                allowedDocType={['image/png', 'image/jpeg']}
                 onComplete={(file) => {
                   setErrorOccurred(false)
                   setErrorMessages(EMPTY_STRING)

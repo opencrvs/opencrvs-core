@@ -40,7 +40,7 @@ describe('User root resolvers', () => {
           passwordHash:
             'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
           salt: '12345',
-          role: 'FIELD_AGENT',
+          systemRole: 'FIELD_AGENT',
           status: 'active',
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -56,7 +56,8 @@ describe('User root resolvers', () => {
 
       const user = await resolvers.Query.getUser(
         {},
-        { userId: 'ba7022f0ff4822' }
+        { userId: 'ba7022f0ff4822' },
+        { headers: undefined }
       )
 
       expect(user).toBeDefined()
@@ -109,7 +110,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -135,7 +136,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -161,7 +162,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -185,7 +186,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Query.searchUsers(
         {},
         {},
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(3)
@@ -219,7 +220,7 @@ describe('User root resolvers', () => {
           username: 'mohammad.ashraful',
           mobile: '+8801733333333',
           email: 'test@test.org',
-          role: 'LOCAL_REGISTRAR',
+          systemRole: 'LOCAL_REGISTRAR',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
@@ -227,7 +228,7 @@ describe('User root resolvers', () => {
           skip: 0,
           sort: 'desc'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -282,8 +283,8 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
-        type: 'HA',
+        systemRole: 'FIELD_AGENT',
+        role: 'HA',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -306,11 +307,11 @@ describe('User root resolvers', () => {
         username: 'mdariful.islam',
         mobile: '+8801740012994',
         email: 'test@test.org',
-        type: 'HA',
+        role: 'HA',
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -349,7 +350,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -357,7 +358,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -369,7 +370,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          type: 'HA',
+          role: 'HA',
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -406,7 +407,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -414,7 +415,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -426,7 +427,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          type: 'HA',
+          role: 'HA',
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -486,7 +487,7 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -494,7 +495,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -516,7 +517,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -533,7 +534,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -612,6 +613,9 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           password: 'test',
           securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+        },
+        {
+          headers: undefined
         }
       )
 
@@ -631,6 +635,9 @@ describe('User root resolvers', () => {
             userId: 'ba7022f0ff4822',
             password: 'test',
             securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          },
+          {
+            headers: undefined
           }
         )
       ).rejects.toThrowError(
@@ -682,7 +689,7 @@ describe('User root resolvers', () => {
           existingPassword: 'test',
           password: 'NewPassword'
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -698,7 +705,7 @@ describe('User root resolvers', () => {
             existingPassword: 'test',
             password: 'NewPassword'
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user password"
@@ -768,7 +775,7 @@ describe('User root resolvers', () => {
           nonce: nonce,
           verifyCode: code
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -789,7 +796,7 @@ describe('User root resolvers', () => {
             nonce: nonce,
             verifyCode: code
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user phone number"
@@ -864,7 +871,7 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           avatar
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(avatar)
@@ -882,7 +889,7 @@ describe('User root resolvers', () => {
               data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user avatar"
@@ -945,8 +952,8 @@ describe('User root resolvers', () => {
       username: 'mohammad.ashraful',
       mobile: '+8801733333333',
       email: 'test@test.org',
-      role: 'LOCAL_REGISTRAR',
-      type: 'HOSPITAL',
+      systemRole: 'LOCAL_REGISTRAR',
+      role: 'HOSPITAL',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }
@@ -962,7 +969,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -980,7 +987,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user: { id: '123', ...user } },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -1010,7 +1017,11 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderSysAdmin)
+        resolvers.Mutation.createOrUpdateUser(
+          {},
+          { user },
+          { headers: authHeaderSysAdmin }
+        )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't create user"
       )
@@ -1060,7 +1071,7 @@ describe('User root resolvers', () => {
           action: 'DEACTIVATE',
           reason: 'SUSPICIOUS'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual(true)
@@ -1093,7 +1104,7 @@ describe('User root resolvers', () => {
             action: 'DEACTIVATE',
             reason: 'SUSPICIOUS'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't audit user 5bce8ujkf0fuib"
@@ -1157,7 +1168,7 @@ describe('User root resolvers', () => {
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1172,7 +1183,7 @@ describe('User root resolvers', () => {
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
@@ -1235,7 +1246,7 @@ describe('User root resolvers', () => {
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1250,7 +1261,7 @@ describe('User root resolvers', () => {
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
@@ -1315,7 +1326,7 @@ describe('User root resolvers', () => {
             userId: '123',
             applicationName: 'opencrvs'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't reset password and send sms to 123"
@@ -1331,7 +1342,7 @@ describe('User root resolvers', () => {
           userId: '123',
           applicationName: 'opencrvs'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)

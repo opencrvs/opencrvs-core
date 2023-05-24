@@ -9,27 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as queryString from 'querystring'
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { IUserDetails } from '@client/utils/userUtils'
+import { SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from './userUtils'
 
-export enum Roles {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
-}
-export interface IURLParams {
-  [key: string]: string | string[] | undefined
-}
 export type Scope = string[]
+
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -42,12 +31,8 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
 }
 
 export function getToken(): string {
-  return (
-    (queryString.parse(window.location.search.replace(/^\?/, ''))
-      .token as string) ||
-    localStorage.getItem('opencrvs') ||
-    ''
-  )
+  const params = new URLSearchParams(window.location.search)
+  return params.get('token') || localStorage.getItem('opencrvs') || ''
 }
 
 export function storeToken(token: string) {
@@ -145,10 +130,10 @@ export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
 }
 
 export const hasAccessToRoute = (
-  roles: Roles[],
-  userDetails: IUserDetails
+  roles: SystemRoleType[],
+  userDetails: UserDetails
 ): boolean => {
-  const userRole = userDetails.role as Roles
+  const userRole = userDetails.systemRole
   if (roles.includes(userRole)) {
     return true
   }

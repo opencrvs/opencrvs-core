@@ -59,7 +59,15 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'DISTRICT_REGISTRAR'
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'DISTRICT_REGISTRAR'
+          }
+        ]
+      }
     }
   }
 }
@@ -641,7 +649,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                       address: {
                         district: 'Narsingdi',
                         state: 'Dhaka'
-                      }
+                      },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
                     },
                     timestamp: null
                   },
@@ -658,7 +667,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                       address: {
                         district: 'Narsingdi',
                         state: 'Dhaka'
-                      }
+                      },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
                     },
                     timestamp: null
                   }

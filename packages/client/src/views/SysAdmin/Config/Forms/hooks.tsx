@@ -18,7 +18,7 @@ import {
 import { IFormField } from '@client/forms'
 import { useParams } from 'react-router'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import { Event } from '@client/utils/gateway'
 
 export function useDefaultForm() {

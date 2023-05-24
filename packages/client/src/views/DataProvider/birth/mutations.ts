@@ -18,6 +18,7 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
     createBirthRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `
@@ -41,7 +42,7 @@ export const REGISTER_BIRTH_DECLARATION = gql`
               firstNames
               familyName
             }
-            role
+            systemRole
           }
           location {
             id
@@ -77,8 +78,18 @@ export const REJECT_BIRTH_DECLARATION = gql`
 `
 
 export const ARCHIVE_BIRTH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
@@ -88,9 +99,31 @@ export const COLLECT_BIRTH_CERTIFICATE = gql`
   }
 `
 
+export const ISSUE_BIRTH_CERTIFICATE = gql`
+  mutation markBirthAsIssued($id: ID!, $details: BirthRegistrationInput!) {
+    markBirthAsIssued(id: $id, details: $details)
+  }
+`
+
 export const MARK_EVENT_UNASSIGNED = gql`
   mutation submitMutation($id: String!) {
     markEventAsUnassigned(id: $id)
+  }
+`
+
+export const MARK_EVENT_AS_DUPLICATE = gql`
+  mutation markEventAsDuplicate(
+    $id: String!
+    $reason: String!
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsDuplicate(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
@@ -106,8 +139,11 @@ export function getBirthMutation(action: SubmissionAction) {
       return REJECT_BIRTH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_BIRTH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
+    case SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION:
       return COLLECT_BIRTH_CERTIFICATE
+    case SubmissionAction.ISSUE_DECLARATION:
+      return ISSUE_BIRTH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_BIRTH_REG_CORRECTION
   }

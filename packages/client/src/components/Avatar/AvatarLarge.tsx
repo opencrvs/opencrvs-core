@@ -12,12 +12,12 @@
 import * as React from 'react'
 import { AvatarLarge as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
-import { IAvatar } from '@client/utils/userUtils'
+import { Avatar } from '@client/utils/gateway'
 import styled from '@client/styledComponents'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: IAvatar | undefined
+  avatar?: Avatar | undefined | null
 }
 
 const AvatarImage = styled.img`
@@ -33,8 +33,8 @@ export function AvatarLarge({ name, avatar, ...props }: IProps) {
   if (!error && (name || avatar)) {
     return (
       <AvatarImage
-        width={132}
-        height={132}
+        width={104}
+        height={104}
         src={
           avatar
             ? avatar.data

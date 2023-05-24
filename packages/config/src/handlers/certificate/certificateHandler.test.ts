@@ -18,7 +18,8 @@ import { readFileSync } from 'fs'
 
 export enum Event {
   BIRTH = 'birth',
-  DEATH = 'death'
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 export enum Status {
   ACTIVE = 'ACTIVE',
@@ -186,6 +187,23 @@ describe('getCertificate handler', () => {
       payload: {
         status: 'ACTIVE',
         event: 'birth'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('get active certificate for marriage using mongoose', async () => {
+    mockingoose(Certificate).toReturn(mockCertificate, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getCertificate',
+      payload: {
+        status: 'ACTIVE',
+        event: 'marriage'
       },
       headers: {
         Authorization: `Bearer ${token}`

@@ -23,13 +23,13 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   width: 100%;
   padding: 10px;
   min-height: 104px;
-  border-radius: 2px;
+  border-radius: 4px;
   border: 2px solid ${({ theme }) => theme.colors.grey600};
   &:focus {
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
     outline: 0;
   }
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {
@@ -41,14 +41,6 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   &:-ms-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholderCopy};
   }
-
-  ${({ ignoreMediaQuery, theme }) => {
-    return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 344px;
-      }`
-      : ''
-  }}
 `
 
 export class TextArea extends React.Component<ITextAreaProps> {

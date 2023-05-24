@@ -60,6 +60,7 @@ describe('View Record for loading and success state', () => {
                         state: 'Central Province',
                         __typename: 'Address'
                       },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c',
                       __typename: 'Location'
                     },
                     __typename: 'RegWorkflow'
@@ -235,8 +236,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -274,8 +275,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -313,8 +314,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -352,8 +353,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -391,8 +392,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -430,8 +431,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -469,8 +470,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -508,8 +509,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -547,8 +548,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -586,8 +587,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -625,8 +626,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -664,8 +665,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -703,8 +704,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -742,8 +743,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -781,8 +782,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -820,8 +821,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -859,8 +860,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -898,8 +899,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -941,8 +942,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -980,8 +981,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    type: '',
-                    role: 'LOCAL_REGISTRAR',
+                    role: '',
+                    systemRole: 'LOCAL_REGISTRAR',
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -1019,8 +1020,8 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '635fd1c82ef11238798ad666',
-                    type: 'LOCAL_LEADER',
-                    role: 'FIELD_AGENT',
+                    role: 'LOCAL_LEADER',
+                    systemRole: 'FIELD_AGENT',
                     name: [
                       {
                         firstNames: 'Terrance',

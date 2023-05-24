@@ -26,7 +26,9 @@
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - disk_encryption_key is defined
           - country_config_path is defined
+          - encrypted_disk_size is defined
 
     - name: Setting global variables accessed by country configuration playbook
       ansible.builtin.set_fact:
@@ -102,20 +104,32 @@
         owner: 1000
         group: 1000
 
-    - name: 'Check file for encrypted file system exists'
+    - name: 'Precheck if encrypted file system exists so we dont try to bootstrap'
       stat:
         path: /cryptfs_file_sparse.img
         get_checksum: False
         get_md5: False
-      register: st
+      register: encryptedFileSystemPreCheck
 
     - name: 'Bootstrap encrypted data folder'
-      script: ../cryptfs/bootstrap.sh -s 100g -p {{disk_encryption_key}}
-      when: (not st.stat.exists) and encrypt_data
+      script: ../cryptfs/bootstrap.sh -s {{encrypted_disk_size}} -p {{disk_encryption_key}}
+      when: (not encryptedFileSystemPreCheck.stat.exists)
+
+    - name: Wait for encrypted file system
+      ansible.builtin.wait_for:
+        path: /cryptfs_file_sparse.img
+        state: present
+
+    - name: 'Register encrypted file system'
+      stat:
+        path: /cryptfs_file_sparse.img
+        get_checksum: False
+        get_md5: False
+      register: encryptedFileSystemPostCheck
 
     - name: 'Mount encrypted data folder'
       script: ../cryptfs/mount.sh -p {{disk_encryption_key}}
-      when: st.stat.exists and encrypt_data
+      when: encryptedFileSystemPostCheck.stat.exists
 
     # https://stackoverflow.com/a/24765946
     - name: Create swap file
@@ -219,6 +233,34 @@
         owner: 1000
         mode: g+rwx
       when: not elasticsearch_data_backup.stat.exists
+
+    - name: Check metabase data directory
+      stat:
+        path: /data/metabase
+      register: metabase_data
+
+    - name: 'Create metabase data directory'
+      file:
+        path: /data/metabase
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+      when: not metabase_data.stat.exists
+
+    - name: Check metabase data backup directory
+      stat:
+        path: /data/backups/metabase
+      register: metabase_data_backup
+
+    - name: 'Create metabase backup directory'
+      file:
+        path: /data/backups/metabase
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not metabase_data_backup.stat.exists
 
     - name: Check influxdb data directory
       stat:

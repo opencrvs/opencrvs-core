@@ -28,9 +28,9 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { Event } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data
   const draft1 = createDeclaration(Event.Birth)
@@ -47,9 +47,32 @@ describe('when user logs in', () => {
     declarations: [draft3]
   }
 
-  const currentUserDetails: IUserDetails = {
+  const currentUserDetails: Partial<UserDetails> = {
     userMgntUserID: 'shakib75',
-    localRegistrar: { name: [] }
+    id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+    creationDate: '2022-03-25T12:30:34.597+00:00',
+    practitionerId: '12345',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Jonathan',
+        familyName: 'Campbell',
+        __typename: 'HumanName'
+      }
+    ],
+    mobile: '+260921111111',
+    systemRole: SystemRoleType.NationalSystemAdmin,
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'National System Admin'
+        }
+      ]
+    },
+    status: 'active' as Status,
+    localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
   }
 
   const indexedDB = {

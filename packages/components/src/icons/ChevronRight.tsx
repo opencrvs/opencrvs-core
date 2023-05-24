@@ -22,7 +22,7 @@ export function ChevronRight(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="prefix__feather prefix__feather-chevron-right"
+      className="ph-caret-right"
       {...props}
     >
       <path d="M9 18l6-6-6-6" />

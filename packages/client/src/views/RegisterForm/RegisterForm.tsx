@@ -23,7 +23,7 @@ import {
   SecondaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
+import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
 import {
   FixedEventTopBar,
   IEventTopBarProps,
@@ -85,6 +85,7 @@ import {
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import {
   buttonMessages,
   constantsMessages,
@@ -107,8 +108,9 @@ import {
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { IUserDetails } from '@client/utils/userUtils'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
+import { UserDetails } from '@client/utils/userUtils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -197,7 +199,6 @@ type DispatchProps = {
 type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
-  setAllFieldsDirty: boolean
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
   scope: Scope | null
@@ -217,6 +218,8 @@ type State = {
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
   startTime: number
+  selectedDuplicateComId: string
+  isDuplicateDeclarationLoading: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -255,10 +258,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
-      startTime: 0
+      startTime: 0,
+      selectedDuplicateComId: props.declaration.id,
+      isDuplicateDeclarationLoading: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  setSelectedCompId = (id: string) => {
+    this.setState({ selectedDuplicateComId: id })
+  }
 
   showAllValidationErrors = () => {
     const touched = getSectionFields(
@@ -594,11 +603,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     return eventTopBarProps
   }
+  setAllFieldsDirty = () =>
+    this.props.declaration.visitedGroupIds?.some(
+      (visitedGroup) =>
+        visitedGroup.sectionId === this.props.activeSection.id &&
+        visitedGroup.groupId === this.props.activeSectionGroup.id
+    ) ?? false
 
   render() {
     const {
       intl,
-      setAllFieldsDirty,
       fieldsToShowValidationErrors,
       declaration,
       registerForm,
@@ -677,12 +691,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     />
                   ) : (
                     <FixedEventTopBar
-                      title={intl.formatMessage(
-                        messages.newVitalEventRegistration,
-                        {
-                          event: declaration.event
-                        }
-                      )}
+                      title={
+                        duplicate
+                          ? intl.formatMessage(
+                              duplicateMessages.duplicateReviewHeader,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                          : intl.formatMessage(
+                              messages.newVitalEventRegistration,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                      }
+                      pageIcon={duplicate ? <Duplicate /> : undefined}
                       iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
@@ -693,19 +717,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={declaration}
-                    rejectDeclarationClickEvent={this.toggleRejectForm}
-                    submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyDeclaration}
-                    onContinue={() => {
-                      this.props.goToCertificateCorrection(
-                        this.props.declaration.id,
-                        CorrectionSection.SupportingDocuments
-                      )
-                    }}
-                  />
+                  {duplicate && (
+                    <DuplicateFormTabs
+                      declaration={declaration}
+                      selectedDuplicateComId={this.state.selectedDuplicateComId}
+                      onTabClick={this.setSelectedCompId}
+                    />
+                  )}
+                  {(!duplicate ||
+                    this.state.selectedDuplicateComId === declaration.id) && (
+                    <ReviewSection
+                      pageRoute={this.props.pageRoute}
+                      draft={declaration}
+                      rejectDeclarationClickEvent={this.toggleRejectForm}
+                      submitClickEvent={this.confirmSubmission}
+                      onChangeReviewForm={this.modifyDeclaration}
+                      onContinue={() => {
+                        this.props.goToCertificateCorrection(
+                          this.props.declaration.id,
+                          CorrectionSection.SupportingDocuments
+                        )
+                      }}
+                    />
+                  )}
                 </>
               )}
 
@@ -801,6 +835,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
+                            key={activeSectionGroup.id}
                             onChange={(values) => {
                               debouncedModifyDeclaration(
                                 values,
@@ -808,7 +843,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 declaration
                               )
                             }}
-                            setAllFieldsDirty={setAllFieldsDirty}
+                            setAllFieldsDirty={this.setAllFieldsDirty()}
                             fieldsToShowValidationErrors={
                               fieldsToShowValidationErrors
                             }
@@ -957,7 +992,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function getInitialValue(
   field: IFormField,
   data: IFormData,
-  userDetails?: IUserDetails | null
+  userDetails?: UserDetails | null
 ) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
@@ -980,7 +1015,7 @@ export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
   data?: IFormData,
-  userDetails?: IUserDetails | null
+  userDetails?: UserDetails | null
 ) {
   return fields.map((field) => ({
     ...field,
@@ -1056,7 +1091,6 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ...activeSectionGroup,
       fields
     },
-    setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state)

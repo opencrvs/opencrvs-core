@@ -9,27 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver, GQLRole } from '@gateway/graphql/schema'
 import { IMongoComparisonObject } from '@gateway/features/role/utils'
 
 interface IRoleModelData {
   _id: string
   title: string
   value: string
-  types: string[]
+  roles: GQLRole[]
   active: boolean
 }
 
 export interface IRoleSearchPayload {
   title?: string
   value?: IMongoComparisonObject
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: string
 }
 export const roleTypeResolvers: GQLResolver = {
-  Role: {
+  SystemRole: {
     id(roleModel: IRoleModelData) {
       return roleModel._id
     }

@@ -13,7 +13,8 @@ import { model, Schema, Document } from 'mongoose'
 
 export enum Event {
   BIRTH = 'birth',
-  DEATH = 'death'
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 export enum Status {
   ACTIVE = 'ACTIVE',

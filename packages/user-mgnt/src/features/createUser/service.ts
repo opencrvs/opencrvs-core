@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import { IUser, IUserName } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 import { logger } from '@user-mgnt/logger'
 
@@ -65,11 +64,11 @@ export const createFhirPractitioner = (
   }
 }
 
-export const createFhirPractitionerRole = (
+export const createFhirPractitionerRole = async (
   user: IUser,
   practitionerId: string,
   system: boolean
-): fhir.PractitionerRole => {
+): Promise<fhir.PractitionerRole> => {
   if (system) {
     return {
       resourceType: 'PractitionerRole',
@@ -99,6 +98,14 @@ export const createFhirPractitionerRole = (
       }))
     }
   } else {
+    const role = await UserRole.findOne({
+      _id: user.role
+    })
+    const titleCase = user.systemRole
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
+      .join(' ')
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -109,7 +116,7 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/roles`,
-              code: user.role
+              code: user.systemRole
             }
           ]
         },
@@ -117,7 +124,9 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: user.type
+              code: role?.labels
+                ? role.labels.find((lbl) => lbl.lang === 'en')?.label
+                : titleCase
             }
           ]
         }
@@ -133,7 +142,7 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
   primaryOfficeId: string,
   token: string
 ): Promise<string[]> => {
-  const catchmentAreaIds: string[] = [primaryOfficeId]
+  const catchmentAreaIds: string[] = []
   let locationRef = `Location/${primaryOfficeId}`
   let parentLocation: fhir.Location = {}
   while (locationRef !== 'Location/0') {
@@ -258,18 +267,16 @@ export async function generateUsername(
   }
 
   try {
-    const record = await UsernameRecord.findOne({
-      username: proposedUsername
-    }).exec()
-
-    if (record !== null) {
-      proposedUsername += record.count
-      await UsernameRecord.update(
-        { username: record.username },
-        { $set: { count: record.count + 1 } }
-      ).exec()
-    } else {
-      await UsernameRecord.create({ username: proposedUsername, count: 1 })
+    let usernameTaken = await checkUsername(proposedUsername)
+    let i = 1
+    const copyProposedName = proposedUsername
+    while (usernameTaken) {
+      if (existingUserName && existingUserName === proposedUsername) {
+        return proposedUsername
+      }
+      proposedUsername = copyProposedName + i
+      i += 1
+      usernameTaken = await checkUsername(proposedUsername)
     }
   } catch (err) {
     logger.error(`Failed username generation: ${err}`)
@@ -277,6 +284,11 @@ export async function generateUsername(
   }
 
   return proposedUsername
+}
+
+async function checkUsername(username: string) {
+  const user = await User.findOne({ username })
+  return !!user
 }
 
 export async function sendCredentialsNotification(

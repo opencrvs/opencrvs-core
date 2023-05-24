@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
+  generateTrackingIdForEvents,
   convertStringToASCII,
   sendEventNotification,
   getMosipUINToken
@@ -23,41 +22,40 @@ import {
   testFhirBundleWithIdsForDeath,
   officeMock,
   mosipDeceasedPatientMock,
-  mosipSuccessMock,
-  informantSMSNotificationMock
+  mosipSuccessMock
 } from '@workflow/test/utils'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 import * as fetchAny from 'jest-fetch-mock'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
   beforeEach(async () => {
     fetch.resetMocks()
-    jest.mock('@workflow/features/registration/utils', () => {
-      const actual = jest.requireActual('./utils')
-      return {
-        ...actual,
-        getInformantSMSNotification: function () {
-          return informantSMSNotificationMock
-        }
-      }
-    })
   })
 
   it('Generates proper birth tracking id successfully', async () => {
-    const trackingId = generateBirthTrackingId()
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.BIRTH)
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^B/)
   })
 
   it('Generates proper death tracking id successfully', async () => {
-    const trackingId = generateDeathTrackingId()
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.DEATH)
 
     expect(trackingId).toBeDefined()
     expect(trackingId.length).toBe(7)
     expect(trackingId).toMatch(/^D/)
+  })
+
+  it('Generates proper marriage tracking id successfully', async () => {
+    const trackingId = generateTrackingIdForEvents(EVENT_TYPE.MARRIAGE)
+
+    expect(trackingId).toBeDefined()
+    expect(trackingId.length).toBe(7)
+    expect(trackingId).toMatch(/^M/)
   })
 
   it('Converts string to corresponding ascii successfully', async () => {
@@ -91,7 +89,6 @@ describe('Verify utility functions', () => {
   })
   it('send Birth declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -122,7 +119,6 @@ describe('Verify utility functions', () => {
   })
   it('send Birth registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -170,7 +166,6 @@ describe('Verify utility functions', () => {
   })
   it('send Death declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -201,7 +196,6 @@ describe('Verify utility functions', () => {
   })
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })

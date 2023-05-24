@@ -23,8 +23,9 @@ import { useHistory, useLocation } from 'react-router'
 
 const SelectContainer = styled.div`
   ${({ theme }) => theme.colors.primary};
-  display: flex;
-  justify-content: end;
+  position: absolute;
+  top: 0;
+  right: 0;
   padding: 24px 24px 8px;
 `
 

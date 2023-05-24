@@ -9,20 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { useState, useRef, useEffect } from 'react'
+import * as React from 'react'
 import {
   LinkButton,
-  TertiaryButton,
   PrimaryButton,
-  SecondaryButton
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import SignatureCanvas from 'react-signature-canvas'
 import {
-  ImageUploader,
   InputField,
   ISelectOption as SelectComponentOptions,
-  TextArea,
-  ErrorText
+  Text,
+  TextArea
 } from '@opencrvs/components/lib/'
 
 import { Alert } from '@opencrvs/components/lib/Alert'
@@ -40,11 +37,17 @@ import {
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
   BirthSection,
+  CHECKBOX,
   CHECKBOX_GROUP,
   DATE,
+  DeathSection,
+  DOCUMENT_UPLOADER_WITH_OPTION,
   FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IAttachmentValue,
+  ICheckboxFormField,
   ICheckboxGroupFormField,
+  IDocumentUploaderWithOptionsFormField,
   IDynamicOptions,
   IFileValue,
   IForm,
@@ -54,28 +57,22 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
+  INestedInputFields,
   IPreviewGroup,
   IRadioOption,
   ISelectOption,
   LIST,
+  LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
+  REVIEW_OVERRIDE_POSITION,
   Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
-  WARNING,
-  REVIEW_OVERRIDE_POSITION,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  IDocumentUploaderWithOptionsFormField,
-  LOCATION_SEARCH_INPUT,
-  IAttachmentValue,
   SubmissionAction,
-  ICheckboxFormField,
-  CHECKBOX,
-  INestedInputFields,
-  DeathSection
+  SUBSECTION,
+  WARNING
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -86,10 +83,10 @@ import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/
 import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
-  getSectionFields,
-  getVisibleSectionGroupsBasedOnConditions,
   getListOfLocations,
-  getSelectedInformantAndContactType
+  getSectionFields,
+  getSelectedInformantAndContactType,
+  getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
   Errors,
@@ -99,8 +96,7 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  formMessageDescriptors,
-  formMessages
+  formMessageDescriptors
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
@@ -117,7 +113,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -125,14 +121,12 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
-import * as React from 'react'
+import { clone, flatten, flattenDeep, get, isArray, pick } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
   IntlShape,
   MessageDescriptor,
-  useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
@@ -142,32 +136,44 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
-  ApplyButton,
-  CancelButton
-} from '@client/views/SysAdmin/Config/Application/Components'
-import { getBase64String } from '@client/utils/imageUtils'
-import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import {
-  ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
+import {
+  SignatureGenerator,
+  SignatureInputProps
+} from '@client/views/RegisterForm/review/SignatureGenerator'
+import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
+import {
+  AddressCases,
+  getAddressCaseFields
+} from '@client/forms/configuration/administrative/addresses'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const RequiredField = styled.span`
+export const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
+
   &::first-letter {
     text-transform: uppercase;
   }
 `
+
+export const ErrorField = styled.p`
+  margin-top: 0;
+  margin-bottom: 0;
+`
+
 const Row = styled.div`
   display: flex;
   flex: 1;
@@ -181,8 +187,9 @@ const RightColumn = styled.div`
   margin-left: 24px;
 
   &:first-child {
-    margin-left: 0px;
+    margin-left: 0;
   }
+
   &:last-child {
     margin-right: -24px;
   }
@@ -191,29 +198,31 @@ const RightColumn = styled.div`
     display: none;
   }
 `
-
-const LeftColumn = styled.div`
+const Items = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+const LeftColumn = styled.div`
   width: 60%;
   margin-bottom: 200px;
 
   &:first-child {
-    margin-left: 0px;
+    margin-left: 0;
   }
+
   &:last-child {
-    margin-right: 0px;
+    margin-right: 0;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
   }
 `
 
-const ZeroDocument = styled.div`
+export const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
@@ -222,6 +231,8 @@ const ZeroDocument = styled.div`
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
+  position: fixed;
+  width: calc(40% - 24px);
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -270,207 +281,12 @@ const InputWrapper = styled.div`
   margin-top: 56px;
 `
 
-const CustomImageUpload = styled(ImageUploader)`
-  border: 0 !important;
-`
-const SignatureContainer = styled.div`
-  border: 2px solid ${({ theme }) => theme.colors.grey600};
-  border-radius: 4px;
-  width: 100%;
-`
-const SignatureInputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`
-const SignaturePreview = styled.img`
-  max-width: 50%;
-  display: block;
-`
-const ErrorMessage = styled.div`
-  margin-top: 16px;
-`
-
-function SignCanvas({
-  value,
-  onChange
-}: {
-  value?: string
-  onChange: (value: string) => void
-}) {
-  const [canvasWidth, setCanvasWidth] = useState(300)
-  const canvasContainerRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<SignatureCanvas>(null)
-
-  useEffect(() => {
-    function handleResize() {
-      if (canvasContainerRef.current) {
-        setCanvasWidth(canvasContainerRef.current.offsetWidth)
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    handleResize()
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [canvasContainerRef])
-
-  useEffect(() => {
-    if (canvasRef.current && value) {
-      canvasRef.current.fromDataURL(value)
-    }
-  }, [value])
-
-  function emitValueToParent() {
-    const data = canvasRef.current?.toDataURL()
-    if (!data) {
-      return
-    }
-    onChange(data)
-  }
-
-  function clear() {
-    canvasRef.current?.clear()
-    onChange('')
-  }
-
-  return (
-    <SignatureInputContainer>
-      <SignatureContainer ref={canvasContainerRef}>
-        <SignatureCanvas
-          ref={canvasRef}
-          onEnd={() => {
-            emitValueToParent()
-          }}
-          penColor="black"
-          canvasProps={{
-            width: canvasWidth,
-            height: 200
-          }}
-        />
-      </SignatureContainer>
-      <TertiaryButton onClick={clear}>Clear</TertiaryButton>
-    </SignatureInputContainer>
-  )
-}
-
-type SignatureInputProps = {
-  id?: string
-  value?: string
-  onChange: (value: string) => void
-  disabled?: boolean
-}
-
-const SignatureDescription = styled.p`
-  margin-top: 0;
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.grey500};
-`
-
-function SignatureInput({
-  id,
-  value,
-  onChange,
-  disabled
-}: SignatureInputProps) {
-  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
-  const [signatureValue, setSignatureValue] = useState('')
-  const [signatureError, setSignatureError] = useState('')
-  const intl = useIntl()
-  const allowedSignatureFormat = ['image/png']
-
-  function apply() {
-    setSignatureDialogOpen(false)
-    onChange(signatureValue)
-  }
-
-  return (
-    <div>
-      <SignatureDescription>
-        {intl.formatMessage(messages.signatureDescription)}
-      </SignatureDescription>
-      <ErrorMessage id="signature-upload-error">
-        {signatureError && <ErrorText>{signatureError}</ErrorText>}
-      </ErrorMessage>
-      {!value && (
-        <>
-          <SecondaryButton
-            onClick={() => setSignatureDialogOpen(true)}
-            disabled={disabled}
-          >
-            {intl.formatMessage(messages.signatureOpenSignatureInput)}
-          </SecondaryButton>
-          <CustomImageUpload
-            id="signature-file-upload"
-            title="Upload"
-            handleFileChange={async (file) => {
-              if (!allowedSignatureFormat.includes(file.type)) {
-                setSignatureError(
-                  intl.formatMessage(formMessages.fileUploadError, {
-                    type: allowedSignatureFormat
-                      .map((signatureFormat) =>
-                        signatureFormat.split('/').pop()
-                      )
-                      .join(', ')
-                  })
-                )
-                return
-              }
-              onChange((await getBase64String(file)).toString())
-              setSignatureError('')
-            }}
-            disabled={disabled}
-          />
-        </>
-      )}
-      {value && <SignaturePreview alt="Informant's signature" src={value} />}
-      {value && (
-        <TertiaryButton onClick={() => onChange('')}>
-          {intl.formatMessage(messages.signatureDelete)}
-        </TertiaryButton>
-      )}
-
-      <ResponsiveModal
-        id={`${id}Modal`}
-        title={intl.formatMessage(messages.informantsSignature)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        width={600}
-        show={signatureDialogOpen}
-        actions={[
-          <CancelButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={() => setSignatureDialogOpen(false)}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
-            key="apply"
-            id="apply_change"
-            disabled={false}
-            onClick={apply}
-          >
-            {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
-        ]}
-        handleClose={() => setSignatureDialogOpen(false)}
-      >
-        <SignatureDescription>
-          {intl.formatMessage(messages.signatureInputDescription)}
-        </SignatureDescription>
-        <SignCanvas value={value} onChange={setSignatureValue} />
-      </ResponsiveModal>
-    </div>
-  )
-}
-
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: IFormSection,
   declaration: IDeclaration
 ) => void
+
 interface IProps {
   draft: IDeclaration
   registerForm: { [key: string]: IForm }
@@ -492,6 +308,7 @@ interface IProps {
   documentsSection: IFormSection
   viewRecord?: boolean
 }
+
 type State = {
   displayEditDialog: boolean
   editClickedSectionId: string
@@ -501,7 +318,7 @@ type State = {
   previewImage: IFileValue | null
 }
 
-interface IErrorsBySection {
+export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
@@ -641,21 +458,34 @@ const renderValue = (
         resource: 'locations',
         initialValue: 'agentDefault'
       }
-      if (field.name.includes('Secondary')) {
-        dynamicOption.dependency = [
-          'internationalStateSecondary',
-          'stateSecondary'
-        ].includes(field.name)
-          ? 'countrySecondary'
-          : 'stateSecondary'
-      } else {
-        dynamicOption.dependency = [
-          'internationalStatePrimary',
-          'statePrimary'
-        ].includes(field.name)
-          ? 'countryPrimary'
-          : 'statePrimary'
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    if (sectionData.countrySecondary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStateSecondary',
+        'stateSecondary'
+      ].includes(field.name)
+        ? 'countrySecondary'
+        : 'stateSecondary'
 
       return renderSelectDynamicLabel(
         value,
@@ -751,7 +581,7 @@ const renderValue = (
   return value
 }
 
-const getErrorsOnFieldsBySection = (
+export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration
@@ -797,9 +627,18 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-const SECTION_MAPPING = {
+export const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
-  [Event.Death]: deathSectionMapping
+  [Event.Death]: deathSectionMapping,
+  [Event.Marriage]: marriageSectionMapping
+}
+
+enum SignatureSectionType {
+  INFORMANT_SIGNATURE = 'informantsSignature',
+  BRIDE_SIGNATURE = 'brideSignature',
+  GROOM_SIGNATURE = 'groomSignature',
+  WITNESS_ONE_SIGNATURE = 'witnessOneSignature',
+  WITNESS_TWO_SIGNATURE = 'witnessTwoSignature'
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -818,7 +657,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.hasChangesBeenMade = false
   }
 
@@ -874,6 +713,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let sectionElement: HTMLElement
     let activeSection = this.state.activeSection
 
+    // TODO: Refactor "findDOMNode" away, as it's deprecated
+    // eslint-disable-next-line react/no-find-dom-node
     const node = findDOMNode(this) as HTMLElement
 
     this.docSections.forEach((section: IFormSection) => {
@@ -1017,12 +858,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
-        const documentData = !isBase64FileString(document.data)
-          ? `${window.config.MINIO_URL}${document.data}`
-          : document.data
-
         documentOptions.push({
-          value: documentData,
+          value: document.data,
           label
         })
         selectOptions.push({
@@ -1109,8 +946,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  isVisibleField(field: IFormField, section: IFormSection) {
-    const { draft, offlineCountryConfiguration } = this.props
+  isVisibleField(
+    draft: IDeclaration,
+    field: IFormField,
+    section: IFormSection
+  ) {
+    const { offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
@@ -1119,7 +960,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     return (
       !conditionalActions.includes('hide') &&
-      !conditionalActions.includes('disable')
+      !conditionalActions.includes('disable') &&
+      !conditionalActions.includes('hideInPreview')
     )
   }
 
@@ -1152,6 +994,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getRenderableField(
+    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -1159,7 +1002,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { draft: declaration, intl } = this.props
+    const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -1218,7 +1061,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getErrorForNestedField(section, field, sectionErrors)
 
     return errorsOnField.length > 0 ? (
-      this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      <ErrorField>
+        {this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])}
+      </ErrorField>
     ) : field.nestedFields && !Boolean(ignoreNestedFieldWrapping) ? (
       (
         (data[section.id] &&
@@ -1297,6 +1142,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getPreviewGroupsField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
@@ -1305,22 +1151,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    const { draft } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
       const baseTag = field.previewGroup
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
-        if (this.isVisibleField(field, section) && !this.isViewOnly(field)) {
+        if (
+          this.isVisibleField(draft, field, section) &&
+          !this.isViewOnly(field)
+        ) {
           if (field.previewGroup === baseTag) {
             taggedFields.push(field)
           }
           for (const index in field.nestedFields) {
             field.nestedFields[index].forEach((tempField) => {
               if (
-                this.isVisibleField(tempField, section) &&
+                this.isVisibleField(draft, tempField, section) &&
                 !this.isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
               ) {
@@ -1413,6 +1260,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
 
       return this.getRenderableField(
+        draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -1490,15 +1338,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getSinglePreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const {
-      draft: { data, originalData }
-    } = this.props
+    const { data, originalData } = draft
 
     let value = this.getValueOrError(
       section,
@@ -1532,6 +1379,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return this.getRenderableField(
+      draft,
       section,
       group,
       field.label,
@@ -1542,17 +1390,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getNestedPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection
   ) {
-    const { draft } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
-      this.getSinglePreviewField(section, group, field, sectionErrors, true)
+      this.getSinglePreviewField(
+        draft,
+        section,
+        group,
+        field,
+        sectionErrors,
+        true
+      )
     )
     ;(
       (field.nestedFields &&
@@ -1568,6 +1423,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (nestedField.previewGroup) {
         nestedItems.push(
           this.getPreviewGroupsField(
+            draft,
             section,
             group,
             nestedField,
@@ -1583,6 +1439,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         nestedItems.push(
           this.getRenderableField(
+            draft,
             section,
             group,
             nestedField.label,
@@ -1602,6 +1459,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverriddenFieldsListForPreview(
+    draft: IDeclaration,
     formSections: IFormSection[]
   ): IFormField[] {
     const overriddenFields = formSections
@@ -1630,7 +1488,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })
               .filter((field) => !Boolean(field.hideInPreview))
               .filter((field) => Boolean(field.reviewOverrides))
-              .filter((field) => this.isVisibleField(field, section))
+              .filter((field) => this.isVisibleField(draft, field, section))
           })
           .filter((item) => item.length)
       })
@@ -1639,6 +1497,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverRiddenPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -1658,6 +1517,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ) as IFormSection
 
     const result = this.getSinglePreviewField(
+      draft,
       residingSection,
       group,
       overriddenField,
@@ -1689,14 +1549,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    const previewImageTransformed = { ...previewImage }
-    previewImageTransformed.data = isBase64FileString(
-      previewImageTransformed.data
-    )
-      ? previewImageTransformed.data
-      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
-
-    this.setState({ previewImage: previewImageTransformed as IFileValue })
+    this.setState({ previewImage: previewImage as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1744,10 +1597,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   shouldShowChangeAll = (section: IFormSection) => {
     const {
-      draft: { data, event },
+      draft: { data, event, duplicates },
       viewRecord
     } = this.props
-    if (viewRecord) {
+
+    if (
+      viewRecord ||
+      (Boolean(duplicates) && !isCorrection(this.props.draft))
+    ) {
       return false
     }
     return (
@@ -1775,9 +1632,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
   ) => {
-    const { intl, draft } = this.props
-    const overriddenFields =
-      this.getOverriddenFieldsListForPreview(formSections)
+    const { intl } = this.props
+    const draft = addSameAddressValues(this.props.draft)
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      draft,
+      formSections
+    )
     let tempItem: any
     return formSections.map((section) => {
       let items: any[] = []
@@ -1791,30 +1651,33 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group.fields
           .filter(
             (field) =>
-              this.isVisibleField(field, section) && !this.isViewOnly(field)
+              this.isVisibleField(draft, field, section) &&
+              !this.isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
+                  draft,
                   section,
                   group,
                   field,
                   visitedTags,
                   errorsOnFields,
                   draft.data[section.id],
-                  (draft.originalData && draft.originalData[section.id]) ||
-                    undefined
+                  draft.originalData?.[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
+                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
               : this.getSinglePreviewField(
+                  draft,
                   section,
                   group,
                   field,
@@ -1823,6 +1686,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
+                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -1867,34 +1731,57 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const formSections = viewRecord
-      ? this.getViewableSection(registerForm[event]).map((section) => {
-          return {
-            ...section,
-            groups: section.groups.map((group) => {
-              return {
-                ...group,
-                fields: group.fields.map(fieldToReadOnlyFields)
-              }
-            })
-          }
-        })
-      : this.getViewableSection(registerForm[event])
+    const isDuplicate = Boolean(declaration.duplicates?.length)
+    const formSections =
+      viewRecord || isDuplicate
+        ? this.getViewableSection(registerForm[event]).map((section) => {
+            return {
+              ...section,
+              groups: section.groups.map((group) => {
+                return {
+                  ...group,
+                  fields: group.fields.map(fieldToReadOnlyFields)
+                }
+              })
+            }
+          })
+        : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
       declaration
     )
 
-    const isSignatureMissing = isCorrection(declaration)
-      ? false
-      : offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
-        !declaration.data.registration?.informantsSignature
+    const disableSubmit = Boolean(
+      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
+        ?.length > 0 ||
+        errorsOnFields.registration?.contactPoint?.errors.length !== 0
+    )
+
+    const isSignatureMissing = () => {
+      if (isCorrection(declaration)) {
+        return false
+      } else {
+        if (event === Event.Birth || event === Event.Death) {
+          return (
+            offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+            !declaration.data.registration?.informantsSignature
+          )
+        } else if (event === Event.Marriage) {
+          return (
+            !declaration.data.registration?.groomSignature ||
+            !declaration.data.registration?.brideSignature ||
+            !declaration.data.registration?.witnessOneSignature ||
+            !declaration.data.registration?.witnessTwoSignature
+          )
+        }
+      }
+    }
 
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0 && !isSignatureMissing
+      ).length === 0 && !isSignatureMissing()
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -1912,19 +1799,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
-    const signatureInputProps = {
-      id: 'informants_signature',
-      onChange: (value: string) => {
-        this.props.onChangeReviewForm &&
-          this.props.onChangeReviewForm(
-            { informantsSignature: value },
-            registrationSection,
-            declaration
-          )
-      },
-      value: declaration.data.registration?.informantsSignature as string
-    }
-
     const sectionName = this.state.activeSection || this.docSections[0].id
     const informantName = getDraftInformantFullName(
       declaration,
@@ -1938,150 +1812,247 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
+    const generateSignatureProps = (
+      sectionType: SignatureSectionType,
+      id: string,
+      value: string,
+      inputLabel: string,
+      isRequired: boolean
+    ): SignatureInputProps => {
+      return {
+        id: id,
+        onChange: (value: string) => {
+          this.props.onChangeReviewForm &&
+            this.props.onChangeReviewForm(
+              { [sectionType]: value },
+              registrationSection,
+              declaration
+            )
+        },
+        value: value,
+        label: inputLabel,
+        isRequired: isRequired
+      }
+    }
+
+    const getSignature = (eventType: Event) => {
+      if ([Event.Birth, Event.Death].includes(eventType)) {
+        if (!offlineCountryConfiguration.config.INFORMANT_SIGNATURE) {
+          return <></>
+        }
+        const informantsSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.INFORMANT_SIGNATURE,
+          'informants_signature',
+          declaration.data.registration?.informantsSignature as string,
+          intl.formatMessage(messages.informantsSignature),
+          window.config.INFORMANT_SIGNATURE_REQUIRED
+        )
+        return (
+          <>
+            <SignatureGenerator
+              description={intl.formatMessage(messages.signatureDescription)}
+              {...informantsSignatureInputPros}
+            />
+          </>
+        )
+      } else if ([Event.Marriage].includes(eventType)) {
+        const brideSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.BRIDE_SIGNATURE,
+          'bride_signature',
+          declaration.data.registration?.brideSignature as string,
+          intl.formatMessage(messages.brideSignature),
+          true
+        )
+
+        const groomSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.GROOM_SIGNATURE,
+          'groom_signature',
+          declaration.data.registration?.groomSignature as string,
+          intl.formatMessage(messages.groomSignature),
+          true
+        )
+
+        const witnessOneSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.WITNESS_ONE_SIGNATURE,
+          'witness_one_signature',
+          declaration.data.registration?.witnessOneSignature as string,
+          intl.formatMessage(messages.witnessOneSignature),
+          true
+        )
+
+        const witnessTwoSignatureInputPros = generateSignatureProps(
+          SignatureSectionType.WITNESS_TWO_SIGNATURE,
+          'witness_two_signature',
+          declaration.data.registration?.witnessTwoSignature as string,
+          intl.formatMessage(messages.witnessTwoSignature),
+          true
+        )
+
+        return (
+          <>
+            <Text id="terms" element="p" variant="reg16">
+              {intl.formatMessage(messages.terms)}
+            </Text>
+            <SignatureGenerator {...groomSignatureInputPros} />
+            <SignatureGenerator {...brideSignatureInputPros} />
+            <SignatureGenerator {...witnessOneSignatureInputPros} />
+            <SignatureGenerator {...witnessTwoSignatureInputPros} />
+          </>
+        )
+      }
+    }
+
     return (
       <FullBodyContent>
         <Row>
           <LeftColumn>
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              title={intl.formatMessage(messages.govtName)}
-              subject={
-                informantName
-                  ? intl.formatMessage(messages.headerSubjectWithName, {
-                      eventType: event,
-                      name: informantName
-                    })
-                  : intl.formatMessage(messages.headerSubjectWithoutName, {
-                      eventType: event
-                    })
-              }
-            />
-            <FormData>
-              {transformedSectionData.map((sec, index) => {
-                const { uploadedDocuments, selectOptions } =
-                  this.prepSectionDocuments(declaration, sec.id)
-                return (
-                  <SectionContainer key={index}>
-                    {sec.title && (
-                      <Title>
-                        {sec.title}
-                        {sec.action && (
-                          <LinkButton onClick={sec.action.handler}>
-                            {sec.action.label}
-                          </LinkButton>
-                        )}
-                      </Title>
-                    )}
-                    {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
-                      <DocumentListPreviewContainer>
-                        <DocumentListPreview
-                          id={sec.id}
-                          documents={uploadedDocuments}
-                          onSelect={this.selectForPreview}
-                          dropdownOptions={selectOptions}
-                          inReviewSection={true}
-                        />
-                      </DocumentListPreviewContainer>
-                    )}
-                    <ListViewSimplified id={'Section_' + sec.id}>
-                      {sec.items.map((item, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            label={<Label>{item.label}</Label>}
-                            value={
-                              <Value id={item.label.split(' ')[0]}>
-                                {item.value}
-                              </Value>
-                            }
-                            actions={
-                              <LinkButton
-                                id={item.action.id}
-                                disabled={item.action.disabled}
-                                onClick={item.action.handler}
-                              >
-                                {item.action.label}
-                              </LinkButton>
-                            }
+            {!isCorrection(declaration) && isDuplicate && (
+              <DuplicateForm declaration={declaration} />
+            )}
+            <Items>
+              <ReviewHeader
+                id="review_header"
+                logoSource={
+                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                }
+                title={intl.formatMessage(messages.govtName)}
+                subject={
+                  informantName
+                    ? intl.formatMessage(messages.headerSubjectWithName, {
+                        eventType: event,
+                        name: informantName
+                      })
+                    : intl.formatMessage(messages.headerSubjectWithoutName, {
+                        eventType: event
+                      })
+                }
+              />
+              <FormData>
+                {transformedSectionData.map((sec, index) => {
+                  const { uploadedDocuments, selectOptions } =
+                    this.prepSectionDocuments(declaration, sec.id)
+                  return (
+                    <SectionContainer key={index}>
+                      {sec.title && (
+                        <Title>
+                          {sec.title}
+                          {sec.action && (
+                            <LinkButton onClick={sec.action.handler}>
+                              {sec.action.label}
+                            </LinkButton>
+                          )}
+                        </Title>
+                      )}
+                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
+                        <DocumentListPreviewContainer>
+                          <DocumentListPreview
+                            id={sec.id}
+                            documents={uploadedDocuments}
+                            onSelect={this.selectForPreview}
+                            dropdownOptions={selectOptions}
+                            inReviewSection={true}
                           />
-                        )
-                      })}
-                    </ListViewSimplified>
-                  </SectionContainer>
-                )
-              })}
-              {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                this.getAllAttachmentInPreviewList(declaration)}
-              {(!isCorrection(declaration) || viewRecord) && (
-                <InputWrapper>
-                  <InputField
-                    id="additional_comments"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.additionalComments)}
-                  >
-                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
-                  </InputField>
-                </InputWrapper>
-              )}
-
-              {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                !isCorrection(declaration) && (
+                        </DocumentListPreviewContainer>
+                      )}
+                      <ListViewSimplified id={'Section_' + sec.id}>
+                        {sec.items.map((item, index) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={index}
+                              label={<Label>{item.label}</Label>}
+                              value={
+                                <Value id={item.label.split(' ')[0]}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={
+                                <LinkButton
+                                  id={item.action.id}
+                                  disabled={item.action.disabled}
+                                  onClick={item.action.handler}
+                                >
+                                  {item.action.label}
+                                </LinkButton>
+                              }
+                            />
+                          )
+                        })}
+                      </ListViewSimplified>
+                    </SectionContainer>
+                  )
+                })}
+                {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                  this.getAllAttachmentInPreviewList(declaration)}
+                {(!isCorrection(declaration) || viewRecord) && (
                   <InputWrapper>
                     <InputField
-                      id="informant_signature"
+                      id="additional_comments"
                       touched={false}
-                      required={window.config.INFORMANT_SIGNATURE_REQUIRED}
-                      label={intl.formatMessage(messages.informantsSignature)}
+                      required={false}
+                      label={intl.formatMessage(messages.additionalComments)}
                     >
-                      <SignatureInput
-                        {...signatureInputProps}
-                        disabled={viewRecord}
+                      <TextArea
+                        {...{
+                          ...textAreaProps,
+                          disabled: viewRecord || isDuplicate
+                        }}
                       />
                     </InputField>
                   </InputWrapper>
                 )}
-              {totalFileSizeExceeded && (
-                <Alert type="warning">
-                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
-                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
-                  })}
-                </Alert>
-              )}
-              {viewRecord ? null : (
-                <>
-                  {!isCorrection(declaration) ? (
-                    <>
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
-                      <ReviewAction
-                        completeDeclaration={isComplete}
-                        totalFileSizeExceeded={totalFileSizeExceeded}
-                        declarationToBeValidated={this.userHasValidateScope()}
-                        declarationToBeRegistered={this.userHasRegisterScope()}
-                        alreadyRejectedDeclaration={
-                          this.props.draft.registrationStatus === REJECTED
-                        }
-                        draftDeclaration={draft}
-                        declaration={declaration}
-                        submitDeclarationAction={submitClickEvent}
-                        rejectDeclarationAction={rejectDeclarationClickEvent}
-                      />
-                    </>
-                  ) : (
-                    <FooterArea>
-                      <PrimaryButton
-                        id="continue_button"
-                        onClick={onContinue}
-                        disabled={!isComplete || !this.hasChangesBeenMade}
-                      >
-                        {intl.formatMessage(buttonMessages.continueButton)}
-                      </PrimaryButton>
-                    </FooterArea>
-                  )}
-                </>
-              )}
-            </FormData>
+
+                {!isCorrection(declaration) &&
+                  !isDuplicate &&
+                  !viewRecord &&
+                  getSignature(declaration?.event as Event)}
+                {totalFileSizeExceeded && (
+                  <Alert type="warning">
+                    {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                      fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                    })}
+                  </Alert>
+                )}
+                {viewRecord || isDuplicate ? null : (
+                  <>
+                    {!isCorrection(declaration) ? (
+                      <>
+                        {isDuplicate && (
+                          <DuplicateWarning
+                            duplicateIds={declaration.duplicates?.map(
+                              (duplicate) => duplicate.compositionId
+                            )}
+                          />
+                        )}
+                        <ReviewAction
+                          completeDeclaration={isComplete}
+                          totalFileSizeExceeded={totalFileSizeExceeded}
+                          declarationToBeValidated={this.userHasValidateScope()}
+                          declarationToBeRegistered={this.userHasRegisterScope()}
+                          alreadyRejectedDeclaration={
+                            this.props.draft.registrationStatus === REJECTED
+                          }
+                          draftDeclaration={draft}
+                          declaration={declaration}
+                          submitDeclarationAction={submitClickEvent}
+                          rejectDeclarationAction={rejectDeclarationClickEvent}
+                          disableSubmit={disableSubmit}
+                        />
+                      </>
+                    ) : (
+                      <FooterArea>
+                        <PrimaryButton
+                          id="continue_button"
+                          onClick={onContinue}
+                          disabled={!isComplete || !this.hasChangesBeenMade}
+                        >
+                          {intl.formatMessage(buttonMessages.continueButton)}
+                        </PrimaryButton>
+                      </FooterArea>
+                    )}
+                  </>
+                )}
+              </FormData>
+            </Items>
           </LeftColumn>
           <RightColumn>
             <ResponsiveDocumentViewer
@@ -2102,7 +2073,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord ? null : (
+                  {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={
@@ -2226,6 +2197,54 @@ function fatherDoesNotExistAndStateIsFather(
     selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
     selectedInformantAndContactType.selectedContactType !== 'FATHER'
   )
+}
+
+function addSameAddressValues(draft: IDeclaration) {
+  if (draft.event === Event.Marriage) {
+    return draft
+  }
+  /*
+   *  Address of y is same as x
+   */
+  const [xSection, ySection] =
+    draft.event === Event.Birth
+      ? (['mother', 'father'] as const)
+      : (['deceased', 'informant'] as const)
+
+  const fieldNames = getAddressCaseFields(
+    AddressCases.PRIMARY_ADDRESS,
+    true
+  ).map((address) => address.name)
+
+  const modifiedDraft = {
+    ...draft
+  }
+
+  if (modifiedDraft.data[ySection]?.primaryAddressSameAsOtherPrimary) {
+    modifiedDraft.data = {
+      ...modifiedDraft.data,
+      [ySection]: {
+        ...modifiedDraft.data[ySection],
+        ...pick(modifiedDraft.data[xSection], fieldNames)
+      }
+    }
+    modifiedDraft.data[ySection].primaryAddressSameAsOtherPrimary = false
+  }
+
+  if (
+    modifiedDraft.originalData?.[ySection]?.primaryAddressSameAsOtherPrimary
+  ) {
+    modifiedDraft.originalData = {
+      ...modifiedDraft.originalData,
+      [ySection]: {
+        ...modifiedDraft.originalData[ySection],
+        ...pick(modifiedDraft.originalData[xSection], fieldNames)
+      }
+    }
+    modifiedDraft.originalData[ySection].primaryAddressSameAsOtherPrimary =
+      false
+  }
+  return modifiedDraft
 }
 
 export const ReviewSection = connect(

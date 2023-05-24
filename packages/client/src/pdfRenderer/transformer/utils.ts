@@ -34,6 +34,11 @@ const eventMessageDescriptor = {
     defaultMessage: 'Death',
     description: 'A label from the death event',
     id: 'constants.death'
+  },
+  [Event.Marriage]: {
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event',
+    id: 'constants.marriage'
   }
 }
 export function getValueFromDeclarationDataByKey(

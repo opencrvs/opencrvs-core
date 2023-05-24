@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs)",
+    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs|sql)",
     ".git",
     ".idea",
     "**/patches",
@@ -31,12 +31,17 @@
     "packages/login/index.html",
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
+    "packages/components/.storybook/manager-head.html",
     "grafana",
     "packages/scheduler/start.sh",
-    "packages/scheduler/cronTabFiles/*",
+    "packages/scheduler/crontab",
     "packages/scheduler/jobs/*",
     ".nvmrc",
-    ".idea"
+    ".idea",
+    "infrastructure/elasticsearch/jvm.options",
+    "packages/dashboards/*.jar",
+    "packages/dashboards/plugins/*.jar",
+    "packages/dashboards/data/metabase/*.db"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

@@ -20,7 +20,7 @@ const DateWrapper = styled.div`
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
 `
-interface IProps {
+type IProps = {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
@@ -39,7 +39,7 @@ interface IState {
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
-  width: 54px !important;
+  width: 58px !important;
   margin: 0 4px;
 
   &:first-of-type {

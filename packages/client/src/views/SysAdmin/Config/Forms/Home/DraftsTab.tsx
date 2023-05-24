@@ -27,7 +27,7 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Pill } from '@opencrvs/components/lib/Pill'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { goToFormConfigWizard } from '@client/navigation'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { DraftStatus, Event } from '@client/utils/gateway'
@@ -84,7 +84,9 @@ function OptionsMenu({ event }: { event: Event }) {
   return (
     <ToggleMenu
       id="draftActions"
-      toggleButton={<VerticalThreeDots />}
+      toggleButton={
+        <Icon name="DotsThreeVertical" color="primary" size="large" />
+      }
       menuItems={[
         {
           label: intl.formatMessage(buttonMessages.preview),

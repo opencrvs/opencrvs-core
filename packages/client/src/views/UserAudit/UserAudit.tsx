@@ -24,17 +24,16 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Button } from '@opencrvs/components/lib/Button'
-import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
 import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { VerticalThreeDots } from '@client/../../components/lib/icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
@@ -46,7 +45,8 @@ import {
   GetUserQuery,
   GetUserQueryVariables,
   HumanName,
-  User
+  User,
+  SystemRoleType
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -55,6 +55,8 @@ import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { UserDetails } from '@client/utils/userUtils'
+import { Scope } from '@client/utils/authUtils'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -93,8 +95,8 @@ const transformUserQueryResult = (
     name:
       createNamesMap(userData.name as HumanName[])[locale] ||
       createNamesMap(userData.name as HumanName[])[LANG_EN],
+    systemRole: userData.systemRole,
     role: userData.role,
-    type: userData.type,
     number: userData.mobile,
     status: userData.status,
     underInvestigation: userData.underInvestigation,
@@ -105,10 +107,37 @@ const transformUserQueryResult = (
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
     locationId:
-      getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) || '0',
+      getJurisdictionLocationIdFromUserDetails(userData as UserDetails) || '0',
     avatar: userData.avatar || undefined,
     device: userData.device
   }
+}
+
+function canEditUserDetails(
+  targetUser: Pick<User, 'systemRole'> & {
+    primaryOffice?: { id: string } | null
+  },
+  loggedInUser: Pick<User, 'systemRole'> & {
+    primaryOffice?: { id: string } | null
+  },
+  scopes: Scope
+) {
+  if (!scopes.includes('sysadmin')) {
+    return false
+  }
+  if (loggedInUser.systemRole === SystemRoleType.NationalSystemAdmin) {
+    return true
+  }
+  const usersInTheSameOffice =
+    loggedInUser.primaryOffice?.id === targetUser?.primaryOffice?.id
+
+  if (
+    loggedInUser.systemRole === SystemRoleType.LocalSystemAdmin &&
+    usersInTheSameOffice
+  ) {
+    return true
+  }
+  return false
 }
 
 export const UserAudit = () => {
@@ -137,8 +166,8 @@ export const UserAudit = () => {
     GetUserQueryVariables
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole = user && getUserRole(user, intl)
-  const userType = user && getUserType(user, intl)
+  const userRole =
+    user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -265,17 +294,25 @@ export const UserAudit = () => {
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<HistoryNavigator hideForward />}
           mobileRight={
+            userDetails &&
+            scope &&
             user && (
               <>
                 <Status status={user.status || 'pending'} />
                 <ToggleMenu
                   id={`sub-page-header-munu-button`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={getMenuItems(
                     user.id as string,
                     user.status as string
                   )}
-                  hide={(scope && !scope.includes('sysadmin')) || false}
+                  hide={!canEditUserDetails(user, userDetails, scope)}
                 />
               </>
             )
@@ -295,15 +332,32 @@ export const UserAudit = () => {
         <Content
           title={user.name}
           icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
-          topActionButtons={[
-            <Status status={user.status || 'pending'} />,
-            <ToggleMenu
-              id={`sub-page-header-munu-button`}
-              toggleButton={<VerticalThreeDots />}
-              menuItems={getMenuItems(user.id as string, user.status as string)}
-              hide={(scope && !scope.includes('sysadmin')) || false}
-            />
-          ]}
+          topActionButtons={
+            userDetails && scope
+              ? [
+                  <Status
+                    key="top-action-status"
+                    status={user.status || 'pending'}
+                  />,
+                  <ToggleMenu
+                    id={`sub-page-header-munu-button`}
+                    key="top-action-toggle-menu"
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
+                    menuItems={getMenuItems(
+                      user.id as string,
+                      user.status as string
+                    )}
+                    hide={!canEditUserDetails(user, userDetails, scope)}
+                  />
+                ]
+              : []
+          }
           size={ContentSize.LARGE}
         >
           <>
@@ -323,12 +377,8 @@ export const UserAudit = () => {
                 }
               />
               <Summary.Row
-                label={
-                  (userType &&
-                    intl.formatMessage(userSetupMessages.roleType)) ||
-                  intl.formatMessage(userFormMessages.labelRole)
-                }
-                value={(userType && `${userRole} / ${userType}`) || userRole}
+                label={intl.formatMessage(userFormMessages.labelRole)}
+                value={userRole}
               />
               <Summary.Row
                 label={intl.formatMessage(userFormMessages.userDevice)}
@@ -340,7 +390,7 @@ export const UserAudit = () => {
               <UserAuditHistory
                 practitionerId={user.practitionerId}
                 practitionerName={user.name}
-                loggedInUserRole={userDetails!.role}
+                loggedInUserRole={userDetails!.systemRole}
               />
             )}
           </>

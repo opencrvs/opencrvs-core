@@ -42,7 +42,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'DISTRICT_REGISTRAR'
+      systemRole: 'DISTRICT_REGISTRAR'
     }
   }
 }

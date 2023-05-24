@@ -28,3 +28,5 @@ grafana
 .vscode/launch.json
 .history
 deploy_key
+.lh
+.vscode

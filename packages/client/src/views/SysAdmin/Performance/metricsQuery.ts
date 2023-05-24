@@ -23,7 +23,7 @@ export const CORRECTION_TOTALS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
       event: $event
-    ) {
+    ) @persist {
       total
       reason
     }
@@ -41,7 +41,7 @@ export const PERFORMANCE_METRICS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
       event: $event
-    ) {
+    ) @persist {
       estimated {
         totalEstimation
         maleEstimation
@@ -72,7 +72,7 @@ export const PERFORMANCE_STATS = gql`
     getLocationStatistics(
       locationId: $locationId
       populationYear: $populationYear
-    ) @skip(if: $officeSelected) {
+    ) @persist @skip(if: $officeSelected) {
       population
       offices
       registrars
@@ -82,7 +82,7 @@ export const PERFORMANCE_STATS = gql`
       locationId: $locationId
       status: $status
       event: $event
-    ) {
+    ) @persist {
       results {
         status
         count

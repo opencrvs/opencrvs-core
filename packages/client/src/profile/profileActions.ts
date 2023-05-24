@@ -12,8 +12,9 @@
 
 import { RouterAction } from 'connected-react-router'
 import { ApolloQueryResult } from '@apollo/client'
-import { IUserDetails } from '@client/utils/userUtils'
-import { Query } from '@client/utils/gateway'
+import { FetchUserQuery } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
   'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
@@ -33,6 +34,9 @@ export const SEND_VERIFY_CODE_COMPLETED =
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
+  payload: {
+    redirectBack: boolean
+  }
 }
 
 type CheckAuthAction = {
@@ -41,12 +45,12 @@ type CheckAuthAction = {
 
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
-  payload: ApolloQueryResult<Query>
+  payload: ApolloQueryResult<FetchUserQuery>
 }
 
 type ModifyUserDetailsAction = {
   type: typeof MODIFY_USER_DETAILS
-  payload: IUserDetails
+  payload: Partial<UserDetails>
 }
 type SendVerifyCode = {
   type: typeof SEND_VERIFY_CODE
@@ -83,13 +87,13 @@ export const checkAuth = (): CheckAuthAction => ({
 })
 
 export const setUserDetails = (
-  payload: ApolloQueryResult<Query>
+  payload: ApolloQueryResult<FetchUserQuery>
 ): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload
 })
 
-export const userDetailsAvailable = (payload: IUserDetails) => ({
+export const userDetailsAvailable = (payload: UserDetails) => ({
   type: USER_DETAILS_AVAILABLE,
   payload
 })
@@ -97,7 +101,7 @@ export const userDetailsAvailable = (payload: IUserDetails) => ({
 export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
 
 export const modifyUserDetails = (
-  payload: IUserDetails
+  payload: Partial<UserDetails>
 ): ModifyUserDetailsAction => ({
   type: MODIFY_USER_DETAILS,
   payload
@@ -121,8 +125,13 @@ export const getStorageUserDetailsFailed =
     type: GET_USER_DETAILS_FAILED
   })
 
-export const redirectToAuthentication = (): RedirectToAuthenticationAction => ({
-  type: REDIRECT_TO_AUTHENTICATION
+export const redirectToAuthentication = (
+  redirectBack = false
+): RedirectToAuthenticationAction => ({
+  type: REDIRECT_TO_AUTHENTICATION,
+  payload: {
+    redirectBack
+  }
 })
 
 export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {

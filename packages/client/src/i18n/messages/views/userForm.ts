@@ -85,6 +85,16 @@ export const messages = {
     description: 'Label for type of event in work queue list item',
     id: 'constants.type'
   },
+  systemRole: {
+    defaultMessage: 'System Role',
+    description: 'Label for system role input in user creation',
+    id: 'constants.user.systemRole'
+  },
+  role: {
+    defaultMessage: 'Role',
+    description: 'Label for role input in user creation',
+    id: 'constants.user.role'
+  },
   userDevice: {
     defaultMessage: 'Device',
     description: 'User device',

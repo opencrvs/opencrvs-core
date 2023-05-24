@@ -18,9 +18,7 @@ export default {
   component: TextArea
 } as Meta
 
-const Template: Story<{ ignoreMediaQuery?: boolean }> = (args) => (
-  <TextArea {...args} />
-)
+const Template: Story = (args) => <TextArea {...args} />
 
 export const TextAreaView = Template.bind({})
 TextAreaView.args = {

@@ -32,7 +32,11 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import {
+  clearUserFormData,
+  ISystemRolesMap,
+  modifyUserFormData
+} from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormikTouched, FormikValues } from 'formik'
@@ -43,7 +47,7 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { selectSystemRoleMap } from '@client/user/selectors'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -64,6 +68,7 @@ type IProps = {
   nextSectionId: string
   nextGroupId: string
   offlineCountryConfig: IOfflineData
+  systemRoleMap: ISystemRolesMap
 }
 
 type IState = {
@@ -134,6 +139,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
     ) {
+      if (values.role) {
+        const getSystemRoles = this.props.systemRoleMap
+        values.systemRole = getSystemRoles[values.role]
+      }
       this.props.modifyUserFormData({ ...formData, ...values })
       this.setState({
         disableContinueOnLocation: false
@@ -198,8 +207,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (
   state: IStoreState
-): { offlineCountryConfig: IOfflineData } => {
+): { offlineCountryConfig: IOfflineData; systemRoleMap: ISystemRolesMap } => {
   return {
+    systemRoleMap: selectSystemRoleMap(state),
     offlineCountryConfig: getOfflineData(state)
   }
 }

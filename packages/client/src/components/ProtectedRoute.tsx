@@ -14,10 +14,11 @@ import { Route } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
-import { hasAccessToRoute, Roles } from '@client/utils/authUtils'
+import { hasAccessToRoute } from '@client/utils/authUtils'
+import { SystemRoleType } from '@client/utils/gateway'
 
 export interface IProps {
-  roles?: Roles[]
+  roles?: SystemRoleType[]
 }
 
 class ProtectedRouteWrapper extends Route<

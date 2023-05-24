@@ -32,6 +32,14 @@ interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -44,8 +52,8 @@ export interface IUserModelData {
   email: string
   mobile: string
   status: string
-  role: string
-  type: string
+  systemRole: string
+  role: IUserRole
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -79,11 +87,12 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'identifiers'
+    | 'role'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
+  systemRole: string
   role: string
-  type: string
   signature?: GQLSignatureInput
 }
 
@@ -91,7 +100,7 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -161,20 +170,21 @@ export const userTypeResolvers: GQLResolver = {
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]
     },
-    async primaryOffice(userModel: IUserModelData, _, authHeader) {
-      return await fetchFHIR(
-        `/Location/${userModel.primaryOfficeId}`,
-        authHeader
-      )
+    async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
+      return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },
-    async catchmentArea(userModel: IUserModelData, _, authHeader) {
+    async catchmentArea(userModel: IUserModelData, _, { dataSources }) {
       return await Promise.all(
         userModel.catchmentAreaIds.map((areaId: string) => {
-          return fetchFHIR(`/Location/${areaId}`, authHeader)
+          return dataSources.locationsAPI.getLocation(areaId)
         })
       )
     },
-    async localRegistrar(userModel: IUserModelData, _, authHeader) {
+    async localRegistrar(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader }
+    ) {
       const scope = userModel.scope
 
       if (!scope) {
@@ -185,7 +195,7 @@ export const userTypeResolvers: GQLResolver = {
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${userModel.practitionerId}`,
-            practitionerRole: userModel.role
+            practitionerRole: userModel.systemRole
           }
 
       if (!practitionerId) {
@@ -204,7 +214,7 @@ export const userTypeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
       const signature =
-        userModel.role === 'FIELD_AGENT'
+        userModel.systemRole === 'FIELD_AGENT'
           ? null
           : signatureExtension && signatureExtension.valueSignature
 
@@ -217,7 +227,7 @@ export const userTypeResolvers: GQLResolver = {
         }
       }
     },
-    async signature(userModel: IUserModelData, _, authHeader) {
+    async signature(userModel: IUserModelData, _, { headers: authHeader }) {
       const practitioner: fhir.Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader

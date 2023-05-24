@@ -19,11 +19,7 @@ import {
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, {
-  FIELD_AGENT_TYPES,
-  IUser,
-  IUserModel
-} from '@user-mgnt/model/user'
+import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
   generateSaltedHash,
   generateRandomPassword
@@ -63,26 +59,16 @@ export default async function createUser(
       user.primaryOfficeId,
       token
     )
-    user.role = user.role ?? 'FIELD_AGENT'
+    user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
-    if (user.role === 'FIELD_AGENT') {
-      if (!user.type || !Object.values(FIELD_AGENT_TYPES).includes(user.type)) {
-        return h.response('Type not supported for this user').code(403)
-      }
-    } else {
-      if (user.type) {
-        return h.response('Type not supported for this user').code(403)
-      }
-    }
-
-    const role = createFhirPractitionerRole(user, practitionerId, false)
+    const role = await createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
     if (!roleId) {
       throw new Error(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = roleScopeMapping[user.role]
+    const userScopes: string[] = roleScopeMapping[user.systemRole]
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -93,9 +79,9 @@ export default async function createUser(
     user.scope = userScopes
 
     if (
-      user.role === 'NOTIFICATION_API_USER' ||
-      user.role === 'VALIDATOR_API_USER' ||
-      user.role === 'AGE_VERIFICATION_API_USER'
+      user.systemRole === 'NOTIFICATION_API_USER' ||
+      user.systemRole === 'VALIDATOR_API_USER' ||
+      user.systemRole === 'AGE_VERIFICATION_API_USER'
     ) {
       // Immediately active API users
       user.status = statuses.ACTIVE

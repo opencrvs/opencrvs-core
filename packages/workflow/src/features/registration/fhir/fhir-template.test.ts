@@ -36,7 +36,15 @@ describe('Verify fhir templates', () => {
           {
             fullUrl: '121',
             resource: {
-              resourceType: 'composition'
+              resourceType: 'Composition',
+              type: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'birth-declaration'
+                  }
+                ]
+              }
             }
           }
         ]

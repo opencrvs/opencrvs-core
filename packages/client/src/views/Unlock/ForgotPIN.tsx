@@ -36,8 +36,6 @@ import { userQueries } from '@client/user/queries'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
 import { Box, Link, Stack, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { BackgroundWrapper } from '@client/views/common/Common'
@@ -106,12 +104,16 @@ export function ForgotPIN(props: IForgotPINProps) {
     dispatch(redirectToAuthentication())
   }, [dispatch])
   const language = useSelector(getLanguage)
-  const onForgetPassword = useCallback(() => {
-    logout()
-    window.location.assign(
-      window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-    )
-  }, [language, logout])
+  const onForgetPassword = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault()
+      logout()
+      window.location.assign(
+        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
+      )
+    },
+    [language, logout]
+  )
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -158,7 +160,7 @@ export function ForgotPIN(props: IForgotPINProps) {
             <Icon name="ArrowLeft" />
           </Button>
           <Button type="icon" onClick={logout} id="logout">
-            <Icon name="LogOut" />
+            <Icon name="SignOut" />
           </Button>
         </Stack>
         <Stack direction="column">

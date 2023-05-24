@@ -16,3 +16,4 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const DEFAULT_TIMEOUT = 600000
+export const PRODUCTION = process.env.NODE_ENV === 'production'

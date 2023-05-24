@@ -22,6 +22,7 @@ export const COMPLETION = 'completed'
 export const APPROVED = 'approved'
 export const REGISTERED = 'registered'
 export const CERTIFIED = 'certified'
+export const ISSUED = 'issued'
 export const EMPTY_STRING = ''
 export const DECLARATION_DATE_FORMAT = 'yyyy-MM-dd'
 export const CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT = 'dd.MM.yyyy'
@@ -101,11 +102,13 @@ export const LOADER_MIN_DISPLAY_TIME =
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   import.meta.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
-export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const AVATAR_API =
+  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
 export const ACCUMULATED_FILE_SIZE = 20480000
 
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
+export const MARRIAGE_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */

@@ -51,7 +51,7 @@ const Header = styled.div`
 const TopActionBar = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 `
 export const SubHeader = styled.div`
   padding-bottom: 16px;
@@ -156,7 +156,7 @@ interface IProps {
   icon?: () => React.ReactNode
   backButtonLabel?: string
   backButtonAction?: () => void
-  title?: string
+  title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
   truncateTitleOnMobile?: boolean

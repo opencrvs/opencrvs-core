@@ -22,7 +22,8 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 
 const clearPassword = (component: ReactWrapper) => {
-  const pinInput = component.find('#pin-input')
+  const pinInput = component.find('#pin-input').hostNodes().first()
+
   pinInput.simulate('keypress', { key: 'Backspace' })
   pinInput.simulate('keypress', { key: 'Backspace' })
   pinInput.simulate('keypress', { key: 'Backspace' })
@@ -30,7 +31,11 @@ const clearPassword = (component: ReactWrapper) => {
   component.update()
 }
 const pressPin = (component: ReactWrapper, keyCode: number) => {
-  component.find('#pin-input').simulate('keyDown', { keyCode })
+  component
+    .find('#pin-input')
+    .hostNodes()
+    .first()
+    .simulate('keyDown', { keyCode })
   component.update()
 }
 

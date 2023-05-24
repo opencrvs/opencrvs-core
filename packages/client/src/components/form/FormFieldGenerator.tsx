@@ -16,7 +16,7 @@ import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
-import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -94,36 +94,34 @@ import { InformativeRadioGroup } from '@client/views/PrintCertificate/Informativ
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
-  injectIntl,
   FormattedMessage,
   MessageDescriptor,
   useIntl
 } from 'react-intl'
 import {
-  withFormik,
   FastField,
   Field,
   FormikProps,
   FieldProps,
   FormikTouched,
-  FormikValues
+  FormikValues,
+  Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
 import { isEqual, flatten } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
-import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { dynamicDispatch } from '@client/declarations'
 import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { UserDetails } from '@client/utils/userUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -147,10 +145,6 @@ const LocationSearchFormField = styled(LocationSearch)`
   ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
     width: 344px;
   }`}
-
-  & > input {
-    border-radius: 0;
-  }
 `
 
 function handleSelectFocus(id: string, isSearchable: boolean) {
@@ -230,7 +224,8 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled ?? disabled,
     error: Boolean(error),
     touched: Boolean(touched),
-    placeholder: fieldDefinition.placeholder
+    placeholder: fieldDefinition.placeholder,
+    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
   }
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
@@ -285,8 +280,8 @@ function GeneratedInputField({
         files={value as IAttachmentValue}
         error={error}
         onComplete={(file) => {
-          onSetFieldValue(fieldDefinition.name, file)
           setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+          onSetFieldValue(fieldDefinition.name, file)
         }}
         onUploadingStateChanged={onUploadingStateChanged}
         requiredErrorMessage={requiredErrorMessage}
@@ -510,7 +505,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === WARNING) {
-    return <WarningMessage>{fieldDefinition.label}</WarningMessage>
+    return <ErrorText>{fieldDefinition.label}</ErrorText>
   }
 
   if (fieldDefinition.type === LINK) {
@@ -582,7 +577,7 @@ function GeneratedInputField({
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 ) {
   let fieldInitialValue = field.initialValue as IFormFieldValue
   const catchmentAreas = userDetails?.catchmentArea
@@ -591,10 +586,16 @@ export function getInitialValueForSelectDynamicValue(
 
   if (catchmentAreas) {
     catchmentAreas.forEach((catchmentArea) => {
-      if (catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')) {
+      if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'DISTRICT'
+        )
+      ) {
         district = catchmentArea.id
       } else if (
-        catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'STATE'
+        )
       ) {
         state = catchmentArea.id
       }
@@ -612,7 +613,7 @@ export function getInitialValueForSelectDynamicValue(
 
 const mapFieldsToValues = (
   fields: IFormField[],
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 ) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
@@ -663,7 +664,7 @@ interface IFormSectionProps {
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }
 
 interface IDispatchProps {
@@ -814,30 +815,10 @@ class FormSectionComponent extends React.Component<Props> {
     const language = this.props.intl.locale
 
     const errors = this.props.errors as unknown as Errors
-    /*
-     * HACK
-     *
-     * No idea why, but when "fields" prop is changed from outside,
-     * "values" still reflect the old version for one render.
-     *
-     * This causes React to throw an error. You can see this happening by doing:
-     *
-     * if (fields.length > Object.keys(values).length) {
-     *   console.log({ fields, values })
-     * }
-     *
-     * 22.8.2019
-     *
-     * This might be because of setState not used with the function syntax
-     */
-
-    const fieldsWithValuesDefined = fields.filter(
-      (field) => values[field.name] !== undefined
-    )
 
     return (
       <section>
-        {fieldsWithValuesDefined.map((field) => {
+        {fields.map((field) => {
           let error: string
           const fieldErrors = errors[field.name] && errors[field.name].errors
 
@@ -921,7 +902,7 @@ class FormSectionComponent extends React.Component<Props> {
                       groups: [
                         {
                           id: `${this.props.id}-view-group`,
-                          fields: fieldsWithValuesDefined
+                          fields
                         }
                       ]
                     } as IFormSection
@@ -1128,30 +1109,38 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
-const FormFieldGeneratorWithFormik = withFormik<
-  IFormSectionProps & IStateProps & IDispatchProps,
-  IFormSectionData
->({
-  mapPropsToValues: (props) =>
-    props.initialValues
-      ? props.initialValues
-      : mapFieldsToValues(props.fields, props.userDetails),
-  handleSubmit: (values) => {},
-  validate: (values, props: IFormSectionProps & IStateProps) =>
-    getValidationErrorsForForm(
-      props.fields,
-      values,
-      props.offlineCountryConfig,
-      props.draftData,
-      props.requiredErrorMessage
-    )
-})(injectIntl(FormSectionComponent))
+export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const userDetails = useSelector(getUserDetails)
+  const intl = useIntl()
+  const dispatch = useDispatch()
 
-export const FormFieldGenerator = connect(
-  (state: IStoreState, ownProps: IFormSectionProps) => ({
-    ...ownProps,
-    offlineCountryConfig: getOfflineData(state),
-    userDetails: getUserDetails(state)
-  }),
-  { dynamicDispatch }
-)(FormFieldGeneratorWithFormik)
+  return (
+    <Formik<IFormSectionData>
+      initialValues={
+        props.initialValues ?? mapFieldsToValues(props.fields, userDetails)
+      }
+      onSubmit={() => {}}
+      validate={(values) =>
+        getValidationErrorsForForm(
+          props.fields,
+          values,
+          offlineCountryConfig,
+          props.draftData,
+          props.requiredErrorMessage
+        )
+      }
+    >
+      {(formikProps) => (
+        <FormSectionComponent
+          {...props}
+          {...formikProps}
+          intl={intl}
+          offlineCountryConfig={offlineCountryConfig}
+          userDetails={userDetails}
+          dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
+        />
+      )}
+    </Formik>
+  )
+}

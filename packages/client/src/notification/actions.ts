@@ -1,3 +1,4 @@
+import { AdditionalIdWithCompositionId } from '@client/utils/gateway'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 /*
@@ -34,6 +35,9 @@ export const SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST =
 
 export const SHOW_USER_AUDIT_SUCCESS_TOAST = 'SHOW_USER_AUDIT_SUCCESS_TOAST'
 export const HIDE_USER_AUDIT_SUCCESS_TOAST = 'HIDE_USER_AUDIT_SUCCESS_TOAST'
+
+export const SHOW_DUPLICATE_RECORDS_TOAST = 'SHOW_DUPLICATE_RECORDS_TOAST'
+export const HIDE_DUPLICATE_RECORDS_TOAST = 'HIDE_DUPLICATE_RECORDS_TOAST'
 
 export const SHOW_PIN_UPDATE_SUCCESS = 'SHOW_PIN_UPDATE_SUCCESS'
 export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
@@ -217,6 +221,27 @@ export const hideUserAuditSuccessToast = (): HideUserAuditSuccessToast => ({
   type: HIDE_USER_AUDIT_SUCCESS_TOAST
 })
 
+export type ShowDuplicateRecordsToast = {
+  type: typeof SHOW_DUPLICATE_RECORDS_TOAST
+  payload: { trackingId: string; compositionId: string }
+}
+
+export const showDuplicateRecordsToast = ({
+  trackingId,
+  compositionId
+}: AdditionalIdWithCompositionId): ShowDuplicateRecordsToast => ({
+  type: SHOW_DUPLICATE_RECORDS_TOAST,
+  payload: { trackingId, compositionId }
+})
+
+export type HideDuplicateRecordsToast = {
+  type: typeof HIDE_DUPLICATE_RECORDS_TOAST
+}
+
+export const hideDuplicateRecordsToast = () => ({
+  type: HIDE_DUPLICATE_RECORDS_TOAST
+})
+
 export type ShowPINUpdateSuccessAction = {
   type: typeof SHOW_PIN_UPDATE_SUCCESS
 }
@@ -262,5 +287,7 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
+  | ShowDuplicateRecordsToast
+  | HideDuplicateRecordsToast
   | ShowUserReconnectedToastAction
   | HideUserReconnectedToastAction

@@ -41,6 +41,9 @@ type UserAuditAction =
   | 'REINSTATED_REJECTED'
   | 'SENT_FOR_APPROVAL'
   | 'CERTIFIED'
+  | 'ISSUED'
+  | 'MARKED_AS_DUPLICATE'
+  | 'MARKED_AS_NOT_DUPLICATE'
 
 type RawUserAuditDataPoint = {
   practitionerId: number
@@ -81,6 +84,9 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'REINSTATED_REJECTED'>
   | UserAuditDataPointWithComposition<'SENT_FOR_APPROVAL'>
   | UserAuditDataPointWithComposition<'CERTIFIED'>
+  | UserAuditDataPointWithComposition<'ISSUED'>
+  | UserAuditDataPointWithComposition<'MARKED_AS_DUPLICATE'>
+  | UserAuditDataPointWithComposition<'MARKED_AS_NOT_DUPLICATE'>
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,

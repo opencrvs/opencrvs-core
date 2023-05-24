@@ -27,6 +27,7 @@ export async function syncRegistrarWorkqueue(
   approvalSkip: number,
   externalValidationSkip: number,
   printSkip: number,
+  issueSkip: number,
   userId?: string
 ) {
   if (isFieldAgent && userId) {
@@ -60,7 +61,8 @@ export async function syncRegistrarWorkqueue(
           rejectSkip: rejectSkip,
           approvalSkip: approvalSkip,
           externalValidationSkip: externalValidationSkip,
-          printSkip: printSkip
+          printSkip: printSkip,
+          issueSkip: issueSkip
         },
         fetchPolicy: 'no-cache'
       })

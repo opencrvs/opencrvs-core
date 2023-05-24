@@ -22,7 +22,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Box, Text, Toast } from '@opencrvs/components'
+import { Box, Stack, Text, Toast } from '@opencrvs/components'
 import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
 import styled from 'styled-components'
 
@@ -31,19 +31,10 @@ type IProps = IntlShapeProps & {
   offlineCountryConfiguration: IOfflineData
 }
 
-export const StyledTitle = styled(Text).attrs({
-  variant: 'h3',
-  element: 'h3'
-})`
-  text-align: center;
+const Content = styled.div`
+  padding: 16px 0;
 `
 
-export const ConfirmPinDescription = styled(Text).attrs({
-  variant: 'bold21',
-  element: 'p'
-})`
-  text-align: center;
-`
 class CreatePinComponent extends React.Component<IProps> {
   pinKeyRef: any
 
@@ -117,127 +108,121 @@ class CreatePinComponent extends React.Component<IProps> {
     return (
       <BackgroundWrapper>
         <Box id="Box">
-          <LogoContainer>
-            <CountryLogo
-              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-            />
-          </LogoContainer>
-          {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
-            <>
-              <StyledTitle id="title-text">
-                {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
-
-              <Text element="p" variant="reg16">
-                {intl.formatMessage(messages.createDescription)}
-              </Text>
-
-              {pinMatchError && (
+          <Content>
+            <LogoContainer>
+              <CountryLogo
+                size="small"
+                src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+              />
+            </LogoContainer>
+            {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
+              <>
+                <Text element="h1" variant="h2" align="center" id="title-text">
+                  {intl.formatMessage(messages.createTitle)}
+                </Text>
+                <Text element="p" variant="reg16" align="center">
+                  {intl.formatMessage(messages.createDescription)}
+                </Text>
+                {pinMatchError && (
+                  <Toast
+                    type="error"
+                    id="pinMatchErrorMsg"
+                    onClose={() => {
+                      this.setState({ pinMatchError: false })
+                    }}
+                  >
+                    {intl.formatMessage(messages.pinMatchError)}
+                  </Toast>
+                )}
+                <PINKeypad
+                  pin=""
+                  ref={(elem: any) => (this.pinKeyRef = elem)}
+                  onComplete={this.firstPINEntry}
+                />
+              </>
+            )}
+            {pinHasSeqDigits && (
+              <>
+                <Text element="h1" variant="h2" align="center" id="title-text">
+                  {intl.formatMessage(messages.createTitle)}
+                </Text>
+                <Text
+                  element="p"
+                  variant="reg16"
+                  color="supportingCopy"
+                  align="center"
+                  id="description-text"
+                >
+                  {intl.formatMessage(messages.createDescription)}
+                </Text>
                 <Toast
                   type="error"
-                  id="pinMatchErrorMsg"
+                  id="pinHasSeqDigitsErrorMsg"
                   onClose={() => {
-                    this.setState({ pinMatchError: false })
+                    this.setState({ pinHasSeqDigits: false })
                   }}
                 >
-                  {intl.formatMessage(messages.pinMatchError)}
+                  {intl.formatMessage(messages.pinSequentialDigitsError)}
                 </Toast>
-              )}
-              <PINKeypad
-                pin=""
-                ref={(elem: any) => (this.pinKeyRef = elem)}
-                onComplete={this.firstPINEntry}
-              />
-            </>
-          )}
-          {pinHasSeqDigits && (
-            <>
-              <StyledTitle id="title-text">
-                {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
-              <Text element="p" variant="reg16" id="description-text">
-                {intl.formatMessage(messages.createDescription)}
-              </Text>
-              <Toast
-                type="error"
-                id="pinHasSeqDigitsErrorMsg"
-                onClose={() => {
-                  this.setState({ pinHasSeqDigits: false })
-                }}
-              >
-                {intl.formatMessage(messages.pinSequentialDigitsError)}
-              </Toast>
-              <PINKeypad
-                onComplete={this.firstPINEntry}
-                key={refresher.toString()}
-              />
-            </>
-          )}
-          {pinHasSameDigits && (
-            <>
-              <StyledTitle id="title-text">
-                {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
-              <Text element="p" variant="reg16" id="description-text">
-                {intl.formatMessage(messages.createDescription)}
-              </Text>
-              <Toast
-                type="error"
-                id="pinHasSameDigitsErrorMsg"
-                onClose={() => {
-                  this.setState({ pinHasSameDigits: false })
-                }}
-              >
-                {intl.formatMessage(messages.pinSameDigitsError)}
-              </Toast>
-              <PINKeypad
-                ref={(elem: any) => (this.pinKeyRef = elem)}
-                onComplete={this.firstPINEntry}
-                key={refresher.toString()}
-              />
-            </>
-          )}
-          {pin && (
-            <>
-              <StyledTitle id="title-text">
-                {intl.formatMessage(messages.reEnterTitle)}
-              </StyledTitle>
-              <ConfirmPinDescription id="description-text">
-                ....
-              </ConfirmPinDescription>
+                <PINKeypad
+                  onComplete={this.firstPINEntry}
+                  key={refresher.toString()}
+                />
+              </>
+            )}
+            {pinHasSameDigits && (
+              <>
+                <Text element="h1" variant="h2" align="center" id="title-text">
+                  {intl.formatMessage(messages.createTitle)}
+                </Text>
+                <Text
+                  element="p"
+                  variant="reg16"
+                  align="center"
+                  id="description-text"
+                >
+                  {intl.formatMessage(messages.createDescription)}
+                </Text>
+                <Toast
+                  type="error"
+                  id="pinHasSameDigitsErrorMsg"
+                  onClose={() => {
+                    this.setState({ pinHasSameDigits: false })
+                  }}
+                >
+                  {intl.formatMessage(messages.pinSameDigitsError)}
+                </Toast>
+                <PINKeypad
+                  ref={(elem: any) => (this.pinKeyRef = elem)}
+                  onComplete={this.firstPINEntry}
+                  key={refresher.toString()}
+                />
+              </>
+            )}
+            {pin && (
+              <>
+                <Text element="h1" variant="h2" align="center" id="title-text">
+                  {intl.formatMessage(messages.reEnterTitle)}
+                </Text>
+                <Text
+                  element="p"
+                  variant="reg16"
+                  align="center"
+                  id="description-text"
+                >
+                  {intl.formatMessage(messages.reEnterDescription)}
+                </Text>
 
-              <PINKeypad
-                ref={(elem: any) => (this.pinKeyRef = elem)}
-                onComplete={this.secondPINEntry}
-              />
-            </>
-          )}
+                <PINKeypad
+                  ref={(elem: any) => (this.pinKeyRef = elem)}
+                  onComplete={this.secondPINEntry}
+                />
+              </>
+            )}
+          </Content>
         </Box>
       </BackgroundWrapper>
     )
-  }
-
-  componentDidUpdate = () => this.focusKeypad()
-
-  componentDidMount = () => {
-    document.addEventListener('mouseup', this.handleClick, false)
-    this.focusKeypad()
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('mouseup', this.handleClick, false)
-  }
-
-  handleClick = (e: Event) => {
-    this.focusKeypad()
-  }
-
-  focusKeypad = () => {
-    const node =
-      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
-    if (node) {
-      node.focus()
-    }
   }
 }
 

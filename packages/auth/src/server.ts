@@ -67,6 +67,9 @@ import {
 } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
+import anonymousTokenHandler, {
+  responseSchema
+} from './features/anonymousToken/handler'
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
@@ -111,6 +114,21 @@ export async function createServer() {
     }
   })
 
+  // curl -H 'Content-Type: application/json' http://localhost:4040/anonymous-token
+  server.route({
+    method: 'GET',
+    path: '/anonymous-token',
+    handler: anonymousTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Authenticate an anonymous user',
+      notes:
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
+      response: {
+        schema: responseSchema
+      }
+    }
+  })
   // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate
   server.route({
     method: 'POST',

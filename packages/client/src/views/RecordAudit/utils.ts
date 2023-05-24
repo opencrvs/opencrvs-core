@@ -29,7 +29,8 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLHumanName,
-  GQLAssignmentData
+  GQLAssignmentData,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -54,7 +55,7 @@ import {
   History,
   HumanName
 } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
   id: string
@@ -64,11 +65,13 @@ export interface IDeclarationData {
   type?: string
   dateOfBirth?: string
   dateOfDeath?: string
+  dateOfMarriage?: string
   placeOfBirth?: string
   placeOfDeath?: string
+  placeOfMarriage?: string
   informant?: string
   informantContact?: string
-  brnDrn?: string
+  registrationNo?: string
   nid?: string
   assignment?: GQLAssignmentData
 }
@@ -77,6 +80,8 @@ export interface IGQLDeclaration {
   id: string
   child?: { name: Array<GQLHumanName | null> }
   deceased?: { name: Array<GQLHumanName | null> }
+  bride?: { name: Array<GQLHumanName | null> }
+  groom?: { name: Array<GQLHumanName | null> }
   registration?: {
     trackingId: string
     type: string
@@ -92,6 +97,18 @@ export const getFieldValue = (
   intl: IntlShape
 ) => {
   let original = value
+  // HOTFIX: The name of the fieldObject that is being received
+  // here is internationalStatePrimary rather than statePrimary
+  // same for districts as well as the secondary address fields
+  if (
+    fieldObj.name.toLowerCase().includes('state') ||
+    fieldObj.name.toLowerCase().includes('district')
+  ) {
+    if (value && offlineData.locations?.[value]) {
+      return offlineData.locations[value].name
+    }
+  }
+
   if (has(fieldObj, 'dynamicOptions')) {
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)
@@ -147,7 +164,7 @@ export const getLocation = (
     internationalState =
       declaration.data?.deathEvent?.internationalState?.toString() ||
       EMPTY_STRING
-  } else {
+  } else if (declaration.event === Event.Birth) {
     locationType =
       declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
     locationId =
@@ -162,6 +179,29 @@ export const getLocation = (
       declaration.data?.child?.internationalDistrict?.toString() || EMPTY_STRING
     internationalState =
       declaration.data?.child?.internationalState?.toString() || EMPTY_STRING
+  } else if (declaration.event === Event.Marriage) {
+    district =
+      declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
+    state = declaration.data?.marriageEvent?.state?.toString() || EMPTY_STRING
+    country =
+      declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      EMPTY_STRING
+
+    if (country && country !== window.config.COUNTRY) {
+      let location = EMPTY_STRING
+      if (internationalDistrict) location = internationalDistrict + ', '
+      if (internationalState) location = location + internationalState + ', '
+      location = location + intl.formatMessage(countryMessages[country])
+      return location
+    }
+    return generateFullLocation(district, state, country, resources, intl)
   }
   if (locationType === 'HEALTH_FACILITY' && locationId) {
     const facility = resources.facilities[locationId]
@@ -269,19 +309,32 @@ export const isDeathDeclaration = (
   return (declaration && declaration.type === 'Death') || false
 }
 
+export const isMarriageDeclaration = (
+  declaration: GQLEventSearchSet | null
+): declaration is GQLMarriageEventSearchSet => {
+  return (declaration && declaration.type === 'Marriage') || false
+}
+
 export const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = EMPTY_STRING
-  let declarationName
+  const declarationName = []
   if (declaration.event === Event.Birth) {
-    declarationName = declaration.data?.child
-  } else {
-    declarationName = declaration.data?.deceased
+    declarationName.push(declaration.data?.child)
+  } else if (declaration.event === Event.Death) {
+    declarationName.push(declaration.data?.deceased)
+  } else if (declaration.event === Event.Marriage) {
+    declarationName.push(declaration.data?.groom)
+    declarationName.push(declaration.data?.bride)
   }
-
   if (declarationName) {
-    name = [declarationName.firstNamesEng, declarationName.familyNameEng]
+    name = declarationName
+      .map((obj) =>
+        [obj?.firstNamesEng, obj?.familyNameEng]
+          .filter((part) => Boolean(part))
+          .join(' ')
+      )
       .filter((part) => Boolean(part))
-      .join(' ')
+      .join(' & ')
   }
   return name
 }
@@ -311,7 +364,7 @@ export const getDraftDeclarationData = (
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
     type: declaration.event || EMPTY_STRING,
-    brnDrn:
+    registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||
       EMPTY_STRING,
     trackingId: trackingId,
@@ -319,8 +372,11 @@ export const getDraftDeclarationData = (
       declaration.data?.child?.childBirthDate?.toString() || EMPTY_STRING,
     dateOfDeath:
       declaration.data?.deathEvent?.deathDate?.toString() || EMPTY_STRING,
+    dateOfMarriage:
+      declaration.data?.marriageEvent?.marriageDate?.toString() || EMPTY_STRING,
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
+    placeOfMarriage: getLocation(declaration, resources, intl) || EMPTY_STRING,
     informant:
       ((declaration.data?.registration?.contactPoint as IFormSectionData)
         ?.value as string) || EMPTY_STRING,
@@ -348,6 +404,18 @@ export const getWQDeclarationData = (
     workqueueDeclaration.deceasedName
   ) {
     name = getName(workqueueDeclaration.deceasedName, language)
+  } else if (
+    isMarriageDeclaration(workqueueDeclaration) &&
+    workqueueDeclaration.brideName &&
+    workqueueDeclaration.groomName
+  ) {
+    const groomName = getName(workqueueDeclaration.groomName, language)
+    const brideName = getName(workqueueDeclaration.brideName, language)
+
+    name =
+      brideName && groomName
+        ? `${groomName} & ${brideName}`
+        : brideName || groomName || EMPTY_STRING
   }
   return {
     id: workqueueDeclaration?.id,
@@ -374,6 +442,19 @@ export const getGQLDeclaration = (
     name = data.deceased.name
       ? getName(data.deceased.name, language)
       : EMPTY_STRING
+  } else if (data.groom || data.bride) {
+    if (data.groom?.name && data.bride?.name) {
+      name = `${getName(data.groom.name, language)} & ${getName(
+        data.bride.name,
+        language
+      )}`
+    } else if (data.groom?.name) {
+      name = getName(data.groom.name, language)
+    } else if (data.bride?.name) {
+      name = getName(data.bride.name, language)
+    } else {
+      name = EMPTY_STRING
+    }
   }
   return {
     id: data?.id,
@@ -384,6 +465,10 @@ export const getGQLDeclaration = (
     assignment: data?.registration?.assignment,
     dateOfBirth: EMPTY_STRING,
     placeOfBirth: EMPTY_STRING,
+    dateOfDeath: EMPTY_STRING,
+    placeOfDeath: EMPTY_STRING,
+    dateOfMarriage: EMPTY_STRING,
+    placeOfMarriage: EMPTY_STRING,
     informant: EMPTY_STRING
   }
 }
@@ -407,7 +492,7 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: IUserDetails | null
+  loggedInUser: UserDetails | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {
@@ -417,8 +502,8 @@ export function getStatusLabel(
   if (
     regStatus === RegStatus.Declared &&
     performedBy?.id === loggedInUser?.userMgntUserID &&
-    loggedInUser?.role &&
-    FIELD_AGENT_ROLES.includes(loggedInUser.role)
+    loggedInUser?.systemRole &&
+    FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }
@@ -434,4 +519,16 @@ export function isSystemInitiated(history: History) {
   return Boolean(
     (history.dhis2Notification && !history.user?.id) || history.system
   )
+}
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+export function isVerifiedAction(history: History) {
+  return history.action === RegAction.Verified
+}
+
+export function isFlaggedAsPotentialDuplicate(history: History) {
+  return history.action === RegAction.FlaggedAsPotentialDuplicate
 }

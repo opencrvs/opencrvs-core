@@ -32,8 +32,9 @@ const {
   createGlobalStyle,
   keyframes,
   ThemeProvider,
-  withTheme
+  withTheme,
+  useTheme
 } = styledComponents as styledComponents.ThemedStyledComponentsModule<ITheme>
 
-export { css, createGlobalStyle, keyframes, ThemeProvider, withTheme }
+export { css, createGlobalStyle, keyframes, ThemeProvider, withTheme, useTheme }
 export default styled

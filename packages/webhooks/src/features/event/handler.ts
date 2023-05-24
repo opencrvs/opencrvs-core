@@ -206,6 +206,13 @@ export async function deathRegisteredHandler(
   return h.response().code(200)
 }
 
+export async function marriageRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  return h.response().code(200)
+}
+
 const fetchSystemPermissions = async (
   { createdBy: { client_id, type } }: IWebhookModel,
   authHeader: IAuthHeader,

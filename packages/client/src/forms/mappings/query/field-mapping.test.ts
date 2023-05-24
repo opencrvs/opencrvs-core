@@ -71,8 +71,21 @@ describe('Query FieldMapping', () => {
     )
     const expectedResult = {
       template: {
-        placeOfBirth: ['ARK Private Clinic', 'Abwe', 'Central', undefined],
-        placeOfBirthCountry: undefined,
+        placeOfBirth: [
+          'ARK Private Clinic',
+          'Abwe',
+          'Central',
+          {
+            defaultMessage: 'Bangladesh',
+            description: 'ISO Country: BGD',
+            id: 'countries.BGD'
+          }
+        ],
+        placeOfBirthCountry: {
+          defaultMessage: 'Bangladesh',
+          description: 'ISO Country: BGD',
+          id: 'countries.BGD'
+        },
         placeOfBirthDistrict: 'Abwe',
         placeOfBirthFacility: 'ARK Private Clinic',
         placeOfBirthState: 'Central'

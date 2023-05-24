@@ -165,7 +165,11 @@ describe('locationUtil tests', () => {
       expect(map).toEqual({
         DISTRICT: 'Abwe',
         STATE: 'Central',
-        country: undefined,
+        country: {
+          defaultMessage: 'Bangladesh',
+          description: 'ISO Country: BGD',
+          id: 'countries.BGD'
+        },
         facility: 'ARK Private Clinic'
       })
     })

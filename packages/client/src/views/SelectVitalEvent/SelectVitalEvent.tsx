@@ -109,6 +109,11 @@ class SelectVitalEventView extends React.Component<
             this.props.storeDeclaration(declaration)
             this.props.goToDeathInformant(declaration.id)
             break
+          case Event.Marriage:
+            declaration = createDeclaration(Event.Marriage)
+            this.props.storeDeclaration(declaration)
+            this.props.goToDeathInformant(declaration.id)
+            break
           default:
             throw new Error(`Unknown eventType ${this.state.goTo}`)
         }
@@ -162,6 +167,21 @@ class SelectVitalEventView extends React.Component<
                 selected={this.state.goTo === 'death' ? 'death' : ''}
                 onChange={() =>
                   this.setState({ goTo: 'death', noEventSelectedError: false })
+                }
+              />
+              <RadioButton
+                size="large"
+                key="marriagevent"
+                name="marriageevent"
+                label={intl.formatMessage(constantsMessages.marriage)}
+                value="marriage"
+                id="select_marriage_event"
+                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+                onChange={() =>
+                  this.setState({
+                    goTo: 'marriage',
+                    noEventSelectedError: false
+                  })
                 }
               />
             </Actions>

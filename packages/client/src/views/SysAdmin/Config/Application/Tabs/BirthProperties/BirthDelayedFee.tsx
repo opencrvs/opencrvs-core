@@ -83,7 +83,9 @@ export function BirthDelayedFee() {
               ON_TIME: offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME,
               LATE: offlineCountryConfiguration.config.BIRTH.FEE.LATE,
               DELAYED: parseFloat(birthDelayedFee.replace(/,/g, ''))
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.BIRTH.PRINT_IN_ADVANCE
           }
         },
         dispatch,

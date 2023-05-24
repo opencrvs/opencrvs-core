@@ -82,6 +82,7 @@ export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
+  customIcon?: React.ReactNode
 }
 
 /**
@@ -93,20 +94,27 @@ export const Alert = ({
   onActionClick,
   actionText,
   children,
+  customIcon,
   ...props
 }: IAlertProps) => (
   <Container $type={type} {...props}>
     <IconContainer>
-      {type === 'success' && <Check />}
-      {type === 'warning' && <Help />}
-      {type === 'error' && <NotificationError />}
-      {type === 'info' && <Notification />}
-      {type === 'loading' && (
-        <Spinner
-          id="in-progress-floating-notification"
-          baseColor={colors.white}
-          size={20}
-        />
+      {!customIcon ? (
+        <>
+          {type === 'success' && <Check />}
+          {type === 'warning' && <Help />}
+          {type === 'error' && <NotificationError />}
+          {type === 'info' && <Notification />}
+          {type === 'loading' && (
+            <Spinner
+              id="in-progress-floating-notification"
+              baseColor={colors.white}
+              size={20}
+            />
+          )}
+        </>
+      ) : (
+        <>{customIcon}</>
       )}
     </IconContainer>
 

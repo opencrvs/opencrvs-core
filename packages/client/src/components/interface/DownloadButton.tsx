@@ -24,7 +24,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, SystemRoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -33,7 +33,7 @@ import {
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
-import { AvatarVerySmall } from '@client/components/Avatar'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
@@ -45,7 +45,6 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
-import { Roles } from '@client/utils/authUtils'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -65,7 +64,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: Roles
+  userRole?: SystemRoleType
   userId?: string
 }
 interface IDispatchProps {
@@ -79,12 +78,11 @@ type HOCProps = IConnectProps & IDispatchProps
 const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
+  height: 40px;
+  width: 40px;
   display: flex;
-  flex-grow: 0;
   align-items: center;
-  max-width: 152px;
-  justify-content: ${({ isLoading }) =>
-    isLoading ? `space-between` : `flex-end`};
+  justify-content: center;
 `
 const DownloadAction = styled(Button)`
   border-radius: 50%;
@@ -113,7 +111,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: Roles,
+  userRole?: SystemRoleType,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -143,8 +141,8 @@ function getAssignModalOptions(
     }
   } else if (assignment) {
     if (
-      userRole === Roles.LOCAL_REGISTRAR ||
-      userRole === Roles.NATIONAL_REGISTRAR
+      userRole === SystemRoleType.LocalRegistrar ||
+      userRole === SystemRoleType.NationalRegistrar
     ) {
       return {
         title: conflictsMessages.unassignTitle,
@@ -174,6 +172,11 @@ function getAssignModalOptions(
   }
 }
 const NoConnectionViewContainer = styled.div`
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .no-connection {
     ::after {
       display: none;
@@ -258,7 +261,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        (assignment?.userId != userId ||
+        (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
         (downloadConfigs.declarationStatus !== 'VALIDATED' ||
           userRole !== ROLE_REGISTRATION_AGENT) &&
@@ -339,8 +342,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
-        ) : assignment && assignment.userId != userId ? (
-          <AvatarVerySmall
+        ) : assignment && assignment.userId !== userId ? (
+          <AvatarSmall
             avatar={{
               data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
               type: 'image/jpeg'
@@ -371,7 +374,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role as Roles | undefined,
+  userRole: state.profile.userDetails?.systemRole,
   userId: state.profile.userDetails?.userMgntUserID
 })
 

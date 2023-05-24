@@ -77,7 +77,9 @@ export function DeathRegistrationTarget() {
             FEE: {
               ON_TIME: offlineCountryConfiguration.config.DEATH.FEE.ON_TIME,
               DELAYED: offlineCountryConfiguration.config.DEATH.FEE.DELAYED
-            }
+            },
+            PRINT_IN_ADVANCE:
+              offlineCountryConfiguration.config.DEATH.PRINT_IN_ADVANCE
           }
         },
         dispatch,

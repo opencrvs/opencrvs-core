@@ -46,7 +46,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'REGISTRATION_AGENT'
+      systemRole: 'REGISTRATION_AGENT'
     }
   }
 }
@@ -63,7 +63,7 @@ const nameObjNatlSysAdmin = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'NATIONAL_SYSTEM_ADMIN'
+      systemRole: 'NATIONAL_SYSTEM_ADMIN'
     }
   }
 }
@@ -107,7 +107,6 @@ describe('Navigation for national system admin related tests', () => {
 
   it('Tabs loaded successfully including config tab', async () => {
     expect(testComponent.exists('#navigation_team')).toBeTruthy()
-    expect(testComponent.exists('#navigation_performance')).toBeTruthy()
     expect(testComponent.exists('#navigation_config_main')).toBeTruthy()
     testComponent.find('#navigation_config_main').hostNodes().simulate('click')
     testComponent.update()

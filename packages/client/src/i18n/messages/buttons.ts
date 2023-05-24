@@ -39,6 +39,7 @@ interface IButtonsMessages
   no: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
+  issue: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
   rejectDeclaration: MessageDescriptor
@@ -74,6 +75,7 @@ interface IButtonsMessages
   copy: MessageDescriptor
   copied: MessageDescriptor
   exactDateUnknown: MessageDescriptor
+  sendForUpdates: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -212,6 +214,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Print',
     description: 'Print button text',
     id: 'buttons.print'
+  },
+  issue: {
+    id: 'buttons.issue',
+    defaultMessage: 'Issue',
+    description: 'Button for issuing'
   },
   reinstate: {
     defaultMessage: 'Reinstate',
@@ -356,7 +363,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Correct record',
+    defaultMessage: 'No, make correction',
     description: 'Correct record button text on review certificate'
   },
   makeCorrection: {
@@ -394,6 +401,10 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Exact date unknown',
     description:
       'Label for DateRangePickerForFormField components daterangepicker toggle button'
+  },
+  sendForUpdates: {
+    id: 'buttons.sendForUpdates',
+    defaultMessage: 'Send for updates'
   }
 }
 

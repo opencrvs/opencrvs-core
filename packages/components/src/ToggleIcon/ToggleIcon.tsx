@@ -17,18 +17,13 @@ export function ToggleIcon({
   name,
   size = 'medium',
   color = 'currentColor',
-  fill = 'currentColor',
+  weight = 'fill',
   ...rest
 }: IconProps & React.HTMLAttributes<HTMLButtonElement>) {
-  const { defaultChecked } = rest
   return (
     <>
       <Button type="icon" {...rest}>
-        <Icon
-          name={name}
-          color={color}
-          fill={defaultChecked ? fill : 'white'}
-        ></Icon>
+        <Icon name={name} color={color} weight={weight}></Icon>
       </Button>
     </>
   )

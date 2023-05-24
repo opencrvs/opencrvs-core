@@ -34,7 +34,7 @@ Default.args = {
 }
 
 export const Heading = () => (
-  <Text variant="h1" element="h1">
+  <Text variant="h1" element="h1" align="center">
     The gold standard for digital civil registration
   </Text>
 )
@@ -55,7 +55,7 @@ export const HeadingWithColour = () => (
 )
 
 export const Body = () => (
-  <Text variant="reg16" element="p">
+  <Text variant="reg16" element="p" align="center">
     OpenCRVS is highly configurable, interoperable and scalable, making it
     ideally suited for use in low resource settings. It uses standards-based and
     proven technologies to provide effective digital civil registration services

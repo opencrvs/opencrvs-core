@@ -39,7 +39,8 @@ describe('Certificate root resolvers', () => {
 
       const certificateSVG = await resolvers.Query.getCertificateSVG(
         {},
-        { user: 'jonathan.campbell' }
+        { user: 'jonathan.campbell' },
+        { headers: undefined }
       )
 
       expect(certificateSVG).toBeDefined()
@@ -73,7 +74,8 @@ describe('Certificate root resolvers', () => {
 
       const certificateSVG = await resolvers.Query.getActiveCertificatesSVG(
         {},
-        { user: 'jonathan.campbell' }
+        { user: 'jonathan.campbell' },
+        { headers: undefined }
       )
 
       expect(certificateSVG).toBeDefined()
@@ -131,7 +133,7 @@ describe('Certificate root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateCertificateSVG(
         {},
         { certificateSVG },
-        authHeaderNatlSYSAdmin
+        { headers: authHeaderNatlSYSAdmin }
       )
 
       expect(response).toEqual({
@@ -151,14 +153,14 @@ describe('Certificate root resolvers', () => {
         resolvers.Mutation.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         'Create or update certificate is only allowed for natlsysadmin'
       )
     })
 
-    it('should throw error when /createUser sends anything but 201', async () => {
+    it('should throw error when /{action}certificate sends anything but 201', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'
@@ -170,7 +172,7 @@ describe('Certificate root resolvers', () => {
         resolvers.Mutation.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
-          authHeaderNatlSYSAdmin
+          { headers: authHeaderNatlSYSAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on config service. Couldn't create certificate"

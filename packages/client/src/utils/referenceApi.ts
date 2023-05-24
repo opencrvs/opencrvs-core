@@ -15,6 +15,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { questionsTransformer } from '@client/forms/questionConfig'
+import { merge } from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -50,6 +51,13 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+export interface IApplicationConfigAnonymous {
+  APPLICATION_NAME: string
+  COUNTRY_LOGO: ICountryLogo
+  LOGIN_BACKGROUND: ILoginBackground
+  PHONE_NUMBER_PATTERN: RegExp
+}
+
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -60,6 +68,7 @@ export interface IApplicationConfig {
       LATE: number
       DELAYED: number
     }
+    PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
@@ -69,6 +78,15 @@ export interface IApplicationConfig {
       ON_TIME: number
       DELAYED: number
     }
+    PRINT_IN_ADVANCE: boolean
+  }
+  MARRIAGE: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+    PRINT_IN_ADVANCE: boolean
   }
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -107,12 +125,35 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
+  /*
+   * This is a temporary fix to merge the config from the config API with the global config object.
+   * Without this questionsTransformer doesn't have the correct window.config.ADMIN_LEVELS value
+   * when the application is loaded with no offline data.
+   * This causes:
+   * - incorrect form fields for address to be shown in the forms
+   * - runtime errors if an implementing country has customized address fields
+   */
+  merge(window.config, response.config)
 
   response.formConfig.questionConfig = questionsTransformer(
     response.formConfig.questionConfig
   )
 
   return response
+}
+
+async function loadConfigAnonymousUser(): Promise<
+  Partial<IApplicationConfigResponse>
+> {
+  const url = `${window.config.CONFIG_API_URL}/publicConfig`
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+  return await res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -243,5 +284,6 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadContent,
-  loadConfig
+  loadConfig,
+  loadConfigAnonymousUser
 }

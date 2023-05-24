@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { differenceInDays } from 'date-fns'
+import { differenceInDays, eachMonthOfInterval } from 'date-fns'
 import {
   IBirthKeyFigures,
   IEstimation
@@ -62,7 +62,8 @@ export interface IMonthRangeFilter {
 
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
 
 export type Location = fhir.Location & { id: string }
@@ -391,9 +392,12 @@ export function getMonthRangeFilterListFromTimeRage(
   const monthFilterList: IMonthRangeFilter[] = []
   const monthDiffs =
     (endDateYear - startDateYear) * 12 + (endDateMonth - startDateMonth)
+  const rangeOfMonths = eachMonthOfInterval({
+    start: new Date(timeStart),
+    end: new Date(timeEnd)
+  })
   for (let index = 0; index <= monthDiffs; index += 1) {
-    const filterDate = new Date(timeStart)
-    filterDate.setMonth(filterDate.getMonth() + index)
+    const filterDate = rangeOfMonths[index]
     monthFilterList.push({
       monthIndex: filterDate.getMonth(),
       month: filterDate.toLocaleString('en-us', { month: 'long' }),
@@ -422,7 +426,9 @@ export async function getRegistrationTargetDays(
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.REGISTRATION_TARGET
-      : applicationConfig.DEATH?.REGISTRATION_TARGET
+      : event === EVENT_TYPE.DEATH
+      ? applicationConfig.DEATH?.REGISTRATION_TARGET
+      : applicationConfig.MARRIAGE?.REGISTRATION_TARGET
   return targetDays
 }
 

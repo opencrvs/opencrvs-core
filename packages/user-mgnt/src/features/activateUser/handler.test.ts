@@ -17,6 +17,7 @@ import User, { IUser } from '@user-mgnt/model/user'
 import { logger } from '@user-mgnt/logger'
 import * as mockingoose from 'mockingoose'
 import { cloneDeep } from 'lodash'
+import { Types } from 'mongoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -44,7 +45,8 @@ const mockUser: IUser & { _id: string } = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  role: 'LOCAL_REGISTRAR',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   status: 'pending',
   primaryOfficeId: '321',
   catchmentAreaIds: [],
