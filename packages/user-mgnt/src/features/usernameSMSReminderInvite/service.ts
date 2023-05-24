@@ -19,12 +19,17 @@ export async function sendUserName(
   userFullName: IUserName[],
   authHeader: { Authorization: string },
   mobile?: string,
-  email?: string
+  emailForNotification?: string
 ) {
   const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserName')
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ msisdn: mobile, email, username, userFullName }),
+    body: JSON.stringify({
+      msisdn: mobile,
+      emailForNotification,
+      username,
+      userFullName
+    }),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader

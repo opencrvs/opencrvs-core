@@ -58,7 +58,7 @@ export default async function resendInvite(
       Authorization: request.headers.authorization
     },
     user.mobile,
-    user.email
+    user.emailForNotification
   )
 
   return h.response().code(200)

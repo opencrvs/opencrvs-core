@@ -20,7 +20,9 @@ import {
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  ShowCreateUserDuplicateEmailErrorToast,
   ShowCreateUserErrorToast,
+  showCreateUserDuplicateEmailErrorToast,
   showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -234,6 +236,7 @@ type UserFormAction =
   | ISubmitFailedAction
   | profileActions.Action
   | ShowCreateUserErrorToast
+  | ShowCreateUserDuplicateEmailErrorToast
   | IRoleLoadedAction
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
@@ -394,18 +397,43 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
-      if (errorData.message.includes('DUPLICATE_MOBILE')) {
-        const mobile = errorData.message.split('-')[1]
-        return loop(
-          { ...state, submitting: false, submissionError: false },
-          Cmd.action(showCreateUserErrorToast(TOAST_MESSAGES.FAIL, mobile))
-        )
-      } else {
-        return loop(
-          { ...state, submitting: false, submissionError: true },
-          Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
-        )
+      const duplicateErrorFromGQL = errorData?.graphQLErrors?.find(
+        (gqlErr) => gqlErr.extensions.duplicateNotificationMethodError
+      )
+
+      if (duplicateErrorFromGQL) {
+        const duplicateError =
+          duplicateErrorFromGQL.extensions.duplicateNotificationMethodError
+
+        if (
+          duplicateError.field &&
+          duplicateError.field === 'emailForNotification'
+        ) {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserDuplicateEmailErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
+              )
+            )
+          )
+        } else if (duplicateError.field && duplicateError.field === 'mobile') {
+          return loop(
+            { ...state, submitting: false, submissionError: false },
+            Cmd.action(
+              showCreateUserErrorToast(
+                TOAST_MESSAGES.FAIL,
+                duplicateError.conflictingValue
+              )
+            )
+          )
+        }
       }
+      return loop(
+        { ...state, submitting: false, submissionError: true },
+        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+      )
 
     case ROLES_LOADED:
       const { systemRoles } = action.payload

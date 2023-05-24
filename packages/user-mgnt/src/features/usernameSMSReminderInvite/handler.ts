@@ -41,7 +41,7 @@ export default async function usernameReminderHandler(
       Authorization: request.headers.authorization
     },
     user.mobile,
-    user.email
+    user.emailForNotification
   )
 
   const remoteAddress =

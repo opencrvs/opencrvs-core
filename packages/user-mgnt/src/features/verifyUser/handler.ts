@@ -28,8 +28,8 @@ interface IVerifyPayload {
 
 interface IVerifyResponse {
   name: IUserName[]
-  mobile: string
-  email: string
+  mobile?: string
+  email?: string
   scope: string[]
   status: string
   securityQuestionKey: string

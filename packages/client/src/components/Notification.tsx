@@ -30,6 +30,7 @@ import {
   ShowUnassignedPayload,
   hideUnassignedModal,
   hideCreateUserErrorToast,
+  hideCreateUserFormDuplicateEmailErrorToast,
   hideUserReconnectedToast,
   hideDuplicateRecordsToast
 } from '@client/notification/actions'
@@ -51,6 +52,7 @@ type NotificationProps = {
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
+  userCreateDuplicateEmailFailedToast: NotificationState['userCreateDuplicateEmailFailedToast']
   userReconnectedToast: boolean
   children?: React.ReactNode
 }
@@ -66,6 +68,7 @@ type DispatchProps = {
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
+  hideCreateUserFormDuplicateEmailErrorToast: typeof hideCreateUserFormDuplicateEmailErrorToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
@@ -96,6 +99,10 @@ class Component extends React.Component<
     this.props.hideCreateUserErrorToast()
   }
 
+  hideCreateUserFormDuplicateEmailErrorToast = () => {
+    this.props.hideCreateUserFormDuplicateEmailErrorToast()
+  }
+
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
@@ -119,6 +126,7 @@ class Component extends React.Component<
       downloadDeclarationFailedToast,
       unassignedModal,
       userCreateDuplicateMobileFailedToast,
+      userCreateDuplicateEmailFailedToast,
       userReconnectedToast,
       goToDeclarationRecordAudit
     } = this.props
@@ -254,6 +262,17 @@ class Component extends React.Component<
             })}
           </Toast>
         )}
+        {userCreateDuplicateEmailFailedToast.visible && (
+          <Toast
+            id="createUserDuplicateEmailFailedToast"
+            type="warning"
+            onClose={this.hideCreateUserFormDuplicateEmailErrorToast}
+          >
+            {intl.formatMessage(userMessages.duplicateUserEmailErrorMessege, {
+              email: userCreateDuplicateEmailFailedToast.emailForNotification
+            })}
+          </Toast>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -279,6 +298,8 @@ const mapStateToProps = (store: IStoreState) => {
     unassignedModal: store.notification.unassignedModal,
     userCreateDuplicateMobileFailedToast:
       store.notification.userCreateDuplicateMobileFailedToast,
+    userCreateDuplicateEmailFailedToast:
+      store.notification.userCreateDuplicateEmailFailedToast,
     userReconnectedToast: store.notification.userReconnectedToast
   }
 }
@@ -295,6 +316,7 @@ export const NotificationComponent = withRouter(
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
     hideCreateUserErrorToast,
+    hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
     goToDeclarationRecordAudit
   })(injectIntl(Component))

@@ -83,7 +83,7 @@ export default async function resetPasswordInviteHandler(
     },
     user.name,
     user.mobile,
-    user.email
+    user.emailForNotification
   )
 
   return h.response().code(200)
@@ -93,8 +93,8 @@ export async function sendPasswordNotification(
   password: string,
   authHeader: { Authorization: string },
   userFullName: IUserName[],
-  msisdn: string,
-  email: string
+  msisdn?: string,
+  emailForNotification?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}resetPasswordInvite`
   try {
@@ -102,7 +102,7 @@ export async function sendPasswordNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        email,
+        emailForNotification,
         password,
         userFullName
       }),

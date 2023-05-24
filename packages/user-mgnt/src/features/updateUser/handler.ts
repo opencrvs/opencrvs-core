@@ -65,6 +65,7 @@ export default async function updateUser(
   existingUser.identifiers = user.identifiers
   existingUser.email = user.email
   existingUser.mobile = user.mobile
+  existingUser.emailForNotification = user.emailForNotification
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
@@ -141,7 +142,10 @@ export default async function updateUser(
       existingPractitionerRole
     )
     if (err.code === 11000) {
-      return h.response().code(403)
+      // check if phone or email has thrown unique constraint errors
+      const errorThrowingProperty =
+        err.keyPattern && Object.keys(err.keyPattern)[0]
+      return h.response({ errorThrowingProperty }).code(403)
     }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
