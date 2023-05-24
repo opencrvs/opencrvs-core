@@ -393,11 +393,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       timeLoggedMS:
         (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
     }
-    if (
-      updatedDeclaration.event === 'birth' &&
-      updatedDeclaration.data.child.birthLocation === '0'
-    )
-      updatedDeclaration.data.child.birthLocation = ''
     this.props.writeDeclaration(updatedDeclaration)
     this.props.history.push(HOME)
   }
