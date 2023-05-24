@@ -21,7 +21,7 @@ import {
 import { getFieldOptions } from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 
-export function questionnaireToCustomFieldTransformer(
+export function questionnaireToTemplateFieldTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -74,5 +74,27 @@ export function questionnaireToCustomFieldTransformer(
 
     default:
       transformedData[sectionId][field.name] = selectedQuestion.value
+  }
+}
+
+export function questionnaireToCustomFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) {
+  if (queryData.questionnaire) {
+    const selectedQuestion: IQuestionnaireQuestion =
+      queryData.questionnaire.filter(
+        (question: IQuestionnaireQuestion) =>
+          question.fieldId === field.customQuesstionMappingId
+      )[0]
+    if (selectedQuestion) {
+      /* transformedData[sectionId] is undefined when mapping templates */
+      if (!transformedData[sectionId]) {
+        transformedData[sectionId] = {}
+      }
+      transformedData[sectionId][field.name] = selectedQuestion.value
+    }
   }
 }
