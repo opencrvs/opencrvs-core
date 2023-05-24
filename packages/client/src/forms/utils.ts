@@ -669,15 +669,19 @@ export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
       : callingCountries[alpha3CountryCode].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
-  const number = phoneUtil.parse(phone, countryCode)
 
-  return (
-    phoneUtil
-      .format(number, PhoneNumberFormat.INTERNATIONAL)
-      // libphonenumber adds spaces and dashes to phone numbers,
-      // which we do not want to keep for now
-      .replace(/[\s-]/g, '')
-  )
+  try {
+    const number = phoneUtil.parse(phone, countryCode)
+    return (
+      phoneUtil
+        .format(number, PhoneNumberFormat.INTERNATIONAL)
+        // libphonenumber adds spaces and dashes to phone numbers,
+        // which we do not want to keep for now
+        .replace(/[\s-]/g, '')
+    )
+  } catch (error) {
+    return phone
+  }
 }
 
 export const isRadioGroupWithNestedField = (

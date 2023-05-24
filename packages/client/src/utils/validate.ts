@@ -341,6 +341,12 @@ export const checkBirthDate =
         }
   }
 
+const getBirthDate = (
+  isExactDateOfBirthUnknown: boolean,
+  date: string,
+  age: string
+) => (isExactDateOfBirthUnknown ? convertAgeToDate(age) : date)
+
 export const checkMarriageDate =
   (minAge: number): Validation =>
   (value: IFormFieldValue, drafts) => {
@@ -354,9 +360,21 @@ export const checkMarriageDate =
     const mDate = new Date(cast)
 
     const groomDOB =
-      drafts && drafts.groom && String(drafts.groom.groomBirthDate)
+      drafts &&
+      drafts.groom &&
+      getBirthDate(
+        Boolean(drafts.groom.exactDateOfBirthUnknown),
+        String(drafts.groom.groomBirthDate),
+        String(drafts.groom.ageOfIndividualInYears)
+      )
     const brideDOB =
-      drafts && drafts.bride && String(drafts.bride.brideBirthDate)
+      drafts &&
+      drafts.bride &&
+      getBirthDate(
+        Boolean(drafts.bride.exactDateOfBirthUnknown),
+        String(drafts.bride.brideBirthDate),
+        String(drafts.bride.ageOfIndividualInYears)
+      )
 
     if (!groomDOB || !brideDOB) {
       return undefined

@@ -177,6 +177,14 @@ export const getLocation = (
     country =
       declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
 
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      EMPTY_STRING
+
     if (country && country !== window.config.COUNTRY) {
       let location = EMPTY_STRING
       if (internationalDistrict) location = internationalDistrict + ', '

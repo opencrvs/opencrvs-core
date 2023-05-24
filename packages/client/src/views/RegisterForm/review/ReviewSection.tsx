@@ -113,7 +113,7 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -121,7 +121,7 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
+import { clone, flatten, flattenDeep, get, isArray, pick } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
@@ -154,6 +154,10 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  AddressCases,
+  getAddressCaseFields
+} from '@client/forms/configuration/administrative/addresses'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1000,6 +1004,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getRenderableField(
+    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -1007,7 +1012,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { draft: declaration, intl } = this.props
+    const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -1147,6 +1152,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getPreviewGroupsField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
@@ -1155,8 +1161,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    const { draft } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -1263,6 +1267,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
 
       return this.getRenderableField(
+        draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -1340,15 +1345,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getSinglePreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const {
-      draft: { data, originalData }
-    } = this.props
+    const { data, originalData } = draft
 
     let value = this.getValueOrError(
       section,
@@ -1382,6 +1386,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return this.getRenderableField(
+      draft,
       section,
       group,
       field.label,
@@ -1392,17 +1397,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getNestedPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection
   ) {
-    const { draft } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
-      this.getSinglePreviewField(section, group, field, sectionErrors, true)
+      this.getSinglePreviewField(
+        draft,
+        section,
+        group,
+        field,
+        sectionErrors,
+        true
+      )
     )
     ;(
       (field.nestedFields &&
@@ -1418,6 +1430,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (nestedField.previewGroup) {
         nestedItems.push(
           this.getPreviewGroupsField(
+            draft,
             section,
             group,
             nestedField,
@@ -1433,6 +1446,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         nestedItems.push(
           this.getRenderableField(
+            draft,
             section,
             group,
             nestedField.label,
@@ -1452,6 +1466,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverriddenFieldsListForPreview(
+    draft: IDeclaration,
     formSections: IFormSection[]
   ): IFormField[] {
     const overriddenFields = formSections
@@ -1489,6 +1504,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverRiddenPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -1508,6 +1524,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ) as IFormSection
 
     const result = this.getSinglePreviewField(
+      draft,
       residingSection,
       group,
       overriddenField,
@@ -1622,9 +1639,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
   ) => {
-    const { intl, draft } = this.props
-    const overriddenFields =
-      this.getOverriddenFieldsListForPreview(formSections)
+    const { intl } = this.props
+    const draft = addSameAddressValues(this.props.draft)
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      draft,
+      formSections
+    )
     let tempItem: any
     return formSections.map((section) => {
       let items: any[] = []
@@ -1645,23 +1665,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .forEach((field) => {
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
+                  draft,
                   section,
                   group,
                   field,
                   visitedTags,
                   errorsOnFields,
                   draft.data[section.id],
-                  (draft.originalData && draft.originalData[section.id]) ||
-                    undefined
+                  draft.originalData?.[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
+                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
               : this.getSinglePreviewField(
+                  draft,
                   section,
                   group,
                   field,
@@ -1670,6 +1692,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
+                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -2196,6 +2219,54 @@ function fatherDoesNotExistAndStateIsFather(
     selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
     selectedInformantAndContactType.selectedContactType !== 'FATHER'
   )
+}
+
+function addSameAddressValues(draft: IDeclaration) {
+  if (draft.event === Event.Marriage) {
+    return draft
+  }
+  /*
+   *  Address of y is same as x
+   */
+  const [xSection, ySection] =
+    draft.event === Event.Birth
+      ? (['mother', 'father'] as const)
+      : (['deceased', 'informant'] as const)
+
+  const fieldNames = getAddressCaseFields(
+    AddressCases.PRIMARY_ADDRESS,
+    true
+  ).map((address) => address.name)
+
+  const modifiedDraft = {
+    ...draft
+  }
+
+  if (modifiedDraft.data[ySection]?.primaryAddressSameAsOtherPrimary) {
+    modifiedDraft.data = {
+      ...modifiedDraft.data,
+      [ySection]: {
+        ...modifiedDraft.data[ySection],
+        ...pick(modifiedDraft.data[xSection], fieldNames)
+      }
+    }
+    modifiedDraft.data[ySection].primaryAddressSameAsOtherPrimary = false
+  }
+
+  if (
+    modifiedDraft.originalData?.[ySection]?.primaryAddressSameAsOtherPrimary
+  ) {
+    modifiedDraft.originalData = {
+      ...modifiedDraft.originalData,
+      [ySection]: {
+        ...modifiedDraft.originalData[ySection],
+        ...pick(modifiedDraft.originalData[xSection], fieldNames)
+      }
+    }
+    modifiedDraft.originalData[ySection].primaryAddressSameAsOtherPrimary =
+      false
+  }
+  return modifiedDraft
 }
 
 export const ReviewSection = connect(
