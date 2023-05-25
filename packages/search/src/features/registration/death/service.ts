@@ -18,6 +18,7 @@ import {
   ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
+  DECLARED_STATUS,
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
@@ -159,12 +160,8 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (
-    body.type !== 'IN_PROGRESS' &&
-    body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED' &&
-    body.type !== 'ISSUED'
-  ) {
+
+  if (body.type === DECLARED_STATUS) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }
