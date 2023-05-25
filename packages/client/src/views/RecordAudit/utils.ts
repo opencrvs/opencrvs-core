@@ -166,10 +166,14 @@ export const getLocation = (
       EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
     if (declaration.data?.child?.placeOfBirthNotOnTheList) {
-      return declaration.data?.child.placeOfBirthOther || EMPTY_STRING
+      return (
+        (declaration.data?.child.placeOfBirthOther as string) || EMPTY_STRING
+      )
     }
 
-    return declaration.data?.child.placeOfBirthLocality || EMPTY_STRING
+    return (
+      (declaration.data?.child.placeOfBirthLocality as string) || EMPTY_STRING
+    )
   } else if (declaration.event === Event.Marriage) {
     district =
       declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
