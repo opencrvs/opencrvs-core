@@ -38,7 +38,12 @@ interface BaseProps
   extends RouteComponentProps<
     {},
     {},
-    { forgottenItem: FORGOTTEN_ITEMS; nonce: string; mobile: string }
+    {
+      forgottenItem: FORGOTTEN_ITEMS
+      nonce: string
+      mobile?: string
+      email?: string
+    }
   > {
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
@@ -118,7 +123,10 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               <>
                 <Title>{intl.formatMessage(messages.codeResentTitle)}</Title>
                 {intl.formatMessage(messages.resentSMS, {
-                  number: this.props.location.state.mobile
+                  number:
+                    window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                      ? this.props.location.state.mobile
+                      : this.props.location.state.email
                 })}
               </>
             )}
@@ -128,7 +136,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
                 </Title>
                 {intl.formatMessage(
-                  messages.recoveryCodeEntryFormBodySubheader
+                  window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                    ? messages.recoveryCodeEntryFormBodySubheaderMobile
+                    : messages.recoveryCodeEntryFormBodySubheaderEmail
                 )}
               </>
             )}{' '}

@@ -270,12 +270,14 @@ export function goToPhoneNumberVerificationForm(forgottenItem: string) {
 }
 export function goToRecoveryCodeEntryForm(
   nonce: string,
-  mobile: string,
-  forgottenItem: string
+  forgottenItem: string,
+  mobile?: string,
+  email?: string
 ) {
   return push(RECOVERY_CODE_ENTRY, {
     nonce,
     mobile,
+    email,
     forgottenItem
   })
 }

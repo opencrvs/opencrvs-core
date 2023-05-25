@@ -22,12 +22,12 @@ export enum RetrievalSteps {
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
-export async function verifyUser(mobile: string) {
+export async function verifyUser(mobile?: string, email?: string) {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ mobile }),
+    body: JSON.stringify({ mobile, email }),
     headers: { 'Content-Type': 'application/json' }
   })
 
@@ -42,6 +42,7 @@ export async function verifyUser(mobile: string) {
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
+    email: body.email,
     securityQuestionKey: body.securityQuestionKey,
     practitionerId: body.practitionerId
   }
@@ -50,7 +51,8 @@ export async function verifyUser(mobile: string) {
 export interface IRetrievalStepInformation {
   userId: string
   username: string
-  mobile: string
+  mobile?: string
+  email?: string
   securityQuestionKey: string
   scope: string[]
   status: RetrievalSteps

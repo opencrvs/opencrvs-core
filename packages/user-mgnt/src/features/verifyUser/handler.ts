@@ -11,7 +11,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { unauthorized, conflict } from '@hapi/boom'
+import { unauthorized, conflict, badRequest } from '@hapi/boom'
 import User, {
   IUserModel,
   ISecurityQuestionAnswer
@@ -22,7 +22,8 @@ import {
 } from '@user-mgnt/utils/non-empty-array'
 
 interface IVerifyPayload {
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 interface IVerifyResponse {
@@ -33,15 +34,26 @@ interface IVerifyResponse {
   id: string
   username: string
   practitionerId: string
+  email?: string
 }
 
 export default async function verifyUserHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { mobile } = request.payload as IVerifyPayload
+  const { mobile, email } = request.payload as IVerifyPayload
 
-  const user: IUserModel | null = await User.findOne({ mobile })
+  let user: IUserModel | null
+
+  if (!email && !mobile) {
+    return badRequest()
+  }
+
+  if (mobile) {
+    user = await User.findOne({ mobile })
+  } else {
+    user = await User.findOne({ emailForNotification: email })
+  }
 
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
@@ -62,6 +74,7 @@ export default async function verifyUserHandler(
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id,
     username: user.username,
+    email: user.emailForNotification,
     practitionerId: user.practitionerId
   }
 
@@ -82,11 +95,13 @@ export function getRandomQuestionKey(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string().required()
+  mobile: Joi.string(),
+  email: Joi.string().email()
 })
 
 export const responseSchema = Joi.object({
   mobile: Joi.string(),
+  email: Joi.string().email(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
