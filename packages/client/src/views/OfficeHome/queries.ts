@@ -219,7 +219,7 @@ export const FIELD_AGENT_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query fieldAgentHome(
     $userId: String
-    $declarationLocationId: String!
+    $declarationLocationId: String
     $pageSize: Int
     $reviewSkip: Int
     $rejectSkip: Int

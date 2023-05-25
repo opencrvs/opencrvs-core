@@ -36,7 +36,6 @@ export async function syncRegistrarWorkqueue(
         query: FIELD_AGENT_HOME_QUERY,
         variables: {
           userId: userId,
-          declarationLocationId: locationId,
           pageSize,
           reviewSkip: reviewSkip,
           rejectSkip: rejectSkip
