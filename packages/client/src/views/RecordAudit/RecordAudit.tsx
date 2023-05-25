@@ -18,8 +18,6 @@ import {
 } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
 import {
-  RotateLeft,
-  Archive,
   DeclarationIcon,
   Edit,
   BackArrow,
@@ -783,7 +781,9 @@ const BodyContent = ({
       ''
 
     let declaration =
-      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+      draft &&
+      (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+        draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
             assignment: workqueueDeclaration?.registration?.assignment
