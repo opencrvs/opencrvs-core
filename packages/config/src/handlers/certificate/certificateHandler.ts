@@ -22,23 +22,10 @@ import { isValidSVGCode } from '@config/services/certificateService'
 import { verifyToken } from '@config/utils/verifyToken'
 import { RouteScope } from '@config/config/routes'
 import { pipe } from 'fp-ts/lib/function'
-import { getDocumentUrl, uploadDocument } from '@config/services/documents'
-import { IAuthHeader } from '@config/services/fhirService'
-import type { LeanDocument } from 'mongoose'
 
 interface IActivePayload {
   status: Status
   event: Event
-}
-
-async function certificateWithDocumentUrl(
-  certificate: LeanDocument<ICertificateModel>,
-  authheader: IAuthHeader
-) {
-  return {
-    ...certificate,
-    svgCode: await getDocumentUrl(certificate.svgCode, authheader)
-  }
 }
 
 export async function getCertificateHandler(
@@ -46,17 +33,12 @@ export async function getCertificateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { status, event } = request.payload as IActivePayload
-  const certificate = await Certificate.findOne({
+  const certificate: ICertificateModel | null = await Certificate.findOne({
     status: status,
     event: event
-  }).lean()
+  })
 
-  return (
-    certificate &&
-    certificateWithDocumentUrl(certificate, {
-      Authorization: request.headers.authorization
-    })
-  )
+  return certificate
 }
 
 export async function getActiveCertificatesHandler(
@@ -80,13 +62,7 @@ export async function getActiveCertificatesHandler(
       status: Status.ACTIVE,
       event: { $in: [Event.BIRTH, Event.DEATH, Event.MARRIAGE] }
     }).lean()
-    return Promise.all(
-      activeCertificates.map((cert) =>
-        certificateWithDocumentUrl(cert, {
-          Authorization: request.headers.authorization
-        })
-      )
-    )
+    return activeCertificates
   }
   return []
 }
@@ -103,23 +79,18 @@ export async function createCertificateHandler(
     throw badRequest(
       `SVG code is not valid by given id: ${newCertificate.user}`
     )
-  }
-  newCertificate.svgCode = await uploadDocument(newCertificate.svgCode, {
-    Authorization: request.headers.authorization
-  })
-  // save new certificate
-  try {
-    const certificateResponse = await Certificate.create(newCertificate).then(
-      (cert) =>
-        certificateWithDocumentUrl(cert, {
-          Authorization: request.headers.authorization
-        })
-    )
+  } else {
+    // save new certificate
+    let certificateResponse
+    try {
+      certificateResponse = await Certificate.create(newCertificate)
+    } catch (err) {
+      logger.error(err)
+      // return 400 if there is a validation error when saving to mongo
+      return h.response().code(400)
+    }
+
     return h.response(certificateResponse).code(201)
-  } catch (err) {
-    logger.error(err)
-    // return 400 if there is a validation error when saving to mongo
-    return h.response().code(400)
   }
 }
 
@@ -129,34 +100,23 @@ export async function updateCertificateHandler(
 ) {
   try {
     const certificate = request.payload as ICertificateModel
-    const existingCertificate = await Certificate.findOne({
-      _id: certificate.id
-    }).lean()
+    const existingCertificate: ICertificateModel | null =
+      await Certificate.findOne({ _id: certificate.id })
     if (!existingCertificate) {
       throw badRequest(`No certificate found by given id: ${certificate.id}`)
     }
     // Update existing certificate's fields
-    if (certificate.svgCode) {
-      existingCertificate.svgCode = await uploadDocument(certificate.svgCode, {
-        Authorization: request.headers.authorization
-      })
-    }
+    existingCertificate.svgCode = certificate.svgCode
     existingCertificate.svgFilename = certificate.svgFilename
     existingCertificate.svgDateUpdated = Date.now()
     existingCertificate.user = certificate.user
     existingCertificate.event = certificate.event
     existingCertificate.status = certificate.status
-    await Certificate.updateOne(
+    await Certificate.update(
       { _id: existingCertificate._id },
       existingCertificate
     )
-    const withDocumentUrl = await certificateWithDocumentUrl(
-      existingCertificate,
-      {
-        Authorization: request.headers.authorization
-      }
-    )
-    return h.response(withDocumentUrl).code(201)
+    return h.response(existingCertificate).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo

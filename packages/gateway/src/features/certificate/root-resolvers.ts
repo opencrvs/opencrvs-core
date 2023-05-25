@@ -13,6 +13,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
+import { uploadSvg } from '@gateway/utils/documents'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -56,6 +57,11 @@ export const resolvers: GQLResolver = {
           )
         )
       }
+
+      certificateSVG.svgCode = await uploadSvg(
+        certificateSVG.svgCode,
+        authHeader
+      )
 
       const action = certificateSVG.id ? 'update' : 'create'
       const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {

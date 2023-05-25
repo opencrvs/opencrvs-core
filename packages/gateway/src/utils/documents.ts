@@ -10,24 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { DOCUMENTS_URL } from '@config/config/constants'
-import { IAuthHeader } from './fhirService'
+import { DOCUMENTS_URL } from '@gateway/constants'
 import { internal } from '@hapi/boom'
-import { logger } from '@config/logger'
+import { logger } from '@gateway/logger'
+import { IAuthHeader } from '@gateway/common-types'
 
-export async function getDocumentUrl(fileUri: string, authHeader: IAuthHeader) {
-  const url = new URL('/presigned-url', DOCUMENTS_URL).toString()
+export async function uploadSvg(fileData: string, authHeader: IAuthHeader) {
+  const url = new URL('upload-svg', DOCUMENTS_URL).toString()
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       ...authHeader,
-      'Content-Type': 'application/json'
+      'Content-Type': 'image/svg+xml'
     },
-    body: JSON.stringify({ fileUri })
+    body: Buffer.from(fileData)
   })
   if (!res.ok) {
     logger.error(await res.json())
     throw internal()
   }
-  return (await res.json()).presignedURL
+  return (await res.json()).refUrl
 }
