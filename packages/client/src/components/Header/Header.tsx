@@ -132,7 +132,8 @@ enum ACTIVE_MENU_ITEM {
   CERTIFICATE,
   APPLICATION,
   FORM,
-  INTEGRATION
+  INTEGRATION,
+  VSEXPORTS
 }
 
 const Search = styled(SearchTool)`
@@ -445,6 +446,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.formDeclarationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
           ? constantsMessages.integrationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+          ? constantsMessages.vsExportTitle
           : constantsMessages.declarationTitle
       )
 
@@ -540,6 +543,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.FORM
       : window.location.href.includes('config/integration')
       ? ACTIVE_MENU_ITEM.INTEGRATION
+      : window.location.href.includes('vsexports')
+      ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
