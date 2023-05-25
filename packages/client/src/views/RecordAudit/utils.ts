@@ -138,8 +138,8 @@ export const getLocation = (
   resources: IOfflineData,
   intl: IntlShape
 ) => {
-  let locationType = EMPTY_STRING
-  let locationId = EMPTY_STRING
+  const locationType = EMPTY_STRING
+  const locationId = EMPTY_STRING
   let district = EMPTY_STRING
   let state = EMPTY_STRING
   let internationalDistrict = EMPTY_STRING
@@ -147,23 +147,11 @@ export const getLocation = (
   let country = EMPTY_STRING
 
   if (declaration.event === Event.Death) {
-    locationType =
-      declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
-    locationId =
-      declaration.data?.deathEvent?.deathLocation?.toString() || EMPTY_STRING
+    if (declaration.data?.deathEvent?.placeOfDeathNotOnTheList) {
+      return declaration.data?.deathEvent.placeOfDeathOther || EMPTY_STRING
+    }
 
-    district =
-      declaration.data?.deathEvent?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.deathEvent?.state?.toString() || EMPTY_STRING
-    country = declaration.data?.deathEvent?.country?.toString() || EMPTY_STRING
-
-    // when address is outside of default country
-    internationalDistrict =
-      declaration.data?.deathEvent?.internationalDistrict?.toString() ||
-      EMPTY_STRING
-    internationalState =
-      declaration.data?.deathEvent?.internationalState?.toString() ||
-      EMPTY_STRING
+    return declaration.data?.deathEvent.placeOfDeathLocality || EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
     if (declaration.data?.child?.placeOfBirthNotOnTheList) {
       return (
