@@ -13,6 +13,8 @@ import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
+import isSvg from 'is-svg'
+import { badRequest } from '@hapi/boom'
 
 export interface IDocumentPayload {
   fileData: string
@@ -25,6 +27,9 @@ export async function svgUploadHandler(
 ) {
   const ref = uuid()
   const bufferData = request.payload as Buffer
+  if (!isSvg(bufferData)) {
+    throw badRequest()
+  }
   const generateFileName = `${ref}.svg`
   try {
     minioClient.putObject(MINIO_BUCKET, generateFileName, bufferData, {
