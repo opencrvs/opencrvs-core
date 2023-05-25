@@ -138,7 +138,7 @@ export const getLocation = (
   resources: IOfflineData,
   intl: IntlShape
 ) => {
-  const locationType = EMPTY_STRING
+  const locationType: string = EMPTY_STRING
   const locationId = EMPTY_STRING
   let district = EMPTY_STRING
   let state = EMPTY_STRING
@@ -148,19 +148,25 @@ export const getLocation = (
 
   if (declaration.event === Event.Death) {
     if (declaration.data?.deathEvent?.placeOfDeathNotOnTheList) {
-      return declaration.data?.deathEvent.placeOfDeathOther || EMPTY_STRING
-    }
-
-    return declaration.data?.deathEvent.placeOfDeathLocality || EMPTY_STRING
-  } else if (declaration.event === Event.Birth) {
-    if (declaration.data?.child?.placeOfBirthNotOnTheList) {
       return (
-        (declaration.data?.child.placeOfBirthOther as string) || EMPTY_STRING
+        declaration.data?.deathEvent.placeOfDeathOther?.toString() ||
+        EMPTY_STRING
       )
     }
 
     return (
-      (declaration.data?.child.placeOfBirthLocality as string) || EMPTY_STRING
+      declaration.data?.deathEvent.placeOfDeathLocality?.toString() ||
+      EMPTY_STRING
+    )
+  } else if (declaration.event === Event.Birth) {
+    if (declaration.data?.child?.placeOfBirthNotOnTheList) {
+      return (
+        declaration.data?.child.placeOfBirthOther?.toString() || EMPTY_STRING
+      )
+    }
+
+    return (
+      declaration.data?.child.placeOfBirthLocality?.toString() || EMPTY_STRING
     )
   } else if (declaration.event === Event.Marriage) {
     district =
