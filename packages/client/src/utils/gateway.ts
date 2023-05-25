@@ -152,6 +152,7 @@ export type AdvancedSearchParametersInput = {
   brideDoBStart?: InputMaybe<Scalars['String']>
   brideFamilyName?: InputMaybe<Scalars['String']>
   brideFirstNames?: InputMaybe<Scalars['String']>
+  brideIdentifier?: InputMaybe<Scalars['String']>
   childDoB?: InputMaybe<Scalars['String']>
   childDoBEnd?: InputMaybe<Scalars['String']>
   childDoBStart?: InputMaybe<Scalars['String']>
@@ -195,6 +196,7 @@ export type AdvancedSearchParametersInput = {
   groomDoBStart?: InputMaybe<Scalars['String']>
   groomFamilyName?: InputMaybe<Scalars['String']>
   groomFirstNames?: InputMaybe<Scalars['String']>
+  groomIdentifier?: InputMaybe<Scalars['String']>
   informantDoB?: InputMaybe<Scalars['String']>
   informantDoBEnd?: InputMaybe<Scalars['String']>
   informantDoBStart?: InputMaybe<Scalars['String']>
@@ -517,9 +519,9 @@ export type CertificateInput = {
 
 export type CertificateSvg = {
   __typename?: 'CertificateSVG'
-  event: Scalars['String']
+  event: Event
   id: Scalars['ID']
-  status: Scalars['String']
+  status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated: Scalars['String']
   svgDateUpdated: Scalars['String']
@@ -528,14 +530,19 @@ export type CertificateSvg = {
 }
 
 export type CertificateSvgInput = {
-  event: Scalars['String']
+  event: Event
   id: Scalars['ID']
-  status: Scalars['String']
+  status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
   svgDateUpdated?: InputMaybe<Scalars['Int']>
   svgFilename: Scalars['String']
   user: Scalars['String']
+}
+
+export enum CertificateStatus {
+  Active = 'ACTIVE',
+  Inactive = 'INACTIVE'
 }
 
 export type CertificationMetric = {
@@ -669,6 +676,7 @@ export type Death = {
 export type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['Date']>
+  deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1188,8 +1196,10 @@ export type Marriage = {
 
 export type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
+  brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
   dateOfMarriage?: Maybe<Scalars['Date']>
+  groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
   operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
@@ -1747,7 +1757,7 @@ export type Query = {
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchSystem?: Maybe<System>
-  getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
+  getActiveCertificatesSVG?: Maybe<Array<CertificateSvg>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
@@ -1834,8 +1844,8 @@ export type QueryFetchSystemArgs = {
 }
 
 export type QueryGetCertificateSvgArgs = {
-  event?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<Scalars['String']>
+  event: Event
+  status: CertificateStatus
 }
 
 export type QueryGetDeclarationsStartedMetricsArgs = {
@@ -2536,8 +2546,8 @@ export type CreateOrUpdateCertificateSvgMutation = {
     svgCode: string
     svgFilename: string
     user: string
-    status: string
-    event: string
+    status: CertificateStatus
+    event: Event
     svgDateCreated: string
     svgDateUpdated: string
   } | null
