@@ -89,12 +89,21 @@ export function questionnaireToCustomFieldTransformer(
         (question: IQuestionnaireQuestion) =>
           question.fieldId === field.customQuesstionMappingId
       )[0]
-    if (selectedQuestion) {
-      /* transformedData[sectionId] is undefined when mapping templates */
-      if (!transformedData[sectionId]) {
-        transformedData[sectionId] = {}
-      }
-      transformedData[sectionId][field.name] = selectedQuestion.value
+    if (!selectedQuestion) {
+      return
+    }
+    /* transformedData[sectionId] is undefined when mapping templates */
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    switch (field.type) {
+      case CHECKBOX:
+        transformedData[sectionId][field.name] =
+          selectedQuestion.value === 'true'
+        break
+
+      default:
+        transformedData[sectionId][field.name] = selectedQuestion.value
     }
   }
 }
