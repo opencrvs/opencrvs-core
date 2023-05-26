@@ -240,11 +240,31 @@ export const userSectionFormType: ISerializedFormSection = {
           ]
         },
         {
+          name: 'primaryFacilityType',
+          customisable: false,
+          type: 'SELECT_WITH_OPTIONS',
+          label: userFormMessages.userOrganisationType,
+          required: false,
+          initialValue: 'HEALTH_FACILITY',
+          options: [
+            {
+              label: userFormMessages.facilityTypeHealthFacility,
+              value: 'HEALTH_FACILITY'
+            }
+          ],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'values.systemRole!=="FIELD_AGENT"'
+            }
+          ],
+          validator: []
+        },
+        {
           name: 'primaryFacilityId',
           customisable: false,
           type: 'LOCATION_SEARCH_INPUT',
           label: userFormMessages.userOrganisation,
-          previewGroup: 'placeOfBirth',
           required: true,
           initialValue: '',
           searchableResource: ['facilities'],
@@ -255,7 +275,8 @@ export const userSectionFormType: ISerializedFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression: 'values.systemRole!=="FIELD_AGENT"'
+              expression:
+                'values.systemRole!=="FIELD_AGENT" || values.primaryFacilityType!=="HEALTH_FACILITY"'
             }
           ],
           validator: [
