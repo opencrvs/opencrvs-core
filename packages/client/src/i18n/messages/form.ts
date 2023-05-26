@@ -336,6 +336,7 @@ interface IFormMessages
   addFile: MessageDescriptor
   uploadFile: MessageDescriptor
   fileUploadError: MessageDescriptor
+  fileSizeError: MessageDescriptor
   typeOfId: MessageDescriptor
   firstName: MessageDescriptor
   lastName: MessageDescriptor
@@ -2131,6 +2132,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: '{type} supported image only',
     description: 'text for error on file upload',
     id: 'form.field.label.fileUploadError'
+  },
+  fileSizeError: {
+    defaultMessage: 'File size must be less than 2MB',
+    description: 'text for error on file size',
+    id: 'form.field.label.fileSizeError'
   },
   typeOfId: {
     defaultMessage: 'Type of ID',

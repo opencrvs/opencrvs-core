@@ -52,7 +52,6 @@ export default async function verifyPassByIdHandler(
     username: user.username,
     id: user.id
   }
-
   return response
 }
 

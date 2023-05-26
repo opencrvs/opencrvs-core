@@ -1522,7 +1522,7 @@ export const fetchDocuments = async <T = any>(
     body
   })
   const res = await result.json()
-  return await res
+  return res
 }
 
 export async function uploadBase64ToMinio(
