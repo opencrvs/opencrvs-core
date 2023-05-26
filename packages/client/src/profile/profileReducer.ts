@@ -220,8 +220,8 @@ export const profileReducer: LoopReducer<
         )
       }
     case actions.SEND_VERIFY_CODE:
-      const { templateName, phoneNumber, email } = action.payload
-      if (state.tokenPayload && templateName && (phoneNumber || email)) {
+      const { notificationEvent, phoneNumber, email } = action.payload
+      if (state.tokenPayload && notificationEvent && (phoneNumber || email)) {
         return loop(
           {
             ...state

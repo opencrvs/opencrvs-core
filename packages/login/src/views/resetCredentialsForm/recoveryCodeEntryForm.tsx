@@ -14,11 +14,7 @@ import {
   goToPhoneNumberVerificationForm,
   goToSecurityQuestionForm
 } from '@login/login/actions'
-import {
-  EmailTemplateType,
-  SMSTemplateType,
-  authApi
-} from '@login/utils/authApi'
+import { NotificationEvent, authApi } from '@login/utils/authApi'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -99,12 +95,10 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     }
   }
 
-  resendAuthenticationCode = async (
-    templateName: EmailTemplateType | SMSTemplateType
-  ) => {
+  resendAuthenticationCode = async (notificationEvent: NotificationEvent) => {
     await authApi.resendAuthenticationCode(
       this.props.location.state.nonce,
-      templateName,
+      notificationEvent,
       true
     )
     this.setState({ resentAuthenticationCode: true })
@@ -114,10 +108,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
     const { resentAuthenticationCode } = this.state
-    const templateName =
-      window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
-        : EmailTemplateType.PASSWORD_RESET
+    const notificationEvent = NotificationEvent.PASSWORD_RESET
 
     return (
       <>
@@ -148,7 +139,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
             )}{' '}
             <LinkButton
               onClick={() => {
-                this.resendAuthenticationCode(templateName)
+                this.resendAuthenticationCode(notificationEvent)
               }}
               id="retrieve-login-mobile-resend"
               type="button"

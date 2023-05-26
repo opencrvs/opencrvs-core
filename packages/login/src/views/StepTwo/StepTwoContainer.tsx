@@ -36,7 +36,7 @@ import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EmailTemplateType, SMSTemplateType } from '@login/utils/authApi'
+import { NotificationEvent } from '@login/utils/authApi'
 
 const FORM_NAME = 'STEP_TWO'
 
@@ -72,10 +72,7 @@ export function StepTwoContainer() {
     '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
   )
   const field = stepTwoFields.code
-  const templateName =
-    window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-      ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
-      : EmailTemplateType.TWO_FACTOR_AUTHENTICATION
+  const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
@@ -160,7 +157,9 @@ export function StepTwoContainer() {
                   type="tertiary"
                   onClick={(e) => {
                     e.preventDefault()
-                    dispatch(actions.resendAuthenticationCode(templateName))
+                    dispatch(
+                      actions.resendAuthenticationCode(notificationEvent)
+                    )
                   }}
                   id="login-mobile-resend"
                 >

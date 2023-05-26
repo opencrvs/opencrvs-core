@@ -16,8 +16,7 @@ import {
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
   NOTIFICATION_URL,
   PRODUCTION,
-  QA_ENV,
-  USER_NOTIFICATION_DELIVERY_METHOD
+  QA_ENV
 } from '@gateway/constants'
 import { del, get, set } from '@gateway/features/user/database'
 import * as crypto from 'crypto'
@@ -56,7 +55,7 @@ interface IUserName {
 
 interface ISendVerifyCodePayload {
   userFullName: IUserName[]
-  templateName: string
+  notificationEvent: string
   phoneNumber?: string
   email?: string
 }
@@ -121,7 +120,7 @@ export function generateNonce() {
 export async function sendVerificationCode(
   verificationCode: string,
   token: string,
-  templateName: string,
+  notificationEvent: string,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
@@ -130,7 +129,7 @@ export async function sendVerificationCode(
     msisdn: mobile,
     email,
     code: verificationCode,
-    templateName,
+    notificationEvent,
     userFullName
   }
 
@@ -150,7 +149,7 @@ export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
   token: string,
-  templateName: string,
+  notificationEvent: string,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
@@ -170,23 +169,14 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateAndStoreVerificationCode(nonce)
   }
   if (!PRODUCTION || QA_ENV) {
-    if (USER_NOTIFICATION_DELIVERY_METHOD === 'sms') {
-      logger.info(
-        `Sending a verification SMS ,
+    logger.info(
+      `Sending a verification to ,
           ${JSON.stringify({
             mobile: mobile,
-            verificationCode
-          })}`
-      )
-    } else if (USER_NOTIFICATION_DELIVERY_METHOD === 'email') {
-      logger.info(
-        `Sending a verification SMS ,
-          ${JSON.stringify({
             email: email,
             verificationCode
           })}`
-      )
-    }
+    )
   } else {
     if (isDemoUser) {
       throw unauthorized()
@@ -194,7 +184,7 @@ export async function generateAndSendVerificationCode(
       await sendVerificationCode(
         verificationCode,
         token,
-        templateName,
+        notificationEvent,
         userFullName,
         mobile,
         email
@@ -208,7 +198,7 @@ export default async function sendVerifyCodeHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ISendVerifyCodePayload
-  const { userFullName, phoneNumber, templateName, email } = payload
+  const { userFullName, phoneNumber, notificationEvent, email } = payload
   const token = request.headers.authorization.replace('Bearer ', '') as string
   const decodedOrError = verifyToken(token)
   if (decodedOrError._tag === 'Left') {
@@ -228,7 +218,7 @@ export default async function sendVerifyCodeHandler(
     nonce,
     scope,
     token,
-    templateName,
+    notificationEvent,
     userFullName,
     phoneNumber,
     email
@@ -244,7 +234,7 @@ export const requestSchema = Joi.object({
       family: Joi.string().required()
     }).unknown(true)
   ),
-  templateName: Joi.string(),
+  notificationEvent: Joi.string(),
   phoneNumber: Joi.string(),
   email: Joi.string()
 })

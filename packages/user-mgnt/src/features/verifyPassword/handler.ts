@@ -49,7 +49,7 @@ export default async function verifyPassHandler(
   const response: IVerifyResponse = {
     name: user.name,
     mobile: user.mobile,
-    email: user.email,
+    email: user.emailForNotification,
     scope: user.scope,
     status: user.status,
     id: user.id,
@@ -71,8 +71,8 @@ export const responseSchema = Joi.object({
       family: Joi.string().required()
     }).unknown(true)
   ),
-  mobile: Joi.string(),
-  email: Joi.string(),
+  mobile: Joi.string().optional(),
+  email: Joi.string().optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

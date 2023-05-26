@@ -19,16 +19,11 @@ import {
   IAuthentication
 } from '@auth/features/authenticate/service'
 import {
-  EmailTemplateType,
-  SMSTemplateType,
+  NotificationEvent,
   generateNonce
 } from '@auth/features/verifyCode/service'
 import { unauthorized, forbidden } from '@hapi/boom'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  USER_NOTIFICATION_DELIVERY_METHOD
-} from '@auth/constants'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -86,15 +81,12 @@ export default async function authenticateHandler(
       result.email
     )
 
-    const templateName =
-      USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
-        : EmailTemplateType.TWO_FACTOR_AUTHENTICATION
+    const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
 
     await generateAndSendVerificationCode(
       nonce,
       result.scope,
-      templateName,
+      notificationEvent,
       result.name,
       result.mobile,
       result.email
@@ -110,8 +102,8 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  mobile: Joi.string(),
-  email: Joi.string(),
+  mobile: Joi.string().optional(),
+  email: Joi.string().optional(),
   status: Joi.string(),
   token: Joi.string().optional()
 })

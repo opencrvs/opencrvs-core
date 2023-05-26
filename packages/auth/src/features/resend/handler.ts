@@ -17,14 +17,11 @@ import {
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
 import { getRetrievalStepInformation } from '@auth/features/retrievalSteps/verifyUser/service'
-import {
-  EmailTemplateType,
-  SMSTemplateType
-} from '@auth/features/verifyCode/service'
+import { NotificationEvent } from '@auth/features/verifyCode/service'
 
 interface IResendNotificationPayload {
   nonce: string
-  templateName: EmailTemplateType | SMSTemplateType
+  notificationEvent: NotificationEvent
   retrievalFlow?: boolean
 }
 
@@ -32,7 +29,7 @@ export default async function resendNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { nonce, retrievalFlow, templateName } =
+  const { nonce, retrievalFlow, notificationEvent } =
     request.payload as IResendNotificationPayload
 
   let userInformation
@@ -49,7 +46,7 @@ export default async function resendNotificationHandler(
   await generateAndSendVerificationCode(
     nonce,
     scope,
-    templateName,
+    notificationEvent,
     userFullName,
     mobile,
     email
@@ -60,7 +57,7 @@ export default async function resendNotificationHandler(
 
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
-  templateName: Joi.string().required(),
+  notificationEvent: Joi.string().required(),
   retrievalFlow: Joi.boolean().optional()
 })
 export const responseSchma = Joi.object({

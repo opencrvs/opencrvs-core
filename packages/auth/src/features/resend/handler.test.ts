@@ -34,7 +34,7 @@ describe('resend handler receives a request', () => {
         url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345',
-          templateName: 'authenticationCodeNotification',
+          notificationEvent: 'authenticationCodeNotification',
           retrievalFlow: true
         }
       })
@@ -62,7 +62,7 @@ describe('resend handler receives a request', () => {
         url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345',
-          templateName: 'authenticationCodeNotification'
+          notificationEvent: 'authenticationCodeNotification'
         }
       })
       expect(spy).toHaveBeenCalled()
@@ -87,7 +87,7 @@ describe('resend handler receives a request', () => {
         url: '/resendAuthenticationCode',
         payload: {
           nonce: '67890',
-          templateName: 'authenticationCodeNotification'
+          notificationEvent: 'authenticationCodeNotification'
         }
       })
       expect(spy).not.toHaveBeenCalled()

@@ -301,7 +301,7 @@ export async function sendCredentialsNotification(
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsSMS`
+  }userCredentialsInvite`
   try {
     await fetch(url, {
       method: 'POST',

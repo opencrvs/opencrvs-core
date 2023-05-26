@@ -43,7 +43,7 @@ describe('Verify user handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/userCredentialsSMS',
+        url: '/userCredentialsInvite',
         payload: {
           userFullName: [
             {
@@ -77,7 +77,7 @@ describe('Verify user handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/userCredentialsSMS',
+        url: '/userCredentialsInvite',
         payload: {
           msisdn: '447789778823',
           password: 'B123456'
@@ -107,7 +107,7 @@ describe('Verify user handlers', () => {
       fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
-        url: '/userCredentialsSMS',
+        url: '/userCredentialsInvite',
         payload: {
           userFullName: [
             {
@@ -259,7 +259,7 @@ describe('Verify user handlers', () => {
               given: ['Sadman']
             }
           ],
-          templateName: 'sendUserAuthenticationCode',
+          notificationEvent: 'TWO_FACTOR_AUTHENTICATION',
           msisdn: '447789778823',
           code: '000000'
         },
@@ -293,7 +293,7 @@ describe('Verify user handlers', () => {
               given: ['Sadman']
             }
           ],
-          templateName: 'sendUserAuthenticationCode',
+          notificationEvent: 'TWO_FACTOR_AUTHENTICATION',
           msisdn: '447789778823'
         },
         headers: {
@@ -330,7 +330,7 @@ describe('Verify user handlers', () => {
               given: ['Sadman']
             }
           ],
-          templateName: 'sendUserAuthenticationCode',
+          notificationEvent: 'TWO_FACTOR_AUTHENTICATION',
           msisdn: '447789778823',
           code: '000000'
         },

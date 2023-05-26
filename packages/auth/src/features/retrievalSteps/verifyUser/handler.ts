@@ -20,13 +20,10 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
 import {
-  EmailTemplateType,
-  SMSTemplateType,
+  NotificationEvent,
   generateNonce
 } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
-import { USER_NOTIFICATION_DELIVERY_METHOD } from '@auth/constants'
-
 interface IVerifyUserPayload {
   mobile: string
   retrieveFlow: string
@@ -61,15 +58,12 @@ export default async function verifyUserHandler(
   )
 
   if (!isUserNameRetrievalFlow) {
-    const templateName =
-      USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-        ? SMSTemplateType.AUTHENTICATION_CODE_NOTIFICATION
-        : EmailTemplateType.PASSWORD_RESET
+    const notificationEvent = NotificationEvent.PASSWORD_RESET
 
     await generateAndSendVerificationCode(
       nonce,
       result.scope,
-      templateName,
+      notificationEvent,
       result.userFullName,
       result.mobile,
       result.email

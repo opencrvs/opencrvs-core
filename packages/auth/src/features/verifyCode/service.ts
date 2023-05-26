@@ -25,22 +25,14 @@ interface ICodeDetails {
   createdAt: number
 }
 
-export enum EmailTemplateType {
-  ONBOARDING_INVITE = 'onboarding-invite',
-  TWO_FACTOR_AUTHENTICATION = '2-factor-authentication',
-  CHANGE_PHONE_NUMBER = 'change-phone-number',
-  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'password-reset-by-system-admin',
-  PASSWORD_RESET = 'password-reset',
-  USERNAME_REMINDER = 'username-reminder',
-  USERNAME_UPDATED = 'username-updated'
-}
-
-export enum SMSTemplateType {
-  AUTHENTICATION_CODE_NOTIFICATION = 'authenticationCodeNotification',
-  USER_CREDENTIALS_NOTIFICATION = 'userCredentialsNotification',
-  RETIEVE_USERNAME_NOTIFICATION = 'retieveUserNameNotification',
-  UPDATE_USERNAME_NOTIFICATION = 'updateUserNameNotification',
-  RESET_USER_PASSWORD_NOTIFICATION = 'resetUserPasswordNotification'
+export enum NotificationEvent {
+  ONBOARDING_INVITE = 'ONBOARDING_INVITE',
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'PASSWORD_RESET_BY_SYSTEM_ADMIN',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  USERNAME_REMINDER = 'USERNAME_REMINDER',
+  USERNAME_UPDATED = 'USERNAME_UPDATED'
 }
 
 type SixDigitVerificationCode = string
@@ -75,7 +67,7 @@ export function generateNonce() {
 
 export async function sendVerificationCode(
   verificationCode: string,
-  templateName: EmailTemplateType | SMSTemplateType,
+  notificationEvent: NotificationEvent,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
@@ -84,7 +76,7 @@ export async function sendVerificationCode(
     msisdn: mobile,
     email,
     code: verificationCode,
-    templateName,
+    notificationEvent,
     userFullName
   }
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {

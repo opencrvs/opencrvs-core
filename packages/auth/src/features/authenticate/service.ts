@@ -18,8 +18,7 @@ import {
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
   QA_ENV,
-  METRICS_URL,
-  USER_NOTIFICATION_DELIVERY_METHOD
+  METRICS_URL
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -28,8 +27,7 @@ import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
 import {
-  EmailTemplateType,
-  SMSTemplateType,
+  NotificationEvent,
   generateVerificationCode,
   sendVerificationCode,
   storeVerificationCode
@@ -95,7 +93,7 @@ export async function authenticate(
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
-    email: body.email
+    email: body.emailForNotification
   }
 }
 
@@ -170,7 +168,7 @@ export async function getStoredUserInformation(nonce: string) {
 export async function generateAndSendVerificationCode(
   nonce: string,
   scope: string[],
-  templateName: EmailTemplateType | SMSTemplateType,
+  notificationEvent: NotificationEvent,
   userFullName: IUserName[],
   mobile?: string,
   email?: string
@@ -190,30 +188,21 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce)
   }
   if (!PRODUCTION || QA_ENV) {
-    if (USER_NOTIFICATION_DELIVERY_METHOD === 'sms') {
-      logger.info(
-        `Sending a verification SMS,
+    logger.info(
+      `Sending a verification to,
           ${JSON.stringify({
             mobile: mobile,
-            verificationCode
-          })}`
-      )
-    } else if (USER_NOTIFICATION_DELIVERY_METHOD === 'email') {
-      logger.info(
-        `Sending a verification email,
-          ${JSON.stringify({
             email: email,
             verificationCode
           })}`
-      )
-    }
+    )
   } else {
     if (isDemoUser) {
       throw unauthorized()
     } else {
       await sendVerificationCode(
         verificationCode,
-        templateName,
+        notificationEvent,
         userFullName,
         mobile,
         email

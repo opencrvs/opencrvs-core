@@ -16,7 +16,7 @@ import {
   sendNotification
 } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
-import { messageKeys } from '@notification/i18n/messages'
+import { templateNames } from '@notification/i18n/messages'
 import { USER_NOTIFICATION_DELIVERY_METHOD } from '@notification/constants'
 
 export const emailTemplateName = {
@@ -43,7 +43,7 @@ interface IRetrieveUserNamePayload extends IMessageRecipient {
 
 interface IUserAuthCodePayload extends IMessageRecipient {
   code: string
-  templateName: string
+  notificationEvent: string
 }
 
 export async function sendUserCredentials(
@@ -54,9 +54,7 @@ export async function sendUserCredentials(
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
   const templateName =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-      ? messageKeys.userCredentialsNotification
-      : emailTemplateName.onBoardingInvite
+    templateNames.ONBOARDING_INVITE[USER_NOTIFICATION_DELIVERY_METHOD]
   const recipient =
     USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
       ? payload.email
@@ -81,9 +79,9 @@ export async function sendResetPasswordInvite(
   const payload = request.payload as IResetPasswordPayload
   logger.info(`Password: ${payload.password}`)
   const templateName =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-      ? messageKeys.resetUserPasswordNotification
-      : emailTemplateName.passwordReset
+    templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN[
+      USER_NOTIFICATION_DELIVERY_METHOD
+    ]
   const recipient =
     USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
       ? payload.email
@@ -106,9 +104,7 @@ export async function retrieveUserName(
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
   const templateName =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-      ? messageKeys.retieveUserNameNotification
-      : emailTemplateName.usernameReminder
+    templateNames.USERNAME_REMINDER[USER_NOTIFICATION_DELIVERY_METHOD]
   const recipient =
     USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
       ? payload.email
@@ -136,10 +132,12 @@ export async function sendUserAuthenticationCode(
       : payload.msisdn!
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
+  const templateName =
+    templateNames[payload.notificationEvent][USER_NOTIFICATION_DELIVERY_METHOD]
 
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
-  await sendNotification(request, payload.templateName, recipient, {
+  await sendNotification(request, templateName, recipient, {
     firstNames,
     authCode: payload.code
   })
@@ -153,9 +151,7 @@ export async function updateUserName(
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
   const templateName =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
-      ? messageKeys.updateUserNameNotification
-      : emailTemplateName.usernameUpdated
+    templateNames.USERNAME_UPDATED[USER_NOTIFICATION_DELIVERY_METHOD]
   const recipient =
     USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
       ? payload.email
@@ -215,7 +211,7 @@ export const authCodeNotificationSchema = Joi.object({
   msisdn: Joi.string().allow('').optional(),
   email: Joi.string().allow('').optional(),
   code: Joi.string().required(),
-  templateName: Joi.string().required(),
+  notificationEvent: Joi.string().required(),
   userFullName: Joi.array().items(
     Joi.object({
       given: Joi.array().items(Joi.string()).required(),

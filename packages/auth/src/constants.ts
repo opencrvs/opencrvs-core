@@ -20,9 +20,6 @@ export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 
-export const USER_NOTIFICATION_DELIVERY_METHOD =
-  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
-
 export const CERT_PRIVATE_KEY_PATH =
   (process.env.CERT_PRIVATE_KEY_PATH as string) ||
   '../../.secrets/private-key.pem'

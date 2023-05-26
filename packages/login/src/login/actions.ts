@@ -17,8 +17,7 @@ import {
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse,
-  EmailTemplateType,
-  SMSTemplateType
+  NotificationEvent
 } from '@login/utils/authApi'
 import {
   PHONE_NUMBER_VERIFICATION,
@@ -97,7 +96,7 @@ export type AuthenticationFailedAction = {
 
 export type ResendAuthenticationCodeAction = {
   type: typeof RESEND_AUTHENTICATION_CODE
-  payload: EmailTemplateType | SMSTemplateType
+  payload: NotificationEvent
 }
 
 export type ResendAuthenticationCodeCompleteAction = {
@@ -212,10 +211,10 @@ export const failAuthentication = (
 })
 
 export const resendAuthenticationCode = (
-  templateName: EmailTemplateType | SMSTemplateType
+  notificationEvent: NotificationEvent
 ): ResendAuthenticationCodeAction => ({
   type: RESEND_AUTHENTICATION_CODE,
-  payload: templateName
+  payload: notificationEvent
 })
 
 export interface IVerifyCodeNumbers {

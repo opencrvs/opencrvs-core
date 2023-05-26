@@ -14,7 +14,7 @@ import { RouterAction } from 'connected-react-router'
 import { ApolloQueryResult } from '@apollo/client'
 import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { EmailTemplateType, SMSTemplateType } from './serviceApi'
+import { NotificationEvent } from './serviceApi'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -61,7 +61,7 @@ type SendVerifyCode = {
       family: string
       given: string[]
     }[]
-    templateName: EmailTemplateType | SMSTemplateType
+    notificationEvent: NotificationEvent
     phoneNumber?: string
     email?: string
   }
@@ -149,7 +149,7 @@ export const sendVerifyCode = (
     family: string
     given: string[]
   }[],
-  templateName: EmailTemplateType | SMSTemplateType,
+  notificationEvent: NotificationEvent,
   phoneNumber?: string,
   email?: string
 ): SendVerifyCode => {
@@ -157,7 +157,7 @@ export const sendVerifyCode = (
     type: SEND_VERIFY_CODE,
     payload: {
       userFullName,
-      templateName,
+      notificationEvent,
       phoneNumber,
       email
     }

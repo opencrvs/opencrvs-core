@@ -130,7 +130,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           Cmd.action(push(routes.STEP_TWO))
       )
     case actions.RESEND_AUTHENTICATION_CODE:
-      const templateName = action.payload
+      const notificationEvent = action.payload
       return loop(
         {
           ...state,
@@ -143,7 +143,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         >(authApi.resendAuthenticationCode, {
           successActionCreator: actions.completeAuthenticationCodeResend,
           failActionCreator: actions.failAuthenticationCodeResend,
-          args: [state.authenticationDetails.nonce, templateName]
+          args: [state.authenticationDetails.nonce, notificationEvent]
         })
       )
     case actions.RESEND_AUTHENTICATION_CODE_FAILED:

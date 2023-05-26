@@ -219,7 +219,7 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/userCredentialsSMS',
+      path: '/userCredentialsInvite',
       handler: sendUserCredentials,
       config: {
         tags: ['api'],
