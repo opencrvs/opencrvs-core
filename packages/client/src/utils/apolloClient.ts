@@ -29,7 +29,11 @@ import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import localforage from 'localforage'
-import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
+import {
+  createPersistLink,
+  persistenceMapper,
+  clearOldCacheEntries
+} from '@client/utils/persistence'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -113,6 +117,7 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
       const { client, persistor } = await createPersistentClient(store)
       setPersistor(persistor)
       setClient(client)
+      clearOldCacheEntries(client.cache)
     }
 
     // skipping the persistent client in tests for now

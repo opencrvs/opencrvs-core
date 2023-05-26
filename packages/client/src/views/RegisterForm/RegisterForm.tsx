@@ -111,6 +111,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -463,7 +464,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration.id)
+    this.props.deleteDeclaration(declaration.id, client)
   }
 
   onCloseDeclaration = () => {
