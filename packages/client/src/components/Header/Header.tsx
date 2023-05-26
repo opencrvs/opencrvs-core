@@ -135,15 +135,24 @@ enum ACTIVE_MENU_ITEM {
   INTEGRATION
 }
 
+const Search = styled(SearchTool)`
+  margin-right: 45px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+  }
+`
+
 const HeaderCenter = styled.div`
   height: 40px;
-  display: flex;
   gap: 12px;
+  display: flex;
   flex-direction: row;
   align-items: center;
+  background: ${({ theme }) => theme.colors.white};
 `
 const HeaderRight = styled.div`
   height: 40px;
+  background: ${({ theme }) => theme.colors.white};
 `
 
 const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
@@ -363,7 +372,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     ]
 
     return (
-      <SearchTool
+      <Search
         key="searchMenu"
         language={language}
         searchText={searchText}
@@ -460,6 +469,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
                 >
                   <Icon name="Plus" size="medium" />
                 </Button>
+
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>
             )}
