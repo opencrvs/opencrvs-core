@@ -1421,6 +1421,7 @@ export interface GQLQuestionInput {
   required?: boolean
   enabled?: string
   custom?: boolean
+  ignoreBottomMargin?: boolean
   conditionals?: Array<GQLConditionalInput>
   datasetId?: string
   options?: Array<GQLCustomSelectOption>

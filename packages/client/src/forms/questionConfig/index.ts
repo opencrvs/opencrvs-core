@@ -61,6 +61,7 @@ export interface IFieldIdentifiers {
 export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
+  ignoreBottomMargin?: boolean
   validateEmpty?: boolean
   identifiers: IFieldIdentifiers
   conditionals?: IConditionalConfig[]
@@ -87,6 +88,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   errorMessage?: IMessage[]
   validateEmpty?: boolean
   maxLength?: number
+  ignoreBottomMargin?: boolean
   inputWidth?: number
   initialValue?: string
   fieldName: string
