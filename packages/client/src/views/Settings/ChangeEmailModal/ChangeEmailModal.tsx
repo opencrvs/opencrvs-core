@@ -1,0 +1,60 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { EMPTY_STRING } from '@client/utils/constants'
+import * as React from 'react'
+import { ChangeEmailView } from '@client/views/Settings/ChangeEmailModal/ChangeEmailView'
+import { VerifyCodeView } from '@client/views/Settings/ChangePhoneModal/VerifyCodeView'
+
+const VIEW_TYPE = {
+  CHANGE_EMAIL: 'change',
+  VERIFY_NUMBER: 'verify'
+}
+
+interface IProps {
+  show: boolean
+  onSuccess: () => void
+  onClose: () => void
+}
+
+export function ChangeEmailModal({ show, onClose, onSuccess }: IProps) {
+  const [view, setView] = React.useState(VIEW_TYPE.CHANGE_EMAIL)
+  const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
+  const onSuccessChangeNumber = (emailAddress: string) => {
+    setEmailAddress(emailAddress)
+    setView(VIEW_TYPE.VERIFY_NUMBER)
+  }
+  const restoreState = () => {
+    setView(VIEW_TYPE.CHANGE_EMAIL)
+    setEmailAddress(EMPTY_STRING)
+  }
+  React.useEffect(() => {
+    if (!show) {
+      restoreState()
+    }
+  }, [show])
+
+  return (
+    <>
+      <ChangeEmailView
+        show={show && view === VIEW_TYPE.CHANGE_EMAIL}
+        onSuccess={onSuccessChangeNumber}
+        onClose={onClose}
+      />
+      <VerifyCodeView
+        show={show && view === VIEW_TYPE.VERIFY_NUMBER}
+        onSuccess={onSuccess}
+        onClose={onClose}
+        data={{ email: emailAddress }}
+      />
+    </>
+  )
+}

@@ -44,6 +44,9 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
     setIsInvalidPhoneNumber(!isAValidPhoneNumberFormat(phoneNumber))
+    if (showDuplicateMobileErrorNotification) {
+      setShowDuplicateMobileErrorNotification(false)
+    }
   }
   const restoreState = () => {
     setPhoneNumber(EMPTY_STRING)
@@ -53,7 +56,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateMobileErrorNotification((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const userData = await queriesForUser.fetchUserDetails(
+    const userData = await queriesForUser.fetchUserDetailsByMobile(
       convertToMSISDN(phoneNumber, window.config.COUNTRY)
     )
     const userDetails = userData.data.getUserByMobile

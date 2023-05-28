@@ -150,6 +150,7 @@ input AvatarInput {
 type Query {
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
+  getUserByEmail(emailForNotification: String): User
   searchUsers(
     username: String
     mobile: String
@@ -191,6 +192,12 @@ type Mutation {
   changePhone(
     userId: String!
     phoneNumber: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
+  changeEmail(
+    userId: String!
+    email: String!
     nonce: String!
     verifyCode: String!
   ): String

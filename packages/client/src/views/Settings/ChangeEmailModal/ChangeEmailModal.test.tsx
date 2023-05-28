@@ -18,20 +18,20 @@ import {
 import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
-import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
-import { changePhoneMutation } from '@client/views/Settings/mutations'
+import { changeEmailMutation } from '@client/views/Settings/mutations'
 import { queriesForUser } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
 import { NetworkStatus } from '@apollo/client'
+import { ChangeEmailModal } from './ChangeEmailModal'
 
 const graphqlMocks = [
   {
     request: {
-      query: changePhoneMutation,
+      query: changeEmailMutation,
       variables: {
         userId: '123',
-        phoneNumber: '+8801741234567',
+        email: 'rabiul@gmail.com',
         nonce: '',
         verifyCode: '000000'
       }
@@ -42,7 +42,7 @@ const graphqlMocks = [
   }
 ]
 
-describe('Change phone modal tests', () => {
+describe('Change email modal tests', () => {
   let component: ReactWrapper
   const onSuccessMock = vi.fn()
   const { history } = createRouterProps('/settings')
@@ -51,7 +51,7 @@ describe('Change phone modal tests', () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
     const testComponent = await createTestComponent(
-      <ChangePhoneModal
+      <ChangeEmailModal
         show={true}
         onSuccess={onSuccessMock}
         onClose={vi.fn()}
@@ -71,9 +71,9 @@ describe('Change phone modal tests', () => {
     ).toBe(true)
   })
 
-  it('should enable continue button when input valid phone number', async () => {
+  it('should enable continue button when input valid email address', async () => {
     component.find('input').simulate('change', {
-      target: { name: 'PhoneNumber', value: '01741234567' }
+      target: { name: 'emailAddress', value: 'test@test.org' }
     })
     component.update()
     expect(
@@ -82,17 +82,17 @@ describe('Change phone modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
+    queriesForUser.fetchUserDetailsByEmail = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: null
+          getUserByEmail: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready
       })
     )
     component.find('input').simulate('change', {
-      target: { name: 'PhoneNumber', value: '01741234567' }
+      target: { name: 'emailAddress', value: 'test@test.org' }
     })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
@@ -103,21 +103,21 @@ describe('Change phone modal tests', () => {
     )
   })
 
-  it('should trigger onSuccess callback after change phone number', async () => {
-    queriesForUser.fetchUserDetailsByMobile = vi.fn(() =>
+  it('should trigger onSuccess callback after change email address', async () => {
+    queriesForUser.fetchUserDetailsByEmail = vi.fn(() =>
       Promise.resolve({
         data: {
-          getUserByMobile: null
+          getUserByEmail: null
         },
         loading: false,
         networkStatus: NetworkStatus.ready
       })
     )
     component
-      .find('#PhoneNumber')
+      .find('#EmailAddressTextInput')
       .hostNodes()
       .simulate('change', {
-        target: { value: '01741234567' }
+        target: { value: 'rabiul@gmail.com' }
       })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
@@ -139,7 +139,7 @@ describe('Change phone modal tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 1000)
     })
 
     component.update()

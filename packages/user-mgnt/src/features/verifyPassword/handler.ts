@@ -27,6 +27,7 @@ interface IVerifyResponse {
   status: string
   id: string
   practitionerId: string
+  email?: string
 }
 
 export default async function verifyPassHandler(
@@ -49,7 +50,8 @@ export default async function verifyPassHandler(
     scope: user.scope,
     status: user.status,
     id: user.id,
-    practitionerId: user.practitionerId
+    practitionerId: user.practitionerId,
+    email: user.emailForNotification
   }
   return response
 }
@@ -60,7 +62,8 @@ export const requestSchema = Joi.object({
 })
 
 export const responseSchema = Joi.object({
-  mobile: Joi.string(),
+  mobile: Joi.string().optional(),
+  email: Joi.string().optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

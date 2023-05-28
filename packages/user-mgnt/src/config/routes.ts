@@ -100,6 +100,9 @@ import updateRole, {
   systemRoleResponseSchema,
   systemRolesRequestSchema
 } from '@user-mgnt/features/updateRole/handler'
+import changeEmailHandler, {
+  changeEmailRequestSchema
+} from '@user-mgnt/features/changeEmail/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -249,6 +252,31 @@ export const getRoutes = () => {
         },
         validate: {
           payload: changePhoneRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changeUserEmail',
+      handler: changeEmailHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes email for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changeEmailRequestSchema
         },
         response: {
           schema: false

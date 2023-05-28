@@ -28,9 +28,10 @@ interface IAuthPayload {
 
 interface IAuthResponse {
   nonce: string
-  mobile: string
+  mobile?: string
   status: string
   token?: string
+  email?: string
 }
 
 export default async function authenticateHandler(
@@ -52,6 +53,7 @@ export default async function authenticateHandler(
   const nonce = generateNonce()
   const response: IAuthResponse = {
     mobile: result.mobile,
+    email: result.email,
     status: result.status,
     nonce
   }
@@ -86,6 +88,7 @@ export const requestSchema = Joi.object({
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
   mobile: Joi.string(),
+  email: Joi.string().optional(),
   status: Joi.string(),
   token: Joi.string().optional()
 })

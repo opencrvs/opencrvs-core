@@ -50,6 +50,7 @@ export interface IAuthentication {
   userId: string
   status: string
   scope: string[]
+  email?: string
 }
 
 export interface ISystemAuthentication {

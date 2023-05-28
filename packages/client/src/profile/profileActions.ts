@@ -55,7 +55,8 @@ type ModifyUserDetailsAction = {
 type SendVerifyCode = {
   type: typeof SEND_VERIFY_CODE
   payload: {
-    phoneNumber: string
+    phoneNumber?: string
+    email?: string
   }
 }
 
@@ -134,11 +135,15 @@ export const redirectToAuthentication = (
   }
 })
 
-export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {
+export const sendVerifyCode = (
+  phoneNumber?: string,
+  email?: string
+): SendVerifyCode => {
   return {
     type: SEND_VERIFY_CODE,
     payload: {
-      phoneNumber
+      phoneNumber,
+      email
     }
   }
 }
