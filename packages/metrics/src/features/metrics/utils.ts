@@ -120,10 +120,14 @@ export const fetchEstimateByLocation = async (
   )
   let estimateExtensionFound = false
   const toYear = new Date(timeTo).getFullYear()
-  let selectedCrudYear = new Date(timeTo).getFullYear()
-  let selectedPopYear = new Date(timeTo).getFullYear()
-  let malePopulationArray: [] = []
-  let femalePopulationArray: [] = []
+  const fromYear = new Date(timeFrom).getFullYear()
+  const yearArray: number[] = []
+  for (let year = fromYear; year <= toYear; year++) {
+    yearArray.push(year)
+  }
+  const selectedCrudYear = new Date(timeTo).getFullYear()
+  let malePopulation = 0
+  let femalePopulation = 0
 
   if (!locationData.extension) {
     return {
@@ -142,47 +146,87 @@ export const fetchEstimateByLocation = async (
       event === EVENT_TYPE.BIRTH
     ) {
       estimateExtensionFound = true
-      const valueArray: [] = JSON.parse(extension.valueString as string)
-      // Checking upto fromYear is risky as most of the time we won't
-      // have any estimation data for recent years
-      for (let key = toYear; key > 1; key--) {
-        valueArray.forEach((data) => {
-          if (key in data) {
-            crudRate = data[key]
-            selectedCrudYear = key
-          }
-        })
-        if (crudRate > 0) {
-          break
+      const valueArray = JSON.parse(extension.valueString as string) as {
+        [key: string]: number
+      }[]
+      let sum = 0
+      let count = 0
+
+      for (let i = 0; i < yearArray.length; i++) {
+        const year = yearArray[i].toString()
+        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
+        if (entry) {
+          sum += entry[year]
+          count++
         }
       }
+      crudRate = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
     ) {
       estimateExtensionFound = true
-      const valueArray: [] = JSON.parse(extension.valueString as string)
-      for (let key = toYear; key > 1; key--) {
-        valueArray.forEach((data) => {
-          if (key in data) {
-            totalPopulation = data[key]
-            selectedPopYear = key
-          }
-        })
-        if (totalPopulation > 0) {
-          break
+      const valueArray = JSON.parse(extension.valueString as string) as {
+        [key: string]: number
+      }[]
+      let sum = 0
+      let count = 0
+
+      for (let i = 0; i < yearArray.length; i++) {
+        const year = yearArray[i].toString()
+        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
+        if (entry) {
+          sum += entry[year]
+          count++
         }
       }
+      totalPopulation = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      malePopulationArray = JSON.parse(extension.valueString as string)
+      const malePopulationArray = JSON.parse(
+        extension.valueString as string
+      ) as {
+        [key: string]: number
+      }[]
+      let sum = 0
+      let count = 0
+
+      for (let i = 0; i < yearArray.length; i++) {
+        const year = yearArray[i].toString()
+        const entry = malePopulationArray.find((obj) =>
+          obj.hasOwnProperty(year)
+        )
+        if (entry) {
+          sum += entry[year]
+          count++
+        }
+      }
+      malePopulation = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      femalePopulationArray = JSON.parse(extension.valueString as string)
+      const femalePopulationArray = JSON.parse(
+        extension.valueString as string
+      ) as {
+        [key: string]: number
+      }[]
+      let sum = 0
+      let count = 0
+
+      for (let i = 0; i < yearArray.length; i++) {
+        const year = yearArray[i].toString()
+        const entry = femalePopulationArray.find((obj) =>
+          obj.hasOwnProperty(year)
+        )
+        if (entry) {
+          sum += entry[year]
+          count++
+        }
+      }
+      femalePopulation = sum / count
     }
   })
   if (!estimateExtensionFound) {
@@ -202,19 +246,6 @@ export const fetchEstimateByLocation = async (
     )
     crudRate = crudeDeathRateResponse.crudeDeathRate
   }
-  let populationData =
-    malePopulationArray?.find((data) => data[selectedPopYear] !== undefined)?.[
-      selectedPopYear
-    ] ?? ''
-  const malePopulation: number =
-    populationData === '' ? totalPopulation / 2 : Number(populationData)
-
-  populationData =
-    femalePopulationArray?.find(
-      (data) => data[selectedPopYear] !== undefined
-    )?.[selectedPopYear] ?? ''
-  const femalePopulation: number =
-    populationData === '' ? totalPopulation / 2 : Number(populationData)
 
   return {
     totalEstimation: Math.round(

@@ -809,7 +809,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
+                  const date = new Date(row.cbr.year, 0, 0)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
