@@ -10,13 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
+import { ISearchResponse } from '@search/elasticsearch/client'
+import { ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
+import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
-  body: ICompositionBody
+  body: ICompositionBody,
+  client: elasticsearch.Client
 ) => {
   let response: any
   try {
@@ -30,11 +32,14 @@ export const indexComposition = async (
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
   }
-
   return response
 }
 
-export const updateComposition = async (id: string, body: ICompositionBody) => {
+export const updateComposition = async (
+  id: string,
+  body: ICompositionBody,
+  client: elasticsearch.Client
+) => {
   let response: any
   try {
     response = await client.update({
@@ -53,25 +58,12 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchComposition = async (body: ICompositionBody) => {
+export const searchByCompositionId = async (
+  compositionId: string,
+  client: elasticsearch.Client
+) => {
   try {
-    const response = client.search<ISearchResponse<any>>({
-      index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
-      body: {
-        query: buildQuery(body)
-      }
-    })
-    return response
-  } catch (err) {
-    logger.error(`searchComposition: error: ${err}`)
-    return null
-  }
-}
-
-export const searchByCompositionId = async (compositionId: string) => {
-  try {
-    const response = await client.search<ISearchResponse<any>>({
+    return await client.search<ISearchResponse<any>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
@@ -82,7 +74,6 @@ export const searchByCompositionId = async (compositionId: string) => {
         }
       }
     })
-    return response
   } catch (err) {
     logger.error(`searchByCompositionId: error: ${err}`)
     return null

@@ -1,5 +1,6 @@
 import {
   DECLARATION_STATUS,
+  DECLARATION_TYPE,
   USER_ACTION
 } from '@metrics/features/registration/fhirUtils'
 
@@ -29,6 +30,11 @@ export interface IUserAuditFields extends IPoint {
   data: string | undefined
   userAgent: string
   ipAddress: string
+}
+
+export interface IMarriageRegistrationFields extends IPoint {
+  compositionId: string
+  daysAfterEvent: number | undefined
 }
 
 export interface IPoint {
@@ -65,6 +71,20 @@ export interface IBirthRegistrationTags {
   locationLevel4?: string
   locationLevel3?: string
   locationLevel2?: string
+}
+
+export interface IMarriageRegistrationTags {
+  regStatus: string
+  timeLabel: string | undefined
+  dateLabel: string | undefined
+  registrarPractitionerId: string
+  practitionerRole: string
+  officeLocation?: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+  locationLevel1?: string
 }
 
 export interface IUserAuditTags {
@@ -194,7 +214,7 @@ export interface IUserAuditBody {
 export interface IPaymentPoints {
   measurement: string
   tags: ILocationTags & {
-    eventType: 'BIRTH' | 'DEATH'
+    eventType: DECLARATION_TYPE
     paymentType: 'certification' | 'correction'
   }
   fields: IPaymentFields
@@ -203,7 +223,7 @@ export interface IPaymentPoints {
 export interface ICorrectionPoint {
   measurement: string
   tags: ILocationTags & {
-    eventType: 'BIRTH' | 'DEATH'
+    eventType: DECLARATION_TYPE
     // CLERICAL_ERROR, MATERIAL_ERROR, MATERIAL_OMISSION, JUDICIAL_ORDER, OTHER
     reason: string
   }

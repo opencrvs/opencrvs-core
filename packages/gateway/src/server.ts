@@ -93,6 +93,11 @@ export async function createServer() {
     await database.start()
     await apolloServer.applyMiddleware({
       app,
+      route: {
+        auth: {
+          mode: 'try'
+        }
+      },
       cors: {
         origin: whitelist
       }

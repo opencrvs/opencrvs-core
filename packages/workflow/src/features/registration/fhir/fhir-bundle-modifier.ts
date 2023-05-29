@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  BIRTH_REG_NUMBER_GENERATION_FAILED,
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -27,12 +28,14 @@ import {
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
+  fetchTaskByCompositionIdFromHearth,
+  generateTrackingIdForEvents,
+  getComposition,
   getEventType,
   getMosipUINToken,
   isEventNotification,
-  isInProgressDeclaration
+  isInProgressDeclaration,
+  getVoidEvent
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -55,6 +58,7 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { triggerEvent } from '@workflow/features/events/handler'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -167,10 +171,11 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  headers: Record<string, string>
-) {
+  headers: Record<string, string>,
+  token: string
+): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    const res = await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -178,8 +183,64 @@ export async function invokeRegistrationValidation(
         ...headers
       }
     })
+    if (!res.ok) {
+      const errorData = await res.json()
+      throw `System error: ${res.statusText} ${res.status} ${errorData.boomCustromMessage}`
+    }
+    return { bundle }
   } catch (err) {
-    throw new Error(`Unable to send registration for validation: ${err}`)
+    const eventType = getEventType(bundle)
+    const composition = await getComposition(bundle)
+    if (!composition) {
+      throw new Error('Cant get composition in bundle')
+    }
+    const taskResource = await fetchTaskByCompositionIdFromHearth(
+      composition.id
+    )
+    const practitioner = await getLoggedInPractitionerResource(token)
+
+    if (
+      !taskResource ||
+      !taskResource.businessStatus ||
+      !taskResource.businessStatus.coding ||
+      !taskResource.businessStatus.coding[0] ||
+      !taskResource.businessStatus.coding[0].code
+    ) {
+      throw new Error('taskResource has no businessStatus code')
+    }
+    taskResource.businessStatus.coding[0].code = RegStatus.REJECTED
+
+    const statusReason: fhir.CodeableConcept = {
+      text: `${JSON.stringify(err)} - ${BIRTH_REG_NUMBER_GENERATION_FAILED}`
+    }
+    taskResource.statusReason = statusReason
+    taskResource.lastModified = new Date().toISOString()
+
+    /* setting registration workflow status here */
+    await setupRegistrationWorkflow(
+      taskResource,
+      getTokenPayload(token),
+      RegStatus.REJECTED
+    )
+
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+
+    /* setting lastRegUser here */
+    setupLastRegUser(taskResource, practitioner)
+
+    /* check if the status of any event draft is not published and setting configuration extension*/
+    await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+    await updateResourceInHearth(taskResource)
+
+    await triggerEvent(
+      getVoidEvent(eventType),
+      { resourceType: 'Bundle', entry: [{ resource: taskResource }] },
+      headers
+    )
+
+    return { bundle, regValidationError: true }
   }
 }
 
@@ -244,12 +305,7 @@ export async function markEventAsRegistered(
   token: string
 ): Promise<fhir.Task> {
   /* Setting registration number here */
-  let identifierName
-  if (eventType === EVENT_TYPE.BIRTH) {
-    identifierName = 'birth-registration-number'
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    identifierName = 'death-registration-number'
-  }
+  const identifierName = `${eventType.toLowerCase()}-registration-number`
 
   if (taskResource && taskResource.identifier) {
     taskResource.identifier.push({
@@ -295,6 +351,48 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export function makeTaskAnonymous(bundle: fhir.Bundle) {
+  const taskResource = getTaskResource(bundle)
+
+  taskResource.extension = taskResource.extension?.filter(
+    ({ url }) =>
+      ![
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
+      ].includes(url)
+  )
+
+  return bundle
+}
+
+export async function markBundleAsIssued(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle)
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    RegStatus.ISSUED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
 export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
@@ -319,16 +417,9 @@ export async function touchBundle(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  let trackingId: string
-  let trackingIdFhirName: string
   const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    trackingId = generateBirthTrackingId()
-    trackingIdFhirName = 'birth-tracking-id'
-  } else {
-    trackingId = generateDeathTrackingId()
-    trackingIdFhirName = 'death-tracking-id'
-  }
+  const trackingId = generateTrackingIdForEvents(eventType)
+  const trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
 
   if (
     !fhirBundle ||
@@ -592,31 +683,35 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
 
 export async function updatePatientIdentifierWithRN(
   composition: fhir.Composition,
-  sectionCode: string,
+  sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<fhir.Patient> {
-  const section = getSectionEntryBySectionCode(composition, sectionCode)
-  const patient: fhir.Patient = await getFromFhir(`/${section.reference}`)
-  if (!patient.identifier) {
-    patient.identifier = []
-  }
-  const rnIdentifier = patient.identifier.find(
-    (identifier) => identifier.type === identifierType
-  )
-  if (rnIdentifier) {
-    rnIdentifier.value = registrationNumber
-  } else {
-    patient.identifier.push({
-      // @ts-ignore
-      // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-      // type should have CodeableConcept instead of string
-      // Need to fix in both places together along with a script for legacy data update
-      type: identifierType,
-      value: registrationNumber
+): Promise<fhir.Patient[]> {
+  return await Promise.all(
+    sectionCodes.map(async (sectionCode) => {
+      const section = getSectionEntryBySectionCode(composition, sectionCode)
+      const patient = await getFromFhir(`/${section.reference}`)
+      if (!patient.identifier) {
+        patient.identifier = []
+      }
+      const rnIdentifier = patient.identifier.find(
+        (identifier: { type: string }) => identifier.type === identifierType
+      )
+      if (rnIdentifier) {
+        rnIdentifier.value = registrationNumber
+      } else {
+        patient.identifier.push({
+          // @ts-ignore
+          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+          // type should have CodeableConcept instead of string
+          // Need to fix in both places together along with a script for legacy data update
+          type: identifierType,
+          value: registrationNumber
+        })
+      }
+      return patient
     })
-  }
-  return patient
+  )
 }
 
 interface Integration {

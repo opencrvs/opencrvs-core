@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query, SystemRoleType } from '@client/utils/gateway'
+import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -46,7 +46,8 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLRegistrationSearchSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLMarriageEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ApolloClient,
@@ -64,7 +65,6 @@ import {
 } from '@client/notification/actions'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
-import { getPotentialDuplicateIds } from '@client/transformer/index'
 import {
   UpdateRegistrarWorkqueueAction,
   updateRegistrarWorkqueue,
@@ -72,8 +72,10 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
+import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -120,6 +122,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_REINSTATE = 'READY_TO_REINSTATE',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
+  READY_TO_ISSUE = 'READY_TO_ISSUE',
+  ISSUING = 'ISSUING',
+  ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
@@ -152,7 +157,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_CERTIFY,
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  SUBMISSION_STATUS.REQUESTING_CORRECTION
+  SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.READY_TO_ISSUE,
+  SUBMISSION_STATUS.ISSUING
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -191,10 +198,15 @@ export interface ITaskHistory {
   rejectComment?: string
 }
 
+export interface IDuplicates {
+  compositionId: string
+  trackingId: string
+}
+
 export interface IDeclaration {
   id: string
   data: IFormData
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
   originalData?: IFormData
   savedOn?: number
   createdAt?: string
@@ -214,6 +226,7 @@ export interface IDeclaration {
   timeLoggedMS?: number
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
+  isNotDuplicate?: boolean
 }
 
 type Relation =
@@ -278,7 +291,7 @@ type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 
-type Payment = {
+export type Payment = {
   paymentId?: string
   type: PaymentType
   total: number
@@ -289,7 +302,12 @@ type Payment = {
 
 interface IArchiveDeclarationAction {
   type: typeof ARCHIVE_DECLARATION
-  payload: { declarationId: string }
+  payload: {
+    declarationId: string
+    reason?: string
+    comment?: string
+    duplicateTrackingId?: string
+  }
 }
 
 interface IStoreDeclarationAction {
@@ -337,6 +355,7 @@ interface IDeleteDeclarationAction {
   type: typeof DELETE_DECLARATION
   payload: {
     declarationId: string
+    client: ApolloClient<{}>
   }
 }
 
@@ -351,7 +370,7 @@ interface IGetStorageDeclarationsFailedAction {
 
 interface IDeleteDeclarationSuccessAction {
   type: typeof DELETE_DECLARATION_SUCCESS
-  payload: string
+  payload: { declarationId: string; client: ApolloClient<{}> }
 }
 
 interface IDeleteDeclarationFailedAction {
@@ -488,7 +507,7 @@ export function createReviewDeclaration(
   formData: IFormData,
   event: Event,
   status?: string,
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
 ): IDeclaration {
   return {
     id: declarationId,
@@ -551,21 +570,32 @@ export const getStorageDeclarationsFailed =
   })
 
 export function archiveDeclaration(
-  declarationId: string
+  declarationId: string,
+  reason?: string,
+  comment?: string,
+  duplicateTrackingId?: string
 ): IArchiveDeclarationAction {
-  return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
+  return {
+    type: ARCHIVE_DECLARATION,
+    payload: { declarationId, reason, comment, duplicateTrackingId }
+  }
 }
 
 export function deleteDeclaration(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declarationId } }
+  return { type: DELETE_DECLARATION, payload: { declarationId, client } }
 }
 
 function deleteDeclarationSuccess(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationSuccessAction {
-  return { type: DELETE_DECLARATION_SUCCESS, payload: declarationId }
+  return {
+    type: DELETE_DECLARATION_SUCCESS,
+    payload: { declarationId, client }
+  }
 }
 
 function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
@@ -711,38 +741,94 @@ export async function updateWorkqueueData(
   if (!workqueueApp) {
     return
   }
-  const sectionId = declaration.event === 'birth' ? 'child' : 'deceased'
-  const sectionDefinition = getRegisterForm(state)[
-    declaration.event
-  ].sections.find((section) => section.id === sectionId)
+  const sectionIds =
+    declaration.event === 'birth'
+      ? ['child']
+      : declaration.event === 'death'
+      ? ['deceased']
+      : ['groom', 'bride']
 
-  const transformedDeclaration = draftToGqlTransformer(
-    // transforming required section only
-    { sections: sectionDefinition ? [sectionDefinition] : [] },
-    declaration.data
-  )
-  const transformedName =
-    (transformedDeclaration &&
-      transformedDeclaration[sectionId] &&
-      transformedDeclaration[sectionId].name) ||
-    []
-  const transformedDeathDate =
-    (declaration.data &&
-      declaration.data.deathEvent &&
-      declaration.data.deathEvent.deathDate) ||
-    []
-  const transformedBirthDate =
-    (declaration.data &&
-      declaration.data.child &&
-      declaration.data.child.childBirthDate) ||
-    []
-  const transformedInformantContactNumber =
+  let transformedName: (GQLHumanName | null)[] | undefined
+  let transformedNameForGroom: (GQLHumanName | null)[] | undefined
+  let transformedNameForBride: (GQLHumanName | null)[] | undefined
+  let transformedDeathDate: IFormFieldValue = EMPTY_STRING
+  let transformedBirthDate: IFormFieldValue = EMPTY_STRING
+  let transformedMarriageDate: IFormFieldValue = EMPTY_STRING
+  let transformedInformantContactNumber = EMPTY_STRING
+
+  if (declaration.event === 'marriage') {
+    const groomSectionId = sectionIds[0]
+    const brideSectionId = sectionIds[1]
+
+    const groomSectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === groomSectionId)
+    const brideSectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === brideSectionId)
+
+    const transformedDeclarationForGroom = draftToGqlTransformer(
+      // transforming required section only
+      { sections: groomSectionDefinition ? [groomSectionDefinition] : [] },
+      declaration.data
+    )
+
+    const transformedDeclarationForBride = draftToGqlTransformer(
+      // transforming required section only
+      { sections: brideSectionDefinition ? [brideSectionDefinition] : [] },
+      declaration.data
+    )
+
+    transformedNameForGroom =
+      (transformedDeclarationForGroom &&
+        transformedDeclarationForGroom[groomSectionId] &&
+        transformedDeclarationForGroom[groomSectionId].name) ||
+      []
+    transformedNameForBride =
+      (transformedDeclarationForBride &&
+        transformedDeclarationForBride[brideSectionId] &&
+        transformedDeclarationForBride[brideSectionId].name) ||
+      []
+    transformedMarriageDate =
+      (declaration.data &&
+        declaration.data.marriageEvent &&
+        declaration.data.marriageEvent.marriageDate) ||
+      []
+  } else {
+    const sectionId = sectionIds[0]
+    const sectionDefinition = getRegisterForm(state)[
+      declaration.event
+    ].sections.find((section) => section.id === sectionId)
+
+    const transformedDeclaration = draftToGqlTransformer(
+      // transforming required section only
+      { sections: sectionDefinition ? [sectionDefinition] : [] },
+      declaration.data
+    )
+    transformedName =
+      (transformedDeclaration &&
+        transformedDeclaration[sectionId] &&
+        transformedDeclaration[sectionId].name) ||
+      []
+    transformedDeathDate =
+      (declaration.data &&
+        declaration.data.deathEvent &&
+        declaration.data.deathEvent.deathDate) ||
+      []
+    transformedBirthDate =
+      (declaration.data &&
+        declaration.data.child &&
+        declaration.data.child.childBirthDate) ||
+      []
+  }
+  transformedInformantContactNumber =
     (declaration.data &&
       declaration.data.registration &&
       declaration.data.registration.contactPoint &&
       (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
+
   if (declaration.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
     ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
@@ -750,11 +836,22 @@ export async function updateWorkqueueData(
       (workqueueApp as GQLDeathEventSearchSet)
         .registration as GQLRegistrationSearchSet
     ).contactNumber = transformedInformantContactNumber
-  } else {
+  } else if (declaration.event === 'death') {
     ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
     ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
     ;(
       (workqueueApp as GQLDeathEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
+  } else if (declaration.event === 'marriage') {
+    ;(workqueueApp as GQLMarriageEventSearchSet).brideName =
+      transformedNameForBride
+    ;(workqueueApp as GQLMarriageEventSearchSet).groomName =
+      transformedNameForGroom
+    ;(workqueueApp as GQLMarriageEventSearchSet).dateOfMarriage =
+      transformedMarriageDate
+    ;(
+      (workqueueApp as GQLMarriageEventSearchSet)
         .registration as GQLRegistrationSearchSet
     ).contactNumber = transformedInformantContactNumber
   }
@@ -924,7 +1021,7 @@ function createRequestForDeclaration(
 }
 
 function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<any>>,
+  mainRequest: Promise<ApolloQueryResult<Query>>,
   getState: () => IStoreState,
   client: ApolloClient<{}>
 ) {
@@ -932,7 +1029,21 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      await fetchAllMinioUrlsInAttachment(data.data as Query)
+      const userDetails = getUserDetails(getState())
+      if (
+        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
+      ) {
+        await fetchAllDuplicateDeclarations(data.data)
+      }
+      const allfetchableURLs = [
+        ...getAttachmentUrls(data.data),
+        ...getSignatureUrls(data.data)
+      ]
+
+      await Promise.all(
+        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
+      )
+
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
@@ -940,20 +1051,55 @@ function requestWithStateWrapper(
   })
 }
 
-async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+function getAttachmentUrls(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
+
+  return (registration?.attachments ?? [])
+    .filter((a): a is Attachment => Boolean(a))
+    .map((a) => a.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+}
+
+function getSignatureUrls(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration ||
+    queryResultData.fetchMarriageRegistration?.registration
+
+  return (
+    [
+      'informantsSignature',
+      'brideSignature',
+      'groomSignature',
+      'witnessOneSignature',
+      'witnessTwoSignature'
+    ] as const
+  )
+    .map((propertyKey) => registration?.[propertyKey])
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+}
+
+async function fetchAllDuplicateDeclarations(queryResultData: Query) {
   const registration =
     queryResultData.fetchBirthRegistration?.registration ||
     queryResultData.fetchDeathRegistration?.registration
 
-  const attachments = registration?.attachments
-  if (!attachments) {
+  const duplicateCompositionIds = registration?.duplicates?.map(
+    (duplicate) => duplicate?.compositionId
+  )
+
+  if (!duplicateCompositionIds || !duplicateCompositionIds?.length) {
     return
   }
-  const urlsWithMinioPath = attachments
-    .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
 
-  return Promise.all(urlsWithMinioPath)
+  const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
+    ViewRecordQueries.fetchDuplicateDeclarations(id as string)
+  )
+
+  return Promise.all(fetchAllDuplicates)
 }
 
 function getDataKey(declaration: IDeclaration) {
@@ -1075,7 +1221,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         declarations: state.declarations.concat(action.payload.declaration)
       }
     case DELETE_DECLARATION: {
-      const { declarationId } = action.payload
+      const { declarationId, client: clientFromDeleteDeclaration } =
+        action.payload
       return loop(
         {
           ...state,
@@ -1086,7 +1233,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           )
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: deleteDeclarationSuccess,
+          successActionCreator: (id: string) =>
+            deleteDeclarationSuccess(id, clientFromDeleteDeclaration),
           failActionCreator: deleteDeclarationFailed,
           args: [state.userID, action.payload.declarationId, state]
         })
@@ -1094,17 +1242,25 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
     }
     case DELETE_DECLARATION_SUCCESS:
       const declarationToDelete = state.declarations.find(
-        (declaration) => declaration.id === action.payload
+        (declaration) => declaration.id === action.payload.declarationId
       )
       const declarationMinioUrls =
         getMinioUrlsFromDeclaration(declarationToDelete)
 
       postMinioUrlsToServiceWorker(declarationMinioUrls)
+
+      const declarationsWithoutDeleted = state.declarations.filter(
+        ({ id }) => id !== action.payload.declarationId
+      )
+
+      clearUnusedViewRecordCacheEntries(
+        action.payload.client.cache,
+        declarationsWithoutDeleted
+      )
+
       return {
         ...state,
-        declarations: state.declarations.filter(
-          ({ id }) => id !== action.payload
-        )
+        declarations: declarationsWithoutDeleted
       }
     case MODIFY_DECLARATION:
       const newDeclarations = [...state.declarations]
@@ -1149,7 +1305,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             return declaration
           })
         },
-        Cmd.action(writeDeclaration(orignalAppliation))
+        Cmd.action(modifyDeclaration(orignalAppliation))
       )
     }
 
@@ -1349,7 +1505,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           transData,
           downloadingDeclaration.event,
           downloadedAppStatus,
-          getPotentialDuplicateIds(eventData)
+          eventData?.registration?.duplicates?.filter(
+            (duplicate: IDuplicates) => !!duplicate
+          )
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
@@ -1559,7 +1717,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
           action: SubmissionAction.ARCHIVE_DECLARATION,
-          payload: { id: declaration.id }
+          payload: {
+            id: declaration.id,
+            reason: action.payload.reason || '',
+            comment: action.payload.comment || '',
+            duplicateTrackingId: action.payload.duplicateTrackingId || ''
+          }
         }
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }
@@ -1640,7 +1803,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           | IUnassignDeclaration
         >(
           [
-            Cmd.action(deleteDeclaration(action.payload.id)),
+            Cmd.action(
+              deleteDeclaration(action.payload.id, action.payload.client)
+            ),
             Cmd.action(updateRegistrarWorkqueue()),
             declarationNextToUnassign
               ? Cmd.action(
@@ -1710,11 +1875,8 @@ export function getMinioUrlsFromDeclaration(
 }
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
-  )
   navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioFullUrls
+    minioUrls: minioUrls
   })
 }
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
@@ -1763,6 +1925,10 @@ export function filterProcessingDeclarationsFromQuery(
     ),
     externalValidationTab: filterProcessingDeclarations(
       queryData.externalValidationTab,
+      processingDeclarationIds
+    ),
+    issueTab: filterProcessingDeclarations(
+      queryData.issueTab,
       processingDeclarationIds
     )
   }

@@ -165,7 +165,7 @@ export const LoginBackground = () => {
   }
 
   async function backgroundMutationHandler() {
-    if (!isWithinFileLength(backgroundImage)) {
+    if (!hexValue && !isWithinFileLength(backgroundImage)) {
       setErrorMessages(
         intl.formatMessage(messages.backgroundImageFileLimitError)
       )

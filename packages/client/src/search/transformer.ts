@@ -14,13 +14,14 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
+  GQLMarriageEventSearchSet,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { SearchEventsQuery } from '@client/utils/gateway'
-import { LANG_EN } from '@client/utils/constants'
+import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
 
 export const transformData = (
@@ -37,17 +38,41 @@ export const transformData = (
     .map((reg: GQLEventSearchSet) => {
       let birthReg
       let deathReg
+      let marriageReg
       let names
+      let groomNames
+      let brideNames
+      let mergedMarriageName
       let dateOfEvent
       const assignedReg = reg as GQLEventSearchSet
       if (assignedReg.registration && assignedReg.type === 'Birth') {
         birthReg = reg as GQLBirthEventSearchSet
         names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
         dateOfEvent = birthReg && birthReg.dateOfBirth
-      } else {
+      } else if (assignedReg.registration && assignedReg.type === 'Death') {
         deathReg = reg as GQLDeathEventSearchSet
         names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
         dateOfEvent = deathReg && deathReg.dateOfDeath
+      } else {
+        marriageReg = reg as GQLMarriageEventSearchSet
+        groomNames =
+          (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
+        brideNames =
+          (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
+
+        const groomName =
+          (createNamesMap(groomNames as HumanName[])[locale] as string) ||
+          (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
+        const brideName =
+          (createNamesMap(brideNames as HumanName[])[locale] as string) ||
+          (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
+
+        mergedMarriageName =
+          brideName && groomName
+            ? `${groomName} & ${brideName}`
+            : brideName || groomName || EMPTY_STRING
+
+        dateOfEvent = marriageReg && marriageReg.dateOfMarriage
       }
       const status =
         assignedReg.registration &&
@@ -56,9 +81,11 @@ export const transformData = (
       return {
         id: assignedReg.id,
         name:
-          (createNamesMap(names)[locale] as string) ||
-          (createNamesMap(names)[LANG_EN] as string) ||
-          '',
+          assignedReg.type === 'Marriage'
+            ? mergedMarriageName
+            : (createNamesMap(names as HumanName[])[locale] as string) ||
+              (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
+              '',
         dob:
           (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||

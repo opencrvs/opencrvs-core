@@ -79,10 +79,12 @@ export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
-  COLLECT_CERTIFICATE = 'collect certificate',
+  CERTIFY_DECLARATION = 'certify declaration',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction'
+  REQUEST_CORRECTION_DECLARATION = 'request correction',
+  ISSUE_DECLARATION = 'issue certificate',
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
 }
 
 export enum DownloadAction {
@@ -289,6 +291,7 @@ export interface IAttachmentValue {
   name?: string
   type: string
   data: string
+  uri?: string
 }
 
 export type IFormFieldMutationMapFunction = (
@@ -420,6 +423,7 @@ export type SerializedFormField = UnionOmit<
 }
 export interface IAttachment {
   data: string
+  uri?: string
   optionValues: string[]
   type: string
   title?: string
@@ -913,6 +917,17 @@ export enum DeathSection {
   Preview = 'preview'
 }
 
+export enum MarriageSection {
+  Registration = 'registration',
+  Groom = 'groom',
+  Bride = 'bride',
+  Event = 'marriageEvent',
+  WitnessOne = 'witnessOne',
+  WitnessTwo = 'witnessTwo',
+  Documents = 'documents',
+  Preview = 'preview'
+}
+
 export type WizardSection = BirthSection | DeathSection | 'settings'
 
 export enum UserSection {
@@ -960,6 +975,7 @@ export type Section =
   | CertificateSection
   | CorrectionSection
   | InformantSection
+  | MarriageSection
 
 export interface IFormSection {
   id: Section

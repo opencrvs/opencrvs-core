@@ -12,7 +12,8 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import {
   collectBirthCertificateFormSection,
-  collectDeathCertificateFormSection
+  collectDeathCertificateFormSection,
+  collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Action } from 'redux'
 import { IFormSection } from '@client/forms'
@@ -21,11 +22,13 @@ import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/p
 const initialState: IPrintFormState = {
   collectBirthCertificateForm: collectBirthCertificateFormSection,
   collectDeathCertificateForm: collectDeathCertificateFormSection,
+  collectMarriageCertificateForm: collectMarriageCertificateFormSection,
   paymentForm: paymentFormSection
 }
 export interface IPrintFormState {
   collectBirthCertificateForm: IFormSection
   collectDeathCertificateForm: IFormSection
+  collectMarriageCertificateForm: IFormSection
   paymentForm: IFormSection
 }
 

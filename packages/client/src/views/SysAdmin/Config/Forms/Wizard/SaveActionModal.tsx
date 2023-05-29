@@ -39,7 +39,7 @@ import { goToFormConfigHome } from '@client/navigation'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import { questionsTransformer } from '@client/forms/questionConfig'
 
 export const SaveActionContext = React.createContext({
@@ -115,10 +115,10 @@ export function SaveActionModal() {
       show={status === ActionStatus.MODAL}
       handleClose={closeModal}
       actions={[
-        <SecondaryButton onClick={closeModal}>
+        <SecondaryButton key="close-modal-button" onClick={closeModal}>
           {intl.formatMessage(buttonMessages.cancel)}
         </SecondaryButton>,
-        <SaveActionButton comment={comment} />
+        <SaveActionButton key="save-action-button" comment={comment} />
       ]}
     >
       {intl.formatMessage(messages.saveDraftDescription)}

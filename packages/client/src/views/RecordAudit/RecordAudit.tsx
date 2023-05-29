@@ -34,7 +34,8 @@ import {
   goToPrintCertificate,
   goToUserProfile,
   goToTeamUserList,
-  goToViewRecordPage
+  goToViewRecordPage,
+  goToIssueCertificate
 } from '@client/navigation'
 import {
   injectIntl,
@@ -103,7 +104,8 @@ import {
   ShowDownloadButton,
   ShowReviewButton,
   ShowUpdateButton,
-  ShowPrintButton
+  ShowPrintButton,
+  ShowIssueButton
 } from './ActionButtons'
 import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
@@ -121,6 +123,8 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
 import { UserDetails } from '@client/utils/userUtils'
 
 const DesktopHeader = styled(Header)`
@@ -206,10 +210,11 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'blue',
+  CERTIFIED: 'teal',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
-  SUBMITTING: 'orange'
+  SUBMITTING: 'orange',
+  ISSUED: 'blue'
 }
 
 const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
@@ -333,40 +338,20 @@ function RecordAuditBody({
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
-  if (
-    declaration.status !== SUBMISSION_STATUS.DRAFT &&
-    (userHasRegisterScope || userHasValidateScope)
-  ) {
-    actions.push(
-      <Button
-        type="secondary"
-        onClick={() => {
-          dispatch(goToViewRecordPage(declaration.id as string))
-        }}
-      >
-        {intl.formatMessage(buttonMessages.view)}
-      </Button>
-    )
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
-  }
-
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (
     isDownloaded &&
+    declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED)
+      declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -389,15 +374,16 @@ function RecordAuditBody({
       (userHasValidateScope && declaration.status !== VALIDATED))
   ) {
     actions.push(
-      <StyledTertiaryButton
-        align={ICON_ALIGNMENT.LEFT}
+      <Button
         id="archive_button"
+        type="tertiary"
         key="archive_button"
-        icon={() => <Archive />}
+        disabled={!isOnline}
         onClick={toggleDisplayDialog}
       >
+        <Icon name="Archive" color="currentColor" size="large" />{' '}
         {intl.formatMessage(buttonMessages.archive)}
-      </StyledTertiaryButton>
+      </Button>
     )
     desktopActionsView.push(actions[actions.length - 1])
   }
@@ -409,18 +395,41 @@ function RecordAuditBody({
     ARCHIVED.includes(declaration.status)
   ) {
     actions.push(
-      <StyledTertiaryButton
-        align={ICON_ALIGNMENT.LEFT}
+      <Button
         id="reinstate_button"
+        type="tertiary"
         key="reinstate_button"
         disabled={!isOnline}
-        icon={() => <RotateLeft />}
         onClick={toggleDisplayDialog}
       >
+        <Icon name="ArchiveTray" color="currentColor" size="large" />
         {intl.formatMessage(buttonMessages.reinstate)}
-      </StyledTertiaryButton>
+      </Button>
     )
     desktopActionsView.push(actions[actions.length - 1])
+  }
+
+  if (
+    declaration.status !== SUBMISSION_STATUS.DRAFT &&
+    (userHasRegisterScope || userHasValidateScope)
+  ) {
+    actions.push(
+      <Button
+        type="secondary"
+        onClick={() => {
+          dispatch(goToViewRecordPage(declaration.id as string))
+        }}
+      >
+        <Icon name="Eye" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.view)}
+      </Button>
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
   }
 
   if (
@@ -472,7 +481,7 @@ function RecordAuditBody({
 
   if (
     declaration.status === SUBMISSION_STATUS.REGISTERED ||
-    declaration.status === SUBMISSION_STATUS.CERTIFIED
+    declaration.status === SUBMISSION_STATUS.ISSUED
   ) {
     actions.push(
       ShowPrintButton({
@@ -492,6 +501,24 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
+  if (declaration.status === SUBMISSION_STATUS.CERTIFIED) {
+    actions.push(
+      ShowIssueButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToIssueCertificate
+      })
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
   if (!isDownloaded) {
     actions.push(
       ShowDownloadButton({
@@ -540,7 +567,7 @@ function RecordAuditBody({
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
-      <BackButtonDiv>
+      <BackButtonDiv key="go-back">
         <BackButton onClick={() => goBack()}>
           <BackArrow />
         </BackButton>

@@ -21,7 +21,8 @@ describe('Location root resolvers', () => {
       // @ts-ignore
       const compositions = await resolvers.Query.locationsByParent(
         {},
-        { parentId: '1' }
+        { parentId: '1' },
+        { headers: undefined }
       )
 
       expect(compositions).toBeDefined()
@@ -35,7 +36,8 @@ describe('Location root resolvers', () => {
       // @ts-ignore
       const composition = await resolvers.Query.locationById(
         {},
-        { locationId: '1' }
+        { locationId: '1' },
+        { headers: undefined }
       )
 
       expect(composition).toBeDefined()
@@ -55,7 +57,8 @@ describe('Location root resolvers', () => {
       // @ts-ignore
       const composition = await resolvers.Query.hasChildLocation(
         {},
-        { parentId: '1' }
+        { parentId: '1' },
+        { headers: undefined }
       )
 
       expect(composition).toBeDefined()

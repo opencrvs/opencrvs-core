@@ -22,6 +22,7 @@ interface Window {
         LATE: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
     COUNTRY: string
@@ -39,12 +40,21 @@ interface Window {
         ON_TIME: number
         DELAYED: number
       }
+      PRINT_IN_ADVANCE: boolean
+    }
+    MARRIAGE: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+      PRINT_IN_ADVANCE: boolean
     }
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
-    MINIO_URL: string
+    MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -60,6 +70,9 @@ interface Window {
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
     ADMIN_LEVELS: number
+    REGISTRATIONS_DASHBOARD_URL: string
+    STATISTICS_DASHBOARD_URL: string
+    LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
 }

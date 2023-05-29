@@ -78,3 +78,14 @@ exports.newChannelTemplate = {
   priority: 1,
   maxBodyAgeDays: 30
 }
+
+exports.routeTemplate = {
+  type: 'http',
+  status: 'enabled',
+  forwardAuthHeader: true,
+  secured: false,
+  path: '',
+  pathTransform: '',
+  username: '',
+  password: ''
+}

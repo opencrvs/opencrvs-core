@@ -43,7 +43,7 @@ class SessionExpireComponent extends React.Component<
               <PrimaryButton
                 key="login"
                 id="login"
-                onClick={this.props.redirectToAuthentication}
+                onClick={() => this.props.redirectToAuthentication(true)}
               >
                 {intl.formatMessage(buttonMessages.login)}
               </PrimaryButton>

@@ -21,7 +21,6 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT
 } from '@client/forms'
-import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import {
   identityOptions,
   identityHelperTextMapper,
@@ -30,7 +29,7 @@ import {
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
 import { conditionals } from '@client/forms/utils'
-import { formMessages, userMessages } from '@client/i18n/messages'
+import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
@@ -59,7 +58,7 @@ export interface IVerifyIDCertificateCollectorDefinition {
   [event: string]: IVerifyIDCertificateCollector
 }
 
-export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
   {
     birth: {
       mother: {
@@ -87,6 +86,18 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
         },
         birthDateField: 'fatherBirthDate',
         nationalityField: 'nationality'
+      },
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
       }
     },
     death: {
@@ -100,6 +111,34 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
             familyNameField: 'familyNameEng'
           }
         },
+        nationalityField: 'nationality'
+      }
+    },
+    marriage: {
+      groom: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'groomBirthDate',
+        nationalityField: 'nationality'
+      },
+      bride: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'brideBirthDate',
         nationalityField: 'nationality'
       }
     }
@@ -121,8 +160,8 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'MOTHER', label: formMessages.contactDetailsMother },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'MOTHER', label: formMessages.certifyRecordToMother },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -148,8 +187,8 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'FATHER', label: formMessages.contactDetailsFather },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'FATHER', label: formMessages.certifyRecordToFather },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -175,9 +214,9 @@ export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
         initialValue: '',
         validate: [],
         options: [
-          { value: 'MOTHER', label: formMessages.contactDetailsMother },
-          { value: 'FATHER', label: formMessages.contactDetailsFather },
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'MOTHER', label: formMessages.certifyRecordToMother },
+          { value: 'FATHER', label: formMessages.certifyRecordToFather },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -203,7 +242,7 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
         initialValue: '',
         validate: [],
         options: [
-          { value: 'OTHER', label: formMessages.someoneElse },
+          { value: 'OTHER', label: formMessages.someoneElseCollector },
           {
             value: 'PRINT_IN_ADVANCE',
             label: formMessages.certificatePrintInAdvance
@@ -350,8 +389,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+              expression: 'values.noAffidavitAgreement?.length !== 0'
             }
           ]
         },
@@ -371,8 +409,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+              expression: 'values.affidavitFile !== ""'
             }
           ]
         }
@@ -408,7 +445,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           ],
           options: [
             { value: 'INFORMANT', label: formMessages.informantName },
-            { value: 'OTHER', label: formMessages.someoneElse },
+            { value: 'OTHER', label: formMessages.someoneElseCollector },
             {
               value: 'PRINT_IN_ADVANCE',
               label: formMessages.certificatePrintInAdvance
@@ -544,8 +581,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+              expression: 'values.noAffidavitAgreement?.length !== 0'
             }
           ]
         },
@@ -565,8 +601,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           conditionals: [
             {
               action: 'hide',
-              expression:
-                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
+              expression: 'values.affidavitFile !== ""'
             }
           ]
         }
@@ -575,17 +610,195 @@ export const collectDeathCertificateFormSection: IFormSection = {
   ]
 }
 
-export const certificateCollectorRelationLabelArray = [
-  {
-    value: CorrectorRelationship.LOCAL_REGISTRAR,
-    label: userMessages.LOCAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.NATIONAL_REGISTRAR,
-    label: userMessages.NATIONAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.REGISTRATION_AGENT,
-    label: userMessages.REGISTRATION_AGENT
-  }
-]
+export const collectMarriageCertificateFormSection: IFormSection = {
+  id: CertificateSection.Collector,
+  viewType: 'form',
+  name: certificateMessages.printCertificate,
+  title: certificateMessages.certificateCollectionTitle,
+  groups: [
+    {
+      id: 'certCollector',
+      title: certificateMessages.whoToCollect,
+      conditionals: [conditionals.certCollectorOther],
+      error: certificateMessages.certificateCollectorError,
+      fields: [
+        {
+          name: 'type',
+          type: RADIO_GROUP,
+          size: RadioSize.LARGE,
+          label: certificateMessages.whoToCollect,
+          hideHeader: true,
+          required: true,
+          initialValue: true,
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          options: [
+            { value: 'BRIDE', label: formMessages.brideName },
+            { value: 'GROOM', label: formMessages.groomName },
+            { value: 'OTHER', label: formMessages.someoneElseCollector },
+            {
+              value: 'PRINT_IN_ADVANCE',
+              label: formMessages.certificatePrintInAdvance
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'otherCertCollector',
+      conditionals: [conditionals.certCollectorOther],
+      title: certificateMessages.otherCollectorFormTitle,
+      error: certificateMessages.certificateOtherCollectorInfoError,
+      fields: [
+        {
+          name: 'iDType',
+          type: SELECT_WITH_OPTIONS,
+          label: formMessages.typeOfId,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          placeholder: formMessages.select,
+          options: identityOptions
+        },
+        {
+          name: 'iDTypeOther',
+          type: TEXT,
+          label: formMessages.iDTypeOtherLabel,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDType]
+        },
+        {
+          name: 'iD',
+          type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+          dynamicDefinitions: {
+            label: {
+              dependency: 'iDType',
+              labelMapper: identityNameMapper
+            },
+            type: {
+              kind: 'dynamic',
+              dependency: 'iDType',
+              typeMapper: identityTypeMapper
+            },
+            validate: [
+              {
+                validator: validIDNumber,
+                dependencies: ['iDType']
+              }
+            ]
+          },
+          label: formMessages.iD,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
+          conditionals: [conditionals.iDAvailable]
+        },
+        {
+          name: 'firstName',
+          type: TEXT,
+          label: formMessages.firstName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'lastName',
+          type: TEXT,
+          label: formMessages.lastName,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        },
+        {
+          name: 'relationship',
+          type: TEXT,
+          label: formMessages.relationshipToSpouses,
+          required: true,
+          initialValue: '',
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
+        }
+      ]
+    },
+    {
+      id: 'affidavit',
+      conditionals: [conditionals.certCollectorOther],
+      title: certificateMessages.certificateOtherCollectorAffidavitFormTitle,
+      error: certificateMessages.certificateOtherCollectorAffidavitError,
+      fields: [
+        {
+          name: 'paragraph',
+          type: PARAGRAPH,
+          label:
+            certificateMessages.certificateOtherCollectorAffidavitFormParagraph,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'affidavitFile',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: certificateMessages.signedAffidavitFileLabel,
+          description: certificateMessages.noLabel,
+          initialValue: '',
+          required: false,
+          allowedDocType: ['image/png', 'image/jpeg'],
+          validate: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'values.noAffidavitAgreement?.length !== 0'
+            }
+          ]
+        },
+        {
+          name: 'noAffidavitAgreement',
+          type: CHECKBOX_GROUP,
+          label: certificateMessages.noLabel,
+          required: false,
+          initialValue: [],
+          validate: [],
+          options: [
+            {
+              value: 'AFFIDAVIT',
+              label: certificateMessages.noSignedAffidavitAvailable
+            }
+          ],
+          conditionals: [
+            {
+              action: 'hide',
+              expression: 'values.affidavitFile !== ""'
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

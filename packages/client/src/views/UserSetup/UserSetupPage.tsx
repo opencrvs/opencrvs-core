@@ -14,9 +14,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { userMessages, buttonMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ProtectedAccoutStep,
@@ -30,7 +28,6 @@ import { useSelector } from 'react-redux'
 
 export const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.gray500};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -56,18 +53,6 @@ export const LogoContainer = styled.div`
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
   padding-top: 40px;
-`
-const InfoHolder = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  padding: 12px 0px;
-  margin: 20px 0px;
-`
-const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-`
-const RoleHolder = styled.div`
-  ${({ theme }) => theme.fonts.reg12};
-  padding-top: 12px;
 `
 const InstructionHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};

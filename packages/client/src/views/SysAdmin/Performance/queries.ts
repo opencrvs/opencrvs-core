@@ -114,6 +114,13 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
             familyName
           }
           systemRole
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
         }
         startedByFacility
         startedAt
@@ -159,6 +166,13 @@ export const FETCH_REGISTRATIONS = gql`
           registrarPractitioner {
             id
             systemRole
+            role {
+              _id
+              labels {
+                lang
+                label
+              }
+            }
             primaryOffice {
               name
               id
@@ -167,6 +181,10 @@ export const FETCH_REGISTRATIONS = gql`
               firstNames
               familyName
               use
+            }
+            avatar {
+              type
+              data
             }
           }
         }
@@ -229,7 +247,12 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       results {
         practitionerId
         fullName
-        role
+        role {
+          labels {
+            label
+            lang
+          }
+        }
         status
         avatar {
           type

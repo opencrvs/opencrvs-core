@@ -97,7 +97,8 @@ export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED
+    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
+    registrationStatus === SUBMISSION_STATUS.ISSUED
   )
 }
 
@@ -400,22 +401,34 @@ export const renderValue = (
         resource: 'locations',
         initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
 
-      if (field.name.includes('Secondary')) {
-        dynamicOption.dependency = [
-          'internationalStateSecondary',
-          'stateSecondary'
-        ].includes(field.name)
-          ? 'countrySecondary'
-          : 'stateSecondary'
-      } else {
-        dynamicOption.dependency = [
-          'internationalStatePrimary',
-          'statePrimary'
-        ].includes(field.name)
-          ? 'countryPrimary'
-          : 'statePrimary'
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineResources,
+        language
+      )
+    }
+
+    if (sectionData.countrySecondary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
       }
+      dynamicOption.dependency = [
+        'internationalStateSecondary',
+        'stateSecondary'
+      ].includes(field.name)
+        ? 'countrySecondary'
+        : 'stateSecondary'
 
       return renderSelectDynamicLabel(
         value,

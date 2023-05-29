@@ -12,7 +12,7 @@
 import traverse from 'traverse'
 import { IForm } from '@client/forms'
 import { deserializeForm } from './deserializer'
-import { registerForms } from '@client/forms/configuration/default'
+import { registerForms } from '@client/forms/configuration/default/index'
 import { Mock } from 'vitest'
 
 function isGraphQLTag(item: any) {

@@ -127,8 +127,9 @@ export class PINKeypad extends React.Component<IProps, IState> {
 
   render() {
     const { pin } = this.state
+    const { onComplete, ...props } = this.props
     return (
-      <Container id="pin-keypad-container" tabIndex={0} {...this.props}>
+      <Container id="pin-keypad-container" tabIndex={0} {...props}>
         <DotsContainer>
           <StyledInput
             type="number"

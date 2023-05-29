@@ -25,7 +25,8 @@ enum RegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  ISSUED = 'ISSUED'
 }
 interface IUserCreateSearchPayload {
   userId: string
@@ -169,7 +170,8 @@ export const createSearchrequestSchema = Joi.object({
         RegStatus.VALIDATED,
         RegStatus.REGISTERED,
         RegStatus.CERTIFIED,
-        RegStatus.REJECTED
+        RegStatus.REJECTED,
+        RegStatus.ISSUED
       )
     ),
     dateOfEvent: Joi.string(),

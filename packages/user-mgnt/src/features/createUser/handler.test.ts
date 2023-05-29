@@ -11,7 +11,6 @@
  */
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -81,7 +80,7 @@ describe('createUser handler', () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       [
-        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        JSON.stringify({ id: '321', partOf: { reference: 'Location/22' } }),
         { status: 200 }
       ],
       [
@@ -99,10 +98,6 @@ describe('createUser handler', () => {
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
       ['', { status: 200 }]
     )
-
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
-    mockingoose(User).toReturn(mockUser, 'save')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -164,12 +159,13 @@ describe('createUser handler', () => {
       ],
       location: [
         { reference: 'Location/321' },
-        { reference: 'Location/11' },
         { reference: 'Location/22' },
         { reference: 'Location/33' },
         { reference: 'Location/44' }
       ]
     }
+
+    console.log('fetch.mock', fetch.mock.calls[5][1].body)
 
     expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
@@ -257,18 +253,12 @@ describe('createUser handler', () => {
   it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 202 }],
+      ['', { status: 202 }]
     )
 
-    mockingoose(UsernameRecord).toReturn(
-      { username: 'jw.doe', count: 1 },
-      'findOne'
-    )
-    mockingoose(UsernameRecord).toReturn(
-      new Error('Failed to update'),
-      'update'
-    )
-
+    mockingoose(User).toReturn(new Error(), 'findOne')
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',

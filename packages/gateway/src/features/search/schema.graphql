@@ -63,13 +63,36 @@ type BirthEventSearchSet implements EventSearchSet {
   dateOfBirth: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+  placeOfBirth: String
+  childGender: String
+  mothersFirstName: String
+  mothersLastName: String
+  fathersFirstName: String
+  fathersLastName: String
+  motherDateOfBirth: String
+  fatherDateOfBirth: String
+  motherIdentifier: String
+  fatherIdentifier: String
 }
 
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
+  deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: Date
+  registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
+type MarriageEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  brideName: [HumanName]
+  groomName: [HumanName]
+  brideIdentifier: String
+  groomIdentifier: String
+  dateOfMarriage: Date
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
 }

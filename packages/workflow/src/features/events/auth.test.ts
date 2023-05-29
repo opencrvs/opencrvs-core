@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { isUserAuthorized } from '@workflow/features/events/auth'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 
 describe('isUserAuthorized()', () => {
   it('returns true when token scopes match event', () => {

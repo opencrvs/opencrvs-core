@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -19,7 +20,9 @@ import {
   getFormattedDate,
   getPageItems,
   getStatusLabel,
-  isSystemInitiated
+  isFlaggedAsPotentialDuplicate,
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
@@ -34,14 +37,12 @@ import { v4 as uuid } from 'uuid'
 import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { getLanguage } from '@client/i18n/selectors'
+import { useSelector } from 'react-redux'
 
 const TableDiv = styled.div`
   overflow: auto;
-`
-
-const Heading = styled.h3`
-  ${({ theme }) => theme.fonts.h3}
-  margin-bottom: 0px !important;
 `
 
 const LargeGreyedInfo = styled.div`
@@ -70,6 +71,16 @@ const HealthSystemLogo = styled.div`
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.grey200};
 `
+
+function SystemUser({ name }: { name?: string }) {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo />
+      <span>{name ?? intl.formatMessage(userMessages.system)}</span>
+    </NameAvatar>
+  )
+}
 
 function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
@@ -148,6 +159,8 @@ export const GetHistory = ({
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+  const currentLanguage = useSelector(getLanguage)
+
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
   if (
@@ -157,7 +170,9 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
         <LargeGreyedInfo />
       </>
     )
@@ -166,13 +181,14 @@ export const GetHistory = ({
   }[]
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
-      date: new Date(draft.savedOn || Date.now()).toString(),
+      date: new Date(draft.savedOn || Date.now()).toISOString(),
       regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        systemRole: userDetails.systemRole
+        systemRole: userDetails.systemRole,
+        role: userDetails.role
       },
       office: userDetails.primaryOffice,
       comments: [],
@@ -218,7 +234,11 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isSystemInitiated(item) ? (
+        {isFlaggedAsPotentialDuplicate(item) ? (
+          <SystemUser name={item.system?.name} />
+        ) : isVerifiedAction(item) ? (
+          <div />
+        ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
@@ -243,12 +263,19 @@ export const GetHistory = ({
         )}
       </>
     ),
-    role:
-      isSystemInitiated(item) || !item.user?.systemRole
-        ? intl.formatMessage(getSystemType(item.system?.type))
-        : item.user.role.labels.find((label) => label.lang === 'en')?.label,
+    role: isFlaggedAsPotentialDuplicate(item) ? (
+      <div />
+    ) : isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
+      intl.formatMessage(getSystemType(item.system?.type))
+    ) : (
+      getUserRole(currentLanguage, item.user?.role)
+    ),
 
-    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+    location: isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
       <Link
@@ -294,7 +321,9 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <Text variant="h3" element="h3" color="copy">
+        {intl.formatMessage(constantsMessages.history)}
+      </Text>
       <TableDiv>
         <Table
           id="task-history"

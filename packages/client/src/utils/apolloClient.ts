@@ -19,7 +19,6 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { resolve } from 'url'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
@@ -29,8 +28,12 @@ import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
 import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
-import * as localforage from 'localforage'
-import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
+import localforage from 'localforage'
+import {
+  createPersistLink,
+  persistenceMapper,
+  clearOldCacheEntries
+} from '@client/utils/persistence'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -39,7 +42,7 @@ export const createClient = (
   restoredCache?: InMemoryCache
 ) => {
   const httpLink = createHttpLink({
-    uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
+    uri: new URL('graphql', window.config.API_GATEWAY_URL).toString()
   })
 
   const authLink = setContext((_, { headers }) => {
@@ -98,9 +101,8 @@ async function createPersistentClient(store: Store<IStoreState, AnyAction>) {
 }
 
 export function useApolloClient(store: Store<IStoreState, AnyAction>) {
-  const [client, setClient] = React.useState<
-    ApolloClient<NormalizedCacheObject>
-  >(createClient(store))
+  const [client, setClient] =
+    React.useState<ApolloClient<NormalizedCacheObject> | null>(null)
   const [persistor, setPersistor] =
     React.useState<CachePersistor<NormalizedCacheObject>>()
   const clearCache = React.useCallback(() => {
@@ -115,6 +117,7 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
       const { client, persistor } = await createPersistentClient(store)
       setPersistor(persistor)
       setClient(client)
+      clearOldCacheEntries(client.cache)
     }
 
     // skipping the persistent client in tests for now

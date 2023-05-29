@@ -43,7 +43,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.draftFailed'
   },
   duplicateWarning: {
-    defaultMessage: 'Potential duplicate with record {trackingId}',
+    defaultMessage: 'Potential duplicate of record {trackingId}',
     description:
       'The warning message shown when a declaration has potential duplicates',
     id: 'duplicates.warning'

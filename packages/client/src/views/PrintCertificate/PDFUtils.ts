@@ -21,6 +21,7 @@ import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>
@@ -122,7 +123,8 @@ function getPDFTemplateWithSVG(
   pageSize: PageSize
 ): IPDFTemplate {
   const svgTemplate =
-    offlineResource.templates.certificates![declaration.event].definition
+    offlineResource.templates.certificates![declaration.event]?.definition ||
+    EMPTY_STRING
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
     declaration.data.template

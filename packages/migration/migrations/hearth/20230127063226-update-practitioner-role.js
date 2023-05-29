@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import lodash from 'lodash'
+const { capitalize } = lodash
 
 export const up = async (db, client) => {
   const session = client.startSession()
@@ -47,11 +49,11 @@ export const up = async (db, client) => {
             (c) => c.coding[0].system === systemRoles
           )[0].coding[0].code
 
-          const titleCase = (code) =>
+          const titleCase = (code = '') =>
             code
               .replace(/_/g, ' ')
               .split(' ')
-              .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
+              .map((s) => capitalize(s))
               .join(' ')
 
           const hasSystemTypes = practitionerRole.code.some((item) => {

@@ -69,7 +69,7 @@ describe('Advanced search resolvers', () => {
             }
           }
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
 
       expect(response.searchList.length).toEqual(3)
@@ -110,7 +110,7 @@ describe('Advanced search resolvers', () => {
               }
             }
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         "Something went wrong on user management service. Couldn't bookmark advanced search."
@@ -160,7 +160,7 @@ describe('Advanced search resolvers', () => {
             searchId: '62b99cd234vs4700cc19a1a'
           }
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
 
       expect(response.searchList.length).toEqual(2)
@@ -195,7 +195,7 @@ describe('Advanced search resolvers', () => {
               searchId: '62b99cd234vs4700cc19a1a'
             }
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         "Something went wrong on user management service. Couldn't unbookmarked advanced search."

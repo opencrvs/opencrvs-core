@@ -24,8 +24,10 @@ interface IRecordAuditMessages
   trackingId: MessageDescriptor
   dateOfBirth: MessageDescriptor
   dateOfDeath: MessageDescriptor
+  dateOfMarriage: MessageDescriptor
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
+  placeOfMarriage: MessageDescriptor
   informant: MessageDescriptor
   brn: MessageDescriptor
   drn: MessageDescriptor
@@ -42,6 +44,7 @@ interface IRecordAuditMessages
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
   reinstateDeclarationDialogDescription: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
@@ -96,6 +99,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Date of death',
     description: 'Label for date of death'
   },
+  dateOfMarriage: {
+    id: 'recordAudit.dateOfMarriage',
+    defaultMessage: 'Date of marriage',
+    description: 'Label for date of marriage'
+  },
   placeOfBirth: {
     id: 'recordAudit.placeOfBirth',
     defaultMessage: 'Place of birth',
@@ -105,6 +113,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.placeOfDeath',
     defaultMessage: 'Place of death',
     description: 'Label for place of death'
+  },
+  placeOfMarriage: {
+    id: 'recordAudit.placeOfMarriage',
+    defaultMessage: 'Place of marriage',
+    description: 'Label for place of marriage'
   },
   informant: {
     id: 'recordAudit.informant',
@@ -120,6 +133,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.drn',
     defaultMessage: 'DRN',
     description: 'Label for Death Registration Number'
+  },
+  registrationNo: {
+    id: 'recordAudit.registrationNo',
+    defaultMessage: 'Registration No',
+    description: 'Label for Event Registration Number'
   },
   noStatus: {
     id: 'recordAudit.noStatus',
@@ -151,6 +169,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No date of death',
     description: 'Label for date of death not available'
   },
+  noDateOfMarriage: {
+    id: 'recordAudit.noDateOfMarriage',
+    defaultMessage: 'No date of marriage',
+    description: 'Label for date of marriage not available'
+  },
   noPlaceOfBirth: {
     id: 'recordAudit.noPlaceOfBirth',
     defaultMessage: 'No place of birth',
@@ -160,6 +183,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.noPlaceOfDeath',
     defaultMessage: 'No place of death',
     description: 'Label for place of death not availale'
+  },
+  noPlaceOfMarriage: {
+    id: 'recordAudit.noPlaceOfMarriage',
+    defaultMessage: 'No place of marriage',
+    description: 'Label for place of marriage not availale'
   },
   noInformant: {
     id: 'recordAudit.noInformant',
@@ -187,6 +215,10 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage:
       'This will revert the application back to its original status and add it to your workqueue.',
     description: 'Description for the dialog when reinstate declaration'
+  },
+  markAsDuplicate: {
+    id: 'recordAudit.declaration.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
   }
 }
 
@@ -200,6 +232,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.assigned',
     defaultMessage: 'Assigned',
     description: 'Assigned action'
+  },
+  [RegAction.Verified]: {
+    id: 'recordAudit.regAction.verified',
+    defaultMessage: 'Certificate verified',
+    description: 'Verified action'
   },
   [RegAction.Unassigned]: {
     id: 'recordAudit.regAction.unassigned',
@@ -221,6 +258,22 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.viewed',
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
+  },
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
+  },
+  MARKED_AS_NOT_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsNotDuplicate',
+    defaultMessage: 'Marked not a duplicate',
+    description: 'Marked not a duplicate status message for record audit'
+  },
+  FLAGGED_AS_POTENTIAL_DUPLICATE: {
+    id: 'recordAudit.regAction.flaggedAsPotentialDuplicate',
+    defaultMessage: 'Flagged as potential duplicate',
+    description:
+      'Flagged as potential duplicate status message for record audit'
   }
 }
 
@@ -259,6 +312,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'recordAudit.regStatus.certified'
+  },
+  [RegStatus.Issued]: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status Issued',
+    id: 'recordAudit.regStatus.issued'
   },
   [RegStatus.Rejected]: {
     defaultMessage: 'Rejected',

@@ -16,7 +16,7 @@ import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getFormDataset(_, {}, authHeader) {
+    async getFormDataset(_, {}, { headers: authHeader }) {
       const resp = await fetch(`${APPLICATION_CONFIG_URL}getFormDataset`, {
         method: 'GET',
         headers: {
@@ -29,7 +29,7 @@ export const resolvers: GQLResolver = {
     }
   },
   Mutation: {
-    async createFormDataset(_, { formDataset }, authHeader) {
+    async createFormDataset(_, { formDataset }, { headers: authHeader }) {
       try {
         const resp = await fetch(`${APPLICATION_CONFIG_URL}createFormDataset`, {
           method: 'POST',

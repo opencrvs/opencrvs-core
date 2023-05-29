@@ -33,7 +33,7 @@ const LeftNavigationContainer = styled.div<{
   display: flex;
   flex-direction: column;
   width: ${({ navigationWidth }) =>
-    navigationWidth ? navigationWidth : 249}px;
+    navigationWidth ? navigationWidth : 282}px;
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};
@@ -71,7 +71,6 @@ const ApplicationNameContainer = styled.div`
   }
 `
 const ApplicationName = styled.div`
-  color: ${({ theme }) => theme.colors.grey};
   ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;

@@ -22,7 +22,10 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
         status {
           type
         }
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         assignment {
           userId
           firstName
@@ -42,6 +45,24 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
       }
       ... on DeathRegistration {
         deceased {
+          id
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+      }
+      ... on MarriageRegistration {
+        bride {
+          id
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+        groom {
           id
           name {
             use

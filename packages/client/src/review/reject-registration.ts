@@ -18,39 +18,33 @@ export interface IRejectRegistrationForm {
 export const rejectRegistration: IRejectRegistrationForm = {
   fields: [
     {
-      name: 'rejectionReason',
-      type: CHECKBOX_GROUP,
-      label: messages.rejectionReason,
-      required: true,
-      initialValue: [],
-      validate: [],
-      options: [
-        {
-          value: 'duplicate',
-          label: messages.rejectionReasonDuplicate
-        },
-        {
-          value: 'misspelling',
-          label: messages.rejectionReasonMisspelling
-        },
-        {
-          value: 'missing_supporting_doc',
-          label: messages.rejectionReasonMissingSupportingDoc
-        },
-        {
-          value: 'other',
-          label: messages.rejectionReasonOther
-        }
-      ]
-    },
-    {
       name: 'rejectionCommentForHealthWorker',
       type: TEXTAREA,
       label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',
-      validate: [],
       required: true,
-      maxLength: 500
+      hideAsterisk: true,
+      hideHeader: true,
+      validate: [],
+      maxLength: 500,
+      ignoreMediaQuery: true,
+      ignoreBottomMargin: true
+    },
+    {
+      name: 'rejectionReason',
+      type: CHECKBOX_GROUP,
+      label: messages.rejectionReason,
+      hideHeader: true,
+      hideAsterisk: true,
+      initialValue: [],
+      validate: [],
+      ignoreBottomMargin: true,
+      options: [
+        {
+          value: 'duplicate',
+          label: messages.markAsDuplicate
+        }
+      ]
     }
   ]
 }

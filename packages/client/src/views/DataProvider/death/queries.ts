@@ -122,10 +122,15 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        duplicates {
+          compositionId
+          trackingId
+        }
         informantsSignature
-        duplicates
+        informantsSignatureURI
         attachments {
           data
+          uri
           type
           contentType
           subject
@@ -143,6 +148,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -181,6 +187,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -262,6 +269,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
+        potentialDuplicates
       }
     }
   }
@@ -376,6 +385,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactRelationship
         contactPhoneNumber
         informantsSignature
+        informantsSignatureURI
+        duplicates {
+          compositionId
+          trackingId
+        }
         status {
           comments {
             comment
@@ -430,6 +444,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         action
         regStatus
         dhis2Notification
+        ipAddress
         statusReason {
           text
         }
@@ -510,6 +525,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
         }
+        duplicateOf
+        potentialDuplicates
       }
     }
   }

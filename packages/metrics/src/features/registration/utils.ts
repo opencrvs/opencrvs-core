@@ -32,6 +32,10 @@ export function getAgeInDays(dateOfBirth: YYYY_MM_DD, fromDate: Date) {
   return getDurationInDays(dateOfBirth, fromDate.toISOString())
 }
 
+export function getdaysAfterEvent(marriageDate: YYYY_MM_DD, fromDate: Date) {
+  return getDurationInDays(marriageDate, fromDate.toISOString())
+}
+
 export function getAgeInYears(dateOfBirth: YYYY_MM_DD, fromDate: Date) {
   return getDurationInYears(dateOfBirth, fromDate.toISOString())
 }

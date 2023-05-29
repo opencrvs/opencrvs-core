@@ -59,6 +59,7 @@ export const profileReducer: LoopReducer<
   | Loop<ProfileState, actions.Action | changeLanguageActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
+      const shouldRedirectBack = action.payload.redirectBack
       return loop(
         {
           ...state,
@@ -76,9 +77,22 @@ export const profileReducer: LoopReducer<
           }),
           Cmd.run(
             (getState: () => IStoreState) => {
-              window.location.assign(
-                `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
-              )
+              if (shouldRedirectBack) {
+                const baseUrl = window.location.origin
+                const restUrl = window.location.href.replace(baseUrl, '')
+                const redirectToURL = new URL(
+                  restUrl === '/'
+                    ? `?lang=${getState().i18n.language}`
+                    : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
+                  window.config.LOGIN_URL
+                ).toString()
+
+                window.location.assign(redirectToURL)
+              } else {
+                window.location.assign(
+                  `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                )
+              }
             },
             { args: [Cmd.getState] }
           )
@@ -100,7 +114,7 @@ export const profileReducer: LoopReducer<
             ...state,
             authenticated: false
           },
-          Cmd.action(actions.redirectToAuthentication())
+          Cmd.action(actions.redirectToAuthentication(true))
         )
       }
 

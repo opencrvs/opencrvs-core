@@ -12,7 +12,7 @@
 import User from '@user-mgnt/model/user'
 
 export async function countUsersByLocation(
-  role: string,
+  systemRole: string,
   locationId: string | undefined
 ) {
   // For the whole country
@@ -20,7 +20,7 @@ export async function countUsersByLocation(
     const resArray = await User.aggregate([
       {
         $match: {
-          role
+          systemRole
         }
       },
       { $count: 'registrars' }
@@ -31,7 +31,7 @@ export async function countUsersByLocation(
     {
       $match: {
         catchmentAreaIds: locationId,
-        role
+        systemRole
       }
     },
     { $unwind: '$catchmentAreaIds' },

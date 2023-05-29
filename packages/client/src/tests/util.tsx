@@ -83,7 +83,10 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ISSUE,
+  [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
+    SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
 } as const
 
@@ -1711,6 +1714,12 @@ export const mockDeclarationData = {
     primaryAddressSameAsOtherPrimary: true
   },
   registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394989'
+      },
+      value: 'MOTHER'
+    },
     whoseContactDetails: {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
@@ -1809,6 +1818,12 @@ export const mockDeathDeclarationData = {
     ]
   },
   registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394982'
+      },
+      value: 'SPOUSE'
+    },
     registrationPhone: '01557394986',
     registrationNumber: '201908122365DDSS0SE1',
     contact: 'OTHER',
@@ -1832,7 +1847,146 @@ export const mockDeathDeclarationData = {
   }
 }
 
+export const mockMarriageDeclarationData = {
+  registration: {
+    informantType: {
+      value: 'GROOM',
+      nestedFields: {
+        otherInformantType: ''
+      }
+    },
+    contactPoint: {
+      value: 'GROOM',
+      nestedFields: {
+        registrationPhone: '0751515152'
+      }
+    },
+    _fhirID: 'a833a452-3472-408f-87e3-ad7c6e2cdcd9',
+    trackingId: 'M2LA47X',
+    registrationNumber: '2023M2LA47X',
+    type: 'marriage',
+    groomSignature: 'data:image/png;base64,iVBORw0KGgoAAQmCC',
+    brideSignature: 'data:image/png;base64,iVBORw0KGgomCC',
+    witnessOneSignature: 'data:image/png;base64,iVBORw0KGgNSUCC',
+    commentsOrNotes: '',
+    regStatus: {
+      type: 'REGISTERED',
+      statusDate: '2023-03-09T09:22:12.673Z',
+      officeName: 'Ibombo District Office',
+      officeAlias: 'Ibombo District Office',
+      officeAddressLevel3: '',
+      officeAddressLevel4: ''
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'BRIDE'
+        },
+        hasShowedVerifiedDocument: true
+      }
+    ]
+  },
+  groom: {
+    nationality: 'FAR',
+    iD: '1296566563',
+    groomBirthDate: '1998-12-12',
+    exactDateOfBirthUnknown: false,
+    firstNamesEng: 'Sadman',
+    familyNameEng: 'Anik',
+    marriedLastNameEng: 'Groom Last Name',
+    countryPrimary: 'FAR',
+    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrbanPrimary: 'URBAN',
+    cityUrbanOptionPrimary: '',
+    addressLine3UrbanOptionPrimary: '',
+    addressLine2UrbanOptionPrimary: '',
+    numberUrbanOptionPrimary: '',
+    postcodePrimary: '',
+    addressLine5Primary: '',
+    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    internationalCityPrimary: '',
+    internationalAddressLine1Primary: '',
+    internationalAddressLine2Primary: '',
+    internationalAddressLine3Primary: '',
+    internationalPostcodePrimary: '',
+    _fhirID: '89113c35-1310-4d8f-9352-0269a04a1c4a'
+  },
+  bride: {
+    nationality: 'FAR',
+    iD: '',
+    brideBirthDate: '1998-12-12',
+    exactDateOfBirthUnknown: false,
+    firstNamesEng: 'Kaitlin',
+    familyNameEng: 'Samo',
+    marriedLastNameEng: 'Bride Last Name',
+    countryPrimary: 'FAR',
+    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrbanPrimary: 'URBAN',
+    cityUrbanOptionPrimary: '',
+    addressLine3UrbanOptionPrimary: '',
+    addressLine2UrbanOptionPrimary: '',
+    numberUrbanOptionPrimary: '',
+    postcodePrimary: '',
+    addressLine5Primary: '',
+    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    internationalCityPrimary: '',
+    internationalAddressLine1Primary: '',
+    internationalAddressLine2Primary: '',
+    internationalAddressLine3Primary: '',
+    internationalPostcodePrimary: '',
+    _fhirID: '09a68a88-921f-4eaf-8424-7d9d43e5804c'
+  },
+  marriageEvent: {
+    marriageDate: '2020-12-12',
+    typeOfMarriage: 'MONOGAMY',
+    country: 'FAR',
+    state: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
+    district: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
+    ruralOrUrban: 'URBAN',
+    addressLine3UrbanOption: '',
+    addressLine2UrbanOption: '',
+    numberUrbanOption: '',
+    addressLine5: '',
+    internationalAddressLine1: '',
+    internationalAddressLine2: '',
+    internationalAddressLine3: ''
+  },
+  witnessOne: {
+    firstNamesEng: 'Sadman',
+    familyNameEng: 'Anik',
+    relationship: 'headOfGroomFamily',
+    _fhirID: '36972633-1c80-4fb4-a636-17f7dc9c2e14'
+  },
+  witnessTwo: {
+    firstNamesEng: 'Edgar',
+    familyNameEng: 'Samo',
+    relationship: 'headOfGroomFamily',
+    _fhirID: '1745b3d2-74fd-4b22-ba62-1c851d632f55'
+  },
+  documents: {
+    imageUploader: [
+      {
+        data: 'base64-data',
+        type: 'image/jpeg',
+        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
+        title: "Proof of Deceased's ID",
+        description: 'National ID (front)'
+      }
+    ]
+  }
+}
+
 export const mockBirthRegistrationSectionData = {
+  contactPoint: {
+    nestedFields: {
+      registrationPhone: '01557394989'
+    },
+    value: 'MOTHER'
+  },
   whoseContactDetails: {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
@@ -1872,6 +2026,12 @@ export const mockBirthRegistrationSectionData = {
 }
 
 export const mockDeathRegistrationSectionData = {
+  contactPoint: {
+    nestedFields: {
+      registrationPhone: '01557394982'
+    },
+    value: 'MOTHER'
+  },
   whoseContactDetails: 'MOTHER',
   informantType: {
     value: 'MOTHER',
@@ -1932,6 +2092,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
@@ -1945,6 +2106,7 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
+  anonymousConfig: mockOfflineData.anonymousConfig,
   formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }
@@ -2099,6 +2261,34 @@ export const mockDeathDeclarationDataWithoutFirstNames = {
         optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
         title: "Proof of Deceased's ID",
         description: 'National ID (front)'
+      }
+    ]
+  },
+  registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394982'
+      },
+      value: 'SPOUSE'
+    },
+    registrationPhone: '01557394986',
+    registrationNumber: '201908122365DDSS0SE1',
+    contact: 'OTHER',
+    contactPhoneNumber: '+8801671010143',
+    contactRelationship: 'Friend',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'MOTHER'
+        },
+        hasShowedVerifiedDocument: true
       }
     ]
   }

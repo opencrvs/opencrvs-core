@@ -30,7 +30,6 @@ import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.black};
   margin: 0px;
 `
 const Instruction = styled.p`

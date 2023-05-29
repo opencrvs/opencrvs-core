@@ -9,36 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import styled from '@client/styledComponents'
-import {
-  Calendar,
-  CalendarGrey,
-  Cross,
-  ChevronLeft,
-  ChevronRight
-} from '@opencrvs/components/lib/icons'
+import format from '@client/utils/date-formatting'
 import {
   CircleButton,
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { IActionObject } from '@opencrvs/components/lib/common-types'
-import format from '@client/utils/date-formatting'
-import subDays from 'date-fns/subDays'
-import subMonths from 'date-fns/subMonths'
-import endOfMonth from 'date-fns/endOfMonth'
-import endOfYear from 'date-fns/endOfYear'
-import subYears from 'date-fns/subYears'
-import isSameMonth from 'date-fns/isSameMonth'
-import isSameYear from 'date-fns/isSameYear'
+import {
+  Calendar,
+  CalendarGrey,
+  ChevronLeft,
+  ChevronRight,
+  Cross
+} from '@opencrvs/components/lib/icons'
 import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
+import endOfMonth from 'date-fns/endOfMonth'
+import endOfYear from 'date-fns/endOfYear'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
+import isSameMonth from 'date-fns/isSameMonth'
+import isSameYear from 'date-fns/isSameYear'
 import startOfMonth from 'date-fns/startOfMonth'
+import subDays from 'date-fns/subDays'
+import subMonths from 'date-fns/subMonths'
+import subYears from 'date-fns/subYears'
+import * as React from 'react'
+import { WrappedComponentProps, injectIntl } from 'react-intl'
 
 const { useState, useEffect, useMemo } = React
 
@@ -637,12 +637,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           id="end-date-small"
           date={endDateNav}
           onNavigateDate={setEndDateNav}
+          // eslint-disable-next-line react/prop-types
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: date
+              endDate: endOfMonth(date)
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()

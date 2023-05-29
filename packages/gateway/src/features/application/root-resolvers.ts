@@ -15,7 +15,8 @@ import {
   GQLDeathInput,
   GQLCountryLogoInput,
   GQLLoginBackgroundInput,
-  GQLResolver
+  GQLResolver,
+  GQLMarriageInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
@@ -24,7 +25,11 @@ import { IApplicationConfigPayload } from '@gateway/features/application/type-re
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async updateApplicationConfig(_, { applicationConfig = {} }, authHeader) {
+    async updateApplicationConfig(
+      _,
+      { applicationConfig = {} },
+      { headers: authHeader }
+    ) {
       // Only natlsysadmin should be able to update application config
 
       if (!hasScope(authHeader, 'natlsysadmin')) {
@@ -40,6 +45,7 @@ export const resolvers: GQLResolver = {
         CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
         BIRTH: applicationConfig.BIRTH as GQLBirthInput,
         DEATH: applicationConfig.DEATH as GQLDeathInput,
+        MARRIAGE: applicationConfig.MARRIAGE as GQLMarriageInput,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
         HIDE_EVENT_REGISTER_INFORMATION:

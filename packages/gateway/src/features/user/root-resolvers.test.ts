@@ -56,7 +56,8 @@ describe('User root resolvers', () => {
 
       const user = await resolvers.Query.getUser(
         {},
-        { userId: 'ba7022f0ff4822' }
+        { userId: 'ba7022f0ff4822' },
+        { headers: undefined }
       )
 
       expect(user).toBeDefined()
@@ -185,7 +186,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Query.searchUsers(
         {},
         {},
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(3)
@@ -227,7 +228,7 @@ describe('User root resolvers', () => {
           skip: 0,
           sort: 'desc'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -349,7 +350,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -406,7 +407,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -486,7 +487,7 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -516,7 +517,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -533,7 +534,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -612,6 +613,9 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           password: 'test',
           securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+        },
+        {
+          headers: undefined
         }
       )
 
@@ -631,6 +635,9 @@ describe('User root resolvers', () => {
             userId: 'ba7022f0ff4822',
             password: 'test',
             securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          },
+          {
+            headers: undefined
           }
         )
       ).rejects.toThrowError(
@@ -682,7 +689,7 @@ describe('User root resolvers', () => {
           existingPassword: 'test',
           password: 'NewPassword'
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -698,7 +705,7 @@ describe('User root resolvers', () => {
             existingPassword: 'test',
             password: 'NewPassword'
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user password"
@@ -768,7 +775,7 @@ describe('User root resolvers', () => {
           nonce: nonce,
           verifyCode: code
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -789,7 +796,7 @@ describe('User root resolvers', () => {
             nonce: nonce,
             verifyCode: code
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user phone number"
@@ -864,7 +871,7 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           avatar
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(avatar)
@@ -882,7 +889,7 @@ describe('User root resolvers', () => {
               data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user avatar"
@@ -962,7 +969,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -980,7 +987,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user: { id: '123', ...user } },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -1010,7 +1017,11 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderSysAdmin)
+        resolvers.Mutation.createOrUpdateUser(
+          {},
+          { user },
+          { headers: authHeaderSysAdmin }
+        )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't create user"
       )
@@ -1060,7 +1071,7 @@ describe('User root resolvers', () => {
           action: 'DEACTIVATE',
           reason: 'SUSPICIOUS'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual(true)
@@ -1093,7 +1104,7 @@ describe('User root resolvers', () => {
             action: 'DEACTIVATE',
             reason: 'SUSPICIOUS'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't audit user 5bce8ujkf0fuib"
@@ -1157,7 +1168,7 @@ describe('User root resolvers', () => {
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1172,7 +1183,7 @@ describe('User root resolvers', () => {
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
@@ -1235,7 +1246,7 @@ describe('User root resolvers', () => {
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1250,7 +1261,7 @@ describe('User root resolvers', () => {
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
@@ -1315,7 +1326,7 @@ describe('User root resolvers', () => {
             userId: '123',
             applicationName: 'opencrvs'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't reset password and send sms to 123"
@@ -1331,7 +1342,7 @@ describe('User root resolvers', () => {
           userId: '123',
           applicationName: 'opencrvs'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)

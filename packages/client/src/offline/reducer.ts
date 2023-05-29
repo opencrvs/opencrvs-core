@@ -21,7 +21,11 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  referenceApi
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
@@ -69,6 +73,7 @@ export interface IOfflineData {
     certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
+      marriage: ISVGTemplate
     }
   }
   assets: {
@@ -76,6 +81,7 @@ export interface IOfflineData {
   }
   systems: System[]
   config: IApplicationConfig
+  anonymousConfig: IApplicationConfigAnonymous
   formConfig: IFormConfig
 }
 
@@ -298,6 +304,15 @@ function reducer(
         Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
       )
     }
+    case actions.ANONYMOUS_USER_OFFLINE_CONFIG: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          ...action.payload
+        }
+      }
+    }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload
       const offlineData: IOfflineData = JSON.parse(
@@ -417,7 +432,15 @@ function reducer(
         ({ event, status }) => event === Event.Death && status === 'ACTIVE'
       )
 
-      if (birthCertificateTemplate && deathCertificateTemplate) {
+      const marriageCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.Marriage && status === 'ACTIVE'
+      )
+
+      if (
+        birthCertificateTemplate &&
+        deathCertificateTemplate &&
+        marriageCertificateTemplate
+      ) {
         const certificatesTemplates = {
           birth: {
             id: birthCertificateTemplate.id,
@@ -430,6 +453,12 @@ function reducer(
             definition: deathCertificateTemplate.svgCode,
             fileName: deathCertificateTemplate.svgFilename,
             lastModifiedDate: deathCertificateTemplate.svgDateUpdated
+          },
+          marriage: {
+            id: marriageCertificateTemplate.id,
+            definition: marriageCertificateTemplate.svgCode,
+            fileName: marriageCertificateTemplate.svgFilename,
+            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated
           }
         }
         newOfflineData = {

@@ -27,6 +27,16 @@ const Container = styled.div`
   }
 `
 
+const SpinnerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.colors.white};
+  width: 595px;
+  height: 841px;
+`
+
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   pdfSource: string | null
 }
@@ -59,11 +69,22 @@ class PDFViewer extends React.Component<IPDFViewerProps, IPDFViewerState> {
     return (
       <Container {...otherProps}>
         <Document
-          loading={<Spinner id="pdf-loader-spinner" />}
+          loading={
+            <SpinnerWrapper>
+              <Spinner id="pdf-loader-spinner" />
+            </SpinnerWrapper>
+          }
           file={pdfSource}
           onLoadSuccess={this.onDocumentLoadSuccess}
         >
-          <Page pageNumber={currentPage} />
+          <Page
+            pageNumber={currentPage}
+            loading={
+              <SpinnerWrapper>
+                <Spinner id="pdf-loader-spinner" />
+              </SpinnerWrapper>
+            }
+          />
         </Document>
         {this.state.numPages > 1 && (
           <Pagination

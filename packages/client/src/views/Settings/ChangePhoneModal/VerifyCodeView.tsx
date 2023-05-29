@@ -62,7 +62,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          mobile: convertToMSISDN(phoneNumber)
+          mobile: convertToMSISDN(phoneNumber, window.config.COUNTRY)
         })
       )
     }
@@ -84,6 +84,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
         <Mutation<ChangePasswordMutation, ChangePhoneMutationVariables>
+          key="change-phone-mutation"
           mutation={changePhoneMutation}
           onCompleted={phoneChangeCompleted}
           onError={() => setErrorOccured(true)}
@@ -98,7 +99,10 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
                     changePhone({
                       variables: {
                         userId: userDetails.userMgntUserID,
-                        phoneNumber: convertToMSISDN(phoneNumber),
+                        phoneNumber: convertToMSISDN(
+                          phoneNumber,
+                          window.config.COUNTRY
+                        ),
                         nonce: nonce,
                         verifyCode: verifyCode
                       }

@@ -33,9 +33,15 @@ interface IOfficeHomeMessages
   validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
   waitingForExternalValidation: MessageDescriptor
   archived: MessageDescriptor
+  issued: MessageDescriptor
 }
 
 const messagesToDefine: IOfficeHomeMessages = {
+  issued: {
+    defaultMessage: 'Issued',
+    description: 'Label for registration status issued',
+    id: 'regHome.issued'
+  },
   certified: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',

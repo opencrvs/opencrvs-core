@@ -20,6 +20,7 @@ export interface IQueryData {
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
+  issueTab: GQLEventSearchResultSet
   externalValidationTab: GQLEventSearchResultSet
 }
 
@@ -82,6 +83,12 @@ export const changeSortedColumn = (
     case COLUMNS.LAST_UPDATED:
       newSortedCol = COLUMNS.LAST_UPDATED
       break
+    case COLUMNS.TRACKING_ID:
+      newSortedCol = COLUMNS.TRACKING_ID
+      break
+    case COLUMNS.REGISTRATION_NO:
+      newSortedCol = COLUMNS.REGISTRATION_NO
+      break
     default:
       newSortedCol = COLUMNS.NAME
   }
@@ -106,6 +113,8 @@ export const getStatusWiseWQTab = (status: string) => {
       return 'printTab'
     case 'VALIDATED':
       return 'approvalTab'
+    case 'ISSUED':
+      return 'issueTab'
     default:
       return 'reviewTab'
   }

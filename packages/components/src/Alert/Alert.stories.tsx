@@ -12,6 +12,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react'
 import { Alert } from './Alert'
 import React, { useState } from 'react'
+import { Icon } from '../Icon'
 
 const Template: ComponentStory<typeof Alert> = (args) => {
   return <Alert {...args} />
@@ -55,6 +56,14 @@ Loading.args = {
   type: 'loading',
   children: "Hello, I'm an alert to show something is loading",
   onClose: undefined
+}
+
+export const CustomIcon = Template.bind({})
+CustomIcon.args = {
+  type: 'success',
+  children: "Hello, I'm an alert to show a custom icon",
+  onClose: undefined,
+  customIcon: <Icon name={'Medal'} />
 }
 
 export const Dismissable = () => {

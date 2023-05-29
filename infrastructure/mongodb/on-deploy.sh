@@ -91,7 +91,7 @@ if [[ $HEARTH_USER != "FOUND" ]]; then
   db.createUser({
     user: 'hearth',
     pwd: '$HEARTH_MONGODB_PASSWORD',
-    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'hearth-dev' }]
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]
   })
 EOF
 else
@@ -99,7 +99,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
   db.updateUser('hearth', {
-    pwd: '$HEARTH_MONGODB_PASSWORD'
+    pwd: '$HEARTH_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'performance' }, { role: 'readWrite', db: 'hearth-dev' }]
   })
 EOF
 fi
@@ -142,6 +143,27 @@ else
   use openhim-dev
   db.updateUser('openhim', {
     pwd: '$OPENHIM_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
+PERFORMANCE_USER=$(echo $(checkIfUserExists "performance"))
+if [[ $PERFORMANCE_USER != "FOUND" ]]; then
+  echo "performance user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use performance
+  db.createUser({
+    user: 'performance',
+    pwd: '$PERFORMANCE_MONGODB_PASSWORD',
+    roles: [{ role: 'read', db: 'performance' }]
+  })
+EOF
+else
+  echo "performance user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use performance
+  db.updateUser('performance', {
+    pwd: '$PERFORMANCE_MONGODB_PASSWORD'
   })
 EOF
 fi

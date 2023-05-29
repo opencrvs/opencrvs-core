@@ -60,7 +60,7 @@ export async function getActiveCertificatesHandler(
   ) {
     const activeCertificates = await Certificate.find({
       status: Status.ACTIVE,
-      event: { $in: [Event.BIRTH, Event.DEATH] }
+      event: { $in: [Event.BIRTH, Event.DEATH, Event.MARRIAGE] }
     })
     return activeCertificates
   }

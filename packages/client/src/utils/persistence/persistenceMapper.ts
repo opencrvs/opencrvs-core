@@ -13,8 +13,26 @@ export const persistenceMapper = async (data: any) => {
   const parsed = JSON.parse(data)
 
   const mapped: any = {}
-  const persistEntities: any[] = []
+  const persistEntities: Set<string> = new Set()
   const rootQuery = parsed['ROOT_QUERY']
+
+  // recursively identify all the nested entities
+  function persistEntity(entity: any) {
+    if (Array.isArray(entity)) {
+      entity.forEach((item: any) => persistEntity(item))
+    } else if (entity && typeof entity === 'object') {
+      if ('__ref' in entity) {
+        const ref = entity.__ref as string
+        persistEntities.add(ref)
+        persistEntity(parsed[ref])
+      }
+      Object.values(entity).forEach((nestedEntity) => {
+        if (nestedEntity && typeof nestedEntity === 'object') {
+          persistEntity(nestedEntity)
+        }
+      })
+    }
+  }
 
   mapped['ROOT_QUERY'] = Object.keys(rootQuery).reduce(
     (obj: any, key: string) => {
@@ -23,13 +41,7 @@ export const persistenceMapper = async (data: any) => {
       if (/@persist$/.test(key)) {
         obj[key] = rootQuery[key]
 
-        if (Array.isArray(rootQuery[key])) {
-          const entities = rootQuery[key].map((item: any) => item.__ref)
-          persistEntities.push(...entities)
-        } else {
-          const entity = rootQuery[key].__ref
-          persistEntities.push(entity)
-        }
+        persistEntity(rootQuery[key])
       }
 
       return obj
@@ -37,10 +49,9 @@ export const persistenceMapper = async (data: any) => {
     { __typename: 'Query' }
   )
 
-  persistEntities.reduce((obj, key) => {
-    obj[key] = parsed[key]
-    return obj
-  }, mapped)
+  persistEntities.forEach(
+    (entityRef) => (mapped[entityRef] = parsed[entityRef])
+  )
 
   return JSON.stringify(mapped)
 }

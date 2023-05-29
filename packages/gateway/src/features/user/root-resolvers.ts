@@ -39,12 +39,16 @@ import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUser(_, { userId }, authHeader) {
+    async getUser(_, { userId }, { headers: authHeader }) {
       return await getUser({ userId }, authHeader)
     },
 
-    async getUserByMobile(_, { mobile }, authHeader) {
-      return await getUser({ mobile }, authHeader)
+    async getUserByMobile(_, { mobile }, { headers: authHeader }) {
+      const res = await getUser({ mobile }, authHeader)
+      if (!res._id) {
+        return null
+      }
+      return res
     },
 
     async searchUsers(
@@ -60,7 +64,7 @@ export const resolvers: GQLResolver = {
         skip = 0,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       // Only sysadmin or registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -119,7 +123,7 @@ export const resolvers: GQLResolver = {
         skip = 0,
         sort = 'desc'
       },
-      authHeader
+      { headers: authHeader }
     ) {
       // Only sysadmin or registrar or registration agent should be able to search field agents
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -214,7 +218,7 @@ export const resolvers: GQLResolver = {
         totalItems: userResponse.totalItems
       }
     },
-    async verifyPasswordById(_, { id, password }, authHeader) {
+    async verifyPasswordById(_, { id, password }, { headers: authHeader }) {
       const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
         method: 'POST',
         body: JSON.stringify({ id, password }),
@@ -235,7 +239,7 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createOrUpdateUser(_, { user }, authHeader) {
+    async createOrUpdateUser(_, { user }, { headers: authHeader }) {
       // Only sysadmin should be able to create user
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
@@ -275,7 +279,11 @@ export const resolvers: GQLResolver = {
       }
       return await res.json()
     },
-    async activateUser(_, { userId, password, securityQNAs }, authHeader) {
+    async activateUser(
+      _,
+      { userId, password, securityQNAs },
+      { headers: authHeader }
+    ) {
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
         method: 'POST',
         body: JSON.stringify({ userId, password, securityQNAs }),
@@ -299,7 +307,7 @@ export const resolvers: GQLResolver = {
     async changePassword(
       _,
       { userId, existingPassword, password },
-      authHeader
+      { headers: authHeader }
     ) {
       // Only token owner except sysadmin should be able to change their password
       if (
@@ -333,7 +341,7 @@ export const resolvers: GQLResolver = {
     async changePhone(
       _,
       { userId, phoneNumber, nonce, verifyCode },
-      authHeader
+      { headers: authHeader }
     ) {
       if (!isTokenOwner(authHeader, userId)) {
         return await Promise.reject(
@@ -368,7 +376,7 @@ export const resolvers: GQLResolver = {
       }
       return true
     },
-    async changeAvatar(_, { userId, avatar }, authHeader) {
+    async changeAvatar(_, { userId, avatar }, { headers: authHeader }) {
       try {
         await validateAttachments([avatar])
       } catch (error) {
@@ -401,7 +409,11 @@ export const resolvers: GQLResolver = {
       }
       return avatar
     },
-    async auditUser(_, { userId, action, reason, comment }, authHeader) {
+    async auditUser(
+      _,
+      { userId, action, reason, comment },
+      { headers: authHeader }
+    ) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -437,7 +449,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async resendSMSInvite(_, { userId }, authHeader) {
+    async resendSMSInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -467,7 +479,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async usernameSMSReminder(_, { userId }, authHeader) {
+    async usernameSMSReminder(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -496,7 +508,11 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async resetPasswordSMS(_, { userId, applicationName }, authHeader) {
+    async resetPasswordSMS(
+      _,
+      { userId, applicationName },
+      { headers: authHeader }
+    ) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(

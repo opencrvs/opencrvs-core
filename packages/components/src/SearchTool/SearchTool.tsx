@@ -60,7 +60,7 @@ const Wrapper = styled.form`
   padding: 0px 8px 0px 4px;
   position: relative;
 `
-const SearchTextInput = styled.input`
+const SearchInput = styled.input`
   border: none;
   margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
@@ -90,8 +90,8 @@ const DropDownWrapper = styled.ul`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   ${({ theme }) => theme.shadows.light};
   position: absolute;
-  padding: 8px 0px;
-  width: 240px;
+  padding: 6px 0;
+  min-width: 200px;
   z-index: 9999;
   list-style: none;
   top: 100%;
@@ -100,26 +100,41 @@ const DropDownWrapper = styled.ul`
   cursor: pointer;
 `
 
-const DropDownItem = styled.li<{ borderTop: boolean }>`
-  ${({ theme }) => theme.fonts.reg16};
+const DropDownItem = styled.li`
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.grey500};
   display: flex;
   align-items: center;
+  gap: 8px;
   cursor: pointer;
-  padding: 8px 8px 8px 16px;
-  ${({ borderTop, theme }) =>
-    borderTop
-      ? `border-top: 1px solid ${theme.colors.grey200}; padding:2px 2px 2px 10px; margin-top: 2px`
-      : ''}
-  &:nth-last-child {
-    border-bottom: none;
-  }
+  margin: 0 6px;
+  border-radius: 4px;
+  padding: 8px 12px;
   &:hover {
+    color: ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.grey100};
   }
-  &:hover span {
-    color: ${({ theme }) => theme.colors.copy};
+  &:active {
+    color: ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.grey200};
+  }
+
+  &:focus-visible {
+    background-color: ${({ theme }) => theme.colors.yellow};
   }
 `
+
+const AdvancedSearchWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  margin-top: 6px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
+  padding: 6px;
+  padding-bottom: 0;
+`
+
 const IconWrapper = styled.span`
   display: flex;
   padding-right: 12px;
@@ -165,7 +180,6 @@ export interface ISearchType {
   label: string
   value: string
   icon: React.ReactNode
-  invertIcon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
 }
@@ -250,29 +264,28 @@ export class SearchTool extends React.Component<IProps, IState> {
           {this.props.searchTypeList.map((item) => {
             return (
               <DropDownItem
-                borderTop={false}
                 id={item.value}
                 key={item.value}
                 onClick={() => this.dropDownItemSelect(item)}
               >
-                <IconWrapper>{item.icon}</IconWrapper>
-                <Label>{item.label}</Label>
+                {item.icon}
+                {item.label}
               </DropDownItem>
             )
           })}
           {this.props.navigationList?.map((item) => {
             return (
-              <DropDownItem
-                borderTop={true}
-                id={item.id}
-                key={item.id}
-                onClick={() => item.onClick()}
-              >
-                <IconWrapper>{item.icon}</IconWrapper>
-                <Text variant={'bold14'} element={'p'} color={'primary'}>
+              <AdvancedSearchWrapper>
+                <Button
+                  id={item.id}
+                  key={item.id}
+                  type="tertiary"
+                  size="small"
+                  onClick={() => item.onClick()}
+                >
                   {item.label}
-                </Text>
-              </DropDownItem>
+                </Button>
+              </AdvancedSearchWrapper>
             )
           })}
         </DropDownWrapper>
@@ -314,7 +327,7 @@ export class SearchTool extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { placeHolderText } = this.state.selectedSearchType
+    const { placeHolderText, value } = this.state.selectedSearchType
     return (
       <SearchBox className={this.props.className}>
         <Wrapper onSubmit={this.search}>
@@ -325,15 +338,16 @@ export class SearchTool extends React.Component<IProps, IState> {
             id="searchIconButton"
             onClick={this.search}
           >
-            <Icon color="currentColor" name="Search" size="large" />
+            <Icon color="currentColor" name="MagnifyingGlass" size="large" />
           </Button>
-          <SearchTextInput
+          <SearchInput
             id="searchText"
-            type="text"
+            type={value === 'phone' ? 'tel' : 'text'}
             autoComplete="off"
             placeholder={placeHolderText}
             onChange={this.onChangeHandler}
             value={this.state.searchParam}
+            maxLength={200}
           />
           {this.state.searchParam && (
             <ClearTextIcon onClick={this.onClearTextHandler} />
@@ -341,7 +355,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           <DropDown id="searchType" onClick={this.toggleDropdownDisplay}>
             <SelectedSearchCriteria>
               <span className="selected-icon">
-                {this.state.selectedSearchType.invertIcon}
+                {this.state.selectedSearchType.icon}
               </span>
               <span className="selected-label">
                 {this.state.selectedSearchType.label}

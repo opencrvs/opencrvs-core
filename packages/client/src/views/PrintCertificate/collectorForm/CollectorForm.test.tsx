@@ -17,7 +17,8 @@ import {
   validImageB64String,
   inValidImageB64String,
   mockDeclarationData,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  mockMarriageDeclarationData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -156,6 +157,12 @@ const birthDeclaration = {
 const deathDeclaration = {
   id: '16ff35e1-3f92-4db3-b812-c402e609fb00',
   data: mockDeathDeclarationData,
+  event: Event.Death
+}
+
+const marriageDeclaration = {
+  id: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
+  data: mockMarriageDeclarationData,
   event: Event.Death
 }
 
@@ -432,7 +439,7 @@ describe('Certificate collector test for a birth registration without father det
         component.find('#submit_confirm').hostNodes().simulate('click')
 
         expect(history.location.pathname).toBe(
-          '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
@@ -571,6 +578,63 @@ describe('Certificate collector test for a death registration', () => {
 
       expect(history.location.pathname).toBe(
         '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
+      )
+    })
+  })
+})
+
+describe('Certificate collector test for a marriage registration', () => {
+  describe('Test collector group', () => {
+    let component: ReactWrapper<{}, {}>
+
+    beforeEach(async () => {
+      store.dispatch(storeDeclaration(marriageDeclaration))
+
+      const testComponent = await createTestComponent(
+        <CollectorForm
+          location={location}
+          history={history}
+          match={{
+            params: {
+              registrationId: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
+              eventType: 'marriage',
+              groupId: 'certCollector'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+
+      component = testComponent
+    })
+
+    it('groom will be available', async () => {
+      const element = await waitForElement(component, '#type_GROOM')
+      expect(element.hostNodes()).toHaveLength(1)
+    })
+
+    it('bride will be available', async () => {
+      const element = await waitForElement(component, '#type_BRIDE')
+      expect(element.hostNodes()).toHaveLength(1)
+    })
+
+    it('redirects to review certificate for print in advance option', async () => {
+      const $printInAdvance = await waitForElement(
+        component,
+        '#type_PRINT_IN_ADVANCE'
+      )
+      $printInAdvance
+        .hostNodes()
+        .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
+
+      const $confirm = await waitForElement(component, '#confirm_form')
+      $confirm.hostNodes().simulate('click')
+
+      expect(history.location.pathname).toBe(
+        '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage'
       )
     })
   })

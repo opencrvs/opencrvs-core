@@ -55,6 +55,7 @@ interface IUserSetupMessages
   registeredAuditAction: MessageDescriptor
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
+  issuedAuditAction: MessageDescriptor
   showMoreAuditList: MessageDescriptor
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
@@ -78,6 +79,8 @@ interface IUserSetupMessages
   reInstatedInReviewAuditAction: MessageDescriptor
   reInStatedRejectedAuditAction: MessageDescriptor
   sentForApprovalAuditAction: MessageDescriptor
+  markedAsDuplicate: MessageDescriptor
+  markedAsNotDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -117,7 +120,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'settings.user.label.nameBN'
   },
   labelEnglishName: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
   },
   match: {
@@ -294,6 +297,11 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for certified declaration',
     id: 'user.profile.audit.description.certified'
   },
+  issuedAuditAction: {
+    defaultMessage: 'Issued',
+    description: 'Description for Issued declaration',
+    id: 'user.profile.audit.description.issued'
+  },
   showMoreAuditList: {
     defaultMessage: 'Show next {pageSize} of {totalItems}',
     description: 'Label for show more link',
@@ -412,6 +420,16 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'Description for sending registration for approval audit action',
     id: 'user.profile.auditList.sentForApproval'
+  },
+  markedAsDuplicate: {
+    defaultMessage: 'Marked as duplicate',
+    description: 'Description for marked as duplicate in audit action',
+    id: 'user.profile.auditList.markedAsDuplicate'
+  },
+  markedAsNotDuplicate: {
+    defaultMessage: 'Marked as not duplicate',
+    description: 'Description for marked as not duplicate in audit action',
+    id: 'user.profile.auditList.markedAsNotDuplicate'
   }
 }
 

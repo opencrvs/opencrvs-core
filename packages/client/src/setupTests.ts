@@ -35,7 +35,7 @@ const config = {
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
-  MINIO_URL: 'http://localhost:3535',
+  MINIO_BUCKET: 'ocrvs',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -47,7 +47,7 @@ const config = {
       DELAYED: 0
     }
   },
-  COUNTRY: 'bgd',
+  COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
@@ -165,7 +165,8 @@ vi.doMock(
         Promise.resolve({
           languages: mockOfflineData.languages
         }),
-      loadConfig: () => Promise.resolve(mockConfigResponse)
+      loadConfig: () => Promise.resolve(mockConfigResponse),
+      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse)
     }
   })
 )

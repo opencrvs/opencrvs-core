@@ -11,7 +11,10 @@
  */
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { applicationConfigLoadAction } from './login/actions'
+import {
+  applicationConfigLoadAction,
+  storeClientRedirectRoute
+} from './login/actions'
 import { changeLanguage, loadLanguages } from './i18n/actions'
 import {
   getDefaultLanguage,
@@ -41,6 +44,16 @@ function useLoadConfigurations() {
   }, [dispatch])
 }
 
+function useStoreClientRedirectRoute() {
+  const dispatch = useDispatch()
+  const paramRedirectTo = useSearchQuery('redirectTo')
+  React.useEffect(() => {
+    if (!!paramRedirectTo) {
+      dispatch(storeClientRedirectRoute(paramRedirectTo))
+    }
+  }, [dispatch])
+}
+
 function useSyncLanguage() {
   const dispatch = useDispatch()
   const paramLanguage = useSearchQuery('lang')
@@ -59,6 +72,6 @@ export function Page({ children }: IProps) {
   useLoadConfigurations()
   useSyncLanguage()
   useDocumentTitle()
-
+  useStoreClientRedirectRoute()
   return <>{children}</>
 }

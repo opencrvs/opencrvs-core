@@ -119,6 +119,16 @@ describe('query result filtering tests', () => {
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
+        },
+        issueTab: {
+          results: [
+            { id: 'READY_TO_ISSUE' },
+            { id: 'ISSUING' },
+            { id: 'ISSUED' },
+            { id: 'FAILED' },
+            { id: 'ISSUING' }
+          ],
+          totalItems: 5
         }
       }
 
@@ -194,6 +204,26 @@ describe('query result filtering tests', () => {
         {
           id: 'FAILED_NETWORK',
           submissionStatus: 'FAILED_NETWORK'
+        },
+        {
+          id: 'READY_TO_ISSUE',
+          submissionStatus: 'READY_TO_ISSUE'
+        },
+        {
+          id: 'ISSUING',
+          submissionStatus: 'ISSUING'
+        },
+        {
+          id: 'ISSUED',
+          submissionStatus: 'ISSUED'
+        },
+        {
+          id: 'FAILED',
+          submissionStatus: 'FAILED'
+        },
+        {
+          id: 'FAILED_NETWORK',
+          submissionStatus: 'FAILED_NETWORK'
         }
       ]
 
@@ -231,6 +261,10 @@ describe('query result filtering tests', () => {
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
+        },
+        issueTab: {
+          results: [{ id: 'ISSUED' }, { id: 'FAILED' }],
+          totalItems: 2
         }
       })
     })

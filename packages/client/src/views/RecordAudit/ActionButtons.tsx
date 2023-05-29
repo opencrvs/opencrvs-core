@@ -15,7 +15,8 @@ import {
   goToPage,
   goToPrintCertificate,
   goToUserProfile,
-  goToTeamUserList
+  goToTeamUserList,
+  goToIssueCertificate
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
@@ -30,6 +31,7 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
@@ -40,6 +42,8 @@ import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
+import { useDispatch } from 'react-redux'
+import { Button } from '@client/../../components/src/Button'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -49,6 +53,7 @@ export type CMethodParams = {
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
+  goToIssueCertificate?: typeof goToIssueCertificate
   goToUserProfile?: typeof goToUserProfile
   goToTeamUserList?: typeof goToTeamUserList
 }
@@ -166,6 +171,8 @@ export const ShowUpdateButton = ({
         PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (type.toString() === 'death') {
         PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      } else if (type.toString() === 'marriage') {
+        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
       }
     } else {
       PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
@@ -222,19 +229,23 @@ export const ShowPrintButton = ({
   const printButtonRoleStatusMap: { [key: string]: string[] } = {
     REGISTRATION_AGENT: [
       SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
+      SUBMISSION_STATUS.CERTIFIED,
+      SUBMISSION_STATUS.ISSUED
     ],
     DISTRICT_REGISTRAR: [
       SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
+      SUBMISSION_STATUS.CERTIFIED,
+      SUBMISSION_STATUS.ISSUED
     ],
     LOCAL_REGISTRAR: [
       SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
+      SUBMISSION_STATUS.CERTIFIED,
+      SUBMISSION_STATUS.ISSUED
     ],
     NATIONAL_REGISTRAR: [
       SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
+      SUBMISSION_STATUS.CERTIFIED,
+      SUBMISSION_STATUS.ISSUED
     ]
   }
 
@@ -273,6 +284,81 @@ export const ShowPrintButton = ({
       >
         {intl.formatMessage(buttonMessages.print)}
       </PrimaryButton>
+    )
+  }
+  return <></>
+}
+
+export const ShowIssueButton = ({
+  declaration,
+  intl,
+  userDetails,
+  draft
+}: CMethodParams) => {
+  const dispatch = useDispatch()
+  const { id, type } = declaration || {}
+  const role = userDetails ? userDetails.systemRole : ''
+  const showActionButton = role
+    ? FIELD_AGENT_ROLES.includes(role)
+      ? false
+      : true
+    : false
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  const issueButtonRoleStatusMap: { [key: string]: string[] } = {
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    NATIONAL_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ]
+  }
+
+  if (
+    role &&
+    type &&
+    role in issueButtonRoleStatusMap &&
+    issueButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    showActionButton
+  ) {
+    if (!isDownloaded) {
+      return (
+        <Button
+          key={id}
+          size={'medium'}
+          id={`issue-${id}`}
+          disabled={true}
+          type={'primary'}
+        >
+          {intl.formatMessage(buttonMessages.issue)}
+        </Button>
+      )
+    }
+    return (
+      <Button
+        key={id}
+        size={'medium'}
+        id={`issue-${id}`}
+        onClick={() => {
+          dispatch(clearCorrectionAndPrintChanges(id))
+          dispatch(goToIssueCertificate(id))
+        }}
+        type={'primary'}
+      >
+        {intl.formatMessage(buttonMessages.issue)}
+      </Button>
     )
   }
   return <></>
