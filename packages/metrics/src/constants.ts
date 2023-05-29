@@ -49,5 +49,5 @@ export const DEATH_REPORT_PATH =
 export const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
 
-export const PERFORMANCE_MONGO_URL =
-  process.env.PERFORMANCE_MONGO_URL || 'mongodb://localhost/performance'
+export const DASHBOARD_MONGO_URL =
+  process.env.DASHBOARD_MONGO_URL || 'mongodb://localhost/performance'

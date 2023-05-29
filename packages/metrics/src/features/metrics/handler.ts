@@ -33,7 +33,7 @@ import { IAuthHeader } from '@metrics/features/registration/'
 import { deleteMeasurements } from '@metrics/influxdb/client'
 import { INFLUX_DB } from '@metrics/influxdb/constants'
 import { MongoClient } from 'mongodb'
-import { PERFORMANCE_MONGO_URL } from '@metrics/constants'
+import { DASHBOARD_MONGO_URL } from '@metrics/constants'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -142,7 +142,7 @@ export async function deletePerformanceHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const client = new MongoClient(PERFORMANCE_MONGO_URL)
+  const client = new MongoClient(DASHBOARD_MONGO_URL)
   try {
     const connectedClient = await client.connect()
     const db = connectedClient.db()
