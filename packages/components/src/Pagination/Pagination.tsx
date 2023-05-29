@@ -67,7 +67,6 @@ const PageNumberButton = styled(Button)`
 
 const DotsButton = styled(Button)`
   height: 24px;
-  pointer-events: none; // Disable click events on the dots
 `
 
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
@@ -152,13 +151,18 @@ export class Pagination extends React.Component<IPaginationProps> {
           disabled={!this.canGoToPreviousPage()}
           aria-label="Previous page"
         >
-          <Icon color="grey400" name="ChevronLeft" size="small" />
+          <Icon color="grey400" name="CaretLeft" size="small" />
         </Button>
         <StyledPagination>
           {pages.map((page, id) => {
             if (page === '...') {
               return (
-                <DotsButton key={id} type="tertiary" size="small" disabled>
+                <DotsButton
+                  key={id}
+                  type="tertiary"
+                  size="small"
+                  disabled // Disable click events on the dots
+                >
                   <StyledPageNumber size={size} isCurrentPage={false}>
                     {page}
                   </StyledPageNumber>
@@ -194,7 +198,7 @@ export class Pagination extends React.Component<IPaginationProps> {
           disabled={!this.canGoToNextPage()}
           aria-label="Next page"
         >
-          <Icon color="grey400" name="ChevronRight" size="small" />
+          <Icon color="grey400" name="CaretRight" size="small" />
         </Button>
       </PaginationContainer>
     )
