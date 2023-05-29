@@ -168,8 +168,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 26068,
         maleEstimation: 25847,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns 0 as estimations for an office', async () => {
@@ -187,8 +186,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 0,
         maleEstimation: 0,
         locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-        locationLevel: '',
-        estimationYear: 2017
+        locationLevel: ''
       })
     })
     it('Returns estimate properly for death', async () => {
@@ -219,8 +217,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 5937,
         maleEstimation: 5937,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns the estimatedFigures for right location', async () => {
@@ -238,8 +235,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 26068,
         maleEstimation: 25847,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
 
@@ -330,8 +326,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 26068,
         maleEstimation: 25847,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
   })

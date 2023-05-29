@@ -125,7 +125,6 @@ export const fetchEstimateByLocation = async (
   for (let year = fromYear; year <= toYear; year++) {
     yearArray.push(year)
   }
-  const selectedCrudYear = new Date(timeTo).getFullYear()
   let malePopulation = 0
   let femalePopulation = 0
 
@@ -135,7 +134,6 @@ export const fetchEstimateByLocation = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: locationData.id,
-      estimationYear: toYear, // TODO: Check if we actually need it
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
@@ -157,8 +155,8 @@ export const fetchEstimateByLocation = async (
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
           sum += entry[year]
-          count++
         }
+        count++
       }
       crudRate = sum / count
     } else if (
@@ -177,8 +175,8 @@ export const fetchEstimateByLocation = async (
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
           sum += entry[year]
-          count++
         }
+        count++
       }
       totalPopulation = sum / count
     } else if (
@@ -200,8 +198,8 @@ export const fetchEstimateByLocation = async (
         )
         if (entry) {
           sum += entry[year]
-          count++
         }
+        count++
       }
       malePopulation = sum / count
     } else if (
@@ -223,8 +221,8 @@ export const fetchEstimateByLocation = async (
         )
         if (entry) {
           sum += entry[year]
-          count++
         }
+        count++
       }
       femalePopulation = sum / count
     }
@@ -235,7 +233,6 @@ export const fetchEstimateByLocation = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: locationData.id,
-      estimationYear: toYear,
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
@@ -258,7 +255,6 @@ export const fetchEstimateByLocation = async (
       ((crudRate * femalePopulation) / 1000) * (estimationForDays / 365)
     ),
     locationId: locationData.id,
-    estimationYear: selectedCrudYear,
     locationLevel: getLocationLevelFromLocationData(locationData)
   }
 }
@@ -300,7 +296,6 @@ export const fetchEstimateForTargetDaysByLocationId = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: 'Location/0',
-      estimationYear: new Date(timeTo).getFullYear(), // TODO: Check if we actually need it
       locationLevel: 'COUNTRY'
     }
 

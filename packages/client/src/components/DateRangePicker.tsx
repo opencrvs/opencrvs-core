@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
-import endOfMonth from 'date-fns/endOfMonth'
+import endOfToday from 'date-fns/endOfMonth'
 import endOfYear from 'date-fns/endOfYear'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
@@ -643,7 +643,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: endOfMonth(date)
+              endDate: endOfToday(date)
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
@@ -733,7 +733,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate,
-                    endDate: endOfMonth(endDate)
+                    endDate: endOfToday(endDate)
                   })
                   setModalVisible(false)
                   props.closeModalFromHOC && props.closeModalFromHOC()

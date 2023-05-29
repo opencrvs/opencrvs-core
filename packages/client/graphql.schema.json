@@ -1196,6 +1196,18 @@
             "deprecationReason": null
           },
           {
+            "name": "brideIdentifier",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "childDoB",
             "description": null,
             "type": {
@@ -1705,6 +1717,18 @@
           },
           {
             "name": "groomFirstNames",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "groomIdentifier",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -5868,6 +5892,18 @@
             "deprecationReason": null
           },
           {
+            "name": "deceasedGender",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "deceasedName",
             "description": null,
             "args": [],
@@ -6994,22 +7030,6 @@
         "name": "Estimation",
         "description": null,
         "fields": [
-          {
-            "name": "estimationYear",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "femaleEstimation",
             "description": null,
@@ -10361,6 +10381,18 @@
         "description": null,
         "fields": [
           {
+            "name": "brideIdentifier",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "brideName",
             "description": null,
             "args": [],
@@ -10383,6 +10415,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "Date",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "groomIdentifier",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
