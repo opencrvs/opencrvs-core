@@ -29,7 +29,8 @@ import {
   REGISTERED_STATUS,
   CERTIFIED_STATUS,
   ARCHIVED_STATUS,
-  DECLARED_STATUS
+  DECLARED_STATUS,
+  IN_PROGRESS_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -169,7 +170,7 @@ async function indexAndSearchComposition(
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
 
-  if (body.type === DECLARED_STATUS) {
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateBirthDuplicates(compositionId, composition, body)
   }
 }

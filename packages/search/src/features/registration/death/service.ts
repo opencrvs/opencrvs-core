@@ -25,6 +25,7 @@ import {
   getStatus,
   ICompositionBody,
   IDeathCompositionBody,
+  IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
   REGISTERED_STATUS,
@@ -161,7 +162,7 @@ async function indexDeclaration(
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
 
-  if (body.type === DECLARED_STATUS) {
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }
