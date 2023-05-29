@@ -136,15 +136,15 @@ enum ACTIVE_MENU_ITEM {
 }
 
 const Search = styled(SearchTool)`
-  position: static;
-  left: calc(50% - 624px / 2 + 24px);
-  top: calc(50% - 40px / 2);
-  margin: 0px 80px 0px 12px;
+  margin-right: 45px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+  }
 `
 
 const HeaderCenter = styled.div`
-  padding: 8px 16px;
   height: 40px;
+  gap: 12px;
   display: flex;
   flex-direction: row;
   align-items: center;
