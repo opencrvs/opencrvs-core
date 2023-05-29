@@ -18,11 +18,21 @@ import {
 } from '@auth/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { createToken } from '@auth/features/authenticate/service'
+import { IUserName, createToken } from '@auth/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
   createdAt: number
+}
+
+export enum NotificationEvent {
+  ONBOARDING_INVITE = 'ONBOARDING_INVITE',
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'PASSWORD_RESET_BY_SYSTEM_ADMIN',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  USERNAME_REMINDER = 'USERNAME_REMINDER',
+  USERNAME_UPDATED = 'USERNAME_UPDATED'
 }
 
 type SixDigitVerificationCode = string
@@ -37,8 +47,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
 }
 
 export async function generateVerificationCode(
-  nonce: string,
-  mobile: string
+  nonce: string
 ): Promise<SixDigitVerificationCode> {
   const code = crypto.randomInt(100000, 999999).toString()
   await storeVerificationCode(nonce, code)
@@ -57,14 +66,19 @@ export function generateNonce() {
 }
 
 export async function sendVerificationCode(
-  mobile: string,
-  verificationCode: string
+  verificationCode: string,
+  notificationEvent: NotificationEvent,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    code: verificationCode
+    email,
+    code: verificationCode,
+    notificationEvent,
+    userFullName
   }
-
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),
@@ -90,7 +104,7 @@ export async function checkVerificationCode(
   const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
 
   if (!codeDetails) {
-    throw new Error('sms code not found')
+    throw new Error('Auth code not found')
   }
 
   const codeExpired =
@@ -98,11 +112,11 @@ export async function checkVerificationCode(
     CONFIG_SMS_CODE_EXPIRY_SECONDS
 
   if (code !== codeDetails.code) {
-    throw new Error('sms code invalid')
+    throw new Error('Auth code invalid')
   }
 
   if (codeExpired) {
-    throw new Error('sms code expired')
+    throw new Error('Auth code expired')
   }
 }
 

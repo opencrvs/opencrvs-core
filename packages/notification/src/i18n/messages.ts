@@ -24,3 +24,34 @@ export const messageKeys = {
   updateUserNameNotification: 'updateUserNameNotification',
   resetUserPasswordNotification: 'resetUserPasswordNotification'
 }
+
+export const templateNames = {
+  ONBOARDING_INVITE: {
+    sms: 'userCredentialsNotification',
+    email: 'onboarding-invite'
+  },
+  TWO_FACTOR_AUTHENTICATION: {
+    sms: 'authenticationCodeNotification',
+    email: '2-factor-authentication'
+  },
+  CHANGE_PHONE_NUMBER: {
+    sms: 'authenticationCodeNotification',
+    email: 'change-phone-number'
+  },
+  PASSWORD_RESET_BY_SYSTEM_ADMIN: {
+    sms: 'resetUserPasswordNotification',
+    email: 'password-reset-by-system-admin'
+  },
+  PASSWORD_RESET: {
+    sms: 'authenticationCodeNotification',
+    email: 'password-reset'
+  },
+  USERNAME_REMINDER: {
+    sms: 'retieveUserNameNotification',
+    email: 'username-reminder'
+  },
+  USERNAME_UPDATED: {
+    sms: 'updateUserNameNotification',
+    email: 'username-updated'
+  }
+}

@@ -95,9 +95,9 @@ export interface GQLMutation {
   changePhone?: string
   changeAvatar?: GQLAvatar
   auditUser?: string
-  resendSMSInvite?: string
-  usernameSMSReminder?: string
-  resetPasswordSMS?: string
+  resendInvite?: string
+  usernameReminder?: string
+  resetPasswordInvite?: string
   updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
@@ -2882,9 +2882,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changePhone?: MutationToChangePhoneResolver<TParent>
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
-  resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
-  usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
-  resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
+  resendInvite?: MutationToResendInviteResolver<TParent>
+  usernameReminder?: MutationToUsernameReminderResolver<TParent>
+  resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
@@ -3469,47 +3469,43 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface MutationToResendSMSInviteArgs {
+export interface MutationToResendInviteArgs {
   userId: string
 }
-export interface MutationToResendSMSInviteResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface MutationToResendInviteResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: MutationToResendSMSInviteArgs,
+    args: MutationToResendInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToUsernameSMSReminderArgs {
+export interface MutationToUsernameReminderArgs {
   userId: string
 }
-export interface MutationToUsernameSMSReminderResolver<
+export interface MutationToUsernameReminderResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToUsernameSMSReminderArgs,
+    args: MutationToUsernameReminderArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToResetPasswordSMSArgs {
+export interface MutationToResetPasswordInviteArgs {
   userId: string
-  applicationName: string
 }
-export interface MutationToResetPasswordSMSResolver<
+export interface MutationToResetPasswordInviteResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToResetPasswordSMSArgs,
+    args: MutationToResetPasswordInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

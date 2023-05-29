@@ -121,6 +121,7 @@ export default async function createUser(
   }
 
   sendCredentialsNotification(
+    user.name,
     user.username,
     autoGenPassword,
     {

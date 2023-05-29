@@ -153,12 +153,13 @@ export default async function updateUser(
 
   if (userNameChanged) {
     sendUpdateUsernameNotification(
+      user.name,
       existingUser.username,
       {
         Authorization: request.headers.authorization
       },
       user.mobile,
-      user.emailForNotification
+      user.email
     )
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])

@@ -466,7 +466,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async resendSMSInvite(_, { userId }, { headers: authHeader }) {
+    async resendInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -475,7 +475,7 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const res = await fetch(`${USER_MANAGEMENT_URL}resendSMSInvite`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}resendInvite`, {
         method: 'POST',
         body: JSON.stringify({
           userId
@@ -496,7 +496,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async usernameSMSReminder(_, { userId }, { headers: authHeader }) {
+    async usernameReminder(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -504,7 +504,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}usernameSMSReminder`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}usernameReminder`, {
         method: 'POST',
         body: JSON.stringify({
           userId
@@ -525,11 +525,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async resetPasswordSMS(
-      _,
-      { userId, applicationName },
-      { headers: authHeader }
-    ) {
+    async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -537,11 +533,10 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordSMS`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordInvite`, {
         method: 'POST',
         body: JSON.stringify({
-          userId,
-          applicationName
+          userId
         }),
         headers: {
           'Content-Type': 'application/json',

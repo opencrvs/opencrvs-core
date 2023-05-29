@@ -65,6 +65,15 @@ export enum QUESTION_KEYS {
   FIRST_CHILD_NAME = 'FIRST_CHILD_NAME'
 }
 
+export enum NotificationEvent {
+  ONBOARDING_INVITE = 'ONBOARDING_INVITE',
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
+  PASSWORD_RESET_BY_SYSTEM_ADMIN = 'PASSWORD_RESET_BY_SYSTEM_ADMIN',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  USERNAME_REMINDER = 'USERNAME_REMINDER',
+  USERNAME_UPDATED = 'USERNAME_UPDATED'
+}
 export interface ITokenResponse {
   token: string
 }
@@ -105,11 +114,18 @@ const authenticate = (data: IAuthenticationData) => {
   })
 }
 
-const resendSMS = (nonce: string, retrievalFlow = false) => {
+const resendAuthenticationCode = (
+  nonce: string,
+  notificationEvent: NotificationEvent,
+  retrievalFlow = false
+) => {
   return request({
-    url: new URL('/resendSms', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      '/resendAuthenticationCode',
+      window.config.AUTH_API_URL
+    ).toString(),
     method: 'POST',
-    data: { nonce, retrievalFlow }
+    data: { nonce, notificationEvent, retrievalFlow }
   })
 }
 
@@ -197,7 +213,7 @@ export const authApi = {
   request,
   authenticate,
   verifyCode,
-  resendSMS,
+  resendAuthenticationCode,
   verifyNumber,
   verifyUser,
   verifySecurityAnswer,

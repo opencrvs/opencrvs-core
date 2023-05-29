@@ -13,6 +13,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
 import { get, set, del } from '@auth/database'
+import { IUserName } from '@auth/features/authenticate/service'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
@@ -39,6 +40,7 @@ export async function verifyUser(mobile?: string, email?: string) {
   return {
     userId: body.id,
     username: body.username,
+    userFullName: body.name,
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
@@ -51,6 +53,7 @@ export async function verifyUser(mobile?: string, email?: string) {
 export interface IRetrievalStepInformation {
   userId: string
   username: string
+  userFullName: IUserName[]
   mobile?: string
   email?: string
   securityQuestionKey: string

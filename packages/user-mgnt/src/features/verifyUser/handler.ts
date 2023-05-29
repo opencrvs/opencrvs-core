@@ -14,7 +14,8 @@ import * as Joi from 'joi'
 import { unauthorized, conflict, badRequest } from '@hapi/boom'
 import User, {
   IUserModel,
-  ISecurityQuestionAnswer
+  ISecurityQuestionAnswer,
+  IUserName
 } from '@user-mgnt/model/user'
 import {
   isNonEmptyArray,
@@ -27,6 +28,7 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
+  name: IUserName[]
   mobile?: string
   scope: string[]
   status: string
@@ -68,6 +70,7 @@ export default async function verifyUserHandler(
   }
 
   const response: IVerifyResponse = {
+    name: user.name,
     mobile: user.mobile,
     scope: user.scope,
     status: user.status,
@@ -100,8 +103,15 @@ export const requestSchema = Joi.object({
 })
 
 export const responseSchema = Joi.object({
+  name: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  ),
   mobile: Joi.string(),
-  email: Joi.string().email(),
+  email: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   securityQuestionKey: Joi.string(),

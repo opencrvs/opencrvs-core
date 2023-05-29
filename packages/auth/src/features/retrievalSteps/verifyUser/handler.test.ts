@@ -66,7 +66,7 @@ describe('verifyUser handler receives a request', () => {
 
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
-    it('generates a mobile verification code and sends it to sms gateway', async () => {
+    it('generates a mobile verification code and sends it to notification gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -93,8 +93,8 @@ describe('verifyUser handler receives a request', () => {
       })
 
       expect(spy).toHaveBeenCalled()
-      expect(spy.mock.calls[0]).toHaveLength(2)
-      expect(spy.mock.calls[0][0]).toBe('+8801711111111')
+      expect(spy.mock.calls[0]).toHaveLength(5)
+      expect(spy.mock.calls[0][3]).toBe('+8801711111111')
     })
   })
 })

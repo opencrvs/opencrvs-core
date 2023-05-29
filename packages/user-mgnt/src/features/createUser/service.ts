@@ -292,23 +292,25 @@ async function checkUsername(username: string) {
 }
 
 export async function sendCredentialsNotification(
+  userFullName: IUserName[],
   username: string,
   password: string,
   authHeader: { Authorization: string },
   msisdn?: string,
-  email?: string
+  emailForNotification?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsSMS`
+  }userCredentialsInvite`
   try {
     await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        email,
+        emailForNotification,
         username,
-        password
+        password,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -321,6 +323,7 @@ export async function sendCredentialsNotification(
 }
 
 export async function sendUpdateUsernameNotification(
+  userFullName: IUserName[],
   username: string,
   authHeader: { Authorization: string },
   msisdn?: string,
@@ -335,7 +338,8 @@ export async function sendUpdateUsernameNotification(
       body: JSON.stringify({
         msisdn,
         emailForNotification,
-        username
+        username,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',

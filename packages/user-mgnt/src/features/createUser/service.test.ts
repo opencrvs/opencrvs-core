@@ -100,13 +100,19 @@ describe('User credentials notification', () => {
     )
 
     await sendCredentialsNotification(
+      [
+        {
+          use: 'en',
+          family: 'Anik',
+          given: ['Sadman']
+        }
+      ],
       'Name1',
       'Name2',
       {
         Authorization: `Bearer ${token}`
       },
-      '01730037449',
-      'test@test.org'
+      '01730037449'
     )
 
     expect(spy).not.toHaveBeenCalled()
@@ -119,13 +125,19 @@ describe('User credentials notification', () => {
     })
 
     await sendCredentialsNotification(
+      [
+        {
+          use: 'en',
+          family: 'Anik',
+          given: ['Sadman']
+        }
+      ],
       'Name1',
       'Name2',
       {
         Authorization: `Bearer ${token}`
       },
-      '01730037449',
-      'test@test.org'
+      '01730037449'
     )
 
     expect(spy).toHaveBeenCalled()
