@@ -239,11 +239,15 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
       }
       updateWorkqueue(getState(), dispatch)
+
       // wrapping deleteDeclaration inside a setTimeout
       // make deleteDeclaration wait a bit until workqueue refreshes
       // because for the deleteDeclaration's updates, there was an "workqueue count flickering" issue ticket
       // This is a "quick fix" for the issue #5268://github.com/opencrvs/opencrvs-core/issues/5268
-      setTimeout(() => dispatch(deleteDeclaration(declaration.id)), 2000)
+      setTimeout(
+        () => dispatch(deleteDeclaration(declaration.id, client)),
+        2000
+      )
     } catch (error) {
       if (!(error instanceof ApolloError)) {
         updateDeclaration(dispatch, {
@@ -262,7 +266,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             trackingId: declaration.data.registration.trackingId as string
           })
         )
-        dispatch(deleteDeclaration(declaration.id))
+        dispatch(deleteDeclaration(declaration.id, client))
         return
       }
       updateDeclaration(dispatch, {
