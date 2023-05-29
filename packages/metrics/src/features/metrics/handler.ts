@@ -11,18 +11,18 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  fetchRegWithinTimeFrames,
-  getCurrentAndLowerLocationLevels,
   fetchCertificationPayments,
+  fetchEstimatedTargetDayMetrics,
   fetchGenderBasisMetrics,
-  fetchEstimatedTargetDayMetrics
+  fetchRegWithinTimeFrames,
+  getCurrentAndLowerLocationLevels
 } from '@metrics/features/metrics/metricsGenerator'
 
 import {
-  TIME_FROM,
-  TIME_TO,
+  EVENT,
   LOCATION_ID,
-  EVENT
+  TIME_FROM,
+  TIME_TO
 } from '@metrics/features/metrics/constants'
 import {
   EVENT_TYPE,
@@ -32,6 +32,8 @@ import {
 import { IAuthHeader } from '@metrics/features/registration/'
 import { deleteMeasurements } from '@metrics/influxdb/client'
 import { INFLUX_DB } from '@metrics/influxdb/constants'
+import { MongoClient } from 'mongodb'
+import { PERFORMANCE_MONGO_URL } from '@metrics/constants'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -134,5 +136,24 @@ export async function metricsDeleteMeasurementHandler(
     return h.response(res).code(200)
   } catch (err) {
     throw new Error(`Could not delete influx database ${INFLUX_DB}`)
+  }
+}
+export async function deletePerformanceHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const client = new MongoClient(PERFORMANCE_MONGO_URL)
+  try {
+    const connectedClient = await client.connect()
+    const db = connectedClient.db()
+    await db.collection('registrations').drop()
+    await db.collection('corrections').drop()
+    await db.collection('populationEstimatesPerDay').drop()
+    const res = {
+      status: `Successfully deleted all the collections from performance database`
+    }
+    return h.response(res).code(200)
+  } catch (err) {
+    throw new Error(`Could not delete performance database`)
   }
 }

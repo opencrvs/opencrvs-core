@@ -48,3 +48,6 @@ export const DEATH_REPORT_PATH =
     : join(__dirname, '../src/scripts/Death_Report.csv')
 export const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
+
+export const PERFORMANCE_MONGO_URL =
+  process.env.PERFORMANCE_MONGO_URL || 'mongodb://localhost/performance'
