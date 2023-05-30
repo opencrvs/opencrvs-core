@@ -180,6 +180,7 @@ const VSExport = () => {
         id="vsexport-wrapper"
         hideBackground={true}
         isCertificatesConfigPage={true}
+        headerTitle={intl.formatMessage(messages.vsexport)}
       >
         <UserTable id="vsexport_list">
           <Content

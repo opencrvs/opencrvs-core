@@ -252,6 +252,9 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
+const StyledAlert = styled(Alert)`
+  margin-top: 24px;
+`
 const Title = styled.div`
   display: flex;
   align-items: center;
@@ -2006,11 +2009,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   !viewRecord &&
                   getSignature(declaration?.event as Event)}
                 {totalFileSizeExceeded && (
-                  <Alert type="warning">
+                  <StyledAlert type="warning">
                     {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
                       fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                     })}
-                  </Alert>
+                  </StyledAlert>
                 )}
                 {viewRecord || isDuplicate ? null : (
                   <>
