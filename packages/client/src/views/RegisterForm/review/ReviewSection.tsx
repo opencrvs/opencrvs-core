@@ -43,6 +43,7 @@ import {
   DeathSection,
   DOCUMENT_UPLOADER_WITH_OPTION,
   FETCH_BUTTON,
+  FIELD_GROUP_TITLE,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IAttachmentValue,
   ICheckboxFormField,
@@ -263,8 +264,10 @@ const Title = styled.div`
   padding: 16px 0;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
+const Label = styled.span<{ section?: boolean }>`
+  ${({ theme, section }) => {
+    return section ? theme.fonts.bold18 : theme.fonts.bold16
+  }};
 `
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
@@ -976,7 +979,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [LIST, WARNING, SUBSECTION, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -1273,7 +1276,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
         completeValue,
-        field.readonly
+        field.readonly ||
+          [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type)
       )
     }
   }
@@ -1392,7 +1396,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field.label,
       field.name,
       value,
-      field.readonly
+      field.readonly ||
+        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type)
     )
   }
 
@@ -1457,7 +1462,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               nestedField,
               sectionErrors[section.id][field.name]
             ),
-            nestedField.readonly
+            nestedField.readonly ||
+              [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(
+                nestedField.type
+              )
           )
         )
       }
@@ -1967,7 +1975,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           return (
                             <ListViewItemSimplified
                               key={index}
-                              label={<Label>{item.label}</Label>}
+                              label={
+                                <Label section={!item.action}>
+                                  {item.label}
+                                </Label>
+                              }
                               value={
                                 <Value id={item.label.split(' ')[0]}>
                                   {item.value}
