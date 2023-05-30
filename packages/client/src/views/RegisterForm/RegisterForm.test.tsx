@@ -55,18 +55,22 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
 import { vi } from 'vitest'
+import { createClient } from '@client/utils/apolloClient'
+import { ApolloClient } from '@apollo/client'
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
 
   let store: AppStore
   let history: History
+  let client: ApolloClient<{}>
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
+      client = createClient(store)
 
       const draft = createDeclaration(Event.Birth)
       store.dispatch(storeDeclaration(draft))
@@ -95,7 +99,7 @@ describe('when user is in the register form for birth event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        { store, history, apolloClient: client }
       )
       component = testComponent
     })
@@ -362,7 +366,7 @@ describe('when user is in the register form for marriage event', () => {
   })
 })
 
-describe('when user is in the register form preview section', () => {
+describe('when user is in the register form preview section without phone number', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -388,6 +392,74 @@ describe('when user is in the register form preview section', () => {
       },
       registration: {
         commentsOrNotes: ''
+      }
+    }
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
+
+    const form = await getRegisterFormFromStore(store, Event.Birth)
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <RegisterForm
+        history={history}
+        registerForm={form}
+        declaration={draft}
+        pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            declarationId: draft.id,
+            pageId: 'preview',
+            groupId: 'preview-view-group'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      { store, history }
+    )
+    component = testComponent
+  })
+
+  it('submit button will be disabled since form does not have a phone no for contact point', () => {
+    expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
+      true
+    )
+  })
+})
+
+describe('when user is in the register form preview section', () => {
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History
+  const mock = vi.fn()
+
+  beforeEach(async () => {
+    mock.mockReset()
+    const storeContext = await createTestStore()
+    store = storeContext.store
+    history = storeContext.history
+
+    const draft = createDeclaration(Event.Birth)
+    draft.data = {
+      child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
+      father: {
+        detailsExist: true
+      },
+      mother: {
+        detailsExist: true
+      },
+      documents: {
+        imageUploader: { title: 'dummy', description: 'dummy', data: '' }
+      },
+      registration: {
+        commentsOrNotes: '',
+        contactPoint: {
+          nestedFields: {
+            registrationPhone: '01557394989'
+          },
+          value: 'MOTHER'
+        }
       }
     }
     store.dispatch(setInitialDeclarations())

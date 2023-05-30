@@ -52,7 +52,7 @@ ToggleMenuView.args = {
   ),
   menuItems: [
     {
-      icon: <Icon name="Share" color="primary" size="large" weight="bold" />,
+      icon: <Icon name="Export" color="primary" size="large" weight="bold" />,
       label: 'Share',
       handler: () => alert('Settings')
     },

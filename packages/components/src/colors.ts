@@ -35,7 +35,7 @@ const config = {
   // Monochrome
   white: '#FFFFFF',
   grey100: '#F5F5F5', // background
-  grey200: '#E8E8E8', // dividers, hover
+  grey200: '#EEEEEE', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
   grey400: '#959595', // placeholder copy
   grey500: '#5B5B5B', // supporting copy

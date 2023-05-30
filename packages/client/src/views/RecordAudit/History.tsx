@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -42,11 +43,6 @@ import { useSelector } from 'react-redux'
 
 const TableDiv = styled.div`
   overflow: auto;
-`
-
-const Heading = styled.h3`
-  ${({ theme }) => theme.fonts.h3}
-  margin-bottom: 0px !important;
 `
 
 const LargeGreyedInfo = styled.div`
@@ -174,7 +170,9 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
         <LargeGreyedInfo />
       </>
     )
@@ -183,7 +181,7 @@ export const GetHistory = ({
   }[]
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
-      date: new Date(draft.savedOn || Date.now()).toString(),
+      date: new Date(draft.savedOn || Date.now()).toISOString(),
       regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
@@ -323,7 +321,9 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <Text variant="h3" element="h3" color="copy">
+        {intl.formatMessage(constantsMessages.history)}
+      </Text>
       <TableDiv>
         <Table
           id="task-history"

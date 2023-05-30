@@ -1291,7 +1291,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'informantNameInEnglish',
               label: {
-                defaultMessage: "Informant's fullname",
+                defaultMessage: 'Full name',
                 description: "Label for informant's name in english",
                 id: 'form.preview.group.label.informant.english.name'
               },
@@ -1334,6 +1334,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: 'mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'hideInPreview',
+                  expression: 'values.detailsExist'
                 }
               ],
               mapping: {
@@ -1839,7 +1843,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'motherNameInEnglish',
               label: {
-                defaultMessage: "Mother's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for mother's name in english",
                 id: 'form.preview.group.label.mother.english.name'
               },
@@ -1887,6 +1891,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'hide',
                   expression: 'fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'hideInPreview',
+                  expression: 'values.detailsExist'
                 }
               ],
               mapping: {
@@ -2359,7 +2367,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'fatherNameInEnglish',
               label: {
-                defaultMessage: "Father's fullname",
+                defaultMessage: 'Full name',
                 description: "Group label for father's name in english",
                 id: 'form.preview.group.label.father.english.name'
               },

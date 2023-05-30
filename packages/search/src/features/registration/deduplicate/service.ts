@@ -65,6 +65,14 @@ export const searchForBirthDuplicates = async (
   // Names of length of >7 characters = 2 edits allowed
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
+  if (
+    (!body.childFirstNames && !body.childFamilyName) ||
+    (!body.motherFirstNames && !body.motherFamilyName) ||
+    !body.motherDoB ||
+    !body.childDoB
+  ) {
+    return []
+  }
   const mothersDetailsMatch = {
     bool: {
       must: [
@@ -230,6 +238,13 @@ export const searchForDeathDuplicates = async (
   client: elasticsearch.Client
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+  if (
+    (!body.deceasedFirstNames && !body.deceasedFamilyName) ||
+    !body.deceasedDoB ||
+    !body.deathDate
+  ) {
+    return []
+  }
 
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({

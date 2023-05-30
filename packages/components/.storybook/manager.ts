@@ -9,21 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { model, Schema, Document } from 'mongoose'
+import { addons } from '@storybook/manager-api'
+import theme from './theme'
+import WebFont from 'webfontloader'
 
-export interface IUsernameRecord {
-  username: string
-  count: number
-}
-
-export interface IUsernameRecordModel extends IUsernameRecord, Document {}
-
-const usernameRecordSchema = new Schema({
-  username: { type: String, required: true },
-  count: { type: Number, default: 0 }
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
 })
 
-export default model<IUsernameRecordModel>(
-  'UsernameRecord',
-  usernameRecordSchema
-)
+addons.setConfig({ theme })
