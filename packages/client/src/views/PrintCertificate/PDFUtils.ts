@@ -183,12 +183,24 @@ export function executeHandlebarsTemplate(
         return ''
       }
 
-      const id = idParts.join('.')
+      const id =
+        idParts.length === 3
+          ? idParts.slice(0, -1).join('.')
+          : idParts.join('.')
 
-      return intl.formatMessage({
+      const value = intl.formatMessage({
         id,
         defaultMessage: 'Missing translation for ' + id
       })
+
+      if (
+        idParts.includes('uppercase') &&
+        !value.split(' ').includes('Missing')
+      ) {
+        return value.toUpperCase()
+      }
+
+      return value
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
 
@@ -284,6 +296,20 @@ export function executeHandlebarsTemplate(
       return options.hash
     }
   )
+
+  Handlebars.registerHelper('uppercase', function (str) {
+    if (str && typeof str === 'string') {
+      return str.toUpperCase()
+    }
+    return ''
+  })
+
+  Handlebars.registerHelper('lowercase', function (str) {
+    if (str && typeof str === 'string') {
+      return str.toLowerCase()
+    }
+    return ''
+  })
 
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data)
