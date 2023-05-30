@@ -98,8 +98,7 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE,
-  EMPTY_STRING
+  ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -112,6 +111,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -200,7 +200,6 @@ type DispatchProps = {
 type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
-  setAllFieldsDirty: boolean
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
   scope: Scope | null
@@ -465,7 +464,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration.id)
+    this.props.deleteDeclaration(declaration.id, client)
   }
 
   onCloseDeclaration = () => {
@@ -605,11 +604,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     return eventTopBarProps
   }
+  setAllFieldsDirty = () =>
+    this.props.declaration.visitedGroupIds?.some(
+      (visitedGroup) =>
+        visitedGroup.sectionId === this.props.activeSection.id &&
+        visitedGroup.groupId === this.props.activeSectionGroup.id
+    ) ?? false
 
   render() {
     const {
       intl,
-      setAllFieldsDirty,
       fieldsToShowValidationErrors,
       declaration,
       registerForm,
@@ -831,7 +835,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               </Alert>
                             )}
                           <FormFieldGenerator
-                            id={activeSectionGroup.id}
+                            id={`${activeSection.id}-${activeSectionGroup.id}`}
+                            key={`${activeSection.id}-${activeSectionGroup.id}`}
                             onChange={(values) => {
                               debouncedModifyDeclaration(
                                 values,
@@ -839,7 +844,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 declaration
                               )
                             }}
-                            setAllFieldsDirty={setAllFieldsDirty}
+                            setAllFieldsDirty={this.setAllFieldsDirty()}
                             fieldsToShowValidationErrors={
                               fieldsToShowValidationErrors
                             }
@@ -1087,7 +1092,6 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ...activeSectionGroup,
       fields
     },
-    setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state)

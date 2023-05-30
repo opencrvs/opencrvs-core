@@ -13,7 +13,9 @@ import {
   MINIO_BUCKET,
   MINIO_BUCKET_REGION,
   MINIO_HOST,
-  MINIO_PORT
+  MINIO_PORT,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY
 } from '@documents/minio/constants'
 import * as Minio from 'minio'
 
@@ -21,8 +23,8 @@ export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
   port: Number(MINIO_PORT),
   useSSL: false,
-  accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin'
+  accessKey: MINIO_ACCESS_KEY,
+  secretKey: MINIO_SECRET_KEY
 })
 
 export async function defaultMinioBucketExists() {

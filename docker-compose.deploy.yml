@@ -275,28 +275,28 @@ services:
       - MINIO_DOMAIN=minio.{{hostname}}
       - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
-    ports:
-      - '9000:9000'
-      - '9001:9001'
     volumes:
       - '/data/minio:/data'
     command: server --console-address ":9001" /data
     deploy:
       labels:
         - 'traefik.enable=true'
+        - 'traefik.docker.network=opencrvs_overlay_net'
         # Console
         - 'traefik.http.routers.minio-console.rule=Host(`minio-console.{{hostname}}`)'
         - 'traefik.http.routers.minio-console.entrypoints=websecure'
         - 'traefik.http.routers.minio-console.tls.certresolver=certResolver'
         - 'traefik.http.routers.minio-console.service=minio-console'
         - 'traefik.http.services.minio-console.loadbalancer.server.port=9001'
-        # APi
+        # API
         - 'traefik.http.routers.minio.rule=Host(`minio.{{hostname}}`)'
-        - 'traefik.http.routers.minio.entrypoints=websecure'
+        - 'traefik.http.routers.minio.entrypoints=websecure,web'
         - 'traefik.http.routers.minio.tls.certresolver=certResolver'
+        - 'traefik.http.routers.minio.tls=true'
         - 'traefik.http.routers.minio.service=minio'
+        - 'traefik.http.routers.minio.middlewares=minio-https-redirect'
+        - 'traefik.http.middlewares.minio-https-redirect.redirectscheme.scheme=https'
         - 'traefik.http.services.minio.loadbalancer.server.port=9000'
-        - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
       - overlay_net
 
@@ -709,6 +709,8 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
   scheduler:
+    environment:
+      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
     deploy:
       replicas: 1
       labels:
@@ -732,6 +734,7 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_URL=minio.{{hostname}}
       - MINIO_HOST=minio
       - MINIO_PORT=9000
       - MINIO_BUCKET=ocrvs
@@ -939,6 +942,10 @@ services:
       - OPENCRVS_METABASE_DB_AUTH_DB=performance
       - OPENCRVS_METABASE_SITE_NAME=OpenCRVS Dashboards
       - OPENCRVS_METABASE_SITE_URL=http://metabase.{{hostname}}
+      - OPENCRVS_METABASE_MAP_NAME=Farajaland
+      - OPENCRVS_METABASE_MAP_URL=http://countryconfig:3040/content/farajaland-map.geojson
+      - OPENCRVS_METABASE_MAP_REGION_KEY=State
+      - OPENCRVS_METABASE_MAP_REGION_NAME=State
     deploy:
       labels:
         - 'traefik.enable=true'

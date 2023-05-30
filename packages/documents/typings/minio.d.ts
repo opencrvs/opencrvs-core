@@ -9,14 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { addons } from '@storybook/addons'
-import theme from './theme'
-import WebFont from 'webfontloader'
-
-WebFont.load({
-  google: {
-    families: ['Noto+Sans:600', 'Noto+Sans:400']
+type Request = {
+  headers: {
+    host: string
   }
-})
+  protocol: string
+  method: string
+  path: string
+}
 
-addons.setConfig({ theme })
+declare module 'minio/dist/main/signing' {
+  export function presignSignatureV4(
+    request: Request,
+    accessKey: string,
+    secretKey: string,
+    sessionToken?: string,
+    region: string,
+    requestDate: Date,
+    expires: number
+  ): string
+}
