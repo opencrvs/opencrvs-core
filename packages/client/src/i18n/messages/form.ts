@@ -1650,7 +1650,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.placeOfBirth'
   },
   nameInEnglishPreviewGroup: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     description: 'Label for child name in english',
     id: 'form.preview.group.label.english.name'
   },

@@ -241,6 +241,7 @@ const InformantNotification = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.informantNotifications)}
           />
         }
         navigation={<Navigation />}

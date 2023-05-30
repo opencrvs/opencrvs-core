@@ -242,7 +242,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     if (assignment) {
       unassignDeclaration(compositionId, client)
     } else {
-      deleteDeclaration(compositionId)
+      deleteDeclaration(compositionId, client)
     }
   }, [
     compositionId,
@@ -388,7 +388,8 @@ const mapDispatchToProps = (
     action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
-  deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
+  deleteDeclaration: (id: string, client: ApolloClient<any>) =>
+    dispatch(deleteDeclarationAction(id, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
       unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)
