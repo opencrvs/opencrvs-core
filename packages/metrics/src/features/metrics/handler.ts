@@ -138,6 +138,7 @@ export async function metricsDeleteMeasurementHandler(
     throw new Error(`Could not delete influx database ${INFLUX_DB}`)
   }
 }
+
 export async function deletePerformanceHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -146,9 +147,11 @@ export async function deletePerformanceHandler(
   try {
     const connectedClient = await client.connect()
     const db = connectedClient.db()
-    await db.collection('registrations').drop()
-    await db.collection('corrections').drop()
-    await db.collection('populationEstimatesPerDay').drop()
+    await Promise.all([
+      db.collection('registrations').drop(),
+      db.collection('corrections').drop(),
+      db.collection('populationEstimatesPerDay').drop()
+    ])
     const res = {
       status: `Successfully deleted all the collections from performance database`
     }
