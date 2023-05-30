@@ -23,6 +23,7 @@ export const marriageRegisterForms: ISerializedForm = {
     {
       id: MarriageSection.Registration,
       viewType: 'form',
+      hasDocumentSection: true,
       name: formMessageDescriptors.registrationName,
       title: formMessageDescriptors.registrationTitle,
       groups: [
@@ -585,7 +586,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'groomNameInEnglish',
               label: {
-                defaultMessage: "Groom's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for groom's name in english",
                 id: 'form.preview.group.label.groom.english.name'
               },
@@ -858,7 +859,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'brideNameInEnglish',
               label: {
-                defaultMessage: "Bride's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for bride's name in english",
                 id: 'form.preview.group.label.bride.english.name'
               },
@@ -967,19 +968,6 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'witness-view-group',
           fields: [
-            {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 1',
-                description: 'Witness 1 desc',
-                id: 'form.field.label.witness1'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validate: [],
-              conditionals: []
-            },
             {
               name: 'firstNamesEng',
               previewGroup: 'witnessOneNameInEnglish',
@@ -1110,7 +1098,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessOneNameInEnglish',
               label: {
-                defaultMessage: 'Witness One English name',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness one name in english',
                 id: 'form.preview.group.label.witness.one.english.name'
               },
@@ -1130,19 +1118,6 @@ export const marriageRegisterForms: ISerializedForm = {
         {
           id: 'witness-view-group',
           fields: [
-            {
-              name: 'seperator',
-              type: 'SUBSECTION',
-              label: {
-                defaultMessage: 'Witness 2',
-                description: 'Witness two desc',
-                id: 'form.field.label.witness2'
-              },
-              initialValue: '',
-              ignoreBottomMargin: true,
-              validate: [],
-              conditionals: []
-            },
             {
               name: 'firstNamesEng',
               previewGroup: 'witnessTwoNameInEnglish',
@@ -1267,7 +1242,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessTwoNameInEnglish',
               label: {
-                defaultMessage: 'Witness Tow English name',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness two name in english',
                 id: 'form.preview.group.label.witness.two.english.name'
               },

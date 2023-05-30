@@ -203,6 +203,7 @@ const InformantNotification = () => {
           {items.map((item: SmsNotification) => {
             return (
               <ListViewItemSimplified
+                key={`${item.name}_label`}
                 label={
                   <Label id={`${item.name}_label`}>
                     {intl.formatMessage(
@@ -242,6 +243,7 @@ const InformantNotification = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.informantNotifications)}
           />
         }
         navigation={<Navigation />}

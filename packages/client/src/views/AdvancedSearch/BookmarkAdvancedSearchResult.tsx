@@ -66,8 +66,8 @@ export function BookmarkAdvancedSearchResult() {
           }
         }}
         name={'Star'}
-        color={bookmark ? 'yellow' : 'blue'}
-        weight={bookmark ? 'fill' : 'regular'}
+        color={bookmark ? 'yellow' : 'primary'}
+        weight={bookmark ? 'fill' : 'bold'}
       />
 
       <BookmarkAdvancedSearchModal

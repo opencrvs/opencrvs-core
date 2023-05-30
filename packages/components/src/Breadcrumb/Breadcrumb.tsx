@@ -15,14 +15,19 @@ import { Stack } from '../Stack'
 import { Text } from '../Text'
 import styled from 'styled-components'
 
-const Container = styled.div`
-  ${({ theme }) => theme.fonts.reg14};
-`
-
 export interface IBreadCrumbData {
   paramId: string | null | undefined
   label: string | null
 }
+
+const BreadcrumbLink = styled(Link)`
+  &::after {
+    display: inline-block;
+    content: '/';
+    padding-left: 4px;
+    color: ${({ theme }) => theme.colors.copy};
+  }
+`
 
 export interface IBreadCrumbProps {
   items: IBreadCrumbData[]
@@ -35,39 +40,26 @@ export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
   }
 
   return (
-    <Container>
-      <Stack gap={4} direction="row" wrap>
-        {items.length > 0 &&
-          items.map((x, idx) => {
-            return (
-              <>
-                {idx > 0 && (
-                  <Text variant="bold14" element="span">
-                    /
-                  </Text>
-                )}
-                <div key={idx}>
-                  {!isLast(idx) ? (
-                    <Link
-                      color={'primary'}
-                      font={'bold14'}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (onSelect) onSelect(x)
-                      }}
-                    >
-                      {x?.label}
-                    </Link>
-                  ) : (
-                    <Text variant={'bold14'} element={'span'}>
-                      {x?.label}
-                    </Text>
-                  )}
-                </div>
-              </>
-            )
-          })}
-      </Stack>
-    </Container>
+    <Stack gap={4} direction="row" wrap>
+      {items.map((item, i) =>
+        !isLast(i) ? (
+          <BreadcrumbLink
+            key={item.label}
+            color={'primary'}
+            font={'bold14'}
+            onClick={(e) => {
+              e.preventDefault()
+              if (onSelect) onSelect(item)
+            }}
+          >
+            {item.label}
+          </BreadcrumbLink>
+        ) : (
+          <Text key={item.label} variant={'bold14'} element={'span'}>
+            {item.label}
+          </Text>
+        )
+      )}
+    </Stack>
   )
 }

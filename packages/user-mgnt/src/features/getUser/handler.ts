@@ -35,9 +35,11 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
+
   const user = await User.findOne(criteria).populate<{
     role: IUserRole
   }>('role')
+
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()

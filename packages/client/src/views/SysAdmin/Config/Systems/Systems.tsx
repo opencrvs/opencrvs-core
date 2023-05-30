@@ -44,10 +44,8 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
-
 import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -243,6 +241,7 @@ export function SystemList() {
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
           <Button
+            key="create-client-button"
             type="secondary"
             id="createClientButton"
             onClick={() => setShowModal(true)}
@@ -275,7 +274,13 @@ export function SystemList() {
                   <ToggleMenu
                     id="toggleMenu"
                     menuItems={getMenuItems(system)}
-                    toggleButton={<VerticalThreeDots />}
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
                   />
                 </>
               }
@@ -343,6 +348,7 @@ export function SystemList() {
         <ResponsiveModal
           actions={[
             <Link
+              key="cancel-link"
               onClick={() => {
                 toggleRevealKeyModal()
                 resetData()
@@ -435,6 +441,7 @@ export function SystemList() {
             ? []
             : [
                 <Link
+                  key="cancel"
                   onClick={() => {
                     toggleModal()
                     clearNewSystemDraft()
@@ -444,6 +451,7 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
+                  key="submit-client-form"
                   id="submitClientForm"
                   disabled={
                     !newSystemType ||

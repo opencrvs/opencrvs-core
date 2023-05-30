@@ -46,7 +46,9 @@ import {
   declarationUpdatedHandler,
   markEventRegisteredHandler,
   newEventRegistrationHandler,
-  markIssuedHandler
+  markIssuedHandler,
+  markedAsDuplicate,
+  markedAsNotDuplicate
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -72,7 +74,11 @@ import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
-import { refresh } from '@metrics/features/performance/viewRefresher'
+import {
+  performanceDataRefreshHandler,
+  refresh
+} from '@metrics/features/performance/viewRefresher'
+import { PRODUCTION, QA_ENV } from '@metrics/constants'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -95,7 +101,9 @@ function analyticsDataRefreshingRoute<T extends Array<any>, U>(
   // Do not use await for the refresh operation. This operation can take minutes or more.
   // Consider triggering this a task that will be left to be run in the background.
   return (...params: T) => {
-    refresh()
+    if (!PRODUCTION || QA_ENV) {
+      refresh()
+    }
     return handler(...params)
   }
 }
@@ -146,6 +154,22 @@ export const getRoutes = () => {
             event: Joi.string().valid(...Object.values(EventType))
           })
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/marked-as-duplicate',
+      handler: markedAsDuplicate,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/not-duplicate',
+      handler: markedAsNotDuplicate,
+      config: {
+        tags: ['api']
       }
     },
 
@@ -668,6 +692,15 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/vsExport',
       handler: vsExportHandler,
+      config: {
+        tags: ['api'],
+        auth: false
+      }
+    },
+    {
+      method: 'GET',
+      path: '/refreshPerformanceData',
+      handler: performanceDataRefreshHandler,
       config: {
         tags: ['api'],
         auth: false

@@ -9,21 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { create } from '@storybook/theming'
-import { getTheme } from '@opencrvs/components/lib/theme'
 
-export const BRAND_BLUE =
-  '#0058E0' /* Also see `main.js`, if you're going to change this */
+import { signFileUrl } from '@documents/minio/sign'
+import * as Hapi from '@hapi/hapi'
 
-const theme = getTheme()
-
-export default create({
-  base: 'light',
-  colorPrimary: BRAND_BLUE,
-  colorSecondary: BRAND_BLUE,
-  brandTitle: 'OpenUi-Kit',
-  brandUrl: '/',
-  brandImage: 'logo.png',
-  brandTarget: '_self',
-  fontBase: theme.fontFamily
-})
+export function createPreSignedUrl(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as { fileName: string }
+  try {
+    const presignedURL = signFileUrl(payload.fileName)
+    return h.response({ presignedURL }).code(200)
+  } catch (error) {
+    return h.response(error).code(400)
+  }
+}

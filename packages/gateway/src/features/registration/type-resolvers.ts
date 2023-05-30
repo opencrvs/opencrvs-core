@@ -18,7 +18,8 @@ import {
   ITimeLoggedResponse,
   getCertificatesFromTask,
   getActionFromTask,
-  fetchTaskByCompositionIdFromHearth
+  fetchTaskByCompositionIdFromHearth,
+  fetchDocuments
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -72,20 +73,27 @@ import {
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { MINIO_BUCKET, USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { getSystem, getUser } from '@gateway/features/user/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
     __resolveType(obj) {
-      if (obj.type.coding[0].code === 'birth-declaration') {
+      if (
+        obj.type.coding[0].code === 'birth-declaration' ||
+        obj.type.coding[0].code === 'birth-notification'
+      ) {
         return 'BirthRegistration'
-      } else if (obj.type.coding[0].code === 'death-declaration') {
+      } else if (
+        obj.type.coding[0].code === 'death-declaration' ||
+        obj.type.coding[0].code === 'death-notification'
+      ) {
         return 'DeathRegistration'
       } else {
         return 'MarriageRegistration'
@@ -450,35 +458,85 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
-    informantsSignature: (task) => {
+    informantsSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        return await getPresignedUrlFromUri(contact, authHeader)
+      }
+      return null
+    },
+    informantsSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    groomSignature: (task) => {
+    groomSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        return await getPresignedUrlFromUri(contact, authHeader)
+      }
+      return null
+    },
+    groomSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    brideSignature: (task) => {
+    brideSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        return await getPresignedUrlFromUri(contact, authHeader)
+      }
+      return null
+    },
+    brideSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    witnessOneSignature: (task) => {
+    witnessOneSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        return await getPresignedUrlFromUri(contact, authHeader)
+      }
+      return null
+    },
+    witnessOneSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
         task.extension
       )
       return (contact && contact.valueString) || null
     },
-    witnessTwoSignature: (task) => {
+    witnessTwoSignature: async (task, _, { headers: authHeader }) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
+        task.extension
+      )
+      if (contact && contact.valueString) {
+        return await getPresignedUrlFromUri(contact, authHeader)
+      }
+      return null
+    },
+    witnessTwoSignatureURI: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
         task.extension
@@ -726,7 +784,20 @@ export const typeResolvers: GQLResolver = {
     id(docRef: fhir.DocumentReference) {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
-    data(docRef: fhir.DocumentReference) {
+    async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
+      const fileName = docRef.content[0].attachment.data?.replace(
+        `/${MINIO_BUCKET}/`,
+        ''
+      )
+      const response = (await fetchDocuments(
+        '/presigned-url',
+        authHeader,
+        'POST',
+        JSON.stringify({ fileName: fileName })
+      )) as { presignedURL: string }
+      return response.presignedURL
+    },
+    uri(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
     },
     contentType(docRef: fhir.DocumentReference) {
@@ -811,7 +882,7 @@ export const typeResolvers: GQLResolver = {
     latitude: (location) => location.position.latitude,
     alias: (location) => location.alias,
     description: (location) => location.description,
-    partOf: (location) => location.partOf,
+    partOf: (location) => location.partOf.reference,
     type: (location: fhir.Location) => {
       return (
         (location.type &&

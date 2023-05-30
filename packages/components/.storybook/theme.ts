@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { model, Schema, Document } from 'mongoose'
+import { create } from '@storybook/theming'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
-export interface IUsernameRecord {
-  username: string
-  count: number
-}
+export const BRAND_BLUE =
+  '#0058E0' /* Also see `manager-head.html`, if you're going to change this */
 
-export interface IUsernameRecordModel extends IUsernameRecord, Document {}
+const theme = getTheme()
 
-const usernameRecordSchema = new Schema({
-  username: { type: String, required: true },
-  count: { type: Number, default: 0 }
+export default create({
+  base: 'light',
+  colorPrimary: BRAND_BLUE,
+  colorSecondary: BRAND_BLUE,
+  brandTitle: 'OpenUi-Kit',
+  brandUrl: '/',
+  brandImage: 'logo.png',
+  brandTarget: '_self',
+  fontBase: theme.fontFamily
 })
-
-export default model<IUsernameRecordModel>(
-  'UsernameRecord',
-  usernameRecordSchema
-)
