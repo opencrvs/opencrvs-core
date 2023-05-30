@@ -18,12 +18,14 @@ import {
   ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
+  DECLARED_STATUS,
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
   ICompositionBody,
   IDeathCompositionBody,
+  IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
   REGISTERED_STATUS,
@@ -159,11 +161,8 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (
-    body.type !== 'IN_PROGRESS' &&
-    body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED'
-  ) {
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }

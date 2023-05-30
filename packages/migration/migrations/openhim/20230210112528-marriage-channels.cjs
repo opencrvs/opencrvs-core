@@ -262,7 +262,7 @@ const marriageReinstateChannel = {
       primary: false
     }
   ],
-  name: 'Marriage Archive',
+  name: 'Marriage Reinstate',
   urlPattern: '^/events/marriage/mark-reinstated$'
 }
 

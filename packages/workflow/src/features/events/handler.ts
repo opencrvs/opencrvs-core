@@ -40,7 +40,11 @@ import {
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
-import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
+import {
+  getToken,
+  hasRegisterScope,
+  hasValidateScope
+} from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -54,7 +58,10 @@ import {
   MARKED_AS_DUPLICATE,
   VERIFIED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
-import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import {
+  invokeRegistrationValidation,
+  setupSystemIdentifier
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
 
 function detectEvent(request: Hapi.Request): Events {
@@ -189,32 +196,49 @@ export async function fhirWorkflowEventHandler(
   }
 
   let response
+  let validationResponse
 
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
     case Events.DEATH_IN_PROGRESS_DEC:
-    case Events.MARRIAGE_IN_PROGRESS_DEC:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_IN_PROGRESS_DEC: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_NEW_DEC:
     case Events.DEATH_NEW_DEC:
-    case Events.MARRIAGE_NEW_DEC:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_NEW_DEC: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
-    case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION: {
+      const { resBundle } = await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
       break
+    }
     case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
+    case Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION: {
+      const { resBundle, payloadForInvokingValidation } =
+        await markEventAsWaitingValidationHandler(request, h, event)
+      response = resBundle
+      validationResponse = await invokeRegistrationValidation(
+        payloadForInvokingValidation,
+        request.headers,
+        getToken(request)
+      )
+      if (!validationResponse.regValidationError) {
+        await triggerEvent(event, request.payload, request.headers)
+      }
       break
+    }
     case Events.BIRTH_REQUEST_CORRECTION:
     case Events.DEATH_REQUEST_CORRECTION:
     case Events.MARRIAGE_REQUEST_CORRECTION:
@@ -223,10 +247,20 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-    case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION: {
+      const { resBundle, payloadForInvokingValidation } =
+        await createRegistrationHandler(request, h, event)
+      response = resBundle
       await triggerEvent(event, request.payload, request.headers)
+      // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
+      // validate registration with resource service and set resulting registration number
+      await invokeRegistrationValidation(
+        payloadForInvokingValidation,
+        request.headers,
+        getToken(request)
+      )
       break
+    }
     case Events.BIRTH_MARK_REINSTATED:
     case Events.DEATH_MARK_REINSTATED:
     case Events.MARRIAGE_MARK_REINSTATED:
@@ -243,7 +277,14 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_REG:
     case Events.MARRIAGE_MARK_REG:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
+      validationResponse = await invokeRegistrationValidation(
+        response.payloadForInvokingValidation,
+        request.headers,
+        getToken(request)
+      )
+      if (!validationResponse.regValidationError) {
+        await triggerEvent(event, request.payload, request.headers)
+      }
       break
 
     case Events.BIRTH_MARK_CERT:

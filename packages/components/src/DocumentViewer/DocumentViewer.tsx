@@ -13,6 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from '../Select'
 import { DocumentImage } from './components/DocumentImage'
+import { isEqual } from 'lodash'
 
 const Container = styled.div`
   position: relative;
@@ -75,6 +76,21 @@ export class DocumentViewer extends React.Component<IProps, IState> {
         typeof this.props.options.documentOptions[0] !== 'undefined'
           ? this.props.options.documentOptions[0].value
           : ''
+    }
+  }
+
+  componentDidUpdate(prevProps: IProps) {
+    if (!isEqual(prevProps.options, this.props.options)) {
+      this.setState({
+        selectedOption:
+          typeof this.props.options.selectOptions[0] !== 'undefined'
+            ? this.props.options.selectOptions[0].value
+            : '',
+        selectedDocument:
+          typeof this.props.options.documentOptions[0] !== 'undefined'
+            ? this.props.options.documentOptions[0].value
+            : ''
+      })
     }
   }
 

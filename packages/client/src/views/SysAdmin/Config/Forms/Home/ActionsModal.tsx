@@ -183,7 +183,7 @@ export function ActionsModal() {
         <TertiaryButton id="cancel-btn" key="cancel" onClick={closeModal}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <ActionButton />
+        <ActionButton key="action-button" />
       ]}
     >
       {intl.formatMessage(actionsModalDescriptionMessages[action])}

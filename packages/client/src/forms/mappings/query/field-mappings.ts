@@ -285,12 +285,24 @@ export const sameAddressFieldTransformer =
       (queryData[fromSection].address as [GQLAddress]).find(
         (addr) => addr.type === fromAddressType
       )
-    const toAddress =
-      queryData[toSection] &&
-      queryData[toSection].address &&
-      (queryData[toSection].address as [GQLAddress]).find(
-        (addr) => addr.type === toAddressType
-      )
+    let toAddress
+    if (toSection === 'informant') {
+      // informant's address is stored inside individual for death
+      // declarations and toSection will be informant for death declarations
+      toAddress =
+        queryData[toSection].individual &&
+        queryData[toSection].individual.address &&
+        (queryData[toSection].individual.address as [GQLAddress]).find(
+          (addr) => addr.type === toAddressType
+        )
+    } else {
+      toAddress =
+        queryData[toSection] &&
+        queryData[toSection].address &&
+        (queryData[toSection].address as [GQLAddress]).find(
+          (addr) => addr.type === toAddressType
+        )
+    }
     if (!fromAddress || !toAddress) {
       transformedData[sectionId][field.name] = false
       return transformedData
@@ -385,6 +397,7 @@ export function attachmentToFieldTransformer(
         if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
           attachments.push({
             data: attachment.data,
+            uri: attachment.uri,
             type: attachment.contentType,
             optionValues: [subject, type],
             title: subject,

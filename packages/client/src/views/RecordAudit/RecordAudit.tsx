@@ -18,8 +18,6 @@ import {
 } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
 import {
-  RotateLeft,
-  Archive,
   DeclarationIcon,
   Edit,
   BackArrow,
@@ -347,11 +345,11 @@ function RecordAuditBody({
     declaration.type !== Event.Marriage &&
     userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
-      declaration.status === SUBMISSION_STATUS.CERTIFIED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
   ) {
     actions.push(
       <StyledTertiaryButton
+        key="btn-correct-record"
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -567,7 +565,7 @@ function RecordAuditBody({
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
-      <BackButtonDiv>
+      <BackButtonDiv key="go-back">
         <BackButton onClick={() => goBack()}>
           <BackArrow />
         </BackButton>
@@ -783,7 +781,9 @@ const BodyContent = ({
       ''
 
     let declaration =
-      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+      draft &&
+      (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+        draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
             assignment: workqueueDeclaration?.registration?.assignment

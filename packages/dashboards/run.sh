@@ -55,6 +55,26 @@ if [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
   exit 1
 fi
 
+if [ -z "${OPENCRVS_METABASE_MAP_NAME}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_NAME environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_URL}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_URL environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_REGION_KEY}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_REGION_KEY environment variable is not defined"
+  exit 1
+fi
+
+if [ -z "${OPENCRVS_METABASE_MAP_REGION_NAME}" ]; then
+  echo "Error: OPENCRVS_METABASE_MAP_REGION_NAME environment variable is not defined"
+  exit 1
+fi
+
 export MB_JETTY_PORT=${MB_JETTY_PORT:-4444}
 export MB_DB_FILE=/data/metabase/metabase.mv.db
 

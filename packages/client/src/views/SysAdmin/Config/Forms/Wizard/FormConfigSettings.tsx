@@ -131,7 +131,7 @@ function FormConfigSettingsComponent() {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.DATE_OF_BIRTH_UNKNOWN]: dateOfBirthUnknown
               }
-            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            : modalName === ConfigActionType.INFORMANT_SIGNATURE
             ? {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.INFORMANT_SIGNATURE_REQUIRED]:
@@ -156,7 +156,7 @@ function FormConfigSettingsComponent() {
               })
             : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
             ? intl.formatMessage(messages.dateOfBirthUnknownSuccessNotification)
-            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            : modalName === ConfigActionType.INFORMANT_SIGNATURE
             ? intl.formatMessage(messages.informantSignatureSuccessNotification)
             : intl.formatMessage(messages.noOfAddressesSuccessNotification)
         )
@@ -185,6 +185,19 @@ function FormConfigSettingsComponent() {
   }
 
   const toggleConfigModal = () => {
+    setNumberOfAddresses(offlineCountryConfiguration.config.ADDRESSES)
+    setIntroductionPage(
+      offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION
+    )
+    setDateOfBirthUnknown(
+      offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
+    )
+    setInformantSignature(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+    )
+    setRequiredForRegistration(
+      offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
+    )
     setShowModal(!showModal)
   }
 
@@ -199,14 +212,16 @@ function FormConfigSettingsComponent() {
           <ListViewItemSimplified
             label={intl.formatMessage(messages.introductionSettings)}
             value={[
-              <span id="Introduction-page_value">
-                {introductionPage
+              <span key="Introduction-page_value" id="Introduction-page_value">
+                {offlineCountryConfiguration.config
+                  .HIDE_EVENT_REGISTER_INFORMATION
                   ? intl.formatMessage(messages.disable)
                   : intl.formatMessage(messages.enable)}
               </span>
             ]}
             actions={[
               <Link
+                key="introduction-page-settings"
                 id={'introductionPageSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION)
@@ -219,9 +234,14 @@ function FormConfigSettingsComponent() {
           />
           <ListViewItemSimplified
             label={intl.formatMessage(messages.addressesSettings)}
-            value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
+            value={
+              <span id="numberOfAddresses">
+                {offlineCountryConfiguration.config.ADDRESSES}
+              </span>
+            }
             actions={[
               <Link
+                key="addresses-settings"
                 id={'addressesSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.ADDRESSES)
@@ -236,13 +256,14 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.exactDateOfBirthUnknownSettings)}
             value={
               <span id="exactDateOfBirthUnknown">
-                {dateOfBirthUnknown
+                {offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
                   ? intl.formatMessage(messages.enable)
                   : intl.formatMessage(messages.disable)}
               </span>
             }
             actions={[
               <Link
+                key="exact-date-of-birth-unknown-settings"
                 id={'exactDateOfBirthUnknownSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.DATE_OF_BIRTH_UNKNOWN)
@@ -257,15 +278,17 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.informantSignatureSettings)}
             value={
               <span id="informantSignature">
-                {!informantSignature
+                {!offlineCountryConfiguration.config.INFORMANT_SIGNATURE
                   ? intl.formatMessage(messages.disable)
-                  : requiredForRegistration
+                  : offlineCountryConfiguration.config
+                      .INFORMANT_SIGNATURE_REQUIRED
                   ? intl.formatMessage(messages.enableAndRequired)
                   : intl.formatMessage(messages.enable)}
               </span>
             }
             actions={[
               <Link
+                key="informant-signature-settings"
                 id={'informantSignatureSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.INFORMANT_SIGNATURE)
