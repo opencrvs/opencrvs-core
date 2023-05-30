@@ -9,19 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { List, IListProps } from '../List'
-
-export default {
-  title: 'Typography/Number list',
-  component: List
-} as Meta
-
-const Template: Story<IListProps> = (args) => <List {...args} />
-
-export const ListView = Template.bind({})
-ListView.args = {
-  id: 'ListView',
-  list: ['Item1', 'Item2', 'Item3']
-}
+export * from './NumberedList'
