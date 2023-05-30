@@ -164,9 +164,9 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT'
       })
@@ -213,9 +213,9 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 11873,
-        femaleEstimation: 5937,
-        maleEstimation: 5937,
+        totalEstimation: 12386,
+        femaleEstimation: 4653,
+        maleEstimation: 4642,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT'
       })
@@ -231,9 +231,9 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT'
       })
@@ -322,9 +322,9 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT'
       })

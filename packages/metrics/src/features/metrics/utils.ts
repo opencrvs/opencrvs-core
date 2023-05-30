@@ -154,7 +154,7 @@ export const fetchEstimateByLocation = async (
         const year = yearArray[i].toString()
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += entry[year]
+          sum += Number(entry[year])
         }
         count++
       }
@@ -174,7 +174,7 @@ export const fetchEstimateByLocation = async (
         const year = yearArray[i].toString()
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += entry[year]
+          sum += Number(entry[year])
         }
         count++
       }
@@ -197,7 +197,7 @@ export const fetchEstimateByLocation = async (
           obj.hasOwnProperty(year)
         )
         if (entry) {
-          sum += entry[year]
+          sum += Number(entry[year])
         }
         count++
       }
@@ -220,7 +220,7 @@ export const fetchEstimateByLocation = async (
           obj.hasOwnProperty(year)
         )
         if (entry) {
-          sum += entry[year]
+          sum += Number(entry[year])
         }
         count++
       }

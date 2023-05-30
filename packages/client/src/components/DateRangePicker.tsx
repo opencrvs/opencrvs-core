@@ -643,7 +643,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: endOfToday(date)
+              endDate: endOfToday()
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
@@ -733,7 +733,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate,
-                    endDate: endOfToday(endDate)
+                    endDate: endOfToday()
                   })
                   setModalVisible(false)
                   props.closeModalFromHOC && props.closeModalFromHOC()
