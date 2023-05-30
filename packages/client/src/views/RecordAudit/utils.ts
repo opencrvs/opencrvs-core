@@ -97,6 +97,18 @@ export const getFieldValue = (
   intl: IntlShape
 ) => {
   let original = value
+  // HOTFIX: The name of the fieldObject that is being received
+  // here is internationalStatePrimary rather than statePrimary
+  // same for districts as well as the secondary address fields
+  if (
+    fieldObj.name.toLowerCase().includes('state') ||
+    fieldObj.name.toLowerCase().includes('district')
+  ) {
+    if (value && offlineData.locations?.[value]) {
+      return offlineData.locations[value].name
+    }
+  }
+
   if (has(fieldObj, 'dynamicOptions')) {
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)
@@ -173,6 +185,14 @@ export const getLocation = (
     state = declaration.data?.marriageEvent?.state?.toString() || EMPTY_STRING
     country =
       declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      EMPTY_STRING
 
     if (country && country !== window.config.COUNTRY) {
       let location = EMPTY_STRING
