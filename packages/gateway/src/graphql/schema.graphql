@@ -152,6 +152,12 @@ type Query {
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
   informantSMSNotifications: [SMSNotification!]
+  getOIDPUserInfo(
+    code: String!
+    clientId: String!
+    redirectUri: String!
+    grantType: String
+  ): UserInfo
 }
 
 type Mutation {
@@ -661,7 +667,8 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  settings: [WebhookPermission!]
+  integratingSystemType: IntegratingSystemType
+  settings: SystemSettings
 }
 
 type FormDataset {
@@ -678,6 +685,13 @@ type SMSNotification {
   enabled: Boolean!
   updatedAt: String!
   createdAt: String!
+}
+
+type UserInfo {
+  oidpUserInfo: OIDPUserInfo
+  districtFhirId: String
+  stateFhirId: String
+  locationLevel3FhirId: String
 }
 
 input NotificationInput {
@@ -874,7 +888,8 @@ type SystemSecret {
 input SystemInput {
   name: String!
   type: SystemType!
-  settings: SystemSettings
+  settings: SystemSettingsInput
+  integratingSystemType: IntegratingSystemType
 }
 
 input UpdatePermissionsInput {
@@ -1043,6 +1058,7 @@ type IdentityType {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 type HumanName {
@@ -1289,14 +1305,46 @@ enum SystemType {
   WEBHOOK
 }
 
-type WebhookPermission {
-  event: String!
-  permissions: [String!]!
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
+}
+
+type SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookPermission!]
+  openIdProviderClientId: String
+  openIdProviderBaseUrl: String
+  openIdProviderClaims: String
 }
 
 type FormDatasetOption {
   value: String!
   label: [FormDatasetOptionLabel]
+}
+
+type OIDPUserInfo {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  middle_name: String
+  nickname: String
+  preferred_username: String
+  profile: String
+  picture: String
+  website: String
+  email: String
+  email_verified: Boolean
+  gender: String
+  birthdate: String
+  zoneinfo: String
+  locale: String
+  phone_number: String
+  phone_number_verified: Boolean
+  address: OIDPUserAddress
+  updated_at: Int
 }
 
 input PersonInput {
@@ -1513,7 +1561,7 @@ input QuestionInput {
   options: [CustomSelectOption!]
 }
 
-input SystemSettings {
+input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
 }
@@ -1615,7 +1663,7 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UINTOKEN
+  MOSIP_PSUT_TOKEN_ID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
@@ -1863,15 +1911,31 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
 type FormDatasetOptionLabel {
   lang: String!
   descriptor: MesssageDescriptor!
+}
+
+type OIDPUserAddress {
+  formatted: String
+  street_address: String
+  locality: String
+  region: String
+  postal_code: String
+  city: String
+  country: String
 }
 
 input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input ContactPointInput {

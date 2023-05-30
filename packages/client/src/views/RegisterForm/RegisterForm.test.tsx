@@ -55,18 +55,22 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
 import { vi } from 'vitest'
+import { createClient } from '@client/utils/apolloClient'
+import { ApolloClient } from '@apollo/client'
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
 
   let store: AppStore
   let history: History
+  let client: ApolloClient<{}>
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
+      client = createClient(store)
 
       const draft = createDeclaration(Event.Birth)
       store.dispatch(storeDeclaration(draft))
@@ -95,7 +99,7 @@ describe('when user is in the register form for birth event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        { store, history, apolloClient: client }
       )
       component = testComponent
     })
