@@ -95,7 +95,7 @@ export const Default = () => (
         {
           label: 'Allow ages in years',
           labelDescription:
-            'Informant can provide an age in years if the exact date of birth is unknownn',
+            'Informant can provide an age in years if the exact date of birth is unknown',
           value: '\u00A0',
           actions: [ToggleOption]
         },
@@ -108,7 +108,7 @@ export const Default = () => (
         },
         {
           label: 'January 2023',
-          value: '2023-Month-Farajaland-Birth-Statisitcs.csv',
+          value: '2023-Month-Farajaland-Birth-Statistics.csv',
           actions: [EditButton]
         }
       ]}
