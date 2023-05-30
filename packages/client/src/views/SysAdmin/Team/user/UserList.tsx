@@ -234,15 +234,15 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
-  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+  const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
+  const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
-  const [showResendSMSError, setShowResendSMSError] = useState(false)
-  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+  const [showResendInviteError, setShowResendInviteError] = useState(false)
+  const [showUsernameReminderError, setShowUsernameReminderError] =
     useState(false)
-  const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
+  const [showResetPasswordSuccess, setShowResetPasswordSuccess] =
     useState(false)
-  const [showResetPasswordSMSError, setResetPasswordSMSError] = useState(false)
+  const [showResetPasswordError, setResetPasswordError] = useState(false)
   const {
     intl,
     userDetails,
@@ -342,39 +342,39 @@ function UserListComponent(props: IProps) {
     [toggleResetPassword]
   )
 
-  const resendSMS = useCallback(
-    async function resendSMS(userId: string) {
+  const resendInvite = useCallback(
+    async function resendInvite(userId: string) {
       try {
-        const res = await userMutations.resendSMSInvite(userId, [
+        const res = await userMutations.resendInvite(userId, [
           {
             query: SEARCH_USERS,
             variables: { primaryOfficeId: locationId, count: recordCount }
           }
         ])
-        if (res && res.data && res.data.resendSMSInvite) {
-          setShowResendSMSSuccess(true)
+        if (res && res.data && res.data.resendInvite) {
+          setShowResendInviteSuccess(true)
         }
       } catch (err) {
-        setShowResendSMSError(true)
+        setShowResendInviteError(true)
       }
     },
     [locationId, recordCount]
   )
 
-  const usernameSMSReminder = useCallback(
-    async function usernameSMSReminder(userId: string) {
+  const usernameReminder = useCallback(
+    async function usernameReminder(userId: string) {
       try {
-        const res = await userMutations.usernameSMSReminderSend(userId, [
+        const res = await userMutations.usernameReminderSend(userId, [
           {
             query: SEARCH_USERS,
             variables: { primaryOfficeId: locationId, count: recordCount }
           }
         ])
-        if (res && res.data && res.data.usernameSMSReminder) {
-          setShowUsernameSMSReminderSuccess(true)
+        if (res && res.data && res.data.usernameReminder) {
+          setShowUsernameReminderSuccess(true)
         }
       } catch (err) {
-        setShowUsernameSMSReminderError(true)
+        setShowUsernameReminderError(true)
       }
     },
     [locationId, recordCount]
@@ -383,24 +383,20 @@ function UserListComponent(props: IProps) {
   const resetPassword = useCallback(
     async function resetPassword(userId: string) {
       try {
-        const res = await userMutations.sendResetPasswordSMS(
-          userId,
-          offlineCountryConfig.config.APPLICATION_NAME,
-          [
-            {
-              query: SEARCH_USERS,
-              variables: { primaryOfficeId: locationId, count: recordCount }
-            }
-          ]
-        )
-        if (res && res.data && res.data.resetPasswordSMS) {
-          setShowResetPasswordSMSSuccess(true)
+        const res = await userMutations.sendResetPasswordInvite(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.resetPasswordInvite) {
+          setShowResetPasswordSuccess(true)
         }
       } catch (err) {
-        setResetPasswordSMSError(true)
+        setResetPasswordError(true)
       }
     },
-    [recordCount, locationId, offlineCountryConfig.config.APPLICATION_NAME]
+    [recordCount, locationId]
   )
 
   const getMenuItems = useCallback(
@@ -435,7 +431,7 @@ function UserListComponent(props: IProps) {
         menuItems.push({
           label: intl.formatMessage(messages.resendSMS),
           handler: () => {
-            resendSMS(user.id as string)
+            resendInvite(user.id as string)
           }
         })
       }
@@ -459,7 +455,7 @@ function UserListComponent(props: IProps) {
     [
       goToReviewUserDetails,
       intl,
-      resendSMS,
+      resendInvite,
       toggleUserActivationModal,
       toggleUsernameReminderModal,
       toggleUserResetPasswordModal
@@ -740,9 +736,7 @@ function UserListComponent(props: IProps) {
                   key="username-reminder-send"
                   onClick={() => {
                     if (toggleUsernameReminder.selectedUser?.id) {
-                      usernameSMSReminder(
-                        toggleUsernameReminder.selectedUser.id
-                      )
+                      usernameReminder(toggleUsernameReminder.selectedUser.id)
                     }
                     toggleUsernameReminderModal()
                   }}
@@ -808,7 +802,7 @@ function UserListComponent(props: IProps) {
       toggleUsernameReminder.modalVisible,
       toggleUsernameReminder.selectedUser,
       toggleUsernameReminderModal,
-      usernameSMSReminder,
+      usernameReminder,
       resetPassword,
       toggleResetPassword.modalVisible,
       toggleResetPassword.selectedUser,
@@ -903,52 +897,52 @@ function UserListComponent(props: IProps) {
         </Content>
       )}
 
-      {showResendSMSSuccess && (
+      {showResendInviteSuccess && (
         <Toast
           id="resend_invite_success"
           type="success"
-          onClose={() => setShowResendSMSSuccess(false)}
+          onClose={() => setShowResendInviteSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
         </Toast>
       )}
-      {showResendSMSError && (
+      {showResendInviteError && (
         <Toast
           id="resend_invite_error"
           type="warning"
-          onClose={() => setShowResendSMSError(false)}
+          onClose={() => setShowResendInviteError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
         </Toast>
       )}
 
-      {showUsernameSMSReminderSuccess && (
+      {showUsernameReminderSuccess && (
         <Toast
           id="username_reminder_success"
           type="success"
-          onClose={() => setShowUsernameSMSReminderSuccess(false)}
+          onClose={() => setShowUsernameReminderSuccess(false)}
         >
           {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
             name: getUserName(toggleUsernameReminder.selectedUser as User)
           })}
         </Toast>
       )}
-      {showUsernameSMSReminderError && (
+      {showUsernameReminderError && (
         <Toast
           id="username_reminder_error"
           type="warning"
-          onClose={() => setShowUsernameSMSReminderError(false)}
+          onClose={() => setShowUsernameReminderError(false)}
         >
           {intl.formatMessage(messages.sendUsernameReminderSMSError)}
         </Toast>
       )}
 
-      {showResetPasswordSMSSuccess && (
+      {showResetPasswordSuccess && (
         <Toast
           id="reset_password_success"
           type="success"
           onClose={() => {
-            setShowResetPasswordSMSSuccess(false)
+            setShowResetPasswordSuccess(false)
             setToggleResetPassword({
               ...toggleResetPassword,
               selectedUser: null
@@ -960,11 +954,11 @@ function UserListComponent(props: IProps) {
           })}
         </Toast>
       )}
-      {showResetPasswordSMSError && (
+      {showResetPasswordError && (
         <Toast
           id="reset_password_error"
           type="warning"
-          onClose={() => setResetPasswordSMSError(false)}
+          onClose={() => setResetPasswordError(false)}
         >
           {intl.formatMessage(messages.resetPasswordSMSError)}
         </Toast>

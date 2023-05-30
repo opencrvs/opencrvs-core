@@ -22,7 +22,7 @@ interface IResendUsernameSMSPayload {
   userId: string
 }
 
-export default async function usernameSMSReminderHandler(
+export default async function usernameReminderHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -36,6 +36,7 @@ export default async function usernameSMSReminderHandler(
 
   await sendUserName(
     user.username,
+    user.name,
     {
       Authorization: request.headers.authorization
     },

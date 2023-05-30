@@ -39,6 +39,9 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false
 
+export const USER_NOTIFICATION_DELIVERY_METHOD =
+  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
+
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
@@ -68,6 +71,3 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   : 600
 export const DEFAULT_TIMEOUT = 600000
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
-
-export const USER_NOTIFICATION_DELIVERY_METHOD =
-  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'

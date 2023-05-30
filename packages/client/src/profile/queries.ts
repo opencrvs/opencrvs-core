@@ -27,6 +27,7 @@ export const FETCH_USER = gql`
       username
       practitionerId
       mobile
+      email
       systemRole
       role {
         _id
