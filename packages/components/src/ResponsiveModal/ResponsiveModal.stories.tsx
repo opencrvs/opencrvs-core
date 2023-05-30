@@ -48,14 +48,14 @@ ResponsiveModalView.args = {
 }
 
 export default {
-  title: 'Depreciated/Dialog',
+  title: 'Deprecated/ResponsiveModal',
   component: ResponsiveModal,
   parameters: {
     docs: {
       description: {
-        component: `
-\`<Dialog>\` is a modal component which requests an action from a user.
-`
+        component: `<b>Note! Deprecated in favor of Dialog component.</b>
+
+\`<ResponsiveModal>\` is a modal component which requests an action from a user.`
       }
     }
   }

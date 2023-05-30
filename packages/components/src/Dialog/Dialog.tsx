@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Text } from '../Text'
@@ -97,32 +108,38 @@ export function Dialog({
   const [hasOverflow, setHasOverflow] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
   const hasActions = actions && actions.length > 0
-  
-  const handleClickOutside = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
+
+  const handleClickOutside = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (
+      dialogRef.current &&
+      !dialogRef.current.contains(event.target as Node)
+    ) {
       handleClose()
     }
   }
 
   useEffect(() => {
-    if (contentRef.current) {
-      const hasOverflow =
-        contentRef.current.scrollHeight > contentRef.current.clientHeight
-      setHasOverflow(hasOverflow)
+    const contentReference = contentRef.current
 
-      const handleScroll = () => {
-        if (contentRef.current) {
-          setHasScrolled(contentRef.current.scrollTop > 0)
-        }
-      }
+    const hasOverflow =
+      contentReference &&
+      contentReference?.scrollHeight > contentReference?.clientHeight
 
-      contentRef.current.addEventListener('scroll', handleScroll)
+    setHasOverflow(hasOverflow ?? false)
 
-      return () => {
-        contentRef.current?.removeEventListener('scroll', handleScroll)
+    const handleScroll = () => {
+      if (contentReference) {
+        setHasScrolled(contentReference.scrollTop > 0)
       }
     }
-    return undefined
+
+    contentReference?.addEventListener('scroll', handleScroll)
+
+    return () => {
+      contentReference?.removeEventListener('scroll', handleScroll)
+    }
   }, [contentRef, isOpen])
 
   const headerHasBorder = hasOverflow && hasScrolled
