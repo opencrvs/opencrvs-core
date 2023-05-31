@@ -136,7 +136,6 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.marriage),
       dateOfMarriage: declaration?.dateOfMarriage,
-      placeOfMarriage: declaration?.placeOfMarriage,
       informant: removeUnderscore(informant)
     }
   }

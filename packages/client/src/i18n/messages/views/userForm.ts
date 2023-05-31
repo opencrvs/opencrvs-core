@@ -106,6 +106,11 @@ export const messages = {
     description: 'User device',
     id: 'form.field.label.userDevice'
   },
+  userOrganisationType: {
+    defaultMessage: 'Organisation type',
+    description: 'User organisation type',
+    id: 'form.field.label.userOrganisationType'
+  },
   userOrganisation: {
     defaultMessage: 'Organisation',
     description: 'User organisation',
@@ -146,5 +151,9 @@ export const messages = {
     defaultMessage: 'Title',
     description: 'The title of this user',
     id: 'constants.title'
+  },
+  facilityTypeHealthFacility: {
+    id: 'facilityType.HEALTH_FACILITY',
+    defaultMessage: 'Hospital'
   }
 }

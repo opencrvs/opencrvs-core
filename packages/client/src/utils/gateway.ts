@@ -2069,6 +2069,7 @@ export type QuestionInput = {
   helperText?: InputMaybe<Array<MesssageInput>>
   hideHeader?: InputMaybe<Scalars['Boolean']>
   hideInPreview?: InputMaybe<Scalars['Boolean']>
+  ignoreBottomMargin?: InputMaybe<Scalars['Boolean']>
   initialValue?: InputMaybe<Scalars['String']>
   inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>

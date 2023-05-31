@@ -125,6 +125,7 @@ export function questionsTransformer(
       conditionals,
       datasetId,
       options,
+      ignoreBottomMargin,
       optionCondition,
       validator,
       extraValue,
@@ -151,6 +152,7 @@ export function questionsTransformer(
           fieldType,
           initialValue,
           precedingFieldId,
+          ignoreBottomMargin,
           required,
           custom,
           conditionals,
@@ -176,6 +178,7 @@ export function questionsTransformer(
         conditionals: conditionals || undefined,
         hideInPreview: hideInPreview ?? false,
         optionCondition: optionCondition || undefined,
+        ignoreBottomMargin: ignoreBottomMargin ?? false,
         hideHeader: hideHeader ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
