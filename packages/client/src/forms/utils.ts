@@ -959,3 +959,12 @@ export const conditionals: IConditionals = {
     expression: 'draftData.formValues.action !== "REACTIVATE"'
   }
 }
+
+export function renderSelectOrRadioLabel(
+  value: IFormFieldValue,
+  options: Array<ISelectOption | IRadioOption>,
+  intl: IntlShape
+) {
+  const option = options.find((option) => option.value === value)
+  return option ? intl.formatMessage(option.label) : value
+}
