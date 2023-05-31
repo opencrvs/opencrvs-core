@@ -808,7 +808,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 0, 0)
+                  const date = new Date(row.cbr.year, 0, 1)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
@@ -817,7 +817,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                   }
                   const totalDays = daysInYear(year)
                   return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
+                    if(index !== 0){
+                      date.setDate(date.getDate() + 1)
+                    }
                     return {
                       date: date.toISOString(),
                       estimatedNumberOfBirths:
