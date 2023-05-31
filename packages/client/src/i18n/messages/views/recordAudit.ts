@@ -169,6 +169,11 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'No date of death',
     description: 'Label for date of death not available'
   },
+  noDateOfMarriage: {
+    id: 'recordAudit.noDateOfMarriage',
+    defaultMessage: 'No date of marriage',
+    description: 'Label for date of marriage not available'
+  },
   noPlaceOfBirth: {
     id: 'recordAudit.noPlaceOfBirth',
     defaultMessage: 'No place of birth',
@@ -178,6 +183,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.noPlaceOfDeath',
     defaultMessage: 'No place of death',
     description: 'Label for place of death not availale'
+  },
+  noPlaceOfMarriage: {
+    id: 'recordAudit.noPlaceOfMarriage',
+    defaultMessage: 'No place of marriage',
+    description: 'Label for place of marriage not availale'
   },
   noInformant: {
     id: 'recordAudit.noInformant',

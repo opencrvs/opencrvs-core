@@ -181,7 +181,7 @@ export const GetHistory = ({
   }[]
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
-      date: new Date(draft.savedOn || Date.now()).toString(),
+      date: new Date(draft.savedOn || Date.now()).toISOString(),
       regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,

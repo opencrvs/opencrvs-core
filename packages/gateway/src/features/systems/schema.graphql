@@ -29,6 +29,20 @@ enum SystemType {
   WEBHOOK
 }
 
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
+}
+
+type SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookPermission!]
+  openIdProviderClientId: String
+  openIdProviderBaseUrl: String
+  openIdProviderClaims: String
+}
+
 type System {
   _id: ID!
   clientId: ID!
@@ -36,7 +50,8 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  settings: [WebhookPermission!]
+  integratingSystemType: IntegratingSystemType
+  settings: SystemSettings
 }
 
 type SystemSecret {
@@ -54,14 +69,15 @@ input WebhookInput {
   permissions: [String]!
 }
 
-input SystemSettings {
+input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
 }
 input SystemInput {
   name: String!
   type: SystemType!
-  settings: SystemSettings
+  settings: SystemSettingsInput
+  integratingSystemType: IntegratingSystemType
 }
 
 input UpdatePermissionsInput {

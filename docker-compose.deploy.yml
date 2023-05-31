@@ -709,6 +709,8 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
   scheduler:
+    environment:
+      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
     deploy:
       replicas: 1
       labels:
@@ -940,6 +942,10 @@ services:
       - OPENCRVS_METABASE_DB_AUTH_DB=performance
       - OPENCRVS_METABASE_SITE_NAME=OpenCRVS Dashboards
       - OPENCRVS_METABASE_SITE_URL=http://metabase.{{hostname}}
+      - OPENCRVS_METABASE_MAP_NAME=Farajaland
+      - OPENCRVS_METABASE_MAP_URL=http://countryconfig:3040/content/farajaland-map.geojson
+      - OPENCRVS_METABASE_MAP_REGION_KEY=State
+      - OPENCRVS_METABASE_MAP_REGION_NAME=State
     deploy:
       labels:
         - 'traefik.enable=true'
