@@ -401,14 +401,14 @@ describe('User list tests', () => {
           component,
           '#user-item-2-menuItem3'
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
         await waitForElement(component, '#resend_invite_success')
       })
 
-      it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
+      it('clicking on menu options Resend invite shows error if any submission error', async () => {
         ;(userMutations.resendInvite as Mock).mockRejectedValueOnce(
           new Error('Something went wrong')
         )
@@ -422,7 +422,7 @@ describe('User list tests', () => {
           component,
           '#user-item-2-menuItem3'
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()

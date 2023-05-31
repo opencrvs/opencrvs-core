@@ -109,7 +109,8 @@ describe('reducer', () => {
       resentAuthenticationCode: true,
       authenticationDetails: {
         nonce: '1234',
-        mobile: ''
+        mobile: '',
+        email: ''
       }
     }
     const action = {
