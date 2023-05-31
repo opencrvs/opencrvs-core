@@ -185,18 +185,6 @@ export function executeHandlebarsTemplate(
 
       const id = idParts.join('.')
 
-      // const value = intl.formatMessage({
-      //   id,
-      //   defaultMessage: 'Missing translation for ' + id
-      // })
-
-      // if (
-      //   idParts.includes('uppercase') &&
-      //   !value.split(' ').includes('Missing')
-      // ) {
-      //   return value.toUpperCase()
-      // }
-
       return intl.formatMessage({
         id,
         defaultMessage: 'Missing translation for ' + id
