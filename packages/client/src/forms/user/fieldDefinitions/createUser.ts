@@ -222,7 +222,7 @@ export const userSectionFormType: ISerializedFormSection = {
           validator: []
         },
         {
-          name: 'seperator',
+          name: 'facilitySeparator',
           type: 'SUBSECTION',
           label: {
             defaultMessage: ' ',

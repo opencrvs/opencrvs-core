@@ -17,6 +17,7 @@ import {
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
+  SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
   SUBSECTION
 } from '@client/forms'
@@ -24,7 +25,8 @@ import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutation
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField,
-  getListOfLocations
+  getListOfLocations,
+  renderSelectOrRadioLabel
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
@@ -242,6 +244,14 @@ class UserReviewFormComponent extends React.Component<
       return offlineLocations[locationId] && offlineLocations[locationId].name
     }
 
+    if (field.type === SELECT_WITH_OPTIONS) {
+      return renderSelectOrRadioLabel(
+        formData[field.name],
+        field.options,
+        intl
+      )?.toString()
+    }
+
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
         ? field.name === 'systemRole'
@@ -386,6 +396,10 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       if (variables.user.signature) {
         delete variables.user.signature.name
         delete variables.user.signature.__typename //to fix updating registrar bug
+      }
+
+      if ('primaryFacilityType' in variables.user) {
+        delete variables.user.primaryFacilityType
       }
 
       dispatch(
