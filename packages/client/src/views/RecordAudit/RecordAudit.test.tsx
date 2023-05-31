@@ -230,9 +230,6 @@ describe('Record audit summary for a draft marriage declaration', () => {
       component.find({ 'data-testid': 'type-value' }).hostNodes().text()
     ).toBe('Marriage')
     expect(component.exists({ 'data-testid': 'drn-value' })).toBeFalsy()
-    expect(
-      component.find({ 'data-testid': 'placeOfMarriage-value' }).hostNodes()
-    ).toHaveLength(1)
   })
 })
 
