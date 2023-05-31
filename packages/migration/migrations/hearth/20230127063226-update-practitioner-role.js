@@ -99,9 +99,7 @@ export const up = async (db, client) => {
                     coding: [
                       {
                         system: 'http://opencrvs.org/specs/types',
-                        code: isFieldAgent
-                          ? 'Social Worker'
-                          : titleCase(roleCode)
+                        code: isFieldAgent ? 'Field agent' : titleCase(roleCode)
                       }
                     ]
                   }
