@@ -22,6 +22,7 @@ import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { urlToBase64 } from '@client/utils/imageUtils'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>
@@ -85,7 +86,7 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
     userDetails,
     offlineResource,
@@ -96,7 +97,7 @@ export async function previewCertificate(
   })
 }
 
-export function printCertificate(
+export async function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
   userDetails: UserDetails | null,
@@ -108,7 +109,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
     userDetails,
     offlineResource,
@@ -117,18 +118,45 @@ export function printCertificate(
   )
 }
 
-function getPDFTemplateWithSVG(
+async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
   pageSize: PageSize
-): IPDFTemplate {
+): Promise<IPDFTemplate> {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
-  const svgCode = executeHandlebarsTemplate(
-    svgTemplate,
-    declaration.data.template
+
+  const signaturePromises = {
+    brideSignature: urlToBase64(
+      declaration.data.template.brideSignature as string
+    ),
+    groomSignature: urlToBase64(
+      declaration.data.template.groomSignature as string
+    ),
+    witnessOneSignature: urlToBase64(
+      declaration.data.template.witnessOneSignature as string
+    ),
+    witnessTwoSignature: urlToBase64(
+      declaration.data.template.witnessTwoSignature as string
+    )
+  }
+
+  const resolvedSignaturePromises = await Promise.all(
+    Object.values(signaturePromises)
   )
+
+  const declarationTemplate = {
+    ...declaration.data.template,
+    ...Object.fromEntries(
+      Object.keys(signaturePromises).map((key, index) => [
+        key,
+        resolvedSignaturePromises[index]
+      ])
+    )
+  }
+  const svgCode = executeHandlebarsTemplate(svgTemplate, declarationTemplate)
+
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)

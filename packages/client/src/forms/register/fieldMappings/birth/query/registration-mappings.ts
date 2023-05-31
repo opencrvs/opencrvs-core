@@ -33,7 +33,6 @@ import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
-import { urlToBase64 } from '@client/utils/imageUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -137,7 +136,7 @@ export function registrationNumberTransformer(
   }
 }
 
-export async function groomSignatureTransformer(
+export function groomSignatureTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -147,11 +146,11 @@ export async function groomSignatureTransformer(
   if (queryData[sectionId].groomSignature) {
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'groomSignature'
-    ] = await urlToBase64(queryData[sectionId].groomSignature)
+    ] = queryData[sectionId].groomSignature
   }
 }
 
-export async function brideSignatureTransformer(
+export function brideSignatureTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -161,11 +160,11 @@ export async function brideSignatureTransformer(
   if (queryData[sectionId].brideSignature) {
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'brideSignature'
-    ] = await urlToBase64(queryData[sectionId].brideSignature)
+    ] = queryData[sectionId].brideSignature
   }
 }
 
-export async function witnessOneSignatureTransformer(
+export function witnessOneSignatureTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -175,11 +174,11 @@ export async function witnessOneSignatureTransformer(
   if (queryData[sectionId].witnessOneSignature) {
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'witnessOneSignature'
-    ] = await urlToBase64(queryData[sectionId].witnessOneSignature)
+    ] = queryData[sectionId].witnessOneSignature
   }
 }
 
-export async function witnessTwoSignatureTransformer(
+export function witnessTwoSignatureTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -189,7 +188,7 @@ export async function witnessTwoSignatureTransformer(
   if (queryData[sectionId].witnessTwoSignature) {
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'witnessTwoSignature'
-    ] = await urlToBase64(queryData[sectionId].witnessTwoSignature)
+    ] = queryData[sectionId].witnessTwoSignature
   }
 }
 
