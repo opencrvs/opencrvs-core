@@ -13,14 +13,14 @@ import {
   GQLAddress,
   GQLHumanName,
   GQLLocationType,
-  GQLAddressType
+  GQLAddressType,
+  GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   BirthRegistration,
   DeathRegistration,
   MarriageRegistration,
-  Address,
-  Attachment
+  Address
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -252,8 +252,8 @@ export const identityToFieldTransformer =
 
 export const identityToNidVerificationFieldTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) => {
   identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
@@ -263,7 +263,8 @@ export const identityToNidVerificationFieldTransformer = (
     field
   )
   const existingIdentity = queryData[sectionId].identifier?.find(
-    (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+    (identity: fhir.Identifier) =>
+      (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -331,7 +332,7 @@ export const sameAddressFieldTransformer =
       )
 
     let toAddress
-    if (toSection === 'informant') {
+    if (toSection === ('informant' as SectionId)) {
       // informant's address is stored inside individual for death
       // declarations and toSection will be informant for death declarations
       toAddress =
@@ -348,7 +349,7 @@ export const sameAddressFieldTransformer =
           (addr) => addr.type === toAddressType
         )
     }
-    
+
     if (!fromAddress || !toAddress) {
       transformedData[sectionId][field.name] = false
       return transformedData
@@ -425,29 +426,28 @@ export function attachmentToFieldTransformer(
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
+  const queryDataAttatchments = queryData[selectedSectionId].attachments
 
-  if (queryData[selectedSectionId].attachments) {
-    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
-      (attachment) => {
-        const subject = attachment.subject as string
-        let type = attachment.type
-        if (typeMapper) {
-          // @ts-ignore
-          type =
-            Object.keys(typeMapper).find(
-              (key) => typeMapper[key] === attachment.type
-            ) || attachment.type
-        }
-        if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-          attachments.push({
-            data: attachment.data,
-            uri: attachment.uri,
-            type: attachment.contentType,
-            optionValues: [subject, type],
-            title: subject,
-            description: type
-          } as IAttachment)
-        }
+  if (queryDataAttatchments) {
+    ;(queryDataAttatchments as GQLAttachment[]).forEach((attachment) => {
+      const subject = attachment.subject as string
+      let type = attachment.type
+      if (typeMapper) {
+        // @ts-ignore
+        type =
+          Object.keys(typeMapper).find(
+            (key) => typeMapper[key] === attachment.type
+          ) || attachment.type
+      }
+      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+        attachments.push({
+          data: attachment.data,
+          uri: attachment.uri,
+          type: attachment.contentType,
+          optionValues: [subject, type],
+          title: subject,
+          description: type
+        } as IAttachment)
       }
       if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
         attachments.push({
@@ -469,7 +469,7 @@ export function attachmentToFieldTransformer(
 export const eventLocationQueryTransformer =
   (
     lineNumber = 0,
-    transformedFieldName?: keyof Address,
+    transformedFieldName?: string,
     ignoreAddressFields?: IIgnoreAddressFields
   ) =>
   (
@@ -485,13 +485,9 @@ export const eventLocationQueryTransformer =
     const address = eventLocation.address
     const line = address?.line
     const country = address?.country
-    const fieldValue =
-      address &&
-      address[
-        transformedFieldName
-          ? transformedFieldName
-          : (field.name as keyof Address)
-      ]
+    const addressKey = transformedFieldName ? transformedFieldName : field.name
+    const fieldValue = address && address[addressKey as keyof Address]
+
     if (lineNumber > 0) {
       transformedData[sectionId][field.name] =
         (line && line[lineNumber - 1]) || []
@@ -662,11 +658,11 @@ export const nestedValueToFieldTransformer =
   }
 
 export const nestedIdentityValueToFieldTransformer =
-  (nestedField: string) =>
+  (nestedField: SectionId) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
@@ -690,7 +686,8 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+      (identity: fhir.Identifier) =>
+        (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
     )
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}

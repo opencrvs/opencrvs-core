@@ -505,7 +505,7 @@ export function getPlaceOfEventLocationSelect(
         operation: 'eventLocationQueryTransformer',
         parameters: [
           locationIndex,
-          location as keyof Address,
+          location,
           {
             fieldsToIgnoreForLocalAddress: [
               'internationalDistrict',
