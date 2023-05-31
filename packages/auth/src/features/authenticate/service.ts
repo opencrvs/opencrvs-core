@@ -93,7 +93,7 @@ export async function authenticate(
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
-    email: body.emailForNotification
+    email: body.email
   }
 }
 
