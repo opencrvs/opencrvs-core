@@ -41,7 +41,6 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
   if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
@@ -52,7 +51,6 @@ export default async function verifyPassHandler(
     id: user.id,
     practitionerId: user.practitionerId
   }
-
   return response
 }
 

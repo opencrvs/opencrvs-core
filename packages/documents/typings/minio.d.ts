@@ -9,8 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import isSvg from 'is-svg'
+type Request = {
+  headers: {
+    host: string
+  }
+  protocol: string
+  method: string
+  path: string
+}
 
-export async function isValidSVGCode(svgCode: string): Promise<boolean> {
-  return isSvg(svgCode)
+declare module 'minio/dist/main/signing' {
+  export function presignSignatureV4(
+    request: Request,
+    accessKey: string,
+    secretKey: string,
+    sessionToken?: string,
+    region: string,
+    requestDate: Date,
+    expires: number
+  ): string
 }

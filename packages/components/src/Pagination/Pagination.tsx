@@ -11,9 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Next, Previous, PreviousLarge, NextLarge } from '../icons'
-import { Button } from '../buttons/Button'
-import { CircleButton } from '../buttons'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 export type IPaginationVariant = 'small' | 'large' // small for desktop and large for mobile
 
@@ -48,9 +47,8 @@ const MobileWrapper = styled.div`
 `
 
 const PaginationContainer = styled.div`
-  margin-top: 8px;
+  height: 40px;
   padding: 8px;
-  color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,22 +62,16 @@ const StyledPagination = styled.div`
 `
 
 const PageNumberButton = styled(Button)`
-  width: auto;
-  height: auto;
-  &:hover {
-    border-bottom: solid 2px ${({ theme }) => theme.colors.grey300};
-    margin-bottom: -2px;
-  }
+  height: 24px;
+`
 
-  &:focus-visible {
-    border-bottom: solid 2px ${({ theme }) => theme.colors.yellow};
-    margin-bottom: -2px;
-  }
+const DotsButton = styled(Button)`
+  height: 24px;
 `
 
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
-    size && size === 'large' ? theme.fonts.h3 : theme.fonts.bold14};
+    size && size === 'large' ? theme.fonts.h4 : theme.fonts.bold12};
   color: ${({ theme, isCurrentPage }) =>
     isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
 `
@@ -150,45 +142,64 @@ export class Pagination extends React.Component<IPaginationProps> {
     const pages = this.paginationRow(currentPage, totalPages, 1)
     return (
       <PaginationContainer id="pagination">
-        <CircleButton
-          size={'medium'}
+        <Button
+          type="icon"
+          size="small"
           onClick={() => {
             this.changePage(currentPage - 1)
           }}
           disabled={!this.canGoToPreviousPage()}
+          aria-label="Previous page"
         >
-          {size === 'small' ? (
-            <Previous id="prev" />
-          ) : (
-            <PreviousLarge id="prev" />
-          )}
-        </CircleButton>
+          <Icon color="grey400" name="CaretLeft" size="small" />
+        </Button>
         <StyledPagination>
-          {pages.map((page, id) => (
-            <PageNumberButton
-              key={id}
-              size={size}
-              id={`page-number-${id}`}
-              onClick={() => this.changePage(page)}
-            >
-              <StyledPageNumber
-                size={size}
-                isCurrentPage={typeof page === 'number' && page === currentPage}
+          {pages.map((page, id) => {
+            if (page === '...') {
+              return (
+                <DotsButton
+                  key={id}
+                  type="tertiary"
+                  size="small"
+                  disabled // Disable click events on the dots
+                >
+                  <StyledPageNumber size={size} isCurrentPage={false}>
+                    {page}
+                  </StyledPageNumber>
+                </DotsButton>
+              )
+            }
+            return (
+              <PageNumberButton
+                key={id}
+                type="tertiary"
+                size="small"
+                id={`page-number-${id}`}
+                onClick={() => this.changePage(page)}
               >
-                {page}
-              </StyledPageNumber>
-            </PageNumberButton>
-          ))}
+                <StyledPageNumber
+                  size={size}
+                  isCurrentPage={
+                    typeof page === 'number' && page === currentPage
+                  }
+                >
+                  {page}
+                </StyledPageNumber>
+              </PageNumberButton>
+            )
+          })}
         </StyledPagination>
-        <CircleButton
-          size={'medium'}
+        <Button
+          type="icon"
+          size="small"
           onClick={() => {
             this.changePage(currentPage + 1)
           }}
           disabled={!this.canGoToNextPage()}
+          aria-label="Next page"
         >
-          {size === 'small' ? <Next id="next" /> : <NextLarge id="next" />}
-        </CircleButton>
+          <Icon color="grey400" name="CaretRight" size="small" />
+        </Button>
       </PaginationContainer>
     )
   }
