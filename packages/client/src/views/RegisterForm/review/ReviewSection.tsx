@@ -1005,13 +1005,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     fieldLabel: MessageDescriptor,
     fieldName: string,
     value: IFormFieldValue | JSX.Element | undefined,
-    ignoreAction = false
+    ignoreAction = false,
+    fieldType = ''
   ) {
     const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
       value,
+      subtitle:
+        fieldType &&
+        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(fieldType),
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
@@ -1268,8 +1272,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
         completeValue,
-        field.readonly ||
-          [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type)
+        field.readonly
       )
     }
   }
@@ -1389,7 +1392,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field.name,
       value,
       field.readonly ||
-        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type)
+        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type),
+      field.type
     )
   }
 
@@ -1454,10 +1458,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               nestedField,
               sectionErrors[section.id][field.name]
             ),
-            nestedField.readonly ||
-              [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(
-                nestedField.type
-              )
+            nestedField.readonly
           )
         )
       }
@@ -1968,7 +1969,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             <ListViewItemSimplified
                               key={index}
                               label={
-                                <Label section={!item.action}>
+                                <Label section={item.subtitle}>
                                   {item.label}
                                 </Label>
                               }
