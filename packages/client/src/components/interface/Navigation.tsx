@@ -10,69 +10,66 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as React from 'react'
-import { storage } from '@client/storage'
 import {
+  filterProcessingDeclarationsFromQuery,
   IDeclaration,
-  SUBMISSION_STATUS,
-  filterProcessingDeclarationsFromQuery
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { IStoreState } from '@opencrvs/client/src/store'
-import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
-import { connect } from 'react-redux'
+import { buttonMessages } from '@client/i18n/messages'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
-  goToHomeTab,
-  goToCertificateConfig,
-  goToSettings,
-  goToPerformanceView,
-  goToTeamView,
-  goToSystemList,
-  goToFormConfigHome,
-  goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport,
-  goToPerformanceStatistics,
-  goToLeaderBoardsView,
+  goToApplicationConfig,
+  goToCertificateConfig,
   goToDashboardView,
-  goToUserRolesConfig,
+  goToFormConfigHome,
+  goToHomeTab,
+  goToInformantNotification,
+  goToLeaderBoardsView,
   goToOrganisationView,
-  goToInformantNotification
+  goToPerformanceStatistics,
+  goToPerformanceView,
+  goToSettings,
+  goToSystemList,
+  goToTeamView,
+  goToUserRolesConfig,
+  goToVSExport
 } from '@client/navigation'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Event, User } from '@client/utils/gateway'
-import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
-import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
-import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { storage } from '@client/storage'
+import styled from '@client/styledComponents'
 import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import styled from '@client/styledComponents'
-import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { omit } from 'lodash'
-import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
-import { Text } from '@opencrvs/components'
+import { isMobileDevice } from '@client/utils/commonUtils'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { IApplicationConfig } from '@client/utils/referenceApi'
+import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
+import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
+import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
+import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
+import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
+import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
+import { omit } from 'lodash'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -122,7 +119,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -182,7 +178,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.readyToIssue,
+    WORKQUEUE_TABS.performance,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
@@ -654,27 +650,10 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
-                    WORKQUEUE_TABS.vsexports
-                  ) && (
-                    <NavigationItem
-                      icon={() => <Icon name="Share" size="small" />}
-                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.vsexports]
-                      )}
-                      onClick={goToVSExportsAction}
-                      isSelected={
-                        enableMenuSelection &&
-                        activeMenuItem === WORKQUEUE_TABS.vsexports
-                      }
-                    />
-                  )}
-                {userDetails?.systemRole &&
-                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.organisation
                   ) && (
                     <NavigationItem
-                      icon={() => <Icon name="List" size="small" />}
+                      icon={() => <Icon name="Buildings" size="medium" />}
                       id={`navigation_${WORKQUEUE_TABS.organisation}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.organisation]
@@ -712,7 +691,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="Compass" size="small" />}
+                        icon={() => <Icon name="Compass" size="medium" />}
                         id={`navigation_${WORKQUEUE_TABS.config}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.config]
@@ -804,7 +783,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Icon name="ChatCircle" size="small" />}
+                        icon={() => <Icon name="ChatCircle" size="medium" />}
                         id={`navigation_${WORKQUEUE_TABS.communications}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.communications]
@@ -856,14 +835,6 @@ export const NavigationView = (props: IFullProps) => {
                     GROUP_ID.analytics
                   ) && (
                     <>
-                      <Text
-                        variant="bold14"
-                        style={{ marginLeft: 24 }}
-                        element="p"
-                        color="opacity24"
-                      >
-                        {intl.formatMessage(navigationMessages['analytic'])}
-                      </Text>
                       <NavigationItem
                         icon={() => <Icon name="ChartLine" size="medium" />}
                         label={intl.formatMessage(
@@ -900,7 +871,9 @@ export const NavigationView = (props: IFullProps) => {
                       />
                       <NavigationItem
                         icon={() => <Icon name="ChartBar" size="medium" />}
-                        label={intl.formatMessage(navigationMessages['report'])}
+                        label={intl.formatMessage(
+                          navigationMessages['performance']
+                        )}
                         onClick={() =>
                           props.goToPerformanceViewAction(userDetails)
                         }
@@ -912,6 +885,23 @@ export const NavigationView = (props: IFullProps) => {
                       />
                     </>
                   )}
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    WORKQUEUE_TABS.vsexports
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Icon name="Export" size="medium" />}
+                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.vsexports]
+                      )}
+                      onClick={goToVSExportsAction}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.vsexports
+                      }
+                    />
+                  )}
               </NavigationGroup>
             )}
         </>
@@ -922,8 +912,14 @@ export const NavigationView = (props: IFullProps) => {
           userDetails.searches.map((bookmarkResult) => {
             return (
               <NavigationItem
+                key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 icon={() => (
-                  <Icon name={'Star'} color={'yellow'} weight={'fill'}></Icon>
+                  <Icon
+                    name="Star"
+                    color="yellow"
+                    size="medium"
+                    weight="fill"
+                  ></Icon>
                 )}
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}
@@ -983,12 +979,14 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     advancedSearchParams: getAdvancedSearchParamsState(state),
-    activeMenuItem: window.location.href.endsWith(WORKQUEUE_TABS.performance)
+    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.endsWith(WORKQUEUE_TABS.team)
-      ? WORKQUEUE_TABS.team
       : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
       ? WORKQUEUE_TABS.vsexports
+      : window.location.href.includes(WORKQUEUE_TABS.organisation)
+      ? WORKQUEUE_TABS.organisation
+      : window.location.href.includes(WORKQUEUE_TABS.team)
+      ? WORKQUEUE_TABS.team
       : window.location.href.endsWith(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
       : window.location.href.endsWith(WORKQUEUE_TABS.settings)

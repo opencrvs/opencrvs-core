@@ -234,6 +234,35 @@ export const identityToFieldTransformer =
     }
     return transformedData
   }
+
+export const identityToNidVerificationFieldTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+    transformedData,
+    queryData,
+    sectionId,
+    field
+  )
+  const existingIdentity = queryData[sectionId].identifier?.find(
+    (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+  )
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (existingIdentity) {
+    const modifiedFields = existingIdentity[
+      'fieldsModifiedByIdentity'
+    ] as string[]
+    transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+  }
+
+  return transformedData
+}
 interface IAddress {
   [key: string]: any
 }
@@ -285,12 +314,24 @@ export const sameAddressFieldTransformer =
       (queryData[fromSection].address as [GQLAddress]).find(
         (addr) => addr.type === fromAddressType
       )
-    const toAddress =
-      queryData[toSection] &&
-      queryData[toSection].address &&
-      (queryData[toSection].address as [GQLAddress]).find(
-        (addr) => addr.type === toAddressType
-      )
+    let toAddress
+    if (toSection === 'informant') {
+      // informant's address is stored inside individual for death
+      // declarations and toSection will be informant for death declarations
+      toAddress =
+        queryData[toSection].individual &&
+        queryData[toSection].individual.address &&
+        (queryData[toSection].individual.address as [GQLAddress]).find(
+          (addr) => addr.type === toAddressType
+        )
+    } else {
+      toAddress =
+        queryData[toSection] &&
+        queryData[toSection].address &&
+        (queryData[toSection].address as [GQLAddress]).find(
+          (addr) => addr.type === toAddressType
+        )
+    }
     if (!fromAddress || !toAddress) {
       transformedData[sectionId][field.name] = false
       return transformedData
@@ -385,6 +426,7 @@ export function attachmentToFieldTransformer(
         if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
           attachments.push({
             data: attachment.data,
+            uri: attachment.uri,
             type: attachment.contentType,
             optionValues: [subject, type],
             title: subject,
@@ -589,6 +631,51 @@ export const nestedValueToFieldTransformer =
     return transformedData
   }
 
+export const nestedIdentityValueToFieldTransformer =
+  (nestedField: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
+      return transformedData
+    }
+    const clonedData = cloneDeep(transformedData)
+    if (!clonedData[nestedField]) {
+      clonedData[nestedField] = {}
+    }
+
+    identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+      clonedData,
+      queryData[sectionId],
+      nestedField,
+      field
+    )
+
+    if (clonedData[nestedField][field.name] === undefined) {
+      return transformedData
+    }
+    transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
+
+    const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
+      (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    if (existingIdentity) {
+      const modifiedFields = existingIdentity[
+        'fieldsModifiedByIdentity'
+      ] as string[]
+      transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+    }
+
+    return transformedData
+  }
+
 export const booleanTransformer = (
   transformedData: IFormData,
   queryData: any,
@@ -724,7 +811,11 @@ export const dateFormatTransformer =
   ): void => {
     let queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
-    if (nestedField && queryData[sectionId][nestedField]) {
+    if (
+      nestedField &&
+      queryData[sectionId] &&
+      queryData[sectionId][nestedField]
+    ) {
       queryValue = String(
         (queryData[sectionId][nestedField] as IFormSectionData)[
           transformedFieldName

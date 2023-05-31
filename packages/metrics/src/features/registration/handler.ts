@@ -66,6 +66,22 @@ export async function waitingExternalValidationHandler(
   return h.response().code(200)
 }
 
+export async function markedAsDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_DUPLICATE', request)
+  return h.response().code(200)
+}
+
+export async function markedAsNotDuplicate(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('MARKED_AS_NOT_DUPLICATE', request)
+  return h.response().code(200)
+}
+
 export async function requestForRegistrarValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -227,7 +243,7 @@ export async function markRejectedHandler(
     points.push(
       await generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']

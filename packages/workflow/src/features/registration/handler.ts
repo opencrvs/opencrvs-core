@@ -17,7 +17,6 @@ import {
   modifyRegistrationBundle,
   setTrackingId,
   markBundleAsWaitingValidation,
-  invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
@@ -198,32 +197,21 @@ export async function createRegistrationHandler(
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
 
-    if (
-      [
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
-      ].includes(event)
-    ) {
-      // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
-      // validate registration with resource service and set resulting registration number
-      invokeRegistrationValidation(payload, request.headers)
-    }
     if (isEventNonNotifiable(event)) {
-      return resBundle
+      return { resBundle, payloadForInvokingValidation: payload }
     }
 
     /* sending notification to the contact */
     const msisdn = await getSharedContactMsisdn(payload)
     if (!msisdn) {
       logger.info('createRegistrationHandler could not send event notification')
-      return resBundle
+      return { resBundle, payloadForInvokingValidation: payload }
     }
     logger.info('createRegistrationHandler sending event notification')
     sendEventNotification(payload, event, msisdn, {
       Authorization: request.headers.authorization
     })
-    return resBundle
+    return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
@@ -412,9 +400,8 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-    invokeRegistrationValidation(payload, request.headers)
 
-    return resBundle
+    return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
     logger.error(
       `Workflow/markAsWaitingValidationHandler[${event}]: error: ${error}`
@@ -433,7 +420,9 @@ export async function markEventAsCertifiedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/markEventAsCertifiedHandler: error: ${error}`)
     throw new Error(error)
@@ -450,7 +439,9 @@ export async function markEventAsIssuedHandler(
       getToken(request)
     )
     await mergePatientIdentifier(payload)
-    return await postToHearth(payload)
+    const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    return resBundle
   } catch (error) {
     logger.error(`Workflow/markEventAsIssuedHandler: error: ${error}`)
     throw new Error(error)

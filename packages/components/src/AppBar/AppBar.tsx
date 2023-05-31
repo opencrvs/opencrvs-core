@@ -41,6 +41,7 @@ const Center = styled.div``
 
 const Actions = styled.div<{ $flex?: '1' | 'none' }>`
   display: flex;
+  gap: 8px;
   flex-direction: row;
   align-items: center;
   justify-content: right;
@@ -53,7 +54,7 @@ const Title = styled(Text)`
   height: 25px;
 `
 
-interface IProps {
+type IProps = {
   mobileLeft?: React.ReactNode
   mobileTitle?: React.ReactNode
   mobileRight?: React.ReactNode

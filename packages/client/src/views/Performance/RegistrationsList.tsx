@@ -60,6 +60,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
+import { useAuthorization } from '@client/hooks/useAuthorization'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -171,6 +172,7 @@ function RegistrationListComponent(props: IProps) {
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
+  const { isPerformanceManager } = useAuthorization()
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -409,30 +411,49 @@ function RegistrationListComponent(props: IProps) {
                     ? getName(result.registrarPractitioner.name, 'en')
                     : ''
                 }
+                avatar={result.registrarPractitioner.avatar}
               />
-              <Link
-                font="bold14"
-                onClick={() => {
-                  props.goToUserProfile(String(result.registrarPractitioner.id))
-                }}
-              >
-                {result.registrarPractitioner.name
-                  ? getName(result.registrarPractitioner.name, 'en')
-                  : ''}
-              </Link>
+              <>
+                {!isPerformanceManager ? (
+                  <Link
+                    font="bold14"
+                    onClick={() => {
+                      props.goToUserProfile(
+                        String(result.registrarPractitioner.id)
+                      )
+                    }}
+                  >
+                    {result.registrarPractitioner.name
+                      ? getName(result.registrarPractitioner.name, 'en')
+                      : ''}
+                  </Link>
+                ) : (
+                  String(
+                    result.registrarPractitioner.name
+                      ? getName(result.registrarPractitioner.name, 'en')
+                      : ''
+                  )
+                )}
+              </>
             </Stack>
           ),
           location: (
-            <Link
-              font="bold14"
-              onClick={() => {
-                props.goToTeamUserList(
-                  result.registrarPractitioner.primaryOffice?.id as string
-                )
-              }}
-            >
-              {result.registrarPractitioner.primaryOffice.name}
-            </Link>
+            <>
+              {!isPerformanceManager ? (
+                <Link
+                  font="bold14"
+                  onClick={() => {
+                    props.goToTeamUserList(
+                      result.registrarPractitioner.primaryOffice?.id as string
+                    )
+                  }}
+                >
+                  {result.registrarPractitioner.primaryOffice.name}
+                </Link>
+              ) : (
+                String(result.registrarPractitioner.primaryOffice.name)
+              )}
+            </>
           ),
           systemRole: getFieldAgentTypeLabel(
             result.registrarPractitioner.systemRole

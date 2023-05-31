@@ -336,6 +336,7 @@ interface IFormMessages
   addFile: MessageDescriptor
   uploadFile: MessageDescriptor
   fileUploadError: MessageDescriptor
+  fileSizeError: MessageDescriptor
   typeOfId: MessageDescriptor
   firstName: MessageDescriptor
   lastName: MessageDescriptor
@@ -1170,7 +1171,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.familyName'
   },
   marriedLastName: {
-    defaultMessage: 'Last name at birth (if different from above)',
+    defaultMessage: 'Married Last name (if different)',
     description: 'Label for married last name text input',
     id: 'form.field.label.marriedLastName'
   },
@@ -1649,7 +1650,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.placeOfBirth'
   },
   nameInEnglishPreviewGroup: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     description: 'Label for child name in english',
     id: 'form.preview.group.label.english.name'
   },
@@ -1727,7 +1728,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.proofOfGroomsID'
   },
   proofOfBridesID: {
-    defaultMessage: "Proof of Brides's identity",
+    defaultMessage: "Proof of Bride's identity",
     description: 'Label for list item Bride ID Proof',
     id: 'form.field.label.proofOfBridesID'
   },
@@ -2132,6 +2133,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'text for error on file upload',
     id: 'form.field.label.fileUploadError'
   },
+  fileSizeError: {
+    defaultMessage: 'File size must be less than 2MB',
+    description: 'text for error on file size',
+    id: 'form.field.label.fileSizeError'
+  },
   typeOfId: {
     defaultMessage: 'Type of ID',
     description: "Input label for certificate collector's id type options",
@@ -2384,6 +2390,29 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Hide',
     description: 'Hide label for accordion component',
     id: 'form.field.hideLabel'
+  },
+  nidNotVerified: {
+    defaultMessage: 'Authenticate',
+    description: 'label for verified nid state',
+    id: 'form.field.nidNotVerified'
+  },
+  nidVerified: {
+    defaultMessage: 'Authenticated',
+    description: 'label for unverified nid state',
+    id: 'form.field.nidVerified'
+  },
+  nidOffline: {
+    defaultMessage:
+      'National ID authentication is currently not available offline.',
+    description:
+      'Label for indicating offline status for the user. NID verification is not currently available offline.',
+    id: 'form.field.nidVerificationOngoing'
+  },
+  nidNotVerifiedReviewSection: {
+    defaultMessage: 'Unauthenticated',
+    description:
+      'Label for indicating unauthenticated status for the a review section',
+    id: 'form.field.nidNotVerifiedReviewSection'
   }
 }
 

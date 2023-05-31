@@ -52,6 +52,7 @@ function getQueriesToPrefetch(
     {
       query: PERFORMANCE_STATS,
       variables: {
+        event: 'birth',
         locationId,
         status: [
           'IN_PROGRESS',
@@ -91,7 +92,7 @@ function getQueriesToPrefetch(
 export const persistenceMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
-  async (action: Action) => {
+  (action: Action) => {
     next(action)
     if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
@@ -106,7 +107,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
           officeSelected
         )
         for (const query of queriesToPrefetch) {
-          await client.query(query)
+          client.query(query)
         }
       }
     } else if (action.type === READY) {
@@ -120,7 +121,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
         for (const stateId of stateIds) {
           const queriesToPrefetch = getQueriesToPrefetch(stateId, false)
           for (const query of queriesToPrefetch) {
-            await client.query(query)
+            client.query(query)
           }
         }
       }

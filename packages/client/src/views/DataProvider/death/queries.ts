@@ -127,8 +127,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           trackingId
         }
         informantsSignature
+        informantsSignatureURI
         attachments {
           data
+          uri
           type
           contentType
           subject
@@ -146,6 +148,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -382,6 +385,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactRelationship
         contactPhoneNumber
         informantsSignature
+        informantsSignatureURI
         duplicates {
           compositionId
           trackingId

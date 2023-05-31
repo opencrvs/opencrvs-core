@@ -391,6 +391,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             )}
             <FormFieldGenerator
               id={formGroup.id}
+              key={formGroup.id}
               onChange={(values) => {
                 if (values && values.affidavitFile) {
                   this.setState({

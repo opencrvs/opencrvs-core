@@ -414,7 +414,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="cache-first"
+                    fetchPolicy="cache-and-network"
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
                         ? {
@@ -437,7 +437,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         return <GenericErrorToast />
                       }
 
-                      if (loading) {
+                      if (loading && !data) {
                         return (
                           <Spinner id="performance-home-loading" size={24} />
                         )
@@ -491,7 +491,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="cache-first"
+                    fetchPolicy="cache-and-network"
                     query={CORRECTION_TOTALS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -524,7 +524,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="cache-first"
+                    fetchPolicy="cache-and-network"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -584,7 +584,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="cache-first"
+            fetchPolicy="cache-and-network"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -600,7 +600,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     actions={[]}
                   >
                     <ResponsiveModalContent>
-                      {loading ? (
+                      {loading && !data ? (
                         <Spinner id="modal-data-loading" size={24} />
                       ) : (
                         <>
@@ -639,7 +639,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <LayoutRight>
                     {!officeSelected && (
                       <LocationStats>
-                        {!isOnline ? null : loading ? (
+                        {!isOnline ? null : loading && !data ? (
                           <Spinner id="location-stats-loading" size={24} />
                         ) : (
                           <LocationStatsView
@@ -661,7 +661,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     <RegistrationStatus>
                       {!isOnline ? (
                         <></>
-                      ) : loading ? (
+                      ) : loading && !data ? (
                         <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView

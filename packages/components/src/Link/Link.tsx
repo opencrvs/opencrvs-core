@@ -31,7 +31,7 @@ export interface LinkProps
 const underlineStyles = css`
   text-decoration: underline;
   text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+  text-underline-offset: 2px;
 `
 
 const StyledLink = styled.button<{

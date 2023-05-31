@@ -23,7 +23,23 @@ export const QA_ENV = process.env.QA_ENV || false
 export const RECORD_SEARCH_QUOTA =
   Number(process.env.RECORD_SEARCH_QUOTA) || 2000
 
-export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const AVATAR_API =
+  'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const DEFAULT_TIMEOUT = 600000
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
+
+export const NATIONAL_ID_OIDP_BASE_URL =
+  process.env.NATIONAL_ID_OIDP_BASE_URL || null // e.g. https://api.esignet.io/v1/idp
+
+export const NATIONAL_ID_OIDP_REST_URL =
+  process.env.NATIONAL_ID_OIDP_REST_URL || null
+
+export const NATIONAL_ID_OIDP_CLIENT_ID =
+  process.env.NATIONAL_ID_OIDP_CLIENT_ID || null
+
+export const NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS =
+  process.env.NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS || null // e.g. given_name,family_name
+
+export const NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS =
+  process.env.NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS || null
