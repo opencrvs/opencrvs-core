@@ -11,10 +11,11 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { TertiaryButton, CircleButton } from '../buttons'
+import { CircleButton } from '../buttons'
 import { DeclarationIcon, Cross } from '../icons'
-import { Icon } from '../Icon'
 import { ToggleMenu } from '../ToggleMenu'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -96,9 +97,15 @@ export const EventTopBar = (props: IEventTopBarProps) => {
           </CircleButton>
         )}
         {saveAction && (
-          <TertiaryButton onClick={saveAction.handler} id="save_draft">
+          <Button
+            type="primary"
+            size="small"
+            onClick={saveAction.handler}
+            id="save_draft"
+          >
+            <Icon name="DownloadSimple" />
             {saveAction.label}
-          </TertiaryButton>
+          </Button>
         )}
 
         {exitAction && (

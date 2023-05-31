@@ -11,8 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { FormLayout } from './components/FormLayout'
 import { Layout, LayoutCentered } from './components/Layout'
-import { Section } from './components/Section'
+import { Section, Back } from './components/Section'
 import {
   SkipToContent,
   MAIN_CONTENT_ANCHOR_ID
@@ -72,5 +73,7 @@ export function Frame({
 }
 
 Frame.Layout = Layout
+Frame.FormLayout = FormLayout
 Frame.LayoutCentered = LayoutCentered
 Frame.Section = Section
+Frame.Back = Back

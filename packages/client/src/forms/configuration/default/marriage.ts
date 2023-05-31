@@ -1267,13 +1267,6 @@ export const marriageRegisterForms: ISerializedForm = {
           id: 'documents-view-group',
           fields: [
             {
-              name: 'paragraph',
-              type: 'PARAGRAPH',
-              label: formMessageDescriptors.documentsParagraph,
-              initialValue: '',
-              validate: []
-            },
-            {
               name: 'uploadDocForMarriageProof',
               type: 'DOCUMENT_UPLOADER_WITH_OPTION',
               label: formMessageDescriptors.proofOfMarriageNotice,

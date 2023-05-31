@@ -345,7 +345,6 @@ export function Outbox() {
         content={transformDeclarationsReadyToSend()}
         columns={getColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResultsOutbox)}
-        hideLastBorder={true}
         sortOrder={sortOrder}
       />
     </WQContentWrapper>

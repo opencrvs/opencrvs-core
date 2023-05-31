@@ -19,3 +19,19 @@ export const Section = styled.div`
     gap: 0;
   }
 `
+
+export const Back = styled.div`
+  display: grid;
+  padding-top: 16px;
+  gap: 24px;
+  justify-items: end;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    gap: 0;
+    background: ${({ theme }) => theme.colors.white};
+    padding: 16px;
+    height: 64px;
+    align-items: centre;
+    justify-items: start;
+  }
+`

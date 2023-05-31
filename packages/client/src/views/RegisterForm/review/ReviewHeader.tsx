@@ -12,6 +12,8 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { small } from '@client/../../components/src/Button/Button.styles'
 
 interface IReviewHeaderProps {
   id?: string
@@ -21,37 +23,44 @@ interface IReviewHeaderProps {
 }
 
 const HeaderContainer = styled.div`
-  min-height: 288px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: left;
   gap: 16px;
   align-items: center;
-  text-align: center;
+  padding: 16px 24px;
+  ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
-  background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
 `
 
 const TitleContainer = styled.div`
   ${({ theme }) => theme.fonts.bold14}
+  color: ${({ theme }) => theme.colors.supportingCopy};
   text-transform: uppercase;
 `
 const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h2}
   overflow-wrap: break-word;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h3}
-  }
 `
 export const ReviewHeader = (props: IReviewHeaderProps) => {
   const { id, logoSource, title, subject } = props
 
   return (
     <HeaderContainer id={id}>
-      <CountryLogo src={logoSource} />
-      <TitleContainer id={`${id}_title`}>{title}</TitleContainer>
-      <SubjectContainer id={`${id}_subject`}>{subject}</SubjectContainer>
+      <CountryLogo size="small" src={logoSource} />
+      <Stack
+        direction="column"
+        alignItems="flex-start"
+        justify-content="flex-start"
+        gap={6}
+      >
+        <TitleContainer id={`${id}_title`}>{title}</TitleContainer>
+        <SubjectContainer id={`${id}_subject`}>{subject}</SubjectContainer>
+      </Stack>
     </HeaderContainer>
   )
 }

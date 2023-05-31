@@ -22,20 +22,32 @@ const Container = styled.div`
 `
 const AccordionHeader = styled.div`
   padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
 
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
     cursor: pointer;
   }
+`
 
+const AccordionHeaderTitle = styled.div`
   h2 {
     margin-top: 0;
     margin-bottom: 6px;
   }
 `
+
+const AccordionHeaderAction = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding-right: 4px;
+`
+
 const Content = styled.div`
-  margin: 16px 0;
-  padding-top: 0px !important;
+  margin-bottom: 32px;
 `
 
 export interface IAccordionProps {
@@ -43,6 +55,8 @@ export interface IAccordionProps {
   label: string
   labelForShowAction: string
   labelForHideAction: string
+  action?: React.ReactNode
+  status?: React.ReactNode
   children: React.ReactNode
   expand?: boolean
 }
@@ -50,6 +64,7 @@ export interface IAccordionProps {
 export const Accordion = ({
   name,
   label,
+  action,
   labelForShowAction,
   labelForHideAction,
   children,
@@ -63,21 +78,24 @@ export const Accordion = ({
         id={`${name}-accordion-header`}
         onClick={() => setIsActive(!isActive)}
       >
-        <Text element={'h2'} variant={'h3'}>
-          {label}
-        </Text>
-        {!isActive && (
-          <Stack gap={4}>
-            <Icon name={'CaretRight'} color={'primary'} size={'small'} />
-            <Link font="bold14">{labelForShowAction}</Link>
-          </Stack>
-        )}
-        {isActive && (
-          <Stack gap={4}>
-            <Icon name={'CaretDown'} color={'primary'} size={'small'} />
-            <Link font="bold14">{labelForHideAction}</Link>
-          </Stack>
-        )}
+        <AccordionHeaderTitle>
+          <Text element={'h2'} variant={'h3'}>
+            {label}
+          </Text>
+          {!isActive && (
+            <Stack gap={4}>
+              <Icon name={'CaretRight'} color={'primary'} size={'small'} />
+              <Link font="bold14">{labelForShowAction}</Link>
+            </Stack>
+          )}
+          {isActive && (
+            <Stack gap={4}>
+              <Icon name={'CaretDown'} color={'primary'} size={'small'} />
+              <Link font="bold14">{labelForHideAction}</Link>
+            </Stack>
+          )}
+        </AccordionHeaderTitle>
+        <AccordionHeaderAction>{action}</AccordionHeaderAction>
       </AccordionHeader>
 
       {isActive && <Content id={`${name}-content`}>{children}</Content>}

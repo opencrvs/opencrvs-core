@@ -11,7 +11,11 @@
  */
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { Container, BodyContent } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -19,15 +23,8 @@ import {
 } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { messages } from '@client/i18n/messages/views/eventInfo'
 import styled from '@client/styledComponents'
-import {
-  TertiaryButton,
-  ICON_ALIGNMENT,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
 import { BulletList } from '@opencrvs/components/lib/BulletList'
 import { connect } from 'react-redux'
 import {
@@ -53,11 +50,8 @@ type IFullProps = RouteComponentProps<{ eventType: Event }> &
   IntlShapeProps &
   IDispatchProps
 
-const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 16px;
-  margin-bottom: 24px;
+const BackButton = styled(Button)`
+  margin-bottom: 16px;
 `
 
 function EventInfoComponet(props: IFullProps) {
@@ -120,26 +114,48 @@ function EventInfoComponet(props: IFullProps) {
   }
 
   return (
-    <Container id={`${eventType}-info-container`}>
-      <FixedEventTopBar
-        title={intl.formatMessage(topBarTitle)}
-        goHome={props.goToHome}
-      />
-      <BodyContent>
-        <TertiaryButton
-          align={ICON_ALIGNMENT.LEFT}
-          icon={() => <BackArrow />}
-          onClick={props.goBack}
-        >
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={<Icon name="Draft" size="large" />}
+          desktopTitle={intl.formatMessage(topBarTitle)}
+          desktopRight={
+            <Button type="icon" size="medium" onClick={props.goToHome}>
+              <Icon name="X" />
+            </Button>
+          }
+          mobileLeft={<Icon name="Draft" size="large" />}
+          mobileTitle={intl.formatMessage(topBarTitle)}
+          mobileRight={
+            <Button type="icon" size="medium" onClick={props.goToHome}>
+              <Icon name="X" />
+            </Button>
+          }
+        />
+      }
+      skipToContentText="Skip to main content"
+    >
+      <Content
+        id={`${eventType}-info-container`}
+        title={intl.formatMessage(messages.title, { eventType })}
+        bottomActionButtons={[
+          <Button
+            id="continue"
+            type="primary"
+            size="large"
+            onClick={handleContinue}
+          >
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </Button>
+        ]}
+      >
+        <BackButton type="tertiary" size="small" onClick={props.goBack}>
+          <Icon name="ArrowLeft" size="medium" />
           {intl.formatMessage(buttonMessages.back)}
-        </TertiaryButton>
-        <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
+        </BackButton>
         <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
-        <PrimaryButton id="continue" onClick={handleContinue}>
-          {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
-      </BodyContent>
-    </Container>
+      </Content>
+    </Frame>
   )
 }
 

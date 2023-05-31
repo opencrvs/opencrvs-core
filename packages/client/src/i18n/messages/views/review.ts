@@ -118,7 +118,7 @@ const messagesToDefine = {
   },
   headerSubjectWithoutName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage}} Declaration',
+      '{eventType, select, birth {Birth} death {Death} other {Marriage}} declaration',
     description: 'Header subject that shows which declaration type to review',
     id: 'review.header.subject.subjectWithoutName'
   },

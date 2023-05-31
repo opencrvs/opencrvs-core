@@ -13,11 +13,14 @@ import * as React from 'react'
 import styled, { keyframes } from '@client/styledComponents'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
-import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
 import {
   goBack,
@@ -39,45 +42,12 @@ import {
   createDeclaration
 } from '@client/declarations'
 
-const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  margin-top: 16px;
-  margin-bottom: 24px;
-`
 const Actions = styled.div`
-  padding-bottom: 24px;
   & > div {
     margin-bottom: 16px;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-bottom: 16px;
-  }
 `
 
-const fadeFromBottom = keyframes`
-from {
-   -webkit-transform: translateY(100%);
-   transform: translateY(100%);
-  }
-`
-const StyledContainer = styled.div`
-  top: 0;
-  min-height: calc(100vh);
-  width: 100%;
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromBottom} ${PAGE_TRANSITIONS_ENTER_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-    z-index: 999;
-  }
-
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-done {
-    position: fixed;
-  }
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
-    z-index: 999;
-    position: fixed;
-  }
-`
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
     goBack: typeof goBack
@@ -126,71 +96,90 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <StyledContainer
-        id="select-vital-event-view"
-        className={PAGE_TRANSITIONS_CLASSNAME}
-      >
-        <Container>
-          <FixedEventTopBar
-            title={intl.formatMessage(messages.registerNewEventTitle)}
-            goHome={this.props.goToHome}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={<Icon name="Draft" size="large" />}
+            desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
+            desktopRight={
+              <Button type="icon" size="medium" onClick={this.props.goToHome}>
+                <Icon name="X" />
+              </Button>
+            }
+            s
+            mobileLeft={<Icon name="Draft" size="large" />}
+            mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
+            mobileRight={
+              <Button type="icon" size="medium" onClick={this.props.goToHome}>
+                <Icon name="X" />
+              </Button>
+            }
           />
-          <BodyContent>
-            <Title>
-              {intl.formatMessage(messages.registerNewEventHeading)}
-            </Title>
-            {this.state.noEventSelectedError && (
-              <ErrorText id="require-error">
-                {intl.formatMessage(messages.errorMessage)}
-              </ErrorText>
-            )}
-            <Actions id="select_vital_event_view">
-              <RadioButton
-                size="large"
-                key="birthevent"
-                name="birthevent"
-                label={intl.formatMessage(constantsMessages.birth)}
-                value="birth"
-                id="select_birth_event"
-                selected={this.state.goTo === 'birth' ? 'birth' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'birth', noEventSelectedError: false })
-                }
-              />
-              <RadioButton
-                size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
-                }
-              />
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
-            </Actions>
-            <PrimaryButton id="continue" onClick={this.handleContinue}>
+        }
+        skipToContentText="Skip to main content"
+      >
+        <Content
+          id="select-vital-event-view"
+          title={intl.formatMessage(messages.registerNewEventHeading)}
+          bottomActionButtons={[
+            <Button
+              id="continue"
+              type="primary"
+              size="large"
+              onClick={this.handleContinue}
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </BodyContent>
-        </Container>
-      </StyledContainer>
+            </Button>
+          ]}
+        >
+          {this.state.noEventSelectedError && (
+            <ErrorText id="require-error">
+              {intl.formatMessage(messages.errorMessage)}
+            </ErrorText>
+          )}
+          <Actions id="select_vital_event_view">
+            <RadioButton
+              size="large"
+              key="birthevent"
+              name="birthevent"
+              label={intl.formatMessage(constantsMessages.birth)}
+              value="birth"
+              id="select_birth_event"
+              selected={this.state.goTo === 'birth' ? 'birth' : ''}
+              onChange={() =>
+                this.setState({ goTo: 'birth', noEventSelectedError: false })
+              }
+            />
+            <RadioButton
+              size="large"
+              key="deathevent"
+              name="deathevent"
+              label={intl.formatMessage(constantsMessages.death)}
+              value="death"
+              id="select_death_event"
+              selected={this.state.goTo === 'death' ? 'death' : ''}
+              onChange={() =>
+                this.setState({ goTo: 'death', noEventSelectedError: false })
+              }
+            />
+            <RadioButton
+              size="large"
+              key="marriagevent"
+              name="marriageevent"
+              label={intl.formatMessage(constantsMessages.marriage)}
+              value="marriage"
+              id="select_marriage_event"
+              selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+              onChange={() =>
+                this.setState({
+                  goTo: 'marriage',
+                  noEventSelectedError: false
+                })
+              }
+            />
+          </Actions>
+        </Content>
+      </Frame>
     )
   }
 }

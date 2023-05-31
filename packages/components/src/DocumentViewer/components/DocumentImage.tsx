@@ -13,6 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { isEqual } from 'lodash'
 import PanViewer from './PanViewer'
+
 const ImageContainer = styled.div`
   top: 0px;
   text-align: center;
