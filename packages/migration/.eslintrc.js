@@ -9,19 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { fetchDocuments } from '@gateway/features/fhir/utils'
-
-export async function getPresignedMinioURLHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const fileUri = request.params.fileUri
-  const response = await fetchDocuments(
-    '/presigned-url',
-    { Authorization: request.headers.authorization },
-    'POST',
-    JSON.stringify({ fileUri })
-  )
-  return response
+module.exports = {
+  extends: '../../.eslintrc.js',
+  env: {
+    es6: true
+  },
+  rules: {
+    'no-console': 'off'
+  }
 }

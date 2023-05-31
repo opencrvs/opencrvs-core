@@ -9,8 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import isSvg from 'is-svg'
-
-export async function isValidSVGCode(svgCode: string): Promise<boolean> {
-  return isSvg(svgCode)
-}
+export * from './Tooltip'

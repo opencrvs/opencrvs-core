@@ -18,8 +18,7 @@ import {
   ITimeLoggedResponse,
   getCertificatesFromTask,
   getActionFromTask,
-  fetchTaskByCompositionIdFromHearth,
-  fetchDocuments
+  fetchTaskByCompositionIdFromHearth
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -73,7 +72,7 @@ import {
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { MINIO_BUCKET, USER_MANAGEMENT_URL } from '@gateway/constants'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
@@ -462,12 +461,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     informantsSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -479,12 +481,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     groomSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -496,12 +501,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     brideSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -513,12 +521,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     witnessOneSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -530,12 +541,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     witnessTwoSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -788,17 +802,11 @@ export const typeResolvers: GQLResolver = {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
     async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
-      const fileName = docRef.content[0].attachment.data?.replace(
-        `/${MINIO_BUCKET}/`,
-        ''
-      )
-      const response = (await fetchDocuments(
-        '/presigned-url',
-        authHeader,
-        'POST',
-        JSON.stringify({ fileName: fileName })
-      )) as { presignedURL: string }
-      return response.presignedURL
+      const fileUri = docRef.content[0].attachment.data
+      if (fileUri) {
+        return getPresignedUrlFromUri(fileUri, authHeader)
+      }
+      return null
     },
     uri(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data

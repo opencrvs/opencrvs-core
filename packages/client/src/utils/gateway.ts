@@ -519,9 +519,9 @@ export type CertificateInput = {
 
 export type CertificateSvg = {
   __typename?: 'CertificateSVG'
-  event: Scalars['String']
+  event: Event
   id: Scalars['ID']
-  status: Scalars['String']
+  status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated: Scalars['String']
   svgDateUpdated: Scalars['String']
@@ -530,14 +530,19 @@ export type CertificateSvg = {
 }
 
 export type CertificateSvgInput = {
-  event: Scalars['String']
+  event: Event
   id: Scalars['ID']
-  status: Scalars['String']
+  status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
   svgDateUpdated?: InputMaybe<Scalars['Int']>
   svgFilename: Scalars['String']
   user: Scalars['String']
+}
+
+export enum CertificateStatus {
+  Active = 'ACTIVE',
+  Inactive = 'INACTIVE'
 }
 
 export type CertificationMetric = {
@@ -1795,7 +1800,7 @@ export type Query = {
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchSystem?: Maybe<System>
-  getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
+  getActiveCertificatesSVG?: Maybe<Array<CertificateSvg>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
@@ -1883,8 +1888,8 @@ export type QueryFetchSystemArgs = {
 }
 
 export type QueryGetCertificateSvgArgs = {
-  event?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<Scalars['String']>
+  event: Event
+  status: CertificateStatus
 }
 
 export type QueryGetDeclarationsStartedMetricsArgs = {
@@ -2611,8 +2616,8 @@ export type CreateOrUpdateCertificateSvgMutation = {
     svgCode: string
     svgFilename: string
     user: string
-    status: string
-    event: string
+    status: CertificateStatus
+    event: Event
     svgDateCreated: string
     svgDateUpdated: string
   } | null
