@@ -146,8 +146,8 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: String, event: String): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG]
+  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG!]
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
@@ -634,8 +634,19 @@ type CertificateSVG {
   svgDateUpdated: String!
   svgDateCreated: String!
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
+}
+
+enum CertificateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Event {
+  birth
+  death
+  marriage
 }
 
 type FormDraft {
@@ -810,8 +821,8 @@ input CertificateSVGInput {
   svgDateUpdated: Int
   svgDateCreated: Int
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
 }
 
 type ApplicationConfiguration {
@@ -1254,12 +1265,6 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
-}
-
-enum Event {
-  birth
-  death
-  marriage
 }
 
 type EventProgressSet {
