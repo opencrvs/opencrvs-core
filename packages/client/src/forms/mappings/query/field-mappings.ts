@@ -1124,17 +1124,30 @@ export const plainInputTransformer = (
   }
 }
 
-export const childIdentityToFieldTransformer = (
-  transformedData: IFormData,
-  queryData: BirthRegistration,
-  sectionId: 'child',
-  targetSectionId?: string
-) => {
-  queryData[sectionId]?.identifier?.forEach((identifier) => {
-    if (!identifier || !identifier.type || !identifier.id) {
-      return
-    }
-    transformedData[targetSectionId || sectionId][identifier.type] =
-      identifier.id
-  })
-}
+export const childIdentityToFieldTransformer =
+  (
+    idTypes: Array<
+      | 'BIRTH_CONFIGURABLE_IDENTIFIER_1'
+      | 'BIRTH_CONFIGURABLE_IDENTIFIER_2'
+      | 'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+    >
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: BirthRegistration,
+    sectionId: 'child',
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    idTypes.forEach((idType) => {
+      const identifier = queryData[sectionId]?.identifier?.find(
+        (identifier) => identifier?.type === idType
+      )
+      if (!identifier || !identifier.type || !identifier.id) {
+        return
+      }
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || identifier.type
+      ] = identifier.id
+    })
+  }
