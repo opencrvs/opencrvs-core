@@ -51,7 +51,8 @@ export const client = axios.create({
 export interface IAuthenticateResponse {
   nonce: string
   token?: string
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 export enum QUESTION_KEYS {
