@@ -117,6 +117,7 @@ const UserRoles = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.userRoles)}
           />
         }
         navigation={<Navigation />}
