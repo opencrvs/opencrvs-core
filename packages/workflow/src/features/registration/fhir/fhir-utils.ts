@@ -426,35 +426,37 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
 export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
-  SECTION_CODE[event].map(async (sectionCode: string) => {
-    const section = getSectionEntryBySectionCode(composition, sectionCode)
-    const patient = getPatientBySection(bundle, section)
-    const patientFromFhir: fhir.Patient = await getFromFhir(
-      `/Patient/${patient?.id}`
-    )
-    if (patientFromFhir) {
-      bundle.entry =
-        bundle &&
-        bundle.entry &&
-        bundle.entry.map((entry) => {
-          if (entry.resource?.id === patientFromFhir.id) {
-            return {
-              ...entry,
-              resource: {
-                ...entry.resource,
-                identifier: unionBy(
-                  (entry.resource as fhir.Patient).identifier,
-                  patientFromFhir.identifier,
-                  'type'
-                )
+  return Promise.all(
+    SECTION_CODE[event].map(async (sectionCode: string) => {
+      const section = getSectionEntryBySectionCode(composition, sectionCode)
+      const patient = getPatientBySection(bundle, section)
+      const patientFromFhir: fhir.Patient = await getFromFhir(
+        `/Patient/${patient?.id}`
+      )
+      if (patientFromFhir) {
+        bundle.entry =
+          bundle &&
+          bundle.entry &&
+          bundle.entry.map((entry) => {
+            if (entry.resource?.id === patientFromFhir.id) {
+              return {
+                ...entry,
+                resource: {
+                  ...entry.resource,
+                  identifier: unionBy(
+                    (entry.resource as fhir.Patient).identifier,
+                    patientFromFhir.identifier,
+                    'type'
+                  )
+                }
               }
+            } else {
+              return entry
             }
-          } else {
-            return entry
-          }
-        })
-    }
-  })
+          })
+      }
+    })
+  )
 }
 
 export async function forwardEntriesToHearth(
