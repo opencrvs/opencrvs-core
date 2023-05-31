@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { differenceInDays, eachMonthOfInterval } from 'date-fns'
+import {
+  differenceInDays,
+  eachMonthOfInterval,
+  eachDayOfInterval,
+  getYear
+} from 'date-fns'
 import {
   IBirthKeyFigures,
   IEstimation
@@ -111,22 +116,25 @@ export const fetchEstimateByLocation = async (
   timeFrom: string,
   timeTo: string
 ): Promise<IEstimation> => {
-  let crudRate = 0
-  let totalPopulation = 0
-
-  const estimationForDays = Math.ceil(
-    Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
-      (1000 * 60 * 60 * 24)
-  )
+  let totalEstimation = 0
+  let maleEstimation = 0
+  let femaleEstimation = 0
   let estimateExtensionFound = false
   const toYear = new Date(timeTo).getFullYear()
   const fromYear = new Date(timeFrom).getFullYear()
   const yearArray: number[] = []
+  const crudArray: number[] = []
+  const malePopulationArray: number[] = []
+  const femalePopulationArray: number[] = []
+  const totalPopulationArray: number[] = []
+  const estimationForDaysArray = getDaysPerYear(
+    new Date(timeFrom),
+    new Date(timeTo)
+  )
+
   for (let year = fromYear; year <= toYear; year++) {
     yearArray.push(year)
   }
-  let malePopulation = 0
-  let femalePopulation = 0
 
   if (!locationData.extension) {
     return {
@@ -147,18 +155,16 @@ export const fetchEstimateByLocation = async (
       const valueArray = JSON.parse(extension.valueString as string) as {
         [key: string]: number
       }[]
-      let sum = 0
-      let count = 0
 
       for (let i = 0; i < yearArray.length; i++) {
         const year = yearArray[i].toString()
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += Number(entry[year])
+          crudArray.push(Number(entry[year]))
+        } else {
+          crudArray.push(0)
         }
-        count++
       }
-      crudRate = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
@@ -167,64 +173,50 @@ export const fetchEstimateByLocation = async (
       const valueArray = JSON.parse(extension.valueString as string) as {
         [key: string]: number
       }[]
-      let sum = 0
-      let count = 0
 
       for (let i = 0; i < yearArray.length; i++) {
         const year = yearArray[i].toString()
         const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += Number(entry[year])
+          totalPopulationArray.push(Number(entry[year]))
+        } else {
+          totalPopulationArray.push(0)
         }
-        count++
       }
-      totalPopulation = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      const malePopulationArray = JSON.parse(
-        extension.valueString as string
-      ) as {
+      const valueArray = JSON.parse(extension.valueString as string) as {
         [key: string]: number
       }[]
-      let sum = 0
-      let count = 0
 
       for (let i = 0; i < yearArray.length; i++) {
         const year = yearArray[i].toString()
-        const entry = malePopulationArray.find((obj) =>
-          obj.hasOwnProperty(year)
-        )
+        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += Number(entry[year])
+          malePopulationArray.push(Number(entry[year]))
+        } else {
+          malePopulationArray.push(0)
         }
-        count++
       }
-      malePopulation = sum / count
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      const femalePopulationArray = JSON.parse(
-        extension.valueString as string
-      ) as {
+      const valueArray = JSON.parse(extension.valueString as string) as {
         [key: string]: number
       }[]
-      let sum = 0
-      let count = 0
 
       for (let i = 0; i < yearArray.length; i++) {
         const year = yearArray[i].toString()
-        const entry = femalePopulationArray.find((obj) =>
-          obj.hasOwnProperty(year)
-        )
+        const entry = valueArray.find((obj) => obj.hasOwnProperty(year))
         if (entry) {
-          sum += Number(entry[year])
+          femalePopulationArray.push(Number(entry[year]))
+        } else {
+          femalePopulationArray.push(0)
         }
-        count++
       }
-      femalePopulation = sum / count
     }
   })
   if (!estimateExtensionFound) {
@@ -241,19 +233,32 @@ export const fetchEstimateByLocation = async (
       'crude-death-rate',
       authHeader
     )
-    crudRate = crudeDeathRateResponse.crudeDeathRate
+
+    for (let i = 0; i < yearArray.length; i++) {
+      crudArray.push(Number(crudeDeathRateResponse.crudeDeathRate))
+    }
+  }
+  for (let i = 0; i < yearArray.length; i++) {
+    totalEstimation =
+      totalEstimation +
+      ((crudArray[i] * totalPopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
+
+    maleEstimation =
+      maleEstimation +
+      ((crudArray[i] * malePopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
+
+    femaleEstimation =
+      femaleEstimation +
+      ((crudArray[i] * femalePopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
   }
 
   return {
-    totalEstimation: Math.round(
-      ((crudRate * totalPopulation) / 1000) * (estimationForDays / 365)
-    ),
-    maleEstimation: Math.round(
-      ((crudRate * malePopulation) / 1000) * (estimationForDays / 365)
-    ),
-    femaleEstimation: Math.round(
-      ((crudRate * femalePopulation) / 1000) * (estimationForDays / 365)
-    ),
+    totalEstimation: Math.round(totalEstimation),
+    maleEstimation: Math.round(maleEstimation),
+    femaleEstimation: Math.round(femaleEstimation),
     locationId: locationData.id,
     locationLevel: getLocationLevelFromLocationData(locationData)
   }
@@ -504,4 +509,26 @@ export function getPopulation(
   )
 
   return totalPopulation ? totalPopulation[populationYearToConsider] : 0
+}
+
+function getDaysPerYear(fromDate: Date, toDate: Date) {
+  const daysPerYear = []
+  const allDates = eachDayOfInterval({ start: fromDate, end: toDate })
+  let currentYear = getYear(fromDate)
+  let daysInYear = 0
+
+  allDates.forEach((date) => {
+    const year = getYear(date)
+    if (year !== currentYear) {
+      daysPerYear.push(daysInYear)
+      currentYear = year
+      daysInYear = 0
+    }
+
+    daysInYear++
+  })
+
+  daysPerYear.push(daysInYear)
+
+  return daysPerYear
 }
