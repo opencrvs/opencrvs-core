@@ -1123,3 +1123,18 @@ export const plainInputTransformer = (
     transformedData[sectionId][field.name] = queryData[fieldName] || ''
   }
 }
+
+export const childIdentityToFieldTransformer = (
+  transformedData: IFormData,
+  queryData: BirthRegistration,
+  sectionId: 'child',
+  targetSectionId?: string
+) => {
+  queryData[sectionId]?.identifier?.forEach((identifier) => {
+    if (!identifier || !identifier.type || !identifier.id) {
+      return
+    }
+    transformedData[targetSectionId || sectionId][identifier.type] =
+      identifier.id
+  })
+}
