@@ -167,7 +167,7 @@ export const facilityMustBeSelected: Validation = (
     offlineCountryConfig as IOfflineData,
     'facilities'
   )
-  const isValid = !value || locationsList[value as string].name
+  const isValid = !value || locationsList[value as string]?.name
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
