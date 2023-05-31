@@ -43,7 +43,7 @@ import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
 
 const { useState, useCallback, useMemo } = React

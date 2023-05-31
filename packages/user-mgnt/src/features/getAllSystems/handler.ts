@@ -9,4 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './List'
+import System from '@user-mgnt/model/system'
+import { pickSystem } from '@user-mgnt/utils/system'
+
+export async function getAllSystemsHandler() {
+  const systems = await System.find()
+  return systems.map((system) => pickSystem(system))
+}

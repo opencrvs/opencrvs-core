@@ -46,7 +46,7 @@ enum Relationship {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UINTOKEN
+  MOSIP_PSUT_TOKEN_ID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
@@ -128,12 +128,14 @@ input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
   type: IdentityIDType # -> .system
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input RelatedPersonInput {
