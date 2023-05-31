@@ -39,9 +39,9 @@ interface ISysAdminMessages
   reactivateUserSubtitle: MessageDescriptor
   reactivateReasonReturnedToRole: MessageDescriptor
   reactivateReasonNoLongerInvestigated: MessageDescriptor
-  resendSMS: MessageDescriptor
-  resendSMSSuccess: MessageDescriptor
-  resendSMSError: MessageDescriptor
+  resendInvite: MessageDescriptor
+  resendInviteSuccess: MessageDescriptor
+  resendInviteError: MessageDescriptor
   sendUsernameReminderSMS: MessageDescriptor
   sendUsernameReminderSMSSuccess: MessageDescriptor
   sendUsernameReminderSMSError: MessageDescriptor
@@ -192,20 +192,20 @@ const messagesToDefine: ISysAdminMessages = {
     description: 'The label for radio option no longer investigated',
     id: 'sysAdHome.user.audit.reactiv.noLongerInv'
   },
-  resendSMS: {
-    defaultMessage: 'Resend SMS invite',
-    description: 'The label for menu option resend SMS',
-    id: 'sysAdHome.resendSMS'
+  resendInvite: {
+    defaultMessage: 'Resend invite',
+    description: 'The label for menu option resend invitation',
+    id: 'sysAdHome.resendInvite'
   },
-  resendSMSSuccess: {
+  resendInviteSuccess: {
     defaultMessage: 'Invite sent',
-    description: 'The label for success notification of resend sms invite',
-    id: 'sysAdHome.resendSMSSuccess'
+    description: 'The label for success notification of resend invite',
+    id: 'sysAdHome.resendInviteSuccess'
   },
-  resendSMSError: {
+  resendInviteError: {
     defaultMessage: 'Invite could not be sent',
-    description: 'The label for error notification of resend sms invite',
-    id: 'sysAdHome.resendSMSError'
+    description: 'The label for error notification of resend invite',
+    id: 'sysAdHome.resendInviteError'
   },
   sendUsernameReminderSMS: {
     defaultMessage: 'Send username reminder',
