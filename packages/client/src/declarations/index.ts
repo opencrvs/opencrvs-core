@@ -470,6 +470,14 @@ export interface IDeclarationsState {
   isWritingDraft: boolean
 }
 
+const signatureKeys = [
+  'informantsSignature',
+  'brideSignature',
+  'groomSignature',
+  'witnessOneSignature',
+  'witnessTwoSignature'
+] as const
+
 const initialState: IDeclarationsState = {
   userID: '',
   declarations: [],
@@ -1062,15 +1070,7 @@ function getSignatureUrls(queryResultData: Query) {
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  return (
-    [
-      'informantsSignature',
-      'brideSignature',
-      'groomSignature',
-      'witnessOneSignature',
-      'witnessTwoSignature'
-    ] as const
-  )
+  return signatureKeys
     .map((propertyKey) => registration?.[propertyKey])
     .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
@@ -1832,10 +1832,13 @@ export function filterProcessingDeclarations(
 export function getMinioUrlsFromDeclaration(
   declaration: IDeclaration | undefined
 ) {
-  const minioUrls: string[] = []
   if (!declaration) {
-    return minioUrls
+    return []
   }
+  const minioUrls: string[] = signatureKeys
+    .map((propertyKey) => declaration.originalData?.registration?.[propertyKey])
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
   const documentsData = declaration.originalData?.documents as Record<
     string,
     IAttachmentValue[]
