@@ -11,21 +11,23 @@
  */
 import fetch from 'node-fetch'
 
-import {
-  COUNTRY_CONFIG_URL,
-  USER_NOTIFICATION_DELIVERY_METHOD
-} from '@notification/constants'
+import { COUNTRY_CONFIG_URL } from '@notification/constants'
 import { logger } from '@notification/logger'
 
 export async function notifyCountryConfig(
-  templateName: string,
-  recipient: string,
+  templateName: {
+    email?: string
+    sms: string
+  },
+  recipient: {
+    email?: string
+    sms?: string
+  },
   variables: Record<string, string>,
   token: string,
   locale: string,
   convertUnicode?: boolean
 ) {
-  const notificationType = USER_NOTIFICATION_DELIVERY_METHOD
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
     logger.info(
@@ -35,7 +37,6 @@ export async function notifyCountryConfig(
     return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        type: notificationType,
         templateName,
         recipient,
         locale,

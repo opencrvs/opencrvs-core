@@ -21,8 +21,14 @@ describe('.sendSMS()', () => {
     fetch.once('Success')
     await expect(
       notifyCountryConfig(
-        'templateName',
-        '27845555555',
+        {
+          email: 'templateName',
+          sms: 'templateName'
+        },
+        {
+          email: 'email@mail.com',
+          sms: '27845555555'
+        },
         { test: 'test' },
         'Bearer token...',
         'en'
@@ -36,8 +42,14 @@ describe('.sendSMS()', () => {
     fetch.mockRejectOnce(new Error('something broke :('))
     await expect(
       notifyCountryConfig(
-        'templateName',
-        '27845555555',
+        {
+          email: 'templateName',
+          sms: 'templateName'
+        },
+        {
+          email: 'email@mail.com',
+          sms: '27845555555'
+        },
         { test: 'test' },
         'Bearer token...',
         'en'
