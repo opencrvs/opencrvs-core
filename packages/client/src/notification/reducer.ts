@@ -31,7 +31,7 @@ type userCreateDuplicateMobileFailedToastState = {
 
 type userCreateDuplicateEmailFailedToastState = {
   visible: boolean
-  emailForNotification: string | null
+  email: string | null
 }
 
 export type NotificationState = {
@@ -75,7 +75,7 @@ export const initialState: NotificationState = {
   },
   userCreateDuplicateEmailFailedToast: {
     visible: false,
-    emailForNotification: null
+    email: null
   },
   userReconnectedToast: false
 }
@@ -135,7 +135,7 @@ export const notificationReducer: LoopReducer<
     case actions.SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST:
       const userCreateDuplicateEmailFailedToast = {
         visible: true,
-        emailForNotification: action.payload.emailForNotification
+        email: action.payload.email
       }
       return {
         ...state,
@@ -169,7 +169,7 @@ export const notificationReducer: LoopReducer<
         ...state,
         userCreateDuplicateEmailFailedToast: {
           visible: false,
-          emailForNotification: null
+          email: null
         }
       }
     case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:

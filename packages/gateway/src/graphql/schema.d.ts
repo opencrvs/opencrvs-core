@@ -636,7 +636,6 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
-  emailForNotification?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -2485,7 +2484,7 @@ export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetUserByEmailArgs {
-  emailForNotification?: string
+  email?: string
 }
 export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
   (

@@ -30,11 +30,11 @@ export const GET_USER_BY_MOBILE = gql`
 
 export const GET_USER_BY_EMAIL = gql`
   query getUserByEmail($email: String) {
-    getUserByEmail(emailForNotification: $email) {
+    getUserByEmail(email: $email) {
       id
       username
       mobile
-      emailForNotification
+      email
       systemRole
       role {
         _id

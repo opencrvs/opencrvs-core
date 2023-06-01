@@ -37,7 +37,7 @@ type Query {
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
-  getUserByEmail(emailForNotification: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String
@@ -762,7 +762,6 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  emailForNotification: String
   systemRole: SystemRoleType!
   role: String
   email: String

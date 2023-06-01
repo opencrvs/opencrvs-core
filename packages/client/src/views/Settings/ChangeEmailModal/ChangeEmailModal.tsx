@@ -28,7 +28,7 @@ interface IProps {
 export function ChangeEmailModal({ show, onClose, onSuccess }: IProps) {
   const [view, setView] = React.useState(VIEW_TYPE.CHANGE_EMAIL)
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
-  const onSuccessChangeNumber = (emailAddress: string) => {
+  const onSuccessChangeEmail = (emailAddress: string) => {
     setEmailAddress(emailAddress)
     setView(VIEW_TYPE.VERIFY_NUMBER)
   }
@@ -46,7 +46,7 @@ export function ChangeEmailModal({ show, onClose, onSuccess }: IProps) {
     <>
       <ChangeEmailView
         show={show && view === VIEW_TYPE.CHANGE_EMAIL}
-        onSuccess={onSuccessChangeNumber}
+        onSuccess={onSuccessChangeEmail}
         onClose={onClose}
       />
       <VerifyCodeView

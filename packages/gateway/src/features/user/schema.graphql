@@ -48,7 +48,6 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  emailForNotification: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -150,7 +149,7 @@ input AvatarInput {
 type Query {
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
-  getUserByEmail(emailForNotification: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String

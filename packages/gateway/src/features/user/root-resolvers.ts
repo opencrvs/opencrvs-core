@@ -54,8 +54,8 @@ export const resolvers: GQLResolver = {
       return res
     },
 
-    async getUserByEmail(_, { emailForNotification }, { headers: authHeader }) {
-      const res = await getUser({ email: emailForNotification }, authHeader)
+    async getUserByEmail(_, { email }, { headers: authHeader }) {
+      const res = await getUser({ email }, authHeader)
       if (!res._id) {
         return null
       }
@@ -615,7 +615,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
-    emailForNotification: user.emailForNotification,
+    emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
     mobile: user.mobile as string,
     device: user.device as string,
     signature: user.signature

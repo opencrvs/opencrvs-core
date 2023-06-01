@@ -269,7 +269,7 @@ class Component extends React.Component<
             onClose={this.hideCreateUserFormDuplicateEmailErrorToast}
           >
             {intl.formatMessage(userMessages.duplicateUserEmailErrorMessege, {
-              email: userCreateDuplicateEmailFailedToast.emailForNotification
+              email: userCreateDuplicateEmailFailedToast.email
             })}
           </Toast>
         )}

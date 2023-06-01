@@ -1930,7 +1930,7 @@ export type QueryGetUserAuditLogArgs = {
 }
 
 export type QueryGetUserByEmailArgs = {
-  emailForNotification?: InputMaybe<Scalars['String']>
+  email?: InputMaybe<Scalars['String']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -2937,7 +2937,7 @@ export type FetchUserQuery = {
     username?: string | null
     practitionerId: string
     mobile?: string | null
-    emailForNotification?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     role: {
@@ -3327,7 +3327,7 @@ export type GetUserQuery = {
     id: string
     username?: string | null
     mobile?: string | null
-    emailForNotification?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
@@ -7597,6 +7597,24 @@ export type GetUserByMobileQueryVariables = Exact<{
 export type GetUserByMobileQuery = {
   __typename?: 'Query'
   getUserByMobile?: {
+    __typename?: 'User'
+    id: string
+    username?: string | null
+    mobile?: string | null
+    email?: string | null
+    systemRole: SystemRoleType
+    status: Status
+    role: { __typename?: 'Role'; _id: string }
+  } | null
+}
+
+export type GetUserByEmailQueryVariables = Exact<{
+  email?: InputMaybe<Scalars['String']>
+}>
+
+export type GetUserByEmailQuery = {
+  __typename?: 'Query'
+  getUserByEmail?: {
     __typename?: 'User'
     id: string
     username?: string | null

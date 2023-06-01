@@ -80,7 +80,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           userDetails?.mobile
             ? convertToMSISDN(userDetails?.mobile, window.config.COUNTRY)
             : undefined,
-          String(userDetails?.emailForNotification)
+          String(userDetails?.email)
         )
       )
       onSuccess(emailAddress)

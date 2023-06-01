@@ -27,13 +27,15 @@ import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplif
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { ChangeEmailModal } from '@client/views/Settings/ChangeEmailModal/ChangeEmailModal'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function EmailAddress() {
   const intl = useIntl()
   const isOnline = useOnlineStatus()
-  const emailForNotification = useSelector<IStoreState, string>(
-    (state) => state.profile.userDetails?.emailForNotification || ''
+  const email = useSelector<IStoreState, string>(
+    (state) => state.profile.userDetails?.email || ''
   )
+
   const dispatch = useDispatch()
 
   const [showSuccessNotification, setShowSuccessNotification] =
@@ -58,7 +60,7 @@ export function EmailAddress() {
             {intl.formatMessage(constantsMessages.labelEmail)}
           </LabelContainer>
         }
-        value={<ValueContainer>{emailForNotification}</ValueContainer>}
+        value={<ValueContainer>{email}</ValueContainer>}
         actions={
           <DynamicHeightLinkButton
             onClick={toggleChangeEmailModal}

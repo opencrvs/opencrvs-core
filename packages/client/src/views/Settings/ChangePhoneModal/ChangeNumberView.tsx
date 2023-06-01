@@ -79,7 +79,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           ],
           notificationEvent,
           convertToMSISDN(phoneNumber, window.config.COUNTRY),
-          String(userDetails?.emailForNotification)
+          String(userDetails?.email)
         )
       )
       onSuccess(phoneNumber)

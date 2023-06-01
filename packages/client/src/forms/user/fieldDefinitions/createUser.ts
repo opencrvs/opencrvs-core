@@ -146,7 +146,7 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
-          name: 'emailForNotification',
+          name: 'email',
           type: TEXT,
           label: userFormMessages.email,
           required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',

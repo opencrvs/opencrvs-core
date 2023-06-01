@@ -16286,7 +16286,7 @@
             "description": null,
             "args": [
               {
-                "name": "emailForNotification",
+                "name": "email",
                 "description": null,
                 "type": {
                   "kind": "SCALAR",

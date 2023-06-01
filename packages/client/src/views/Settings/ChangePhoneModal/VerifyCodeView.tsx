@@ -79,7 +79,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          emailForNotification: email
+          email: email
         })
       )
     }
