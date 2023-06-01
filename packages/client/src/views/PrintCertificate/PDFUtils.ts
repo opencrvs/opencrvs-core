@@ -85,7 +85,7 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  await createPDF(
+  createPDF(
     await getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
     userDetails,
@@ -127,33 +127,23 @@ async function getPDFTemplateWithSVG(
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
 
-  const signaturePromises = {
-    brideSignature: urlToBase64(
-      declaration.data.template.brideSignature as string
-    ),
-    groomSignature: urlToBase64(
-      declaration.data.template.groomSignature as string
-    ),
-    witnessOneSignature: urlToBase64(
-      declaration.data.template.witnessOneSignature as string
-    ),
-    witnessTwoSignature: urlToBase64(
-      declaration.data.template.witnessTwoSignature as string
-    )
-  }
-
-  const resolvedSignaturePromises = await Promise.all(
-    Object.values(signaturePromises)
-  )
+  const resolvedSignatures = await Promise.all(
+    [
+      'groomSignature',
+      'brideSignature',
+      'witnessOneSignature',
+      'witnessTwoSignature'
+    ]
+      .map((k) => ({ signatureKey: k, url: declaration.data.template[k] }))
+      .filter(({ url }) => Boolean(url))
+      .map(({ signatureKey, url }) =>
+        urlToBase64(url as string).then((value) => ({ [signatureKey]: value }))
+      )
+  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
 
   const declarationTemplate = {
     ...declaration.data.template,
-    ...Object.fromEntries(
-      Object.keys(signaturePromises).map((key, index) => [
-        key,
-        resolvedSignaturePromises[index]
-      ])
-    )
+    ...resolvedSignatures
   }
   const svgCode = executeHandlebarsTemplate(svgTemplate, declarationTemplate)
 
