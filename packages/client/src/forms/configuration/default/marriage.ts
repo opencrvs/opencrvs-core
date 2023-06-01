@@ -969,7 +969,7 @@ export const marriageRegisterForms: ISerializedForm = {
                 template: {
                   operation: 'marriageDateFormatTransformation',
                   fieldName: 'eventDate',
-                  parameters: ['en', 'do MMMM yyyy', ['bride', 'groom']]
+                  parameters: ['en', 'yyyy-MM-dd', ['bride', 'groom']]
                 },
                 mutation: {
                   operation: 'fieldToMarriageDateTransformation',

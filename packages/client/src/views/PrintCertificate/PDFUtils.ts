@@ -285,6 +285,20 @@ export function executeHandlebarsTemplate(
     }
   )
 
+  Handlebars.registerHelper('uppercase', function (str) {
+    if (str && typeof str === 'string') {
+      return str.toUpperCase()
+    }
+    return ''
+  })
+
+  Handlebars.registerHelper('lowercase', function (str) {
+    if (str && typeof str === 'string') {
+      return str.toLowerCase()
+    }
+    return ''
+  })
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data)
   const output = template(formattedTemplateData)
