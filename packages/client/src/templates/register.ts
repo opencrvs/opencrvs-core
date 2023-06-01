@@ -26,5 +26,6 @@ export const certificateBaseTemplate = {
         bolditalics: 'NotoSans-RegularItalic.ttf'
       }
     }
-  }
+  },
+  vfs: {}
 }
