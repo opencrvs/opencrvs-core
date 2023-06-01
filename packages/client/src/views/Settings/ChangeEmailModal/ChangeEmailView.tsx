@@ -19,9 +19,13 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { queriesForUser } from '@client/views/Settings/queries'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
+import { NotificationEvent } from '@client/profile/serviceApi'
+import { getLanguage } from '@client/i18n/selectors'
+import { convertToMSISDN } from '@client/forms/utils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IProps {
   show: boolean
@@ -39,6 +43,9 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
   const dispatch = useDispatch()
+  const userDetails = useSelector(getUserDetails)
+  const language = useSelector(getLanguage)
+
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
     setEmailAddress(emailAddress)
@@ -56,10 +63,26 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     const userData = await queriesForUser.fetchUserDetailsByEmail(emailAddress)
-    const userDetails = userData.data.getUserByEmail
-    console.log(userDetails)
-    if (!userDetails) {
-      dispatch(sendVerifyCode(emailAddress))
+    const emailExists = userData.data.getUserByEmail
+
+    if (!emailExists) {
+      const notificationEvent = NotificationEvent.CHANGE_EMAIL_ADDRESS
+      dispatch(
+        sendVerifyCode(
+          [
+            {
+              use: language,
+              family: String(userDetails?.name?.[0].familyName),
+              given: [String(userDetails?.name?.[0].firstNames)]
+            }
+          ],
+          notificationEvent,
+          userDetails?.mobile
+            ? convertToMSISDN(userDetails?.mobile, window.config.COUNTRY)
+            : undefined,
+          String(userDetails?.emailForNotification)
+        )
+      )
       onSuccess(emailAddress)
     } else {
       toggleDuplicateEmailErrorNotification()
