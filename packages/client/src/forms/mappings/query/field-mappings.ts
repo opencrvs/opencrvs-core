@@ -1143,11 +1143,11 @@ export const childIdentityToFieldTransformer =
       const identifier = queryData[sectionId]?.identifier?.find(
         (identifier) => identifier?.type === idType
       )
-      if (!identifier || !identifier.type || !identifier.id) {
+      if (!identifier || !identifier.type) {
         return
       }
       transformedData[targetSectionId || sectionId][
         targetFieldName || identifier.type
-      ] = identifier.id
+      ] = identifier.id ?? ''
     })
   }
