@@ -90,6 +90,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  ignoreBottomMargin: Boolean
   conditionals: [ConditionalInput!]
   datasetId: String
   options: [CustomSelectOption!]

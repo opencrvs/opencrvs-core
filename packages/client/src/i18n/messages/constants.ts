@@ -127,6 +127,11 @@ const messagesToDefine = {
     description: 'Integration title',
     id: 'constants.integrations'
   },
+  vsExportTitle: {
+    defaultMessage: 'Vital statistics',
+    description: 'Vital statistics title',
+    id: 'config.application.vsexport'
+  },
   declarationUpdatedOn: {
     defaultMessage: 'Updated on',
     description:
