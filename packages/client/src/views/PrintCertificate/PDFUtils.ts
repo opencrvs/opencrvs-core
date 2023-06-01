@@ -22,7 +22,7 @@ import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { urlToBase64 } from '@client/utils/imageUtils'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>
@@ -137,7 +137,9 @@ async function getPDFTemplateWithSVG(
       .map((k) => ({ signatureKey: k, url: declaration.data.template[k] }))
       .filter(({ url }) => Boolean(url))
       .map(({ signatureKey, url }) =>
-        urlToBase64(url as string).then((value) => ({ [signatureKey]: value }))
+        fetchImageAsBase64(url as string).then((value) => ({
+          [signatureKey]: value
+        }))
       )
   ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
 
