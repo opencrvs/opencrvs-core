@@ -13404,7 +13404,7 @@
             "deprecationReason": null
           },
           {
-            "name": "resendSMSInvite",
+            "name": "resendInvite",
             "description": null,
             "args": [
               {
@@ -13433,25 +13433,9 @@
             "deprecationReason": null
           },
           {
-            "name": "resetPasswordSMS",
+            "name": "resetPasswordInvite",
             "description": null,
             "args": [
-              {
-                "name": "applicationName",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
               {
                 "name": "userId",
                 "description": null,
@@ -13700,7 +13684,7 @@
             "deprecationReason": null
           },
           {
-            "name": "usernameSMSReminder",
+            "name": "usernameReminder",
             "description": null,
             "args": [
               {

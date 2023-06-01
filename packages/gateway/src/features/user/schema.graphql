@@ -208,7 +208,7 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
-  resetPasswordSMS(userId: String!, applicationName: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
+  resetPasswordInvite(userId: String!): String
 }

@@ -15,9 +15,13 @@ import {
   authenticate,
   storeUserInformation,
   createToken,
-  generateAndSendVerificationCode
+  generateAndSendVerificationCode,
+  IAuthentication
 } from '@auth/features/authenticate/service'
-import { generateNonce } from '@auth/features/verifyCode/service'
+import {
+  NotificationEvent,
+  generateNonce
+} from '@auth/features/verifyCode/service'
 import { unauthorized, forbidden } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
@@ -29,9 +33,9 @@ interface IAuthPayload {
 interface IAuthResponse {
   nonce: string
   mobile?: string
+  email?: string
   status: string
   token?: string
-  email?: string
 }
 
 export default async function authenticateHandler(
@@ -39,7 +43,7 @@ export default async function authenticateHandler(
   h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
-  let result
+  let result: IAuthentication
   const { username, password } = payload
   try {
     result = await authenticate(username.trim(), password)
@@ -70,12 +74,23 @@ export default async function authenticateHandler(
   } else {
     await storeUserInformation(
       nonce,
+      result.name,
       result.userId,
       result.scope,
-      result.mobile
+      result.mobile,
+      result.email
     )
 
-    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
+
+    await generateAndSendVerificationCode(
+      nonce,
+      result.scope,
+      notificationEvent,
+      result.name,
+      result.mobile,
+      result.email
+    )
   }
   return response
 }
@@ -87,7 +102,7 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  mobile: Joi.string(),
+  mobile: Joi.string().optional(),
   email: Joi.string().optional(),
   status: Joi.string(),
   token: Joi.string().optional()

@@ -16,12 +16,8 @@ import {
   IRegistrationPayload,
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
-import {
-  buildAndSendSMS,
-  getTranslations
-} from '@notification/features/sms/utils'
+import { sendNotification } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
 
 export async function sendDeathInProgressConfirmation(
@@ -34,19 +30,11 @@ export async function sendDeathInProgressConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathInProgressNotification,
-    {
-      trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName = messageKeys.deathInProgressNotification
+  await sendNotification(request, templateName, payload.msisdn, {
+    trackingId: payload.trackingId,
+    crvsOffice: payload.crvsOffice
+  })
   return h.response().code(200)
 }
 
@@ -60,19 +48,11 @@ export async function sendDeathDeclarationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathDeclarationNotification,
-    {
-      name: payload.name,
-      trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName = messageKeys.deathDeclarationNotification
+  await sendNotification(request, templateName, payload.msisdn, {
+    name: payload.name,
+    trackingId: payload.trackingId
+  })
   return h.response().code(200)
 }
 
@@ -86,20 +66,12 @@ export async function sendDeathRegistrationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathRegistrationNotification,
-    {
-      name: payload.name,
-      trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName = messageKeys.deathRegistrationNotification
+  await sendNotification(request, templateName, payload.msisdn, {
+    name: payload.name,
+    trackingId: payload.trackingId,
+    registrationNumber: payload.registrationNumber
+  })
   return h.response().code(200)
 }
 
@@ -113,18 +85,10 @@ export async function sendDeathRejectionConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.deathRejectionNotification,
-    {
-      name: payload.name,
-      trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
-  )
-  await buildAndSendSMS(request, payload.msisdn, message)
+  const templateName = messageKeys.deathRejectionNotification
+  await sendNotification(request, templateName, payload.msisdn, {
+    name: payload.name,
+    trackingId: payload.trackingId
+  })
   return h.response().code(200)
 }
