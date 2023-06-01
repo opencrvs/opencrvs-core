@@ -11,20 +11,17 @@
  */
 
 import { fetchDocuments } from '@gateway/features/fhir/utils'
-import { MINIO_BUCKET } from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
 
 export async function getPresignedUrlFromUri(
-  contact: fhir.Extension,
+  fileUri: string,
   authHeader: IAuthHeader
 ) {
-  const fileName =
-    contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
   const response = (await fetchDocuments(
     '/presigned-url',
     authHeader,
     'POST',
-    JSON.stringify({ fileName: fileName })
+    JSON.stringify({ fileUri })
   )) as { presignedURL: string }
   return response.presignedURL
 }

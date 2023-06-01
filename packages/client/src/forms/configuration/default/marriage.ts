@@ -586,7 +586,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'groomNameInEnglish',
               label: {
-                defaultMessage: "Groom's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for groom's name in english",
                 id: 'form.preview.group.label.groom.english.name'
               },
@@ -859,7 +859,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'brideNameInEnglish',
               label: {
-                defaultMessage: "Bride's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for bride's name in english",
                 id: 'form.preview.group.label.bride.english.name'
               },
@@ -1098,7 +1098,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessOneNameInEnglish',
               label: {
-                defaultMessage: 'Witness One English name',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness one name in english',
                 id: 'form.preview.group.label.witness.one.english.name'
               },
@@ -1242,7 +1242,7 @@ export const marriageRegisterForms: ISerializedForm = {
             {
               id: 'witnessTwoNameInEnglish',
               label: {
-                defaultMessage: 'Witness Two English name',
+                defaultMessage: 'Full name',
                 description: 'Label for Witness two name in english',
                 id: 'form.preview.group.label.witness.two.english.name'
               },

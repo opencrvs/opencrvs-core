@@ -34,7 +34,7 @@ const options = [
   { value: 'death', label: 'Death' },
   { value: 'marriage', label: 'Marriage' },
   { value: 'adoption', label: 'Adoption' },
-  { value: 'divorce', label: 'Divorce' }
+  { value: 'divorce', label: 'Divorce', disabled: true }
 ]
 
 export const Default = () => {
