@@ -39,7 +39,7 @@ import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Avatar } from '@client/utils/gateway'
+import { Avatar, Event } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
@@ -91,8 +91,8 @@ type IProps = RouteComponentProps &
   IDispatchProps
 
 export enum EVENT_OPTIONS {
-  BIRTH = 'birth',
-  DEATH = 'death'
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH'
 }
 
 enum STATUS_OPTIONS {
@@ -425,11 +425,11 @@ function FieldAgentListComponent(props: IProps) {
               options={[
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
-                  value: EVENT_OPTIONS.BIRTH
+                  value: Event.Birth
                 },
                 {
                   label: intl.formatMessage(messages.eventOptionForDeaths),
-                  value: EVENT_OPTIONS.DEATH
+                  value: Event.Death
                 }
               ]}
             />
