@@ -318,11 +318,14 @@ export enum AttachmentSubject {
 }
 
 export enum AttachmentType {
+  AdoptionProof = 'ADOPTION_PROOF',
   AttestedLetterOfDeath = 'ATTESTED_LETTER_OF_DEATH',
   BirthCertificate = 'BIRTH_CERTIFICATE',
   BurialReceipt = 'BURIAL_RECEIPT',
   CoronersReport = 'CORONERS_REPORT',
+  CourtOrder = 'COURT_ORDER',
   HospitalCertificateOfDeath = 'HOSPITAL_CERTIFICATE_OF_DEATH',
+  MarriageCertificate = 'MARRIAGE_CERTIFICATE',
   MarriageNotice = 'MARRIAGE_NOTICE',
   MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   NationalId = 'NATIONAL_ID',
@@ -333,15 +336,12 @@ export enum AttachmentType {
   PoliceCertificateOfDeath = 'POLICE_CERTIFICATE_OF_DEATH',
   ProofOfAssignedResponsibility = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
   ProofOfLegalGuardianship = 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  RecognitionProof = 'RECOGNITION_PROOF',
   RefugeeCard = 'REFUGEE_CARD',
+  Requisition = 'REQUISITION',
   ResidentCard = 'RESIDENT_CARD',
   RetiredPoliceId = 'RETIRED_POLICE_ID',
-  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT',
-  Requisition = 'REQUISITION',
-  CourtOrder = 'COURT_ORDER',
-  MarriageCertificate = 'MARRIAGE_CERTIFICATE',
-  RecognitionProof = 'RECOGNITION_PROOF',
-  AdoptionProof = 'ADOPTION_PROOF'
+  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
 }
 
 export enum AttendantType {
@@ -544,7 +544,7 @@ export type CertificateSvg = {
 
 export type CertificateSvgInput = {
   event: Event
-  id: Scalars['ID']
+  id?: InputMaybe<Scalars['ID']>
   status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
@@ -1686,10 +1686,6 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
-export type Operation = {
-  operation: Scalars['String']
-}
-
 export type OidpUserAddress = {
   __typename?: 'OIDPUserAddress'
   city?: Maybe<Scalars['String']>
@@ -1723,6 +1719,10 @@ export type OidpUserInfo = {
   updated_at?: Maybe<Scalars['Int']>
   website?: Maybe<Scalars['String']>
   zoneinfo?: Maybe<Scalars['String']>
+}
+
+export type Operation = {
+  operation: Scalars['String']
 }
 
 export type OperationHistorySearchSet = {
@@ -5736,6 +5736,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string
@@ -7261,7 +7262,7 @@ export type RegistrationHomeQuery = {
 
 export type FieldAgentHomeQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['String']>
-  declarationLocationId: Scalars['String']
+  declarationLocationId?: InputMaybe<Scalars['String']>
   pageSize?: InputMaybe<Scalars['Int']>
   reviewSkip?: InputMaybe<Scalars['Int']>
   rejectSkip?: InputMaybe<Scalars['Int']>

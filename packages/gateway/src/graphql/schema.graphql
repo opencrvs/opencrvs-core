@@ -819,7 +819,7 @@ input SystemRoleInput {
 }
 
 input CertificateSVGInput {
-  id: ID!
+  id: ID
   svgCode: String!
   svgFilename: String!
   svgDateUpdated: Int
