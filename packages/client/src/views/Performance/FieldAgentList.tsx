@@ -74,6 +74,7 @@ interface ISearchParams {
   locationId: string
   timeStart: string
   timeEnd: string
+  event: string
 }
 
 interface IConnectProps {
@@ -90,8 +91,8 @@ type IProps = RouteComponentProps &
   IDispatchProps
 
 export enum EVENT_OPTIONS {
-  BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  BIRTH = 'birth',
+  DEATH = 'death'
 }
 
 enum STATUS_OPTIONS {
@@ -160,11 +161,10 @@ function FieldAgentListComponent(props: IProps) {
     location: { search },
     offlineOffices
   } = props
-  const { locationId, timeStart, timeEnd } = parse(
+  const { event, locationId, timeStart, timeEnd } = parse(
     search
   ) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
-  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] =
@@ -411,10 +411,11 @@ function FieldAgentListComponent(props: IProps) {
             />
             <PerformanceSelect
               onChange={(option) => {
-                setEvent(
-                  Object.values(EVENT_OPTIONS).find(
-                    (val) => val === option.value
-                  ) || EVENT_OPTIONS.BIRTH
+                props.goToFieldAgentList(
+                  timeStart,
+                  timeEnd,
+                  locationId,
+                  option.value
                 )
               }}
               id="event-select"

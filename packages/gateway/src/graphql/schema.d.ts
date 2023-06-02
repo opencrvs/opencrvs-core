@@ -51,11 +51,12 @@ export interface GQLQuery {
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
-  getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
+  getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   getFormDraft?: Array<GQLFormDraft>
   fetchSystem?: GQLSystem
   getFormDataset?: Array<GQLFormDataset>
   informantSMSNotifications?: Array<GQLSMSNotification>
+  getOIDPUserInfo?: GQLUserInfo
 }
 
 export interface GQLMutation {
@@ -507,8 +508,19 @@ export interface GQLCertificateSVG {
   svgDateUpdated: string
   svgDateCreated: string
   user: string
-  event: string
-  status: string
+  event: GQLEvent
+  status: GQLCertificateStatus
+}
+
+export const enum GQLCertificateStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death',
+  marriage = 'marriage'
 }
 
 export interface GQLFormDraft {
@@ -529,7 +541,8 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
-  settings?: Array<GQLWebhookPermission>
+  integratingSystemType?: GQLIntegratingSystemType
+  settings?: GQLSystemSettings
 }
 
 export interface GQLFormDataset {
@@ -546,6 +559,13 @@ export interface GQLSMSNotification {
   enabled: boolean
   updatedAt: string
   createdAt: string
+}
+
+export interface GQLUserInfo {
+  oidpUserInfo?: GQLOIDPUserInfo
+  districtFhirId?: string
+  stateFhirId?: string
+  locationLevel3FhirId?: string
 }
 
 export interface GQLNotificationInput {
@@ -675,8 +695,8 @@ export interface GQLCertificateSVGInput {
   svgDateUpdated?: number
   svgDateCreated?: number
   user: string
-  event: string
-  status: string
+  event: GQLEvent
+  status: GQLCertificateStatus
 }
 
 export interface GQLApplicationConfiguration {
@@ -742,7 +762,8 @@ export interface GQLSystemSecret {
 export interface GQLSystemInput {
   name: string
   type: GQLSystemType
-  settings?: GQLSystemSettings
+  settings?: GQLSystemSettingsInput
+  integratingSystemType?: GQLIntegratingSystemType
 }
 
 export interface GQLUpdatePermissionsInput {
@@ -911,6 +932,7 @@ export interface GQLIdentityType {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLHumanName {
@@ -1143,12 +1165,6 @@ export interface GQLEventSearchSetNameMap {
   MarriageEventSearchSet: GQLMarriageEventSearchSet
 }
 
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death',
-  marriage = 'marriage'
-}
-
 export interface GQLEventProgressSet {
   id: string
   type?: string
@@ -1187,14 +1203,46 @@ export const enum GQLSystemType {
   WEBHOOK = 'WEBHOOK'
 }
 
-export interface GQLWebhookPermission {
-  event: string
-  permissions: Array<string>
+export const enum GQLIntegratingSystemType {
+  MOSIP = 'MOSIP',
+  OSIA = 'OSIA',
+  OTHER = 'OTHER'
+}
+
+export interface GQLSystemSettings {
+  dailyQuota?: number
+  webhook?: Array<GQLWebhookPermission>
+  openIdProviderClientId?: string
+  openIdProviderBaseUrl?: string
+  openIdProviderClaims?: string
 }
 
 export interface GQLFormDatasetOption {
   value: string
   label?: Array<GQLFormDatasetOptionLabel | null>
+}
+
+export interface GQLOIDPUserInfo {
+  sub: string
+  name?: string
+  given_name?: string
+  family_name?: string
+  middle_name?: string
+  nickname?: string
+  preferred_username?: string
+  profile?: string
+  picture?: string
+  website?: string
+  email?: string
+  email_verified?: boolean
+  gender?: string
+  birthdate?: string
+  zoneinfo?: string
+  locale?: string
+  phone_number?: string
+  phone_number_verified?: boolean
+  address?: GQLOIDPUserAddress
+  updated_at?: number
 }
 
 export interface GQLPersonInput {
@@ -1411,7 +1459,7 @@ export interface GQLQuestionInput {
   options?: Array<GQLCustomSelectOption>
 }
 
-export interface GQLSystemSettings {
+export interface GQLSystemSettingsInput {
   dailyQuota?: number
   webhook?: Array<GQLWebhookInput | null>
 }
@@ -1513,7 +1561,7 @@ export interface GQLInputOutput {
 export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
-  MOSIP_UINTOKEN = 'MOSIP_UINTOKEN',
+  MOSIP_PSUT_TOKEN_ID = 'MOSIP_PSUT_TOKEN_ID',
   DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
   BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
   DRIVING_LICENSE = 'DRIVING_LICENSE',
@@ -1762,15 +1810,31 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLWebhookPermission {
+  event: string
+  permissions: Array<string>
+}
+
 export interface GQLFormDatasetOptionLabel {
   lang: string
   descriptor: GQLMesssageDescriptor
+}
+
+export interface GQLOIDPUserAddress {
+  formatted?: string
+  street_address?: string
+  locality?: string
+  region?: string
+  postal_code?: string
+  city?: string
+  country?: string
 }
 
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
   otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
 }
 
 export interface GQLContactPointInput {
@@ -2045,6 +2109,7 @@ export interface GQLResolver {
   System?: GQLSystemTypeResolver
   FormDataset?: GQLFormDatasetTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
+  UserInfo?: GQLUserInfoTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -2088,8 +2153,9 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
-  WebhookPermission?: GQLWebhookPermissionTypeResolver
+  SystemSettings?: GQLSystemSettingsTypeResolver
   FormDatasetOption?: GQLFormDatasetOptionTypeResolver
+  OIDPUserInfo?: GQLOIDPUserInfoTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
@@ -2116,7 +2182,9 @@ export interface GQLResolver {
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  WebhookPermission?: GQLWebhookPermissionTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
+  OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
@@ -2172,6 +2240,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getFormDataset?: QueryToGetFormDatasetResolver<TParent>
   informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
+  getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2774,8 +2843,8 @@ export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetCertificateSVGArgs {
-  status?: string
-  event?: string
+  status: GQLCertificateStatus
+  event: GQLEvent
 }
 export interface QueryToGetCertificateSVGResolver<
   TParent = any,
@@ -2838,6 +2907,21 @@ export interface QueryToInformantSMSNotificationsResolver<
   (
     parent: TParent,
     args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetOIDPUserInfoArgs {
+  code: string
+  clientId: string
+  redirectUri: string
+  grantType?: string
+}
+export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetOIDPUserInfoArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6049,6 +6133,7 @@ export interface GQLSystemTypeResolver<TParent = any> {
   status?: SystemToStatusResolver<TParent>
   name?: SystemToNameResolver<TParent>
   type?: SystemToTypeResolver<TParent>
+  integratingSystemType?: SystemToIntegratingSystemTypeResolver<TParent>
   settings?: SystemToSettingsResolver<TParent>
 }
 
@@ -6098,6 +6183,18 @@ export interface SystemToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface SystemToIntegratingSystemTypeResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
@@ -6222,6 +6319,55 @@ export interface SMSNotificationToUpdatedAtResolver<
 }
 
 export interface SMSNotificationToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLUserInfoTypeResolver<TParent = any> {
+  oidpUserInfo?: UserInfoToOidpUserInfoResolver<TParent>
+  districtFhirId?: UserInfoToDistrictFhirIdResolver<TParent>
+  stateFhirId?: UserInfoToStateFhirIdResolver<TParent>
+  locationLevel3FhirId?: UserInfoToLocationLevel3FhirIdResolver<TParent>
+}
+
+export interface UserInfoToOidpUserInfoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserInfoToDistrictFhirIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserInfoToStateFhirIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserInfoToLocationLevel3FhirIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -7435,6 +7581,7 @@ export interface GQLIdentityTypeTypeResolver<TParent = any> {
   id?: IdentityTypeToIdResolver<TParent>
   type?: IdentityTypeToTypeResolver<TParent>
   otherType?: IdentityTypeToOtherTypeResolver<TParent>
+  fieldsModifiedByIdentity?: IdentityTypeToFieldsModifiedByIdentityResolver<TParent>
 }
 
 export interface IdentityTypeToIdResolver<TParent = any, TResult = any> {
@@ -7456,6 +7603,18 @@ export interface IdentityTypeToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentityTypeToOtherTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IdentityTypeToFieldsModifiedByIdentityResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},
@@ -8626,12 +8785,15 @@ export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface GQLWebhookPermissionTypeResolver<TParent = any> {
-  event?: WebhookPermissionToEventResolver<TParent>
-  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+export interface GQLSystemSettingsTypeResolver<TParent = any> {
+  dailyQuota?: SystemSettingsToDailyQuotaResolver<TParent>
+  webhook?: SystemSettingsToWebhookResolver<TParent>
+  openIdProviderClientId?: SystemSettingsToOpenIdProviderClientIdResolver<TParent>
+  openIdProviderBaseUrl?: SystemSettingsToOpenIdProviderBaseUrlResolver<TParent>
+  openIdProviderClaims?: SystemSettingsToOpenIdProviderClaimsResolver<TParent>
 }
 
-export interface WebhookPermissionToEventResolver<
+export interface SystemSettingsToDailyQuotaResolver<
   TParent = any,
   TResult = any
 > {
@@ -8643,7 +8805,40 @@ export interface WebhookPermissionToEventResolver<
   ): TResult
 }
 
-export interface WebhookPermissionToPermissionsResolver<
+export interface SystemSettingsToWebhookResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderClientIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderBaseUrlResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface SystemSettingsToOpenIdProviderClaimsResolver<
   TParent = any,
   TResult = any
 > {
@@ -8673,6 +8868,233 @@ export interface FormDatasetOptionToValueResolver<
 }
 
 export interface FormDatasetOptionToLabelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLOIDPUserInfoTypeResolver<TParent = any> {
+  sub?: OIDPUserInfoToSubResolver<TParent>
+  name?: OIDPUserInfoToNameResolver<TParent>
+  given_name?: OIDPUserInfoToGiven_nameResolver<TParent>
+  family_name?: OIDPUserInfoToFamily_nameResolver<TParent>
+  middle_name?: OIDPUserInfoToMiddle_nameResolver<TParent>
+  nickname?: OIDPUserInfoToNicknameResolver<TParent>
+  preferred_username?: OIDPUserInfoToPreferred_usernameResolver<TParent>
+  profile?: OIDPUserInfoToProfileResolver<TParent>
+  picture?: OIDPUserInfoToPictureResolver<TParent>
+  website?: OIDPUserInfoToWebsiteResolver<TParent>
+  email?: OIDPUserInfoToEmailResolver<TParent>
+  email_verified?: OIDPUserInfoToEmail_verifiedResolver<TParent>
+  gender?: OIDPUserInfoToGenderResolver<TParent>
+  birthdate?: OIDPUserInfoToBirthdateResolver<TParent>
+  zoneinfo?: OIDPUserInfoToZoneinfoResolver<TParent>
+  locale?: OIDPUserInfoToLocaleResolver<TParent>
+  phone_number?: OIDPUserInfoToPhone_numberResolver<TParent>
+  phone_number_verified?: OIDPUserInfoToPhone_number_verifiedResolver<TParent>
+  address?: OIDPUserInfoToAddressResolver<TParent>
+  updated_at?: OIDPUserInfoToUpdated_atResolver<TParent>
+}
+
+export interface OIDPUserInfoToSubResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToGiven_nameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToFamily_nameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToMiddle_nameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToNicknameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToPreferred_usernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToProfileResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToPictureResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToWebsiteResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToEmail_verifiedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToGenderResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToBirthdateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToZoneinfoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToLocaleResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToPhone_numberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToPhone_number_verifiedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToAddressResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserInfoToUpdated_atResolver<
   TParent = any,
   TResult = any
 > {
@@ -11133,6 +11555,35 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   ): TResult
 }
 
+export interface GQLWebhookPermissionTypeResolver<TParent = any> {
+  event?: WebhookPermissionToEventResolver<TParent>
+  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+}
+
+export interface WebhookPermissionToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLFormDatasetOptionLabelTypeResolver<TParent = any> {
   lang?: FormDatasetOptionLabelToLangResolver<TParent>
   descriptor?: FormDatasetOptionLabelToDescriptorResolver<TParent>
@@ -11151,6 +11602,94 @@ export interface FormDatasetOptionLabelToLangResolver<
 }
 
 export interface FormDatasetOptionLabelToDescriptorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLOIDPUserAddressTypeResolver<TParent = any> {
+  formatted?: OIDPUserAddressToFormattedResolver<TParent>
+  street_address?: OIDPUserAddressToStreet_addressResolver<TParent>
+  locality?: OIDPUserAddressToLocalityResolver<TParent>
+  region?: OIDPUserAddressToRegionResolver<TParent>
+  postal_code?: OIDPUserAddressToPostal_codeResolver<TParent>
+  city?: OIDPUserAddressToCityResolver<TParent>
+  country?: OIDPUserAddressToCountryResolver<TParent>
+}
+
+export interface OIDPUserAddressToFormattedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToStreet_addressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToLocalityResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToRegionResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToPostal_codeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToCityResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface OIDPUserAddressToCountryResolver<
   TParent = any,
   TResult = any
 > {

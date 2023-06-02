@@ -17,9 +17,9 @@ export function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as { fileName: string }
+  const payload = request.payload as { fileUri: string }
   try {
-    const presignedURL = signFileUrl(payload.fileName)
+    const presignedURL = signFileUrl(payload.fileUri)
     return h.response({ presignedURL }).code(200)
   } catch (error) {
     return h.response(error).code(400)

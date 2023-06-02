@@ -17,11 +17,10 @@ import {
   MINIO_SECRET_KEY,
   MINIO_PRESIGNED_URL_EXPIRY_IN_SECOND,
   MINIO_URL,
-  MINIO_PROTOCOL,
-  MINIO_BUCKET
+  MINIO_PROTOCOL
 } from './constants'
 
-export function signFileUrl(path: string) {
+export function signFileUrl(uri: string) {
   return presignSignatureV4(
     {
       headers: {
@@ -29,7 +28,7 @@ export function signFileUrl(path: string) {
       },
       protocol: MINIO_PROTOCOL,
       method: 'GET',
-      path: `/${MINIO_BUCKET}/${path}`
+      path: uri
     },
     MINIO_ACCESS_KEY,
     MINIO_SECRET_KEY,
