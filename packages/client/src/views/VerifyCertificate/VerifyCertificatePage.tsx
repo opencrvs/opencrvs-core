@@ -540,23 +540,23 @@ export function VerifyCertificatePage() {
                         </Text>
                       }
                     />
-                    <ListViewItemSimplified
-                      label={
-                        <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type ===
-                            RegistrationType.Birth &&
-                            intl.formatMessage(messageToDefine.placeOfBirth)}
-                          {currentData?.registration?.type ===
-                            RegistrationType.Death &&
-                            intl.formatMessage(messageToDefine.placeOfDeath)}
-                        </Text>
-                      }
-                      value={
-                        <Text variant={'reg16'} element={'span'}>
-                          {getChildOrDeceasedData(currentData).location}
-                        </Text>
-                      }
-                    />
+                    {currentData?.registration?.type ===
+                      RegistrationType.Birth && (
+                      <ListViewItemSimplified
+                        label={
+                          <Text variant={'bold16'} element={'span'}>
+                            {currentData?.registration?.type ===
+                              RegistrationType.Birth &&
+                              intl.formatMessage(messageToDefine.placeOfBirth)}
+                          </Text>
+                        }
+                        value={
+                          <Text variant={'reg16'} element={'span'}>
+                            {getChildOrDeceasedData(currentData).location}
+                          </Text>
+                        }
+                      />
+                    )}
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
