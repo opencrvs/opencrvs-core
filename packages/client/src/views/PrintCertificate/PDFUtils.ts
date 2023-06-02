@@ -362,15 +362,121 @@ function getPDFTemplateWithSVG(
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
+  const fonts = getFontsFromSVG(svgTemplate)
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
     declaration.data.template,
     state
   )
+
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+  pdfTemplate.vfs = getVFSFromFonts(fonts)
+  pdfTemplate.fonts.en = {
+    ...certificateBaseTemplate.fonts.en,
+    ...getTemplateFonts(fonts)
+  }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate
+}
+
+function parseDataURL(dataURL: string) {
+  if (!dataURL.startsWith('data:')) return
+  const contentAndType = dataURL.split(':')[1]
+  const [type, content] = contentAndType.split(';')
+  let ext = ''
+  let data = ''
+  if (type) {
+    ext = type.split('/')[1]
+  }
+  if (content) {
+    data = content.split(',')[1]
+  }
+  return {
+    ext,
+    data
+  }
+}
+
+interface IFont {
+  fontFamily: string
+  ext: string
+  data: string
+  fontStyle: string
+}
+/**
+ *
+ * @param fontFamily
+ * This function assumes that fontFamily
+ * is set by a convention: Name-Style
+ * i.e. Roboto-Italic, Roboto-Bold
+ *
+ */
+
+function getPDFMakeFontStyle(fontFamily: string) {
+  const style = fontFamily.split('-')[1]?.toLowerCase()
+  if (style === 'bold') return 'bold'
+  else if (style === 'italic') return 'italics'
+  else if (style === 'bolditalic') return 'bolditalics'
+  else return 'normal'
+}
+
+function getFontsFromSVG(svgCode: string) {
+  const parser = new DOMParser()
+  const svg = parser.parseFromString(svgCode, 'image/svg+xml')
+  const style = svg.querySelector('style')
+  const fontFaceRules = Array.from(style?.sheet?.cssRules || []).filter(
+    isCSSFontFaceRule
+  )
+
+  return fontFaceRules.reduce<IFont[]>((fonts, rule) => {
+    // @ts-ignore
+    const dataurl = rule.style.src.split('"')[1].slice(0, -1)
+    const parsed = parseDataURL(dataurl)
+
+    if (parsed) {
+      const { ext, data } = parsed
+      const fontFamily = rule.style.fontFamily.replaceAll('"', '')
+      return [
+        ...fonts,
+        {
+          fontFamily,
+          ext,
+          data,
+          fontStyle: getPDFMakeFontStyle(fontFamily)
+        }
+      ]
+    }
+    return fonts
+  }, [])
+}
+
+function getVFSFromFonts(fonts: IFont[]) {
+  return fonts.reduce(
+    (vfs, font) => ({
+      ...vfs,
+      [`${font.fontFamily}.${font.ext}`]: font.data
+    }),
+    {}
+  )
+}
+
+function getTemplateFonts(fonts: IFont[]) {
+  const name = fonts.find((font) => font.fontStyle === 'normal')?.fontFamily
+  if (!name) return {}
+  return {
+    [name]: fonts.reduce(
+      (style, font) => ({
+        ...style,
+        [font.fontStyle]: `${font.fontFamily}.${font.ext}`
+      }),
+      {}
+    )
+  }
+}
+
+function isCSSFontFaceRule(cssRule: CSSRule): cssRule is CSSFontFaceRule {
+  return cssRule instanceof CSSFontFaceRule
 }
 
 export function downloadFile(
