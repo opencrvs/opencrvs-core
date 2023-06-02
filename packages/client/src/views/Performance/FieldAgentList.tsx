@@ -193,7 +193,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: event.toUpperCase() || undefined,
+        event: event?.toUpperCase() || undefined,
         count: recordCount,
         sort: 'asc',
         skip: 0
