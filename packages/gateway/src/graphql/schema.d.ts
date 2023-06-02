@@ -689,7 +689,7 @@ export interface GQLSystemRoleInput {
 }
 
 export interface GQLCertificateSVGInput {
-  id: string
+  id?: string
   svgCode: string
   svgFilename: string
   svgDateUpdated?: number

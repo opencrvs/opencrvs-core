@@ -531,7 +531,7 @@ export type CertificateSvg = {
 
 export type CertificateSvgInput = {
   event: Event
-  id: Scalars['ID']
+  id?: InputMaybe<Scalars['ID']>
   status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
@@ -1669,10 +1669,6 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
-export type Operation = {
-  operation: Scalars['String']
-}
-
 export type OidpUserAddress = {
   __typename?: 'OIDPUserAddress'
   city?: Maybe<Scalars['String']>
@@ -1706,6 +1702,10 @@ export type OidpUserInfo = {
   updated_at?: Maybe<Scalars['Int']>
   website?: Maybe<Scalars['String']>
   zoneinfo?: Maybe<Scalars['String']>
+}
+
+export type Operation = {
+  operation: Scalars['String']
 }
 
 export type OperationHistorySearchSet = {
@@ -5711,6 +5711,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string
