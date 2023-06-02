@@ -12,20 +12,9 @@
 export const certificateBaseTemplate = {
   definition: {
     pageMargins: [0, 0, 0, 0] as [number, number, number, number],
-    defaultStyle: {
-      font: 'notosans'
-    },
+    defaultStyle: {},
     content: []
   },
-  fonts: {
-    en: {
-      notosans: {
-        normal: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf',
-        italics: 'NotoSans-LightItalic.ttf',
-        bolditalics: 'NotoSans-RegularItalic.ttf'
-      }
-    }
-  },
+  fonts: { en: {} },
   vfs: {}
 }
