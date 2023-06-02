@@ -21,7 +21,7 @@ import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 function isMessageDescriptor(
@@ -128,13 +128,10 @@ async function getPDFTemplateWithSVG(
     EMPTY_STRING
 
   const resolvedSignatures = await Promise.all(
-    [
-      'groomSignature',
-      'brideSignature',
-      'witnessOneSignature',
-      'witnessTwoSignature'
-    ]
-      .map((k) => ({ signatureKey: k, url: declaration.data.template[k] }))
+    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
+      signatureKey: k,
+      url: declaration.data.template[k]
+    }))
       .filter(({ url }) => Boolean(url))
       .map(({ signatureKey, url }) =>
         fetchImageAsBase64(url as string).then((value) => ({
