@@ -74,6 +74,7 @@ interface IConstantsMessages
   labelLanguage: MessageDescriptor
   labelPassword: MessageDescriptor
   labelPhone: MessageDescriptor
+  labelEmail: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   labelSystemRole: MessageDescriptor
@@ -500,6 +501,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Phone label',
     id: 'constants.phoneNumber'
   },
+  labelEmail: {
+    defaultMessage: 'Email Address',
+    description: 'Email label',
+    id: 'constants.emailAddress'
+  },
+
   labelPin: {
     defaultMessage: 'PIN',
     description: 'PIN label',

@@ -1308,6 +1308,7 @@ export type Mutation = {
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
+  changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
   createBirthRegistration: CreatedIds
@@ -1381,6 +1382,13 @@ export type MutationBookmarkAdvancedSearchArgs = {
 export type MutationChangeAvatarArgs = {
   avatar: AvatarInput
   userId: Scalars['String']
+}
+
+export type MutationChangeEmailArgs = {
+  email: Scalars['String']
+  nonce: Scalars['String']
+  userId: Scalars['String']
+  verifyCode: Scalars['String']
 }
 
 export type MutationChangePasswordArgs = {
@@ -1766,6 +1774,7 @@ export type Query = {
   getTotalPayments?: Maybe<Array<PaymentMetric>>
   getUser?: Maybe<User>
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
+  getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
@@ -1918,6 +1927,10 @@ export type QueryGetUserAuditLogArgs = {
   skip?: InputMaybe<Scalars['Int']>
   timeEnd?: InputMaybe<Scalars['String']>
   timeStart?: InputMaybe<Scalars['String']>
+}
+
+export type QueryGetUserByEmailArgs = {
+  email?: InputMaybe<Scalars['String']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -3314,7 +3327,7 @@ export type GetUserQuery = {
     id: string
     username?: string | null
     mobile?: string | null
-    emailForNotification?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
@@ -7565,6 +7578,18 @@ export type ChangePhoneMutation = {
   changePhone?: string | null
 }
 
+export type ChangeEmailMutationVariables = Exact<{
+  userId: Scalars['String']
+  email: Scalars['String']
+  nonce: Scalars['String']
+  verifyCode: Scalars['String']
+}>
+
+export type ChangeEmailMutation = {
+  __typename?: 'Mutation'
+  changeEmail?: string | null
+}
+
 export type GetUserByMobileQueryVariables = Exact<{
   mobile?: InputMaybe<Scalars['String']>
 }>
@@ -7572,6 +7597,24 @@ export type GetUserByMobileQueryVariables = Exact<{
 export type GetUserByMobileQuery = {
   __typename?: 'Query'
   getUserByMobile?: {
+    __typename?: 'User'
+    id: string
+    username?: string | null
+    mobile?: string | null
+    email?: string | null
+    systemRole: SystemRoleType
+    status: Status
+    role: { __typename?: 'Role'; _id: string }
+  } | null
+}
+
+export type GetUserByEmailQueryVariables = Exact<{
+  email?: InputMaybe<Scalars['String']>
+}>
+
+export type GetUserByEmailQuery = {
+  __typename?: 'Query'
+  getUserByEmail?: {
     __typename?: 'User'
     id: string
     username?: string | null

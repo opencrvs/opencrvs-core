@@ -70,9 +70,12 @@ interface IUserMessages
   changePhoneTitle: MessageDescriptor
   verifyPhoneTitle: MessageDescriptor
   changePhoneLabel: MessageDescriptor
+  changeEmailLabel: MessageDescriptor
   verifyPhoneLabel: MessageDescriptor
   confirmationPhoneMsg: MessageDescriptor
+  confirmationEmailMsg: MessageDescriptor
   phoneNumberChangeFormValidationMsg: MessageDescriptor
+  emailAddressChangeFormValidationMsg: MessageDescriptor
   changeAvatar: MessageDescriptor
   changeImage: MessageDescriptor
   resizeAvatar: MessageDescriptor
@@ -90,6 +93,7 @@ interface IUserMessages
   incorrectVerifyCode: MessageDescriptor
   passwordUpdated: MessageDescriptor
   phoneNumberUpdated: MessageDescriptor
+  emailAddressUpdated: MessageDescriptor
   avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
   name: MessageDescriptor
@@ -366,6 +370,11 @@ const messagesToDefine: IUserMessages = {
     description: 'Change phone number label',
     id: 'phone.label.changeNumber'
   },
+  changeEmailLabel: {
+    defaultMessage: 'What is your new email?',
+    description: 'Change email address label',
+    id: 'phone.label.changeEmail'
+  },
   verifyPhoneLabel: {
     defaultMessage: 'Enter 6 digit verification code',
     description: 'Verify phone number label',
@@ -376,10 +385,20 @@ const messagesToDefine: IUserMessages = {
     description: 'Confirmation phone number message',
     id: 'phone.label.confirmation'
   },
+  confirmationEmailMsg: {
+    defaultMessage: 'A confirmational SMS has been sent to {email}',
+    description: 'Confirmation email address message',
+    id: 'email.label.confirmation'
+  },
   phoneNumberChangeFormValidationMsg: {
     id: 'changePhone.validation.msg',
     defaultMessage:
       'Must be a valid {num} digit number that starts with {start}',
+    description: 'Phone number validation message'
+  },
+  emailAddressChangeFormValidationMsg: {
+    id: 'changeEmail.validation.msg',
+    defaultMessage: 'Must be a valid email address',
     description: 'Phone number validation message'
   },
   changeAvatar: {
@@ -467,6 +486,11 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.phonedNumberUpdated',
     defaultMessage: 'Phone number updated',
     description: 'Phone change message on success'
+  },
+  emailAddressUpdated: {
+    id: 'system.user.settings.emailAddressUpdated',
+    defaultMessage: 'Email Address updated',
+    description: 'Email change message on success'
   },
   avatarUpdating: {
     id: 'system.user.settings.avatarUpdating',

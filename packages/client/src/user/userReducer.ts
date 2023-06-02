@@ -405,10 +405,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         const duplicateError =
           duplicateErrorFromGQL.extensions.duplicateNotificationMethodError
 
-        if (
-          duplicateError.field &&
-          duplicateError.field === 'emailForNotification'
-        ) {
+        if (duplicateError.field && duplicateError.field === 'email') {
           return loop(
             { ...state, submitting: false, submissionError: false },
             Cmd.action(

@@ -53,10 +53,10 @@ export interface IUserName {
 export interface IAuthentication {
   name: IUserName[]
   mobile?: string
-  email?: string
   userId: string
   status: string
   scope: string[]
+  email?: string
 }
 
 export interface ISystemAuthentication {

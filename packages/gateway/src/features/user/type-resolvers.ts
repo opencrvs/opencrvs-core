@@ -171,6 +171,9 @@ export const userTypeResolvers: GQLResolver = {
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]
     },
+    email(userModel: IUserModelData) {
+      return userModel.emailForNotification
+    },
     async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
       return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },

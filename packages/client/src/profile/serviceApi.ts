@@ -15,7 +15,8 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as Sentry from '@sentry/react'
 
 export enum NotificationEvent {
-  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER'
+  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
+  CHANGE_EMAIL_ADDRESS = 'CHANGE_EMAIL_ADDRESS'
 }
 
 export interface ISendVerifyCodeData {
