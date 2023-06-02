@@ -38,6 +38,10 @@ export const templateNames = {
     sms: 'authenticationCodeNotification',
     email: 'change-phone-number'
   },
+  CHANGE_EMAIL_ADDRESS: {
+    sms: 'authenticationCodeNotification',
+    email: 'change-email-address'
+  },
   PASSWORD_RESET_BY_SYSTEM_ADMIN: {
     sms: 'resetUserPasswordNotification',
     email: 'password-reset-by-system-admin'

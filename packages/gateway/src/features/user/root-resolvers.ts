@@ -54,6 +54,14 @@ export const resolvers: GQLResolver = {
       return res
     },
 
+    async getUserByEmail(_, { email }, { headers: authHeader }) {
+      const res = await getUser({ email }, authHeader)
+      if (!res._id) {
+        return null
+      }
+      return res
+    },
+
     async searchUsers(
       _,
       {
@@ -393,6 +401,44 @@ export const resolvers: GQLResolver = {
       }
       return true
     },
+    async changeEmail(
+      _,
+      { userId, email, nonce, verifyCode },
+      { headers: authHeader }
+    ) {
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Change email is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      try {
+        await checkVerificationCode(nonce, verifyCode)
+      } catch (err) {
+        logger.error(err)
+        return await Promise.reject(
+          new Error(`Change email is not allowed. Error: ${err}`)
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserEmail`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, email }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user email"
+          )
+        )
+      }
+      return true
+    },
     async changeAvatar(_, { userId, avatar }, { headers: authHeader }) {
       try {
         await validateAttachments([avatar])
@@ -569,7 +615,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
-    emailForNotification: user.emailForNotification,
+    emailForNotification: user.email, //instead of saving data in email, we want to store it in emailForNotification property
     mobile: user.mobile as string,
     device: user.device as string,
     signature: user.signature

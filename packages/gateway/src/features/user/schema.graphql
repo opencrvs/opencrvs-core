@@ -48,7 +48,6 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  emailForNotification: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -150,6 +149,7 @@ input AvatarInput {
 type Query {
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String
@@ -191,6 +191,12 @@ type Mutation {
   changePhone(
     userId: String!
     phoneNumber: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
+  changeEmail(
+    userId: String!
+    email: String!
     nonce: String!
     verifyCode: String!
   ): String

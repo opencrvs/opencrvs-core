@@ -90,7 +90,7 @@ export type ShowCreateUserDuplicateEmailErrorToast = {
   type: typeof SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
   payload: {
     data: string
-    emailForNotification: string
+    email: string
   }
 }
 
@@ -206,10 +206,10 @@ export const showCreateUserErrorToast = (
 
 export const showCreateUserDuplicateEmailErrorToast = (
   data: string,
-  emailForNotification: string
+  email: string
 ): ShowCreateUserDuplicateEmailErrorToast => ({
   type: SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST,
-  payload: { data, emailForNotification }
+  payload: { data, email }
 })
 
 export const showDownloadDeclarationFailedToast =
