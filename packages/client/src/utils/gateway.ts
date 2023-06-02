@@ -986,7 +986,7 @@ export type History = {
   requester?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
-  system?: Maybe<System>
+  system?: Maybe<IntegratedSystem>
   user?: Maybe<User>
 }
 
@@ -1075,6 +1075,13 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export type IntegratedSystem = {
+  __typename?: 'IntegratedSystem'
+  name?: Maybe<Scalars['String']>
+  type?: Maybe<Scalars['String']>
+  username?: Maybe<Scalars['String']>
 }
 
 export enum IntegratingSystemType {
@@ -3846,7 +3853,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -4156,7 +4167,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -4555,7 +4570,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -4848,7 +4867,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -5250,7 +5273,11 @@ export type FetchMarriageRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -5554,7 +5581,11 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string; type: SystemType } | null
+      system?: {
+        __typename?: 'IntegratedSystem'
+        name?: string | null
+        type?: string | null
+      } | null
       user?: {
         __typename?: 'User'
         id: string
@@ -5654,6 +5685,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string

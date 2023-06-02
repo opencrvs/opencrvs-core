@@ -894,7 +894,7 @@ export interface GQLHistory {
   requester?: string
   hasShowedVerifiedDocument?: boolean
   otherReason?: string
-  system?: GQLSystem
+  system?: GQLIntegratedSystem
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -1545,6 +1545,12 @@ export interface GQLStatusReason {
   text?: string
 }
 
+export interface GQLIntegratedSystem {
+  name?: string
+  username?: string
+  type?: string
+}
+
 export interface GQLComment {
   id: string
   user?: GQLUser
@@ -2167,6 +2173,7 @@ export interface GQLResolver {
   Certificate?: GQLCertificateTypeResolver
   DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
+  IntegratedSystem?: GQLIntegratedSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   RoleLabel?: GQLRoleLabelTypeResolver
@@ -9546,6 +9553,42 @@ export interface GQLStatusReasonTypeResolver<TParent = any> {
 }
 
 export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLIntegratedSystemTypeResolver<TParent = any> {
+  name?: IntegratedSystemToNameResolver<TParent>
+  username?: IntegratedSystemToUsernameResolver<TParent>
+  type?: IntegratedSystemToTypeResolver<TParent>
+}
+
+export interface IntegratedSystemToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToTypeResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

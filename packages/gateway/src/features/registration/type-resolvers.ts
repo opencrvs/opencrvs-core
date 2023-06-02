@@ -78,7 +78,7 @@ import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { getSystem, getUser } from '@gateway/features/user/utils'
+import { getUser } from '@gateway/features/user/utils'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
@@ -1070,7 +1070,7 @@ export const typeResolvers: GQLResolver = {
       if (!systemIdentifier || !systemIdentifier.value) {
         return null
       }
-      return await getSystem({ systemId: systemIdentifier.value }, authHeader)
+      return JSON.parse(systemIdentifier.value)
     },
     location: async (task: fhir.Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(
