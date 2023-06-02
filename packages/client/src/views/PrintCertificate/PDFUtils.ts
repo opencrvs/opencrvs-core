@@ -299,6 +299,15 @@ export function executeHandlebarsTemplate(
     return ''
   })
 
+  Handlebars.registerHelper('camelize', function (str: string) {
+    if (str && typeof str === 'string') {
+      return str.replace(/\W+(.)/g, function (match, chr) {
+        return chr.toUpperCase()
+      })
+    }
+    return ''
+  })
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data)
   const output = template(formattedTemplateData)
