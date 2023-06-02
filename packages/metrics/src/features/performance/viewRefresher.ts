@@ -694,7 +694,6 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$state' },
         {
           $project: {
-            _id: '$id',
             gender: '$child.gender',
             reason: '$reason.text',
             extensions: '$extensions',

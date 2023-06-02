@@ -10,18 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { List, IListProps } from '../List'
+import { Story, Meta } from '@storybook/react'
+import { NumberedList, NumberedListProps } from './NumberedList'
 
 export default {
-  title: 'Typography/Number list',
-  component: List
+  title: 'Typography/Numbered List',
+  component: NumberedList
 } as Meta
 
-const Template: Story<IListProps> = (args) => <List {...args} />
+const Template: Story<NumberedListProps> = (args) => <NumberedList {...args} />
 
-export const ListView = Template.bind({})
-ListView.args = {
-  id: 'ListView',
-  list: ['Item1', 'Item2', 'Item3']
+export const Default = Template.bind({})
+Default.args = {
+  items: ['Birth', 'Death', 'Marriage', 'Adoption', 'Divorce'],
+  font: 'reg18'
 }
