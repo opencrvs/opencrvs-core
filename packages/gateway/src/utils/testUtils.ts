@@ -185,7 +185,7 @@ export const mockUser = {
     labels: [
       {
         lang: 'en',
-        label: 'CHAIRMAN'
+        label: 'Field Agent'
       }
     ]
   },
@@ -309,7 +309,7 @@ export const mockTaskDownloaded = {
     reference: 'Composition/123' // the composition encompassing this registration
   },
   authoredOn: '2016-10-31T08:25:05+10:00',
-  lastModified: '2016-10-31T09:45:05+10:00',
+  lastModified: '2023-01-31T09:45:05+10:00',
   statusReason: {
     text: 'Rejected reason'
   },
