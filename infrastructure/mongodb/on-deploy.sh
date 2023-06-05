@@ -158,7 +158,7 @@ if [[ $PERFORMANCE_USER != "FOUND" ]]; then
   db.createUser({
     user: 'performance',
     pwd: '$PERFORMANCE_MONGODB_PASSWORD',
-    roles: [{ role: 'read', db: 'performance' }]
+    roles: [{ role: 'readWrite', db: 'performance' }]
   })
 EOF
 else
@@ -167,7 +167,7 @@ else
   use performance
   db.updateUser('performance', {
     pwd: '$PERFORMANCE_MONGODB_PASSWORD',
-    roles: [{ role: 'read', db: 'performance' }]
+    roles: [{ role: 'readWrite', db: 'performance' }]
   })
 EOF
 fi
