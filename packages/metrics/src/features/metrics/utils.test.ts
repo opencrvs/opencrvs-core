@@ -16,7 +16,8 @@ import {
   getDistrictLocation,
   fillEmptyDataArrayByKey,
   EVENT_TYPE,
-  getMonthRangeFilterListFromTimeRage
+  getMonthRangeFilterListFromTimeRage,
+  getDaysPerYear
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 import { cloneDeep } from 'lodash'
@@ -410,6 +411,32 @@ describe('verify metrics util', () => {
       expect(monthIndexes).toEqual([
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
       ])
+    })
+  })
+
+  describe('check for the list of days in year for a range', () => {
+    it('Returns set of days from a range when start date is 29th of the month', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-04-29T10:00:00.000Z'),
+        new Date('2023-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([247, 95])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in same year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([67])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in different year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2018-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T11:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([337, 365, 366, 365, 95])
     })
   })
 })

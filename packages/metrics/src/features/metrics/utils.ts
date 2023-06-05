@@ -12,8 +12,9 @@
 import {
   differenceInDays,
   eachMonthOfInterval,
-  eachDayOfInterval,
-  getYear
+  eachYearOfInterval,
+  startOfYear,
+  endOfYear
 } from 'date-fns'
 import {
   IBirthKeyFigures,
@@ -511,24 +512,15 @@ export function getPopulation(
   return totalPopulation ? totalPopulation[populationYearToConsider] : 0
 }
 
-function getDaysPerYear(fromDate: Date, toDate: Date) {
-  const daysPerYear = []
-  const allDates = eachDayOfInterval({ start: fromDate, end: toDate })
-  let currentYear = getYear(fromDate)
-  let daysInYear = 0
-
-  allDates.forEach((date) => {
-    const year = getYear(date)
-    if (year !== currentYear) {
-      daysPerYear.push(daysInYear)
-      currentYear = year
-      daysInYear = 0
-    }
-
-    daysInYear++
+export function getDaysPerYear(fromDate: Date, toDate: Date) {
+  const daysPerYear: number[] = []
+  eachYearOfInterval({ start: fromDate, end: toDate }).forEach((date) => {
+    const year = date.getFullYear()
+    let rangeStart = startOfYear(new Date(year, 0, 1))
+    let rangeEnd = endOfYear(new Date(year, 11, 31))
+    if (rangeStart < fromDate) rangeStart = fromDate
+    if (rangeEnd > toDate) rangeEnd = toDate
+    daysPerYear.push(differenceInDays(rangeEnd, rangeStart) + 1)
   })
-
-  daysPerYear.push(daysInYear)
-
   return daysPerYear
 }
