@@ -241,6 +241,7 @@ mkdir -p /tmp/opencrvs/infrastructure/default_backups
 mkdir -p /tmp/opencrvs/infrastructure/cryptfs
 
 # Copy selected country default backups to infrastructure default_backups folder
+cp $COUNTRY_CONFIG_PATH/backups/minio.tar.gz /tmp/opencrvs/infrastructure/default_backups/minio.tar.gz
 cp $COUNTRY_CONFIG_PATH/backups/hearth-dev.gz /tmp/opencrvs/infrastructure/default_backups/hearth-dev.gz
 cp $COUNTRY_CONFIG_PATH/backups/openhim-dev.gz /tmp/opencrvs/infrastructure/default_backups/openhim-dev.gz
 cp $COUNTRY_CONFIG_PATH/backups/user-mgnt.gz /tmp/opencrvs/infrastructure/default_backups/user-mgnt.gz
