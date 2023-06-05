@@ -72,7 +72,11 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import {
+  EMPTY_STRING,
+  FIELD_AGENT_ROLES,
+  SIGNATURE_KEYS
+} from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
@@ -1069,17 +1073,9 @@ function getSignatureUrls(queryResultData: Query) {
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  return (
-    [
-      'informantsSignature',
-      'brideSignature',
-      'groomSignature',
-      'witnessOneSignature',
-      'witnessTwoSignature'
-    ] as const
-  )
-    .map((propertyKey) => registration?.[propertyKey])
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+  return SIGNATURE_KEYS.map(
+    (propertyKey) => registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1851,10 +1847,13 @@ export function filterProcessingDeclarations(
 export function getMinioUrlsFromDeclaration(
   declaration: IDeclaration | undefined
 ) {
-  const minioUrls: string[] = []
   if (!declaration) {
-    return minioUrls
+    return []
   }
+  const minioUrls: string[] = SIGNATURE_KEYS.map(
+    (propertyKey) => declaration.originalData?.registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
   const documentsData = declaration.originalData?.documents as Record<
     string,
     IAttachmentValue[]
