@@ -147,7 +147,7 @@ export const up = async (db, client) => {
             $set: {
               type: userRolesResult.insertedIds[
                 UserRolesIndex[
-                  user.role === 'FIELD_AGENT' ? 'FIELD_AGENT' : user.role
+                  user.role
                 ]
               ]
             }
