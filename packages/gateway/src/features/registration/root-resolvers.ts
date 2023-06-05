@@ -738,12 +738,7 @@ async function createEventRegistration(
 
   if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
-      return await getRegistrationIds(
-        existingComposition,
-        event,
-        false,
-        authHeader
-      )
+      return { compositionId: existingComposition }
     } else {
       // return tracking-id
       return await getDeclarationIds(existingComposition, authHeader)
