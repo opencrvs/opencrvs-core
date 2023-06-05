@@ -78,7 +78,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use application-config
   db.updateUser('config', {
-    pwd: '$CONFIG_MONGODB_PASSWORD'
+    pwd: '$CONFIG_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'application-config' }]
   })
 EOF
 fi
@@ -121,7 +122,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use user-mgnt
   db.updateUser('user-mgnt', {
-    pwd: '$USER_MGNT_MONGODB_PASSWORD'
+    pwd: '$USER_MGNT_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'user-mgnt' }]
   })
 EOF
 fi
@@ -142,7 +144,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use openhim-dev
   db.updateUser('openhim', {
-    pwd: '$OPENHIM_MONGODB_PASSWORD'
+    pwd: '$OPENHIM_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'openhim' }, { role: 'readWrite', db: 'openhim-dev' }]
   })
 EOF
 fi
@@ -163,7 +166,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use performance
   db.updateUser('performance', {
-    pwd: '$PERFORMANCE_MONGODB_PASSWORD'
+    pwd: '$PERFORMANCE_MONGODB_PASSWORD',
+    roles: [{ role: 'read', db: 'performance' }]
   })
 EOF
 fi
@@ -184,7 +188,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use metrics
   db.updateUser('metrics', {
-    pwd: '$METRICS_MONGODB_PASSWORD'
+    pwd: '$METRICS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'metrics' }]
   })
 EOF
 fi
@@ -205,7 +210,8 @@ else
   mongo $(mongo_credentials) --host $HOST <<EOF
   use webhooks
   db.updateUser('webhooks', {
-    pwd: '$WEBHOOKS_MONGODB_PASSWORD'
+    pwd: '$WEBHOOKS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'webhooks' }]
   })
 EOF
 fi
