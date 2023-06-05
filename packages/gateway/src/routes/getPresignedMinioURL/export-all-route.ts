@@ -14,7 +14,7 @@ import { getPresignedMinioURLHandler } from '@gateway/routes/getPresignedMinioUR
 
 export default {
   method: 'GET',
-  path: '/document/{fileName}',
+  path: '/document/{fileUri}',
   handler: getPresignedMinioURLHandler,
   config: {
     description: 'Get presigned url from minio',

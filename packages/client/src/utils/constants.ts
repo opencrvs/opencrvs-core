@@ -73,6 +73,18 @@ export const REGISTRAR_ROLES = [
   ROLE_REGISTRATION_AGENT
 ]
 
+export const MARRIAGE_SIGNATURE_KEYS = [
+  'groomSignature',
+  'brideSignature',
+  'witnessOneSignature',
+  'witnessTwoSignature'
+] as const
+
+export const SIGNATURE_KEYS = [
+  ...MARRIAGE_SIGNATURE_KEYS,
+  'informantsSignature'
+] as const
+
 export const ROLE_TYPE_SECRETARY = 'SECRETARY'
 export const ROLE_TYPE_MAYOR = 'MAYOR'
 export const ROLE_TYPE_CHAIRMAN = 'CHAIRMAN'
