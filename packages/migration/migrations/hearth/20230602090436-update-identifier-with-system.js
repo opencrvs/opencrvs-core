@@ -43,6 +43,10 @@ export const up = async (db, client) => {
         .toArray()
 
       // Task update with system identifier value
+      // eslint-disable-next-line no-console
+      console.log(
+        `Migration - Update task integration with system object :: Processing total ${tasksWithSystem.length} tasks...`
+      )
       for await (const task of tasksWithSystem) {
         for await (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
@@ -67,6 +71,10 @@ export const up = async (db, client) => {
         }
       }
       // Task history update with system identifier value
+      // eslint-disable-next-line no-console
+      console.log(
+        `Migration - Update Task history integration with system object :: Processing total ${tasksHistoryWithSystem.length} tasks...`
+      )
       for await (const task of tasksHistoryWithSystem) {
         for await (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
