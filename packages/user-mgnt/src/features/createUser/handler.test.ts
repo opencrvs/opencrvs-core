@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@user-mgnt/server'
-import User, { IUser } from '@user-mgnt/model/user'
+import User, { IUser, UserRole } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -99,6 +99,25 @@ describe('createUser handler', () => {
       ['', { status: 200 }]
     )
 
+    mockingoose(UserRole).toReturn(
+      {
+        _id: '6348acd2e1a47ca32e79f46f',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de terrain'
+          }
+        ],
+        createdAt: '1685959052687',
+        updatedAt: '1685959052687'
+      },
+      'findOne'
+    )
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
@@ -115,7 +134,7 @@ describe('createUser handler', () => {
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
-        role: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -152,7 +171,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'Field Agent'
+              code: '{"en":"Field Agent","fr":"Agent de terrain"}'
             }
           ]
         }
