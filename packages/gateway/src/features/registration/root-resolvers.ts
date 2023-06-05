@@ -31,7 +31,6 @@ import {
   getIDFromResponse,
   getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition,
-  getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
   setCertificateCollector
