@@ -56,7 +56,6 @@ import {
   HumanName
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { options } from '../../../../integration/src/k6-declaration'
 
 export interface IDeclarationData {
   id: string
