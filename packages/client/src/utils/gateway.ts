@@ -636,7 +636,6 @@ export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
   isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
-  registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
 
@@ -5654,6 +5653,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string

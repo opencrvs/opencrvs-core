@@ -29,7 +29,7 @@ import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
   getIDFromResponse,
-  getRegistrationIdsFromResponse,
+  getCompositionIdFromResponse,
   removeDuplicatesFromComposition,
   getDeclarationIds,
   getStatusFromTask,
@@ -762,7 +762,7 @@ async function createEventRegistration(
 
   if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
-    return await getRegistrationIdsFromResponse(res, event, authHeader)
+    return await getCompositionIdFromResponse(res, event, authHeader)
   } else {
     // return tracking-id and potential duplicates
     const ids = await getDeclarationIdsFromResponse(res, authHeader)
