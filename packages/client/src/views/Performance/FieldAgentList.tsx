@@ -161,9 +161,12 @@ function FieldAgentListComponent(props: IProps) {
     location: { search },
     offlineOffices
   } = props
-  const { event, locationId, timeStart, timeEnd } = parse(
-    search
-  ) as unknown as ISearchParams
+  const {
+    event = Event.Birth,
+    locationId,
+    timeStart,
+    timeEnd
+  } = parse(search) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
@@ -183,7 +186,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
         status: status.toString(),
-        event: event.toUpperCase() || undefined,
+        event: event.toUpperCase(),
         count: recordCount,
         sort: 'asc',
         skip: 0
@@ -193,7 +196,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: event?.toUpperCase() || undefined,
+        event: event.toUpperCase(),
         count: recordCount,
         sort: 'asc',
         skip: 0
