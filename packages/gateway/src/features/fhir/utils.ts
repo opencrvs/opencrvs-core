@@ -1386,8 +1386,7 @@ export async function getRegistrationIdsFromResponse(
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const compositionId = getIDFromResponse(resBody)
-  return compositionId
+  return { compositionId: getIDFromResponse(resBody) }
 }
 
 export async function getRegistrationIds(
