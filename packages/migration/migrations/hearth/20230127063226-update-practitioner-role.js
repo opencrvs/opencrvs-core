@@ -18,62 +18,20 @@ export const up = async (db, client) => {
   let skip = 0
   let processedDocCount = 0
   const usersLabels = [
-    {
-      lang: 'en',
-      label: 'Field Agent'
-    },
-    {
-      lang: 'fr',
-      label: 'Agent de terrain'
-    },
-    {
-      lang: 'en',
-      label: 'Registration Agent'
-    },
-    {
-      lang: 'fr',
-      label: "Agent d'enregistrement"
-    },
-    {
-      lang: 'en',
-      label: 'Local Registrar'
-    },
-    {
-      lang: 'fr',
-      label: 'Registraire local'
-    },
-    {
-      lang: 'en',
-      label: 'Local System Admin'
-    },
-    {
-      lang: 'fr',
-      label: 'Administrateur système local'
-    },
-    {
-      lang: 'en',
-      label: 'National System Admin'
-    },
-    {
-      lang: 'fr',
-      label: 'Administrateur système national'
-    },
-    {
-      lang: 'en',
-      label: 'Performance Manager'
-    },
-    {
-      lang: 'fr',
-      label: 'Gestion des performances'
-    },
-    {
-      lang: 'en',
-      label: 'National Registrar'
-    },
-    {
-      lang: 'fr',
-      label: 'Registraire national'
-    }
+    { label: 'Field Agent' },
+    { label: 'Agent de terrain' },
+    { label: 'Registration Agent' },
+    { label: "Agent d'enregistrement" },
+    { label: 'Local Registrar' },
+    { label: 'Registraire local' },
+    { label: 'Local System Admin' },
+    { label: 'Administrateur système local' },
+    { label: 'National System Admin' },
+    { label: 'Administrateur système national' },
+    { label: 'Performance Management' },
+    { label: 'Gestion des performances' },
+    { label: 'National Registrar' },
+    { label: 'Registraire national' }
   ]
 
   try {
@@ -116,15 +74,12 @@ export const up = async (db, client) => {
               .join(' ')
 
           let frLabel = ''
-          usersLabels.forEach((label, index) => {
-            if (
-              label.lang === 'en' &&
-              label.label === titleCase(roleCode).trim()
-            ) {
-              const frLabelObj = usersLabels[index + 1]
-              frLabel = frLabelObj ? frLabelObj.label : ''
+          usersLabels.forEach((element, index) => {
+            if (element.label === titleCase(roleCode).trim()) {
+              frLabel = usersLabels[index + 1].label
             }
           })
+
           const hasSystemTypes = practitionerRole.code.some((item) => {
             return item.coding.some((coding) => {
               return coding.system === systemTypes
