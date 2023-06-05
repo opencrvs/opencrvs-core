@@ -17,6 +17,65 @@ export const up = async (db, client) => {
   const limit = 10
   let skip = 0
   let processedDocCount = 0
+  const usersLabels = [
+    {
+      lang: 'en',
+      label: 'Field Agent'
+    },
+    {
+      lang: 'fr',
+      label: 'Agent de terrain'
+    },
+    {
+      lang: 'en',
+      label: 'Registration Agent'
+    },
+    {
+      lang: 'fr',
+      label: "Agent d'enregistrement"
+    },
+    {
+      lang: 'en',
+      label: 'Local Registrar'
+    },
+    {
+      lang: 'fr',
+      label: 'Registraire local'
+    },
+    {
+      lang: 'en',
+      label: 'Local System Admin'
+    },
+    {
+      lang: 'fr',
+      label: 'Administrateur système local'
+    },
+    {
+      lang: 'en',
+      label: 'National System Admin'
+    },
+    {
+      lang: 'fr',
+      label: 'Administrateur système national'
+    },
+    {
+      lang: 'en',
+      label: 'Performance Manager'
+    },
+    {
+      lang: 'fr',
+      label: 'Gestion des performances'
+    },
+    {
+      lang: 'en',
+      label: 'National Registrar'
+    },
+    {
+      lang: 'fr',
+      label: 'Registraire national'
+    }
+  ]
+
   try {
     await session.withTransaction(async () => {
       const totalPractitionerRoleCount = await getTotalDocCountByCollectionName(
@@ -56,6 +115,16 @@ export const up = async (db, client) => {
               .map((s) => capitalize(s))
               .join(' ')
 
+          let frLabel = ''
+          usersLabels.forEach((label, index) => {
+            if (
+              label.lang === 'en' &&
+              label.label === titleCase(roleCode).trim()
+            ) {
+              const frLabelObj = usersLabels[index + 1]
+              frLabel = frLabelObj ? frLabelObj.label : ''
+            }
+          })
           const hasSystemTypes = practitionerRole.code.some((item) => {
             return item.coding.some((coding) => {
               return coding.system === systemTypes
@@ -99,7 +168,10 @@ export const up = async (db, client) => {
                     coding: [
                       {
                         system: 'http://opencrvs.org/specs/types',
-                        code: isFieldAgent ? 'Field agent' : titleCase(roleCode)
+                        code: JSON.stringify({
+                          en: titleCase(roleCode),
+                          fr: frLabel
+                        })
                       }
                     ]
                   }

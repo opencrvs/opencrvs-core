@@ -101,11 +101,6 @@ export const createFhirPractitionerRole = async (
     const role = await UserRole.findOne({
       _id: user.role
     })
-    const titleCase = user.systemRole
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
-      .join(' ')
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -124,9 +119,10 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: role?.labels
-                ? role.labels.find((lbl) => lbl.lang === 'en')?.label
-                : titleCase
+              code: JSON.stringify({
+                en: role?.labels.find((lbl) => lbl.lang === 'en')?.label,
+                fr: role?.labels.find((lbl) => lbl.lang === 'fr')?.label
+              })
             }
           ]
         }

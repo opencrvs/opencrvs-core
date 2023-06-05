@@ -1042,6 +1042,7 @@ export const typeResolvers: GQLResolver = {
       })
 
       const role = targetCode?.coding?.[0].code
+      const roleObj = JSON.parse(role!)
 
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
@@ -1056,7 +1057,10 @@ export const typeResolvers: GQLResolver = {
       const userResponse: IUserModelData = await res.json()
       userResponse.role.labels.forEach((item) => {
         if (item.lang === 'en') {
-          item.label = role ?? item.label
+          item.label = roleObj.en ?? item.label
+        }
+        if (item.lang === 'fr') {
+          item.label = roleObj.fr ?? item.label
         }
       })
 
