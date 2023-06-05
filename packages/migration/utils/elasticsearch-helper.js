@@ -19,7 +19,7 @@ export const client = new elasticsearch.Client({
   node: `http://${ES_HOST}`
 })
 
-export const updateComposition = async (id, body) => {
+export const updateComposition = async (id, body, extraConfigs) => {
   let response
   try {
     response = await client.update({
@@ -28,7 +28,8 @@ export const updateComposition = async (id, body) => {
       id,
       body: {
         doc: body
-      }
+      },
+      ...extraConfigs
     })
   } catch (e) {
     console.error(`updateComposition: error: ${e}`)
@@ -82,6 +83,25 @@ export const searchByCompositionId = async (compositionId) => {
     })
   } catch (err) {
     console.error(`searchByCompositionId: error: ${err}`)
+    return null
+  }
+}
+
+export const searchCompositionByCriteria = async (
+  criteriaObject,
+  extraConfigs
+) => {
+  try {
+    return await client.search({
+      index: ELASTICSEARCH_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: criteriaObject,
+        ...extraConfigs
+      }
+    })
+  } catch (err) {
+    console.error(`searchCompositionByCriteria: error: ${err}`)
     return null
   }
 }
