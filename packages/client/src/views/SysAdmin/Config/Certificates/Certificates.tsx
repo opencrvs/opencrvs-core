@@ -74,6 +74,13 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   margin-top: 15px;
   margin-bottom: 8px;
+  max-width: 340px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
+  }
 `
 
 const ToggleWrapper = styled.div`

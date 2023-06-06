@@ -485,9 +485,18 @@ export const getXAddressSameAsY = (
           {
             action: 'hide',
             expression: `${conditionalCase}`
+          },
+          {
+            action: 'hideInPreview',
+            expression: `!values.${AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY}`
           }
         ]
-      : [],
+      : [
+          {
+            action: 'hideInPreview',
+            expression: `!values.${AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY}`
+          }
+        ],
     mapping: {
       mutation: {
         operation: 'copyAddressTransformer',
@@ -508,14 +517,6 @@ export const getXAddressSameAsY = (
         ]
       }
     }
-  }
-  if (conditionalCase) {
-    copyAddressField['conditionals'] = [
-      {
-        action: 'hide',
-        expression: `${conditionalCase}`
-      }
-    ]
   }
   return [copyAddressField]
 }
@@ -667,7 +668,7 @@ function getPlaceOfEventAdminLevelSelects(
   }
 }
 
-function getAddressCaseFields(
+export function getAddressCaseFields(
   addressCase: AddressCases,
   informant: boolean
 ): SerializedFormField[] {
@@ -695,6 +696,12 @@ function getAddressCaseFields(
       options: {
         resource: 'countries'
       },
+      conditionals: [
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('countryPrimary')`
+        }
+      ],
       mapping: {
         template: {
           fieldName: `country${sentenceCase(useCase)}`,
@@ -1246,6 +1253,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalStatePrimary')`
         }
       ],
       mapping: {
@@ -1305,6 +1316,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalDistrictPrimary')`
         }
       ],
       mapping: {
@@ -1364,6 +1379,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalCityPrimary')`
         }
       ],
       mapping: {
@@ -1423,6 +1442,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalAddressLine1Primary')`
         }
       ],
       mapping: {
@@ -1600,6 +1623,10 @@ function getAddressCaseFields(
         {
           action: 'hide',
           expression: `isDefaultCountry(values.country${sentenceCase(useCase)})`
+        },
+        {
+          action: 'disable',
+          expression: `values?.fieldsModifiedByNidUserInfo?.includes('internationalPostcodePrimary')`
         }
       ],
       mapping: {

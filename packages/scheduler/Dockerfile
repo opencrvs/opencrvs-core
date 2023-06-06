@@ -1,7 +1,7 @@
-FROM alpine:3.15
+FROM alpine:3.9
 
 # Install required packages
-RUN apk add --update --no-cache bash curl coreutils
+RUN apk add --update --no-cache bash curl coreutils mongodb mongodb-tools
 
 WORKDIR /usr/scheduler
 
@@ -11,7 +11,7 @@ ENV METRICS_URL=$METRICS_URL
 
 # Copy files
 COPY packages/scheduler/jobs/*.* ./jobs/
-COPY packages/scheduler/cronTabFiles/VSExportCrontab ./
+COPY packages/scheduler/crontab ./
 COPY packages/scheduler/start.sh .
 
 # create cron.log file

@@ -18,8 +18,6 @@ import {
 } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
 import {
-  RotateLeft,
-  Archive,
   DeclarationIcon,
   Edit,
   BackArrow,
@@ -121,7 +119,7 @@ import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
@@ -783,7 +781,9 @@ const BodyContent = ({
       ''
 
     let declaration =
-      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+      draft &&
+      (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+        draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
             assignment: workqueueDeclaration?.registration?.assignment
