@@ -47,14 +47,14 @@ const messagesToDefine = {
   recoveryCodeEntryFormBodySubheaderMobile: {
     id: 'resetCredentials.recoveryCodeEntry.form.body.subheader',
     defaultMessage:
-      "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?",
+      "The recovery code was sent to your phone number. Please enter the code. Didn't receive it? {link}",
     description:
       'Form body subheader used for recovery code entry step in mobile flow'
   },
   recoveryCodeEntryFormBodySubheaderEmail: {
     id: 'resetCredentials.recoveryCodeEntry.form.body.subheader.email',
     defaultMessage:
-      "The recovery code was sent to your email. Please enter the code. Didn't receive it?",
+      "The recovery code was sent to your email. Please enter the code. Didn't receive it? {link}",
     description:
       'Form body subheader used for recovery code entry step in email flow'
   },
