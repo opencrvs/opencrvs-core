@@ -143,11 +143,6 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for option Spouse',
     id: 'form.field.label.informantRelation.spouse'
   },
-  OTHER: {
-    defaultMessage: 'Someone else',
-    description: 'Other Label',
-    id: 'form.field.label.someoneElse'
-  },
   SON: {
     defaultMessage: 'Son',
     description: 'Label for option Son',
