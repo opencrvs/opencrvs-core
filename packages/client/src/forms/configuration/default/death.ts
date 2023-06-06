@@ -108,7 +108,7 @@ export const deathRegisterForms: ISerializedForm = {
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.OTHER
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               placeholder: formMessageDescriptors.formSelectPlaceholder,

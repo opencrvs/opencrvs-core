@@ -28,6 +28,7 @@ interface IFormMessages
   informantError: MessageDescriptor
   SPOUSE: MessageDescriptor
   SON: MessageDescriptor
+  OTHER: MessageDescriptor
   SON_IN_LAW: MessageDescriptor
   GRANDSON: MessageDescriptor
   DAUGHTER: MessageDescriptor
@@ -141,6 +142,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse',
     id: 'form.field.label.informantRelation.spouse'
+  },
+  OTHER: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
   },
   SON: {
     defaultMessage: 'Son',
