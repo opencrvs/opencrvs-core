@@ -45,8 +45,14 @@ export const birthEventLocationMutationTransformer =
         draftData[sectionId][field.name]
       }`
     } else if (field.name === 'placeOfBirth' && transformedData.eventLocation) {
+      if (draftData[sectionId][field.name] === 'HEALTH_FACILITY') {
+        return
+      }
       transformedData.eventLocation.type = `${draftData[sectionId][field.name]}`
     } else if (field.name === 'birthLocation') {
+      if (draftData[sectionId][field.name] === '0') {
+        return
+      }
       transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
       if (transformedData.eventLocation.address) {
         delete transformedData.eventLocation.address
