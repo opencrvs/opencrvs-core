@@ -6,6 +6,7 @@
     "**/patches",
     ".secrets",
     "deploy_key.enc",
+    "license-header.txt",
     ".vscode",
     ".history",
     "data",

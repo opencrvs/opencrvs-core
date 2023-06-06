@@ -48,15 +48,15 @@ export const marriageRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'GROOM',
-                  label: informantMessageDescriptors.groom
+                  label: informantMessageDescriptors.GROOM
                 },
                 {
                   value: 'BRIDE',
-                  label: informantMessageDescriptors.bride
+                  label: informantMessageDescriptors.BRIDE
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -132,15 +132,15 @@ export const marriageRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'GROOM',
-                  label: informantMessageDescriptors.groom
+                  label: informantMessageDescriptors.GROOM
                 },
                 {
                   value: 'BRIDE',
-                  label: informantMessageDescriptors.bride
+                  label: informantMessageDescriptors.BRIDE
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -272,6 +272,10 @@ export const marriageRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationNumber',
             operation: 'registrationNumberTransformer'
+          },
+          {
+            fieldName: 'informantType',
+            operation: 'informantTypeTransformer'
           },
           {
             fieldName: 'certificateDate',
