@@ -54,43 +54,44 @@ export const up = async (db, client) => {
       ]
     }
   }
-  try {
-    const compositionsWithoutLocationIdsResult =
-      await searchCompositionByCriteria(searchCriteria)
-    const totalCompositionsWithoutLocationIds =
-      compositionsWithoutLocationIdsResult.body.hits.total.value || 0
 
-    while (processedDocCount < totalCompositionsWithoutLocationIds) {
-      const elasticDocBatchResult = await searchCompositionByCriteria(
-        searchCriteria,
-        { size: 10 }
-      )
-      const elasticDocBatch = elasticDocBatchResult.body.hits.hits
-      // eslint-disable-next-line no-console
-      console.log(
-        `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${
-          processedDocCount + limit
-        } of ${totalCompositionsWithoutLocationIds} compositions...`
-      )
+  const compositionsWithoutLocationIdsResult =
+    await searchCompositionByCriteria(searchCriteria)
+  const totalCompositionsWithoutLocationIds =
+    compositionsWithoutLocationIdsResult.body.hits.total.value || 0
 
-      for (const elasticDoc of elasticDocBatch) {
-        // populate the missing eventCountry and eventLocationId/eventJurisdictionIds for each doc
-        await updateEventLocationIdOrJurisdictionIds(db, elasticDoc)
-      }
-      processedDocCount += limit
-    }
+  while (processedDocCount < totalCompositionsWithoutLocationIds) {
+    const elasticDocBatchResult = await searchCompositionByCriteria(
+      searchCriteria,
+      { size: 10 }
+    )
+    const elasticDocBatch = elasticDocBatchResult.body.hits.hits
     // eslint-disable-next-line no-console
     console.log(
-      `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds  completed successfully.`
+      `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${
+        processedDocCount + limit
+      } of ${totalCompositionsWithoutLocationIds} compositions...`
     )
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds failed : ${error.stack}`
-    )
-  } finally {
-    await session.endSession()
+
+    for (const elasticDoc of elasticDocBatch) {
+      // populate the missing eventCountry and eventLocationId/eventJurisdictionIds for each doc
+      try {
+        await updateEventLocationIdOrJurisdictionIds(db, elasticDoc)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds for ${elasticDoc.id} failed : ${error.stack}`
+        )
+      }
+    }
+    processedDocCount += limit
   }
+
+  await session.endSession()
+  // eslint-disable-next-line no-console
+  console.log(
+    `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds  completed successfully.`
+  )
 }
 
 export const down = async (db, client) => {
@@ -150,7 +151,6 @@ async function updateEventLocationIdOrJurisdictionIds(db, elasticDoc) {
     if (locationDoc.length > 0) {
       if (locationDoc[0].type.coding[0].code === 'HEALTH_FACILITY') {
         body.eventLocationId = locationDoc[0].id
-        body.eventCountry = 'FAR'
       } else {
         const address = locationDoc[0].address
         if (address) {
