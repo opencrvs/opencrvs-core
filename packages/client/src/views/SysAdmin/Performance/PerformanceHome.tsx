@@ -437,7 +437,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         return <GenericErrorToast />
                       }
 
-                      if (loading) {
+                      if (loading && !data) {
                         return (
                           <Spinner id="performance-home-loading" size={24} />
                         )
@@ -485,6 +485,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
+                            event={event}
                           />
                         </>
                       )
@@ -600,7 +601,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     actions={[]}
                   >
                     <ResponsiveModalContent>
-                      {loading ? (
+                      {loading && !data ? (
                         <Spinner id="modal-data-loading" size={24} />
                       ) : (
                         <>
@@ -639,7 +640,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <LayoutRight>
                     {!officeSelected && (
                       <LocationStats>
-                        {!isOnline ? null : loading ? (
+                        {!isOnline ? null : loading && !data ? (
                           <Spinner id="location-stats-loading" size={24} />
                         ) : (
                           <LocationStatsView
@@ -661,7 +662,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     <RegistrationStatus>
                       {!isOnline ? (
                         <></>
-                      ) : loading ? (
+                      ) : loading && !data ? (
                         <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView
