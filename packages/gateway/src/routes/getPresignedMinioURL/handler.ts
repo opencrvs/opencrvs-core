@@ -16,12 +16,12 @@ export async function getPresignedMinioURLHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const fileName = request.params.fileName
+  const fileUri = request.params.fileUri
   const response = await fetchDocuments(
     '/presigned-url',
     { Authorization: request.headers.authorization },
     'POST',
-    JSON.stringify({ fileName: fileName })
+    JSON.stringify({ fileUri })
   )
   return response
 }

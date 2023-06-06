@@ -61,7 +61,6 @@ import {
   getSystemRequestSchema,
   getSystemResponseSchema,
   getSystemHandler,
-  getAllSystemsHandler,
   updatePermissions,
   reqUpdateSystemSchema,
   refreshSystemSecretHandler,
@@ -103,6 +102,7 @@ import updateRole, {
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
+import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',

@@ -121,7 +121,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'settings.user.label.nameBN'
   },
   labelEnglishName: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
   },
   match: {

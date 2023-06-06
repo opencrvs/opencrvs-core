@@ -25,6 +25,8 @@ export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/application-config'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
+export const DOCUMENTS_URL =
+  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||

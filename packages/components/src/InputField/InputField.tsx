@@ -108,11 +108,18 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       color = colors.white
       hideBorder = true
     }
+    const isDomElement = (
+      nodeType: string | React.JSXElementConstructor<any>
+    ) => {
+      return typeof nodeType === 'string'
+    }
     const children = React.Children.map(
       this.props.children,
       (node: React.ReactElement) => {
         if (!node) return
-        return React.cloneElement(node, { hideBorder })
+        return isDomElement(node.type)
+          ? node
+          : React.cloneElement(node, { hideBorder })
       }
     )
 
