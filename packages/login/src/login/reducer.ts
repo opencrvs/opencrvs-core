@@ -20,7 +20,7 @@ import { IStoreState } from '@login/store'
 export type LoginState = {
   submitting: boolean
   token: string
-  authenticationDetails: { nonce: string; mobile: string }
+  authenticationDetails: { nonce: string; mobile?: string; email?: string }
   submissionError: boolean
   resentAuthenticationCode: boolean
   stepOneDetails: { username: string }
@@ -35,7 +35,8 @@ export const initialState: LoginState = {
   config: {},
   authenticationDetails: {
     nonce: '',
-    mobile: ''
+    mobile: '',
+    email: ''
   },
   submissionError: false,
   resentAuthenticationCode: false,
@@ -118,7 +119,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           authenticationDetails: {
             ...state.authenticationDetails,
             nonce: action.payload.nonce,
-            mobile: action.payload.mobile
+            mobile: action.payload.mobile,
+            email: action.payload.email
           }
         },
         (action.payload.token &&

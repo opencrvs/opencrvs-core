@@ -271,7 +271,7 @@ export const UserAudit = () => {
 
     if (status === 'pending') {
       menuItems.push({
-        label: intl.formatMessage(sysMessages.resendSMS),
+        label: intl.formatMessage(sysMessages.resendInvite),
         handler: () => {
           resendInvite(userId)
         }
@@ -481,7 +481,7 @@ export const UserAudit = () => {
               type="success"
               onClose={() => setShowResendInviteSuccess(false)}
             >
-              {intl.formatMessage(sysMessages.resendSMSSuccess)}
+              {intl.formatMessage(sysMessages.resendInviteSuccess)}
             </Toast>
           )}
           {showResendInviteError && (
@@ -490,7 +490,7 @@ export const UserAudit = () => {
               type="error"
               onClose={() => setShowResendInviteError(false)}
             >
-              {intl.formatMessage(sysMessages.resendSMSError)}
+              {intl.formatMessage(sysMessages.resendInviteError)}
             </Toast>
           )}
           {showUsernameReminderSuccess && (

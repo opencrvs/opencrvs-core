@@ -282,7 +282,7 @@ export const resolvers: GQLResolver = {
         const errorResponse = await res.json()
         const duplicateDataErrorMap = {
           emailForNotification: {
-            field: 'emailForNotification',
+            field: 'email',
             conflictingValue: userPayload.emailForNotification
           },
           mobile: {

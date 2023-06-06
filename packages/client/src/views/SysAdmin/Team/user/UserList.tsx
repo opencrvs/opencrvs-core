@@ -429,7 +429,7 @@ function UserListComponent(props: IProps) {
 
       if (user.status === 'pending') {
         menuItems.push({
-          label: intl.formatMessage(messages.resendSMS),
+          label: intl.formatMessage(messages.resendInvite),
           handler: () => {
             resendInvite(user.id as string)
           }
@@ -903,7 +903,7 @@ function UserListComponent(props: IProps) {
           type="success"
           onClose={() => setShowResendInviteSuccess(false)}
         >
-          {intl.formatMessage(messages.resendSMSSuccess)}
+          {intl.formatMessage(messages.resendInviteSuccess)}
         </Toast>
       )}
       {showResendInviteError && (
@@ -912,7 +912,7 @@ function UserListComponent(props: IProps) {
           type="warning"
           onClose={() => setShowResendInviteError(false)}
         >
-          {intl.formatMessage(messages.resendSMSError)}
+          {intl.formatMessage(messages.resendInviteError)}
         </Toast>
       )}
 

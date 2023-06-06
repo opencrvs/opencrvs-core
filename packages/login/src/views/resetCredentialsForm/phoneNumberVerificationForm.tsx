@@ -16,7 +16,7 @@ import {
   goToSecurityQuestionForm
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
-import { phoneNumberFormat } from '@login/utils/validate'
+import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -45,9 +45,11 @@ interface BaseProps {
 }
 interface State {
   phone: string
+  email: string
   touched: boolean
   error: boolean
   errorMessage: string
+  notificationMethod: string
 }
 
 type Props = BaseProps &
@@ -59,13 +61,15 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     super(props)
     this.state = {
       phone: '',
+      email: '',
       touched: false,
       error: false,
-      errorMessage: ''
+      errorMessage: '',
+      notificationMethod: window.config.USER_NOTIFICATION_DELIVERY_METHOD
     }
   }
 
-  handleChange = (value: string) => {
+  handleMobileChange = (value: string) => {
     this.setState({
       error: phoneNumberFormat(value) ? true : false,
       phone: value,
@@ -73,9 +77,20 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     })
   }
 
+  handleEmailChange = (value: string) => {
+    this.setState({
+      error: emailAddressFormat(value) ? true : false,
+      email: value,
+      touched: true
+    })
+  }
+
   handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!this.state.phone || this.state.error) {
+    if (
+      this.state.notificationMethod === 'sms' &&
+      (!this.state.phone || this.state.error)
+    ) {
       this.setState({
         touched: true,
         error: true,
@@ -84,12 +99,33 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
         )
       })
       return
+    } else if (
+      this.state.notificationMethod === 'email' &&
+      (!this.state.email || this.state.error)
+    ) {
+      this.setState({
+        touched: true,
+        error: true,
+        errorMessage: this.props.intl.formatMessage(
+          validationMessages.emailAddressFormat
+        )
+      })
+      return
     }
+
     try {
-      const { nonce, securityQuestionKey } = await authApi.verifyUser(
-        convertToMSISDN(this.state.phone, window.config.COUNTRY),
-        this.props.location.state.forgottenItem
-      )
+      const { nonce, securityQuestionKey } = await authApi.verifyUser({
+        mobile:
+          this.state.notificationMethod === 'sms'
+            ? convertToMSISDN(this.state.phone, window.config.COUNTRY)
+            : undefined,
+        email:
+          this.state.notificationMethod === 'email'
+            ? this.state.email
+            : undefined,
+        retrieveFlow: this.props.location.state.forgottenItem
+      })
+
       if (securityQuestionKey) {
         this.props.goToSecurityQuestionForm(
           nonce,
@@ -99,26 +135,36 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
       } else {
         this.props.goToRecoveryCodeEntryForm(
           nonce,
+          this.props.location.state.forgottenItem,
           this.state.phone,
-          this.props.location.state.forgottenItem
+          this.state.email
         )
       }
     } catch (err) {
       this.setState({
         error: true,
         errorMessage: this.props.intl.formatMessage(
-          messages.errorPhoneNumberNotFound
+          this.state.notificationMethod === 'sms'
+            ? messages.errorPhoneNumberNotFound
+            : messages.errorEmailAddressNotFound
         )
       })
     }
   }
 
   render() {
-    const { error: responseError, errorMessage } = this.state
+    const {
+      error: responseError,
+      errorMessage,
+      notificationMethod
+    } = this.state
     const { intl, goToForgottenItemForm } = this.props
-    const validationError =
-      this.state.error && phoneNumberFormat(this.state.phone)
 
+    const validationError =
+      this.state.error &&
+      (notificationMethod === 'sms'
+        ? phoneNumberFormat(this.state.phone)
+        : emailAddressFormat(this.state.email))
     return (
       <>
         <ActionPageLight
@@ -129,22 +175,35 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           goBack={goToForgottenItemForm}
         >
           <form
-            id="phone-number-verification-form"
+            id="phone-or-email-verification-form"
             onSubmit={this.handleContinue}
           >
             <Title>
-              {intl.formatMessage(
-                messages.phoneNumberConfirmationFormBodyHeader
-              )}
+              {notificationMethod === 'sms' &&
+                intl.formatMessage(
+                  messages.phoneNumberConfirmationFormBodyHeader
+                )}
+              {notificationMethod === 'email' &&
+                intl.formatMessage(
+                  messages.emailAddressConfirmationFormBodyHeader
+                )}
             </Title>
 
-            <Actions id="phone-number-verification">
+            <Actions id="phone-or-email-verification">
               <InputField
-                id="phone-number"
-                key="phoneNumberFieldContainer"
-                label={this.props.intl.formatMessage(
-                  messages.phoneNumberFieldLabel
-                )}
+                id="phone-or-email-for-notification"
+                key="phoneOrEmailFieldInputContainer"
+                label={
+                  this.state.notificationMethod === 'sms'
+                    ? this.props.intl.formatMessage(
+                        messages.phoneNumberFieldLabel
+                      )
+                    : this.state.notificationMethod === 'email'
+                    ? this.props.intl.formatMessage(
+                        messages.emailAddressFieldLabel
+                      )
+                    : ''
+                }
                 touched={this.state.touched}
                 error={
                   validationError
@@ -158,17 +217,31 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                 }
                 hideAsterisk={true}
               >
-                <TextInput
-                  id="phone-number-input"
-                  type="tel"
-                  key="phoneNumberInputField"
-                  name="phoneNumberInput"
-                  isSmallSized={true}
-                  value={this.state.phone}
-                  onChange={(e) => this.handleChange(e.target.value)}
-                  touched={this.state.touched}
-                  error={responseError}
-                />
+                {notificationMethod === 'sms' && (
+                  <TextInput
+                    id="phone-number-input"
+                    type="tel"
+                    key="phoneNumberInputField"
+                    name="phoneNumberInput"
+                    isSmallSized={true}
+                    value={this.state.phone}
+                    onChange={(e) => this.handleMobileChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={responseError}
+                  />
+                )}
+                {notificationMethod === 'email' && (
+                  <TextInput
+                    id="email-address-input"
+                    key="emailAddressInputField"
+                    name="emailAddressInput"
+                    isSmallSized={true}
+                    value={this.state.email}
+                    onChange={(e) => this.handleEmailChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={responseError}
+                  />
+                )}
               </InputField>
             </Actions>
 

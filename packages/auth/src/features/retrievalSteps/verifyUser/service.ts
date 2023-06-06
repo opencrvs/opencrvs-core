@@ -23,12 +23,12 @@ export enum RetrievalSteps {
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
-export async function verifyUser(mobile: string) {
+export async function verifyUser(mobile?: string, email?: string) {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ mobile }),
+    body: JSON.stringify({ mobile, email }),
     headers: { 'Content-Type': 'application/json' }
   })
 

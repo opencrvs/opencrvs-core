@@ -25,7 +25,8 @@ import {
 } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
 interface IVerifyUserPayload {
-  mobile: string
+  mobile?: string
+  email?: string
   retrieveFlow: string
 }
 
@@ -41,7 +42,7 @@ export default async function verifyUserHandler(
   const payload = request.payload as IVerifyUserPayload
   let result
   try {
-    result = await verifyUser(payload.mobile)
+    result = await verifyUser(payload.mobile, payload.email)
   } catch (err) {
     throw unauthorized()
   }
@@ -80,7 +81,8 @@ export default async function verifyUserHandler(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string().required(),
+  mobile: Joi.string(),
+  email: Joi.string().email(),
   retrieveFlow: Joi.string()
     .valid(RETRIEVAL_FLOW_USER_NAME, RETRIEVAL_FLOW_PASSWORD)
     .required()
