@@ -17,22 +17,36 @@ export const up = async (db, client) => {
   const limit = 10
   let skip = 0
   let processedDocCount = 0
-  const usersLabels = [
-    { label: 'Field Agent' },
-    { label: 'Agent de terrain' },
-    { label: 'Registration Agent' },
-    { label: "Agent d'enregistrement" },
-    { label: 'Local Registrar' },
-    { label: 'Registraire local' },
-    { label: 'Local System Admin' },
-    { label: 'Administrateur système local' },
-    { label: 'National System Admin' },
-    { label: 'Administrateur système national' },
-    { label: 'Performance Management' },
-    { label: 'Gestion des performances' },
-    { label: 'National Registrar' },
-    { label: 'Registraire national' }
-  ]
+  const usersLabels = {
+    FIELD_AGENT: [
+      { label: 'Field Agent', lang: 'en' },
+      { label: 'Agent de terrain', lang: 'fr' }
+    ],
+    REGISTRATION_AGENT: [
+      { label: 'Registration Agent', lang: 'en' },
+      { label: "Agent d'enregistrement", lang: 'fr' }
+    ],
+    LOCAL_REGISTRAR: [
+      { label: 'Local Registrar', lang: 'en' },
+      { label: 'Registraire local', lang: 'fr' }
+    ],
+    LOCAL_SYSTEM_ADMIN: [
+      { label: 'Local System Admin', lang: 'en' },
+      { label: 'Administrateur système local', lang: 'fr' }
+    ],
+    NATIONAL_SYSTEM_ADMIN: [
+      { label: 'National System Admin', lang: 'en' },
+      { label: 'Administrateur système national', lang: 'fr' }
+    ],
+    PERFORMANCE_MANAGEMENT: [
+      { label: 'Performance Management', lang: 'en' },
+      { label: 'Gestion des performances', lang: 'fr' }
+    ],
+    NATIONAL_REGISTRAR: [
+      { label: 'National Registrar', lang: 'en' },
+      { label: 'Registraire national', lang: 'fr' }
+    ]
+  }
 
   try {
     await session.withTransaction(async () => {
@@ -72,13 +86,6 @@ export const up = async (db, client) => {
               .split(' ')
               .map((s) => capitalize(s))
               .join(' ')
-
-          let frLabel = ''
-          usersLabels.forEach((element, index) => {
-            if (element.label === titleCase(roleCode).trim()) {
-              frLabel = usersLabels[index + 1].label
-            }
-          })
 
           const hasSystemTypes = practitionerRole.code.some((item) => {
             return item.coding.some((coding) => {
@@ -123,10 +130,7 @@ export const up = async (db, client) => {
                     coding: [
                       {
                         system: 'http://opencrvs.org/specs/types',
-                        code: JSON.stringify({
-                          en: titleCase(roleCode),
-                          fr: frLabel
-                        })
+                        code: JSON.stringify(usersLabels[roleCode])
                       }
                     ]
                   }

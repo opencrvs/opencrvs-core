@@ -1055,14 +1055,7 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
-      userResponse.role.labels.forEach((item) => {
-        if (item.lang === 'en') {
-          item.label = roleObj.en ?? item.label
-        }
-        if (item.lang === 'fr') {
-          item.label = roleObj.fr ?? item.label
-        }
-      })
+      userResponse.role.labels = roleObj
 
       return userResponse
     },

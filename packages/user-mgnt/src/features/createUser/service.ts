@@ -119,10 +119,7 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: JSON.stringify({
-                en: role?.labels.find((lbl) => lbl.lang === 'en')?.label,
-                fr: role?.labels.find((lbl) => lbl.lang === 'fr')?.label
-              })
+              code: JSON.stringify(role?.labels)
             }
           ]
         }
