@@ -348,7 +348,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: '{"en":"Field Agent","fr":"Agent de terrain"}'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -401,7 +401,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: '{"en":"Field Agent","fr":"Agent de terrain"}'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -442,7 +442,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: '{"en":"Local Registrar","fr":"Registraire local"}'
+                      code: '[{"label":"Local Registrar","lang":"en"},{"label":"Registraire local","lang":"fr"}]'
                     }
                   ]
                 }

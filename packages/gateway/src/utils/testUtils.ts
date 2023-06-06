@@ -183,10 +183,8 @@ export const mockUser = {
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
-      {
-        lang: 'en',
-        label: 'Field Agent'
-      }
+      { label: 'Field Agent', lang: 'en' },
+      { label: 'Agent de terrain', lang: 'fr' }
     ]
   },
   name: [

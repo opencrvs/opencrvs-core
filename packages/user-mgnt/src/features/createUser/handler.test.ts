@@ -171,7 +171,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: '{"en":"Field Agent","fr":"Agent de terrain"}'
+              code: '[{"lang":"en","label":"Field Agent"},{"lang":"fr","label":"Agent de terrain"}]'
             }
           ]
         }
@@ -183,8 +183,6 @@ describe('createUser handler', () => {
         { reference: 'Location/44' }
       ]
     }
-
-    console.log('fetch.mock', fetch.mock.calls[5][1].body)
 
     expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
