@@ -17,7 +17,6 @@ import {
 } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
 import { templateNames } from '@notification/i18n/messages'
-import { USER_NOTIFICATION_DELIVERY_METHOD } from '@notification/constants'
 
 export const emailTemplateName = {
   onBoardingInvite: 'onboarding-invite',
@@ -53,22 +52,24 @@ export async function sendUserCredentials(
   const payload = request.payload as ICredentialsPayload
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
-  const templateName =
-    templateNames.ONBOARDING_INVITE[USER_NOTIFICATION_DELIVERY_METHOD]
-  const recipient =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
-      ? payload.email
-      : payload.msisdn!
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
 
-  await sendNotification(request, templateName, recipient, {
-    firstNames,
-    username: payload.username,
-    password: payload.password
-  })
+  await sendNotification(
+    request,
+    {
+      sms: templateNames.ONBOARDING_INVITE['sms'],
+      email: templateNames.ONBOARDING_INVITE['email']
+    },
+    { email: payload.email, sms: payload.msisdn },
+    {
+      firstNames,
+      username: payload.username,
+      password: payload.password
+    }
+  )
   return h.response().code(200)
 }
 
@@ -78,22 +79,22 @@ export async function sendResetPasswordInvite(
 ) {
   const payload = request.payload as IResetPasswordPayload
   logger.info(`Password: ${payload.password}`)
-  const templateName =
-    templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN[
-      USER_NOTIFICATION_DELIVERY_METHOD
-    ]
-  const recipient =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
-      ? payload.email
-      : payload.msisdn!
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
 
-  await sendNotification(request, templateName, recipient, {
-    firstNames,
-    password: payload.password
-  })
+  await sendNotification(
+    request,
+    {
+      sms: templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN['sms'],
+      email: templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN['email']
+    },
+    { email: payload.email, sms: payload.msisdn },
+    {
+      firstNames,
+      password: payload.password
+    }
+  )
   return h.response().code(200)
 }
 
@@ -103,20 +104,23 @@ export async function retrieveUserName(
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  const templateName =
-    templateNames.USERNAME_REMINDER[USER_NOTIFICATION_DELIVERY_METHOD]
-  const recipient =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
-      ? payload.email
-      : payload.msisdn!
+
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
 
-  await sendNotification(request, templateName, recipient, {
-    firstNames,
-    username: payload.username
-  })
+  await sendNotification(
+    request,
+    {
+      sms: templateNames.USERNAME_REMINDER['sms'],
+      email: templateNames.USERNAME_REMINDER['email']
+    },
+    { email: payload.email, sms: payload.msisdn },
+    {
+      firstNames,
+      username: payload.username
+    }
+  )
   return h.response().code(200)
 }
 
@@ -126,21 +130,23 @@ export async function sendUserAuthenticationCode(
 ) {
   const payload = request.payload as IUserAuthCodePayload
   logger.info(`Authentication Code: ${payload.code}`)
-  const recipient =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
-      ? payload.email
-      : payload.msisdn!
 
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
-  const templateName =
-    templateNames[payload.notificationEvent][USER_NOTIFICATION_DELIVERY_METHOD]
 
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
-  await sendNotification(request, templateName, recipient, {
-    firstNames,
-    authCode: payload.code
-  })
+  await sendNotification(
+    request,
+    {
+      sms: templateNames[payload.notificationEvent]['sms'],
+      email: templateNames[payload.notificationEvent]['email']
+    },
+    { email: payload.email, sms: payload.msisdn },
+    {
+      firstNames,
+      authCode: payload.code
+    }
+  )
   return h.response().code(200)
 }
 
@@ -150,20 +156,23 @@ export async function updateUserName(
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  const templateName =
-    templateNames.USERNAME_UPDATED[USER_NOTIFICATION_DELIVERY_METHOD]
-  const recipient =
-    USER_NOTIFICATION_DELIVERY_METHOD === 'email' && payload.email
-      ? payload.email
-      : payload.msisdn!
+
   const nameObject = payload.userFullName.find((obj) => obj.use === 'en')
   // Extract the firstNames
   const firstNames = nameObject?.given[0] as string
 
-  await sendNotification(request, templateName, recipient, {
-    firstNames,
-    username: payload.username
-  })
+  await sendNotification(
+    request,
+    {
+      sms: templateNames.USERNAME_UPDATED['sms'],
+      email: templateNames.USERNAME_UPDATED['email']
+    },
+    { email: payload.email, sms: payload.msisdn },
+    {
+      firstNames,
+      username: payload.username
+    }
+  )
   return h.response().code(200)
 }
 

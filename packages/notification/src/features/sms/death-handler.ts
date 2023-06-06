@@ -31,10 +31,15 @@ export async function sendDeathInProgressConfirmation(
     )}`
   )
   const templateName = messageKeys.deathInProgressNotification
-  await sendNotification(request, templateName, payload.msisdn, {
-    trackingId: payload.trackingId,
-    crvsOffice: payload.crvsOffice
-  })
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
+    {
+      trackingId: payload.trackingId,
+      crvsOffice: payload.crvsOffice
+    }
+  )
   return h.response().code(200)
 }
 
@@ -49,10 +54,15 @@ export async function sendDeathDeclarationConfirmation(
     )}`
   )
   const templateName = messageKeys.deathDeclarationNotification
-  await sendNotification(request, templateName, payload.msisdn, {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
+    {
+      name: payload.name,
+      trackingId: payload.trackingId
+    }
+  )
   return h.response().code(200)
 }
 
@@ -67,11 +77,16 @@ export async function sendDeathRegistrationConfirmation(
     )}`
   )
   const templateName = messageKeys.deathRegistrationNotification
-  await sendNotification(request, templateName, payload.msisdn, {
-    name: payload.name,
-    trackingId: payload.trackingId,
-    registrationNumber: payload.registrationNumber
-  })
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
+    {
+      name: payload.name,
+      trackingId: payload.trackingId,
+      registrationNumber: payload.registrationNumber
+    }
+  )
   return h.response().code(200)
 }
 
@@ -86,9 +101,14 @@ export async function sendDeathRejectionConfirmation(
     )}`
   )
   const templateName = messageKeys.deathRejectionNotification
-  await sendNotification(request, templateName, payload.msisdn, {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
+    {
+      name: payload.name,
+      trackingId: payload.trackingId
+    }
+  )
   return h.response().code(200)
 }

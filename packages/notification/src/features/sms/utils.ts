@@ -46,8 +46,14 @@ export interface IAuthHeader {
 
 export async function sendNotification(
   request: Hapi.Request,
-  templateName: string,
-  recipient: string,
+  templateName: {
+    email?: string
+    sms: string
+  },
+  recipient: {
+    email?: string
+    sms?: string
+  },
   variables: Record<string, string>
 ) {
   const token = request.headers.authorization
