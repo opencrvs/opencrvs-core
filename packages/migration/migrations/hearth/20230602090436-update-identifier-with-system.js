@@ -23,8 +23,9 @@ export const up = async (db, client) => {
   const systemsCollection = connectedUserManagementClient
     .db()
     .collection('systems')
-
   const systemIdentifier = 'http://opencrvs.org/specs/id/system_identifier'
+  let processTask = 0
+  let processTaskHistory = 0
 
   try {
     await session.withTransaction(async () => {
@@ -42,13 +43,22 @@ export const up = async (db, client) => {
         })
         .toArray()
 
-      // Task update with system identifier value
       // eslint-disable-next-line no-console
       console.log(
-        `Migration - Update task integration with system object :: Processing total ${tasksWithSystem.length} tasks...`
+        `Migration - Task integration update with system object, total ${tasksWithSystem.length} tasks need to be processed`
       )
+
       for await (const task of tasksWithSystem) {
-        for await (const identifier of task.identifier) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `Processed ${processTask + 1}/${
+            tasksWithSystem.length
+          } tasks, progress ${(
+            ((processTask + 1) / tasksWithSystem.length) *
+            100
+          ).toFixed(2)} ...`
+        )
+        for (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
             const system = await systemsCollection.findOne({
               _id: ObjectId(identifier.value)
@@ -66,17 +76,27 @@ export const up = async (db, client) => {
                   }
                 }
               )
+              processTask++
             }
           }
         }
       }
-      // Task history update with system identifier value
+
       // eslint-disable-next-line no-console
       console.log(
-        `Migration - Update Task history integration with system object :: Processing total ${tasksHistoryWithSystem.length} tasks...`
+        `Migration - Task history integration update with system object, total ${tasksHistoryWithSystem.length} task history need to be processed`
       )
       for await (const task of tasksHistoryWithSystem) {
-        for await (const identifier of task.identifier) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `Processed ${processTaskHistory + 1}/${
+            tasksHistoryWithSystem.length
+          } tasks history, progress ${(
+            ((processTaskHistory + 1) / tasksHistoryWithSystem.length) *
+            100
+          ).toFixed(2)} ...`
+        )
+        for (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
             const system = await systemsCollection.findOne({
               _id: ObjectId(identifier.value)
@@ -94,6 +114,7 @@ export const up = async (db, client) => {
                   }
                 }
               )
+              processTaskHistory++
             }
           }
         }
