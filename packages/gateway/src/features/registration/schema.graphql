@@ -589,7 +589,6 @@ type RegistrationCountResult {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
   isPotentiallyDuplicate: Boolean
 }
 

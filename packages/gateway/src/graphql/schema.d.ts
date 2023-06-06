@@ -581,7 +581,6 @@ export interface GQLNotificationInput {
 export interface GQLCreatedIds {
   compositionId?: string
   trackingId?: string
-  registrationNumber?: string
   isPotentiallyDuplicate?: boolean
 }
 
@@ -6382,7 +6381,6 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
-  registrationNumber?: CreatedIdsToRegistrationNumberResolver<TParent>
   isPotentiallyDuplicate?: CreatedIdsToIsPotentiallyDuplicateResolver<TParent>
 }
 
@@ -6399,18 +6397,6 @@ export interface CreatedIdsToCompositionIdResolver<
 }
 
 export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CreatedIdsToRegistrationNumberResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
