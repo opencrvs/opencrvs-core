@@ -17,6 +17,37 @@ export const up = async (db, client) => {
   const limit = 10
   let skip = 0
   let processedDocCount = 0
+  const usersLabels = {
+    FIELD_AGENT: [
+      { label: 'Field Agent', lang: 'en' },
+      { label: 'Agent de terrain', lang: 'fr' }
+    ],
+    REGISTRATION_AGENT: [
+      { label: 'Registration Agent', lang: 'en' },
+      { label: "Agent d'enregistrement", lang: 'fr' }
+    ],
+    LOCAL_REGISTRAR: [
+      { label: 'Local Registrar', lang: 'en' },
+      { label: 'Registraire local', lang: 'fr' }
+    ],
+    LOCAL_SYSTEM_ADMIN: [
+      { label: 'Local System Admin', lang: 'en' },
+      { label: 'Administrateur système local', lang: 'fr' }
+    ],
+    NATIONAL_SYSTEM_ADMIN: [
+      { label: 'National System Admin', lang: 'en' },
+      { label: 'Administrateur système national', lang: 'fr' }
+    ],
+    PERFORMANCE_MANAGEMENT: [
+      { label: 'Performance Management', lang: 'en' },
+      { label: 'Gestion des performances', lang: 'fr' }
+    ],
+    NATIONAL_REGISTRAR: [
+      { label: 'National Registrar', lang: 'en' },
+      { label: 'Registraire national', lang: 'fr' }
+    ]
+  }
+
   try {
     await session.withTransaction(async () => {
       const totalPractitionerRoleCount = await getTotalDocCountByCollectionName(
@@ -99,7 +130,7 @@ export const up = async (db, client) => {
                     coding: [
                       {
                         system: 'http://opencrvs.org/specs/types',
-                        code: isFieldAgent ? 'Field agent' : titleCase(roleCode)
+                        code: JSON.stringify(usersLabels[roleCode])
                       }
                     ]
                   }
