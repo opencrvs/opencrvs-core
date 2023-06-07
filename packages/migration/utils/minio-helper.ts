@@ -11,9 +11,8 @@
  */
 
 import * as Minio from 'minio'
-import uuidPKG from 'uuid'
-const { v4: uuid } = uuidPKG
-import fileTypePKG from 'file-type'
+import { v4 as uuid } from 'uuid'
+import * as fileTypePKG from 'file-type'
 const { fromBuffer } = fileTypePKG
 
 export const MINIO_HOST = process.env.MINIO_HOST || 'localhost'
@@ -30,15 +29,17 @@ export const minioClient = new Minio.Client({
   secretKey: process.env.MINIO_SECRET_KEY || DEFAULT_MINIO_SECRET_KEY
 })
 
-export async function uploadBase64ToMinio(fileData) {
+export async function uploadBase64ToMinio(
+  fileData: string
+): Promise<string | Error> {
   const ref = uuid()
   try {
     const base64String = fileData.split(',')[1]
     const base64Decoded = Buffer.from(base64String, 'base64')
     const fileType = await fromBuffer(base64Decoded)
-    const generateFileName = `${ref}.${fileType.ext}`
+    const generateFileName = `${ref}.${fileType?.ext}`
     await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      'content-type': fileType.mime
+      'content-type': fileType?.mime
     })
     return `/${MINIO_BUCKET}/${generateFileName}`
   } catch (error) {
@@ -46,7 +47,7 @@ export async function uploadBase64ToMinio(fileData) {
   }
 }
 
-export async function uploadSvgToMinio(svgCode) {
+export async function uploadSvgToMinio(svgCode: string) {
   const ref = uuid()
   const fileName = `${ref}.svg`
   await minioClient.putObject(MINIO_BUCKET, fileName, svgCode, {
@@ -55,7 +56,7 @@ export async function uploadSvgToMinio(svgCode) {
   return `/${MINIO_BUCKET}/${fileName}`
 }
 
-export function isBase64FileString(fileData) {
+export function isBase64FileString(fileData: string) {
   if (fileData === '' || fileData.trim() === '') {
     return false
   }

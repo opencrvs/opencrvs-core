@@ -10,15 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { Db, MongoClient } from 'mongodb'
 import {
   INFORMANT_SMS_NOTIFICATION_COLLECTION,
   getNotificationContent
-  // eslint-disable-next-line import/no-relative-parent-imports
-} from '../../utils/resource-helper.js'
+} from '../../utils/resource-helper'
+import { NotificationContent } from '../../utils/commonTypes'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
-  const notificationContentData = getNotificationContent()
+  const notificationContentData: NotificationContent[] =
+    getNotificationContent()
   try {
     await session.withTransaction(async () => {
       await db
@@ -26,19 +28,19 @@ export const up = async (db, client) => {
         .insertMany(notificationContentData)
     })
   } finally {
-    console.log(`Migration - INFORMANT_SMS_NOTIFICATION : Done. `)
+    console.log(`Migration - INFORMANT_SMS_NOTIFICATION : Done.`)
     await session.endSession()
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
       await db.collection(INFORMANT_SMS_NOTIFICATION_COLLECTION).drop()
     })
   } finally {
-    console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE `)
+    console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE`)
     await session.endSession()
   }
 }

@@ -10,15 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  svgCode as marriageCertificateTemplateDefault
-  // eslint-disable-next-line import/no-relative-parent-imports
-} from '../../utils/marriage-certificate-template-default.js'
-export const up = async (db, client) => {
+import { svgCode as marriageCertificateTemplateDefault } from '../../utils/marriage-certificate-template-default.js'
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('certificates').insert({
+      await db.collection('certificates').insertOne({
         event: 'marriage',
         status: 'ACTIVE',
         svgCode: marriageCertificateTemplateDefault,
@@ -29,12 +28,12 @@ export const up = async (db, client) => {
       })
     })
   } finally {
-    console.log(`Migration - Add Marriage Certificate Configuration: Done. `)
+    console.log(`Migration - Add Marriage Certificate Configuration: Done.`)
     await session.endSession()
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -42,7 +41,7 @@ export const down = async (db, client) => {
     })
   } finally {
     console.log(
-      `Migration - DOWN - Add Marriage Certificate Configuration: Done `
+      `Migration - DOWN - Add Marriage Certificate Configuration: Done.`
     )
     await session.endSession()
   }

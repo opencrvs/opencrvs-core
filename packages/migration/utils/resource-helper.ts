@@ -10,9 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { NotificationContent } from './commonTypes'
+
 export const INFORMANT_SMS_NOTIFICATION_COLLECTION = 'informantsmsnotifications'
 
-export const NOTIFICATION_NAME_MAPPING_WITH_RESOURCE = {
+export const NOTIFICATION_NAME_MAPPING_WITH_RESOURCE: Record<string, string> = {
   birthInProgressSMS: 'birthInProgressNotification',
   birthDeclarationSMS: 'birthDeclarationNotification',
   birthRegistrationSMS: 'birthRegistrationNotification',
@@ -23,7 +25,7 @@ export const NOTIFICATION_NAME_MAPPING_WITH_RESOURCE = {
   deathRejectionSMS: 'deathRejectionNotification'
 }
 
-export function getNotificationContent() {
+export function getNotificationContent(): NotificationContent[] {
   return Object.keys(NOTIFICATION_NAME_MAPPING_WITH_RESOURCE).map((key) => ({
     name: key,
     enabled: true,

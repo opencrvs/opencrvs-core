@@ -10,7 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export const up = async (db, client) => {
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -31,12 +33,12 @@ export const up = async (db, client) => {
       )
     })
   } finally {
-    console.log(`Migration - Add Marriage Configuration : Done. `)
+    console.log(`Migration - Add Marriage Configuration: Done.`)
     await session.endSession()
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -45,7 +47,7 @@ export const down = async (db, client) => {
         .updateMany({}, { $unset: { MARRIAGE: '' } })
     })
   } finally {
-    console.log(`Migration - DOWN - Add Marriage Configuration - DONE `)
+    console.log(`Migration - DOWN - Add Marriage Configuration - DONE`)
     await session.endSession()
   }
 }

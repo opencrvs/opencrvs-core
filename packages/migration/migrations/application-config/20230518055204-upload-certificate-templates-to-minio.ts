@@ -10,24 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import isSvg from 'is-svg'
-import { uploadSvgToMinio } from '../../utils/minio-helper.js'
+import { uploadSvgToMinio } from '../../utils/minio-helper'
+import { MongoClient, Db } from 'mongodb'
+import { ICertificateTemplateData } from '../../utils/commonTypes'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const certificates = await db
-        .collection('certificates')
-        .find()
-        .project({ svgCode: 1, event: 1 })
+      const certificates = (await db.collection('certificates').find().project({
+        svgCode: 1,
+        event: 1
+      })) as unknown as ICertificateTemplateData[]
+
       for await (const { _id, svgCode, event } of certificates) {
         if (!isSvg(svgCode)) {
           console.log(`Invalid certificate svg found for ${event}`)
           continue
         }
+
         try {
           const uri = await uploadSvgToMinio(svgCode)
-          db.collection('certificates').updateOne({ _id }, { $set: { svgCode: uri } })
+          await db
+            .collection('certificates')
+            .updateOne({ _id }, { $set: { svgCode: uri } })
         } catch (err) {
           console.log(`Saving certificate template failed with error: ${err}`)
         }
@@ -38,4 +44,4 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async (db: Db, client: MongoClient) => {}

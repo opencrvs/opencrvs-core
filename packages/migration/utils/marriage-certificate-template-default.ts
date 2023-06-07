@@ -13,9 +13,9 @@
 import {
   notoSans
   // eslint-disable-next-line import/no-relative-parent-imports
-} from './fonts/noto-sans.js'
+} from './fonts/noto-sans'
 
-export const svgCode = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+export const svgCode: string = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect width="420" height="595" fill="white"/>
 <text fill="#222222" xml:space="default" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
   <tspan x="50%" y="156.104" text-anchor="middle">Date of issuance of certificate:  {{certificateDate}}</tspan>
