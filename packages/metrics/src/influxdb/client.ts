@@ -270,8 +270,6 @@ export const query = <T = any>(
 export async function deleteMeasurements() {
   try {
     await Promise.all([
-      influx.dropMeasurement('birth_reg', INFLUX_DB),
-      influx.dropMeasurement('death_reg', INFLUX_DB),
       influx.dropMeasurement('in_complete_fields', INFLUX_DB),
       influx.dropMeasurement('declaration_time_logged', INFLUX_DB),
       influx.dropMeasurement('declaration_event_duration', INFLUX_DB),
@@ -280,7 +278,9 @@ export async function deleteMeasurements() {
       influx.dropMeasurement('declarations_started', INFLUX_DB),
       influx.dropMeasurement('declarations_rejected', INFLUX_DB),
       influx.dropMeasurement('user_audit_event', INFLUX_DB),
-      influx.dropMeasurement('marriage_registration', INFLUX_DB)
+      influx.dropMeasurement('marriage_registration', INFLUX_DB),
+      influx.dropMeasurement('death_registration', INFLUX_DB),
+      influx.dropMeasurement('birth_registration', INFLUX_DB)
     ])
     return {
       status: `Successfully deleted all the measurements form ${INFLUX_DB} database`

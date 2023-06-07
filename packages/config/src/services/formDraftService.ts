@@ -71,10 +71,17 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         }
+      }),
+      await fetch(`${METRICS_URL}/performance`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
       })
     ])
   } catch (err) {
-    throw Error(`Failed to delete elastic, influx data. ${err}`)
+    throw Error(`Failed to delete elastic, influx, mongo data. ${err}`)
   }
 
   Promise.all(
