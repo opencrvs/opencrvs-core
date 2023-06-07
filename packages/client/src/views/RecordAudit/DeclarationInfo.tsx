@@ -59,10 +59,12 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
+  const messageInformant = camelize(
+    removeUnderscore(`${declaration?.informant?.toLowerCase()}`)
+  )
+
   let informant = intl.formatMessage(
-    dynamicConstantsMessages[
-      camelize(removeUnderscore(declaration?.informant?.toLowerCase()))
-    ]
+    dynamicConstantsMessages[`${messageInformant}`]
   )
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
