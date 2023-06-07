@@ -887,7 +887,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 

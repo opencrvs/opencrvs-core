@@ -1093,7 +1093,6 @@ export interface GQLEstimation {
   maleEstimation: number
   femaleEstimation: number
   locationId: string
-  estimationYear: number
   locationLevel: string
 }
 
@@ -8310,7 +8309,6 @@ export interface GQLEstimationTypeResolver<TParent = any> {
   maleEstimation?: EstimationToMaleEstimationResolver<TParent>
   femaleEstimation?: EstimationToFemaleEstimationResolver<TParent>
   locationId?: EstimationToLocationIdResolver<TParent>
-  estimationYear?: EstimationToEstimationYearResolver<TParent>
   locationLevel?: EstimationToLocationLevelResolver<TParent>
 }
 
@@ -8351,18 +8349,6 @@ export interface EstimationToFemaleEstimationResolver<
 }
 
 export interface EstimationToLocationIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EstimationToEstimationYearResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
