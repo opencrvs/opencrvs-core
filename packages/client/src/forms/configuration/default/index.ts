@@ -21,7 +21,7 @@ interface IDefaultRegisterForms {
 }
 
 export const registerForms: IDefaultRegisterForms = {
-  birth: birthRegisterForms,
+  birth: window.config.FORMS.birth,
   death: deathRegisterForms,
   marriage: marriageRegisterForms
 }
