@@ -153,7 +153,7 @@ export const getLocation = (
   if (declaration.event === Event.Death) {
     if (declaration.data?.deathEvent?.placeOfDeathNotOnTheList) {
       return (
-        declaration.data?.deathEvent.placeOfDeathOther?.toString() ||
+        declaration.data?.deathEvent?.placeOfDeathOther?.toString() ||
         EMPTY_STRING
       )
     }
@@ -162,7 +162,7 @@ export const getLocation = (
 
     if (currentDataset) {
       const currentValue = currentDataset?.options.find(
-        (r) => r.value === declaration.data?.deathEvent.placeOfDeathLocality
+        (r) => r.value === declaration.data?.deathEvent?.placeOfDeathLocality
       )
 
       if (currentValue) {
@@ -180,7 +180,7 @@ export const getLocation = (
   } else if (declaration.event === Event.Birth) {
     if (declaration.data?.child?.placeOfBirthNotOnTheList) {
       return (
-        declaration.data?.child.placeOfBirthOther?.toString() || EMPTY_STRING
+        declaration.data?.child?.placeOfBirthOther?.toString() || EMPTY_STRING
       )
     }
 
@@ -188,7 +188,7 @@ export const getLocation = (
 
     if (currentDataset) {
       const currentValue = currentDataset?.options.find(
-        (r) => r.value === declaration.data?.child.placeOfBirthLocality
+        (r) => r.value === declaration.data?.child?.placeOfBirthLocality
       )
 
       if (currentValue) {
