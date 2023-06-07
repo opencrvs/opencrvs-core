@@ -514,7 +514,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
 }
 
 input BirthRegistrationInput {
