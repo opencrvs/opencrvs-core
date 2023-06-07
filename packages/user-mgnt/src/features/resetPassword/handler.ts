@@ -102,7 +102,7 @@ export async function sendPasswordNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        emailForNotification,
+        email: emailForNotification,
         password,
         userFullName
       }),

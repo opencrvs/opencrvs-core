@@ -26,7 +26,7 @@ export async function sendUserName(
     method: 'POST',
     body: JSON.stringify({
       msisdn: mobile,
-      emailForNotification,
+      email: emailForNotification,
       username,
       userFullName
     }),

@@ -18,16 +18,6 @@ import {
 import { logger } from '@notification/logger'
 import { templateNames } from '@notification/i18n/messages'
 
-export const emailTemplateName = {
-  onBoardingInvite: 'onboarding-invite',
-  twoFactorAuthentication: '2-factor-authentication',
-  changePhoneNumber: 'change-phone-number',
-  passwordResetBySystemAdmin: 'password-reset-by-system-admin',
-  passwordReset: 'password-reset',
-  usernameReminder: 'username-reminder',
-  usernameUpdated: 'username-updated'
-}
-
 interface ICredentialsPayload extends IMessageRecipient {
   username: string
   password: string
