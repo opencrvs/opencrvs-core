@@ -88,7 +88,7 @@ export const GetDeclarationInfo = ({
   if (info.type === 'Birth') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
@@ -106,7 +106,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Death') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
@@ -124,7 +124,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Marriage') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
