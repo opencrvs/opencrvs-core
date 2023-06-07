@@ -13,13 +13,14 @@
 import React from 'react'
 import {
   IDeclarationData,
+  camelize,
   getCaptitalizedWord,
   removeUnderscore
 } from './utils'
 import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import format from '@client/utils/date-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
@@ -58,7 +59,11 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
-  let informant = getCaptitalizedWord(declaration?.informant)
+  let informant = intl.formatMessage(
+    dynamicConstantsMessages[
+      camelize(removeUnderscore(declaration?.informant?.toLowerCase()))
+    ]
+  )
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
@@ -72,6 +77,8 @@ export const GetDeclarationInfo = ({
       ? intl.formatMessage(constantsMessages.registeredStatus)
       : finalStatus === 'Archived'
       ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
+      : finalStatus === 'Draft'
+      ? intl.formatMessage(constantsMessages.draftStatus)
       : finalStatus
 
   if (declaration?.informantContact && informant) {
@@ -152,7 +159,7 @@ export const GetDeclarationInfo = ({
             (key === 'dateOfBirth' ||
             key === 'dateOfDeath' ||
             key === 'dateOfMarriage'
-              ? format(new Date(value), 'MMMM dd, yyyy')
+              ? formatLongDate(value, intl.locale, 'dd MMM yyyy')
               : value)
 
           const message =
