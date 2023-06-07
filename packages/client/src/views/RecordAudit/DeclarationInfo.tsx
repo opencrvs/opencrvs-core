@@ -124,7 +124,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Marriage') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(finalStatus.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
