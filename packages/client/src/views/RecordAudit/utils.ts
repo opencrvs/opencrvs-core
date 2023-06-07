@@ -549,15 +549,6 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
-export function camelize(str: string) {
-  if (str && typeof str === 'string') {
-    return str.replace(/\W+(.)/g, function (match, chr) {
-      return chr.toUpperCase()
-    })
-  }
-  return ''
-}
-
 export function isVerifiedAction(history: History) {
   return history.action === RegAction.Verified
 }
