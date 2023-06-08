@@ -798,7 +798,7 @@ function mapStateToProps(state: IStoreState) {
     registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
     scope: getScope(state),
-    state: state
+    state
   }
 }
 

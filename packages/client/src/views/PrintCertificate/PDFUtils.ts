@@ -26,8 +26,9 @@ import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
-import { EMPTY_STRING } from '@client/utils/constants'
+import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
 import { IStoreState } from '@client/store'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -43,15 +44,17 @@ function isMessageDescriptor(
 }
 
 export function formatAllNonStringValues(
-  templateData: Record<string, TemplateDataType>
+  templateData: Record<string, TemplateDataType>,
+  intl: IntlShape
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
     if (
       typeof templateData[key] === 'object' &&
       isMessageDescriptor(templateData[key] as Record<string, unknown>)
     ) {
-      templateData[key] = (templateData[key] as MessageDescriptor)
-        .defaultMessage as string
+      templateData[key] = intl.formatMessage(
+        templateData[key] as MessageDescriptor
+      )
     } else if (Array.isArray(templateData[key])) {
       // For address field, country label is a MessageDescriptor
       // but state, province is string
@@ -61,7 +64,7 @@ export function formatAllNonStringValues(
         .filter(Boolean)
         .map((item) =>
           isMessageDescriptor(item as Record<string, unknown>)
-            ? (item as MessageDescriptor).defaultMessage
+            ? intl.formatMessage(item as MessageDescriptor)
             : item
         )
         .join(', ')
@@ -70,7 +73,8 @@ export function formatAllNonStringValues(
       templateData[key] !== null
     ) {
       templateData[key] = formatAllNonStringValues(
-        templateData[key] as Record<string, TemplateDataType>
+        templateData[key] as Record<string, TemplateDataType>,
+        intl
       )
     }
   }
@@ -142,7 +146,7 @@ export function executeHandlebarsTemplate(
     }
   )
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data)
+  const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
   return output
 }
@@ -161,8 +165,8 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
+  createPDF(
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -173,7 +177,7 @@ export async function previewCertificate(
   })
 }
 
-export function printCertificate(
+export async function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
   userDetails: UserDetails | null,
@@ -186,7 +190,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -195,20 +199,39 @@ export function printCertificate(
   )
 }
 
-function getPDFTemplateWithSVG(
+async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
   pageSize: PageSize,
   state: IStoreState
-): IPDFTemplate {
+): Promise<IPDFTemplate> {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
     EMPTY_STRING
+
+  const resolvedSignatures = await Promise.all(
+    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
+      signatureKey: k,
+      url: declaration.data.template[k]
+    }))
+      .filter(({ url }) => Boolean(url))
+      .map(({ signatureKey, url }) =>
+        fetchImageAsBase64(url as string).then((value) => ({
+          [signatureKey]: value
+        }))
+      )
+  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
+
+  const declarationTemplate = {
+    ...declaration.data.template,
+    ...resolvedSignatures
+  }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
-    declaration.data.template,
+    declarationTemplate,
     state
   )
+
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)

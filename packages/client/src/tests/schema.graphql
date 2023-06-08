@@ -514,7 +514,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
 }
 
 input BirthRegistrationInput {
@@ -912,7 +911,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 

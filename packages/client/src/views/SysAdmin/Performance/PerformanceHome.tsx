@@ -485,6 +485,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
+                            event={event}
                           />
                         </>
                       )
