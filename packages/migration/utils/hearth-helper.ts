@@ -10,6 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { FindCursor, Db, Document } from 'mongodb'
+
 export const COLLECTION_NAMES = {
   COMPOSITION: 'Composition',
   ENCOUNTER: 'Encounter',
@@ -20,12 +22,12 @@ export const COLLECTION_NAMES = {
   TASK: 'Task'
 }
 
-export async function getBirthEncounterCompositionCursor(
-  db,
+export async function getBirthEncounterCompositionCursor<T extends Document>(
+  db: Db,
   limit = 50,
   skip = 0
 ) {
-  return db.collection(COLLECTION_NAMES.COMPOSITION).find(
+  return db.collection<Document>(COLLECTION_NAMES.COMPOSITION).find<T>(
     {
       'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
     },
@@ -33,7 +35,9 @@ export async function getBirthEncounterCompositionCursor(
   )
 }
 
-export async function getBirthEncounterCompositionCount(db) {
+export async function getBirthEncounterCompositionCount(
+  db: Db
+): Promise<number> {
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
@@ -42,28 +46,43 @@ export async function getBirthEncounterCompositionCount(db) {
     .count()
 }
 
-export async function getCompositionCursor(db, limit = 50, skip = 0) {
+export async function getCompositionCursor(
+  db: Db,
+  limit = 50,
+  skip = 0
+): Promise<FindCursor<Document>> {
   return db.collection(COLLECTION_NAMES.COMPOSITION).find({}, { limit, skip })
 }
 
-export async function getCertifiedTaskCursor(db, limit = 50, skip = 0) {
+export async function getCertifiedTaskCursor<T extends Document>(
+  db: Db,
+  limit = 50,
+  skip = 0
+) {
   return db
     .collection(COLLECTION_NAMES.TASK)
-    .find({ 'businessStatus.coding.code': 'CERTIFIED' }, { limit, skip })
+    .find<T>({ 'businessStatus.coding.code': 'CERTIFIED' }, { limit, skip })
 }
 
-export async function getTotalCertifiedTaskCount(db) {
+export async function getTotalCertifiedTaskCount(db: Db) {
   return db
     .collection(COLLECTION_NAMES.TASK)
     .find({ 'businessStatus.coding.code': 'CERTIFIED' })
     .count()
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
+export async function getTotalDocCountByCollectionName(
+  db: Db,
+  collectionName: string
+) {
   return await db.collection(collectionName).count()
 }
 
-export async function getCollectionDocuments(db, collectionName, ids) {
+export async function getCollectionDocuments(
+  db: Db,
+  collectionName: string,
+  ids: string[]
+) {
   if (ids.length > 0) {
     return await db
       .collection(collectionName)

@@ -9,10 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import lodash from 'lodash'
+import { Db, MongoClient, Document } from 'mongodb'
+
 const { capitalize } = lodash
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 10
   let skip = 0
@@ -24,11 +27,12 @@ export const up = async (db, client) => {
         'PractitionerRole'
       )
       while (totalPractitionerRoleCount > processedDocCount) {
-        const practitionerRoleCursor = await getPractitionerRoleCursor(
-          db,
-          limit,
-          skip
-        )
+        const practitionerRoleCursor =
+          await getPractitionerRoleCursor<fhir.PractitionerRole>(
+            db,
+            limit,
+            skip
+          )
         const count = await practitionerRoleCursor.count()
         // eslint-disable-next-line no-console
         console.log(
@@ -39,39 +43,39 @@ export const up = async (db, client) => {
           } of ${totalPractitionerRoleCount} documents...`
         )
         while (await practitionerRoleCursor.hasNext()) {
-          const practitionerRole = await practitionerRoleCursor.next()
+          const practitionerRole = (await practitionerRoleCursor.next())!
           const systemRoles = 'http://opencrvs.org/specs/roles'
           const systemTypes = 'http://opencrvs.org/specs/types'
           const automatedCode = 'AUTOMATED'
           const fieldAgentCode = 'FIELD_AGENT'
 
-          const roleCode = practitionerRole.code.filter(
-            (c) => c.coding[0].system === systemRoles
-          )[0].coding[0].code
+          const roleCode = practitionerRole.code?.find(
+            (c) => c.coding?.[0].system === systemRoles
+          )?.coding?.[0]?.code
 
-          const titleCase = (code = '') =>
+          const titleCase = (code: string = '') =>
             code
               .replace(/_/g, ' ')
               .split(' ')
               .map((s) => capitalize(s))
               .join(' ')
 
-          const hasSystemTypes = practitionerRole.code.some((item) => {
-            return item.coding.some((coding) => {
+          const hasSystemTypes = practitionerRole.code?.some((item) => {
+            return item.coding?.some((coding) => {
               return coding.system === systemTypes
             })
           })
 
-          const isAutomated = practitionerRole.code.some((item) => {
-            return item.coding.some((coding) => {
+          const isAutomated = practitionerRole.code?.some((item) => {
+            return item.coding?.some((coding) => {
               return (
                 coding.system === systemRoles && coding.code === automatedCode
               )
             })
           })
 
-          const isFieldAgent = practitionerRole.code.some((item) => {
-            return item.coding.some((coding) => {
+          const isFieldAgent = practitionerRole.code?.some((item) => {
+            return item.coding?.some((coding) => {
               return (
                 coding.system === systemRoles && coding.code === fieldAgentCode
               )
@@ -81,18 +85,18 @@ export const up = async (db, client) => {
           if (isAutomated) continue
 
           if (hasSystemTypes) {
-            const typeCode = practitionerRole.code.filter(
-              (c) => c.coding[0].system === systemTypes
-            )[0].coding[0].code
+            const typeCode = practitionerRole.code?.find(
+              (c) => c.coding?.[0].system === systemTypes
+            )?.coding?.[0].code
             await db
               .collection('PractitionerRole')
               .updateOne(
-                { id: practitionerRole.id },
+                { id: practitionerRole?.id },
                 { $set: { 'code.1.coding.0.code': titleCase(typeCode) } }
               )
           } else {
             await db.collection('PractitionerRole').updateOne(
-              { id: practitionerRole.id },
+              { id: practitionerRole?.id },
               {
                 $push: {
                   code: {
@@ -125,7 +129,7 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 10
   let skip = 0
@@ -137,11 +141,12 @@ export const down = async (db, client) => {
         'PractitionerRole'
       )
       while (totalPractitionerRoleCount > processedDocCount) {
-        const practitionerRoleCursor = await getPractitionerRoleCursor(
-          db,
-          limit,
-          skip
-        )
+        const practitionerRoleCursor =
+          await getPractitionerRoleCursor<fhir.PractitionerRole>(
+            db,
+            limit,
+            skip
+          )
         const count = await practitionerRoleCursor.count()
         // eslint-disable-next-line no-console
         console.log(
@@ -157,16 +162,16 @@ export const down = async (db, client) => {
           const automatedCode = 'AUTOMATED'
           const fieldAgentCode = 'FIELD_AGENT'
 
-          const isAutomated = practitionerRole.code.some((item) => {
-            return item.coding.some((coding) => {
+          const isAutomated = practitionerRole!.code?.some((item) => {
+            return item.coding?.some((coding) => {
               return (
                 coding.system === systemRoles && coding.code === automatedCode
               )
             })
           })
 
-          const isFieldAgent = practitionerRole.code.some((item) => {
-            return item.coding.some((coding) => {
+          const isFieldAgent = practitionerRole!.code?.some((item) => {
+            return item.coding?.some((coding) => {
               return (
                 coding.system === systemRoles && coding.code === fieldAgentCode
               )
@@ -179,7 +184,7 @@ export const down = async (db, client) => {
             await db
               .collection('PractitionerRole')
               .updateOne(
-                { id: practitionerRole.id },
+                { id: practitionerRole?.id },
                 { $set: { 'code.1.coding.0.code': roleCode } }
               )
           }
@@ -201,10 +206,17 @@ export const down = async (db, client) => {
   }
 }
 
-export async function getPractitionerRoleCursor(db, limit = 50, skip = 0) {
-  return db.collection('PractitionerRole').find({}, { limit, skip })
+export async function getPractitionerRoleCursor<T extends Document>(
+  db: Db,
+  limit = 50,
+  skip = 0
+) {
+  return db.collection('PractitionerRole').find<T>({}, { limit, skip })
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
+export async function getTotalDocCountByCollectionName(
+  db: Db,
+  collectionName: string
+) {
   return await db.collection(collectionName).count()
 }

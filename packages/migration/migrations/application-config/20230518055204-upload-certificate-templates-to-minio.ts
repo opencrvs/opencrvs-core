@@ -12,7 +12,7 @@
 import isSvg from 'is-svg'
 import { uploadSvgToMinio } from '../../utils/minio-helper'
 import { MongoClient, Db } from 'mongodb'
-import { ICertificateTemplateData } from '../../utils/commonTypes'
+import { ICertificateTemplateData } from '../../utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

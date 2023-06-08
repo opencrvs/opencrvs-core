@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import {
   getBirthEncounterCompositionCursor,
   getBirthEncounterCompositionCount
-  // eslint-disable-next-line import/no-relative-parent-imports
-} from './../../utils/hearth-helper.js'
+} from '../../utils/hearth-helper'
+import { Db, MongoClient } from 'mongodb'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 50
   let skip = 0
@@ -24,13 +25,13 @@ export const up = async (db, client) => {
     await session.withTransaction(async () => {
       const totalCompositionCount = await getBirthEncounterCompositionCount(db)
       while (totalCompositionCount > processedDocCount) {
-        const compositionCursor = await getBirthEncounterCompositionCursor(
-          db,
-          limit,
-          skip
-        )
+        const compositionCursor =
+          await getBirthEncounterCompositionCursor<fhir.Composition>(
+            db,
+            limit,
+            skip
+          )
         const count = await compositionCursor.count()
-        // eslint-disable-next-line no-console
         console.log(
           `Migration - SupportingDocuments :: Processing ${
             processedDocCount + 1
@@ -39,7 +40,7 @@ export const up = async (db, client) => {
           } of ${totalCompositionCount} compositions...`
         )
         while (await compositionCursor.hasNext()) {
-          const composition = await compositionCursor.next()
+          const composition: any = await compositionCursor.next()
           const compositionHistory = await db
             .collection('Composition_history')
             .find({
@@ -47,17 +48,16 @@ export const up = async (db, client) => {
             })
             .toArray()
           compositionHistory.push(composition)
-          const correctionIndex = compositionHistory.findIndex(
-            (composition) => {
-              return composition.section.find(
-                (section) =>
-                  section.code.coding[0].code === 'birth-correction-encounters'
-              )
-            }
+          const correctionIndex = compositionHistory.findIndex((composition) =>
+            composition.section.find(
+              (section: any) =>
+                section.code.coding[0].code === 'birth-correction-encounters'
+            )
           )
           const immediatePrevComp = compositionHistory[correctionIndex - 1]
           const hasDocumentSection = immediatePrevComp?.section.find(
-            (section) => section.code.coding[0].code === 'supporting-documents'
+            (section: any) =>
+              section.code.coding[0].code === 'supporting-documents'
           )
           if (hasDocumentSection) {
             await db
@@ -74,7 +74,6 @@ export const up = async (db, client) => {
           (processedDocCount / totalCompositionCount) *
           100
         ).toFixed(2)
-        // eslint-disable-next-line no-console
         console.log(
           `Migration - SupportingDocuments :: Processing done ${percentage}%`
         )
@@ -85,4 +84,4 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async (db: Db, client: MongoClient) => {}

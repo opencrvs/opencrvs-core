@@ -15,7 +15,7 @@ import {
   INFORMANT_SMS_NOTIFICATION_COLLECTION,
   getNotificationContent
 } from '../../utils/resource-helper'
-import { NotificationContent } from '../../utils/commonTypes'
+import { NotificationContent } from '../../utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

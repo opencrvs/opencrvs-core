@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import { InfluxDB, FieldType } from 'influx'
+import { Db } from 'mongodb'
+import { IPoints } from '../../utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
-const INFLUX_PORT = process.env.INFLUX_PORT || 8086
+const INFLUX_PORT = Number(process.env.INFLUX_PORT) || 8086
 const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
 
-export const up = async (db) => {
+export const up = async (db: Db) => {
   const influx = new InfluxDB({
     host: INFLUX_HOST,
     database: INFLUX_DB,
@@ -42,10 +45,10 @@ export const up = async (db) => {
 
   const rejectedPoints = (
     await influx.query('SELECT * FROM declarations_rejected')
-  ).map(({ time, ...point }) => ({
+  ).map(({ time, ...point }: { time: any; [key: string]: any }) => ({
     ...point,
     timestamp: time.getNanoTime()
-  }))
+  })) as IPoints[]
 
   const startedByMap = await getCompositionIdToStartedByMap(
     db,
@@ -55,7 +58,7 @@ export const up = async (db) => {
   const rejectedPointsWithCorrectStartedBy = rejectedPoints.map(
     ({ compositionId, timestamp, ...tags }) => ({
       measurement: 'declarations_rejected',
-      tags: { ...tags, startedBy: startedByMap.get(compositionId) },
+      tags: { ...tags, startedBy: startedByMap.get(compositionId)! },
       fields: { compositionId },
       timestamp
     })
@@ -66,22 +69,31 @@ export const up = async (db) => {
   await influx.writePoints(rejectedPointsWithCorrectStartedBy)
 }
 
-async function getCompositionIdToStartedByMap(db, compositionIds) {
-  const extractId = (reference) => reference.split('/')[1]
+async function getCompositionIdToStartedByMap(
+  db: Db,
+  compositionIds: string[]
+) {
+  const extractId = (reference: string) => reference.split('/')[1]
   const cursor = await getTaskCursor(db, compositionIds)
-  const startedByMap = new Map()
-  await cursor.forEach((task) => {
-    const compositionId = extractId(task.focus.reference)
-    if (startedByMap.has(compositionId)) return
-    startedByMap.set(
-      compositionId,
-      extractId(task.extension[0].valueReference.reference)
-    )
-  })
+  const startedByMap = new Map<string, string>()
+  async function iterateCursor(cursor: any) {
+    while (await cursor.hasNext()) {
+      const task = await cursor.next()
+      const compositionId = extractId(task.focus.reference)
+      if (startedByMap.has(compositionId)) return
+      startedByMap.set(
+        compositionId,
+        extractId(task.extension[0].valueReference.reference)
+      )
+    }
+  }
+
+  await iterateCursor(cursor)
+
   return startedByMap
 }
 
-function getTaskCursor(db, compositionIds) {
+function getTaskCursor(db: Db, compositionIds: string[]) {
   const query = {
     $match: {
       'businessStatus.coding.code': {
@@ -114,7 +126,9 @@ function getTaskCursor(db, compositionIds) {
     }
   }
   const sort = { $sort: { 'meta.lastUpdated': 1 } }
-  return db.collection('Task_history').aggregate([query, projection, sort])
+  return db
+    .collection('Task_history')
+    .aggregate([query, projection, sort]) as unknown as fhir.Task
 }
 
 export const down = async () => {}

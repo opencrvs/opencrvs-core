@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const up = async (db, client) => {
+import { Collection, MongoClient } from 'mongodb'
+
+export const up = async (db: Collection, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('DocumentReference').updateMany(
+      await db.updateMany(
         { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
         {
           $set: { 'type.coding.$[elem].code': 'PROOF_OF_LEGAL_GUARDIANSHIP' }
@@ -30,11 +32,11 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Collection, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('DocumentReference').updateMany(
+      await db.updateMany(
         { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
         { $set: { 'type.coding.$[elem].code': 'BIRTH_CERTIFICATE' } },
         {

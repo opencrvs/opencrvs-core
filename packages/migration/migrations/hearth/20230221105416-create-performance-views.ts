@@ -10,7 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export const up = async (db, client) => {
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
   await db
     .collection('Task')
     .aggregate(
@@ -432,7 +434,6 @@ export const up = async (db, client) => {
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
             },
-            practitionerRole: 1,
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
             birthType: '$birthTypeObservation.valueQuantity.value',
@@ -757,7 +758,7 @@ export const up = async (db, client) => {
     .toArray()
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   // TODO write the statements to rollback your migration (if possible)
   // Example:
   // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});

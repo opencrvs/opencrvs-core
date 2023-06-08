@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Minio from 'minio'
+
 import {
   MINIO_BUCKET,
   DEFAULT_MINIO_ACCESS_KEY,
   minioClient
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '../../utils/minio-helper.js'
+} from '../../utils/minio-helper'
+import { Db, MongoClient } from 'mongodb'
 
 const updatedPolicy = `
 {
@@ -52,11 +53,11 @@ const updatedPolicy = `
   ]
 }`
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      if (minioClient.bucketExists(MINIO_BUCKET)) {
+      if (await minioClient.bucketExists(MINIO_BUCKET)) {
         minioClient.setBucketPolicy(MINIO_BUCKET, updatedPolicy)
       }
     })
@@ -65,4 +66,4 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async (db: Db, client: MongoClient) => {}

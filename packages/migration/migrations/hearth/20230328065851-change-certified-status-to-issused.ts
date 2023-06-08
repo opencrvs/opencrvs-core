@@ -11,31 +11,26 @@
  */
 
 import {
-  COLLECTION_NAMES,
   getCertifiedTaskCursor,
   getTotalCertifiedTaskCount
-} from '../../utils/hearth-helper.js'
+} from '../../utils/hearth-helper'
 import {
   updateComposition,
   searchByCompositionId
-} from '../../utils/elasticsearch-helper.js'
-import uuidPKG from 'uuid'
-const { v4: uuid } = uuidPKG
+} from '../../utils/elasticsearch-helper'
+import { v4 as uuid } from 'uuid'
+import { Db, MongoClient } from 'mongodb'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 10
   let processedDocCount = 0
   try {
     await session.withTransaction(async () => {
-      const totalCertifiedTaskCount = await getTotalCertifiedTaskCount(
-        db,
-        COLLECTION_NAMES.TASK
-      )
+      const totalCertifiedTaskCount = await getTotalCertifiedTaskCount(db)
       while (totalCertifiedTaskCount > processedDocCount) {
-        const taskCursor = await getCertifiedTaskCursor(db, limit)
+        const taskCursor = await getCertifiedTaskCursor<fhir.Task>(db, limit)
         const count = await taskCursor.count()
-        // eslint-disable-next-line no-console
         console.log(
           `Migration - Change Certified Status to Issued :: Processing ${
             processedDocCount + 1
@@ -44,7 +39,8 @@ export const up = async (db, client) => {
           } of ${totalCertifiedTaskCount} compositions...`
         )
         while (await taskCursor.hasNext()) {
-          const body = {}
+          const body: any = {}
+          //@ts-ignore
           const { _id, ...taskDoc } = await taskCursor.next()
           if (taskDoc) {
             await db.collection('Task').updateOne(
@@ -55,7 +51,7 @@ export const up = async (db, client) => {
                 }
               }
             )
-            await db.collection('Task_history').insert({
+            await db.collection('Task_history').insertOne({
               ...taskDoc,
               meta: {
                 ...taskDoc.meta,
@@ -64,7 +60,7 @@ export const up = async (db, client) => {
             })
 
             const compositionId =
-              taskDoc?.focus?.reference.replace('Composition/', '') || ''
+              taskDoc?.focus?.reference!.replace('Composition/', '') || ''
             const searchResult = await searchByCompositionId(compositionId)
             const operationHistoriesData =
               searchResult &&
@@ -90,14 +86,12 @@ export const up = async (db, client) => {
           (processedDocCount / totalCertifiedTaskCount) *
           100
         ).toFixed(2)
-        // eslint-disable-next-line no-console
         console.log(
           `Migration - Change Certified Status to Issued :: Processing done ${percentage}%`
         )
       }
     })
   } finally {
-    // eslint-disable-next-line no-console
     console.log(
       `Migration - Change Certified Status to Issued :: Process completed successfully.`
     )
@@ -105,7 +99,7 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   // TODO write the statements to rollback your migration (if possible)
   // Example:
   // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});

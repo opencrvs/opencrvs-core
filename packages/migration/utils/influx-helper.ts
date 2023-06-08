@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { InfluxDB, FieldType } from 'influx'
+import { InfluxDB, FieldType, IPoint, IQueryOptions } from 'influx'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = process.env.INFLUX_PORT || 8086
@@ -19,7 +19,7 @@ const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
 export const influx = new InfluxDB({
   host: INFLUX_HOST,
   database: INFLUX_DB,
-  port: INFLUX_PORT,
+  port: Number(INFLUX_PORT),
   schema: [
     {
       measurement: 'birth_registration',
@@ -91,18 +91,20 @@ export const influx = new InfluxDB({
   ]
 })
 
-export const query = (query, options) => {
+export const query = async (query: string, options?: IQueryOptions) => {
   try {
-    return influx.query(query, options)
+    return await influx.query(query, options)
   } catch (err) {
     console.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw err
   }
 }
 
-export const writePoints = (points) => {
-  return influx.writePoints(points).catch((err) => {
+export const writePoints = async (points: IPoint[]) => {
+  try {
+    await influx.writePoints(points)
+  } catch (err) {
     console.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err
-  })
+  }
 }

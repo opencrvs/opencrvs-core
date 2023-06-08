@@ -9,9 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { query, writePoints } from './../../utils/influx-helper.js'
 
-export const up = async (db, client) => {
+import { Db } from 'mongodb'
+import { query, writePoints } from '../../utils/influx-helper'
+import {
+  IRegistrationFields,
+  IMigrationRegistrationResults
+} from '../../utils/migration-interfaces'
+
+export const up = async (db: Db, client: any) => {
   const session = client.startSession()
   await session.withTransaction(async () => {
     await migrateRegistrations('birth_registration', db)
@@ -21,10 +27,10 @@ export const up = async (db, client) => {
 
 const LIMIT = 100
 
-async function migrateRegistrations(measurement, db) {
-  const result = await query(
+async function migrateRegistrations(measurement: string, db: Db) {
+  const result = (await query(
     `SELECT COUNT(compositionId) as total FROM ${measurement} WHERE registrarPractitionerId = ''`
-  )
+  )) as unknown as IMigrationRegistrationResults[]
 
   const totalCount = result[0]?.total ?? 0
 
@@ -35,9 +41,9 @@ async function migrateRegistrations(measurement, db) {
   let processed = 0
 
   while (processed < totalCount) {
-    const registrations = await query(
+    const registrations = (await query(
       `SELECT * FROM ${measurement} WHERE registrarPractitionerId = '' LIMIT ${LIMIT}`
-    )
+    )) as unknown as IRegistrationFields[]
     console.log(
       `Migration - InfluxDB :: Processing ${measurement}, ${processed + 1}-${
         processed + registrations.length
@@ -47,8 +53,8 @@ async function migrateRegistrations(measurement, db) {
 
     await writePoints(updatedPoints)
 
-    const startTime = registrations[0].time.getNanoTime()
-    const endTime = registrations[registrations.length - 1].time.getNanoTime()
+    const startTime = registrations[0].time?.getNanoTime()
+    const endTime = registrations[registrations.length - 1].time?.getNanoTime()
 
     const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time >= ${startTime} AND time <= ${endTime}`
     await query(deleteQuery)
@@ -63,7 +69,11 @@ async function migrateRegistrations(measurement, db) {
   }
 }
 
-const getUpdatedPoints = async (registrations, measurement, db) => {
+const getUpdatedPoints = async (
+  registrations: any[],
+  measurement: string,
+  db: Db
+) => {
   return Promise.all(
     registrations.map(
       async ({
@@ -75,31 +85,44 @@ const getUpdatedPoints = async (registrations, measurement, db) => {
         deathDays,
         ...tags
       }) => {
-        let task = await db.collection('Task').findOne({
+        let task = (await db.collection('Task').findOne({
           focus: {
             reference: `Composition/${compositionId}`
           },
           'businessStatus.coding.code': 'REGISTERED'
-        })
+        })) as fhir.Task | null
 
         if (!task) {
-          task = await db.collection('Task_history').findOne({
+          task = (await db.collection('Task_history').findOne({
             focus: {
               reference: `Composition/${compositionId}`
             },
             'businessStatus.coding.code': 'REGISTERED'
-          })
+          })) as unknown as fhir.Task
         }
 
-        const practitionerExtension = task.extension.find(
-          (extension) =>
-            extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
-        )
-        const id = practitionerExtension.valueReference.reference.replace(
-          'Practitioner/',
-          ''
-        )
-        const fields = { compositionId, currentStatus }
+        let practitionerExtension: fhir.Extension | undefined
+
+        if (task && task.extension) {
+          practitionerExtension = task.extension.find(
+            (extension: fhir.Extension) =>
+              extension.url ===
+              'http://opencrvs.org/specs/extension/regLastUser'
+          )
+        }
+
+        let id: string = ''
+        if (
+          practitionerExtension &&
+          practitionerExtension.valueReference &&
+          practitionerExtension.valueReference.reference
+        ) {
+          id = practitionerExtension.valueReference.reference.replace(
+            'Practitioner/',
+            ''
+          )
+        }
+        const fields: any = { compositionId, currentStatus }
         if (measurement === 'birth_registration') {
           fields.ageInDays = ageInDays
         }
@@ -114,7 +137,7 @@ const getUpdatedPoints = async (registrations, measurement, db) => {
           measurement,
           tags: {
             ...tags,
-            registrarPractitionerId: practitioner.id
+            registrarPractitionerId: practitioner?.id
           },
           fields,
           timestamp: time.getNanoTime()
@@ -124,7 +147,7 @@ const getUpdatedPoints = async (registrations, measurement, db) => {
   )
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: any) => {
   // TODO write the statements to rollback your migration (if possible)
   // Example:
   // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});

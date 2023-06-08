@@ -14,9 +14,10 @@ import {
   isBase64FileString,
   uploadBase64ToMinio
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '../../utils/minio-helper.js'
+} from '../../utils/minio-helper'
+import { Db, MongoClient } from 'mongodb'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 10
   let skip = 0
@@ -38,7 +39,7 @@ export const up = async (db, client) => {
         )
         while (await documentCursor.hasNext()) {
           const document = await documentCursor.next()
-          const fileData = document.content[0].attachment.data
+          const fileData = document?.content[0].attachment.data
           if (fileData && isBase64FileString(fileData)) {
             const refUrl = await uploadBase64ToMinio(fileData)
             if (refUrl) {
@@ -66,12 +67,15 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async (db: Db, client: any) => {}
 
-export async function getDocumentReferenceCursor(db, limit = 50, skip = 0) {
+export async function getDocumentReferenceCursor(db: Db, limit = 50, skip = 0) {
   return db.collection('DocumentReference').find({}, { limit, skip })
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
+export async function getTotalDocCountByCollectionName(
+  db: Db,
+  collectionName: string
+) {
   return await db.collection(collectionName).count()
 }

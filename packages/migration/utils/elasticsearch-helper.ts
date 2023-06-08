@@ -10,21 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as elasticsearch from '@elastic/elasticsearch'
+import { Client } from '@elastic/elasticsearch'
 
-const ES_HOST = process.env.ES_HOST || 'localhost:9200'
-const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
+const ES_HOST: string = process.env.ES_HOST || 'localhost:9200'
+const ELASTICSEARCH_INDEX_NAME: string = 'ocrvs'
 
-export const client = new elasticsearch.Client({
+export const client: Client = new Client({
   node: `http://${ES_HOST}`
 })
 
-export const updateComposition = async (id, body) => {
-  let response
+export const updateComposition = async (
+  id: string,
+  body: any
+): Promise<any> => {
+  let response: any
   try {
     response = await client.update({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
+      type: '_doc',
       id,
       body: {
         doc: body
@@ -38,13 +41,12 @@ export const updateComposition = async (id, body) => {
 }
 
 export const updateFieldNameByCompositionId = async (
-  newFieldName,
-  oldFieldName
+  newFieldName: string,
+  oldFieldName: string
 ) => {
   try {
     const response = await client.updateByQuery({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           bool: {
@@ -67,11 +69,10 @@ export const updateFieldNameByCompositionId = async (
   }
 }
 
-export const searchByCompositionId = async (compositionId) => {
+export const searchByCompositionId = async (compositionId: string) => {
   try {
     return await client.search({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           match: {

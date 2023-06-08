@@ -11,16 +11,17 @@
  */
 
 import { FieldType, InfluxDB } from 'influx'
+import { IPoints } from '../../utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
-const INFLUX_PORT = process.env.INFLUX_PORT || 8086
+const INFLUX_PORT = process.env.INFLUX_PORT || '8086'
 const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
 
-export const up = async (db) => {
+export const up = async (db: any) => {
   const influx = new InfluxDB({
     host: INFLUX_HOST,
     database: INFLUX_DB,
-    port: INFLUX_PORT,
+    port: parseInt(INFLUX_PORT),
     schema: [
       {
         measurement: 'in_complete_fields',
@@ -47,10 +48,10 @@ export const up = async (db) => {
     await influx.query(
       "SELECT * from in_complete_fields WHERE regStatus='IN_PROGESS'"
     )
-  ).map(({ time, ...point }) => ({
+  ).map(({ time, ...point }: { time: any; [key: string]: any }) => ({
     ...point,
     timestamp: time.getNanoTime()
-  }))
+  })) as IPoints[]
 
   const updatePoints = previousPoints.map(
     ({ compositionId, timestamp, ...tags }) => ({

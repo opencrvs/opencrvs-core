@@ -17,7 +17,8 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["fhir", "jest"],
+    "esModuleInterop": true
   },
   "include": ["migrations/**/*.ts"],
   "exclude": ["node_modules", "build", "scripts"]

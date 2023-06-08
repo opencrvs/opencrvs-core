@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { NotificationContent } from './commonTypes'
+import { NotificationContent } from './migration-interfaces'
 
 export const INFORMANT_SMS_NOTIFICATION_COLLECTION = 'informantsmsnotifications'
 
