@@ -72,10 +72,15 @@ export const GetDeclarationInfo = ({
       ? intl.formatMessage(constantsMessages.registeredStatus)
       : finalStatus === 'Archived'
       ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
+      : finalStatus === 'Draft'
+      ? intl.formatMessage(dynamicConstantsMessages.draft)
       : finalStatus
 
   if (declaration?.informantContact && informant) {
-    informant = informant + ' · ' + declaration.informantContact
+    informant =
+      intl.formatMessage(dynamicConstantsMessages[informant.toLowerCase()]) +
+      ' · ' +
+      declaration.informantContact
   }
 
   let info: ILabel = {
