@@ -56,15 +56,12 @@ import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
-  BIRTH_REG_NO,
-  DEATH_REG_NO,
   DOWNLOADED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  MARRIAGE_REG_NO,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
   VERIFIED_EXTENSION_URL,
@@ -1381,63 +1378,12 @@ export async function getDeclarationIds(
   return { trackingId: compositionBundle.identifier.value, compositionId }
 }
 
-export async function getRegistrationIdsFromResponse(
+export async function getCompositionIdFromResponse(
   resBody: fhir.Bundle,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const compositionId = getIDFromResponse(resBody)
-  return getRegistrationIds(
-    compositionId,
-    eventType,
-    isTaskResponse(resBody),
-    authHeader
-  )
-}
-
-export async function getRegistrationIds(
-  compositionId: string,
-  eventType: EVENT_TYPE,
-  isTask: boolean,
-  authHeader: IAuthHeader
-) {
-  let registrationNumber: string
-  if (eventType === EVENT_TYPE.BIRTH) {
-    registrationNumber = BIRTH_REG_NO
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    registrationNumber = DEATH_REG_NO
-  } else if (eventType === EVENT_TYPE.MARRIAGE) {
-    registrationNumber = MARRIAGE_REG_NO
-  }
-
-  let path
-  if (isTask) {
-    path = `/Task/${compositionId}`
-  } else {
-    path = `/Task?focus=Composition/${compositionId}`
-  }
-  const taskBundle = await fetchFHIR(path, authHeader)
-  let taskResource
-  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
-    taskResource = taskBundle.entry[0].resource
-  } else if (taskBundle.resourceType === 'Task') {
-    taskResource = taskBundle
-  } else {
-    throw new Error('getRegistrationIds: Invalid task found')
-  }
-  const regIdentifier =
-    taskResource.identifier &&
-    taskResource.identifier.find(
-      (identifier: fhir.Identifier) =>
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/${registrationNumber}`
-    )
-  if (!regIdentifier || !regIdentifier.value) {
-    throw new Error(
-      'getRegistrationIds: Task does not have any registration identifier'
-    )
-  }
-  return { registrationNumber: regIdentifier.value, compositionId }
+  return { compositionId: getIDFromResponse(resBody) }
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {

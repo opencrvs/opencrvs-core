@@ -379,7 +379,7 @@ function mapStatetoProps(
     userDetails: getUserDetails(state),
     offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event),
-    state: state
+    state
   }
 }
 

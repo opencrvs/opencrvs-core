@@ -18,7 +18,9 @@ export const up = async (db, client) => {
         { $unwind: '$businessStatus.coding' },
         {
           $match: {
-            'businessStatus.coding.code': { $in: ['CERTIFIED', 'REGISTERED'] }
+            'businessStatus.coding.code': {
+              $in: ['CERTIFIED', 'REGISTERED', 'ISSUED']
+            }
           }
         },
         {
@@ -99,6 +101,34 @@ export const up = async (db, client) => {
         },
         {
           $addFields: {
+            registerTask: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$allTasks',
+                    cond: {
+                      $eq: [
+                        'REGISTERED',
+                        {
+                          $let: {
+                            vars: {
+                              coding: {
+                                $arrayElemAt: [
+                                  '$$this.businessStatus.coding',
+                                  0
+                                ]
+                              }
+                            },
+                            in: '$$coding.code'
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                0
+              ]
+            },
             firstTask: {
               $arrayElemAt: [
                 {
@@ -125,6 +155,29 @@ export const up = async (db, client) => {
               $arrayToObject: {
                 $map: {
                   input: '$firstTask.extension',
+                  as: 'el',
+                  in: [
+                    {
+                      $replaceOne: {
+                        input: '$$el.url',
+                        find: 'http://opencrvs.org/specs/extension/',
+                        replacement: ''
+                      }
+                    },
+                    {
+                      $arrayElemAt: [
+                        { $split: ['$$el.valueReference.reference', '/'] },
+                        1
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            'registerTask.extensionsObject': {
+              $arrayToObject: {
+                $map: {
+                  input: '$registerTask.extension',
                   as: 'el',
                   in: [
                     {
@@ -196,40 +249,6 @@ export const up = async (db, client) => {
             encounterIdForJoining: { $concat: ['Encounter/', '$encounter.id'] }
           }
         },
-        {
-          $lookup: {
-            from: 'Observation',
-            localField: 'encounterIdForJoining',
-            foreignField: 'context.reference',
-            as: 'observations'
-          }
-        },
-        {
-          $addFields: {
-            birthTypeObservation: {
-              $filter: {
-                input: '$observations',
-                as: 'element',
-                cond: {
-                  $eq: [
-                    {
-                      $let: {
-                        vars: {
-                          firstElement: {
-                            $arrayElemAt: ['$$element.code.coding', 0]
-                          }
-                        },
-                        in: '$$firstElement.code'
-                      }
-                    },
-                    '57722-1'
-                  ]
-                }
-              }
-            }
-          }
-        },
-        { $unwind: '$birthTypeObservation' },
         {
           $lookup: {
             from: 'Location',
@@ -318,7 +337,7 @@ export const up = async (db, client) => {
         {
           $lookup: {
             from: 'Practitioner',
-            localField: 'firstTask.extensionsObject.regLastUser',
+            localField: 'registerTask.extensionsObject.regLastUser',
             foreignField: 'id',
             as: 'practitioner'
           }
@@ -363,12 +382,15 @@ export const up = async (db, client) => {
           }
         },
         { $unwind: '$practitionerRole' },
-        { $unwind: '$practitionerRole.code' },
-        { $unwind: '$practitionerRole.code.coding' },
+        {
+          $addFields: {
+            firstCode: { $slice: ['$practitionerRole.code', 1] }
+          }
+        },
+        { $unwind: '$firstCode' },
         {
           $match: {
-            'practitionerRole.code.coding.system':
-              'http://opencrvs.org/specs/titles'
+            'firstCode.coding.system': 'http://opencrvs.org/specs/roles'
           }
         },
         {
@@ -382,7 +404,7 @@ export const up = async (db, client) => {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -390,23 +412,23 @@ export const up = async (db, client) => {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -427,18 +449,16 @@ export const up = async (db, client) => {
             birthOrder: '$child.multipleBirthInteger',
             createdBy: '$firstTask.extensionsObject.regLastUser',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
             },
-            practitionerRole: 1,
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
-            birthType: '$birthTypeObservation.valueQuantity.value',
             mothersAgeAtBirthOfChildInYears: '$mothersAgeAtBirthOfChild',
             placeOfBirthType: 1,
-            practitionerRole: '$practitionerRole.code.coding.code',
+            practitionerRole: { $arrayElemAt: ['$firstCode.coding.code', 0] },
             practitionerName: {
               $concat: [
                 '$practitionerFamilyname',
@@ -568,7 +588,7 @@ export const up = async (db, client) => {
         { $unwind: '$office' },
         {
           $addFields: {
-            'office.lga': {
+            'office.district': {
               $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
             }
           }
@@ -576,23 +596,23 @@ export const up = async (db, client) => {
         {
           $lookup: {
             from: 'Location',
-            localField: 'office.lga',
+            localField: 'office.district',
             foreignField: 'id',
-            as: 'lga'
+            as: 'district'
           }
         },
-        { $unwind: '$lga' },
+        { $unwind: '$district' },
         {
           $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
+            'district.state': {
+              $arrayElemAt: [{ $split: ['$district.partOf.reference', '/'] }, 1]
             }
           }
         },
         {
           $lookup: {
             from: 'Location',
-            localField: 'lga.state',
+            localField: 'district.state',
             foreignField: 'id',
             as: 'state'
           }
@@ -604,7 +624,7 @@ export const up = async (db, client) => {
             reason: '$reason.text',
             extensions: '$extensions',
             officeName: '$office.name',
-            lgaName: '$lga.name',
+            districtName: '$district.name',
             stateName: '$state.name',
             event: 'Birth',
             createdAt: {
@@ -712,7 +732,7 @@ export const up = async (db, client) => {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
+                  const date = new Date(row.cbr.year, 0, 1)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
@@ -721,7 +741,9 @@ export const up = async (db, client) => {
                   }
                   const totalDays = daysInYear(year)
                   return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
+                    if(index !== 0){
+                      date.setDate(date.getDate() + 1)
+                    }
                     return {
                       date: date.toISOString(),
                       estimatedNumberOfBirths:

@@ -56,7 +56,6 @@ describe('registration query mappings tests', () => {
     expect(transformedData).toEqual(expectedTransformedData)
   })
 })
-
 describe('phone number conversion from international format back to local format', () => {
   it('replaces country code', async () => {
     expect(convertToLocal('+260211000000', 'ZMB')).toBe('0211000000')

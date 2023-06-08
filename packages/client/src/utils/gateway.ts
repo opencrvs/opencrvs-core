@@ -649,7 +649,6 @@ export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
   isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
-  registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
 
@@ -830,7 +829,6 @@ export enum EducationType {
 
 export type Estimation = {
   __typename?: 'Estimation'
-  estimationYear: Scalars['Int']
   femaleEstimation: Scalars['Int']
   locationId: Scalars['String']
   locationLevel: Scalars['String']
@@ -8186,7 +8184,6 @@ export type GetTotalMetricsQuery = {
       maleEstimation: number
       femaleEstimation: number
       locationId: string
-      estimationYear: number
       locationLevel: string
     }
     results: Array<{

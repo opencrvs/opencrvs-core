@@ -30,12 +30,13 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import {
   getAddressMapping,
   getAddressName
 } from '@client/views/SysAdmin/Team/utils'
+
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
@@ -125,6 +126,22 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].informantsSignatureURI =
       queryData[sectionId].informantsSignatureURI
   }
+}
+
+export function informantTypeTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'informantType'
+  ] = queryData[sectionId].informantType
+    ? (informantMessageDescriptors[
+        queryData[sectionId].informantType
+      ] as MessageDescriptor & Record<string, string>)
+    : ''
 }
 
 export function registrationNumberTransformer(

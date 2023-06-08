@@ -583,7 +583,6 @@ export interface GQLNotificationInput {
 export interface GQLCreatedIds {
   compositionId?: string
   trackingId?: string
-  registrationNumber?: string
   isPotentiallyDuplicate?: boolean
 }
 
@@ -1103,7 +1102,6 @@ export interface GQLEstimation {
   maleEstimation: number
   femaleEstimation: number
   locationId: string
-  estimationYear: number
   locationLevel: string
 }
 
@@ -6461,7 +6459,6 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
-  registrationNumber?: CreatedIdsToRegistrationNumberResolver<TParent>
   isPotentiallyDuplicate?: CreatedIdsToIsPotentiallyDuplicateResolver<TParent>
 }
 
@@ -6478,18 +6475,6 @@ export interface CreatedIdsToCompositionIdResolver<
 }
 
 export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CreatedIdsToRegistrationNumberResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
@@ -8403,7 +8388,6 @@ export interface GQLEstimationTypeResolver<TParent = any> {
   maleEstimation?: EstimationToMaleEstimationResolver<TParent>
   femaleEstimation?: EstimationToFemaleEstimationResolver<TParent>
   locationId?: EstimationToLocationIdResolver<TParent>
-  estimationYear?: EstimationToEstimationYearResolver<TParent>
   locationLevel?: EstimationToLocationLevelResolver<TParent>
 }
 
@@ -8444,18 +8428,6 @@ export interface EstimationToFemaleEstimationResolver<
 }
 
 export interface EstimationToLocationIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EstimationToEstimationYearResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},

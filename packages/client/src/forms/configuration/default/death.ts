@@ -72,43 +72,43 @@ export const deathRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'SPOUSE',
-                  label: informantMessageDescriptors.spouse
+                  label: informantMessageDescriptors.SPOUSE
                 },
                 {
                   value: 'SON',
-                  label: informantMessageDescriptors.son
+                  label: informantMessageDescriptors.SON
                 },
                 {
                   value: 'DAUGHTER',
-                  label: informantMessageDescriptors.daughter
+                  label: informantMessageDescriptors.DAUGHTER
                 },
                 {
                   value: 'SON_IN_LAW',
-                  label: informantMessageDescriptors.sonInLaw
+                  label: informantMessageDescriptors.SON_IN_LAW
                 },
                 {
                   value: 'DAUGHTER_IN_LAW',
-                  label: informantMessageDescriptors.daughterInLaw
+                  label: informantMessageDescriptors.DAUGHTER_IN_LAW
                 },
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDSON',
-                  label: informantMessageDescriptors.grandson
+                  label: informantMessageDescriptors.GRANDSON
                 },
                 {
                   value: 'GRANDDAUGHTER',
-                  label: informantMessageDescriptors.granddaughter
+                  label: informantMessageDescriptors.GRANDDAUGHTER
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -197,43 +197,43 @@ export const deathRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'SPOUSE',
-                  label: informantMessageDescriptors.spouse
+                  label: informantMessageDescriptors.SPOUSE
                 },
                 {
                   value: 'SON',
-                  label: informantMessageDescriptors.son
+                  label: informantMessageDescriptors.SON
                 },
                 {
                   value: 'DAUGHTER',
-                  label: informantMessageDescriptors.daughter
+                  label: informantMessageDescriptors.DAUGHTER
                 },
                 {
                   value: 'SON_IN_LAW',
-                  label: informantMessageDescriptors.sonInLaw
+                  label: informantMessageDescriptors.SON_IN_LAW
                 },
                 {
                   value: 'DAUGHTER_IN_LAW',
-                  label: informantMessageDescriptors.daughterInLaw
+                  label: informantMessageDescriptors.DAUGHTER_IN_LAW
                 },
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDSON',
-                  label: informantMessageDescriptors.grandson
+                  label: informantMessageDescriptors.GRANDSON
                 },
                 {
                   value: 'GRANDDAUGHTER',
-                  label: informantMessageDescriptors.granddaughter
+                  label: informantMessageDescriptors.GRANDDAUGHTER
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -617,6 +617,10 @@ export const deathRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationNumber',
             operation: 'registrationNumberTransformer'
+          },
+          {
+            fieldName: 'informantType',
+            operation: 'informantTypeTransformer'
           },
           {
             fieldName: 'qrCode',
