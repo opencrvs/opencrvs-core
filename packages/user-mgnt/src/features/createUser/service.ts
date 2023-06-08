@@ -307,7 +307,7 @@ export async function sendCredentialsNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        emailForNotification,
+        email: emailForNotification,
         username,
         password,
         userFullName
