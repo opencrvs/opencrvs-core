@@ -146,28 +146,63 @@ export const getLocation = (
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
 
+  const currentDataset = resources.formConfig.formDataset?.find(
+    (r) => r.fileName === 'cameroon-locality-list'
+  )
+
   if (declaration.event === Event.Death) {
     if (declaration.data?.deathEvent?.placeOfDeathNotOnTheList) {
       return (
-        declaration.data?.deathEvent.placeOfDeathOther?.toString() ||
+        declaration.data?.deathEvent?.placeOfDeathOther?.toString() ||
         EMPTY_STRING
       )
     }
 
-    return (
-      declaration.data?.deathEvent.placeOfDeathLocality?.toString() ||
-      EMPTY_STRING
-    )
+    let localityValue = ''
+
+    if (currentDataset) {
+      const currentValue = currentDataset?.options.find(
+        (r) => r.value === declaration.data?.deathEvent?.placeOfDeathLocality
+      )
+
+      if (currentValue) {
+        const currentValueLanguage = currentValue.label.find(
+          (r) => r.lang === intl.locale
+        )
+
+        localityValue = currentValueLanguage
+          ? intl.formatMessage(currentValueLanguage.descriptor)
+          : ''
+      }
+    }
+
+    return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
     if (declaration.data?.child?.placeOfBirthNotOnTheList) {
       return (
-        declaration.data?.child.placeOfBirthOther?.toString() || EMPTY_STRING
+        declaration.data?.child?.placeOfBirthOther?.toString() || EMPTY_STRING
       )
     }
 
-    return (
-      declaration.data?.child.placeOfBirthLocality?.toString() || EMPTY_STRING
-    )
+    let localityValue = ''
+
+    if (currentDataset) {
+      const currentValue = currentDataset?.options.find(
+        (r) => r.value === declaration.data?.child?.placeOfBirthLocality
+      )
+
+      if (currentValue) {
+        const currentValueLanguage = currentValue.label.find(
+          (r) => r.lang === intl.locale
+        )
+
+        localityValue = currentValueLanguage
+          ? intl.formatMessage(currentValueLanguage.descriptor)
+          : ''
+      }
+    }
+
+    return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Marriage) {
     district =
       declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
