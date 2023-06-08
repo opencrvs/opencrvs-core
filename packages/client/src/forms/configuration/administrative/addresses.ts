@@ -13,16 +13,12 @@
 import {
   BirthSection,
   DeathSection,
-  MarriageSection,
   FLEX_DIRECTION,
   SerializedFormField,
-  ISerializedForm,
   IPreviewGroup
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
-import { cloneDeep } from 'lodash'
-import { getFieldIdentifiers } from '@client/forms/questionConfig'
 import {
   getLocationSelect,
   getPlaceOfEventLocationSelect,
@@ -519,44 +515,6 @@ export const getXAddressSameAsY = (
     }
   }
   return [copyAddressField]
-}
-
-export function populateRegisterFormsWithAddresses(
-  defaultEventForm: ISerializedForm,
-  event: string
-) {
-  const newForm = cloneDeep(defaultEventForm)
-
-  defaultAddressConfiguration.forEach(
-    ({ precedingFieldId, configurations }: IAddressConfiguration) => {
-      if (precedingFieldId.includes(event)) {
-        const { sectionIndex, groupIndex, fieldIndex } = getFieldIdentifiers(
-          precedingFieldId,
-          newForm
-        )
-
-        let addressFields: SerializedFormField[] = []
-        let previewGroups: IPreviewGroup[] = []
-        configurations.forEach((configuration) => {
-          addressFields = addressFields.concat(getAddressFields(configuration))
-          previewGroups = previewGroups.concat(getPreviewGroups(configuration))
-        })
-        newForm.sections[sectionIndex].groups[groupIndex].fields.splice(
-          fieldIndex + 1,
-          0,
-          ...addressFields
-        )
-
-        const group = newForm.sections[sectionIndex].groups[groupIndex]
-        if (group.previewGroups) {
-          group.previewGroups = group.previewGroups.concat(previewGroups)
-        } else {
-          group.previewGroups = previewGroups
-        }
-      }
-    }
-  )
-  return newForm
 }
 
 export function getAddress(

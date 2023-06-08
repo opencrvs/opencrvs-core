@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
+import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { questionsTransformer } from '@client/forms/questionConfig'
 import { merge } from 'lodash'
 
 export interface ILocationDataResponse {
@@ -25,6 +24,16 @@ export interface IFacilitiesDataResponse {
 }
 export interface IContentResponse {
   languages: ILanguage[]
+}
+
+export interface IForms {
+  birth: ISerializedForm
+  death: ISerializedForm
+  marriage: ISerializedForm
+}
+
+export interface IFormsResponse {
+  forms: IForms
 }
 
 export interface ICountryLogo {
@@ -104,7 +113,6 @@ export interface IApplicationConfig {
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
-  formConfig: IFormConfig
   systems: System[]
 }
 
@@ -133,11 +141,11 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
    * - incorrect form fields for address to be shown in the forms
    * - runtime errors if an implementing country has customized address fields
    */
-  merge(window.config, response.config)
 
-  response.formConfig.questionConfig = questionsTransformer(
-    response.formConfig.questionConfig
-  )
+  /*
+  We can deprecate this when addresses is moved into Farajaland I think
+  */
+  merge(window.config, response.config)
 
   return response
 }
@@ -154,6 +162,27 @@ async function loadConfigAnonymousUser(): Promise<
     throw Error(res.statusText)
   }
   return await res.json()
+}
+
+async function loadForms(): Promise<IFormsResponse> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/forms`
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+
+  return {
+    ...response
+  }
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -295,5 +324,6 @@ export const referenceApi = {
   loadFacilities,
   loadContent,
   loadConfig,
+  loadForms,
   loadConfigAnonymousUser
 }

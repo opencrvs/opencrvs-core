@@ -9,113 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import {
-  CustomFieldType,
-  DraftStatus,
-  Event,
-  System,
-  SystemStatus,
-  SystemType
-} from '@client/utils/gateway'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { ILocation } from '@client/offline/reducer'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-
-const formDrafts: IFormDraft[] = [
-  {
-    event: Event.Birth,
-    status: DraftStatus.Draft,
-    version: 0,
-    history: [],
-    updatedAt: 1649395100098,
-    createdAt: 1649395100098
-  },
-  {
-    event: Event.Death,
-    status: DraftStatus.Draft,
-    version: 0,
-    history: [],
-    updatedAt: 1649395100098,
-    createdAt: 1649395100098
-  }
-]
-
-export const formConfig: IFormConfig = {
-  formDrafts,
-  questionConfig: [
-    {
-      fieldId: 'birth.child.child-view-group.vaccination',
-      label: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'What vaccinations has the child received?',
-            description: 'Label for form field: vaccination question',
-            id: 'form.field.label.vaccination'
-          }
-        }
-      ],
-      placeholder: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'E.G. Polio, Diptheria',
-            description: 'Placeholder for form field: vaccination question',
-            id: 'form.field.label.vaccinationPlaceholder'
-          }
-        }
-      ],
-      description: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Vaccine name',
-            description: 'Input field for vaccination question',
-            id: 'form.field.label.vaccinationDescription'
-          }
-        }
-      ],
-      tooltip: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Enter the Vaccine name',
-            description: 'Tooltip for form field: vaccination question',
-            id: 'form.field.label.vaccinationTooltip'
-          }
-        }
-      ],
-      errorMessage: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Please enter the valid vaccine name',
-            description: 'Error Message for form field: vaccination question',
-            id: 'form.field.label.vaccinationErrorMessage'
-          }
-        }
-      ],
-      maxLength: 32,
-      fieldName: 'vaccination',
-      fieldType: CustomFieldType.Text,
-      precedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
-      required: false,
-      enabled: '',
-      custom: true
-    },
-    {
-      fieldId: 'birth.child.child-view-group.birthType',
-      enabled: '',
-      identifiers: { sectionIndex: 1, groupIndex: 0, fieldIndex: 6 },
-      precedingFieldId: 'birth.child.child-view-group.vaccination'
-    }
-  ]
-}
 
 export const systems: System[] = [
   {
@@ -379,7 +279,7 @@ export const mockConditionals = {
 }
 
 export const mockOfflineData = {
-  forms: JSON.parse(readFileSync(join(__dirname, './default.json')).toString()),
+  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString()),
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -807,7 +707,6 @@ export const mockOfflineData = {
     },
     PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
   },
-  formConfig,
   systems
 }
 

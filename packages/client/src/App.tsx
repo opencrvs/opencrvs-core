@@ -56,7 +56,6 @@ import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
@@ -321,16 +320,6 @@ export function App(props: IAppProps) {
                                               ]}
                                               path={routes.USER_ROLES_CONFIG}
                                               component={UserRoles}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_WIZARD}
-                                              component={FormConfigWizard}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_HOME}
-                                              component={FormConfigHome}
                                             />
                                             <ProtectedRoute
                                               path={
