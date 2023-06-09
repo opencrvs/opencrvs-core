@@ -77,10 +77,7 @@ export const GetDeclarationInfo = ({
       : finalStatus
 
   if (declaration?.informantContact && informant) {
-    informant =
-      intl.formatMessage(dynamicConstantsMessages[informant.toLowerCase()]) +
-      ' · ' +
-      declaration.informantContact
+    informant = informant + ' · ' + declaration.informantContact
   }
 
   let info: ILabel = {
