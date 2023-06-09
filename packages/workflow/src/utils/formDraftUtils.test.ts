@@ -12,10 +12,7 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchAny from 'jest-fetch-mock'
-import {
-  getFormDraft,
-  checkFormDraftStatusToAddTestExtension
-} from '@workflow/utils/formDraftUtils'
+import { getFormDraft } from '@workflow/utils/formDraftUtils'
 import { testFhirTaskBundle, mockFormDraft } from '@workflow/test/utils'
 import * as fhirModifier from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -46,29 +43,5 @@ describe('Verify handler', () => {
   it('getFormDraft returns form draft response', async () => {
     fetch.mockReject(new Error('error'))
     await expect(getFormDraft(token)).rejects.toThrowError('error')
-  })
-})
-
-describe('checkFormDraftStatusToAddTestExtension handler', () => {
-  beforeEach(() => {
-    token = jwt.sign(
-      { scope: ['natlsysadmin'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:config-user'
-      }
-    )
-  })
-
-  it('checkFormDraftStatusToAddTestExtension returns form draft response', async () => {
-    fetch.mockResponse(JSON.stringify(mockFormDraft))
-    const spy = jest.spyOn(fhirModifier, 'setupTestExtension')
-    await checkFormDraftStatusToAddTestExtension(
-      testFhirTaskBundle.entry[0].resource,
-      token
-    )
-    expect(spy).toBeCalledTimes(1)
   })
 })

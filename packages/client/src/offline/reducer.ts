@@ -63,6 +63,7 @@ export interface ILocation {
 export interface IOfflineData {
   locations: ILocationDataResponse
   forms: {
+    version: string
     birth: ISerializedForm
     death: ISerializedForm
     marriage: ISerializedForm
@@ -460,6 +461,7 @@ function reducer(
      */
 
     case actions.FORMS_LOADED: {
+      console.log('FORMS: ', action.payload.forms)
       return {
         ...state,
         offlineData: {

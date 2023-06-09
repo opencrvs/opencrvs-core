@@ -27,6 +27,7 @@ export interface IContentResponse {
 }
 
 export interface IForms {
+  version: string
   birth: ISerializedForm
   death: ISerializedForm
   marriage: ISerializedForm
@@ -165,7 +166,7 @@ async function loadConfigAnonymousUser(): Promise<
 }
 
 async function loadForms(): Promise<IFormsResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/forms`
+  const url = `${window.config.CONFIG_API_URL}/forms`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -174,7 +175,7 @@ async function loadForms(): Promise<IFormsResponse> {
     }
   })
 
-  if (res && res.status !== 200) {
+  if (res && res.status !== 201) {
     throw Error(res.statusText)
   }
 

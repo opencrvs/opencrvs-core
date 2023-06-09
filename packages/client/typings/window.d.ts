@@ -12,8 +12,6 @@
 
 interface Window {
   config: {
-    // TODO: Better typing, also maybe move to offline data..
-    FORMS: { birth: { sections: any[] } }
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
     BIRTH: {

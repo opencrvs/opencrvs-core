@@ -32,6 +32,7 @@ import updateInformantSMSNotificationHandler, {
   requestSchema as updateInformantSMSNotificationReqSchema
 } from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
+import getForms from '@config/handlers/forms/formsHandler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -98,6 +99,15 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Retrieve Application integrations'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/forms',
+      handler: getForms,
+      config: {
+        tags: ['api'],
+        description: 'Retrieve forms'
       }
     },
     {
