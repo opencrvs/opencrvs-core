@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Db } from 'mongodb'
+import { Db, MongoClient } from 'mongodb'
 import { query, writePoints } from '../../utils/influx-helper'
 import {
   IRegistrationFields,
   IMigrationRegistrationResults
 } from '../../utils/migration-interfaces'
 
-export const up = async (db: Db, client: any) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   await session.withTransaction(async () => {
     await migrateRegistrations('birth_registration', db)
@@ -147,7 +147,7 @@ const getUpdatedPoints = async (
   )
 }
 
-export const down = async (db: Db, client: any) => {
+export const down = async (db: Db, client: MongoClient) => {
   // TODO write the statements to rollback your migration (if possible)
   // Example:
   // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});

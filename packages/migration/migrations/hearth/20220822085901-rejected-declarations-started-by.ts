@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import { InfluxDB, FieldType } from 'influx'
 import { Db } from 'mongodb'
 import { IPoints } from '../../utils/migration-interfaces'

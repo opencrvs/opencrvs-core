@@ -67,7 +67,7 @@ export const up = async (db: Db, client: MongoClient) => {
   }
 }
 
-export const down = async (db: Db, client: any) => {}
+export const down = async (db: Db, client: MongoClient) => {}
 
 export async function getDocumentReferenceCursor(db: Db, limit = 50, skip = 0) {
   return db.collection('DocumentReference').find({}, { limit, skip })

@@ -12,17 +12,14 @@
 
 import { Client } from '@elastic/elasticsearch'
 
-const ES_HOST: string = process.env.ES_HOST || 'localhost:9200'
-const ELASTICSEARCH_INDEX_NAME: string = 'ocrvs'
+const ES_HOST = process.env.ES_HOST || 'localhost:9200'
+const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
 
 export const client: Client = new Client({
   node: `http://${ES_HOST}`
 })
 
-export const updateComposition = async (
-  id: string,
-  body: any
-): Promise<any> => {
+export const updateComposition = async (id: string, body: any) => {
   let response: any
   try {
     response = await client.update({

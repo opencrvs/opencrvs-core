@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
+import { Db } from 'mongodb'
 import { FieldType, InfluxDB } from 'influx'
 import { IPoints } from '../../utils/migration-interfaces'
 
@@ -17,7 +17,7 @@ const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = process.env.INFLUX_PORT || '8086'
 const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
 
-export const up = async (db: any) => {
+export const up = async (db: Db) => {
   const influx = new InfluxDB({
     host: INFLUX_HOST,
     database: INFLUX_DB,

@@ -53,7 +53,7 @@ export const up = async (db: Db, client: MongoClient) => {
         while (await compositionCursor.hasNext()) {
           const body = {}
           const compositionDoc =
-            (await compositionCursor.next()) as fhir.Composition
+            (await compositionCursor.next()) as unknown as fhir.Composition
           await setInformantDeceasedAndLocationDetails(db, body, compositionDoc)
         }
         skip += limit

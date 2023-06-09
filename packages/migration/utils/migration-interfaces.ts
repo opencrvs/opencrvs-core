@@ -48,29 +48,11 @@ export interface IRegistrationFields extends IPoint {
   compositionId: string
   ageInYears: number | undefined
   deathDays: number | undefined
+  ageInDays: number | undefined
+  currentStatus: string
 }
 
 export interface Identifier {
   type: string
   value: string
 }
-
-export interface ICorrectionPoint {
-  measurement: string
-  tags: {
-    eventType: DECLARATION_TYPE
-    reason: string
-  }
-  fields: { compositionId: string }
-  timestamp: number | undefined
-}
-
-export interface ILocationTags {
-  officeLocation?: string
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
-}
-
-export type DECLARATION_TYPE = 'BIRTH' | 'DEATH' | 'MARRIAGE'

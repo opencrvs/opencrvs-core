@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { FindCursor, Db, Document } from 'mongodb'
+import { Db, Document } from 'mongodb'
 
 export const COLLECTION_NAMES = {
   COMPOSITION: 'Composition',
@@ -35,9 +35,7 @@ export async function getBirthEncounterCompositionCursor<T extends Document>(
   )
 }
 
-export async function getBirthEncounterCompositionCount(
-  db: Db
-): Promise<number> {
+export async function getBirthEncounterCompositionCount(db: Db) {
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
@@ -46,11 +44,7 @@ export async function getBirthEncounterCompositionCount(
     .count()
 }
 
-export async function getCompositionCursor(
-  db: Db,
-  limit = 50,
-  skip = 0
-): Promise<FindCursor<Document>> {
+export async function getCompositionCursor(db: Db, limit = 50, skip = 0) {
   return db.collection(COLLECTION_NAMES.COMPOSITION).find({}, { limit, skip })
 }
 
