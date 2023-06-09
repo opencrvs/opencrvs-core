@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import isSvg from 'is-svg'
-import { uploadSvgToMinio } from '../../utils/minio-helper'
+import { uploadSvgToMinio } from '@opencrvs/migration/utils/minio-helper'
 import { MongoClient, Db } from 'mongodb'
-import { ICertificateTemplateData } from '../../utils/migration-interfaces'
+import { ICertificateTemplateData } from '@opencrvs/migration/utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

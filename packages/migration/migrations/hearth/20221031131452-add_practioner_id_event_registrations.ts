@@ -11,11 +11,11 @@
  */
 
 import { Db, MongoClient } from 'mongodb'
-import { query, writePoints } from '../../utils/influx-helper'
+import { query, writePoints } from '@opencrvs/migration/utils/influx-helper'
 import {
   IRegistrationFields,
   IMigrationRegistrationResults
-} from '../../utils/migration-interfaces'
+} from '@opencrvs/migration/utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

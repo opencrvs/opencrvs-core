@@ -13,11 +13,11 @@
 import {
   getCertifiedTaskCursor,
   getTotalCertifiedTaskCount
-} from '../../utils/hearth-helper'
+} from '@opencrvs/migration/utils/hearth-helper'
 import {
   updateComposition,
   searchByCompositionId
-} from '../../utils/elasticsearch-helper'
+} from '@opencrvs/migration/utils/elasticsearch-helper'
 import { v4 as uuid } from 'uuid'
 import { Db, MongoClient } from 'mongodb'
 

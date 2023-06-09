@@ -13,7 +13,7 @@
 import {
   getBirthEncounterCompositionCursor,
   getBirthEncounterCompositionCount
-} from '../../utils/hearth-helper'
+} from '@opencrvs/migration/utils/hearth-helper'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {

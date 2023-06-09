@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { svgCode as marriageCertificateTemplateDefault } from '../../utils/marriage-certificate-template-default.js'
+import { svgCode as marriageCertificateTemplateDefault } from '@opencrvs/migration/utils/marriage-certificate-template-default.js'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {

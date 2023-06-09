@@ -11,7 +11,7 @@
  */
 import { Db } from 'mongodb'
 import { FieldType, InfluxDB } from 'influx'
-import { IPoints } from '../../utils/migration-interfaces'
+import { IPoints } from '@opencrvs/migration/utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = process.env.INFLUX_PORT || '8086'
