@@ -43,6 +43,7 @@ import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
+import { IdentityType } from '@client/utils/gateway'
 
 interface IName {
   [key: string]: any
@@ -208,7 +209,7 @@ export const identityToFieldTransformer =
         const existingIdentity = queryData[sectionId][
           nestedField
         ].identifier.find(
-          (identity: fhir.Identifier) => identity.type === identityType
+          (identity: IdentityType) => identity.type === identityType
         )
         if (!transformedData[sectionId]) {
           transformedData[sectionId] = {}
@@ -221,7 +222,7 @@ export const identityToFieldTransformer =
     } else {
       if (queryData[sectionId] && queryData[sectionId].identifier) {
         const existingIdentity = queryData[sectionId].identifier.find(
-          (identity: fhir.Identifier) => identity.type === identityType
+          (identity: IdentityType) => identity.type === identityType
         )
         if (!transformedData[sectionId]) {
           transformedData[sectionId] = {}
@@ -248,7 +249,7 @@ export const identityToNidVerificationFieldTransformer = (
     field
   )
   const existingIdentity = queryData[sectionId].identifier?.find(
-    (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+    (identity: IdentityType) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -660,7 +661,7 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
+      (identity: IdentityType) => identity.type === 'MOSIP_PSUT_TOKEN_ID'
     )
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}

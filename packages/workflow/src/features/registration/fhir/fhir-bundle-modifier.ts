@@ -695,17 +695,21 @@ export async function updatePatientIdentifierWithRN(
         patient.identifier = []
       }
       const rnIdentifier = patient.identifier.find(
-        (identifier: { type: string }) => identifier.type === identifierType
+        (identifier: fhir.Identifier) =>
+          identifier.type?.coding?.[0].code === identifierType
       )
       if (rnIdentifier) {
         rnIdentifier.value = registrationNumber
       } else {
         patient.identifier.push({
-          // @ts-ignore
-          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-          // type should have CodeableConcept instead of string
-          // Need to fix in both places together along with a script for legacy data update
-          type: identifierType,
+          type: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                code: identifierType
+              }
+            ]
+          },
           value: registrationNumber
         })
       }
@@ -810,7 +814,8 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_PSUT_TOKEN_ID' &&
+                    identifier.type?.coding?.[0].code ===
+                      'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )
@@ -829,13 +834,27 @@ export async function validateDeceasedDetails(
             // One should not overwrite the other
             birthPatient.deceasedBoolean = true
             birthPatient.identifier.push({
-              type: 'DECEASED_PATIENT_ENTRY',
+              type: {
+                coding: [
+                  {
+                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                    code: 'DECEASED_PATIENT_ENTRY'
+                  }
+                ]
+              },
               value: patient.id
             } as fhir.CodeableConcept)
             await updateResourceInHearth(birthPatient)
             // mark patient with link to the birth patient
             patient.identifier?.push({
-              type: 'BIRTH_PATIENT_ENTRY',
+              type: {
+                coding: [
+                  {
+                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                    code: 'BIRTH_PATIENT_ENTRY'
+                  }
+                ]
+              },
               value: birthPatient.id
             } as fhir.CodeableConcept)
           }

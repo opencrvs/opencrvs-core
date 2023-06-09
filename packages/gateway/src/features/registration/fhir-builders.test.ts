@@ -258,7 +258,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('en')
   expect(fhir.entry[1].resource.identifier[0].value).toBe('123456')
-  expect(fhir.entry[1].resource.identifier[0].type).toBe('OTHER')
+  expect(fhir.entry[1].resource.identifier[0].type.coding[0].code).toBe('OTHER')
   expect(fhir.entry[1].resource.identifier[0].otherType).toBe('Custom type')
   expect(fhir.entry[1].resource.birthDate).toBe('2000-01-28')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
@@ -552,7 +552,14 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[10].resource.identifier).toEqual([
     {
       id: '123456',
-      type: 'PASSPORT'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'PASSPORT'
+          }
+        ]
+      }
     }
   ])
 
