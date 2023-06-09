@@ -18,40 +18,22 @@ import { badRequest, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
-import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
-import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
 
 export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [
-      certificates,
-      questionConfig,
-      formDrafts,
-      config,
-      systems,
-      formDataset
-    ] = await Promise.all([
+    const [certificates, config, systems] = await Promise.all([
       getActiveCertificatesHandler(request, h),
-      getQuestionsHandler(request, h),
-      getFormDrafts(request, h),
       getApplicationConfig(request, h),
-      getSystems(request, h),
-      getFormDatasetHandler(request, h)
+      getSystems(request, h)
     ])
     return {
       config,
       certificates,
-      systems,
-      formConfig: {
-        questionConfig,
-        formDrafts,
-        formDataset
-      }
+      systems
     }
   } catch (ex) {
     logger.error(ex)

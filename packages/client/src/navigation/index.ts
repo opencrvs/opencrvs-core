@@ -48,8 +48,6 @@ import {
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
-  FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
   SYSTEM_LIST,
   VS_EXPORTS,
@@ -217,10 +215,6 @@ export function goToDashboardView() {
 
 export function goToAdvancedSearch() {
   return push(ADVANCED_SEARCH)
-}
-
-export function goToFormConfigHome() {
-  return push(FORM_CONFIG_HOME)
 }
 
 export function goToApplicationConfig() {
@@ -465,15 +459,6 @@ export function goToIssueCertificatePayment(
 export function goToDeathRegistration(declarationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
-  )
-}
-
-export function goToFormConfigWizard(event: Event, section: WizardSection) {
-  return push(
-    formatUrl(FORM_CONFIG_WIZARD, {
-      event: event,
-      section: section
-    })
   )
 }
 

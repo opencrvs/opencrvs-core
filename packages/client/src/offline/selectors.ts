@@ -29,7 +29,7 @@ export function isOfflineDataLoaded(
     state.facilities &&
     state.locations &&
     state.config &&
-    state.formConfig &&
+    state.forms &&
     state.templates &&
     state.languages
 

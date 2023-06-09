@@ -22,7 +22,6 @@ import {
   goToApplicationConfig,
   goToCertificateConfig,
   goToDashboardView,
-  goToFormConfigHome,
   goToHomeTab,
   goToInformantNotification,
   goToLeaderBoardsView,
@@ -49,11 +48,9 @@ import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -96,7 +93,6 @@ export const WORKQUEUE_TABS = {
   systems: 'integration',
   userRoles: 'userroles',
   settings: 'settings',
-  declarationForms: 'form',
   logout: 'logout',
   communications: 'communications',
   informantNotification: 'informantnotification',
@@ -227,7 +223,6 @@ interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
-  goToFormConfigAction: typeof goToFormConfigHome
   goToUserRolesConfigAction: typeof goToUserRolesConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
@@ -308,7 +303,6 @@ export const NavigationView = (props: IFullProps) => {
     goToCertificateConfigAction,
     goToUserRolesConfigAction,
     goToVSExportsAction,
-    goToFormConfigAction,
     goToSystemViewAction,
     goToApplicationConfigAction,
     goToAdvancedSearchResultAction,
@@ -337,7 +331,6 @@ export const NavigationView = (props: IFullProps) => {
   const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.declarationForms,
     WORKQUEUE_TABS.systems,
     WORKQUEUE_TABS.userRoles
   ]
@@ -413,7 +406,6 @@ export const NavigationView = (props: IFullProps) => {
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
     >
       {userDetails?.systemRole === 'FIELD_AGENT' ? (
@@ -735,19 +727,6 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.certificate
                             }
                           />
-                          <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
-                            label={intl.formatMessage(
-                              navigationMessages[
-                                WORKQUEUE_TABS.declarationForms
-                              ]
-                            )}
-                            onClick={goToFormConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.declarationForms
-                            }
-                          />
 
                           <NavigationSubItem
                             id={`navigation_${WORKQUEUE_TABS.systems}`}
@@ -993,8 +972,6 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.settings
       : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
-      : window.location.href.endsWith(WORKQUEUE_TABS.declarationForms)
-      ? WORKQUEUE_TABS.declarationForms
       : window.location.href.endsWith(WORKQUEUE_TABS.systems)
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
@@ -1013,7 +990,6 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
-  goToFormConfigAction: goToFormConfigHome,
   goToUserRolesConfigAction: goToUserRolesConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,

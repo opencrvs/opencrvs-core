@@ -31,7 +31,6 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 
@@ -78,7 +77,6 @@ interface IPageProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
-  formConfigLoaded: boolean
   loadingError: boolean
   offlineData: IOfflineData | undefined
   children?: React.ReactNode
@@ -137,16 +135,10 @@ class Component extends React.Component<
       initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
-      formConfigLoaded,
       children
     } = this.props
 
-    if (
-      offlineDataLoaded &&
-      initialDeclarationsLoaded &&
-      registerFormLoaded &&
-      formConfigLoaded
-    ) {
+    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -168,7 +160,6 @@ const mapStateToProps = (store: IStoreState) => {
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store),
-    formConfigLoaded: isFormConfigLoaded(store),
     offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }

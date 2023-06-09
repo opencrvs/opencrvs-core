@@ -20,6 +20,7 @@ import { ThemeProvider } from '@client/styledComponents'
 import { getSchema } from '@client/tests/graphql-schema-mock'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { join } from 'path'
 import {
   configure,
   mount,
@@ -2094,7 +2095,6 @@ export const mockConfigResponse = {
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }
 
@@ -2107,7 +2107,7 @@ export const mockOfflineDataDispatch = {
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
-  formConfig: mockOfflineData.formConfig,
+  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString()),
   systems: mockOfflineData.systems
 }
 
