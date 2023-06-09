@@ -282,6 +282,7 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
+  const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
@@ -413,7 +414,7 @@ function UserListComponent(props: IProps) {
       if (user.status === 'pending' || user.status === 'active') {
         menuItems.push(
           {
-            label: intl.formatMessage(messages.sendUsernameReminderSMS),
+            label: intl.formatMessage(messages.sendUsernameReminderInvite),
             handler: () => {
               toggleUsernameReminderModal(user)
             }
@@ -726,7 +727,7 @@ function UserListComponent(props: IProps) {
               show={toggleUsernameReminder.modalVisible}
               handleClose={() => toggleUsernameReminderModal()}
               title={intl.formatMessage(
-                messages.sendUsernameReminderSMSModalTitle
+                messages.sendUsernameReminderInviteModalTitle
               )}
               actions={[
                 <Button
@@ -755,8 +756,14 @@ function UserListComponent(props: IProps) {
               autoHeight={true}
             >
               {intl.formatMessage(
-                messages.sendUsernameReminderSMSModalMessage,
-                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
+                messages.sendUsernameReminderInviteModalMessage,
+                {
+                  recipient:
+                    deliveryMethod === 'sms'
+                      ? toggleUsernameReminder.selectedUser?.mobile
+                      : toggleUsernameReminder.selectedUser?.email,
+                  deliveryMethod
+                }
               )}
             </ResponsiveModal>
             <ResponsiveModal
@@ -791,7 +798,11 @@ function UserListComponent(props: IProps) {
               autoHeight={true}
             >
               {intl.formatMessage(messages.resetUserPasswordModalMessage, {
-                phoneNumber: toggleResetPassword.selectedUser?.mobile ?? ''
+                deliveryMethod,
+                recipient:
+                  deliveryMethod == 'sms'
+                    ? toggleResetPassword.selectedUser?.mobile
+                    : toggleResetPassword.selectedUser?.email
               })}
             </ResponsiveModal>
           </UserTable>
@@ -813,7 +824,8 @@ function UserListComponent(props: IProps) {
       resetPassword,
       toggleResetPassword.modalVisible,
       toggleResetPassword.selectedUser,
-      toggleUserResetPasswordModal
+      toggleUserResetPasswordModal,
+      deliveryMethod
     ]
   )
 
@@ -929,7 +941,7 @@ function UserListComponent(props: IProps) {
           type="success"
           onClose={() => setShowUsernameReminderSuccess(false)}
         >
-          {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
+          {intl.formatMessage(messages.sendUsernameReminderInviteSuccess, {
             name: getUserName(toggleUsernameReminder.selectedUser as User)
           })}
         </Toast>
@@ -940,7 +952,7 @@ function UserListComponent(props: IProps) {
           type="warning"
           onClose={() => setShowUsernameReminderError(false)}
         >
-          {intl.formatMessage(messages.sendUsernameReminderSMSError)}
+          {intl.formatMessage(messages.sendUsernameReminderInviteError)}
         </Toast>
       )}
 
@@ -956,7 +968,7 @@ function UserListComponent(props: IProps) {
             })
           }}
         >
-          {intl.formatMessage(messages.resetPasswordSMSSuccess, {
+          {intl.formatMessage(messages.resetPasswordSuccess, {
             username: getUserName(toggleResetPassword.selectedUser as User)
           })}
         </Toast>
@@ -967,7 +979,7 @@ function UserListComponent(props: IProps) {
           type="warning"
           onClose={() => setResetPasswordError(false)}
         >
-          {intl.formatMessage(messages.resetPasswordSMSError)}
+          {intl.formatMessage(messages.resetPasswordError)}
         </Toast>
       )}
     </SysAdminContentWrapper>

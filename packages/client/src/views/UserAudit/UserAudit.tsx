@@ -98,6 +98,7 @@ const transformUserQueryResult = (
     systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
+    email: userData.email,
     status: userData.status,
     underInvestigation: userData.underInvestigation,
     username: userData.username,
@@ -160,6 +161,7 @@ export const UserAudit = () => {
   const [showResetPasswordError, setShowResetPasswordError] = useState(false)
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
+  const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
   const { data, loading, error } = useQuery<
     GetUserQuery,
     GetUserQueryVariables
@@ -241,7 +243,7 @@ export const UserAudit = () => {
     if (status === 'pending' || status === 'active') {
       menuItems.push(
         {
-          label: intl.formatMessage(sysMessages.sendUsernameReminderSMS),
+          label: intl.formatMessage(sysMessages.sendUsernameReminderInvite),
           handler: () => {
             toggleUsernameReminderModal()
           }
@@ -407,7 +409,7 @@ export const UserAudit = () => {
             show={toggleUsernameReminder}
             handleClose={() => toggleUsernameReminderModal()}
             title={intl.formatMessage(
-              sysMessages.sendUsernameReminderSMSModalTitle
+              sysMessages.sendUsernameReminderInviteModalTitle
             )}
             actions={[
               <Button
@@ -436,8 +438,11 @@ export const UserAudit = () => {
             autoHeight={true}
           >
             {intl.formatMessage(
-              sysMessages.sendUsernameReminderSMSModalMessage,
-              { phoneNumber: user.number }
+              sysMessages.sendUsernameReminderInviteModalMessage,
+              {
+                recipient: deliveryMethod === 'sms' ? user.number : user.email,
+                deliveryMethod
+              }
             )}
           </ResponsiveModal>
           <ResponsiveModal
@@ -472,7 +477,8 @@ export const UserAudit = () => {
             autoHeight={true}
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
-              phoneNumber: user.number ?? ''
+              deliveryMethod,
+              recipient: deliveryMethod == 'sms' ? user.number : user.email
             })}
           </ResponsiveModal>
           {showResendInviteSuccess && (
@@ -499,9 +505,12 @@ export const UserAudit = () => {
               type="success"
               onClose={() => setShowUsernameReminderSuccess(false)}
             >
-              {intl.formatMessage(sysMessages.sendUsernameReminderSMSSuccess, {
-                name: user.name
-              })}
+              {intl.formatMessage(
+                sysMessages.sendUsernameReminderInviteSuccess,
+                {
+                  name: user.name
+                }
+              )}
             </Toast>
           )}
           {showUsernameReminderError && (
@@ -510,7 +519,7 @@ export const UserAudit = () => {
               type="warning"
               onClose={() => setShowUsernameReminderError(false)}
             >
-              {intl.formatMessage(sysMessages.sendUsernameReminderSMSError)}
+              {intl.formatMessage(sysMessages.sendUsernameReminderInviteError)}
             </Toast>
           )}
 
@@ -522,7 +531,7 @@ export const UserAudit = () => {
                 setShowResetPasswordSuccess(false)
               }}
             >
-              {intl.formatMessage(sysMessages.resetPasswordSMSSuccess, {
+              {intl.formatMessage(sysMessages.resetPasswordSuccess, {
                 username: user.name
               })}
             </Toast>
@@ -533,7 +542,7 @@ export const UserAudit = () => {
               type="warning"
               onClose={() => setShowResetPasswordError(false)}
             >
-              {intl.formatMessage(sysMessages.resetPasswordSMSError)}
+              {intl.formatMessage(sysMessages.resetPasswordError)}
             </Toast>
           )}
         </Content>

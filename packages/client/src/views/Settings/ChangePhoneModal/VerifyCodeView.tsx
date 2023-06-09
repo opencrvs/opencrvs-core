@@ -155,14 +155,13 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       contentScrollableY={true}
     >
       <Message>
-        {phoneNumber &&
-          intl.formatMessage(messages.confirmationPhoneMsg, {
-            num: phoneNumber
-          })}
-        {email &&
-          intl.formatMessage(messages.confirmationEmailMsg, {
-            email: email
-          })}
+        {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+          ? intl.formatMessage(messages.confirmationPhoneMsg, {
+              num: phoneNumber || userDetails?.mobile
+            })
+          : intl.formatMessage(messages.confirmationEmailMsg, {
+              email: email || userDetails?.email
+            })}
       </Message>
       <InputField
         id="verifyCode"

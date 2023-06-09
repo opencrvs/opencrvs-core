@@ -2567,6 +2567,7 @@ export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
 export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   systemRole?: string
   primaryOfficeId?: string

@@ -41,6 +41,7 @@ type Query {
   searchUsers(
     username: String
     mobile: String
+    email: String
     status: String
     systemRole: String
     primaryOfficeId: String
