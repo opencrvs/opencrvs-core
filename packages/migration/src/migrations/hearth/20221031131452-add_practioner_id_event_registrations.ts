@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Db, MongoClient } from 'mongodb'
-import { query, writePoints } from '@opencrvs/migration/utils/influx-helper'
+import { query, writePoints } from '@migration/utils/influx-helper'
 import {
   IRegistrationFields,
   IMigrationRegistrationResults
-} from '@opencrvs/migration/utils/migration-interfaces'
+} from '@migration/utils/migration-interfaces'
+import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

@@ -15,9 +15,8 @@ import {
   DEFAULT_MINIO_ACCESS_KEY,
   minioClient
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '@opencrvs/migration/utils/minio-helper'
+} from '@migration/utils/minio-helper'
 import { Db, MongoClient } from 'mongodb'
-
 const updatedPolicy = `
 {
   "Version": "2012-10-17",

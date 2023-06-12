@@ -11,7 +11,7 @@
  */
 import { InfluxDB, FieldType } from 'influx'
 import { Db } from 'mongodb'
-import { IPoints } from '@opencrvs/migration/utils/migration-interfaces'
+import { IPoints } from '@migration/utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = Number(process.env.INFLUX_PORT) || 8086
@@ -125,9 +125,7 @@ function getTaskCursor(db: Db, compositionIds: string[]) {
     }
   }
   const sort = { $sort: { 'meta.lastUpdated': 1 } }
-  return db
-    .collection('Task_history')
-    .aggregate([query, projection, sort]) as unknown as fhir.Task
+  return db.collection('Task_history').aggregate([query, projection, sort])
 }
 
 export const down = async () => {}

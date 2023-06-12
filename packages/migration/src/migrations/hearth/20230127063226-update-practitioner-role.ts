@@ -11,8 +11,7 @@
  */
 
 import lodash from 'lodash'
-import { Db, MongoClient, Document } from 'mongodb'
-
+import { Db, MongoClient } from 'mongodb'
 const { capitalize } = lodash
 
 export const up = async (db: Db, client: MongoClient) => {
@@ -58,12 +57,11 @@ export const up = async (db: Db, client: MongoClient) => {
         'PractitionerRole'
       )
       while (totalPractitionerRoleCount > processedDocCount) {
-        const practitionerRoleCursor =
-          await getPractitionerRoleCursor<fhir.PractitionerRole>(
-            db,
-            limit,
-            skip
-          )
+        const practitionerRoleCursor = await getPractitionerRoleCursor(
+          db,
+          limit,
+          skip
+        )
         const count = await practitionerRoleCursor.count()
         // eslint-disable-next-line no-console
         console.log(
@@ -74,7 +72,8 @@ export const up = async (db: Db, client: MongoClient) => {
           } of ${totalPractitionerRoleCount} documents...`
         )
         while (await practitionerRoleCursor.hasNext()) {
-          const practitionerRole = (await practitionerRoleCursor.next())!
+          const practitionerRole =
+            (await practitionerRoleCursor.next()) as unknown as fhir.PractitionerRole
           const systemRoles = 'http://opencrvs.org/specs/roles'
           const systemTypes = 'http://opencrvs.org/specs/types'
           const automatedCode = 'AUTOMATED'
@@ -163,12 +162,11 @@ export const down = async (db: Db, client: MongoClient) => {
         'PractitionerRole'
       )
       while (totalPractitionerRoleCount > processedDocCount) {
-        const practitionerRoleCursor =
-          await getPractitionerRoleCursor<fhir.PractitionerRole>(
-            db,
-            limit,
-            skip
-          )
+        const practitionerRoleCursor = await getPractitionerRoleCursor(
+          db,
+          limit,
+          skip
+        )
         const count = await practitionerRoleCursor.count()
         // eslint-disable-next-line no-console
         console.log(
@@ -179,7 +177,8 @@ export const down = async (db: Db, client: MongoClient) => {
           } of ${totalPractitionerRoleCount} documents...`
         )
         while (await practitionerRoleCursor.hasNext()) {
-          const practitionerRole = await practitionerRoleCursor.next()
+          const practitionerRole =
+            (await practitionerRoleCursor.next()) as unknown as fhir.PractitionerRole
           const systemRoles = 'http://opencrvs.org/specs/roles'
           const automatedCode = 'AUTOMATED'
           const fieldAgentCode = 'FIELD_AGENT'

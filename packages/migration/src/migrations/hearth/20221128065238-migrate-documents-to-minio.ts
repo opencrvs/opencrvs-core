@@ -14,7 +14,7 @@ import {
   isBase64FileString,
   uploadBase64ToMinio
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '@opencrvs/migration/utils/minio-helper'
+} from '@migration/utils/minio-helper'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {

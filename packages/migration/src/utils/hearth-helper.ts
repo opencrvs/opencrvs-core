@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Db, Document } from 'mongodb'
-
+import { Db } from 'mongodb'
 export const COLLECTION_NAMES = {
   COMPOSITION: 'Composition',
   ENCOUNTER: 'Encounter',
@@ -27,7 +26,7 @@ export async function getBirthEncounterCompositionCursor<T extends Document>(
   limit = 50,
   skip = 0
 ) {
-  return db.collection<Document>(COLLECTION_NAMES.COMPOSITION).find<T>(
+  return db.collection(COLLECTION_NAMES.COMPOSITION).find<T>(
     {
       'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
     },

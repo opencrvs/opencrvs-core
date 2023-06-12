@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": {
-      "@migration/*": ["./*"]
-    },
+    "baseUrl": "src",
     "target": "es6",
     "module": "commonjs",
     "rootDir": ".",
@@ -17,9 +14,9 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"],
-    "esModuleInterop": true
+    "types": ["fhir"]
   },
-  "include": ["migrations/**/*.ts"],
+  "include": ["src"],
+  "extends": "./tsconfig.paths.json",
   "exclude": ["node_modules", "build", "scripts"]
 }

@@ -13,7 +13,7 @@
 import {
   notoSans
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '@opencrvs/migration/utils/fonts/noto-sans'
+} from '@migration/utils/fonts/noto-sans'
 
 export const svgCode: string = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect width="420" height="595" fill="white"/>

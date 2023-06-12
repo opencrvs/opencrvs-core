@@ -15,15 +15,14 @@ import {
   getCompositionCursor,
   getCollectionDocuments,
   getTotalDocCountByCollectionName
-} from '@opencrvs/migration/utils/hearth-helper'
+} from '@migration/utils/hearth-helper'
 
 import {
   updateComposition,
   updateFieldNameByCompositionId
-} from '@opencrvs/migration/utils/elasticsearch-helper'
-
+} from '@migration/utils/elasticsearch-helper'
 import { Db, MongoClient } from 'mongodb'
-import { Identifier } from '@opencrvs/migration/utils/migration-interfaces'
+import { Identifier } from '@migration/utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

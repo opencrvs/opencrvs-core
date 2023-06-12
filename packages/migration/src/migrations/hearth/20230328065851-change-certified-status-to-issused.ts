@@ -13,11 +13,11 @@
 import {
   getCertifiedTaskCursor,
   getTotalCertifiedTaskCount
-} from '@opencrvs/migration/utils/hearth-helper'
+} from '@migration/utils/hearth-helper'
 import {
   updateComposition,
   searchByCompositionId
-} from '@opencrvs/migration/utils/elasticsearch-helper'
+} from '@migration/utils/elasticsearch-helper'
 import { v4 as uuid } from 'uuid'
 import { Db, MongoClient } from 'mongodb'
 
@@ -29,7 +29,7 @@ export const up = async (db: Db, client: MongoClient) => {
     await session.withTransaction(async () => {
       const totalCertifiedTaskCount = await getTotalCertifiedTaskCount(db)
       while (totalCertifiedTaskCount > processedDocCount) {
-        const taskCursor = await getCertifiedTaskCursor<fhir.Task>(db, limit)
+        const taskCursor = await getCertifiedTaskCursor(db, limit)
         const count = await taskCursor.count()
         console.log(
           `Migration - Change Certified Status to Issued :: Processing ${
@@ -41,7 +41,7 @@ export const up = async (db: Db, client: MongoClient) => {
         while (await taskCursor.hasNext()) {
           const body: any = {}
           //@ts-ignore
-          const { _id, ...taskDoc } = await taskCursor.next()
+          const { _id, ...taskDoc } = (await taskCursor.next()) as fhir.Task
           if (taskDoc) {
             await db.collection('Task').updateOne(
               { id: taskDoc.id },
@@ -60,7 +60,7 @@ export const up = async (db: Db, client: MongoClient) => {
             })
 
             const compositionId =
-              taskDoc?.focus?.reference!.replace('Composition/', '') || ''
+              taskDoc.focus?.reference?.replace('Composition/', '') || ''
             const searchResult = await searchByCompositionId(compositionId)
             const operationHistoriesData =
               searchResult &&

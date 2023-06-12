@@ -13,7 +13,7 @@
 import {
   getBirthEncounterCompositionCursor,
   getBirthEncounterCompositionCount
-} from '@opencrvs/migration/utils/hearth-helper'
+} from '@migration/utils/hearth-helper'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
@@ -25,12 +25,11 @@ export const up = async (db: Db, client: MongoClient) => {
     await session.withTransaction(async () => {
       const totalCompositionCount = await getBirthEncounterCompositionCount(db)
       while (totalCompositionCount > processedDocCount) {
-        const compositionCursor =
-          await getBirthEncounterCompositionCursor<fhir.Composition>(
-            db,
-            limit,
-            skip
-          )
+        const compositionCursor = await getBirthEncounterCompositionCursor(
+          db,
+          limit,
+          skip
+        )
         const count = await compositionCursor.count()
         console.log(
           `Migration - SupportingDocuments :: Processing ${
