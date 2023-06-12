@@ -15,6 +15,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { merge } from 'lodash'
+import { Validation } from './validate'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -186,6 +187,11 @@ async function loadForms(): Promise<IFormsResponse> {
   }
 }
 
+async function loadValidators(): Promise<Record<string, Validation>> {
+  const url = `${window.config.CONFIG_API_URL}/validators.js`
+  return import(url)
+}
+
 async function loadContent(): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
@@ -326,5 +332,6 @@ export const referenceApi = {
   loadContent,
   loadConfig,
   loadForms,
+  loadValidators,
   loadConfigAnonymousUser
 }

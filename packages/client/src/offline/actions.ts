@@ -23,6 +23,7 @@ import {
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
+import { Validation } from '@client/utils/validate'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -63,6 +64,18 @@ export type FormsLoadedAction = {
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
 export type FormsFailedAction = {
   type: typeof FORMS_FAILED
+  payload: Error
+}
+
+export const VALIDATORS_LOADED = 'OFFLINE/VALIDATORS_LOADED'
+export type ValidatorsLoadedAction = {
+  type: typeof VALIDATORS_LOADED
+  payload: { [key: string]: Validation }
+}
+
+export const VALIDATORS_FAILED = 'OFFLINE/VALIDATORS_FAILED'
+export type ValidatorsFailedAction = {
+  type: typeof VALIDATORS_FAILED
   payload: Error
 }
 
