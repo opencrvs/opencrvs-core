@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
@@ -22,7 +22,9 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
-  mobile: string
+  name: IUserName[]
+  mobile?: string
+  email?: string
   scope: string[]
   status: string
   id: string
@@ -45,7 +47,9 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
   const response: IVerifyResponse = {
+    name: user.name,
     mobile: user.mobile,
+    email: user.emailForNotification,
     scope: user.scope,
     status: user.status,
     id: user.id,
@@ -60,7 +64,15 @@ export const requestSchema = Joi.object({
 })
 
 export const responseSchema = Joi.object({
-  mobile: Joi.string(),
+  name: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  ),
+  mobile: Joi.string().optional(),
+  email: Joi.string().optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

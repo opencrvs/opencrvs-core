@@ -19,6 +19,7 @@
     "**/.DS_Store",
     "AUTHORS",
     "LICENSE",
+    "license-header.txt",
     "**/*Dockerfile",
     "**/packages/components/lib",
     "**/packages/*/build",

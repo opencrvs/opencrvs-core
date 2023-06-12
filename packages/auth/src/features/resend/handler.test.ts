@@ -31,9 +31,10 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
           nonce: '12345',
+          notificationEvent: 'authenticationCodeNotification',
           retrievalFlow: true
         }
       })
@@ -42,7 +43,7 @@ describe('resend handler receives a request', () => {
     })
   })
 
-  describe('resend sms service says nonce is valid, generates a mobile verification code and sends it to sms gateway', () => {
+  describe('resend notification service says nonce is valid, generates a mobile verification code and sends it to notification gateway', () => {
     it('returns a nonce to the client', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
       // eslint-disable-next-line
@@ -58,9 +59,10 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
-          nonce: '12345'
+          nonce: '12345',
+          notificationEvent: 'authenticationCodeNotification'
         }
       })
       expect(spy).toHaveBeenCalled()
@@ -82,9 +84,10 @@ describe('resend handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/resendSms',
+        url: '/resendAuthenticationCode',
         payload: {
-          nonce: '67890'
+          nonce: '67890',
+          notificationEvent: 'authenticationCodeNotification'
         }
       })
       expect(spy).not.toHaveBeenCalled()
