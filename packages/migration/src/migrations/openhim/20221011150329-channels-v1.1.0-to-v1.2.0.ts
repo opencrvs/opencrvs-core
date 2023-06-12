@@ -1,20 +1,17 @@
 /*
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { upsertChannel, Channel } from '@migration/utils/openhim-helpers'
 
-OpenCRVS is also distributed under the terms of the Civil Registration
-& Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.
-*/
-const {
-  upsertChannel,
-  removeChannel
-} = require('../../utils/openhim-helpers.cjs')
-
-const newChannel = {
+const newChannel: Channel = {
   methods: [
     'GET',
     'POST',
@@ -89,6 +86,8 @@ const newChannel = {
   rewriteUrlsConfig: [],
   name: 'Death Registration',
   urlPattern: '^/events/death/mark-registered$',
+  priority: 1,
+  maxBodyAgeDays: 30,
   matchContentRegex: null,
   matchContentXpath: null,
   matchContentValue: null,
@@ -96,11 +95,10 @@ const newChannel = {
   pollingSchedule: null,
   tcpHost: null,
   tcpPort: null,
-  alerts: [],
-  priority: 1
+  alerts: []
 }
 
-const oldChannel = {
+const oldChannel: Channel = {
   methods: [
     'GET',
     'POST',
@@ -161,6 +159,8 @@ const oldChannel = {
   rewriteUrlsConfig: [],
   name: 'Death Registration',
   urlPattern: '^/events/death/mark-registered$',
+  priority: 1,
+  maxBodyAgeDays: 30,
   matchContentRegex: null,
   matchContentXpath: null,
   matchContentValue: null,
@@ -168,11 +168,10 @@ const oldChannel = {
   pollingSchedule: null,
   tcpHost: null,
   tcpPort: null,
-  alerts: [],
-  priority: 1
+  alerts: []
 }
 
-exports.up = async (db, client) => {
+export const up = async (db: any, client: any) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -183,7 +182,7 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+export const down = async (db: any, client: any) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

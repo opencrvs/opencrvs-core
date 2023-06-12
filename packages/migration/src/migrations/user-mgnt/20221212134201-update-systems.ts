@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const up = async (db, client) => {
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await db
@@ -77,7 +79,7 @@ export const up = async (db, client) => {
     await session.endSession()
   }
 }
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -88,8 +90,8 @@ export const down = async (db, client) => {
       await db.collection('systems').updateMany({}, [
         {
           $set: {
-            createdBy: natlSysAdmin.name,
-            name: natlSysAdmin.name
+            createdBy: natlSysAdmin?.name,
+            name: natlSysAdmin?.name
           }
         }
       ])

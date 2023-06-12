@@ -1,22 +1,24 @@
 /*
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-OpenCRVS is also distributed under the terms of the Civil Registration
-& Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.
-*/
-const {
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import {
   upsertChannel,
   removeChannel,
   newChannelTemplate,
-  routeTemplate
-} = require('../../utils/openhim-helpers.cjs')
+  routeTemplate,
+  Channel
+} from '@migration/utils/openhim-helpers'
+import { Db, MongoClient } from 'mongodb'
 
-const marriageNewDeclarationChannel = {
+const marriageNewDeclarationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -38,7 +40,7 @@ const marriageNewDeclarationChannel = {
   urlPattern: '^/events/marriage/new-declaration$'
 }
 
-const marriageInProgressDeclarationChannel = {
+const marriageInProgressDeclarationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -60,7 +62,7 @@ const marriageInProgressDeclarationChannel = {
   urlPattern: '^/events/marriage/in-progress-declaration$'
 }
 
-const marriageRequestForRegistrarValidationChannel = {
+const marriageRequestForRegistrarValidationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -82,7 +84,7 @@ const marriageRequestForRegistrarValidationChannel = {
   urlPattern: '^/events/marriage/request-for-registrar-validation$'
 }
 
-const marriageWaitingExternalResourceValidationChannel = {
+const marriageWaitingExternalResourceValidationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -104,30 +106,31 @@ const marriageWaitingExternalResourceValidationChannel = {
   urlPattern: '^/events/marriage/waiting-external-resource-validation$'
 }
 
-const registrarMarriageRegistrationWaitingExternalResourceValidationChannel = {
-  ...newChannelTemplate,
-  routes: [
-    {
-      ...routeTemplate,
-      name: 'Search -> Registrar Marriage Registration Waiting External Resource Validation',
-      host: 'search',
-      port: 9090,
-      primary: true
-    },
-    {
-      ...routeTemplate,
-      name: 'Metrics -> Registrar Marriage Registration Waiting External Resource Validation',
-      host: 'metrics',
-      port: 1050,
-      primary: false
-    }
-  ],
-  name: 'Registrar Marriage Registration Waiting External Resource Validation',
-  urlPattern:
-    '^/events/marriage/registrar-registration-waiting-external-resource-validation$'
-}
+const registrarMarriageRegistrationWaitingExternalResourceValidationChannel: Channel =
+  {
+    ...newChannelTemplate,
+    routes: [
+      {
+        ...routeTemplate,
+        name: 'Search -> Registrar Marriage Registration Waiting External Resource Validation',
+        host: 'search',
+        port: 9090,
+        primary: true
+      },
+      {
+        ...routeTemplate,
+        name: 'Metrics -> Registrar Marriage Registration Waiting External Resource Validation',
+        host: 'metrics',
+        port: 1050,
+        primary: false
+      }
+    ],
+    name: 'Registrar Marriage Registration Waiting External Resource Validation',
+    urlPattern:
+      '^/events/marriage/registrar-registration-waiting-external-resource-validation$'
+  }
 
-const marriageRegistrationChannel = {
+const marriageRegistrationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -156,7 +159,7 @@ const marriageRegistrationChannel = {
   urlPattern: '^/events/marriage/mark-registered$'
 }
 
-const marriageValidationChannel = {
+const marriageValidationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -178,7 +181,7 @@ const marriageValidationChannel = {
   urlPattern: '^/events/marriage/mark-validated$'
 }
 
-const marriageCertificationChannel = {
+const marriageCertificationChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -200,7 +203,7 @@ const marriageCertificationChannel = {
   urlPattern: '^/events/marriage/mark-certified$'
 }
 
-const marriageRejectionChannel = {
+const marriageRejectionChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -222,7 +225,7 @@ const marriageRejectionChannel = {
   urlPattern: '^/events/marriage/mark-voided$'
 }
 
-const marriageArchiveChannel = {
+const marriageArchiveChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -244,7 +247,7 @@ const marriageArchiveChannel = {
   urlPattern: '^/events/marriage/mark-archived$'
 }
 
-const marriageReinstateChannel = {
+const marriageReinstateChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -266,7 +269,7 @@ const marriageReinstateChannel = {
   urlPattern: '^/events/marriage/mark-reinstated$'
 }
 
-const marriageRequestCorrectionChannel = {
+const marriageRequestCorrectionChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -288,7 +291,7 @@ const marriageRequestCorrectionChannel = {
   urlPattern: '^/events/marriage/request-correction$'
 }
 
-const marriageCertificateIssueChannel = {
+const marriageCertificateIssueChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -324,7 +327,7 @@ const marriageCertificateIssueChannel = {
   urlPattern: '^/events/marriage/mark-issued$'
 }
 
-exports.up = async (db, client) => {
+exports.up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -350,7 +353,7 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+exports.down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import lodash from 'lodash'
+import * as lodash from 'lodash'
 import { Db, MongoClient } from 'mongodb'
 const { capitalize } = lodash
 

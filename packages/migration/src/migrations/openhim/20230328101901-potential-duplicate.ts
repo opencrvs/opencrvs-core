@@ -1,25 +1,26 @@
 /*
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-OpenCRVS is also distributed under the terms of the Civil Registration
-& Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.
-*/
-const {
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import {
   addRouteToChannel,
   removeRouteFromChannel,
   upsertChannel,
   removeChannel,
   newChannelTemplate,
-  routeTemplate
-} = require('../../utils/openhim-helpers.cjs')
+  routeTemplate,
+  Channel
+} from '@migration/utils/openhim-helpers'
+import { Db, MongoClient } from 'mongodb'
 
-
-const eventMarkAsDuplicateChannel = {
+const eventMarkAsDuplicateChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -27,14 +28,14 @@ const eventMarkAsDuplicateChannel = {
       name: 'Metrics -> Marked as duplicate',
       host: 'metrics',
       port: 1050,
-      primary: true,
+      primary: true
     }
   ],
   name: 'Marked as duplicate',
   urlPattern: '^/events/marked-as-duplicate'
 }
 
-exports.up = async (db, client) => {
+exports.up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -43,8 +44,7 @@ exports.up = async (db, client) => {
         name: 'Metrics -> Marked as not duplicate',
         host: 'metrics',
         port: 1050,
-        primary: false,
-
+        primary: false
       })
       await upsertChannel(db, eventMarkAsDuplicateChannel)
     })
@@ -53,7 +53,7 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+exports.down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -67,4 +67,4 @@ exports.down = async (db, client) => {
   } finally {
     await session.endSession()
   }
-};
+}

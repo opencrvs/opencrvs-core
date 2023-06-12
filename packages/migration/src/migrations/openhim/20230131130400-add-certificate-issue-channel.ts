@@ -1,24 +1,24 @@
 /*
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 
-OpenCRVS is also distributed under the terms of the Civil Registration
-& Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.
-*/
-const {
-  addRouteToChannel,
-  removeRouteFromChannel,
+import { Db, MongoClient } from 'mongodb'
+import {
   upsertChannel,
   removeChannel,
-  newChannelTemplate
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require('../../utils/openhim-helpers.cjs')
+  newChannelTemplate,
+  Channel
+} from '@migration/utils/openhim-helpers'
 
-const birthCertificateIssueChannel = {
+const birthCertificateIssueChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -54,7 +54,7 @@ const birthCertificateIssueChannel = {
   urlPattern: '^/events/birth/mark-issued$'
 }
 
-const deathCertificateIssueChannel = {
+const deathCertificateIssueChannel: Channel = {
   ...newChannelTemplate,
   routes: [
     {
@@ -90,7 +90,7 @@ const deathCertificateIssueChannel = {
   urlPattern: '^/events/death/mark-issued$'
 }
 
-exports.up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -102,7 +102,7 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

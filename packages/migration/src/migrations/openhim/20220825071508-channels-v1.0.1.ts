@@ -20,9 +20,10 @@ graphic logo are (registered/a) trademark(s) of Plan International.
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const baseConfig = require('./openhim-base-config-v1.0.1.json')
+import { Db, MongoClient } from 'mongodb'
+import * as baseConfig from './openhim-base-config-v1.0.1.json'
 
-exports.up = async (db, client) => {
+export async function up(db: Db, client: MongoClient) {
   const session = client.startSession()
   try {
     const channels = baseConfig.Channels
@@ -42,11 +43,11 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+export async function down(db: Db, client: MongoClient) {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('channels').remove({})
+      await db.collection('channels').deleteMany({})
     })
   } finally {
     await session.endSession()

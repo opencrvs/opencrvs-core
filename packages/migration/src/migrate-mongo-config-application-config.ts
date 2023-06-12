@@ -9,19 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { config as configMongo } from 'migrate-mongo'
+
 const config = {
   mongodb: {
-    url: process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt',
+    url:
+      process.env.APPLICATION_CONFIG_MONGO_URL ||
+      'mongodb://localhost/application-config',
     options: {
-      useNewUrlParser: true, // removes a deprecation warning when connecting
-      useUnifiedTopology: true // removes a deprecating warning when connecting
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     }
   },
-  migrationsDir: 'migrations/user-mgnt',
+  migrationsDir: './migrations/application-config',
   changelogCollectionName: 'changelog',
-  migrationFileExtension: '.js',
+  migrationFileExtension: '.ts',
   useFileHash: false,
   moduleSystem: 'esm'
-}
+} as configMongo.Config
 
 export default config

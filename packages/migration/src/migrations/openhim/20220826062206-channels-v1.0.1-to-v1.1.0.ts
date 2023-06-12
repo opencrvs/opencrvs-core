@@ -1,20 +1,22 @@
 /*
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-OpenCRVS is also distributed under the terms of the Civil Registration
-& Healthcare Disclaimer located at http://opencrvs.org/license.
-
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
-graphic logo are (registered/a) trademark(s) of Plan International.
-*/
-const {
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { Db, MongoClient } from 'mongodb'
+import {
   upsertChannel,
-  removeChannel
-} = require('../../utils/openhim-helpers.cjs')
+  removeChannel,
+  Channel
+} from '@migration/utils/openhim-helpers'
 
-const newChannel = {
+const newChannel: Channel = {
   methods: ['POST'],
   type: 'http',
   allow: [],
@@ -64,7 +66,7 @@ const newChannel = {
   alerts: []
 }
 
-exports.up = async (db, client) => {
+export async function up(db: Db, client: MongoClient): Promise<void> {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -75,7 +77,7 @@ exports.up = async (db, client) => {
   }
 }
 
-exports.down = async (db, client) => {
+export async function down(db: Db, client: MongoClient): Promise<void> {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

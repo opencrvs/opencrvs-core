@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const up = async (db, client) => {}
+import { Db, MongoClient } from 'mongodb'
 
-export const down = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {}
+
+export const down = async (db: Db, client: MongoClient) => {
   await db.collection('registrations').drop()
   await db.collection('corrections').drop()
   await db.collection('populationEstimatesPerDay').drop()

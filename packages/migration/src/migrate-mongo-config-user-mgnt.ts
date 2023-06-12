@@ -9,19 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { config as configMongo } from 'migrate-mongo'
+
 const config = {
   mongodb: {
-    url: process.env.OPENHIM_MONGO_URL || 'mongodb://localhost/openhim-dev',
+    url: process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting
     }
   },
-  migrationsDir: 'migrations/openhim',
+  migrationsDir: 'migrations/user-mgnt',
   changelogCollectionName: 'changelog',
-  migrationFileExtension: '.cjs',
+  migrationFileExtension: '.js',
   useFileHash: false,
   moduleSystem: 'esm'
-}
+} as configMongo.Config
 
 export default config

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Db, MongoClient } from 'mongodb'
 
 const UserRoles = [
   {
@@ -107,7 +108,7 @@ const UserRolesIndex = {
   NATIONAL_REGISTRAR: 6
 }
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   const limit = 10
   let skip = 0
@@ -142,13 +143,11 @@ export const up = async (db, client) => {
       while (await userCursor.hasNext()) {
         const user = await userCursor.next()
         await db.collection('users').updateOne(
-          { username: user.username },
+          { username: user?.username },
           {
             $set: {
               type: userRolesResult.insertedIds[
-                UserRolesIndex[
-                  user.role
-                ]
+                UserRolesIndex[user?.role as keyof typeof UserRolesIndex]
               ]
             }
           }
@@ -178,7 +177,11 @@ export const up = async (db, client) => {
         { _id: role._id },
         {
           $set: {
-            types: [userRolesResult.insertedIds[UserRolesIndex[role.value]]]
+            types: [
+              userRolesResult.insertedIds[
+                UserRolesIndex[role.value as keyof typeof UserRolesIndex]
+              ]
+            ]
           }
         }
       )
@@ -194,7 +197,7 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     /* ==============Drop collection userroles============== */
@@ -214,7 +217,9 @@ export const down = async (db, client) => {
       await db.collection('users').updateOne(
         { username: user.username },
         {
-          $set: { type: user.role === 'FIELD_AGENT' ? 'HEALTHCARE_WORKER' : '' }
+          $set: {
+            type: user.role === 'FIELD_AGENT' ? 'HEALTHCARE_WORKER' : ''
+          }
         }
       )
     }
@@ -250,10 +255,13 @@ export const down = async (db, client) => {
   }
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
+export async function getTotalDocCountByCollectionName(
+  db: Db,
+  collectionName: string
+) {
   return await db.collection(collectionName).count()
 }
 
-export async function getUserCursor(db, limit = 50, skip = 0) {
+export async function getUserCursor(db: Db, limit = 50, skip = 0) {
   return db.collection('users').find({}, { limit, skip })
 }

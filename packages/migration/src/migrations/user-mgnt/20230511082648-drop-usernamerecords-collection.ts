@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Db, MongoClient } from 'mongodb'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
-
   try {
     const collections = await db.listCollections().toArray()
     const collectionExists = collections.some(
@@ -29,4 +29,4 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async () => {}

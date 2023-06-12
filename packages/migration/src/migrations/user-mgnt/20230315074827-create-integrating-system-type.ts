@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const up = async (db, client) => {
+import { Db, MongoClient } from 'mongodb'
+
+export const up = async (db: Db, client: MongoClient) => {
   await db.collection('systems').updateMany({ type: 'NATIONAL_ID' }, [
     {
       $set: {
@@ -25,7 +27,7 @@ export const up = async (db, client) => {
   ])
 }
 
-export const down = async (db, client) => {
+export const down = async (db: Db, client: MongoClient) => {
   await db.collection('systems').updateMany(
     { type: 'NATIONAL_ID', integratingSystemType: 'MOSIP' },
     {
