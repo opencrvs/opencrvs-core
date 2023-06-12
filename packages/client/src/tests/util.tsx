@@ -2866,6 +2866,7 @@ export const mockCompleteFormData = {
   firstNamesEng: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
+  email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',

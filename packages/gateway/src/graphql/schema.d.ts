@@ -33,6 +33,7 @@ export interface GQLQuery {
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
   getUserByMobile?: GQLUser
+  getUserByEmail?: GQLUser
   searchUsers?: GQLSearchUserResult
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
@@ -94,11 +95,12 @@ export interface GQLMutation {
   activateUser?: string
   changePassword?: string
   changePhone?: string
+  changeEmail?: string
   changeAvatar?: GQLAvatar
   auditUser?: string
-  resendSMSInvite?: string
-  usernameSMSReminder?: string
-  resetPasswordSMS?: string
+  resendInvite?: string
+  usernameReminder?: string
+  resetPasswordInvite?: string
   updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
@@ -288,7 +290,8 @@ export interface GQLUser {
   practitionerId: string
   name: Array<GQLHumanName>
   username?: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
@@ -651,7 +654,7 @@ export interface GQLUserInput {
   name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile: string
+  mobile?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -2252,6 +2255,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
+  getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
@@ -2583,9 +2587,22 @@ export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetUserByEmailArgs {
+  email?: string
+}
+export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetUserByEmailArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   systemRole?: string
   primaryOfficeId?: string
@@ -2997,11 +3014,12 @@ export interface GQLMutationTypeResolver<TParent = any> {
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
   changePhone?: MutationToChangePhoneResolver<TParent>
+  changeEmail?: MutationToChangeEmailResolver<TParent>
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
-  resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
-  usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
-  resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
+  resendInvite?: MutationToResendInviteResolver<TParent>
+  usernameReminder?: MutationToUsernameReminderResolver<TParent>
+  resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
@@ -3558,6 +3576,21 @@ export interface MutationToChangePhoneResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface MutationToChangeEmailArgs {
+  userId: string
+  email: string
+  nonce: string
+  verifyCode: string
+}
+export interface MutationToChangeEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangeEmailArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToChangeAvatarArgs {
   userId: string
   avatar: GQLAvatarInput
@@ -3586,47 +3619,43 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface MutationToResendSMSInviteArgs {
+export interface MutationToResendInviteArgs {
   userId: string
 }
-export interface MutationToResendSMSInviteResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface MutationToResendInviteResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: MutationToResendSMSInviteArgs,
+    args: MutationToResendInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToUsernameSMSReminderArgs {
+export interface MutationToUsernameReminderArgs {
   userId: string
 }
-export interface MutationToUsernameSMSReminderResolver<
+export interface MutationToUsernameReminderResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToUsernameSMSReminderArgs,
+    args: MutationToUsernameReminderArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToResetPasswordSMSArgs {
+export interface MutationToResetPasswordInviteArgs {
   userId: string
-  applicationName: string
 }
-export interface MutationToResetPasswordSMSResolver<
+export interface MutationToResetPasswordInviteResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToResetPasswordSMSArgs,
+    args: MutationToResetPasswordInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5125,6 +5154,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  emailForNotification?: UserToEmailForNotificationResolver<TParent>
   systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
@@ -5187,6 +5217,18 @@ export interface UserToUsernameResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToMobileResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserToEmailForNotificationResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

@@ -27,6 +27,13 @@ describe('username reminder', () => {
     fetch.resetMocks()
     fetch.mockResponse('OK')
     storeRetrievalStepInformation('12345', RetrievalSteps.SECURITY_Q_VERIFIED, {
+      userFullName: [
+        {
+          use: 'en',
+          family: 'Anik',
+          given: ['Sadman']
+        }
+      ],
       userId: '123',
       username: 'fake_user_name',
       mobile: '123123123',
@@ -80,6 +87,13 @@ describe('username reminder', () => {
         '12345',
         RetrievalSteps.NUMBER_VERIFIED,
         {
+          userFullName: [
+            {
+              use: 'en',
+              family: 'Anik',
+              given: ['Sadman']
+            }
+          ],
           userId: '123',
           username: 'fake_user_name',
           mobile: '123123123',
