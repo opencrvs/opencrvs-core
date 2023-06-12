@@ -98,7 +98,7 @@ export const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(opt.label)
+      label: opt.label ? intl.formatMessage(opt.label) : ''
     }
   })
 }

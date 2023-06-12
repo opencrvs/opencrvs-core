@@ -940,12 +940,12 @@ const dynamicMessagesToDefine: Record<
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
   },
-  groom: {
+  GROOM: {
     defaultMessage: 'Groom',
     description: 'Label for option groom',
     id: 'form.field.label.informantRelation.groom'
   },
-  bride: {
+  BRIDE: {
     defaultMessage: 'Bride',
     description: 'Label for option bride',
     id: 'form.field.label.informantRelation.bride'
@@ -955,57 +955,57 @@ const dynamicMessagesToDefine: Record<
     description: 'Label for option Groom & Bride',
     id: 'form.field.label.informantRelation.groomAndBride'
   },
-  grandfather: {
+  GRANDFATHER: {
     defaultMessage: 'Grandfather',
     description: 'Label for option Grandfather',
     id: 'form.field.label.informantRelation.grandfather'
   },
-  grandmother: {
+  GRANDMOTHER: {
     defaultMessage: 'Grandmother',
     description: 'Label for option Grandmother',
     id: 'form.field.label.informantRelation.grandmother'
   },
-  brother: {
+  BROTHER: {
     defaultMessage: 'Brother',
     description: 'Label for option brother',
     id: 'form.field.label.informantRelation.brother'
   },
-  sister: {
+  SISTER: {
     defaultMessage: 'Sister',
     description: 'Label for option Sister',
     id: 'form.field.label.informantRelation.sister'
   },
-  legalGuardian: {
+  LEGAL_GUARDIAN: {
     defaultMessage: 'Legal guardian',
     description: 'Label for option Legal Guardian',
     id: 'form.field.label.informantRelation.legalGuardian'
   },
-  other: {
+  OTHER: {
     defaultMessage: 'Someone else',
     description: 'Label for option someone else',
     id: 'form.field.label.informantRelation.others'
   },
-  sonInLaw: {
+  SON_IN_LAW: {
     defaultMessage: 'Son in law',
     description: 'Label for option Son in law',
     id: 'form.field.label.informantRelation.sonInLaw'
   },
-  grandson: {
+  GRANDSON: {
     defaultMessage: 'Grandson',
     description: 'Label for option Grandson',
     id: 'form.field.label.informantRelation.grandson'
   },
-  daughterInLaw: {
+  DAUGHTER_IN_LAW: {
     defaultMessage: 'Daughter in law',
     description: 'Label for option Daughter in law',
     id: 'form.field.label.informantRelation.daughterInLaw'
   },
-  granddaughter: {
+  GRANDDAUGHTER: {
     defaultMessage: 'Granddaughter',
     description: 'Label for option Granddaughter',
     id: 'form.field.label.informantRelation.granddaughter'
   },
-  otherFamilyMember: {
+  OTHER_FAMILY_MEMBER: {
     defaultMessage: 'Other family member',
     description: 'Label for other family member relation',
     id: 'form.field.label.relationOtherFamilyMember'
@@ -1030,11 +1030,6 @@ const dynamicMessagesToDefine: Record<
     defaultMessage: 'Self',
     description: 'The title that appears when selecting self as informant',
     id: 'form.field.label.self'
-  },
-  OTHER: {
-    defaultMessage: 'Someone else',
-    description: 'Other Label',
-    id: 'form.field.label.someoneElse'
   },
   SPOUSE: {
     id: 'form.field.label.informantRelation.spouse',
