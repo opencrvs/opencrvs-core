@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MINIO_BUCKET } from '@gateway/constants'
+import {
+  MINIO_BUCKET,
+  USER_NOTIFICATION_DELIVERY_METHOD
+} from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLUserInput
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
@@ -51,6 +55,18 @@ export async function validateAttachments(
     if (!type.mime.startsWith('image/')) {
       throw new Error(`File type doesn't match image/*`)
     }
+  }
+}
+
+export async function validateNotificationDeliveryMethod(user: GQLUserInput) {
+  const notificationMethodMap = {
+    sms: 'mobile',
+    email: 'emailForNotification'
+  }
+  if (!user[notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]]) {
+    throw new Error(
+      `${notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]} is required`
+    )
   }
 }
 

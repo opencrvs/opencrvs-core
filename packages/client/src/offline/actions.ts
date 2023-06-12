@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import {
+  CertificatePayload,
+  ILocation,
+  IOfflineData
+} from '@client/offline/reducer'
 import { ILanguageState } from '@client/i18n/reducer'
 import {
   ILocationDataResponse,
@@ -96,6 +100,29 @@ export type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
+export const CERTIFICATE_LOADED = 'OFFLINE/CERTIFICATE_LOADED'
+export type CertificateLoadedAction = {
+  type: typeof CERTIFICATE_LOADED
+  payload: CertificatePayload
+}
+
+export const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
+export type CertificateLoadFailedAction = {
+  type: typeof CERTIFICATE_LOAD_FAILED
+  payload: Error
+}
+
+export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
+export type CertificatesLoadedAction = {
+  type: typeof CERTIFICATES_LOADED
+  payload: CertificatePayload[]
+}
+
+export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+export type CertificatesLoadFailedAction = {
+  type: typeof CERTIFICATES_LOAD_FAILED
+  payload: Error
+}
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
@@ -225,6 +252,34 @@ export const configLoaded = (
   payload: payload
 })
 
+export const certificateLoaded = (
+  payload: CertificatePayload
+): CertificateLoadedAction => ({
+  type: CERTIFICATE_LOADED,
+  payload
+})
+
+export const certificateLoadFailed = (
+  payload: CertificateLoadFailedAction['payload']
+): CertificateLoadFailedAction => ({
+  type: CERTIFICATE_LOAD_FAILED,
+  payload
+})
+
+export const certificatesLoaded = (
+  payload: CertificatePayload[]
+): CertificatesLoadedAction => ({
+  type: CERTIFICATES_LOADED,
+  payload
+})
+
+export const certificatesLoadFailed = (
+  payload: CertificatesLoadFailedAction['payload']
+): CertificatesLoadFailedAction => ({
+  type: CERTIFICATES_LOAD_FAILED,
+  payload
+})
+
 export const configAnonymousUserLoaded = (payload: {
   anonymousConfig: IApplicationConfig
 }): ApplicationConfigAnonymousUserAction => ({
@@ -291,6 +346,10 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | CertificateLoadedAction
+  | CertificateLoadFailedAction
+  | CertificatesLoadedAction
+  | CertificatesLoadFailedAction
   | UpdateOfflineSystemsAction
   | UpdateOfflineCertificateAction
   | IFilterLocationsAction

@@ -29,6 +29,7 @@ import { resolvers as correctionRootResolvers } from '@gateway/features/correcti
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
+import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -80,7 +81,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
   informantSMSNotificationResolvers as IResolvers,
-  informantSMSNotiTypeResolvers as IResolvers
+  informantSMSNotiTypeResolvers as IResolvers,
+  OIDPUserInfoResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {

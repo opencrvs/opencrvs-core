@@ -42,7 +42,8 @@ describe('Field agent list tests', () => {
         search: {
           locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
           timeEnd: new Date(1487076708000).toISOString(),
-          timeStart: new Date(1455454308000).toISOString()
+          timeStart: new Date(1455454308000).toISOString(),
+          event: 'birth'
         }
       }
     )

@@ -33,7 +33,6 @@ import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 
 export const { store, history } = createStore()
-
 interface IAppProps {
   store: AppStore
   history: History

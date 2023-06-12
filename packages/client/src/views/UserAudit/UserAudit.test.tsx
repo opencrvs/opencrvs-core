@@ -98,7 +98,7 @@ const mockAuditedUserGqlResponse = {
 }
 
 describe('User audit list tests for field agent', () => {
-  userMutations.resendSMSInvite = vi.fn()
+  userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
@@ -147,7 +147,7 @@ describe('User audit list tests for field agent', () => {
 })
 
 describe('User audit list tests for sys admin', () => {
-  userMutations.resendSMSInvite = vi.fn()
+  userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>

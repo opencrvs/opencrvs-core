@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled, { keyframes } from '@client/styledComponents'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -53,7 +53,13 @@ const StyledPage = styled.div<IPageProps>`
   }
 `
 
+const spinnerAppearAnimation = keyframes`
+  85% { opacity: 0; }
+  100% {  opacity: 1; }
+`
+
 const StyledSpinner = styled(Spinner)`
+  visibility: hidden;
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
@@ -61,6 +67,8 @@ const StyledSpinner = styled(Spinner)`
   left: 50%;
   width: 40px;
   height: 40px;
+  /** Show spinner after 2 seconds */
+  animation: ${spinnerAppearAnimation} 2s forwards;
 `
 export const StyledText = styled.div`
   position: absolute;

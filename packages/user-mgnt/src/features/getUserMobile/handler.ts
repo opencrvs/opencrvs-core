@@ -20,7 +20,7 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
-  mobile: string
+  mobile?: string
 }
 
 export default async function getUserMobile(

@@ -15,7 +15,6 @@ import sendVerifyCodeHandler, {
   responseSchema as resAuthSchema
 } from '@gateway/routes/verifyCode/handler'
 
-// curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/sendVerifyCode
 export default {
   method: 'POST',
   path: '/sendVerifyCode',

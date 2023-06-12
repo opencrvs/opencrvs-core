@@ -119,8 +119,7 @@ describe('verify locationWiseEventEstimations handler', () => {
         maleEstimation: 60,
         femaleEstimation: 40,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     readPoints.mockResolvedValueOnce([
       {
@@ -219,8 +218,7 @@ describe('verify locationWiseEventEstimations handler', () => {
         maleEstimation: 60,
         femaleEstimation: 40,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     readPoints.mockResolvedValueOnce([
       {

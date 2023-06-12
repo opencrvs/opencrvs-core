@@ -510,11 +510,13 @@ export function goToCompletenessRates(
 export function goToFieldAgentList(
   timeStart: string,
   timeEnd: string,
-  locationId?: string
+  locationId?: string,
+  event?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
     search: stringify({
+      event,
       locationId,
       timeStart,
       timeEnd

@@ -22,6 +22,7 @@ services:
     environment:
       - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/metrics?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
+      - DASHBOARD_MONGO_URL=mongodb://performance:${PERFORMANCE_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/performance?replicaSet=rs0
 
   scheduler:
     environment:

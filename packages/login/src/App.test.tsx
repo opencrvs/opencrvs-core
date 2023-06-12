@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createTestApp, wait } from '@login/tests/util'
+import { createTestApp } from '@login/tests/util'
 
 describe('Login app step one', () => {
   let app: any
@@ -23,6 +23,7 @@ describe('Login app step one', () => {
       LANGUAGES: 'en,fr',
       AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
       CLIENT_APP_URL: 'http://localhost:3000/',
+      USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
       COUNTRY_CONFIG_URL: 'http://localhost:3040',
       PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,
       SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',

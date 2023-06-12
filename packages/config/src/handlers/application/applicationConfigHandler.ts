@@ -19,6 +19,7 @@ import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
+import { getDocumentUrl } from '@config/services/documents'
 
 export default async function configHandler(
   request: Hapi.Request,
@@ -26,7 +27,16 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getActiveCertificatesHandler(request, h),
+      getActiveCertificatesHandler(request, h).then((certs) =>
+        Promise.all(
+          certs.map(async (cert) => ({
+            ...cert,
+            svgCode: await getDocumentUrl(cert.svgCode, {
+              Authorization: request.headers.authorization
+            })
+          }))
+        )
+      ),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])

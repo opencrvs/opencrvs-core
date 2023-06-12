@@ -125,7 +125,8 @@ export interface IUser {
   username: string
   identifiers: IIdentifier[]
   email: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   passwordHash: string
   salt: string
   systemRole: string
@@ -296,6 +297,7 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
   email: { type: String },
+  emailForNotification: { type: String, unique: true, sparse: true },
   mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
