@@ -26,7 +26,6 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages/constants'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { camelCase } from 'lodash'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -59,9 +58,7 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
-  const messageInformant = camelCase(
-    removeUnderscore(`${declaration?.informant?.toLowerCase()}`)
-  )
+  const messageInformant = declaration?.informant
 
   let informant = declaration?.informant
     ? intl.formatMessage(dynamicConstantsMessages[`${messageInformant}`])
