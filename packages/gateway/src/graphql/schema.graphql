@@ -37,9 +37,11 @@ type Query {
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String
+    email: String
     status: String
     systemRole: String
     primaryOfficeId: String
@@ -146,10 +148,16 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: String, event: String): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG]
+  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   informantSMSNotifications: [SMSNotification!]
+  getOIDPUserInfo(
+    code: String!
+    clientId: String!
+    redirectUri: String!
+    grantType: String
+  ): UserInfo
 }
 
 type Mutation {
@@ -234,6 +242,12 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
+  changeEmail(
+    userId: String!
+    email: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
   changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
@@ -241,9 +255,9 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
-  resetPasswordSMS(userId: String!, applicationName: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
+  resetPasswordInvite(userId: String!): String
   updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
@@ -415,7 +429,8 @@ type User {
   practitionerId: String!
   name: [HumanName!]!
   username: String
-  mobile: String!
+  mobile: String
+  emailForNotification: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
@@ -622,8 +637,19 @@ type CertificateSVG {
   svgDateUpdated: String!
   svgDateCreated: String!
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
+}
+
+enum CertificateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Event {
+  birth
+  death
+  marriage
 }
 
 type System {
@@ -633,7 +659,8 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  settings: [WebhookPermission!]
+  integratingSystemType: IntegratingSystemType
+  settings: SystemSettings
 }
 
 type SMSNotification {
@@ -643,6 +670,13 @@ type SMSNotification {
   enabled: Boolean!
   updatedAt: String!
   createdAt: String!
+}
+
+type UserInfo {
+  oidpUserInfo: OIDPUserInfo
+  districtFhirId: String
+  stateFhirId: String
+  locationLevel3FhirId: String
 }
 
 input NotificationInput {
@@ -658,7 +692,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
   isPotentiallyDuplicate: Boolean
 }
 
@@ -729,7 +762,7 @@ input UserInput {
   name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String!
+  mobile: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -766,14 +799,14 @@ input SystemRoleInput {
 }
 
 input CertificateSVGInput {
-  id: ID!
+  id: ID
   svgCode: String!
   svgFilename: String!
   svgDateUpdated: Int
   svgDateCreated: Int
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
 }
 
 type ApplicationConfiguration {
@@ -824,7 +857,8 @@ type SystemSecret {
 input SystemInput {
   name: String!
   type: SystemType!
-  settings: SystemSettings
+  settings: SystemSettingsInput
+  integratingSystemType: IntegratingSystemType
 }
 
 input UpdatePermissionsInput {
@@ -982,6 +1016,7 @@ type IdentityType {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 type HumanName {
@@ -1144,7 +1179,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 
@@ -1191,12 +1225,6 @@ interface EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-enum Event {
-  birth
-  death
-  marriage
-}
-
 type EventProgressSet {
   id: ID!
   type: String
@@ -1221,9 +1249,41 @@ enum SystemType {
   WEBHOOK
 }
 
-type WebhookPermission {
-  event: String!
-  permissions: [String!]!
+enum IntegratingSystemType {
+  MOSIP
+  OSIA
+  OTHER
+}
+
+type SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookPermission!]
+  openIdProviderClientId: String
+  openIdProviderBaseUrl: String
+  openIdProviderClaims: String
+}
+
+type OIDPUserInfo {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  middle_name: String
+  nickname: String
+  preferred_username: String
+  profile: String
+  picture: String
+  website: String
+  email: String
+  email_verified: Boolean
+  gender: String
+  birthdate: String
+  zoneinfo: String
+  locale: String
+  phone_number: String
+  phone_number_verified: Boolean
+  address: OIDPUserAddress
+  updated_at: Int
 }
 
 input PersonInput {
@@ -1421,7 +1481,7 @@ input LoginBackgroundInput {
   imageFit: ImageFit
 }
 
-input SystemSettings {
+input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
 }
@@ -1523,7 +1583,7 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UINTOKEN
+  MOSIP_PSUT_TOKEN_ID
   DECEASED_PATIENT_ENTRY
   BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
@@ -1771,10 +1831,26 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
+type OIDPUserAddress {
+  formatted: String
+  street_address: String
+  locality: String
+  region: String
+  postal_code: String
+  city: String
+  country: String
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
   otherType: String
+  fieldsModifiedByIdentity: [String]
 }
 
 input ContactPointInput {

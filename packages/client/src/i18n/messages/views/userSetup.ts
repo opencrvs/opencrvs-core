@@ -64,6 +64,7 @@ interface IUserSetupMessages
   loggedInAuditAction: MessageDescriptor
   loggedOutAuditAction: MessageDescriptor
   phoneNumberChangedAuditAction: MessageDescriptor
+  emailAddressChangedAuditAction: MessageDescriptor
   passwordChangedAuditAction: MessageDescriptor
   reactivateAuditAction: MessageDescriptor
   deactivateAuditAction: MessageDescriptor
@@ -120,7 +121,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'settings.user.label.nameBN'
   },
   labelEnglishName: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
   },
   match: {
@@ -341,6 +342,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Phone number changed',
     description: 'Description for user change phoneNumber',
     id: 'user.profile.auditList.phoneNumberChanged'
+  },
+  emailAddressChangedAuditAction: {
+    defaultMessage: 'Email Address changed',
+    description: 'Description for user change email',
+    id: 'user.profile.auditList.emailAddressChanged'
   },
   passwordChangedAuditAction: {
     defaultMessage: 'Changed Password',

@@ -27,6 +27,7 @@ export interface IPDFTemplate {
 export interface ISVGTemplate {
   id: string
   definition: string
+  hash?: string
   fonts?: { [language: string]: { [name: string]: TFontFamilyTypes } }
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]

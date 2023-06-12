@@ -25,16 +25,29 @@ export const systems: System[] = [
     _id: '63998b6efbd0f8bad7708033',
     shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
     clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-    settings: [
-      {
-        event: 'birth',
-        permissions: ['informant-details', 'supporting-documents']
-      },
-      {
-        event: 'death',
-        permissions: ['deceased-details', 'death-encounter']
-      }
-    ]
+    settings: {
+      webhook: [
+        {
+          event: 'birth',
+          permissions: ['informant-details', 'supporting-documents']
+        },
+        {
+          event: 'death',
+          permissions: ['deceased-details', 'death-encounter']
+        }
+      ]
+    }
+  },
+  {
+    name: 'National Id',
+    status: SystemStatus.Active,
+    type: SystemType.NationalId,
+    _id: '613ddbbe4c0b86e9b9f114e8',
+    shaSecret: '22ea09c2-f964-4562-bdac-8e9ca9b9a81a',
+    clientId: '2f1047bb-af48-4f27-8ab8-993d7b960f92',
+    settings: {
+      openIdProviderClientId: '7b621732-6c1d-4808-81b2-fd67f05f3af3'
+    }
   },
   {
     _id: '63a01ffe607915acacc2f553',
@@ -43,7 +56,7 @@ export const systems: System[] = [
     shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
     status: SystemStatus.Deactivated,
     type: SystemType.Health,
-    settings: [],
+    settings: {},
     __typename: 'System'
   }
 ]

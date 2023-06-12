@@ -15,47 +15,11 @@ const UserRoles = [
     labels: [
       {
         lang: 'en',
-        label: 'Health Worker'
+        label: 'Field Agent'
       },
       {
         lang: 'fr',
-        label: 'Professionnel de Santé'
-      }
-    ]
-  },
-  {
-    labels: [
-      {
-        lang: 'en',
-        label: 'Police Worker'
-      },
-      {
-        lang: 'fr',
-        label: 'Agent de Police'
-      }
-    ]
-  },
-  {
-    labels: [
-      {
-        lang: 'en',
-        label: 'Social Worker'
-      },
-      {
-        lang: 'fr',
-        label: 'Travailleur Social'
-      }
-    ]
-  },
-  {
-    labels: [
-      {
-        lang: 'en',
-        label: 'Local Leader'
-      },
-      {
-        lang: 'fr',
-        label: 'Leader Local'
+        label: 'Agent de terrain'
       }
     ]
   },
@@ -134,16 +98,13 @@ const UserRoles = [
 ]
 
 const UserRolesIndex = {
-  HEALTHCARE_WORKER: 0,
-  POLICE_OFFICER: 1,
-  SOCIAL_WORKER: 2,
-  LOCAL_LEADER: 3,
-  REGISTRATION_AGENT: 4,
-  LOCAL_REGISTRAR: 5,
-  LOCAL_SYSTEM_ADMIN: 6,
-  NATIONAL_SYSTEM_ADMIN: 7,
-  PERFORMANCE_MANAGEMENT: 8,
-  NATIONAL_REGISTRAR: 9
+  FIELD_AGENT: 0,
+  REGISTRATION_AGENT: 1,
+  LOCAL_REGISTRAR: 2,
+  LOCAL_SYSTEM_ADMIN: 3,
+  NATIONAL_SYSTEM_ADMIN: 4,
+  PERFORMANCE_MANAGEMENT: 5,
+  NATIONAL_REGISTRAR: 6
 }
 
 const DEFAULT_SYSTEM_ROLES = [
@@ -240,11 +201,7 @@ export const up = async (db, client) => {
           { username: user.username },
           {
             $set: {
-              type: userRolesResult.insertedIds[
-                UserRolesIndex[
-                  user.role === 'FIELD_AGENT' ? user.type : user.role
-                ]
-              ]
+              type: userRolesResult.insertedIds[UserRolesIndex[user.role]]
             }
           }
         )
@@ -279,10 +236,7 @@ export const up = async (db, client) => {
           { _id: role._id },
           {
             $set: {
-              types:
-                role.value === 'FIELD_AGENT'
-                  ? Object.values(userRolesResult.insertedIds).slice(0, 4)
-                  : [userRolesResult.insertedIds[UserRolesIndex[role.value]]]
+              types: [userRolesResult.insertedIds[UserRolesIndex[role.value]]]
             }
           }
         )
@@ -358,7 +312,12 @@ export const down = async (db, client) => {
           $set: {
             types:
               role.value === 'FIELD_AGENT'
-                ? Object.keys(UserRolesIndex).slice(0, 4)
+                ? [
+                    'HEALTHCARE_WORKER',
+                    'POLICE_OFFICER',
+                    'SOCIAL_WORKER',
+                    'LOCAL_LEADER'
+                  ]
                 : []
           }
         }

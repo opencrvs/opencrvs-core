@@ -101,11 +101,6 @@ export const createFhirPractitionerRole = async (
     const role = await UserRole.findOne({
       _id: user.role
     })
-    const titleCase = user.systemRole
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
-      .join(' ')
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -124,9 +119,7 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: role?.labels
-                ? role.labels.find((lbl) => lbl.lang === 'en')?.label
-                : titleCase
+              code: JSON.stringify(role?.labels)
             }
           ]
         }
@@ -292,21 +285,25 @@ async function checkUsername(username: string) {
 }
 
 export async function sendCredentialsNotification(
-  msisdn: string,
+  userFullName: IUserName[],
   username: string,
   password: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  msisdn?: string,
+  emailForNotification?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsSMS`
+  }userCredentialsInvite`
   try {
     await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
         msisdn,
+        email: emailForNotification,
         username,
-        password
+        password,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -319,9 +316,11 @@ export async function sendCredentialsNotification(
 }
 
 export async function sendUpdateUsernameNotification(
-  msisdn: string,
+  userFullName: IUserName[],
   username: string,
-  authHeader: { Authorization: string }
+  authHeader: { Authorization: string },
+  msisdn?: string,
+  emailForNotification?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
@@ -331,7 +330,9 @@ export async function sendUpdateUsernameNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        username
+        emailForNotification,
+        username,
+        userFullName
       }),
       headers: {
         'Content-Type': 'application/json',

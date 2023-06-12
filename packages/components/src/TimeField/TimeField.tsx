@@ -125,7 +125,7 @@ export function TimeField(props: ITimeFieldProps) {
       }
       setState((state) => ({ ...state, hh: val }))
     } else if (event.target.id.includes('mm')) {
-      if (Number(val) < 0 || Number(val) > 59) return
+      if (Number(val) < 0 || Number(val) > 59 || val.length > 2) return
       setState((state) => ({ ...state, mm: val }))
     }
   }

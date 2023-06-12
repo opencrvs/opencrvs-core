@@ -40,13 +40,13 @@ describe('authenticate handler receives a request', () => {
           password: '2r23432'
         }
       })
-      const smsCode = codeSpy.mock.calls[0][1]
+      const authCode = codeSpy.mock.calls[0][0]
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: smsCode
+          code: authCode
         }
       })
 
