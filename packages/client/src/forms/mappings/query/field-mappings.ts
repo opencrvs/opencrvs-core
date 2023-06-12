@@ -25,7 +25,8 @@ import {
   IFormFieldQueryMapFunction,
   TransformedData,
   IFormSectionData,
-  ISelectFormFieldWithOptions
+  ISelectFormFieldWithOptions,
+  AddressCases
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
@@ -44,8 +45,6 @@ import {
   countryAlpha3toAlpha2,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-
-import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
   [key: string]: any

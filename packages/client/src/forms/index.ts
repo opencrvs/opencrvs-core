@@ -88,6 +88,11 @@ export enum DownloadAction {
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction'
 }
 
+export enum AddressCases {
+  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
+  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS'
+}
+
 export type Action = SubmissionAction | DownloadAction
 export interface ISelectOption {
   value: SelectComponentOption['value']
