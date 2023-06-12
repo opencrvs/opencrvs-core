@@ -25,7 +25,8 @@ import {
   modifyDeclaration,
   writeDeclaration,
   storeDeclaration,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  IDeclaration
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -141,8 +142,23 @@ class ReviewCertificateActionComponent extends React.Component<
     })
   }
 
+  makeCertificatePrintableWithoutCollector = (draft: IPrintableDeclaration) => {
+    if (!draft.data.registration?.certificates?.[0]?.collector) {
+      return
+    }
+    draft.data.registration.certificates = [
+      {
+        collector: { type: 'PRINT_IN_ADVANCE' },
+        hasShowedVerifiedDocument: false
+      }
+    ]
+  }
+
   readyToCertifyAndIssueOrCertify = () => {
     const { draft } = this.props
+    if (draft.event === Event.Marriage) {
+      this.makeCertificatePrintableWithoutCollector(draft)
+    }
     const isPrintInAdvanced = isCertificateForPrintInAdvance(draft)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = isPrintInAdvanced
