@@ -117,13 +117,18 @@ const messagesToDefine = {
       '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful} other {}}',
     description: 'Title for success page'
   },
-  successPageSubtitle: {
-    id: 'resetCredentials.success.page.subtitle',
+  successPageSubtitlePhone: {
+    id: 'resetCredentials.success.page.subtitle.phone',
     defaultMessage:
       '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}',
-    description: 'Subtitle for success page'
+    description: 'Subtitle for success page for phone'
   },
-
+  successPageSubtitleEmail: {
+    id: 'resetCredentials.success.page.subtitle.email',
+    defaultMessage:
+      '{forgottenItem, select, username {Check your email for a reminder of your username} password {You can now login with your new password} other {}}',
+    description: 'Subtitle for success page for email'
+  },
   usernameOptionLabel: {
     id: 'resetCredentials.option.username',
     defaultMessage: 'My username',

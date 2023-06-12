@@ -2072,6 +2072,7 @@ export type QuerySearchFieldAgentsArgs = {
 
 export type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
+  email?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   mobile?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
@@ -2576,7 +2577,6 @@ export type UserInput = {
   catchmentArea?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   device?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
-  emailForNotification?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile?: InputMaybe<Scalars['String']>
@@ -3338,6 +3338,7 @@ export type SearchUsersQuery = {
       username?: string | null
       systemRole: SystemRoleType
       mobile?: string | null
+      email?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -5669,6 +5670,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string
