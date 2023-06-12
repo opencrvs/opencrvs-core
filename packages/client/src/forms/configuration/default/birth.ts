@@ -73,39 +73,39 @@ export const birthRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDFATHER',
-                  label: informantMessageDescriptors.grandfather
+                  label: informantMessageDescriptors.GRANDFATHER
                 },
                 {
                   value: 'GRANDMOTHER',
-                  label: informantMessageDescriptors.grandmother
+                  label: informantMessageDescriptors.GRANDMOTHER
                 },
                 {
                   value: 'BROTHER',
-                  label: informantMessageDescriptors.brother
+                  label: informantMessageDescriptors.BROTHER
                 },
                 {
                   value: 'SISTER',
-                  label: informantMessageDescriptors.sister
+                  label: informantMessageDescriptors.SISTER
                 },
                 {
                   value: 'OTHER_FAMILY_MEMBER',
-                  label: informantMessageDescriptors.otherFamilyMember
+                  label: informantMessageDescriptors.OTHER_FAMILY_MEMBER
                 },
                 {
                   value: 'LEGAL_GUARDIAN',
-                  label: informantMessageDescriptors.legalGuardian
+                  label: informantMessageDescriptors.LEGAL_GUARDIAN
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -192,39 +192,39 @@ export const birthRegisterForms: ISerializedForm = {
               options: [
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDFATHER',
-                  label: informantMessageDescriptors.grandfather
+                  label: informantMessageDescriptors.GRANDFATHER
                 },
                 {
                   value: 'GRANDMOTHER',
-                  label: informantMessageDescriptors.grandmother
+                  label: informantMessageDescriptors.GRANDMOTHER
                 },
                 {
                   value: 'BROTHER',
-                  label: informantMessageDescriptors.brother
+                  label: informantMessageDescriptors.BROTHER
                 },
                 {
                   value: 'SISTER',
-                  label: informantMessageDescriptors.sister
+                  label: informantMessageDescriptors.SISTER
                 },
                 {
                   value: 'OTHER_FAMILY_MEMBER',
-                  label: informantMessageDescriptors.otherFamilyMember
+                  label: informantMessageDescriptors.OTHER_FAMILY_MEMBER
                 },
                 {
                   value: 'LEGAL_GUARDIAN',
-                  label: informantMessageDescriptors.legalGuardian
+                  label: informantMessageDescriptors.LEGAL_GUARDIAN
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -572,6 +572,10 @@ export const birthRegisterForms: ISerializedForm = {
           {
             fieldName: 'registrationNumber',
             operation: 'registrationNumberTransformer'
+          },
+          {
+            fieldName: 'informantType',
+            operation: 'informantTypeTransformer'
           },
           {
             fieldName: 'qrCode',

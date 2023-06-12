@@ -72,7 +72,7 @@ export default async function updateUser(
   if (existingUser.systemRole !== user.systemRole) {
     changingRole = true
     existingUser.systemRole = user.systemRole
-    // Updating user sope
+    // Updating user scope
     const userScopes: string[] =
       roleScopeMapping[existingUser.systemRole || 'FIELD_AGENT']
     if (

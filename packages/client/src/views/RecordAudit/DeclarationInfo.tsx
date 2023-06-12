@@ -19,7 +19,7 @@ import {
 import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { formatLongDate } from '@client/utils/date-formatting'
+import format from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
@@ -77,7 +77,7 @@ export const GetDeclarationInfo = ({
       : finalStatus === 'Archived'
       ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
       : finalStatus === 'Draft'
-      ? intl.formatMessage(constantsMessages.draftStatus)
+      ? intl.formatMessage(dynamicConstantsMessages.draft)
       : finalStatus
 
   if (declaration?.informantContact && informant) {
@@ -94,7 +94,7 @@ export const GetDeclarationInfo = ({
   if (info.type === 'Birth') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
@@ -112,7 +112,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Death') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED, ISSUED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo
@@ -130,7 +130,7 @@ export const GetDeclarationInfo = ({
   } else if (info.type === 'Marriage') {
     if (
       info.status &&
-      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+      [REGISTERED, CERTIFIED, ISSUED].includes(finalStatus.toLowerCase())
     ) {
       if (declaration?.registrationNo) {
         info.registrationNo = declaration.registrationNo

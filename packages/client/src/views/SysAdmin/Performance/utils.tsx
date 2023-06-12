@@ -321,7 +321,6 @@ export const mockPerformanceMetricsRequest = {
           maleEstimation: 0,
           femaleEstimation: 0,
           locationId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
-          estimationYear: 2022,
           locationLevel: '',
           __typename: 'Estimation'
         },

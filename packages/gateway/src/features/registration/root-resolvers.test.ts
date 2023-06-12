@@ -809,8 +809,7 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        registrationNumber: '2019123265B1234569'
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       })
     })
   })
@@ -989,8 +988,7 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toEqual({
-        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        registrationNumber: '2019123265B1234569'
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       })
     })
 

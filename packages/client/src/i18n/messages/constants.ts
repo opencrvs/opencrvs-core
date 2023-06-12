@@ -467,11 +467,6 @@ const messagesToDefine = {
     description: 'A label for In Review',
     id: 'constants.inReview.status'
   },
-  draftStatus: {
-    defaultMessage: 'Draft',
-    description: 'A label for draft',
-    id: 'constants.draft.status'
-  },
   incompleteStatus: {
     defaultMessage: 'Incomplete',
     description: 'A label for Incomplete',
@@ -835,6 +830,11 @@ const dynamicMessagesToDefine: Record<
   string | number | symbol,
   MessageDescriptor
 > = {
+  draft: {
+    id: 'constants.draft.status',
+    defaultMessage: 'Draft',
+    description: 'A label for draft'
+  },
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',
