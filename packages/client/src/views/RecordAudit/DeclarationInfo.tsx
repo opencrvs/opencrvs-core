@@ -72,6 +72,8 @@ export const GetDeclarationInfo = ({
       ? intl.formatMessage(constantsMessages.registeredStatus)
       : finalStatus === 'Archived'
       ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
+      : finalStatus === 'Draft'
+      ? intl.formatMessage(dynamicConstantsMessages.draft)
       : finalStatus
 
   if (declaration?.informantContact && informant) {

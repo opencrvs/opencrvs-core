@@ -40,6 +40,7 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -214,7 +215,12 @@ export const GetHistory = ({
     sortedHistory
   )
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
-    date: getFormattedDate(item?.date),
+    date: formatLongDate(
+      item?.date.toLocaleString(),
+      intl.locale,
+      'MMMM dd, yyyy · hh.mm a'
+    ),
+
     action: (
       <Link
         font="bold14"
