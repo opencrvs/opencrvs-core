@@ -830,6 +830,11 @@ const dynamicMessagesToDefine: Record<
   string | number | symbol,
   MessageDescriptor
 > = {
+  draft: {
+    id: 'constants.draft',
+    defaultMessage: 'Draft',
+    description: 'A label for draft'
+  },
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',
