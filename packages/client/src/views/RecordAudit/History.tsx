@@ -218,7 +218,7 @@ export const GetHistory = ({
     date: formatLongDate(
       item?.date.toLocaleString(),
       intl.locale,
-      'MMMM dd, yyyy · hh.mm a'
+      intl.locale === 'fr' ? 'dd MMMM yyyy · HH.mm' : 'MMMM dd, yyyy · hh.mm a'
     ),
 
     action: (
