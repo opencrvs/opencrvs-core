@@ -71,6 +71,11 @@ export const messages = {
     description: 'Input label for phone input',
     id: 'form.field.label.phoneNumber'
   },
+  email: {
+    defaultMessage: 'Email',
+    description: 'Input label for email address',
+    id: 'form.field.label.email'
+  },
   NID: {
     defaultMessage: 'NID',
     description: 'National ID',

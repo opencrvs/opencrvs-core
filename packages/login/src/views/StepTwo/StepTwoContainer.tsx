@@ -25,7 +25,7 @@ import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { Box } from '@login/../../components/lib/Box'
 import {
-  getResentSMS,
+  getResentAuthenticationCode,
   getStepOneDetails,
   getSubmissionError,
   getsubmitting,
@@ -36,6 +36,8 @@ import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
+import { NotificationEvent } from '@login/utils/authApi'
+import { maskEmail, maskString } from '@login/utils/authUtils'
 
 const FORM_NAME = 'STEP_TWO'
 
@@ -46,7 +48,7 @@ export function StepTwoContainer() {
   const submitting = useSelector(getsubmitting)
 
   const submissionError = useSelector(getSubmissionError)
-  const resentSMS = useSelector(getResentSMS)
+  const resentAuthenticationCode = useSelector(getResentAuthenticationCode)
 
   const stepOneDetails = useSelector(getStepOneDetails)
   const intl = useIntl()
@@ -57,27 +59,19 @@ export function StepTwoContainer() {
     if (appName) document.title = appName
   }, [appName])
 
-  const maskPercentage = 0.6
-  const numberLength = stepOneDetails.mobile.length
-  const unmaskedNumberLength =
-    numberLength - ceil(maskPercentage * numberLength)
-  const startForm = ceil(unmaskedNumberLength / 2)
-  const endBefore = unmaskedNumberLength - startForm
-  const mobileNumber = stepOneDetails.mobile.replace(
-    stepOneDetails.mobile.slice(
-      startForm,
-      stepOneDetails.mobile.length - endBefore
-    ),
-    '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
-  )
+  const mobileNumber =
+    stepOneDetails.mobile && maskString(stepOneDetails.mobile)
+  const emailAddress = stepOneDetails.email && maskEmail(stepOneDetails.email)
+
   const field = stepTwoFields.code
+  const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
         <LogoContainer>
           <CountryLogo size="small" src={logo} />
         </LogoContainer>
-        {resentSMS ? (
+        {resentAuthenticationCode ? (
           <React.Fragment>
             <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
@@ -88,9 +82,14 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {intl.formatMessage(messages.resentSMS, {
-                number: mobileNumber
-              })}
+              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms' &&
+                intl.formatMessage(messages.resentSMS, {
+                  number: mobileNumber
+                })}
+              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email' &&
+                intl.formatMessage(messages.resentEMAIL, {
+                  email: emailAddress
+                })}
             </Text>
           </React.Fragment>
         ) : (
@@ -105,9 +104,14 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {intl.formatMessage(messages.stepTwoInstruction, {
-                number: mobileNumber
-              })}
+              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms' &&
+                intl.formatMessage(messages.stepTwoInstructionSMS, {
+                  number: mobileNumber
+                })}
+              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email' &&
+                intl.formatMessage(messages.stepTwoInstructionEMAIL, {
+                  email: emailAddress
+                })}
             </Text>
           </React.Fragment>
         )}
@@ -155,7 +159,9 @@ export function StepTwoContainer() {
                   type="tertiary"
                   onClick={(e) => {
                     e.preventDefault()
-                    dispatch(actions.resendSMS())
+                    dispatch(
+                      actions.resendAuthenticationCode(notificationEvent)
+                    )
                   }}
                   id="login-mobile-resend"
                 >
