@@ -94,7 +94,7 @@ export async function sendPasswordNotification(
   authHeader: { Authorization: string },
   userFullName: IUserName[],
   msisdn?: string,
-  emailForNotification?: string
+  email?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}resetPasswordInvite`
   try {
@@ -102,7 +102,7 @@ export async function sendPasswordNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        email: emailForNotification,
+        email,
         password,
         userFullName
       }),
