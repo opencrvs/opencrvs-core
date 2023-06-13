@@ -151,7 +151,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.email,
           required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
           initialValue: '',
-          validate: [{ operation: 'emailAddressFormat' }]
+          validator: [{ operation: 'emailAddressFormat' }]
         },
         {
           name: 'nid',

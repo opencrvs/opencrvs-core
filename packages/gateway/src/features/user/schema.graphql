@@ -87,7 +87,6 @@ type User {
   name: [HumanName!]! # -> .name
   username: String
   mobile: String
-  emailForNotification: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
