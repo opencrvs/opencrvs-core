@@ -89,7 +89,7 @@ describe('usernameSMSReminderInvite handler', () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/usernameReminder',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },
@@ -106,7 +106,7 @@ describe('usernameSMSReminderInvite handler', () => {
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/usernameReminder',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },

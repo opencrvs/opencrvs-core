@@ -351,6 +351,12 @@ const messagesToDefine = {
     description: 'Phone label',
     id: 'constants.phoneNumber'
   },
+  labelEmail: {
+    defaultMessage: 'Email Address',
+    description: 'Email label',
+    id: 'constants.emailAddress'
+  },
+
   labelPin: {
     defaultMessage: 'PIN',
     description: 'PIN label',

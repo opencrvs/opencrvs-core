@@ -30,6 +30,7 @@ import {
   PhoneNumber,
   ProfileImage
 } from '@client/views/Settings/items'
+import { EmailAddress } from './items/EmailAddress'
 
 export function SettingsPage() {
   const intl = useIntl()
@@ -48,6 +49,7 @@ export function SettingsPage() {
         <ListViewSimplified>
           <Name />
           <PhoneNumber />
+          <EmailAddress />
           <Role />
           <Title />
           <Language />
