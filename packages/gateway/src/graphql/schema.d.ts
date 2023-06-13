@@ -726,7 +726,6 @@ export interface GQLApplicationConfigurationInput {
   CURRENCY?: GQLCurrencyInput
   DEATH?: GQLDeathInput
   MARRIAGE?: GQLMarriageInput
-  MARRIAGE_REGISTRATION?: boolean
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean

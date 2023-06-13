@@ -2378,18 +2378,6 @@
             "deprecationReason": null
           },
           {
-            "name": "MARRIAGE_REGISTRATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "NID_NUMBER_PATTERN",
             "description": null,
             "type": {

@@ -852,7 +852,6 @@ input ApplicationConfigurationInput {
   CURRENCY: CurrencyInput
   DEATH: DeathInput
   MARRIAGE: MarriageInput
-  MARRIAGE_REGISTRATION: Boolean
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
