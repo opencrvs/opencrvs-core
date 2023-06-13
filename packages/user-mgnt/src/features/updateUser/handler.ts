@@ -159,7 +159,7 @@ export default async function updateUser(
         Authorization: request.headers.authorization
       },
       user.mobile,
-      user.email
+      user.emailForNotification
     )
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
