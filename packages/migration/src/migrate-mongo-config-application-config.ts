@@ -17,13 +17,13 @@ const config = {
       process.env.APPLICATION_CONFIG_MONGO_URL ||
       'mongodb://localhost/application-config',
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+      useNewUrlParser: true, // removes a deprecation warning when connecting
+      useUnifiedTopology: true // removes a deprecating warning when connecting
     }
   },
   migrationsDir: './migrations/application-config',
   changelogCollectionName: 'changelog',
-  migrationFileExtension: '.ts',
+  migrationFileExtension: '.js',
   useFileHash: false,
   moduleSystem: 'esm'
 } as configMongo.Config

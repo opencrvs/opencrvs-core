@@ -32,7 +32,7 @@ export const up = async (db: Db, client: MongoClient) => {
       )
     })
   } finally {
-    console.log(`Migration - Add Marriage Configuration: Done.`)
+    console.log(`Migration - Add Marriage Configuration : Done. `)
     await session.endSession()
   }
 }
@@ -46,7 +46,7 @@ export const down = async (db: Db, client: MongoClient) => {
         .updateMany({}, { $unset: { MARRIAGE: '' } })
     })
   } finally {
-    console.log(`Migration - DOWN - Add Marriage Configuration - DONE`)
+    console.log(`Migration - DOWN - Add Marriage Configuration - DONE `)
     await session.endSession()
   }
 }

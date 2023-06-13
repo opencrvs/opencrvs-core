@@ -101,10 +101,8 @@ export const query = async (query: string, options?: IQueryOptions) => {
 }
 
 export const writePoints = async (points: IPoint[]) => {
-  try {
-    await influx.writePoints(points)
-  } catch (err) {
+  return influx.writePoints(points).catch((err) => {
     console.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err
-  }
+  })
 }

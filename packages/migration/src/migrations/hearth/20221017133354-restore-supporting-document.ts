@@ -14,7 +14,7 @@ import {
   getBirthEncounterCompositionCursor,
   getBirthEncounterCompositionCount
 } from '@migration/utils/hearth-helper'
-import { Db, MongoClient } from 'mongodb'
+import { Db, MongoClient, ObjectId } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
@@ -39,24 +39,26 @@ export const up = async (db: Db, client: MongoClient) => {
           } of ${totalCompositionCount} compositions...`
         )
         while (await compositionCursor.hasNext()) {
-          const composition: any = await compositionCursor.next()
+          const composition =
+            (await compositionCursor.next()) as unknown as fhir.Composition
           const compositionHistory = await db
             .collection('Composition_history')
             .find({
               id: composition.id
             })
             .toArray()
-          compositionHistory.push(composition)
+          compositionHistory.push({ ...composition, _id: new ObjectId() })
           const correctionIndex = compositionHistory.findIndex((composition) =>
             composition.section.find(
-              (section: any) =>
-                section.code.coding[0].code === 'birth-correction-encounters'
+              (section: fhir.CompositionSection) =>
+                section?.code?.coding?.[0].code ===
+                'birth-correction-encounters'
             )
           )
           const immediatePrevComp = compositionHistory[correctionIndex - 1]
-          const hasDocumentSection = immediatePrevComp?.section.find(
-            (section: any) =>
-              section.code.coding[0].code === 'supporting-documents'
+          const hasDocumentSection = immediatePrevComp.section.find(
+            (section: fhir.CompositionSection) =>
+              section?.code?.coding?.[0].code === 'supporting-documents'
           )
           if (hasDocumentSection) {
             await db

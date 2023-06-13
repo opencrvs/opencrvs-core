@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { upsertChannel, Channel } from '@migration/utils/openhim-helpers'
+import { Db, MongoClient } from 'mongodb'
 
 const newChannel: Channel = {
   methods: [
@@ -86,8 +87,6 @@ const newChannel: Channel = {
   rewriteUrlsConfig: [],
   name: 'Death Registration',
   urlPattern: '^/events/death/mark-registered$',
-  priority: 1,
-  maxBodyAgeDays: 30,
   matchContentRegex: null,
   matchContentXpath: null,
   matchContentValue: null,
@@ -95,7 +94,8 @@ const newChannel: Channel = {
   pollingSchedule: null,
   tcpHost: null,
   tcpPort: null,
-  alerts: []
+  alerts: [],
+  priority: 1
 }
 
 const oldChannel: Channel = {
@@ -159,8 +159,6 @@ const oldChannel: Channel = {
   rewriteUrlsConfig: [],
   name: 'Death Registration',
   urlPattern: '^/events/death/mark-registered$',
-  priority: 1,
-  maxBodyAgeDays: 30,
   matchContentRegex: null,
   matchContentXpath: null,
   matchContentValue: null,
@@ -168,10 +166,11 @@ const oldChannel: Channel = {
   pollingSchedule: null,
   tcpHost: null,
   tcpPort: null,
-  alerts: []
+  alerts: [],
+  priority: 1
 }
 
-export const up = async (db: any, client: any) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -182,7 +181,7 @@ export const up = async (db: any, client: any) => {
   }
 }
 
-export const down = async (db: any, client: any) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

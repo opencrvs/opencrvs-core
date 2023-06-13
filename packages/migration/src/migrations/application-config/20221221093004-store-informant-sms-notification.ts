@@ -27,7 +27,7 @@ export const up = async (db: Db, client: MongoClient) => {
         .insertMany(notificationContentData)
     })
   } finally {
-    console.log(`Migration - INFORMANT_SMS_NOTIFICATION : Done.`)
+    console.log(`Migration - INFORMANT_SMS_NOTIFICATION : Done. `)
     await session.endSession()
   }
 }
@@ -39,7 +39,7 @@ export const down = async (db: Db, client: MongoClient) => {
       await db.collection(INFORMANT_SMS_NOTIFICATION_COLLECTION).drop()
     })
   } finally {
-    console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE`)
+    console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE `)
     await session.endSession()
   }
 }

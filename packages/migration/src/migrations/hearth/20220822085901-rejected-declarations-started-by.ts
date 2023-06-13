@@ -75,20 +75,14 @@ async function getCompositionIdToStartedByMap(
   const extractId = (reference: string) => reference.split('/')[1]
   const cursor = await getTaskCursor(db, compositionIds)
   const startedByMap = new Map<string, string>()
-  async function iterateCursor(cursor: any) {
-    while (await cursor.hasNext()) {
-      const task = await cursor.next()
-      const compositionId = extractId(task.focus.reference)
-      if (startedByMap.has(compositionId)) return
-      startedByMap.set(
-        compositionId,
-        extractId(task.extension[0].valueReference.reference)
-      )
-    }
-  }
-
-  await iterateCursor(cursor)
-
+  await cursor.forEach((task) => {
+    const compositionId = extractId(task.focus.reference)
+    if (startedByMap.has(compositionId)) return
+    startedByMap.set(
+      compositionId,
+      extractId(task.extension[0].valueReference.reference)
+    )
+  })
   return startedByMap
 }
 

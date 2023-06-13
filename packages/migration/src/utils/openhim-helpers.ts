@@ -43,7 +43,7 @@ export interface Channel {
   tcpPort: null | string
   alerts: any[]
   priority: number
-  maxBodyAgeDays: number
+  maxBodyAgeDays?: number
 }
 
 export interface Route {

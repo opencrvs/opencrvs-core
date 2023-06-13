@@ -40,8 +40,8 @@ export const up = async (db: Db, client: MongoClient) => {
         )
         while (await taskCursor.hasNext()) {
           const body: any = {}
-          //@ts-ignore
-          const { _id, ...taskDoc } = (await taskCursor.next()) as fhir.Task
+          const { _id, ...taskDoc } =
+            (await taskCursor.next()) as unknown as fhir.Task
           if (taskDoc) {
             await db.collection('Task').updateOne(
               { id: taskDoc.id },
