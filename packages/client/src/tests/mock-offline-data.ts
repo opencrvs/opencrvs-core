@@ -742,6 +742,7 @@ export const mockOfflineData = {
       },
       PRINT_IN_ADVANCE: true
     },
+    MARRIAGE_REGISTRATION: true,
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
     FIELD_AGENT_AUDIT_LOCATIONS:
