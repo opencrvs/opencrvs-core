@@ -9,26 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  NON_UNICODED_LANGUAGES,
-  COUNTRY_CONFIG_URL
-} from '@notification/constants'
+import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 import { internal } from '@hapi/boom'
 import { notifyCountryConfig } from '@notification/features/sms/service'
-import fetch from 'node-fetch'
-import * as Handlebars from 'handlebars'
 import * as Hapi from '@hapi/hapi'
 import { getDefaultLanguage } from '@notification/i18n/utils'
-interface ISendSMSPayload {
-  applicationName?: string
-  name?: string
-  authCode?: string
-  trackingId?: string
-  username?: string
-  password?: string
-  crvsOffice?: string
-  registrationNumber?: string
-}
 
 interface IMessageIdentifier {
   [key: string]: string
@@ -39,57 +24,47 @@ export interface ILanguage {
   messages: IMessageIdentifier
 }
 
-interface ITranslationsResponse {
-  languages: ILanguage[]
-}
-
 export interface ISMSPayload {
   msisdn: string
+}
+
+interface IUserName {
+  use: string
+  family: string
+  given: string[]
+}
+
+export interface IMessageRecipient {
+  userFullName: IUserName[]
+  msisdn?: string
+  email?: string
 }
 
 export interface IAuthHeader {
   Authorization: string
 }
 
-export async function getTranslations(
-  authHeader: IAuthHeader,
-  messageKey: string,
-  messagePayload: ISendSMSPayload,
-  locale: string
-): Promise<string> {
-  const url = `${COUNTRY_CONFIG_URL}/content/notification`
-  const res: ITranslationsResponse = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(new Error(` request failed: ${error.message}`))
-    })
-
-  const language: ILanguage = res.languages.filter((obj) => {
-    return obj.lang === locale
-  })[0]
-  const template = Handlebars.compile(language.messages[messageKey])
-  return template(messagePayload)
-}
-
-export async function buildAndSendSMS(
+export async function sendNotification(
   request: Hapi.Request,
-  msisdn: string,
-  message: string
+  templateName: {
+    email?: string
+    sms: string
+  },
+  recipient: {
+    email?: string
+    sms?: string
+  },
+  variables: Record<string, string>
 ) {
   const token = request.headers.authorization
+  const locale = getDefaultLanguage()
   try {
     return await notifyCountryConfig(
-      msisdn,
-      message,
+      templateName,
+      recipient,
+      variables,
       token,
+      locale,
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(getDefaultLanguage()) < 0
     )

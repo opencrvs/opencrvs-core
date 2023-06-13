@@ -61,6 +61,13 @@ describe('verifyNumber handler receives a request', () => {
     jest
       .spyOn(retrievalService, 'getRetrievalStepInformation')
       .mockResolvedValueOnce({
+        userFullName: [
+          {
+            use: 'en',
+            family: 'Anik',
+            given: ['Sadman']
+          }
+        ],
         userId: '123',
         username: 'fake_user_name',
         mobile: '+8801711111111',
