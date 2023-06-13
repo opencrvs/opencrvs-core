@@ -2510,7 +2510,6 @@ export type User = {
   creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
-  emailForNotification?: Maybe<Scalars['String']>
   id: Scalars['ID']
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
