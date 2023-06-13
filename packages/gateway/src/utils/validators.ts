@@ -61,7 +61,7 @@ export async function validateAttachments(
 export async function validateNotificationDeliveryMethod(user: GQLUserInput) {
   const notificationMethodMap = {
     sms: 'mobile',
-    email: 'emailForNotification'
+    email: 'email'
   }
   if (!user[notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]]) {
     throw new Error(

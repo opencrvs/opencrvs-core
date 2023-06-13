@@ -290,7 +290,7 @@ export async function sendCredentialsNotification(
   password: string,
   authHeader: { Authorization: string },
   msisdn?: string,
-  emailForNotification?: string
+  email?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
@@ -300,7 +300,7 @@ export async function sendCredentialsNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        email: emailForNotification,
+        email,
         username,
         password,
         userFullName
@@ -320,7 +320,7 @@ export async function sendUpdateUsernameNotification(
   username: string,
   authHeader: { Authorization: string },
   msisdn?: string,
-  emailForNotification?: string
+  email?: string
 ) {
   const url = `${NOTIFICATION_SERVICE_URL}${
     NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
@@ -330,7 +330,7 @@ export async function sendUpdateUsernameNotification(
       method: 'POST',
       body: JSON.stringify({
         msisdn,
-        emailForNotification,
+        email,
         username,
         userFullName
       }),

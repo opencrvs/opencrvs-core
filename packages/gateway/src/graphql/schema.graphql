@@ -430,7 +430,6 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  emailForNotification: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
