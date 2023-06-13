@@ -24,7 +24,6 @@ import { storage } from '@client/storage'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
-  IFormsResponse,
   ILocationDataResponse,
   ICertificateTemplateData,
   referenceApi
@@ -42,6 +41,8 @@ import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
+import { Validation } from '@client/utils/validate'
+import { AnyFn } from '@client/forms/mappings/deserializer'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -71,6 +72,7 @@ export interface IOfflineData {
     death: ISerializedForm
     marriage: ISerializedForm
   }
+  validators: Record<string, Validation | AnyFn<Validation>>
   facilities: ILocationDataResponse
   offices: ILocationDataResponse
   languages: ILanguage[]
@@ -204,7 +206,7 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
+const FORMS_CMD = Cmd.run(() => referenceApi.loadFormsAndValidators(), {
   successActionCreator: actions.formsLoaded,
   failActionCreator: actions.formsFailed
 })
@@ -573,7 +575,8 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          forms: action.payload.forms
+          forms: action.payload.forms,
+          validators: action.payload.validators
         }
       }
     }

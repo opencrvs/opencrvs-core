@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { required, IValidationResult, Validation } from '@client/utils/validate'
+import { required, IValidationResult } from '@client/utils/validate'
 import {
   IFormField,
   IFormSectionData,
@@ -23,8 +23,6 @@ import {
 } from '@opencrvs/client/src/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
-import { COUNTRY_CONFIG_URL } from '@opencrvs/gateway/src/constants'
-import * as validators from '@opencrvs/client/src/utils/validate'
 
 export interface IFieldErrors {
   errors: IValidationResult[]
@@ -150,19 +148,4 @@ export function getValidationErrorsForForm(
           },
     {}
   )
-}
-
-export async function getValidatorsFromCountryConfig() {
-  const countryConfigValidations = (await import(
-    COUNTRY_CONFIG_URL + '/validations.js'
-  )) as Record<string, Validation>
-  return countryConfigValidations
-}
-
-export const getAllValidators = async () => {
-  const countryConfigValidations = await getValidatorsFromCountryConfig()
-  return {
-    ...validators,
-    ...countryConfigValidations
-  }
 }

@@ -23,11 +23,11 @@ import {
   IApplicationConfig,
   ICertificateTemplateData,
   IApplicationConfigAnonymous,
-  IFormsResponse
+  LoadValidatorsResponse,
+  LoadFormsAndValidatorsResponse
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { Validation } from '@client/utils/validate'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -62,7 +62,7 @@ export type LocationsFailedAction = {
 export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
 export type FormsLoadedAction = {
   type: typeof FORMS_LOADED
-  payload: IFormsResponse
+  payload: LoadFormsAndValidatorsResponse
 }
 
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
@@ -74,7 +74,7 @@ export type FormsFailedAction = {
 export const VALIDATORS_LOADED = 'OFFLINE/VALIDATORS_LOADED'
 export type ValidatorsLoadedAction = {
   type: typeof VALIDATORS_LOADED
-  payload: { [key: string]: Validation }
+  payload: LoadValidatorsResponse
 }
 
 export const VALIDATORS_FAILED = 'OFFLINE/VALIDATORS_FAILED'
@@ -195,7 +195,9 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const formsLoaded = (payload: IFormsResponse): FormsLoadedAction => ({
+export const formsLoaded = (
+  payload: LoadFormsAndValidatorsResponse
+): FormsLoadedAction => ({
   type: FORMS_LOADED,
   payload: payload
 })
@@ -203,6 +205,13 @@ export const formsLoaded = (payload: IFormsResponse): FormsLoadedAction => ({
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
+})
+
+export const validatorsLoaded = (
+  payload: LoadValidatorsResponse
+): ValidatorsLoadedAction => ({
+  type: VALIDATORS_LOADED,
+  payload
 })
 
 export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({

@@ -16,7 +16,7 @@ import * as labels from '@client/forms/mappings/label'
 import * as responseTransformers from '@client/forms/mappings/response-transformers'
 import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
-import { getAllValidators } from '@client/forms/validation'
+import * as validators from '@opencrvs/client/src/utils/validate'
 
 import {
   IForm,
@@ -52,16 +52,14 @@ import {
   IQueryTemplateDescriptor
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
-import { COUNTRY_CONFIG_URL } from '@opencrvs/gateway/src/constants'
 
-/*
+/**
  * Some of the exports of mutations and queries are not functions
  * There are for instance some Enums and value mappings that are exported
  *
  * This here removes those from the type, so we don't have to cast anything to any
  */
-
-type AnyFn<T> = (...args: any[]) => T
+export type AnyFn<T> = (...args: any[]) => T
 type AnyFactoryFn<T> = (...args: any[]) => (...args: any[]) => T
 
 type FilterType<Base, Condition> = {
@@ -79,9 +77,9 @@ type QueryFunctionExports = FilterType<
 >[keyof typeof queries]
 
 type ValidatorFunctionExports = FilterType<
-  ReturnType<typeof getAllValidators>,
+  typeof validators,
   Validation | AnyFn<Validation>
->[keyof ReturnType<typeof getAllValidators>]
+>[keyof typeof validators]
 
 function isFactoryOperation(
   descriptor: IQueryDescriptor
@@ -219,7 +217,8 @@ function fieldMutationDescriptorToMutationFunction(
 }
 
 export function fieldValidationDescriptorToValidationFunction(
-  descriptor: IValidatorDescriptor
+  descriptor: IValidatorDescriptor,
+  validators: Record<string, Validation | AnyFn<Validation>>
 ): Validation {
   const validator: Validation | AnyFn<Validation> =
     validators[descriptor.operation as ValidatorFunctionExports]
@@ -290,12 +289,17 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-export function deserializeFormField(field: SerializedFormField): IFormField {
+export function deserializeFormField(
+  field: SerializedFormField,
+  validators: Record<string, Validation | AnyFn<Validation>>
+): IFormField {
   const baseFields = {
     ...field,
     validator:
       field.validator &&
-      field.validator.map(fieldValidationDescriptorToValidationFunction),
+      field.validator.map((descriptor) =>
+        fieldValidationDescriptorToValidationFunction(descriptor, validators)
+      ),
     mapping: field.mapping && {
       query:
         field.mapping.query &&
@@ -322,7 +326,9 @@ export function deserializeFormField(field: SerializedFormField): IFormField {
       (fields, key) => {
         return {
           ...fields,
-          [key]: field.nestedFields[key].map(deserializeFormField)
+          [key]: field.nestedFields[key].map((field) =>
+            deserializeFormField(field, validators)
+          )
         }
       },
       {}
@@ -358,7 +364,8 @@ export function deserializeFormField(field: SerializedFormField): IFormField {
 }
 
 export function deserializeFormSection(
-  section: ISerializedFormSection
+  section: ISerializedFormSection,
+  validators: Record<string, Validation | AnyFn<Validation>>
 ): IFormSection {
   const mapping = {
     query:
@@ -382,7 +389,7 @@ export function deserializeFormSection(
   const groups = section.groups.map((group) => ({
     ...group,
     fields: group.fields.map((field) => {
-      return deserializeFormField(field)
+      return deserializeFormField(field, validators)
     })
   }))
 
@@ -393,8 +400,17 @@ export function deserializeFormSection(
   }
 }
 
-export function deserializeForm(form: ISerializedForm): IForm {
-  const sections = form.sections.map(deserializeFormSection)
+export function deserializeForm(
+  form: ISerializedForm,
+  countryConfigValidators: Record<string, Validation | AnyFn<Validation>>
+): IForm {
+  const sections = form.sections.map(
+    (section) =>
+      deserializeFormSection(section, {
+        ...countryConfigValidators,
+        ...validators
+      } as any) // TODO: Fix as any!
+  )
 
   return {
     ...form,

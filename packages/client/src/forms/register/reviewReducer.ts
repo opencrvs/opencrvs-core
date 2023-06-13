@@ -47,11 +47,11 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.FORMS_LOADED:
-      const { forms } = action.payload
+      const { forms, validators } = action.payload
 
-      const birth = deserializeForm(forms.birth)
-      const death = deserializeForm(forms.death)
-      const marriage = deserializeForm(forms.marriage)
+      const birth = deserializeForm(forms.birth, validators)
+      const death = deserializeForm(forms.death, validators)
+      const marriage = deserializeForm(forms.marriage, validators)
 
       const review = {
         id: ReviewSection.Review,
