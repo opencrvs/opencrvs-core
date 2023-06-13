@@ -16,7 +16,7 @@ import * as labels from '@client/forms/mappings/label'
 import * as responseTransformers from '@client/forms/mappings/response-transformers'
 import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
-import * as validators from '@opencrvs/client/src/utils/validate'
+import { getAllValidators } from '@client/forms/validation'
 
 import {
   IForm,
@@ -52,6 +52,7 @@ import {
   IQueryTemplateDescriptor
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
+import { COUNTRY_CONFIG_URL } from '@opencrvs/gateway/src/constants'
 
 /*
  * Some of the exports of mutations and queries are not functions
@@ -78,9 +79,9 @@ type QueryFunctionExports = FilterType<
 >[keyof typeof queries]
 
 type ValidatorFunctionExports = FilterType<
-  typeof validators,
+  ReturnType<typeof getAllValidators>,
   Validation | AnyFn<Validation>
->[keyof typeof validators]
+>[keyof ReturnType<typeof getAllValidators>]
 
 function isFactoryOperation(
   descriptor: IQueryDescriptor
