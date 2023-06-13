@@ -118,4 +118,4 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
-concurrently "yarn run start" "yarn run compose:deps"
+concurrently "yarn run start" "yarn run compose:deps" "bash setup-elastic-index.sh"
