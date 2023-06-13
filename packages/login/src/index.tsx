@@ -22,6 +22,8 @@ import { BrowserTracing } from '@sentry/tracing'
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
 
+const sentryDsn = process.env.SENTRY_DSN
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
@@ -33,10 +35,10 @@ if (
   window.location.hostname !== '127.0.0.1'
 ) {
   // setup error reporting using sentry
-  if (window.config.SENTRY) {
+  if (sentryDsn) {
     Sentry.init({
       environment: process.env.NODE_ENV,
-      dsn: window.config.SENTRY,
+      dsn: sentryDsn,
       integrations: [new BrowserTracing()],
       tracesSampleRate: 1.0
     })
@@ -48,7 +50,7 @@ if (
   }
 
   // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
+  if (sentryDsn && window.config.LOGROCKET) {
     Sentry.configureScope((scope) => {
       scope.addEventProcessor(async (event) => {
         if (!event.extra) {

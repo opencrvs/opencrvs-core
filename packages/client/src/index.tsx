@@ -26,6 +26,8 @@ import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
 
+const sentryDsn = process.env.SENTRY_DSN
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
@@ -43,7 +45,7 @@ if (
   window.location.hostname !== '127.0.0.1'
 ) {
   // setup error reporting using sentry
-  if (window.config.SENTRY) {
+  if (sentryDsn) {
     Sentry.init({
       release: import.meta.env.REACT_APP_VERSION,
       environment: import.meta.env.NODE_ENV,
@@ -52,7 +54,7 @@ if (
       // We recommend adjusting this value in production, or using tracesSampler
       // for finer control
       tracesSampleRate: 1.0,
-      dsn: window.config.SENTRY
+      dsn: sentryDsn
     })
   }
 
@@ -64,7 +66,7 @@ if (
   }
 
   // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
+  if (sentryDsn && window.config.LOGROCKET) {
     Sentry.configureScope((scope) => {
       scope.addEventProcessor(async (event) => {
         if (!event.extra) {
