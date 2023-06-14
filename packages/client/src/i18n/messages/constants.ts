@@ -827,6 +827,16 @@ const messagesToDefine = {
     defaultMessage: 'Matched to',
     description: 'table header for `Matched to` in record audit',
     id: 'constants.matchedTo'
+  },
+  formatWithTime: {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    description: 'Date format with time',
+    id: 'constants.formatWithTime'
+  },
+  format: {
+    defaultMessage: 'MMMM dd, yyyy',
+    description: 'Date format without time',
+    id: 'constants.format'
   }
 }
 
