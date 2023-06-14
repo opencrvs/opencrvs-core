@@ -35,7 +35,7 @@ interface ITableProps extends WrappedComponentProps {
   loading: boolean
   eventType?: Event
   base: IEstimationBase
-  data?: GQLMonthWiseEstimationMetric[] | GQLLocationWiseEstimationMetric[]
+  data?: GQLLocationWiseEstimationMetric[] | GQLMonthWiseEstimationMetric[]
   completenessRateTime: CompletenessRateTime
 }
 
@@ -64,8 +64,20 @@ const TableDiv = styled.div`
   overflow: auto;
 `
 
+function isLocationData(
+  data: GQLLocationWiseEstimationMetric[] | GQLMonthWiseEstimationMetric[]
+): data is GQLLocationWiseEstimationMetric[] {
+  return Array.isArray(data) && data.length > 0 && 'locationName' in data[0]
+}
+
+function isTimeData(
+  data: GQLLocationWiseEstimationMetric[] | GQLMonthWiseEstimationMetric[]
+): data is GQLMonthWiseEstimationMetric[] {
+  return Array.isArray(data) && data.length > 0 && 'within1Year' in data[0]
+}
+
 function CompletenessDataTableComponent(props: ITableProps) {
-  const { intl, loading, eventType, base } = props
+  const { intl, loading, eventType, base, data } = props
 
   // A dynamic list of fields and directions and in which priority order to sort them
   // user clicking on a sort arrow puts the field in front of the list
@@ -78,35 +90,44 @@ function CompletenessDataTableComponent(props: ITableProps) {
     }))
   )
 
-  const content =
-    base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
-      ? ((props.data || []) as GQLLocationWiseEstimationMetric[]).map(
-          (item) => ({
-            location: item.locationName,
-            totalRegistered: String(item.total),
-            registeredWithinTargetd: String(item[props.completenessRateTime]),
-            estimated: String(item.estimated),
-            completenessRate: `${Number(
-              (item[props.completenessRateTime] / item.estimated) * 100
-            ).toFixed(2)}%`
-          })
-        )
-      : base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
-      ? ((props.data || []) as GQLMonthWiseEstimationMetric[]).map((item) => ({
-          startTime: new Date(item.year, item.month),
-          month: formatLongDate(
-            new Date(item.year, item.month).toISOString(),
-            intl.locale,
-            'MMMM yyyy'
-          ),
-          totalRegistered: item.total,
-          registeredWithinTargetd: String(item[props.completenessRateTime]),
-          estimated: String(item.estimated),
-          completenessRate: `${Number(
-            (item[props.completenessRateTime] / item.estimated) * 100
-          ).toFixed(2)}%`
-        }))
-      : []
+  const generateContent = () => {
+    if (data && isLocationData(data)) {
+      const locationContent = data.map((item) => ({
+        location: item.locationName,
+        totalRegistered: String(item.total),
+        registeredWithinTargetd: String(item[props.completenessRateTime]),
+        estimated: String(item.estimated),
+        completenessRate: `${Number(
+          (item[props.completenessRateTime] / item.estimated) * 100
+        ).toFixed(2)}%`
+      }))
+
+      return locationContent
+    }
+
+    if (data && isTimeData(data)) {
+      const timeContent = data.map((item) => ({
+        startTime: new Date(item.year, item.month),
+        month: formatLongDate(
+          new Date(item.year, item.month).toISOString(),
+          intl.locale,
+          'MMMM yyyy'
+        ),
+        totalRegistered: item.total,
+        registeredWithinTargetd: String(item[props.completenessRateTime]),
+        estimated: String(item.estimated),
+        completenessRate: `${Number(
+          (item[props.completenessRateTime] / item.estimated) * 100
+        ).toFixed(2)}%`
+      }))
+
+      return timeContent
+    }
+
+    return []
+  }
+
+  const content = generateContent()
 
   function toggleSort(key: keyof SortMap) {
     const existingItemInSortOrder = sortOrder.find((item) => item.key === key)!

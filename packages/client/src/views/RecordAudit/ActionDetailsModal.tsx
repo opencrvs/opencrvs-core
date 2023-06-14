@@ -374,7 +374,7 @@ export const ActionDetailsModalListTable = ({
 
     const name = certificate.collector?.individual?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.individual.name,
           window.config.LANGUAGES
         )
       : {}
@@ -619,7 +619,7 @@ export const ActionDetailsModal = ({
   } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null

@@ -23,10 +23,7 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import {
-  GQLRegStatus,
-  GQLRegWorkflow
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
@@ -42,7 +39,7 @@ export function transformStatusData(
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   transformedData[sectionId] = {
     ...transformedData[sectionId],
@@ -104,11 +101,7 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].status) {
-    transformStatusData(
-      transformedData,
-      queryData[sectionId].status as GQLRegWorkflow[],
-      sectionId
-    )
+    transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
 
   if (queryData[sectionId].informantsSignature) {
@@ -382,11 +375,11 @@ export const registrationLocationUserTransformer = (
   targetFieldName?: string,
   offlineData?: IOfflineData
 ) => {
-  const statusData = queryData['registration'].status as GQLRegWorkflow[]
+  const statusData: GQLRegWorkflow[] = queryData['registration'].status
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   if (!registrationStatus?.office || !offlineData) {
     transformedData[targetSectionId || sectionId][
