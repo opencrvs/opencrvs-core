@@ -34,12 +34,6 @@ const birthBulletListItemsToDefine: MessageDescriptor[] = [
     defaultMessage:
       'Once I complete the declaration, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for birth'
-  },
-  {
-    id: 'register.eventInfo.birth.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
-    description: 'Event info bullet list item for birth'
   }
 ]
 
@@ -55,12 +49,6 @@ const deathBulletListItemsToDefine: MessageDescriptor[] = [
     defaultMessage:
       'Once I complete the declaration, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for death'
-  },
-  {
-    id: 'register.eventInfo.death.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
-    description: 'Event info bullet list item for death'
   }
 ]
 
@@ -75,12 +63,6 @@ const marriageBulletListItemsToDefine: MessageDescriptor[] = [
     id: 'register.eventInfo.marriage.listItem1',
     defaultMessage:
       'Once I complete the declaration, it will be sent to the registration office for review.',
-    description: 'Event info bullet list item for marriage'
-  },
-  {
-    id: 'register.eventInfo.marriage.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
     description: 'Event info bullet list item for marriage'
   }
 ]
