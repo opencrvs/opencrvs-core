@@ -348,7 +348,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: 'HEALTHCARE_WORKER'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -401,7 +401,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: 'HEALTHCARE_WORKER'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -435,6 +435,14 @@ describe('Registration type resolvers', () => {
                     {
                       system: 'http://opencrvs.org/specs/roles',
                       code: 'LOCAL_REGISTRAR'
+                    }
+                  ]
+                },
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: '[{"label":"Local Registrar","lang":"en"},{"label":"Registraire local","lang":"fr"}]'
                     }
                   ]
                 }

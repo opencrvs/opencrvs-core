@@ -192,10 +192,10 @@ describe('Registrations List test', () => {
       component,
       '#month-label'
     )
-    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('November-2022')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('November 2022')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('February-2022')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('February 2022')
   })
 })

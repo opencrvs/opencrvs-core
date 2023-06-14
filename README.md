@@ -69,7 +69,7 @@ Dependencies are required. Ensure you have satisfied all the following requireme
 
 ## Install OpenCRVS
 
-The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland". To deploy OpenCRVS onto a publicly accessible server, follow [these instructions](https://github.com/opencrvs/opencrvs-core/tree/develop/infrastructure/server-setup).
+The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland". To deploy OpenCRVS onto a publicly accessible server, follow [these instructions](https://github.com/opencrvs/opencrvs-farajaland/tree/develop/infrastructure/server-setup).
 
 1. Check you have installed all the dependencies. See above.
 2. Run `git clone https://github.com/opencrvs/opencrvs-core.git`
@@ -220,7 +220,7 @@ We want to see OpenCRVS implemented across the world. We can’t do this alone. 
 
 ## Contributing
 
-You may view/add issues here: https://github.com/opencrvs/opencrvs-core/issues
+You may view or add issues here: https://github.com/opencrvs/opencrvs-core/issues
 
 To contribute code, please review the CONTRIBUTING.md file https://github.com/opencrvs/opencrvs-core/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
 

@@ -262,7 +262,7 @@ export const identityToNidVerificationFieldTransformer = (
     sectionId,
     field
   )
-  const existingIdentity = queryData[sectionId].identifier?.find(
+  const existingIdentity = queryData[sectionId]?.identifier?.find(
     (identity: fhir.Identifier) =>
       (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
   )

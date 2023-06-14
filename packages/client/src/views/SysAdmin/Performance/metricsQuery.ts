@@ -47,7 +47,6 @@ export const PERFORMANCE_METRICS = gql`
         maleEstimation
         femaleEstimation
         locationId
-        estimationYear
         locationLevel
       }
       results {

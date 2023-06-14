@@ -218,8 +218,8 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -514,7 +514,6 @@ input NotificationInput {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
 }
 
 input BirthRegistrationInput {
@@ -888,7 +887,6 @@ type Estimation {
   maleEstimation: Int!
   femaleEstimation: Int!
   locationId: String!
-  estimationYear: Int!
   locationLevel: String!
 }
 
