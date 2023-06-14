@@ -19,13 +19,14 @@ import {
 import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import format from '@client/utils/date-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED, ISSUED } from '@client/utils/constants'
 import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages/constants'
 import { Summary } from '@opencrvs/components/lib/Summary'
+import { camelCase } from 'lodash'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -58,7 +59,9 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
-  let informant = getCaptitalizedWord(declaration?.informant)
+  let informant = declaration?.informant
+    ? intl.formatMessage(dynamicConstantsMessages[`${declaration?.informant}`])
+    : ''
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
@@ -154,7 +157,7 @@ export const GetDeclarationInfo = ({
             (key === 'dateOfBirth' ||
             key === 'dateOfDeath' ||
             key === 'dateOfMarriage'
-              ? format(new Date(value), 'MMMM dd, yyyy')
+              ? formatLongDate(value, intl.locale, 'dd MMM yyyy')
               : value)
 
           const message =
