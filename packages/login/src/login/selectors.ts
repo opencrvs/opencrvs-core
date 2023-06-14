@@ -25,8 +25,10 @@ export const getSubmissionError = (
 export const getErrorCode = (store: IStoreState): LoginState['errorCode'] =>
   getKey(store, 'errorCode')
 
-export const getResentSMS = (store: IStoreState): LoginState['resentSMS'] =>
-  getKey(store, 'resentSMS')
+export const getResentAuthenticationCode = (
+  store: IStoreState
+): LoginState['resentAuthenticationCode'] =>
+  getKey(store, 'resentAuthenticationCode')
 
 export const getsubmitting = (store: IStoreState): LoginState['submitting'] =>
   getKey(store, 'submitting')

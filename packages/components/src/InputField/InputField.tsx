@@ -116,6 +116,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     const children = React.Children.map(
       this.props.children,
       (node: React.ReactElement) => {
+        if (!node) return
         return isDomElement(node.type)
           ? node
           : React.cloneElement(node, { hideBorder })

@@ -70,6 +70,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   )
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
+  const email = (userDetails && (userDetails.email as string)) || ''
   const language = useSelector(getLanguage)
   const role = userDetails && getUserRole(language, userDetails.role)
   const primaryOffice =
@@ -107,6 +108,15 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       id: 'UserPhone',
       label: intl.formatMessage(constantsMessages.labelPhone),
       value: mobile,
+      action: {
+        label: intl.formatMessage(buttonMessages.change),
+        disabled: true
+      }
+    },
+    {
+      id: 'Email',
+      label: intl.formatMessage(constantsMessages.labelEmail),
+      value: email,
       action: {
         label: intl.formatMessage(buttonMessages.change),
         disabled: true
