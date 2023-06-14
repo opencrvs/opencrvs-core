@@ -225,9 +225,9 @@ describe('User list tests', () => {
     })
 
     describe('when there is a result from query', () => {
-      userMutations.resendSMSInvite = vi.fn()
-      userMutations.usernameSMSReminderSend = vi.fn()
-      userMutations.sendResetPasswordSMS = vi.fn()
+      userMutations.resendInvite = vi.fn()
+      userMutations.usernameReminderSend = vi.fn()
+      userMutations.sendResetPasswordInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
@@ -387,9 +387,9 @@ describe('User list tests', () => {
         expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
       })
 
-      it('clicking on menu options Resend SMS invite sends invite', async () => {
-        ;(userMutations.resendSMSInvite as Mock).mockResolvedValueOnce({
-          data: { resendSMSInvite: 'true' }
+      it('clicking on menu options Resend invite sends invite', async () => {
+        ;(userMutations.resendInvite as Mock).mockResolvedValueOnce({
+          data: { resendInvite: 'true' }
         })
         const toggleButtonElement = await waitForElement(
           component,
@@ -401,15 +401,15 @@ describe('User list tests', () => {
           component,
           '#user-item-2-menuItem3'
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
         await waitForElement(component, '#resend_invite_success')
       })
 
-      it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
-        ;(userMutations.resendSMSInvite as Mock).mockRejectedValueOnce(
+      it('clicking on menu options Resend invite shows error if any submission error', async () => {
+        ;(userMutations.resendInvite as Mock).mockRejectedValueOnce(
           new Error('Something went wrong')
         )
         const toggleButtonElement = await waitForElement(
@@ -422,7 +422,7 @@ describe('User list tests', () => {
           component,
           '#user-item-2-menuItem3'
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
@@ -468,8 +468,8 @@ describe('User list tests', () => {
       })
 
       it('will send username after clicking on send button shows on modal', async () => {
-        ;(userMutations.usernameSMSReminderSend as Mock).mockResolvedValueOnce({
-          data: { usernameSMSReminder: 'iModupsy' }
+        ;(userMutations.usernameReminderSend as Mock).mockResolvedValueOnce({
+          data: { usernameReminder: 'iModupsy' }
         })
         const toggleButtonElement = await waitForElement(
           component,
@@ -497,7 +497,7 @@ describe('User list tests', () => {
       })
 
       it('clicking username reminder send button shows error if any submission error', async () => {
-        ;(userMutations.usernameSMSReminderSend as Mock).mockRejectedValueOnce(
+        ;(userMutations.usernameReminderSend as Mock).mockRejectedValueOnce(
           new Error('Something went wrong')
         )
         const toggleButtonElement = await waitForElement(
@@ -561,8 +561,8 @@ describe('User list tests', () => {
       })
 
       it('will reset password after clicking on send button shows on modal', async () => {
-        ;(userMutations.sendResetPasswordSMS as Mock).mockResolvedValueOnce({
-          data: { resetPasswordSMS: 'sadman.anik' }
+        ;(userMutations.sendResetPasswordInvite as Mock).mockResolvedValueOnce({
+          data: { resetPasswordInvite: 'sadman.anik' }
         })
         const toggleButtonElement = await waitForElement(
           component,
@@ -574,6 +574,7 @@ describe('User list tests', () => {
           component,
           '#user-item-1-menuItem2'
         )
+
         expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
         menuOptionButton.hostNodes().simulate('click')
         component.update()
@@ -588,7 +589,7 @@ describe('User list tests', () => {
       })
 
       it('clicking reset password send button shows error if any submission error', async () => {
-        ;(userMutations.sendResetPasswordSMS as Mock).mockRejectedValueOnce(
+        ;(userMutations.sendResetPasswordInvite as Mock).mockRejectedValueOnce(
           new Error('Something went wrong')
         )
         const toggleButtonElement = await waitForElement(

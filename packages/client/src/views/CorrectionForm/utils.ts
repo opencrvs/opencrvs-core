@@ -278,7 +278,7 @@ export function renderSelectOrRadioLabel(
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
@@ -304,8 +304,12 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId] || {
+          name: locationId,
+          alias: locationId
+        }
       } else {
         selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
       }
@@ -386,11 +390,15 @@ export const renderValue = (
     [
       'statePrimary',
       'districtPrimary',
+      'cityUrbanOptionPrimary',
       'internationalStatePrimary',
       'internationalDistrictPrimary',
+      'internationalCityPrimary',
       'stateSecondary',
       'districtSecondary',
+      'cityUrbanOptionSecondary',
       'internationalStateSecondary',
+      'internationalCitySecondary',
       'internationalDistrictSecondary'
     ].includes(field.name)
   ) {

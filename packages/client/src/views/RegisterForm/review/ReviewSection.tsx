@@ -71,6 +71,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
+  NID_VERIFICATION_BUTTON,
   SUBSECTION,
   WARNING
 } from '@client/forms'
@@ -145,6 +146,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   SignatureGenerator,
@@ -248,6 +250,9 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
+const StyledAlert = styled(Alert)`
+  margin-top: 24px;
+`
 const Title = styled.div`
   display: flex;
   align-items: center;
@@ -326,7 +331,7 @@ function renderSelectOrRadioLabel(
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
@@ -352,9 +357,11 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation =
-          offlineCountryConfig[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = offlineCountryConfig[OFFLINE_LOCATIONS_KEY][
+          locationId
+        ] || { name: locationId, alias: locationId }
       } else {
         selectedLocation =
           offlineCountryConfig[OFFLINE_FACILITIES_KEY][locationId]
@@ -438,11 +445,15 @@ const renderValue = (
     [
       'statePrimary',
       'districtPrimary',
+      'cityUrbanOptionPrimary',
       'internationalStatePrimary',
       'internationalDistrictPrimary',
+      'internationalCityPrimary',
       'stateSecondary',
       'districtSecondary',
+      'cityUrbanOptionSecondary',
       'internationalStateSecondary',
+      'internationalCitySecondary',
       'internationalDistrictSecondary'
     ].includes(field.name) &&
     isOriginalData
@@ -560,6 +571,25 @@ const renderValue = (
       (location) => location.id === value
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
+  }
+  if (field.type === NID_VERIFICATION_BUTTON) {
+    return (
+      <VerificationButton
+        onClick={() => {}}
+        labelForVerified={intl.formatMessage(
+          formMessageDescriptors.nidVerified
+        )}
+        labelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerified
+        )}
+        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
+        reviewLabelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerifiedReviewSection
+        )}
+        status={value ? 'verified' : 'unverified'}
+        useAsReviewLabel={true}
+      />
+    )
   }
 
   if (typeof value === 'boolean') {
@@ -952,7 +982,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     return (
       !conditionalActions.includes('hide') &&
-      !conditionalActions.includes('disable') &&
       !conditionalActions.includes('hideInPreview')
     )
   }
@@ -1606,7 +1635,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    offlineCountryConfiguration: IOfflineData,
+    declaration: IDeclaration
   ) => {
     const { intl, draft } = this.props
     const overriddenFields =
@@ -1629,6 +1660,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
+            const fieldDisabled = getConditionalActionsForField(
+              field,
+              draft.data[section.id] || {},
+              offlineCountryConfiguration,
+              draft.data
+            )
+
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
                   section,
@@ -1653,7 +1691,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   field,
                   errorsOnFields
                 )
-
+            if (fieldDisabled.includes('disable') && tempItem?.action) {
+              tempItem.action.disabled = true
+            }
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
                 section,
@@ -1777,7 +1817,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
-      errorsOnFields
+      errorsOnFields,
+      offlineCountryConfiguration,
+      declaration
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
@@ -1935,13 +1977,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                 </Value>
                               }
                               actions={
-                                <LinkButton
-                                  id={item.action.id}
-                                  disabled={item.action.disabled}
-                                  onClick={item.action.handler}
-                                >
-                                  {item.action.label}
-                                </LinkButton>
+                                !item?.action?.disabled && (
+                                  <LinkButton
+                                    id={item.action.id}
+                                    disabled={item.action.disabled}
+                                    onClick={item.action.handler}
+                                  >
+                                    {item.action.label}
+                                  </LinkButton>
+                                )
                               }
                             />
                           )
@@ -1975,11 +2019,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   !viewRecord &&
                   getSignature(declaration?.event as Event)}
                 {totalFileSizeExceeded && (
-                  <Alert type="warning">
+                  <StyledAlert type="warning">
                     {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
                       fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                     })}
-                  </Alert>
+                  </StyledAlert>
                 )}
                 {viewRecord || isDuplicate ? null : (
                   <>

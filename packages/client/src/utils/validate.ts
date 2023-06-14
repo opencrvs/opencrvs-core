@@ -201,6 +201,10 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
 
 export const emailAddressFormat: Validation = (value: IFormFieldValue) => {
   const cast = value as string
+  if (cast === '') {
+    return
+  }
+
   return cast && isAValidEmailAddressFormat(cast)
     ? undefined
     : {
@@ -344,6 +348,12 @@ export const checkBirthDate =
         }
   }
 
+const getBirthDate = (
+  isExactDateOfBirthUnknown: boolean,
+  date: string,
+  age: string
+) => (isExactDateOfBirthUnknown ? convertAgeToDate(age) : date)
+
 export const checkMarriageDate =
   (minAge: number): Validation =>
   (value: IFormFieldValue, drafts) => {
@@ -361,10 +371,23 @@ export const checkMarriageDate =
         message: messages.dateFormat
       }
     }
+
     const groomDOB =
-      drafts && drafts.groom && String(drafts.groom.groomBirthDate)
+      drafts &&
+      drafts.groom &&
+      getBirthDate(
+        Boolean(drafts.groom.exactDateOfBirthUnknown),
+        String(drafts.groom.groomBirthDate),
+        String(drafts.groom.ageOfIndividualInYears)
+      )
     const brideDOB =
-      drafts && drafts.bride && String(drafts.bride.brideBirthDate)
+      drafts &&
+      drafts.bride &&
+      getBirthDate(
+        Boolean(drafts.bride.exactDateOfBirthUnknown),
+        String(drafts.bride.brideBirthDate),
+        String(drafts.bride.ageOfIndividualInYears)
+      )
 
     if (!groomDOB || !brideDOB) {
       return undefined

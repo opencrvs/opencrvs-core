@@ -44,7 +44,9 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
-  IContactPoint
+  IContactPoint,
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -56,8 +58,7 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData,
-  LocationType
+  IOfflineData
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -66,7 +67,6 @@ import {
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
-import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
@@ -154,6 +154,18 @@ export const internationaliseFieldObject = (
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
+    )
+  }
+
+  if (base.type === NID_VERIFICATION_BUTTON) {
+    ;(base as any).labelForVerified = intl.formatMessage(
+      (field as INidVerificationButton).labelForVerified
+    )
+    ;(base as any).labelForUnverified = intl.formatMessage(
+      (field as INidVerificationButton).labelForUnverified
+    )
+    ;(base as any).labelForOffline = intl.formatMessage(
+      (field as INidVerificationButton).labelForOffline
     )
   }
 
@@ -546,6 +558,7 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
+
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
@@ -657,15 +670,19 @@ export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
       : callingCountries[alpha3CountryCode].alpha2
 
   const phoneUtil = PhoneNumberUtil.getInstance()
-  const number = phoneUtil.parse(phone, countryCode)
 
-  return (
-    phoneUtil
-      .format(number, PhoneNumberFormat.INTERNATIONAL)
-      // libphonenumber adds spaces and dashes to phone numbers,
-      // which we do not want to keep for now
-      .replace(/[\s-]/g, '')
-  )
+  try {
+    const number = phoneUtil.parse(phone, countryCode)
+    return (
+      phoneUtil
+        .format(number, PhoneNumberFormat.INTERNATIONAL)
+        // libphonenumber adds spaces and dashes to phone numbers,
+        // which we do not want to keep for now
+        .replace(/[\s-]/g, '')
+    )
+  } catch (error) {
+    return phone
+  }
 }
 
 export const isRadioGroupWithNestedField = (

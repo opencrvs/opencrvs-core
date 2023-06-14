@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_MONGO_URL, PRODUCTION } from '@metrics/constants'
+import { HEARTH_MONGO_URL, PRODUCTION, QA_ENV } from '@metrics/constants'
 import { logger } from '@metrics/logger'
 import { subMinutes } from 'date-fns'
 import { MongoClient } from 'mongodb'
@@ -72,7 +72,7 @@ export async function refresh() {
 
 async function refreshPerformanceMaterialisedViews(client: MongoClient) {
   const db = client.db()
-  const REFRESH_AFTER_IN_MINUTE = PRODUCTION ? 1440 : 5
+  const REFRESH_AFTER_IN_MINUTE = PRODUCTION && !QA_ENV ? 1440 : 5
   const lastUpdatedAt = subMinutes(
     new Date(),
     REFRESH_AFTER_IN_MINUTE
@@ -694,7 +694,6 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$state' },
         {
           $project: {
-            _id: '$id',
             gender: '$child.gender',
             reason: '$reason.text',
             extensions: '$extensions',
@@ -809,7 +808,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
+                  const date = new Date(row.cbr.year, 0, 1)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
@@ -818,7 +817,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                   }
                   const totalDays = daysInYear(year)
                   return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
+                    if(index !== 0){
+                      date.setDate(date.getDate() + 1)
+                    }
                     return {
                       date: date.toISOString(),
                       estimatedNumberOfBirths:
