@@ -28,7 +28,7 @@ export const up = async (db, client) => {
             },
             // Marriage registration should be disabled in production. This is because configurable registration offices, advanced search, performance analytics and dashboard data for marriage is still in development as of OpenCRVS v1.3.
             // Marriage registration is included in this release as a work-in-progress and will be developed further using an appropriate country implementation. For more information, or to request support to develop marriage for your country, email us at team@opencrvs.org
-            MARRIAGE_REGISTRATION: true
+            MARRIAGE_REGISTRATION: false
           }
         }
       )
@@ -47,7 +47,7 @@ export const down = async (db, client) => {
         .collection('configs')
         .updateMany(
           {},
-          { $unset: { MARRIAGE: '', MARRIAGE_REGISTRATION: false } }
+          { $unset: { MARRIAGE: '', MARRIAGE_REGISTRATION: '' } }
         )
     })
   } finally {
