@@ -25,7 +25,11 @@ import { IApplicationConfigPayload } from '@gateway/features/application/type-re
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async updateApplicationConfig(_, { applicationConfig = {} }, authHeader) {
+    async updateApplicationConfig(
+      _,
+      { applicationConfig = {} },
+      { headers: authHeader }
+    ) {
       // Only natlsysadmin should be able to update application config
 
       if (!hasScope(authHeader, 'natlsysadmin')) {

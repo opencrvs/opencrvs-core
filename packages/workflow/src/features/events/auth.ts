@@ -22,7 +22,7 @@ function getEventToScopeMap(event: Events) {
     case Events.BIRTH_NEW_DEC:
     case Events.DEATH_NEW_DEC:
     case Events.MARRIAGE_NEW_DEC:
-      return [USER_SCOPE.DECLARE, USER_SCOPE.REGISTER]
+      return [USER_SCOPE.DECLARE, USER_SCOPE.REGISTER, USER_SCOPE.VALIDATE]
 
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:

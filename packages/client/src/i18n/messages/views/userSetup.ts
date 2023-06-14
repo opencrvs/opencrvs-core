@@ -64,6 +64,7 @@ interface IUserSetupMessages
   loggedInAuditAction: MessageDescriptor
   loggedOutAuditAction: MessageDescriptor
   phoneNumberChangedAuditAction: MessageDescriptor
+  emailAddressChangedAuditAction: MessageDescriptor
   passwordChangedAuditAction: MessageDescriptor
   reactivateAuditAction: MessageDescriptor
   deactivateAuditAction: MessageDescriptor
@@ -79,6 +80,8 @@ interface IUserSetupMessages
   reInstatedInReviewAuditAction: MessageDescriptor
   reInStatedRejectedAuditAction: MessageDescriptor
   sentForApprovalAuditAction: MessageDescriptor
+  markedAsDuplicate: MessageDescriptor
+  markedAsNotDuplicate: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -118,7 +121,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'settings.user.label.nameBN'
   },
   labelEnglishName: {
-    defaultMessage: 'English name',
+    defaultMessage: 'Full name',
     id: 'settings.user.label.nameEN'
   },
   match: {
@@ -340,6 +343,11 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for user change phoneNumber',
     id: 'user.profile.auditList.phoneNumberChanged'
   },
+  emailAddressChangedAuditAction: {
+    defaultMessage: 'Email Address changed',
+    description: 'Description for user change email',
+    id: 'user.profile.auditList.emailAddressChanged'
+  },
   passwordChangedAuditAction: {
     defaultMessage: 'Changed Password',
     description: 'Description for user change password',
@@ -418,6 +426,16 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'Description for sending registration for approval audit action',
     id: 'user.profile.auditList.sentForApproval'
+  },
+  markedAsDuplicate: {
+    defaultMessage: 'Marked as duplicate',
+    description: 'Description for marked as duplicate in audit action',
+    id: 'user.profile.auditList.markedAsDuplicate'
+  },
+  markedAsNotDuplicate: {
+    defaultMessage: 'Marked as not duplicate',
+    description: 'Description for marked as not duplicate in audit action',
+    id: 'user.profile.auditList.markedAsNotDuplicate'
   }
 }
 

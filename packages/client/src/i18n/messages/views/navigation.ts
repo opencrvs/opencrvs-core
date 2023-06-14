@@ -146,6 +146,31 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Ready to issue',
     description: 'Ready to issue label in navigation',
     id: 'navigation.readyToIssue'
+  },
+  analytic: {
+    defaultMessage: 'Analytics',
+    description: 'Analytic Group',
+    id: 'navigation.analytic'
+  },
+  statistics: {
+    defaultMessage: 'Statistics',
+    description: 'Statistics Dashboard Section',
+    id: 'navigation.performanceStatistics'
+  },
+  leaderboards: {
+    defaultMessage: 'Leaderboards',
+    description: 'Leaderboards Dashboard Section',
+    id: 'navigation.leaderboards'
+  },
+  dashboard: {
+    defaultMessage: 'Dashboard',
+    description: 'Dashboard Section',
+    id: 'navigation.dashboard'
+  },
+  report: {
+    defaultMessage: 'Report',
+    description: 'Report Dashboard Section',
+    id: 'navigation.report'
   }
 }
 

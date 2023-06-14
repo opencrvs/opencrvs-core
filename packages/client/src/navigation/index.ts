@@ -56,6 +56,9 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_STATISTICS,
+  PERFORMANCE_DASHBOARD,
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
@@ -200,6 +203,16 @@ export function goToInformantNotification() {
 
 export function goToVSExport() {
   return push(VS_EXPORTS)
+}
+
+export function goToPerformanceStatistics() {
+  return push(PERFORMANCE_STATISTICS, { isNavigatedInsideApp: true })
+}
+export function goToLeaderBoardsView() {
+  return push(PERFORMANCE_LEADER_BOARDS, { isNavigatedInsideApp: true })
+}
+export function goToDashboardView() {
+  return push(PERFORMANCE_DASHBOARD, { isNavigatedInsideApp: true })
 }
 
 export function goToAdvancedSearch() {
@@ -512,11 +525,13 @@ export function goToCompletenessRates(
 export function goToFieldAgentList(
   timeStart: string,
   timeEnd: string,
-  locationId?: string
+  locationId?: string,
+  event?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
     search: stringify({
+      event,
       locationId,
       timeStart,
       timeEnd

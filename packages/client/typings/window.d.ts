@@ -54,9 +54,10 @@ interface Window {
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
-    MINIO_URL: string
+    MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
+    USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
@@ -70,6 +71,9 @@ interface Window {
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
     ADMIN_LEVELS: number
+    REGISTRATIONS_DASHBOARD_URL: string
+    STATISTICS_DASHBOARD_URL: string
+    LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
 }

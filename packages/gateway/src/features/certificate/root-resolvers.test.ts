@@ -25,21 +25,24 @@ beforeEach(() => {
 describe('Certificate root resolvers', () => {
   describe('getCertificateSVG()', () => {
     it('returns a certificate object', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          id: 'ba7022f0ff4822',
-          svgCode: mockCertificate,
-          svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-          user: 'jonathan.campbell',
-          event: 'death',
-          status: 'ACTIVE',
-          creationDate: 1559054406433
-        })
-      )
+      fetch
+        .once(
+          JSON.stringify({
+            id: 'ba7022f0ff4822',
+            svgCode: 'ocrvs/1234-4567.svg',
+            svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+            user: 'jonathan.campbell',
+            event: 'death',
+            status: 'ACTIVE',
+            creationDate: 1559054406433
+          })
+        )
+        .once(JSON.stringify({ presignedURL: 'presigend-url' }))
 
       const certificateSVG = await resolvers.Query.getCertificateSVG(
         {},
-        { user: 'jonathan.campbell' }
+        { user: 'jonathan.campbell' },
+        { headers: undefined }
       )
 
       expect(certificateSVG).toBeDefined()
@@ -48,32 +51,38 @@ describe('Certificate root resolvers', () => {
 
   describe('getActiveCertificatesSVG()', () => {
     it('returns active certificates array for birth and death event', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          {
-            _d: 'ba7022f0ff4822',
-            svgCode: mockCertificate,
-            svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-            user: 'jonathan.campbell',
-            event: 'birth',
-            status: 'ACTIVE',
-            creationDate: 1559054406433
-          },
-          {
-            id: 'ca7022fafd4842',
-            svgCode: mockCertificate,
-            svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-            user: 'jonathan.campbell',
-            event: 'death',
-            status: 'ACTIVE',
-            creationDate: 1559054406433
-          }
-        ])
-      )
+      fetch
+        .once(
+          JSON.stringify([
+            {
+              _d: 'ba7022f0ff4822',
+              svgCode: 'ocrvs/1234-4567.svg',
+              svgFilename:
+                'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+              user: 'jonathan.campbell',
+              event: 'birth',
+              status: 'ACTIVE',
+              creationDate: 1559054406433
+            },
+            {
+              id: 'ca7022fafd4842',
+              svgCode: 'ocrvs/7809-4567.svg',
+              svgFilename:
+                'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+              user: 'jonathan.campbell',
+              event: 'death',
+              status: 'ACTIVE',
+              creationDate: 1559054406433
+            }
+          ])
+        )
+        .once(JSON.stringify({ presignedURL: 'presigend-url' }))
+        .once(JSON.stringify({ presignedURL: 'presigend-url-2' }))
 
       const certificateSVG = await resolvers.Query.getActiveCertificatesSVG(
         {},
-        { user: 'jonathan.campbell' }
+        { user: 'jonathan.campbell' },
+        { headers: undefined }
       )
 
       expect(certificateSVG).toBeDefined()
@@ -121,9 +130,10 @@ describe('Certificate root resolvers', () => {
     }
 
     it('creates certificate by natlsysadmin', async () => {
-      fetch.mockResponseOnce(
+      fetch.once(JSON.stringify({ refUrl: 'ocrvs/1234-5678.svg' })).once(
         JSON.stringify({
-          user: 'jonathan.campbell'
+          ...certificateSVG,
+          svgCode: 'ocrvs/1234-5678.svg'
         }),
         { status: 201 }
       )
@@ -131,11 +141,12 @@ describe('Certificate root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateCertificateSVG(
         {},
         { certificateSVG },
-        authHeaderNatlSYSAdmin
+        { headers: authHeaderNatlSYSAdmin }
       )
 
       expect(response).toEqual({
-        user: 'jonathan.campbell'
+        ...certificateSVG,
+        svgCode: 'ocrvs/1234-5678.svg'
       })
     })
 
@@ -151,7 +162,7 @@ describe('Certificate root resolvers', () => {
         resolvers.Mutation.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError(
         'Create or update certificate is only allowed for natlsysadmin'
@@ -159,7 +170,7 @@ describe('Certificate root resolvers', () => {
     })
 
     it('should throw error when /{action}certificate sends anything but 201', async () => {
-      fetch.mockResponseOnce(
+      fetch.once(JSON.stringify({ refUrl: 'ocrvs/1234-5678.svg' })).once(
         JSON.stringify({
           statusCode: '201'
         }),
@@ -170,7 +181,7 @@ describe('Certificate root resolvers', () => {
         resolvers.Mutation.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
-          authHeaderNatlSYSAdmin
+          { headers: authHeaderNatlSYSAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on config service. Couldn't create certificate"

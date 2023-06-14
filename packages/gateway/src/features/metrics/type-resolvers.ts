@@ -37,12 +37,16 @@ export const typeResolvers: GQLResolver = {
     }
   },
   EventMetricsByLocation: {
-    async location({ location }, _, authHeader) {
+    async location({ location }, _, { headers: authHeader }) {
       return await fetchFHIR(`/${location}`, authHeader)
     }
   },
   EventMetricsByRegistrar: {
-    async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
+    async registrarPractitioner(
+      { registrarPractitioner },
+      _,
+      { headers: authHeader }
+    ) {
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({

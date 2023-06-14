@@ -19,6 +19,7 @@ import { userMessages } from '@client/i18n/messages'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { SystemRoleType } from '@client/utils/gateway'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 
 export enum UserStatus {
   ACTIVE,
@@ -86,6 +87,7 @@ const AuditDescriptionMapping: {
   LOGGED_IN: messages.loggedInAuditAction,
   LOGGED_OUT: messages.loggedOutAuditAction,
   PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
+  EMAIL_ADDRESS_CHANGED: messages.emailAddressChangedAuditAction,
   PASSWORD_CHANGED: messages.passwordChangedAuditAction,
   DEACTIVATE: messages.deactivateAuditAction,
   REACTIVATE: messages.reactivateAuditAction,
@@ -100,7 +102,19 @@ const AuditDescriptionMapping: {
   REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction,
+  MARKED_AS_DUPLICATE: messages.markedAsDuplicate,
+  MARKED_AS_NOT_DUPLICATE: messages.markedAsNotDuplicate
+}
+
+export const getAddressName = (
+  offlineCountryConfig: IOfflineData,
+  { name, partOf }: ILocation
+): string => {
+  const parentLocationId = partOf.split('/')[1]
+  if (parentLocationId === '0') return name
+  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
+  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
 export function getUserAuditDescription(

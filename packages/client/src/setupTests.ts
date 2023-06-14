@@ -35,7 +35,7 @@ const config = {
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
-  MINIO_URL: 'http://localhost:3535',
+  MINIO_BUCKET: 'ocrvs',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -47,7 +47,7 @@ const config = {
       DELAYED: 0
     }
   },
-  COUNTRY: 'bgd',
+  COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
@@ -61,6 +61,7 @@ const config = {
   },
   LANGUAGES: 'en,bn,fr',
   AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
+  USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
@@ -232,7 +233,11 @@ beforeEach(() => {
 vi.mock('lodash/debounce', () => ({
   default: vi.fn().mockImplementation((arg) => arg)
 }))
-vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
+
+vi.mock('./utils', async () => ({
+  useOnlineStatus: () => true,
+  isNavigatorOnline: () => true
+}))
 
 vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
@@ -240,4 +245,13 @@ vi.mock('react-router', async () => ({
     event: 'birth',
     section: 'child'
   }))
+}))
+
+vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
+  ...((await vi.importActual(
+    '@client/views/OIDPVerificationCallback/utils'
+  )) as any),
+  useExtractCallBackState: vi.fn(),
+  useQueryParams: vi.fn(),
+  useCheckNonce: vi.fn()
 }))

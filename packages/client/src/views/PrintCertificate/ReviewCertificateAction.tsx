@@ -29,7 +29,6 @@ import {
 } from '@opencrvs/client/src/declarations'
 import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
@@ -130,6 +129,7 @@ class ReviewCertificateActionComponent extends React.Component<
             certificatePdf: svg
           })
         },
+        this.props.state,
         this.props.countries
       )
     }
@@ -200,6 +200,7 @@ class ReviewCertificateActionComponent extends React.Component<
       draft,
       this.props.userDetails,
       this.props.offlineCountryConfig,
+      this.props.state,
       this.props.countries
     )
     this.props.modifyDeclaration(draft)
@@ -224,6 +225,7 @@ class ReviewCertificateActionComponent extends React.Component<
   render = () => {
     const { intl, scope } = this.props
     const isPrintInAdvanced = isCertificateForPrintInAdvance(this.props.draft)
+    const isEventMarriage = this.props.draft.event === Event.Marriage
 
     /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
@@ -265,7 +267,7 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            {hasRegisterScope(scope) && (
+            {!isEventMarriage && hasRegisterScope(scope) && (
               <DangerButton
                 onClick={() =>
                   this.props.goToCertificateCorrection(
@@ -287,10 +289,15 @@ class ReviewCertificateActionComponent extends React.Component<
               : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
           }
           actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+            <CustomTertiaryButton
+              key="close-modal"
+              onClick={this.toggleModal}
+              id="close-modal"
+            >
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton
+              key="print-certificate"
               onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >
@@ -371,7 +378,8 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
     offlineCountryConfig,
-    registerForm: getEventRegisterForm(state, event)
+    registerForm: getEventRegisterForm(state, event),
+    state
   }
 }
 

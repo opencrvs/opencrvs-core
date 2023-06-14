@@ -18,7 +18,6 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { LANG_EN } from '@client/utils/constants'
@@ -105,15 +104,15 @@ function UserAuditActionModalComponent(
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
-    <TertiaryButton id="modal-cancel" onClick={onClose}>
+    <TertiaryButton key="modal-cancel" id="modal-cancel" onClick={onClose}>
       {intl.formatMessage(buttonMessages.cancel)}
     </TertiaryButton>
   ]
 
   if (user) {
     name =
-      (createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-      (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string)
+      (createNamesMap(user.name)[intl.locale] as string) ||
+      (createNamesMap(user.name)[LANG_EN] as string)
   }
 
   useEffect(() => {

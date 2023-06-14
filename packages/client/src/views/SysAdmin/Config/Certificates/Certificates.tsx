@@ -33,7 +33,6 @@ import {
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -55,6 +54,8 @@ import {
   updateOfflineCertificate,
   updateOfflineConfigData
 } from '@client/offline/actions'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
 import {
@@ -73,6 +74,13 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   margin-top: 15px;
   margin-bottom: 8px;
+  max-width: 340px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
+  }
 `
 
 const ToggleWrapper = styled.div`
@@ -114,6 +122,7 @@ type Props = WrappedComponentProps & {
 } & {
   updateOfflineCertificate: typeof updateOfflineCertificate
   updateOfflineConfigData: typeof updateOfflineConfigData
+  state: IStoreState
 }
 
 interface State {
@@ -153,7 +162,8 @@ export const printDummyCertificate = async (
   registerForm: { birth: IForm; death: IForm; marriage: IForm },
   intl: IntlShape,
   userDetails: UserDetails,
-  offlineData: IOfflineData
+  offlineData: IOfflineData,
+  state: IStoreState
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
 
@@ -161,7 +171,8 @@ export const printDummyCertificate = async (
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    offlineData
+    offlineData,
+    state
   )
 }
 
@@ -208,7 +219,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm
           )
 
-          svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
+          svgCode = executeHandlebarsTemplate(
+            svgCode,
+            dummyTemplateData,
+            this.props.state
+          )
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -226,7 +241,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             this.props.registerForm,
             intl,
             this.props.userDetails as UserDetails,
-            this.props.offlineResources
+            this.props.offlineResources,
+            this.props.state
           )
         }
       },
@@ -394,7 +410,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               {offlineResources.templates.certificates?.birth && (
                 <ToggleMenu
                   id={`template-birth-action-menu`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={this.getMenuItems(
                     intl,
                     Event.Birth,
@@ -419,7 +441,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               {offlineResources.templates.certificates?.death && (
                 <ToggleMenu
                   id={`template-death-action-menu`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={this.getMenuItems(
                     intl,
                     Event.Death,
@@ -444,7 +472,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               {offlineResources.templates.certificates?.marriage && (
                 <ToggleMenu
                   id={`template-marriage-action-menu`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={this.getMenuItems(
                     intl,
                     Event.Marriage,
@@ -734,7 +768,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   let svgCode = atob(file.data.split(',')[1])
                   svgCode = executeHandlebarsTemplate(
                     svgCode,
-                    dummyTemplateData
+                    dummyTemplateData,
+                    this.props.state
                   )
                   const data = `data:${SVGFile.type};base64,${window.btoa(
                     svgCode
@@ -770,7 +805,8 @@ function mapStateToProps(state: IStoreState) {
     offlineResources: getOfflineData(state),
     registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    state
   }
 }
 

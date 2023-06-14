@@ -94,9 +94,10 @@ const messagesToDefine: IValidationMessages = {
     id: 'validations.emailAddressFormat'
   },
   englishOnlyNameFormat: {
-    defaultMessage: 'Must contain only English characters',
+    defaultMessage:
+      'Input contains invalid characters. Please use only letters (a-z), numbers (0-9), hyphens (-), and underscores (_)',
     description:
-      'The error message that appears when a non English character is used in an English name',
+      'The error message that appears when a non English character except numbers, hyphens and underscores is used in an English name',
     id: 'validations.englishOnlyNameFormat'
   },
   facilityMustBeSelected: {

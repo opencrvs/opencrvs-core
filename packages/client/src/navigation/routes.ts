@@ -96,6 +96,10 @@ export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
 export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 export const PERFORMANCE_REGISTRATIONS_LIST = '/performance/registrations'
 
+export const PERFORMANCE_DASHBOARD = '/performance/dashboard'
+export const PERFORMANCE_LEADER_BOARDS = '/performance/leaderboards'
+export const PERFORMANCE_STATISTICS = '/performance/statistics'
+
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
@@ -111,3 +115,5 @@ export const VIEW_RECORD = '/:declarationId/viewRecord'
 
 export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
+
+export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'

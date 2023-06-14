@@ -40,7 +40,7 @@ describe('elastic search utils', () => {
       'c79e8d62-335e-458d-9fcc-45ec5836c404',
       mockCompositionBody
     )
-    expect(duplicates[0]).toEqual('c99e8d62-335e-458d-9fcc-45ec5836c404')
+    expect(duplicates[0].id).toEqual('c99e8d62-335e-458d-9fcc-45ec5836c404')
   })
 
   it('should return appropriate history with facility name for notifications', async () => {

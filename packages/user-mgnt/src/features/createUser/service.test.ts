@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { generateUsername, sendCredentialsNotification } from './service'
-import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import User from '@user-mgnt/model/user'
 import * as mockingoose from 'mockingoose'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
@@ -18,8 +18,7 @@ import { readFileSync } from 'fs'
 import { logger } from '@user-mgnt/logger'
 
 const fetch = fetchMock as fetchMock.FetchMock
-const mockUsernameRecord = {
-  count: 1,
+const mockUser = {
   username: 'je.doe'
 }
 
@@ -35,8 +34,7 @@ const token = jwt.sign(
 
 describe('Username generation', () => {
   it('generates valid username with given and family names', async () => {
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'save')
+    mockingoose(User).toReturn(null, 'findOne')
     const names = [{ given: ['John', 'Evan'], family: 'Doe', use: 'en' }]
     const username = await generateUsername(names)
     expect(username).toBe('je.doe')
@@ -44,8 +42,13 @@ describe('Username generation', () => {
   })
 
   it('generates valid username with given and family names with appended number', async () => {
-    mockingoose(UsernameRecord).toReturn(mockUsernameRecord, 'findOne')
-    mockingoose(UsernameRecord).toReturn(null, 'update')
+    const finderMock = (query: { getQuery: () => Record<string, unknown> }) => {
+      if (query.getQuery().username === 'je.doe') {
+        return mockUser
+      }
+      return null
+    }
+    mockingoose(User).toReturn(finderMock, 'findOne')
     const names = [{ given: ['John', 'Evan'], family: 'Doe', use: 'en' }]
     const username = await generateUsername(names)
     expect(username).toBe('je.doe1')
@@ -53,7 +56,7 @@ describe('Username generation', () => {
   })
 
   it('generates valid username with just family name', async () => {
-    mockingoose(UsernameRecord).toReturn(null, 'findOne')
+    mockingoose(User).toReturn(null, 'findOne')
     const names = [{ given: [], family: 'Doe', use: 'en' }]
     const username = await generateUsername(names)
     expect(username).toBe('doe')
@@ -74,7 +77,7 @@ describe('Username generation', () => {
   })
 
   it('generates valid username with given and family names with appended number', async () => {
-    mockingoose(UsernameRecord).toReturn(new Error(), 'findOne')
+    mockingoose(User).toReturn(new Error(), 'findOne')
     const names = [{ given: ['John', 'Evan'], family: 'Doe', use: 'en' }]
     let error
     try {
@@ -96,9 +99,21 @@ describe('User credentials notification', () => {
       })
     )
 
-    await sendCredentialsNotification('01730037449', 'Name1', 'Name2', {
-      Authorization: `Bearer ${token}`
-    })
+    await sendCredentialsNotification(
+      [
+        {
+          use: 'en',
+          family: 'Anik',
+          given: ['Sadman']
+        }
+      ],
+      'Name1',
+      'Name2',
+      {
+        Authorization: `Bearer ${token}`
+      },
+      '01730037449'
+    )
 
     expect(spy).not.toHaveBeenCalled()
   })
@@ -109,9 +124,21 @@ describe('User credentials notification', () => {
       throw new Error('error')
     })
 
-    await sendCredentialsNotification('01730037449', 'Name1', 'Name2', {
-      Authorization: `Bearer ${token}`
-    })
+    await sendCredentialsNotification(
+      [
+        {
+          use: 'en',
+          family: 'Anik',
+          given: ['Sadman']
+        }
+      ],
+      'Name1',
+      'Name2',
+      {
+        Authorization: `Bearer ${token}`
+      },
+      '01730037449'
+    )
 
     expect(spy).toHaveBeenCalled()
   })

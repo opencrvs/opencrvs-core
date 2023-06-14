@@ -64,7 +64,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -86,7 +86,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -113,7 +113,7 @@ describe('Integrations root resolvers', () => {
           {
             clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
           },
-          authHeaderRegister
+          { headers: authHeaderRegister }
         )
       ).rejects.toThrowError('Deactivate user is only allowed for natlsysadmin')
     })
@@ -138,7 +138,7 @@ describe('Integrations root resolvers', () => {
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
     ).rejects.toThrowError('Activate user is only allowed for natlsysadmin')
   })
@@ -194,7 +194,7 @@ describe('generate refresh token', () => {
     const response = await resolvers.Mutation.refreshSystemSecret(
       {},
       { clientId: '1231234' },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual(responsePayload)
@@ -206,7 +206,7 @@ describe('generate refresh token', () => {
     const response = resolvers.Mutation.refreshSystemSecret(
       {},
       { clientId: '1231234' },
-      authHeaderRegister
+      { headers: authHeaderRegister }
     )
     await expect(response).rejects.toThrowError(
       'Only system user can update refresh client secret'
@@ -263,7 +263,7 @@ describe('delete system integration', () => {
     const response = await resolvers.Mutation.deleteSystem(
       {},
       { clientId: '1231234' },
-      authHeaderSysAdmin
+      { headers: authHeaderSysAdmin }
     )
 
     expect(response).toEqual(responsePayload)
@@ -275,7 +275,7 @@ describe('delete system integration', () => {
     const response = resolvers.Mutation.deleteSystem(
       {},
       { clientId: '1231234' },
-      authHeaderRegister
+      { headers: authHeaderRegister }
     )
     await expect(response).rejects.toThrowError(
       'Only system user can delete the system'

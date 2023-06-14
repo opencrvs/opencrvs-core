@@ -31,6 +31,7 @@ import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/roo
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
 import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
+import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -49,7 +50,9 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import { Request } from '@hapi/hapi'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
+import { Context } from '@gateway/graphql/context'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -83,7 +86,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   bookmarkAdvancedSearchResolvers as IResolvers,
   formDatasetResolvers as IResolvers,
   informantSMSNotificationResolvers as IResolvers,
-  informantSMSNotiTypeResolvers as IResolvers
+  informantSMSNotiTypeResolvers as IResolvers,
+  OIDPUserInfoResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -158,14 +162,6 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
-type Context = {
-  request: Request
-  Authorization: string
-  'x-correlation-id': string
-  'x-real-ip': string
-  'x-real-user-agent': string
-}
-
 export const getApolloConfig = (): Config<Context> => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
@@ -180,14 +176,20 @@ export const getApolloConfig = (): Config<Context> => {
   return {
     schema,
     introspection: true,
-    context: async ({ request }) => {
+    dataSources: (): Context['dataSources'] => ({
+      locationsAPI: new LocationsAPI(),
+      practitionerRoleAPI: new PractitionerRoleAPI()
+    }),
+    context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
         request,
-        Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
-        'x-real-ip':
-          request.headers['x-real-ip'] || request.info?.remoteAddress,
-        'x-real-user-agent': request.headers['user-agent']
+        headers: {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
+          'x-real-ip':
+            request.headers['x-real-ip'] || request.info?.remoteAddress,
+          'x-real-user-agent': request.headers['user-agent']
+        }
       }
     }
   }

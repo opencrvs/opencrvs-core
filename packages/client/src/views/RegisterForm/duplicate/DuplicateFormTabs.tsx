@@ -82,6 +82,7 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const SupportingDocumentWrapper = styled(Stack)`
+  position: sticky;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column;
     align-items: flex-start;
@@ -270,14 +271,13 @@ export const DuplicateFormTabs = (props: IProps) => {
   }
 
   const getSinglePreviewField = (
+    declaration: IDeclaration,
     section: IFormSection,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) => {
-    const {
-      declaration: { data }
-    } = props
+    const { data } = declaration
 
     const value = getValueOrError(
       section,
@@ -425,7 +425,9 @@ export const DuplicateFormTabs = (props: IProps) => {
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
-    nestedItems.push(getSinglePreviewField(section, field, sectionErrors, true))
+    nestedItems.push(
+      getSinglePreviewField(declaration, section, field, sectionErrors, true)
+    )
     ;(
       (field.nestedFields &&
         draft.data[section.id] &&
@@ -466,6 +468,7 @@ export const DuplicateFormTabs = (props: IProps) => {
   }
 
   const getOverRiddenPreviewField = (
+    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -485,6 +488,7 @@ export const DuplicateFormTabs = (props: IProps) => {
     ) as IFormSection
 
     const result = getSinglePreviewField(
+      declaration,
       residingSection,
       overriddenField,
       sectionErrors
@@ -561,10 +565,11 @@ export const DuplicateFormTabs = (props: IProps) => {
                   errorsOnFields,
                   declaration
                 )
-              : getSinglePreviewField(section, field, errorsOnFields)
+              : getSinglePreviewField(draft, section, field, errorsOnFields)
 
             overriddenFields.forEach((overriddenField) => {
               items = getOverRiddenPreviewField(
+                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -772,7 +777,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           label: (
             <Text variant="bold16" element="span" color="grey600">
               {intl.formatMessage(
-                duplicateRegData.type.toLowerCase() === 'birth'
+                duplicateRegData.type.toLowerCase() === Event.Birth
                   ? recordAuditMessages.brn
                   : recordAuditMessages.drn
               )}
@@ -852,8 +857,8 @@ export const DuplicateFormTabs = (props: IProps) => {
                   </Text>
                 ),
                 heading: {
-                  right: duplicateTrackingId,
-                  left: actualTrackingId
+                  right: String(duplicateRegData.trackingId),
+                  left: String(actualRegData.trackingId)
                 },
                 leftValue: (
                   <Text variant="reg16" element="span" color="grey600">

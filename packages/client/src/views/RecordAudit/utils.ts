@@ -97,6 +97,18 @@ export const getFieldValue = (
   intl: IntlShape
 ) => {
   let original = value
+  // HOTFIX: The name of the fieldObject that is being received
+  // here is internationalStatePrimary rather than statePrimary
+  // same for districts as well as the secondary address fields
+  if (
+    fieldObj.name.toLowerCase().includes('state') ||
+    fieldObj.name.toLowerCase().includes('district')
+  ) {
+    if (value && offlineData.locations?.[value]) {
+      return offlineData.locations[value].name
+    }
+  }
+
   if (has(fieldObj, 'dynamicOptions')) {
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)
@@ -173,6 +185,14 @@ export const getLocation = (
     state = declaration.data?.marriageEvent?.state?.toString() || EMPTY_STRING
     country =
       declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      EMPTY_STRING
 
     if (country && country !== window.config.COUNTRY) {
       let location = EMPTY_STRING
@@ -389,10 +409,13 @@ export const getWQDeclarationData = (
     workqueueDeclaration.brideName &&
     workqueueDeclaration.groomName
   ) {
-    name = `${getName(workqueueDeclaration.groomName, language)} & ${getName(
-      workqueueDeclaration.brideName,
-      language
-    )}`
+    const groomName = getName(workqueueDeclaration.groomName, language)
+    const brideName = getName(workqueueDeclaration.brideName, language)
+
+    name =
+      brideName && groomName
+        ? `${groomName} & ${brideName}`
+        : brideName || groomName || EMPTY_STRING
   }
   return {
     id: workqueueDeclaration?.id,
@@ -420,14 +443,14 @@ export const getGQLDeclaration = (
       ? getName(data.deceased.name, language)
       : EMPTY_STRING
   } else if (data.groom || data.bride) {
-    if (data.groom && data.bride) {
-      name = `${getName(data.bride.name, language)} & ${getName(
-        data.groom.name,
+    if (data.groom?.name && data.bride?.name) {
+      name = `${getName(data.groom.name, language)} & ${getName(
+        data.bride.name,
         language
       )}`
-    } else if (data.groom) {
+    } else if (data.groom?.name) {
       name = getName(data.groom.name, language)
-    } else if (data.bride) {
+    } else if (data.bride?.name) {
       name = getName(data.bride.name, language)
     } else {
       name = EMPTY_STRING
@@ -504,4 +527,8 @@ export function capitalize(str: string) {
 
 export function isVerifiedAction(history: History) {
   return history.action === RegAction.Verified
+}
+
+export function isFlaggedAsPotentialDuplicate(history: History) {
+  return history.action === RegAction.FlaggedAsPotentialDuplicate
 }

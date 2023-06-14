@@ -48,7 +48,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { Route, Switch } from 'react-router'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
@@ -64,15 +64,19 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
-import { UnprotectedRoute } from '@client/components/UnprotectedRoute'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { Home } from '@client/views/OfficeHome/Home'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -132,7 +136,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={routes.HOME}
-                                              component={OfficeHome}
+                                              component={Home}
                                             />
                                             <ProtectedRoute
                                               exact
@@ -454,6 +458,27 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              path={
+                                                routes.PERFORMANCE_STATISTICS
+                                              }
+                                              component={PerformanceStatistics}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.PERFORMANCE_LEADER_BOARDS
+                                              }
+                                              component={Leaderboards}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.PERFORMANCE_DASHBOARD
+                                              }
+                                              component={PerformanceDashboard}
+                                            />
+                                            <ProtectedRoute
+                                              exact
                                               roles={[
                                                 SystemRoleType.NationalSystemAdmin,
                                                 SystemRoleType.NationalRegistrar
@@ -527,6 +552,15 @@ export function App(props: IAppProps) {
                                                 routes.ISSUE_CERTIFICATE_PAYMENT
                                               }
                                               component={IssuePayment}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.OIDP_VERIFICATION_CALLBACK
+                                              }
+                                              component={
+                                                OIDPVerificationCallback
+                                              }
                                             />
                                           </Switch>
                                         </TransitionWrapper>

@@ -18,10 +18,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
-  GQLEventSearchResultSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLMarriageEventSearchSet
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   IDeclaration,
@@ -41,7 +38,7 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { ITheme, withTheme } from '@client/styledComponents'
-import { LANG_EN } from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -78,6 +75,11 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  isMarriageEvent,
+  isBirthEvent,
+  isDeathEvent
+} from '@client/search/transformer'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -189,34 +191,35 @@ export class InProgressComponent extends React.Component<
 
       let name
       let eventDate = ''
-      if (reg.registration && reg.type === 'Birth') {
-        const birthReg = reg as GQLBirthEventSearchSet
-        const names = birthReg && (birthReg.childName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLBirthEventSearchSet).dateOfBirth
-        eventDate = date && date
-      } else if (reg.registration && reg.type === 'Death') {
-        const deathReg = reg as GQLDeathEventSearchSet
-        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
-        const namesMap = createNamesMap(names)
-        name = namesMap[locale] || namesMap[LANG_EN]
-        const date = (reg as GQLDeathEventSearchSet).dateOfDeath
-        eventDate = date && date
-      } else if (reg.registration && reg.type === 'Marriage') {
-        const marriageReg = reg as GQLMarriageEventSearchSet
-        const groomNames =
-          marriageReg && (marriageReg.groomName as GQLHumanName[])
-        const groomNamesMap = createNamesMap(groomNames)
-        const brideNames =
-          marriageReg && (marriageReg.groomName as GQLHumanName[])
-        const brideNamesMap = createNamesMap(brideNames)
-        const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
-        const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
-        name = groomName + (brideName ? ` & ${brideName}` : '')
-        const date = (reg as GQLMarriageEventSearchSet).dateOfMarriage
-        eventDate = date && date
+
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          const names = reg.childName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          eventDate = reg.dateOfBirth
+        } else if (isDeathEvent(reg)) {
+          const names = reg.deceasedName as GQLHumanName[]
+          const namesMap = createNamesMap(names)
+          name = namesMap[locale] || namesMap[LANG_EN]
+          const date = reg.dateOfDeath
+          eventDate = date && date
+        } else if (isMarriageEvent(reg)) {
+          const groomNames = reg.groomName as GQLHumanName[]
+          const groomNamesMap = createNamesMap(groomNames)
+          const brideNames = reg.groomName as GQLHumanName[]
+          const brideNamesMap = createNamesMap(brideNames)
+          const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
+          const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
+          name =
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
+          const date = reg.dateOfMarriage
+          eventDate = date && date
+        }
       }
+
       const dateOfEvent =
         eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
       const actions: IAction[] = []
@@ -380,10 +383,13 @@ export class InProgressComponent extends React.Component<
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
+
       const eventTime =
         draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.data.deathEvent?.deathDate || ''
+          : draft.event === Event.Death
+          ? draft.data.deathEvent?.deathDate || ''
+          : draft.data.marriageEvent?.marriageDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
         <NameContainer

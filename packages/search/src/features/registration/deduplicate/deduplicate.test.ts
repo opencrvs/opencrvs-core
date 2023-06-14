@@ -116,6 +116,54 @@ describe('deduplication tests', () => {
         )
       ).resolves.toHaveLength(0)
     })
+
+    it('finds no duplicate if both the firstName & familyName for child is not given', async () => {
+      await expect(
+        compareForBirthDuplication(
+          {
+            childFirstNames: ['John', ''],
+            childFamilyName: ['Smith', ''],
+            childDoB: ['2011-11-11', '2014-11-01'],
+            motherFirstNames: ['Mother', 'Mother'],
+            motherFamilyName: ['Smith', 'Smith'],
+            motherDoB: ['2000-11-12', '2000-11-12']
+          },
+          client
+        )
+      ).resolves.toHaveLength(0)
+    })
+
+    it('finds a duplicate even if the firstName of child is not given', async () => {
+      await expect(
+        compareForBirthDuplication(
+          {
+            childFirstNames: ['John', ''],
+            childFamilyName: ['Smith', 'Smiht'],
+            childDoB: ['2011-11-11', '2011-11-01'],
+            motherFirstNames: ['Mother', 'Mother'],
+            motherFamilyName: ['Smith', 'Smith'],
+            motherDoB: ['2000-11-12', '2000-11-12']
+          },
+          client
+        )
+      ).resolves.toHaveLength(1)
+    })
+
+    it('finds no duplicate if a required field is missing', async () => {
+      await expect(
+        compareForBirthDuplication(
+          {
+            childFirstNames: ['John', 'Jhon'],
+            childFamilyName: ['Smith', 'Smith'],
+            childDoB: ['2011-11-11', ''],
+            motherDoB: ['2000-11-12', '2000-11-12'],
+            motherFirstNames: ['Mother', 'Mother'],
+            motherFamilyName: ['Smith', 'Smith']
+          },
+          client
+        )
+      ).resolves.toHaveLength(0)
+    })
   })
 
   describe('same mother two births within 9 months of each other', () => {
@@ -161,7 +209,7 @@ describe('deduplication tests', () => {
           {
             childFirstNames: ['John', 'John'],
             childFamilyName: ['Smith', 'Smith'],
-            childDoB: ['2011-11-11', '2012-11-01'],
+            childDoB: ['2011-11-11', '2014-11-01'],
             motherFirstNames: ['Mother', 'Mother'],
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12'],
@@ -180,14 +228,59 @@ describe('deduplication tests for death', () => {
   })
 
   describe('standard check for death duplication', () => {
-    it.only('finds a duplicate with very similar details', async () => {
+    it('finds a duplicate with very similar details', async () => {
       await expect(
         compareForDeathDuplication(
           {
             deceasedFirstNames: ['John', 'jhon'],
             deceasedFamilyName: ['koly', 'koly'],
             deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17']
+            deathDate: ['2000-11-12', '2000-11-17'],
+            deceasedDoB: ['2020-11-12', '2020-11-10']
+          },
+          client
+        )
+      ).resolves.toHaveLength(1)
+    })
+
+    it('finds no duplicate if a required field is missing', async () => {
+      await expect(
+        compareForDeathDuplication(
+          {
+            deceasedFirstNames: ['John', 'Jhon'],
+            deceasedFamilyName: ['koly', 'koly'],
+            deathDate: ['2000-11-12', '2000-11-12'],
+            deceasedDoB: ['2020-11-12', '']
+          },
+          client
+        )
+      ).resolves.toHaveLength(0)
+    })
+
+    it('finds no duplicate if both the firstName & familyName of deceased is not given', async () => {
+      await expect(
+        compareForDeathDuplication(
+          {
+            deceasedFirstNames: ['John', ''],
+            deceasedFamilyName: ['koly', ''],
+            deceasedIdentifier: ['23412387', '23412387'],
+            deathDate: ['2000-11-12', '2000-11-17'],
+            deceasedDoB: ['2020-11-12', '2020-11-10']
+          },
+          client
+        )
+      ).resolves.toHaveLength(0)
+    })
+
+    it('finds duplicate even if the familyName of deceased is not given', async () => {
+      await expect(
+        compareForDeathDuplication(
+          {
+            deceasedFirstNames: ['John', 'Jonh'],
+            deceasedFamilyName: ['koly', ''],
+            deceasedIdentifier: ['23412387', '23412387'],
+            deathDate: ['2000-11-12', '2000-11-17'],
+            deceasedDoB: ['2020-11-12', '2020-11-10']
           },
           client
         )

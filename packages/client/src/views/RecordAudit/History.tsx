@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -19,6 +20,7 @@ import {
   getFormattedDate,
   getPageItems,
   getStatusLabel,
+  isFlaggedAsPotentialDuplicate,
   isSystemInitiated,
   isVerifiedAction
 } from './utils'
@@ -38,14 +40,10 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const TableDiv = styled.div`
   overflow: auto;
-`
-
-const Heading = styled.h3`
-  ${({ theme }) => theme.fonts.h3}
-  margin-bottom: 0px !important;
 `
 
 const LargeGreyedInfo = styled.div`
@@ -74,6 +72,16 @@ const HealthSystemLogo = styled.div`
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.grey200};
 `
+
+function SystemUser({ name }: { name?: string }) {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo />
+      <span>{name ?? intl.formatMessage(userMessages.system)}</span>
+    </NameAvatar>
+  )
+}
 
 function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
@@ -163,7 +171,9 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
         <LargeGreyedInfo />
       </>
     )
@@ -172,7 +182,7 @@ export const GetHistory = ({
   }[]
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
-      date: new Date(draft.savedOn || Date.now()).toString(),
+      date: new Date(draft.savedOn || Date.now()).toISOString(),
       regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
@@ -205,7 +215,12 @@ export const GetHistory = ({
     sortedHistory
   )
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
-    date: getFormattedDate(item?.date),
+    date: formatLongDate(
+      item?.date.toLocaleString(),
+      intl.locale,
+      'MMMM dd, yyyy · hh.mm a'
+    ),
+
     action: (
       <Link
         font="bold14"
@@ -225,7 +240,9 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isVerifiedAction(item) ? (
+        {isFlaggedAsPotentialDuplicate(item) ? (
+          <SystemUser name={item.system?.name} />
+        ) : isVerifiedAction(item) ? (
           <div />
         ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
@@ -252,7 +269,9 @@ export const GetHistory = ({
         )}
       </>
     ),
-    role: isVerifiedAction(item) ? (
+    role: isFlaggedAsPotentialDuplicate(item) ? (
+      <div />
+    ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) || !item.user?.systemRole ? (
       intl.formatMessage(getSystemType(item.system?.type))
@@ -308,7 +327,9 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <Text variant="h3" element="h3" color="copy">
+        {intl.formatMessage(constantsMessages.history)}
+      </Text>
       <TableDiv>
         <Table
           id="task-history"

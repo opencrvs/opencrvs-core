@@ -1714,6 +1714,12 @@ export const mockDeclarationData = {
     primaryAddressSameAsOtherPrimary: true
   },
   registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394989'
+      },
+      value: 'MOTHER'
+    },
     whoseContactDetails: {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
@@ -1812,6 +1818,12 @@ export const mockDeathDeclarationData = {
     ]
   },
   registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394982'
+      },
+      value: 'SPOUSE'
+    },
     registrationPhone: '01557394986',
     registrationNumber: '201908122365DDSS0SE1',
     contact: 'OTHER',
@@ -1969,6 +1981,12 @@ export const mockMarriageDeclarationData = {
 }
 
 export const mockBirthRegistrationSectionData = {
+  contactPoint: {
+    nestedFields: {
+      registrationPhone: '01557394989'
+    },
+    value: 'MOTHER'
+  },
   whoseContactDetails: {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
@@ -2008,6 +2026,12 @@ export const mockBirthRegistrationSectionData = {
 }
 
 export const mockDeathRegistrationSectionData = {
+  contactPoint: {
+    nestedFields: {
+      registrationPhone: '01557394982'
+    },
+    value: 'MOTHER'
+  },
   whoseContactDetails: 'MOTHER',
   informantType: {
     value: 'MOTHER',
@@ -2237,6 +2261,34 @@ export const mockDeathDeclarationDataWithoutFirstNames = {
         optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
         title: "Proof of Deceased's ID",
         description: 'National ID (front)'
+      }
+    ]
+  },
+  registration: {
+    contactPoint: {
+      nestedFields: {
+        registrationPhone: '01557394982'
+      },
+      value: 'SPOUSE'
+    },
+    registrationPhone: '01557394986',
+    registrationNumber: '201908122365DDSS0SE1',
+    contact: 'OTHER',
+    contactPhoneNumber: '+8801671010143',
+    contactRelationship: 'Friend',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'MOTHER'
+        },
+        hasShowedVerifiedDocument: true
       }
     ]
   }
@@ -2814,6 +2866,7 @@ export const mockCompleteFormData = {
   firstNamesEng: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
+  email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',

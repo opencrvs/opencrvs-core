@@ -9,42 +9,44 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Middleware, Action, createAction } from '@reduxjs/toolkit'
-import { IStoreState } from '@client/store'
+import { ApolloError } from '@apollo/client'
 import {
+  ICertificate,
+  IDeclaration,
+  Payment,
   SUBMISSION_STATUS,
   deleteDeclaration,
-  IDeclaration,
   modifyDeclaration,
-  writeDeclaration,
-  ICertificate,
-  Payment
+  writeDeclaration
 } from '@client/declarations'
-import { updateRegistrarWorkqueue } from '@client/workqueue'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { client } from '@client/utils/apolloClient'
-import {
-  getBirthMutation,
-  MARK_EVENT_AS_DUPLICATE
-} from '@client/views/DataProvider/birth/mutations'
-import { Event } from '@client/utils/gateway'
-import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
-import {
-  draftToGqlTransformer,
-  appendGqlMetadataFromDraft
-} from '@client/transformer'
-import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   showDuplicateRecordsToast,
   showUnassigned
 } from '@client/notification/actions'
+import { IStoreState } from '@client/store'
+import {
+  appendGqlMetadataFromDraft,
+  draftToGqlTransformer
+} from '@client/transformer'
+import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { ApolloError } from '@apollo/client'
+import { Event } from '@client/utils/gateway'
+import {
+  MARK_EVENT_AS_DUPLICATE,
+  getBirthMutation
+} from '@client/views/DataProvider/birth/mutations'
+import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
 import { getMarriageMutation } from '@client/views/DataProvider/marriage/mutations'
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
+import { updateRegistrarWorkqueue } from '@client/workqueue'
+import { Action, Middleware, createAction } from '@reduxjs/toolkit'
+import { Dispatch } from 'redux'
 // eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -68,12 +70,17 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
-function getGqlDetails(form: IForm, draft: IDeclaration) {
+function getGqlDetails(
+  form: IForm,
+  draft: IDeclaration,
+  offlineData: IOfflineData
+) {
   const gqlDetails = draftToGqlTransformer(
     form,
     draft.data,
     draft.id,
-    draft.originalData
+    draft.originalData,
+    offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
   return gqlDetails
@@ -144,7 +151,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
-      declaration
+      declaration,
+      getOfflineData(getState())
     )
 
     //then add payment while issue declaration
@@ -168,8 +176,11 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             details: gqlDetails
           }
         })
+
         const { isPotentiallyDuplicate, trackingId, compositionId } =
-          response?.data?.createBirthRegistration ?? {}
+          response?.data?.createBirthRegistration ??
+          response?.data?.createDeathRegistration ??
+          {}
 
         if (isPotentiallyDuplicate) {
           dispatch(
@@ -236,7 +247,15 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         })
       }
       updateWorkqueue(getState(), dispatch)
-      dispatch(deleteDeclaration(declaration.id))
+
+      // wrapping deleteDeclaration inside a setTimeout
+      // make deleteDeclaration wait a bit until workqueue refreshes
+      // because for the deleteDeclaration's updates, there was an "workqueue count flickering" issue ticket
+      // This is a "quick fix" for the issue #5268://github.com/opencrvs/opencrvs-core/issues/5268
+      setTimeout(
+        () => dispatch(deleteDeclaration(declaration.id, client)),
+        2000
+      )
     } catch (error) {
       if (!(error instanceof ApolloError)) {
         updateDeclaration(dispatch, {
@@ -255,7 +274,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             trackingId: declaration.data.registration.trackingId as string
           })
         )
-        dispatch(deleteDeclaration(declaration.id))
+        dispatch(deleteDeclaration(declaration.id, client))
         return
       }
       updateDeclaration(dispatch, {

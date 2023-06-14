@@ -83,6 +83,12 @@ export const changeSortedColumn = (
     case COLUMNS.LAST_UPDATED:
       newSortedCol = COLUMNS.LAST_UPDATED
       break
+    case COLUMNS.TRACKING_ID:
+      newSortedCol = COLUMNS.TRACKING_ID
+      break
+    case COLUMNS.REGISTRATION_NO:
+      newSortedCol = COLUMNS.REGISTRATION_NO
+      break
     default:
       newSortedCol = COLUMNS.NAME
   }

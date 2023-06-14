@@ -22,8 +22,7 @@ import {
   testFhirBundleWithIdsForDeath,
   officeMock,
   mosipDeceasedPatientMock,
-  mosipSuccessMock,
-  informantSMSNotificationMock
+  mosipSuccessMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/utils'
 import * as fetchAny from 'jest-fetch-mock'
@@ -34,15 +33,6 @@ const fetch = fetchAny as any
 describe('Verify utility functions', () => {
   beforeEach(async () => {
     fetch.resetMocks()
-    jest.mock('@workflow/features/registration/utils', () => {
-      const actual = jest.requireActual('./utils')
-      return {
-        ...actual,
-        getInformantSMSNotification: function () {
-          return informantSMSNotificationMock
-        }
-      }
-    })
   })
 
   it('Generates proper birth tracking id successfully', async () => {
@@ -99,7 +89,6 @@ describe('Verify utility functions', () => {
   })
   it('send Birth declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -130,7 +119,6 @@ describe('Verify utility functions', () => {
   })
   it('send Birth registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -178,7 +166,6 @@ describe('Verify utility functions', () => {
   })
   it('send Death declaration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
@@ -209,7 +196,6 @@ describe('Verify utility functions', () => {
   })
   it('send Death registration notification logs an error in case of invalid data', async () => {
     const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockResponseOnce([JSON.stringify(informantSMSNotificationMock)])
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })

@@ -14,7 +14,8 @@ import {
   subscribeWebhooksHandler,
   reqSubscribeWebhookSchema,
   listWebhooksHandler,
-  deleteWebhookHandler
+  deleteWebhookHandler,
+  deleteWebhookByClientIdHandler
 } from '@webhooks/features/manage/handler'
 import {
   birthRegisteredHandler,
@@ -68,6 +69,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Delete webhooks'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deleteWebhooksByClientId', // Used when deleting a system through the admin UI
+      handler: deleteWebhookByClientIdHandler,
+      config: {
+        tags: ['api'],
+        description: 'Delete webhooks by client id'
       }
     },
     {

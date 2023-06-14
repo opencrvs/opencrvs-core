@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
-import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -56,7 +56,8 @@ describe('User root resolvers', () => {
 
       const user = await resolvers.Query.getUser(
         {},
-        { userId: 'ba7022f0ff4822' }
+        { userId: 'ba7022f0ff4822' },
+        { headers: undefined }
       )
 
       expect(user).toBeDefined()
@@ -185,7 +186,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Query.searchUsers(
         {},
         {},
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(3)
@@ -227,7 +228,7 @@ describe('User root resolvers', () => {
           skip: 0,
           sort: 'desc'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -349,7 +350,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -406,7 +407,7 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(2)
@@ -486,7 +487,7 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response.totalItems).toBe(1)
@@ -516,7 +517,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -533,7 +534,7 @@ describe('User root resolvers', () => {
             timeStart: '2019-03-31T18:00:00.000Z',
             timeEnd: '2020-06-30T17:59:59.999Z'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).resolves.toStrictEqual({
         totalItems: 0,
@@ -612,6 +613,9 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           password: 'test',
           securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+        },
+        {
+          headers: undefined
         }
       )
 
@@ -631,6 +635,9 @@ describe('User root resolvers', () => {
             userId: 'ba7022f0ff4822',
             password: 'test',
             securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          },
+          {
+            headers: undefined
           }
         )
       ).rejects.toThrowError(
@@ -682,7 +689,7 @@ describe('User root resolvers', () => {
           existingPassword: 'test',
           password: 'NewPassword'
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -698,7 +705,7 @@ describe('User root resolvers', () => {
             existingPassword: 'test',
             password: 'NewPassword'
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user password"
@@ -757,7 +764,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
@@ -768,7 +775,7 @@ describe('User root resolvers', () => {
           nonce: nonce,
           verifyCode: code
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(true)
@@ -778,7 +785,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -789,7 +796,7 @@ describe('User root resolvers', () => {
             nonce: nonce,
             verifyCode: code
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user phone number"
@@ -798,7 +805,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -864,7 +871,7 @@ describe('User root resolvers', () => {
           userId: 'ba7022f0ff4822',
           avatar
         },
-        authHeaderValidUser
+        { headers: authHeaderValidUser }
       )
 
       expect(response).toEqual(avatar)
@@ -882,7 +889,7 @@ describe('User root resolvers', () => {
               data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
-          authHeaderValidUser
+          { headers: authHeaderValidUser }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user avatar"
@@ -962,7 +969,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -980,7 +987,7 @@ describe('User root resolvers', () => {
       const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user: { id: '123', ...user } },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual({
@@ -1010,7 +1017,11 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderSysAdmin)
+        resolvers.Mutation.createOrUpdateUser(
+          {},
+          { user },
+          { headers: authHeaderSysAdmin }
+        )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't create user"
       )
@@ -1060,7 +1071,7 @@ describe('User root resolvers', () => {
           action: 'DEACTIVATE',
           reason: 'SUSPICIOUS'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual(true)
@@ -1093,7 +1104,7 @@ describe('User root resolvers', () => {
             action: 'DEACTIVATE',
             reason: 'SUSPICIOUS'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't audit user 5bce8ujkf0fuib"
@@ -1101,7 +1112,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('resendSMSInvite mutation', () => {
+  describe('resendInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1136,7 +1147,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
@@ -1152,12 +1163,12 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1167,19 +1178,19 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resendSMSInvite(
+      const res = await resolvers.Mutation.resendInvite(
         {},
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
     })
   })
 
-  describe('usernameSMSReminder mutation', () => {
+  describe('usernameReminder mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1214,7 +1225,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
@@ -1230,12 +1241,12 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't send sms to 123"
@@ -1245,19 +1256,19 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.usernameSMSReminder(
+      const res = await resolvers.Mutation.usernameReminder(
         {},
         {
           userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)
     })
   })
 
-  describe('resetPasswordSMS mutation', () => {
+  describe('resetPasswordInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1292,11 +1303,10 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
           authHeaderRegAgent
         )
@@ -1309,13 +1319,12 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
-          authHeaderSysAdmin
+          { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't reset password and send sms to 123"
@@ -1325,13 +1334,12 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resetPasswordSMS(
+      const res = await resolvers.Mutation.resetPasswordInvite(
         {},
         {
-          userId: '123',
-          applicationName: 'opencrvs'
+          userId: '123'
         },
-        authHeaderSysAdmin
+        { headers: authHeaderSysAdmin }
       )
 
       expect(res).toBe(true)

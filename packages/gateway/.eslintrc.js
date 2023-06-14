@@ -14,6 +14,16 @@ module.exports = {
   env: {
     es6: true
   },
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "CallExpression[callee.name='fetchFHIR'][arguments.0.value=/Location|PractitionerRole/]",
+        message: 'This resource should be fetched by datasource'
+      }
+    ]
+  },
   overrides: [
     {
       files: ['*.ts'],

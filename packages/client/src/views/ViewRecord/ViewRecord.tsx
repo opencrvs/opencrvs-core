@@ -14,6 +14,7 @@ import React from 'react'
 import {
   createReviewDeclaration,
   IDeclaration,
+  IDuplicates,
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
@@ -29,7 +30,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/review'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -176,13 +177,20 @@ export const ViewRecord = () => {
     eventType: eventType
   })
   const iconColor = getDeclarationIconColor(declaration)
+  const isDuplicate =
+    (
+      data?.fetchRegistrationForViewing?.registration
+        ?.duplicates as IDuplicates[]
+    )?.length > 0
 
   return (
     <Frame
       header={
         <AppBar
           desktopTitle={headerTitle}
-          desktopLeft={<DeclarationIcon color={iconColor} />}
+          desktopLeft={
+            isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
+          }
           desktopRight={
             <Button
               size="large"
@@ -193,7 +201,9 @@ export const ViewRecord = () => {
             </Button>
           }
           mobileTitle={headerTitle}
-          mobileLeft={<DeclarationIcon color={iconColor} />}
+          mobileLeft={
+            isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
+          }
           mobileRight={
             <Button
               size="large"

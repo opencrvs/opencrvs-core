@@ -15,6 +15,7 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
   EVENT,
@@ -127,7 +128,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
@@ -200,10 +202,12 @@ async function createBrideIndex(
     brideNameLocal && brideNameLocal.given && brideNameLocal.given.join(' ')
   body.brideFamilyNameLocal =
     brideNameLocal && brideNameLocal.family && brideNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.brideIdentifier =
+    bride &&
     bride.identifier &&
     bride.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
@@ -238,10 +242,13 @@ async function createGroomIndex(
     groomNameLocal && groomNameLocal.given && groomNameLocal.given.join(' ')
   body.groomFamilyNameLocal =
     groomNameLocal && groomNameLocal.family && groomNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.groomIdentifier =
+    groom &&
     groom.identifier &&
     groom.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value

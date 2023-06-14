@@ -16,7 +16,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getFormDraft(_, {}, authHeader) {
+    async getFormDraft(_, {}, { headers: authHeader }) {
       const res = await fetch(`${APPLICATION_CONFIG_URL}formDraft`, {
         method: 'GET',
         headers: {
@@ -29,7 +29,7 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createFormDraft(_, { formDraft }, authHeader) {
+    async createFormDraft(_, { formDraft }, { headers: authHeader }) {
       // Only natlsysadmin should be able to create a formDraft
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
@@ -57,7 +57,7 @@ export const resolvers: GQLResolver = {
       return await res.json()
     },
 
-    async modifyDraftStatus(_, { formDraft }, authHeader) {
+    async modifyDraftStatus(_, { formDraft }, { headers: authHeader }) {
       // Only natlsysadmin should be able to modify a formDraft
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
@@ -86,7 +86,7 @@ export const resolvers: GQLResolver = {
       return await res.json()
     },
 
-    async deleteFormDraft(_, { formDraft }, authHeader) {
+    async deleteFormDraft(_, { formDraft }, { headers: authHeader }) {
       // Only natlsysadmin should be able to delete a formDraft
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(

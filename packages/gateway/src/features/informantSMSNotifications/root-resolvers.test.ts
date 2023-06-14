@@ -110,7 +110,7 @@ describe('InformantSMSNotifications root resolvers', () => {
             enabled: false
           }
         ],
-        authHeaderNatlSYSAdmin
+        { headers: authHeaderNatlSYSAdmin }
       )
 
       expect(res).toBeDefined()
@@ -153,7 +153,7 @@ describe('InformantSMSNotifications root resolvers', () => {
               enabled: false
             }
           ],
-          authHeaderNatlSYSAdmin
+          { headers: authHeaderNatlSYSAdmin }
         )
       ).rejects.toThrowError(
         "Something went wrong on config service. Couldn't get informantSMSNotification"
@@ -182,7 +182,7 @@ describe('toggleInformantSMSNotification mutation', () => {
           enabled: true
         }
       ],
-      authHeaderNatlSYSAdmin
+      { headers: authHeaderNatlSYSAdmin }
     )
 
     expect(response[1].enabled).toBe(true)
@@ -204,7 +204,7 @@ describe('toggleInformantSMSNotification mutation', () => {
             enabled: true
           }
         ],
-        authHeaderRegister
+        { headers: authHeaderRegister }
       )
     ).rejects.toThrowError(
       'Toggle informantSMSNotification is only allowed for natlsysadmin'

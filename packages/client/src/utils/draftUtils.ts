@@ -93,22 +93,20 @@ export const getDraftInformantFullName = (
     case Event.Death:
       return getInformantFullName(draft.data.deceased, language, lastNameFirst)
     case Event.Marriage:
-      if (draft.data.bride && draft.data.bride) {
-        const brideName = getInformantFullName(
-          draft.data.bride,
-          language,
-          lastNameFirst
-        )
-        const groomName = getInformantFullName(
-          draft.data.groom,
-          language,
-          lastNameFirst
-        )
-        return groomName + (brideName ? ` & ${brideName}` : '')
+      const brideName = getInformantFullName(
+        draft.data.bride,
+        language,
+        lastNameFirst
+      )
+      const groomName = getInformantFullName(
+        draft.data.groom,
+        language,
+        lastNameFirst
+      )
+      if (brideName && groomName) {
+        return `${groomName} & ${brideName}`
       } else {
-        return draft.data.groom
-          ? getInformantFullName(draft.data.groom, language, lastNameFirst)
-          : getInformantFullName(draft.data.bride, language, lastNameFirst)
+        return brideName || groomName || EMPTY_STRING
       }
   }
 }

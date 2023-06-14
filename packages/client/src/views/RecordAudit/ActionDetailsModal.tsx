@@ -46,12 +46,12 @@ import {
   CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
-import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
 import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -232,7 +232,11 @@ export const ActionDetailsModalListTable = ({
       label: intl.formatMessage(messages.correctionSummaryOriginal),
       width: 33.33
     },
-    { key: 'edit', label: 'Edit', width: 33.33 }
+    {
+      key: 'edit',
+      label: intl.formatMessage(messages.correctionSummaryCorrection),
+      width: 33.33
+    }
   ]
   const certificateCollectorVerified = [
     {
@@ -248,6 +252,24 @@ export const ActionDetailsModalListTable = ({
       width: 100
     }
   ]
+
+  const matchedToColumn = [
+    {
+      key: 'potentialDuplicates',
+      label: intl.formatMessage(constantsMessages.matchedTo),
+      width: 100
+    }
+  ]
+
+  const potentialDuplicatesTransformer = (items: string[]) => {
+    return (
+      <>
+        {items.map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </>
+    )
+  }
 
   const getItemName = (
     sectionName: MessageDescriptor,
@@ -362,7 +384,7 @@ export const ActionDetailsModalListTable = ({
 
     const name = certificate.collector?.individual?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.individual.name,
           window.config.LANGUAGES
         )
       : {}
@@ -376,14 +398,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = certificateCollectorRelationLabelArray.find(
-          (labelItem) =>
-            labelItem.value === certificate.collector?.otherRelationship
-        )
-        const otherRelationLabel = otherRelation
-          ? intl.formatMessage(otherRelation.label)
-          : ''
-        return `${collectorName} (${otherRelationLabel})`
+        return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
     }
@@ -555,6 +570,22 @@ export const ActionDetailsModalListTable = ({
           onPageChange={pageChangeHandler}
         />
       )}
+
+      {/* Matched to */}
+      {actionDetailsData.potentialDuplicates &&
+        actionDetailsData.action === RegAction.FlaggedAsPotentialDuplicate && (
+          <Table
+            noResultText=" "
+            columns={matchedToColumn}
+            content={[
+              {
+                potentialDuplicates: potentialDuplicatesTransformer(
+                  actionDetailsData.potentialDuplicates
+                )
+              }
+            ]}
+          />
+        )}
     </>
   )
 }
@@ -598,7 +629,7 @@ export const ActionDetailsModal = ({
   } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null
@@ -624,7 +655,15 @@ export const ActionDetailsModal = ({
       <>
         <div>
           <>{userName}</>
-          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+          <span>
+            {' '}
+            —{' '}
+            {formatLongDate(
+              actionDetailsData.date.toLocaleString(),
+              intl.locale,
+              'MMMM dd, yyyy · hh.mm a'
+            )}
+          </span>
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}

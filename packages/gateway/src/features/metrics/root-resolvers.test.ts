@@ -26,7 +26,6 @@ describe('get total metrics', () => {
           maleEstimation: 127633,
           femaleEstimation: 136838,
           locationId: 'Location/0',
-          estimationYear: 2022,
           locationLevel: 'COUNTRY'
         },
         results: [
@@ -47,7 +46,8 @@ describe('get total metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         event: 'BIRTH'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -71,7 +71,8 @@ describe('get declarations started metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -110,7 +111,8 @@ describe('get month wise event estimation metrics', () => {
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
         event: 'BIRTH'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()
@@ -150,7 +152,8 @@ describe('get location wise event estimation metrics', () => {
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
         event: 'birth'
-      }
+      },
+      { headers: undefined }
     )
 
     expect(data).toBeDefined()

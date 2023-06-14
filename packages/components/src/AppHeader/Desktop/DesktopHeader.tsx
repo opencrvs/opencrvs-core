@@ -42,12 +42,11 @@ export class DesktopHeader extends React.Component<
     return (
       <HeaderContainer id={id} className={className}>
         {desktopRightMenu &&
-          desktopRightMenu.map((item: IRightMenu, index) => (
-            <React.Fragment key={`desktop-header-${index}`}>
-              {' '}
-              {item.element}
-            </React.Fragment>
-          ))}
+          desktopRightMenu.map((item: IRightMenu, index) =>
+            React.cloneElement(item.element, {
+              key: index
+            })
+          )}
       </HeaderContainer>
     )
   }

@@ -15,14 +15,17 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  ARCHIVED_STATUS,
   CERTIFIED_STATUS,
   createStatusHistory,
+  DECLARED_STATUS,
   detectDeathDuplicates,
   EVENT,
   getCreatedBy,
   getStatus,
   ICompositionBody,
   IDeathCompositionBody,
+  IN_PROGRESS_STATUS,
   IOperationHistory,
   NAME_EN,
   REGISTERED_STATUS,
@@ -30,15 +33,16 @@ import {
   VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
+  addEventLocation,
+  addFlaggedAsPotentialDuplicate,
   findEntry,
+  findEntryResourceByUrl,
   findName,
   findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl,
-  getdeclarationJurisdictionIds,
-  addEventLocation
+  getdeclarationJurisdictionIds
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 import { client } from '@search/elasticsearch/client'
@@ -128,7 +132,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       REJECTED_STATUS,
       VALIDATED_STATUS,
       REGISTERED_STATUS,
-      CERTIFIED_STATUS
+      CERTIFIED_STATUS,
+      ARCHIVED_STATUS
     ].includes(body.type ?? '')
   ) {
     body.assignment = null
@@ -156,11 +161,8 @@ async function indexDeclaration(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (
-    body.type !== 'IN_PROGRESS' &&
-    body.type !== 'WAITING_VALIDATION' &&
-    body.type !== 'VALIDATED'
-  ) {
+
+  if (body.type === DECLARED_STATUS || body.type === IN_PROGRESS_STATUS) {
     await detectAndUpdateDeathDuplicates(compositionId, composition, body)
   }
 }
@@ -177,8 +179,14 @@ async function detectAndUpdateDeathDuplicates(
   logger.info(
     `Search/service:death: ${duplicates.length} duplicate composition(s) found`
   )
-
-  return await updateCompositionWithDuplicates(composition, duplicates)
+  await addFlaggedAsPotentialDuplicate(
+    duplicates.map((ite) => ite.trackingId).join(','),
+    compositionId
+  )
+  return await updateCompositionWithDuplicates(
+    composition,
+    duplicates.map((it) => it.id)
+  )
 }
 
 async function createIndexBody(

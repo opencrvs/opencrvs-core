@@ -40,6 +40,7 @@ const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 export const REGISTERED_STATUS = 'REGISTERED'
 const REINSTATED_STATUS = 'REINSTATED'
 export const CERTIFIED_STATUS = 'CERTIFIED'
+export const ISSUED_STATUS = 'ISSUED'
 const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
@@ -51,12 +52,14 @@ export interface ICorrection {
   oldValue: string
   newValue: string
 }
+
 export interface IAssignment {
   userId: string
   firstName: string
   lastName: string
   officeName: string
 }
+
 export interface IOperationHistory {
   operationType: string
   operatedOn: string
@@ -163,6 +166,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantDoB?: string
   informantIdentifier?: string
 }
+
 export interface IMarriageCompositionBody extends ICompositionBody {
   brideFirstNames?: string
   groomFirstNames?: string
@@ -191,9 +195,11 @@ type Label = {
   lang: string
   label: string
 }
+
 interface IUserRole {
   labels: Label[]
 }
+
 export interface IUserModelData {
   _id: string
   role: IUserRole
@@ -316,7 +322,10 @@ function findBirthDuplicateIds(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map((hit) => hit._id)
+    .map((hit) => ({
+      id: hit._id,
+      trackingId: hit._source.trackingId
+    }))
 }
 
 function findDeathDuplicateIds(
@@ -328,7 +337,10 @@ function findDeathDuplicateIds(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map((hit) => hit._id)
+    .map((hit) => ({
+      id: hit._id,
+      trackingId: hit._source.trackingId
+    }))
 }
 
 export async function getUser(practitionerId: string, authHeader: any) {
@@ -362,6 +374,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
     [REJECTED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,
+      WAITING_VALIDATION_STATUS,
       VALIDATED_STATUS,
       ARCHIVED_STATUS
     ],
@@ -387,10 +400,10 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       VALIDATED_STATUS,
       WAITING_VALIDATION_STATUS
     ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
+    [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS],
+    [ISSUED_STATUS]: [CERTIFIED_STATUS],
     [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REINSTATED_STATUS]: [ARCHIVED_STATUS],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
+    [REINSTATED_STATUS]: [ARCHIVED_STATUS]
   }
 
   const previousStatus = getPreviousStatus(body)

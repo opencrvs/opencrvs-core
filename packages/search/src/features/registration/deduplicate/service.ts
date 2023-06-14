@@ -65,6 +65,14 @@ export const searchForBirthDuplicates = async (
   // Names of length of >7 characters = 2 edits allowed
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
 
+  if (
+    (!body.childFirstNames && !body.childFamilyName) ||
+    (!body.motherFirstNames && !body.motherFamilyName) ||
+    !body.motherDoB ||
+    !body.childDoB
+  ) {
+    return []
+  }
   const mothersDetailsMatch = {
     bool: {
       must: [
@@ -184,11 +192,11 @@ export const searchForBirthDuplicates = async (
                                     childDoB: {
                                       gte: subYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString(),
                                       lte: addYears(
                                         new Date(body.childDoB),
-                                        1
+                                        3
                                       ).toISOString()
                                     }
                                   }
@@ -230,6 +238,13 @@ export const searchForDeathDuplicates = async (
   client: elasticsearch.Client
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+  if (
+    (!body.deceasedFirstNames && !body.deceasedFamilyName) ||
+    !body.deceasedDoB ||
+    !body.deathDate
+  ) {
+    return []
+  }
 
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
@@ -282,6 +297,34 @@ export const searchForDeathDuplicates = async (
                         field: 'deathDate',
                         pivot: '5d', // 5 days
                         origin: new Date(body.deathDate).toISOString(),
+                        boost: 1
+                      }
+                    }
+                  ].filter(Boolean)
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    body.deceasedDoB && {
+                      range: {
+                        deceasedDoB: {
+                          gte: subDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString(),
+                          lte: addDays(
+                            new Date(body.deceasedDoB),
+                            5
+                          ).toISOString()
+                        }
+                      }
+                    },
+                    body.deceasedDoB && {
+                      distance_feature: {
+                        field: 'deceasedDoB',
+                        pivot: '5d', // 5 days
+                        origin: new Date(body.deceasedDoB).toISOString(),
                         boost: 1
                       }
                     }

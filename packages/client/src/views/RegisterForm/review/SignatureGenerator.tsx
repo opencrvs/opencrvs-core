@@ -32,6 +32,8 @@ import {
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import SignatureCanvas from 'react-signature-canvas'
+import { isBase64FileString } from '@client/utils/commonUtils'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const InputWrapper = styled.div`
   margin-top: 56px;
@@ -85,11 +87,12 @@ export function SignatureGenerator({
   isRequired
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
-  const [signatureValue, setSignatureValue] = useState('')
-  const [signatureError, setSignatureError] = useState('')
+  const [signatureValue, setSignatureValue] = useState(EMPTY_STRING)
+  const [signatureError, setSignatureError] = useState(EMPTY_STRING)
   const intl = useIntl()
   const allowedSignatureFormat = ['image/png']
 
+  const signatureData = value
   function apply() {
     setSignatureDialogOpen(false)
     onChange(signatureValue)
@@ -105,7 +108,7 @@ export function SignatureGenerator({
           <ErrorMessage id="signature-upload-error">
             {signatureError && <ErrorText>{signatureError}</ErrorText>}
           </ErrorMessage>
-          {!value && (
+          {!signatureData && (
             <>
               <SecondaryButton
                 onClick={() => setSignatureDialogOpen(true)}
@@ -115,8 +118,15 @@ export function SignatureGenerator({
               </SecondaryButton>
               <CustomImageUpload
                 id="signature-file-upload"
-                title="Upload"
+                title={intl.formatMessage(buttonMessages.upload)}
                 handleFileChange={async (file) => {
+                  const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
+                  if (fileSizeMB > 2) {
+                    setSignatureError(
+                      intl.formatMessage(formMessages.fileSizeError)
+                    )
+                    return
+                  }
                   if (!allowedSignatureFormat.includes(file.type)) {
                     setSignatureError(
                       intl.formatMessage(formMessages.fileUploadError, {
@@ -136,8 +146,10 @@ export function SignatureGenerator({
               />
             </>
           )}
-          {value && <SignaturePreview alt={label} src={value} />}
-          {value && (
+          {signatureData && (
+            <SignaturePreview alt={label} src={signatureData} />
+          )}
+          {signatureData && (
             <TertiaryButton onClick={() => onChange('')}>
               {intl.formatMessage(messages.signatureDelete)}
             </TertiaryButton>

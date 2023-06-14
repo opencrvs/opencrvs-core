@@ -62,14 +62,14 @@ Dependencies are required. Ensure you have satisfied all the following requireme
 - **Admin rights**: You must have admin rights over your computer and a sudo password
 - **Disk space and RAM:** A minimum of 20GB of hard drive space available and at least 16GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
 - **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically. OpenCRVS has been tested on Docker version 20.10.11 and docker-compose version 1.29.2
-- **Nodejs:** You must install Node v14.18.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
+- **Nodejs:** You must install Node v16.20.0 using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
 - **Yarn:** Install the [Yarn Package Manager](https://classic.yarnpkg.com/en/docs/install) for Node
 - **Chrome:** Install [Google Chrome](https://www.google.com/chrome). The OpenCRVS client application is a progressive web application.
 - **tmux:** Install [tmux](https://github.com/tmux/tmux/wiki). Multiple terminal windows are required to run OpenCRVS Core alongside the default country configuration. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts.
 
 ## Install OpenCRVS
 
-The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland". To deploy OpenCRVS onto a publicly accessible server, follow [these instructions](https://github.com/opencrvs/opencrvs-core/tree/develop/infrastructure/server-setup).
+The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland". To deploy OpenCRVS onto a publicly accessible server, follow [these instructions](https://github.com/opencrvs/opencrvs-farajaland/tree/develop/infrastructure/server-setup).
 
 1. Check you have installed all the dependencies. See above.
 2. Run `git clone https://github.com/opencrvs/opencrvs-core.git`
@@ -220,14 +220,13 @@ We want to see OpenCRVS implemented across the world. We can’t do this alone. 
 
 ## Contributing
 
-You may view/add issues here: https://github.com/opencrvs/opencrvs-core/issues
+You may view or add issues here: https://github.com/opencrvs/opencrvs-core/issues
 
 To contribute code, please review the CONTRIBUTING.md file https://github.com/opencrvs/opencrvs-core/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
 
 By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
 
 <br>
-
 
 ## License
 
