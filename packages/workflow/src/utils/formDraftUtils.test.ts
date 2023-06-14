@@ -13,8 +13,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchAny from 'jest-fetch-mock'
 import { getFormDraft } from '@workflow/utils/formDraftUtils'
-import { testFhirTaskBundle, mockFormDraft } from '@workflow/test/utils'
-import * as fhirModifier from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { mockFormDraft } from '@workflow/test/utils'
 
 const fetch = fetchAny as any
 let token: string
