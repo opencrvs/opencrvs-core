@@ -51,7 +51,8 @@ import {
 } from '@client/navigation'
 import {
   CERTIFICATE_COLLECTOR,
-  REGISTRAR_HOME_TAB
+  REGISTRAR_HOME_TAB,
+  REVIEW_CERTIFICATE
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
@@ -363,6 +364,16 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToPrint,
             selectorId: ''
+          })}
+        />
+      )
+    }
+    if (event === Event.Marriage) {
+      return (
+        <Redirect
+          to={formatUrl(REVIEW_CERTIFICATE, {
+            registrationId: declarationToBeCertified.id,
+            eventType: event
           })}
         />
       )
