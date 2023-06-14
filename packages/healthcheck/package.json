@@ -10,19 +10,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "13.1.2",
+    "@next/font": "^13.4.5",
     "@types/node": "18.11.18",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.10",
     "eslint": "8.32.0",
-    "eslint-config-next": "13.1.2",
-    "next": "13.1.2",
+    "eslint-config-next": "^13.4.5",
+    "next": "^13.4.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.4"
-  },
-  "resolutions": {
-    "//": "See https://github.com/opencrvs/opencrvs-core/issues/3820 Which affects the root package.json, and therefore we need to override it here.",
-    "@types/react": "18.0.26"
+    "styled-components": "^5.2.0",
+    "typescript": "^4.8.3"
   }
 }

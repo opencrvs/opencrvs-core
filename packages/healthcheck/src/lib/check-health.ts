@@ -25,7 +25,10 @@ export interface Service extends Record<string, unknown> {
 
 export const checkHealth = async (): Promise<Service[]> => {
   if (!process.env.HEALTHCHECK_URL) {
-    throw new Error('Environment variable "HEALTHCHECK_URL" is not set')
+    throw new Error(`Environment variable "HEALTHCHECK_URL" is not set.
+
+Run the following command in packages/healthcheck and restart services:
+echo "HEALTHCHECK_URL=http://localhost:7070/ping" > .env.local`)
   }
 
   const res = await fetch(process.env.HEALTHCHECK_URL!)

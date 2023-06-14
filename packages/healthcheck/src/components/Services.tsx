@@ -21,10 +21,6 @@ const Table = styled.table`
     padding: 8px;
     text-align: left;
   }
-
-  ${({ theme }) => {
-    return `color: ${theme.colors.yellow}`
-  }}
 `
 
 export const Services = ({ services }: { services: Service[] }) => {
@@ -33,12 +29,20 @@ export const Services = ({ services }: { services: Service[] }) => {
       <thead>
         <tr>
           <th>
-            <Text variant="h1" element="h1">
-              asdfasdf
+            <Text variant="bold18" element="span">
+              Service
             </Text>
           </th>
-          <th>URL</th>
-          <th>Status</th>
+          <th>
+            <Text variant="bold18" element="span">
+              URL
+            </Text>
+          </th>
+          <th>
+            <Text variant="bold18" element="span">
+              Status
+            </Text>
+          </th>
         </tr>
       </thead>
       <tbody>

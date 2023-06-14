@@ -37,9 +37,7 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>
-          <>{!isAllOk ? '! ' : ''}OpenCRVS healthcheck</>
-        </title>
+        <title>{isAllOk ? '' : '! '}OpenCRVS healthcheck</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Favicon status={isAllOk ? 'ok' : 'error'} />
       </Head>

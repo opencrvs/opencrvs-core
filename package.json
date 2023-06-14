@@ -6,10 +6,6 @@
   "workspaces": {
     "packages": [
       "packages/*"
-    ],
-    "--": "nohoist fixes issue with Next.js and Monorepos: https://github.com/vercel/next.js/discussions/39432",
-    "nohoist": [
-      "**/healthcheck/**"
     ]
   },
   "husky": {
