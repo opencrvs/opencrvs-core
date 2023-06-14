@@ -404,12 +404,12 @@ export function deserializeForm(
   form: ISerializedForm,
   countryConfigValidators: Record<string, Validation | AnyFn<Validation>>
 ): IForm {
-  const sections = form.sections.map(
-    (section) =>
-      deserializeFormSection(section, {
-        ...countryConfigValidators,
-        ...validators
-      } as any) // TODO: Fix as any!
+  const sections = form.sections.map((section) =>
+    deserializeFormSection(section, {
+      // `any` because validators can include functions that aren't "Validation" -type
+      ...(validators as Record<string, any>),
+      ...countryConfigValidators
+    })
   )
 
   return {
