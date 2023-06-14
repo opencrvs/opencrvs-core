@@ -17,7 +17,7 @@ import {
   newChannelTemplate,
   routeTemplate,
   Channel
-} from '@migration/utils/openhim-helpers'
+} from '../../utils/openhim-helpers'
 import { Db, MongoClient } from 'mongodb'
 
 const eventMarkAsDuplicateChannel: Channel = {
@@ -35,7 +35,7 @@ const eventMarkAsDuplicateChannel: Channel = {
   urlPattern: '^/events/marked-as-duplicate'
 }
 
-exports.up = async (db: Db, client: MongoClient) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
@@ -53,7 +53,7 @@ exports.up = async (db: Db, client: MongoClient) => {
   }
 }
 
-exports.down = async (db: Db, client: MongoClient) => {
+export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {

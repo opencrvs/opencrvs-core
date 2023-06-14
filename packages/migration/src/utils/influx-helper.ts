@@ -95,7 +95,7 @@ export const query = async (query: string, options?: IQueryOptions) => {
   try {
     return await influx.query(query, options)
   } catch (err) {
-    console.error(`Error reading data from InfluxDB! ${err.stack}`)
+    console.error(`Error reading data from InfluxDB! ${(err as Error).stack}`)
     throw err
   }
 }

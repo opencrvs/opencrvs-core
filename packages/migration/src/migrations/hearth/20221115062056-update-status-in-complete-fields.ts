@@ -11,7 +11,7 @@
  */
 import { Db } from 'mongodb'
 import { FieldType, InfluxDB } from 'influx'
-import { IPoints } from '@migration/utils/migration-interfaces'
+import { IPoints } from '../../utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = process.env.INFLUX_PORT || '8086'
@@ -48,7 +48,7 @@ export const up = async (db: Db) => {
     await influx.query(
       "SELECT * from in_complete_fields WHERE regStatus='IN_PROGESS'"
     )
-  ).map(({ time, ...point }: { time: any; [key: string]: any }) => ({
+  ).map(({ time, ...point }: any) => ({
     ...point,
     timestamp: time.getNanoTime()
   })) as IPoints[]

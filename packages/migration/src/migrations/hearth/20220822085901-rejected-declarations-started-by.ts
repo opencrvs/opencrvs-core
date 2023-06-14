@@ -11,7 +11,7 @@
  */
 import { InfluxDB, FieldType } from 'influx'
 import { Db } from 'mongodb'
-import { IPoints } from '@migration/utils/migration-interfaces'
+import { IPoints } from '../../utils/migration-interfaces'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = Number(process.env.INFLUX_PORT) || 8086
@@ -44,20 +44,20 @@ export const up = async (db: Db) => {
 
   const rejectedPoints = (
     await influx.query('SELECT * FROM declarations_rejected')
-  ).map(({ time, ...point }: { time: any; [key: string]: any }) => ({
+  ).map(({ time, ...point }: any) => ({
     ...point,
     timestamp: time.getNanoTime()
   })) as IPoints[]
 
   const startedByMap = await getCompositionIdToStartedByMap(
     db,
-    rejectedPoints.map(({ compositionId }) => compositionId)
+    rejectedPoints.map(({ compositionId }) => compositionId!)
   )
 
   const rejectedPointsWithCorrectStartedBy = rejectedPoints.map(
     ({ compositionId, timestamp, ...tags }) => ({
       measurement: 'declarations_rejected',
-      tags: { ...tags, startedBy: startedByMap.get(compositionId)! },
+      tags: { ...tags, startedBy: startedByMap.get(compositionId!)! },
       fields: { compositionId },
       timestamp
     })

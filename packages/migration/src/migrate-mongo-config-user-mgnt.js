@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { config as configMongo } from 'migrate-mongo'
 
 const config = {
   mongodb: {
@@ -19,11 +18,11 @@ const config = {
       useUnifiedTopology: true // removes a deprecating warning when connecting
     }
   },
-  migrationsDir: 'migrations/user-mgnt',
+  migrationsDir: 'build/dist/src/migrations/user-mgnt',
   changelogCollectionName: 'changelog',
   migrationFileExtension: '.js',
   useFileHash: false,
   moduleSystem: 'esm'
-} as configMongo.Config
+}
 
 export default config

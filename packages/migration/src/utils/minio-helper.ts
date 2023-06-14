@@ -43,7 +43,7 @@ export async function uploadBase64ToMinio(
     })
     return `/${MINIO_BUCKET}/${generateFileName}`
   } catch (error) {
-    return error
+    return error as Error
   }
 }
 

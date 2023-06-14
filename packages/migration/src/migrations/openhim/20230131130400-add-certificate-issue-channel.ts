@@ -16,7 +16,7 @@ import {
   removeChannel,
   newChannelTemplate,
   Channel
-} from '@migration/utils/openhim-helpers'
+} from '../../utils/openhim-helpers'
 
 const birthCertificateIssueChannel: Channel = {
   ...newChannelTemplate,

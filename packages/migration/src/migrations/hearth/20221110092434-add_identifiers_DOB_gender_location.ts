@@ -15,14 +15,14 @@ import {
   getCompositionCursor,
   getCollectionDocuments,
   getTotalDocCountByCollectionName
-} from '@migration/utils/hearth-helper'
+} from '../../utils/hearth-helper'
 
 import {
   updateComposition,
   updateFieldNameByCompositionId
-} from '@migration/utils/elasticsearch-helper'
+} from '../../utils/elasticsearch-helper'
 import { Db, MongoClient } from 'mongodb'
-import { Identifier } from '@migration/utils/migration-interfaces'
+import { Identifier } from '../../utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

@@ -13,8 +13,8 @@ import { Db, MongoClient } from 'mongodb'
 import {
   INFORMANT_SMS_NOTIFICATION_COLLECTION,
   getNotificationContent
-} from '@migration/utils/resource-helper'
-import { NotificationContent } from '@migration/utils/migration-interfaces'
+} from '../../utils/resource-helper'
+import { NotificationContent } from '../../utils/migration-interfaces'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()

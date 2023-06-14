@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Db, MongoClient } from 'mongodb'
-import { Channel } from '@migration/utils/openhim-helpers'
+import { Channel } from '../../utils/openhim-helpers'
 
 import {
   addRouteToChannel,
@@ -18,7 +18,7 @@ import {
   upsertChannel,
   removeChannel,
   newChannelTemplate
-} from '@migration/utils/openhim-helpers'
+} from '../../utils/openhim-helpers'
 
 const eventDownloadedChannel: Channel = {
   ...newChannelTemplate,

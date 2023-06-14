@@ -6,7 +6,7 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "./runMigrations.sh",
+    "start": "yarn build && ./runMigrations.sh",
     "revert": "./revertMigrations.sh",
     "start:prod": "./runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
@@ -19,7 +19,8 @@
     "status:user-mgnt": "migrate-mongo status -f migrate-mongo-config-user-mgnt.js",
     "status:application-config": "migrate-mongo status -f migrate-mongo-config-application-config.js",
     "precommit": "lint-staged",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "build": "tsc --traceResolution"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
