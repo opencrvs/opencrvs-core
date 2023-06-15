@@ -41,7 +41,7 @@ const messagesToDefine: IStepTwoFormMessages = {
   resend: {
     id: 'login.resend',
     defaultMessage: 'Resend SMS',
-    description: 'Text for button that resends SMS verification code'
+    description: 'Text for button that resends SMS or email verification code'
   },
   stepTwoInstructionSMS: {
     id: 'login.stepTwoInstruction.sms',
