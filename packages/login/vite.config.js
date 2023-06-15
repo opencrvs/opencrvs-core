@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
     // This changes the out put dir from dist to build
     build: {
       outDir: 'build',
+      sourcemap: true,
       commonjsOptions: {
         transformMixedEsModules: true
       }
