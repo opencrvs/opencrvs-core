@@ -88,14 +88,12 @@ export interface IEstimation {
   femaleEstimation: number
   locationId: string
   locationLevel: string
-  estimationYear: number
 }
 
 export interface IRegistrationInTargetDayEstimation {
   locationId: string
   registrationInTargetDay: number
   estimatedRegistration: number
-  estimationYear: number
   estimationLocationLevel: string
   estimationPercentage: number
 }
@@ -743,7 +741,6 @@ export async function fetchEstimatedTargetDayMetrics(
       locationId: point[locationLevel],
       registrationInTargetDay: point.withInTargetDay,
       estimatedRegistration: estimationOfTargetDay.totalEstimation,
-      estimationYear: estimationOfTargetDay.estimationYear,
       estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage:
         point.withInTargetDay === 0 ||
@@ -773,7 +770,6 @@ export async function fetchEstimatedTargetDayMetrics(
       locationId: id,
       registrationInTargetDay: 0,
       estimatedRegistration: estimationOfTargetDay.totalEstimation,
-      estimationYear: estimationOfTargetDay.estimationYear,
       estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage: 0
     })
