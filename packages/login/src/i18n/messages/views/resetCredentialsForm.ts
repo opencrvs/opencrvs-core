@@ -222,8 +222,9 @@ const messagesToDefine = {
   },
   resend: {
     id: 'resend.sms',
-    defaultMessage: 'Resend SMS',
-    description: 'Text for button that resends SMS verification code'
+    defaultMessage:
+      'Resend {notificationMethod, select, sms {SMS} email {Email} other {}}',
+    description: 'Text for button that resend SMS or email verification code'
   }
 }
 
