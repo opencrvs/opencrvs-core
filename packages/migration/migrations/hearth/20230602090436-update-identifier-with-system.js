@@ -11,6 +11,7 @@
  */
 import { MongoClient } from 'mongodb'
 import * as mongoose from 'mongoose'
+import { getTotalDocCountByCollectionName } from './20230127063226-update-practitioner-role.js'
 
 const USER_MGNT_MONGO_URL =
   process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt'
@@ -29,32 +30,34 @@ export const up = async (db, client) => {
 
   try {
     await session.withTransaction(async () => {
-      const tasksWithSystem = await db
-        .collection('Task')
-        .find({
-          'identifier.system': systemIdentifier
-        })
-        .toArray()
+      const tasksWithSystem = await db.collection('Task').find({
+        'identifier.system': systemIdentifier
+      })
 
-      const tasksHistoryWithSystem = await db
-        .collection('Task_history')
-        .find({
-          'identifier.system': systemIdentifier
-        })
-        .toArray()
+      const tasksHistoryWithSystem = await db.collection('Task_history').find({
+        'identifier.system': systemIdentifier
+      })
+
+      const tasksWithSystemCount = await getTotalDocCountByCollectionName(
+        db,
+        'Task'
+      )
+
+      const tasksHistoryWithSystemCount =
+        await getTotalDocCountByCollectionName(db, 'Task_history')
 
       // eslint-disable-next-line no-console
       console.log(
-        `Migration - Task integration update with system object, total ${tasksWithSystem.length} tasks need to be processed`
+        `Migration - Task integration update with system object, total ${tasksWithSystemCount} tasks need to be processed`
       )
 
       for await (const task of tasksWithSystem) {
         // eslint-disable-next-line no-console
         console.log(
-          `Processed ${processTask + 1}/${
-            tasksWithSystem.length
-          } tasks, progress ${(
-            ((processTask + 1) / tasksWithSystem.length) *
+          `Processed ${
+            processTask + 1
+          }/${tasksWithSystemCount} tasks, progress ${(
+            ((processTask + 1) / tasksWithSystemCount) *
             100
           ).toFixed(2)} ...`
         )
@@ -84,15 +87,15 @@ export const up = async (db, client) => {
 
       // eslint-disable-next-line no-console
       console.log(
-        `Migration - Task history integration update with system object, total ${tasksHistoryWithSystem.length} task history need to be processed`
+        `Migration - Task history integration update with system object, total ${tasksHistoryWithSystemCount} task history need to be processed`
       )
       for await (const task of tasksHistoryWithSystem) {
         // eslint-disable-next-line no-console
         console.log(
-          `Processed ${processTaskHistory + 1}/${
-            tasksHistoryWithSystem.length
-          } tasks history, progress ${(
-            ((processTaskHistory + 1) / tasksHistoryWithSystem.length) *
+          `Processed ${
+            processTaskHistory + 1
+          }/${tasksHistoryWithSystemCount} tasks history, progress ${(
+            ((processTaskHistory + 1) / tasksHistoryWithSystemCount) *
             100
           ).toFixed(2)} ...`
         )
