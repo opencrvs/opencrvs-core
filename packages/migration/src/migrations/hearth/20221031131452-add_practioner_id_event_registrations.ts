@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { query, writePoints } from '../../utils/influx-helper'
+import { query, writePoints } from '../../utils/influx-helper.js'
 import {
   IRegistrationFields,
   IMigrationRegistrationResults
-} from '../../utils/migration-interfaces'
+} from '../../utils/migration-interfaces.js'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {

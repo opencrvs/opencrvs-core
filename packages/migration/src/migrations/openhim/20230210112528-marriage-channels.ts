@@ -15,7 +15,7 @@ import {
   newChannelTemplate,
   routeTemplate,
   Channel
-} from '../../utils/openhim-helpers'
+} from '../../utils/openhim-helpers.js'
 import { Db, MongoClient } from 'mongodb'
 
 const marriageNewDeclarationChannel: Channel = {

@@ -14,7 +14,7 @@ import {
   upsertChannel,
   removeChannel,
   Channel
-} from '../../utils/openhim-helpers'
+} from '../../utils/openhim-helpers.js'
 
 const newChannel: Channel = {
   methods: ['POST'],

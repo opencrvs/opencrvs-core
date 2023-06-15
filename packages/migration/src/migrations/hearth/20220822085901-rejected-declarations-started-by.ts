@@ -11,7 +11,7 @@
  */
 import { InfluxDB, FieldType } from 'influx'
 import { Db } from 'mongodb'
-import { IPoints } from '../../utils/migration-interfaces'
+import { IPoints } from '../../utils/migration-interfaces.js'
 
 const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = Number(process.env.INFLUX_PORT) || 8086

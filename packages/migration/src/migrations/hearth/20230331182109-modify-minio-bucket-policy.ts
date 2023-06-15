@@ -15,7 +15,7 @@ import {
   DEFAULT_MINIO_ACCESS_KEY,
   minioClient
   // eslint-disable-next-line import/no-relative-parent-imports
-} from '../../utils/minio-helper'
+} from '../../utils/minio-helper.js'
 import { Db, MongoClient } from 'mongodb'
 const updatedPolicy = `
 {

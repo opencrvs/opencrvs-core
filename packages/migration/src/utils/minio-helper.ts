@@ -11,9 +11,11 @@
  */
 
 import * as Minio from 'minio'
-import { v4 as uuid } from 'uuid'
+import uuidPkg from 'uuid'
 import * as fileTypePKG from 'file-type'
 const { fromBuffer } = fileTypePKG
+
+const { v4: uuid } = uuidPkg
 
 export const MINIO_HOST = process.env.MINIO_HOST || 'localhost'
 export const MINIO_PORT = process.env.MINIO_PORT || 3535

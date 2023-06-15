@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { upsertChannel, Channel } from '../../utils/openhim-helpers'
+import { upsertChannel, Channel } from '../../utils/openhim-helpers.js'
 import { Db, MongoClient } from 'mongodb'
 
 const newChannel: Channel = {

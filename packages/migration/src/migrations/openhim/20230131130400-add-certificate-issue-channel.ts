@@ -16,7 +16,7 @@ import {
   removeChannel,
   newChannelTemplate,
   Channel
-} from '../../utils/openhim-helpers'
+} from '../../utils/openhim-helpers.js'
 
 const birthCertificateIssueChannel: Channel = {
   ...newChannelTemplate,

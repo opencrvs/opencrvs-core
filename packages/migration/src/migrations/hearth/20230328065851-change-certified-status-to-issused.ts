@@ -13,13 +13,15 @@
 import {
   getCertifiedTaskCursor,
   getTotalCertifiedTaskCount
-} from '../../utils/hearth-helper'
+} from '../../utils/hearth-helper.js'
 import {
   updateComposition,
   searchByCompositionId
-} from '../../utils/elasticsearch-helper'
-import { v4 as uuid } from 'uuid'
+} from '../../utils/elasticsearch-helper.js'
+import uuidPkg from 'uuid'
 import { Db, MongoClient } from 'mongodb'
+
+const { v4: uuid } = uuidPkg
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
