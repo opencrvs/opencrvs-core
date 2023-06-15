@@ -50,12 +50,12 @@ export const FETCH_PERSON_NID = gql`
 `
 
 export const transformPersonData = (response: ApolloQueryResult<GQLQuery>) => {
-  const responseData = response.data.queryPersonByNidIdentifier as GQLPerson
+  const responseData = response.data.queryPersonByNidIdentifier
   return responseData
 }
 export const transformInformantData = (
   response: ApolloQueryResult<GQLQuery>
 ) => {
-  const responseData = response.data.queryPersonByNidIdentifier as GQLPerson
+  const responseData = response.data.queryPersonByNidIdentifier
   return { individual: responseData }
 }

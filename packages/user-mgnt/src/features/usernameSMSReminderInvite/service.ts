@@ -12,16 +12,24 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import { IUserName } from '@user-mgnt/model/user'
 
 export async function sendUserName(
-  mobile: string,
   username: string,
-  authHeader: { Authorization: string }
+  userFullName: IUserName[],
+  authHeader: { Authorization: string },
+  mobile?: string,
+  email?: string
 ) {
-  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')
+  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserName')
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ msisdn: mobile, username }),
+    body: JSON.stringify({
+      msisdn: mobile,
+      email,
+      username,
+      userFullName
+    }),
     headers: {
       'Content-Type': 'application/json',
       ...authHeader

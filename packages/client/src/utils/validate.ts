@@ -201,6 +201,10 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
 
 export const emailAddressFormat: Validation = (value: IFormFieldValue) => {
   const cast = value as string
+  if (cast === '') {
+    return
+  }
+
   return cast && isAValidEmailAddressFormat(cast)
     ? undefined
     : {
