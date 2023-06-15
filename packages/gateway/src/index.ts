@@ -17,10 +17,13 @@ import '@opencrvs/commons/monitoring'
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as DotEnv from 'dotenv'
 import { createServer } from '@gateway/server'
+import { seedData } from './features/dataSeeding'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
 })
+
+seedData()
 
 createServer().then((app) => {
   app.start()
