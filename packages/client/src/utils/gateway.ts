@@ -2126,6 +2126,7 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  disabled?: InputMaybe<Scalars['Boolean']>
   dynamicOptions?: InputMaybe<DynamicOptionInput>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
@@ -4184,6 +4185,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4885,6 +4887,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -5599,6 +5602,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
