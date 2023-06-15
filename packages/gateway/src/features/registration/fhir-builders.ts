@@ -18,7 +18,6 @@ import {
   BIRTH_ATTENDANT_CODE,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   BIRTH_ENCOUNTER_CODE,
-  BIRTH_REG_TYPE_CODE,
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
   CAUSE_OF_DEATH_CODE,
@@ -1149,18 +1148,6 @@ export const builders: IFieldBuilders = {
           OBSERVATION_CATEGORY_PROCEDURE_DESC,
           BIRTH_ATTENDANT_CODE,
           'Birth attendant title',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
-      birthRegistrationType: (fhirBundle, fieldValue, context) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          BIRTH_REG_TYPE_CODE,
-          'Birth registration type',
           fhirBundle,
           context
         )
@@ -4096,22 +4083,6 @@ export const builders: IFieldBuilders = {
       OBSERVATION_CATEGORY_PROCEDURE_DESC,
       BIRTH_ATTENDANT_CODE,
       'Birth attendant title',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
-  },
-  birthRegistrationType: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      BIRTH_REG_TYPE_CODE,
-      'Birth registration type',
       fhirBundle,
       context
     )

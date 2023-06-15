@@ -951,8 +951,6 @@ export enum MarriageSection {
   Preview = 'preview'
 }
 
-export type WizardSection = BirthSection | DeathSection | 'settings'
-
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
