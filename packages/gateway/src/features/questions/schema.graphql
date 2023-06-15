@@ -102,4 +102,5 @@ input QuestionInput {
   optionCondition: String
   hideHeader: Boolean
   previewGroup: String
+  disabled: Boolean
 }
