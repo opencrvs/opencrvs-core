@@ -71,7 +71,7 @@ describe('authenticate handler receives a request', () => {
 
       expect(res.statusCode).toBe(403)
     })
-    it('generates a mobile verification code and sends it to sms gateway', async () => {
+    it('generates a mobile verification code and sends it to notification gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -99,8 +99,8 @@ describe('authenticate handler receives a request', () => {
       })
 
       expect(spy).toHaveBeenCalled()
-      expect(spy.mock.calls[0]).toHaveLength(2)
-      expect(spy.mock.calls[0][0]).toBe('+345345343')
+      expect(spy.mock.calls[0]).toHaveLength(5)
+      expect(spy.mock.calls[0][3]).toBe('+345345343')
     })
     it('does not generate a mobile verification code for pending users', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
