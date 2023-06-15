@@ -177,7 +177,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 
   const jurisdictionTypeIdentifier =
     location.identifier &&
-    (location.identifier as GQLIdentifier[]).find(
+    location.identifier.find(
       ({ system }: GQLIdentifier) =>
         system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
     )

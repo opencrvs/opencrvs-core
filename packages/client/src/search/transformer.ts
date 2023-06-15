@@ -24,6 +24,24 @@ import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
 
+export const isBirthEvent = (
+  req: GQLEventSearchSet
+): req is GQLBirthEventSearchSet => {
+  return req.type === 'Birth'
+}
+
+export const isDeathEvent = (
+  req: GQLEventSearchSet
+): req is GQLDeathEventSearchSet => {
+  return req.type === 'Death'
+}
+
+export const isMarriageEvent = (
+  reg: GQLEventSearchSet
+): reg is GQLMarriageEventSearchSet => {
+  return reg.type === 'Marriage'
+}
+
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
   intl: IntlShape
@@ -42,37 +60,40 @@ export const transformData = (
       let names
       let groomNames
       let brideNames
-      let mergedMarriageName
       let dateOfEvent
-      const assignedReg = reg as GQLEventSearchSet
-      if (assignedReg.registration && assignedReg.type === 'Birth') {
-        birthReg = reg as GQLBirthEventSearchSet
-        names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
-        dateOfEvent = birthReg && birthReg.dateOfBirth
-      } else if (assignedReg.registration && assignedReg.type === 'Death') {
-        deathReg = reg as GQLDeathEventSearchSet
-        names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
-        dateOfEvent = deathReg && deathReg.dateOfDeath
-      } else {
-        marriageReg = reg as GQLMarriageEventSearchSet
-        groomNames =
-          (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
-        brideNames =
-          (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
+      let mergedMarriageName
+      const assignedReg = reg
 
-        const groomName =
-          (createNamesMap(groomNames as HumanName[])[locale] as string) ||
-          (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
-        const brideName =
-          (createNamesMap(brideNames as HumanName[])[locale] as string) ||
-          (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
+      if (reg.registration) {
+        if (isBirthEvent(reg)) {
+          birthReg = reg
+          names = (birthReg.childName as GQLHumanName[]) || []
+          dateOfEvent = birthReg.dateOfBirth
+        } else if (isDeathEvent(reg)) {
+          deathReg = reg
+          names = (deathReg.deceasedName as GQLHumanName[]) || []
+          dateOfEvent = deathReg && deathReg.dateOfDeath
+        } else if (isMarriageEvent(reg)) {
+          marriageReg = reg
+          groomNames =
+            (marriageReg && (marriageReg.groomName as GQLHumanName[])) || []
+          brideNames =
+            (marriageReg && (marriageReg.brideName as GQLHumanName[])) || []
 
-        mergedMarriageName =
-          brideName && groomName
-            ? `${groomName} & ${brideName}`
-            : brideName || groomName || EMPTY_STRING
+          const groomName =
+            (createNamesMap(groomNames as HumanName[])[locale] as string) ||
+            (createNamesMap(groomNames as HumanName[])[LANG_EN] as string)
+          const brideName =
+            (createNamesMap(brideNames as HumanName[])[locale] as string) ||
+            (createNamesMap(brideNames as HumanName[])[LANG_EN] as string)
 
-        dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+          mergedMarriageName =
+            brideName && groomName
+              ? `${groomName} & ${brideName}`
+              : brideName || groomName || EMPTY_STRING
+
+          dateOfEvent = marriageReg && marriageReg.dateOfMarriage
+        }
       }
       const status =
         assignedReg.registration &&

@@ -17,6 +17,7 @@ interface IValidationMessages
   minLength: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
+  emailAddressFormat: MessageDescriptor
   mobilePhoneRegex: MessageDescriptor
   mobileNumberFormat: MessageDescriptor
   requiredSymbol: MessageDescriptor
@@ -45,6 +46,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
+  },
+  emailAddressFormat: {
+    id: 'validations.emailAddressFormat',
+    defaultMessage: 'Must be a valid email address',
+    description: 'The error message that appears on email address'
   },
   mobilePhoneRegex: {
     id: 'validations.mobilePhoneRegex',

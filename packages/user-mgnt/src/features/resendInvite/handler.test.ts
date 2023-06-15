@@ -76,7 +76,7 @@ const mockUser: IUser & { _id: string } = {
   ]
 }
 
-describe('resendSMSInvite handler', () => {
+describe('resendInvite handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -88,7 +88,7 @@ describe('resendSMSInvite handler', () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resendSMSInvite',
+      url: '/resendInvite',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },
@@ -105,7 +105,7 @@ describe('resendSMSInvite handler', () => {
     mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resendSMSInvite',
+      url: '/resendInvite',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },
@@ -121,7 +121,7 @@ describe('resendSMSInvite handler', () => {
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resendSMSInvite',
+      url: '/resendInvite',
       payload: {
         userId: '5d10885374be318fa7689f0b'
       },
