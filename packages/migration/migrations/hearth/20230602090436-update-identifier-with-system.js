@@ -59,7 +59,7 @@ export const up = async (db, client) => {
           }/${tasksWithSystemCount} tasks, progress ${(
             ((processTask + 1) / tasksWithSystemCount) *
             100
-          ).toFixed(2)} ...`
+          ).toFixed(2)}% ...`
         )
         for (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
@@ -97,7 +97,7 @@ export const up = async (db, client) => {
           }/${tasksHistoryWithSystemCount} tasks history, progress ${(
             ((processTaskHistory + 1) / tasksHistoryWithSystemCount) *
             100
-          ).toFixed(2)} ...`
+          ).toFixed(2)}% ...`
         )
         for (const identifier of task.identifier) {
           if (identifier.system === systemIdentifier) {
