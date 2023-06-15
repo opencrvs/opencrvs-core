@@ -15,15 +15,18 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      // eslint-disable-next-line no-console
       console.log('Updating indices for collection: Task')
       await db.collection('Task').createIndex({ id: 1 })
       if (
         await db
           .collection('Task')
           .count({ 'focus.reference': { $exists: true } })
-      )
-        // eslint-disable-next-line no-console
-        console.log('Done updating indices for collection: Task')
+      ) {
+        await db.collection('Task').createIndex({ 'focus.reference': 1 })
+      }
+      // eslint-disable-next-line no-console
+      console.log('Done updating indices for collection: Task')
 
       // eslint-disable-next-line no-console
       console.log('Updating indices for collection: Composition')
@@ -93,19 +96,22 @@ export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('Task').dropIndex('focus.reference')
-      await db.collection('Task').dropIndex('id')
-      await db.collection('Composition').dropIndex('id')
-      await db.collection('Location').dropIndex('id')
-      await db.collection('Encounter').dropIndex('id')
-      await db.collection('Observation').dropIndex('id')
-      await db.collection('DocumentReference').dropIndex('id')
-      await db.collection('Practitioner').dropIndex('id')
-      await db.collection('PractitionerRole').dropIndex('id')
-      await db.collection('RelatedPerson').dropIndex('id')
-      await db.collection('Patient').dropIndex('id')
-      await db.collection('PaymentReconciliation').dropIndex('id')
+      await db
+        .collection('Task')
+        .dropIndexes({ 'focus.reference': 1, id: 1 } as any)
+      await db.collection('Composition').dropIndex({ id: 1 } as any)
+      await db.collection('Location').dropIndex({ id: 1 } as any)
+      await db.collection('Encounter').dropIndex({ id: 1 } as any)
+      await db.collection('Observation').dropIndex({ id: 1 } as any)
+      await db.collection('DocumentReference').dropIndex({ id: 1 } as any)
+      await db.collection('Practitioner').dropIndex({ id: 1 } as any)
+      await db.collection('PractitionerRole').dropIndex({ id: 1 } as any)
+      await db.collection('RelatedPerson').dropIndex({ id: 1 } as any)
+      await db.collection('Patient').dropIndex({ id: 1 } as any)
+      await db.collection('PaymentReconciliation').dropIndex({ id: 1 } as any)
     })
+  } catch (error) {
+    console.error('Error occurred while dropping the index:', error)
   } finally {
     await session.endSession()
   }

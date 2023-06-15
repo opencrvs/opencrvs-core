@@ -7,8 +7,8 @@
   "license": "MPL-2.0",
   "scripts": {
     "start": "yarn build && ./runMigrations.sh",
-    "revert": "./revertMigrations.sh",
-    "start:prod": "./runMigrations.sh",
+    "revert": "bash revertMigrations.sh",
+    "start:prod": "yarn build && ./runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
     "create:performance": "migrate-mongo create -f migrate-mongo-config-performance.js",

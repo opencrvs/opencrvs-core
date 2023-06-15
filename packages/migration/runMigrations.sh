@@ -16,8 +16,6 @@ USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-# need to update script path
-# SCRIPT_PATH=/home/nileem29/opencrvs/opencrvs-core/packages/migration/build/dist/src
 
 # hearth migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
