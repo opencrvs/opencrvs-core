@@ -14,7 +14,7 @@ import {
   getBirthEncounterCompositionCursor,
   getBirthEncounterCompositionCount
 } from '../../utils/hearth-helper.js'
-import { Db, MongoClient, ObjectId } from 'mongodb'
+import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
@@ -47,7 +47,7 @@ export const up = async (db: Db, client: MongoClient) => {
               id: composition.id
             })
             .toArray()
-          compositionHistory.push({ ...composition, _id: new ObjectId() })
+          compositionHistory.push(composition as any)
           const correctionIndex = compositionHistory.findIndex((composition) =>
             composition.section.find(
               (section: fhir.CompositionSection) =>
