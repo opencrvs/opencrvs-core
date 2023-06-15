@@ -51,7 +51,7 @@ do
 done
 
 if $dependencies; then
-  yarn run compose:deps
+  concurrently "yarn run compose:deps" "bash setup-elastic-index.sh"
   exit 0
 elif $services; then
   yarn dev:secrets:gen
