@@ -191,7 +191,9 @@ export const up = async (db: Db, client: MongoClient) => {
     //remove 'title' field from all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
     //rename 'roles' collection name to 'systemroles'
-    await db.collection('roles').rename('systemroles')
+    if ((await db.listCollections({ name: 'roles' }).toArray()).length == 1) {
+      await db.collection('roles').rename('systemroles')
+    }
   } finally {
     await session.endSession()
   }
