@@ -35,7 +35,8 @@ import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  ROLE_LOCAL_REGISTRAR
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -466,13 +467,15 @@ class OfficeHomeView extends React.Component<
           rejectTab
         )}
 
-        <FABContainer>
-          <FloatingActionButton
-            id="new_event_declaration"
-            onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
-        </FABContainer>
+        {this.props.userDetails?.systemRole !== ROLE_LOCAL_REGISTRAR && (
+          <FABContainer>
+            <FloatingActionButton
+              id="new_event_declaration"
+              onClick={this.props.goToEvents}
+              icon={() => <PlusTransparentWhite />}
+            />
+          </FABContainer>
+        )}
 
         {this.state.showCertificateToast && (
           <Toast
