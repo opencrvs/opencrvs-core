@@ -17,7 +17,6 @@ import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import {
-  getFormattedDate,
   getPageItems,
   getStatusLabel,
   isFlaggedAsPotentialDuplicate,
@@ -218,7 +217,7 @@ export const GetHistory = ({
     date: formatLongDate(
       item?.date.toLocaleString(),
       intl.locale,
-      intl.locale === 'fr' ? 'dd MMMM yyyy · HH.mm' : 'MMMM dd, yyyy · hh.mm a'
+      intl.formatMessage(constantsMessages.formatWithTime)
     ),
 
     action: (
