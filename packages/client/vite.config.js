@@ -51,6 +51,9 @@ export default defineConfig(({ mode }) => {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         swDest: 'build/service-worker.js',
         swSrc: 'src/src-sw.js'
+      },
+      devOptions: {
+        enabled: true
       }
     })
   }
