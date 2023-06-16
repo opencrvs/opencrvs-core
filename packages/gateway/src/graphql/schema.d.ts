@@ -1481,6 +1481,7 @@ export interface GQLQuestionInput {
   optionCondition?: string
   hideHeader?: boolean
   previewGroup?: string
+  disabled?: boolean
 }
 
 export interface GQLSystemSettingsInput {

@@ -89,7 +89,8 @@ export function createCustomField({
   dynamicOptions,
   optionCondition,
   hideHeader,
-  previewGroup
+  previewGroup,
+  disabled
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -118,6 +119,7 @@ export function createCustomField({
     }),
     dynamicOptions: {},
     hideHeader,
+    disabled,
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'

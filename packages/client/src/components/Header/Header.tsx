@@ -45,7 +45,8 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES
+  PERFORMANCE_MANAGEMENT_ROLES,
+  ROLE_LOCAL_REGISTRAR
 } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -463,15 +464,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
             ) && (
               <HeaderCenter>
-                <Button
-                  type="iconPrimary"
-                  size="medium"
-                  key="newEvent"
-                  id="header_new_event"
-                  onClick={this.props.goToEvents}
-                >
-                  <Icon name="Plus" size="medium" />
-                </Button>
+                {this.props.userDetails?.systemRole !==
+                  ROLE_LOCAL_REGISTRAR && (
+                  <Button
+                    type="iconPrimary"
+                    size="medium"
+                    key="newEvent"
+                    id="header_new_event"
+                    onClick={this.props.goToEvents}
+                  >
+                    <Icon name="Plus" size="medium" />
+                  </Button>
+                )}
 
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>
