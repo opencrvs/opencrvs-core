@@ -17,7 +17,7 @@ import Head from 'next/head'
 import React from 'react'
 
 const isAllOk = (services: Service[]) =>
-  services.every((service) => service.status)
+  services.every((service) => service.status === 'ok')
 
 export async function getServerSideProps() {
   const services = await checkHealth()
