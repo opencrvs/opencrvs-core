@@ -179,6 +179,17 @@ export function executeHandlebarsTemplate(
   })
 
   Handlebars.registerHelper(
+    'translateAge',
+    function (
+      ageOfIndividualInYears: number,
+      registrationDate: string,
+      ...args
+    ) {
+      return getYear(new Date(registrationDate)) - ageOfIndividualInYears
+    }
+  )
+
+  Handlebars.registerHelper(
     'intl',
     function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
       // If even one of the parts is undefined, then return empty string
@@ -194,6 +205,19 @@ export function executeHandlebarsTemplate(
         defaultMessage: 'Missing translation for ' + id
       })
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  Handlebars.registerHelper(
+    'intlVariable',
+    function (messageId: string, key: string, value: string) {
+      return intl.formatMessage(
+        {
+          id: messageId,
+          defaultMessage: 'Missing translation for ' + messageId
+        },
+        { [key]: value }
+      )
+    }
   )
 
   Handlebars.registerHelper(
