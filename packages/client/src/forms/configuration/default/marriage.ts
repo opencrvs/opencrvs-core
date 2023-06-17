@@ -539,6 +539,10 @@ export const marriageRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'ignoreFieldTransformer'
+                },
+                template: {
+                  fieldName: 'groomExactDateOfBirthUnknown',
+                  operation: 'booleanTransformer'
                 }
               }
             },
@@ -565,7 +569,13 @@ export const marriageRegisterForms: ISerializedForm = {
                 }
               ],
               postfix: 'years',
-              inputFieldWidth: '78px'
+              inputFieldWidth: '78px',
+              mapping: {
+                template: {
+                  fieldName: 'groomAgeOfIndividualInYears',
+                  operation: 'plainInputTransformer'
+                }
+              }
             },
             {
               name: 'firstNamesEng',
@@ -812,6 +822,10 @@ export const marriageRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'ignoreFieldTransformer'
+                },
+                template: {
+                  fieldName: 'brideExactDateOfBirthUnknown',
+                  operation: 'booleanTransformer'
                 }
               }
             },
@@ -839,7 +853,13 @@ export const marriageRegisterForms: ISerializedForm = {
               ],
 
               postfix: 'years',
-              inputFieldWidth: '78px'
+              inputFieldWidth: '78px',
+              mapping: {
+                template: {
+                  fieldName: 'brideAgeOfIndividualInYears',
+                  operation: 'plainInputTransformer'
+                }
+              }
             },
             {
               name: 'firstNamesEng',
