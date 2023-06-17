@@ -1701,6 +1701,10 @@ export const birthRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'ignoreFieldTransformer'
+                },
+                template: {
+                  fieldName: 'motherExactDateOfBirthUnknown',
+                  operation: 'booleanTransformer'
                 }
               }
             },
@@ -1732,7 +1736,13 @@ export const birthRegisterForms: ISerializedForm = {
                 }
               ],
               postfix: 'years',
-              inputFieldWidth: '78px'
+              inputFieldWidth: '78px',
+              mapping: {
+                template: {
+                  fieldName: 'motherAgeOfIndividualInYears',
+                  operation: 'plainInputTransformer'
+                }
+              }
             },
             {
               name: 'firstNamesEng',
@@ -2303,6 +2313,10 @@ export const birthRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'ignoreFieldTransformer'
+                },
+                template: {
+                  fieldName: 'fatherExactDateOfBirthUnknown',
+                  operation: 'booleanTransformer'
                 }
               }
             },
@@ -2334,7 +2348,13 @@ export const birthRegisterForms: ISerializedForm = {
                 }
               ],
               postfix: 'years',
-              inputFieldWidth: '78px'
+              inputFieldWidth: '78px',
+              mapping: {
+                template: {
+                  fieldName: 'fatherAgeOfIndividualInYears',
+                  operation: 'plainInputTransformer'
+                }
+              }
             },
             {
               name: 'firstNamesEng',

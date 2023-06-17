@@ -820,6 +820,10 @@ export const deathRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'ignoreFieldTransformer'
+                },
+                template: {
+                  fieldName: 'deceasedExactDateOfBirthUnknown',
+                  operation: 'booleanTransformer'
                 }
               }
             },
@@ -846,7 +850,13 @@ export const deathRegisterForms: ISerializedForm = {
                 }
               ],
               postfix: 'years',
-              inputFieldWidth: '78px'
+              inputFieldWidth: '78px',
+              mapping: {
+                template: {
+                  fieldName: 'deceasedAgeOfIndividualInYears',
+                  operation: 'plainInputTransformer'
+                }
+              }
             },
             {
               name: 'firstNamesEng',
