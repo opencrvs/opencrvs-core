@@ -157,7 +157,11 @@ export const GetDeclarationInfo = ({
             (key === 'dateOfBirth' ||
             key === 'dateOfDeath' ||
             key === 'dateOfMarriage'
-              ? formatLongDate(value, intl.locale, 'dd MMM yyyy')
+              ? formatLongDate(
+                  value,
+                  intl.locale,
+                  intl.formatMessage(constantsMessages.format)
+                )
               : value)
 
           const message =

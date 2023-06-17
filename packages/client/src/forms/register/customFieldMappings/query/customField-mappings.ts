@@ -14,6 +14,7 @@ import {
   CHECKBOX,
   IFormData,
   IFormField,
+  IFormFieldValue,
   IQuestionnaireQuestion,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS
@@ -63,10 +64,12 @@ export function questionnaireToTemplateFieldTransformer(
           ?.label.defaultMessage?.toString() || selectedQuestion.value
       break
     case SELECT_WITH_OPTIONS:
-      transformedData[sectionId][field.name] =
-        field.options
-          .find((option) => option.value === selectedQuestion.value)
-          ?.label.defaultMessage?.toString() || selectedQuestion.value
+      const option = field.options.find(
+        (option) => option.value === selectedQuestion.value
+      )
+      transformedData[sectionId][field.name] = option
+        ? (option.label as unknown as IFormFieldValue)
+        : selectedQuestion.value
       break
     case CHECKBOX:
       transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
