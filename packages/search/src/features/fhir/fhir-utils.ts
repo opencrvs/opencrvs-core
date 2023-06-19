@@ -303,11 +303,9 @@ export async function getdeclarationJurisdictionIds(
     return []
   }
   const locationHirarchyIds = [declarationLocationId]
-  console.log(locationHirarchyIds)
   let locationId = `Location/${declarationLocationId}`
   while (locationId) {
     locationId = await fetchParentLocationByLocationID(locationId)
-    console.log({ fetched: locationId })
     if (locationId === 'Location/0') {
       break
     }
