@@ -28,11 +28,6 @@ const ViewerWrapper = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
-
-  > div#document_image {
-    padding-top: 0px;
-    padding-left: 0px;
-  }
 `
 
 const ViewerContainer = styled.div`
@@ -48,6 +43,12 @@ const ViewerHeader = styled.div`
   justify-content: space-between;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+
+const ViewerImage = styled.div`
+  display: flex;
+  height: 700px;
+  align-items: center;
 `
 
 export interface IDocumentViewerOptions {
@@ -155,13 +156,15 @@ export class DocumentViewer extends React.Component<IProps, IState> {
               />
             </ViewerHeader>
             {isSupportingDocumentsEmpty && (
-              <PanViewer
-                key={Math.random()}
-                id="document_image"
-                image={this.state.selectedDocument}
-                zoom={this.state.zoom}
-                rotation={this.state.rotation}
-              />
+              <ViewerImage>
+                <PanViewer
+                  key={Math.random()}
+                  id="document_image"
+                  image={this.state.selectedDocument}
+                  zoom={this.state.zoom}
+                  rotation={this.state.rotation}
+                />
+              </ViewerImage>
             )}
             {children}
           </ViewerContainer>
