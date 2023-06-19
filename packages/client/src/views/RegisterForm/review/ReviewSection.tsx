@@ -154,15 +154,12 @@ import {
   SignatureInputProps
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
-<<<<<<< HEAD
 import {
   AddressCases,
   getAddressCaseFields
 } from '@client/forms/configuration/administrative/addresses'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-=======
->>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -247,24 +244,11 @@ const FormData = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
   }
 `
-<<<<<<< HEAD
 const ReviewContainter = styled.div`
   padding: 0px 32px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px 16px;
   }
-=======
-const StyledAlert = styled(Alert)`
-  margin-top: 24px;
-`
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  ${({ theme }) => theme.fonts.h3};
-  padding: 16px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
->>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
 `
 
 const DeclarationDataContainer = styled.div``
@@ -1958,48 +1942,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           sec.action && (
                             <Link font="reg16" onClick={sec.action.handler}>
                               {sec.action.label}
-<<<<<<< HEAD
                             </Link>
-=======
-                            </LinkButton>
-                          )}
-                        </Title>
-                      )}
-                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
-                        <DocumentListPreviewContainer>
-                          <DocumentListPreview
-                            id={sec.id}
-                            documents={uploadedDocuments}
-                            onSelect={this.selectForPreview}
-                            dropdownOptions={selectOptions}
-                            inReviewSection={true}
-                          />
-                        </DocumentListPreviewContainer>
-                      )}
-                      <ListViewSimplified id={'Section_' + sec.id}>
-                        {sec.items.map((item, index) => {
-                          return (
-                            <ListViewItemSimplified
-                              key={index}
-                              label={<Label>{item.label}</Label>}
-                              value={
-                                <Value id={item.label.split(' ')[0]}>
-                                  {item.value}
-                                </Value>
-                              }
-                              actions={
-                                !item?.action?.disabled && (
-                                  <LinkButton
-                                    id={item.action.id}
-                                    disabled={item.action.disabled}
-                                    onClick={item.action.handler}
-                                  >
-                                    {item.action.label}
-                                  </LinkButton>
-                                )
-                              }
-                            />
->>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
                           )
                         }
                         labelForHideAction="Hide"

@@ -751,60 +751,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 {intl.formatMessage(
                                   buttonMessages.continueButton
                                 )}
-<<<<<<< HEAD
                               </Button>
                             ),
                             declaration.review && (
                               <Button
-=======
-                              </Alert>
-                            )}
-                          <FormFieldGenerator
-                            id={`${activeSection.id}-${activeSectionGroup.id}`}
-                            key={`${activeSection.id}-${activeSectionGroup.id}`}
-                            onChange={(values) => {
-                              debouncedModifyDeclaration(
-                                values,
-                                activeSection,
-                                declaration
-                              )
-                            }}
-                            setAllFieldsDirty={this.setAllFieldsDirty()}
-                            fieldsToShowValidationErrors={
-                              fieldsToShowValidationErrors
-                            }
-                            fields={getVisibleGroupFields(activeSectionGroup)}
-                            draftData={declaration.data}
-                            onSetTouched={(setTouchedFunc) => {
-                              this.setAllFormFieldsTouched = setTouchedFunc
-                            }}
-                            onUploadingStateChanged={
-                              this.onUploadingStateChanged
-                            }
-                          />
-                        </form>
-                        {nextSectionGroup && (
-                          <FooterArea>
-                            <PrimaryButton
-                              id="next_section"
-                              onClick={() => {
-                                this.continueButtonHandler(
-                                  this.props.pageRoute,
-                                  declaration.id,
-                                  nextSectionGroup.sectionId,
-                                  nextSectionGroup.groupId,
-                                  declaration.event.toLowerCase()
-                                )
-                              }}
-                              disabled={this.state.isFileUploading}
-                            >
-                              {intl.formatMessage(
-                                buttonMessages.continueButton
-                              )}
-                            </PrimaryButton>
-                            {declaration.review && (
-                              <BackReviewButton
->>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
                                 id="back-to-review-button"
                                 type="secondary"
                                 size="large"

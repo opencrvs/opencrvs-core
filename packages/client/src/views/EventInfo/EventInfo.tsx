@@ -152,25 +152,10 @@ function EventInfoComponet(props: IFullProps) {
         <BackButton type="tertiary" size="small" onClick={props.goBack}>
           <Icon name="ArrowLeft" size="medium" />
           {intl.formatMessage(buttonMessages.back)}
-<<<<<<< HEAD
         </BackButton>
         <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
       </Content>
     </Frame>
-=======
-        </TertiaryButton>
-        <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
-        <BulletList
-          id={`${eventType}-info-bullet-list`}
-          items={listItems}
-          font="reg18"
-        />
-        <PrimaryButton id="continue" onClick={handleContinue}>
-          {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
-      </BodyContent>
-    </Container>
->>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
   )
 }
 
