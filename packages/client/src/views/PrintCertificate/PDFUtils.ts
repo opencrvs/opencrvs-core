@@ -32,8 +32,9 @@ import getDate from 'date-fns/getDate'
 import getMonth from 'date-fns/getMonth'
 import getYear from 'date-fns/getYear'
 import isValid from 'date-fns/isValid'
-import formatDate from '@client/utils/date-formatting'
+import formatDate, { formatLongDate } from '@client/utils/date-formatting'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { constantsMessages } from '@client/i18n/messages'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -175,8 +176,34 @@ export function executeHandlebarsTemplate(
   )
 
   Handlebars.registerHelper('translateDate', function (date: string) {
-    return formatDate(new Date(date), 'dd MMMM yyyy')
+    if (date) {
+      const longDate = formatLongDate(
+        date,
+        intl.locale,
+        intl.formatMessage(constantsMessages.format)
+      )
+      if (!longDate) {
+        return formatDate(
+          new Date(date),
+          intl.formatMessage(constantsMessages.format)
+        )
+      } else {
+        return longDate
+      }
+    }
+    return ''
   })
+
+  Handlebars.registerHelper(
+    'translateAge',
+    function (
+      ageOfIndividualInYears: number,
+      registrationDate: string,
+      ...args
+    ) {
+      return getYear(new Date(registrationDate)) - ageOfIndividualInYears
+    }
+  )
 
   Handlebars.registerHelper(
     'intl',
@@ -194,6 +221,19 @@ export function executeHandlebarsTemplate(
         defaultMessage: 'Missing translation for ' + id
       })
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  Handlebars.registerHelper(
+    'intlVariable',
+    function (messageId: string, key: string, value: string) {
+      return intl.formatMessage(
+        {
+          id: messageId,
+          defaultMessage: 'Missing translation for ' + messageId
+        },
+        { [key]: value }
+      )
+    }
   )
 
   Handlebars.registerHelper(

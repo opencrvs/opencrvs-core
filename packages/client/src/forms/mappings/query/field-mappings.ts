@@ -689,6 +689,9 @@ export const booleanTransformer = (
   field: IFormField
 ) => {
   // graphql boolean ignored unless forced like this
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
   if (queryData && queryData[sectionId] && field && field.name) {
     transformedData[sectionId][field.name] = queryData[sectionId][field.name]
   }
