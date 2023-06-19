@@ -96,6 +96,10 @@ export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      /*
+       * TODO: The dropIndexes/dropIndex need to be called
+       * with the index name and not with field names
+       */
       await db
         .collection('Task')
         .dropIndexes({ 'focus.reference': 1, id: 1 } as any)
