@@ -63,7 +63,7 @@ export const getRoutes = () => {
           const res = await client.ping()
           logger.info(res)
           return {
-            success: res.statusCode === 200
+            success: res.meta.connection.status === 'alive'
           }
         } catch (error) {
           logger.error(error)
