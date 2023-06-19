@@ -23,7 +23,7 @@ import styled from 'styled-components'
 const ControlsContainer = styled.div<{ centerController?: boolean }>`
   height: 64px;
   position: relative;
-  padding: 0 16px;
+  gap: 2px;
   display: flex;
   align-items: center;
   justify-content: flex-end;

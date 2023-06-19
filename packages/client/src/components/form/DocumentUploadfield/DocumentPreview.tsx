@@ -16,6 +16,7 @@ import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { DividerVertical } from '@opencrvs/components/lib/Divider'
 import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 
@@ -44,6 +45,12 @@ const ViewerContainer = styled.div`
     max-width: 80vw;
     width: auto;
   }
+`
+
+const Divider = styled.div`
+  width: 1px;
+  height: 24px;
+  background-color: ${({ theme }) => theme.colors.grey200};
 `
 
 type IProps = {
@@ -104,14 +111,18 @@ export class DocumentPreview extends React.Component<IProps, IState> {
                 rotateLeft={this.rotateLeft}
               />
               {!disableDelete && (
-                <Button
-                  id="preview_delete"
-                  type="icon"
-                  onClick={() => onDelete(previewImage)}
-                >
-                  <Icon name="TrashSimple" color="red" />
-                </Button>
+                <>
+                  <DividerVertical />
+                  <Button
+                    id="preview_delete"
+                    type="icon"
+                    onClick={() => onDelete(previewImage)}
+                  >
+                    <Icon name="TrashSimple" color="red" />
+                  </Button>
+                </>
               )}
+              <DividerVertical />
               <Button
                 aria-label="Go back"
                 size="medium"

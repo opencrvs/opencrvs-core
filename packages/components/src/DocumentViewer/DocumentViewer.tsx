@@ -43,15 +43,11 @@ const ViewerHeader = styled.div`
   height: 64px;
   display: flex;
   align-items: center;
+  padding: 0 16px;
   z-index: 99;
   justify-content: space-between;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-
-  > div#select_document {
-    z-index: 99;
-    padding-left: 16px;
-  }
 `
 
 export interface IDocumentViewerOptions {
