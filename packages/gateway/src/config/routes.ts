@@ -45,10 +45,7 @@ export const getRoutes = () => {
       config: {
         auth: false,
         description: 'Checks the health of all services.',
-        notes: 'Pass the service as a query param: service',
-        validate: {
-          query: healthCheckQuerySchema
-        }
+        notes: 'Pass the service as a query param: service'
       }
     },
     // get all locations
