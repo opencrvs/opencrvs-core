@@ -935,7 +935,7 @@ export const birthRegisterForms: ISerializedForm = {
               mapping: {
                 mutation: {
                   operation: 'birthEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationTypeQueryTransformer',
@@ -975,7 +975,7 @@ export const birthRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'birthEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationIDQueryTransformer',

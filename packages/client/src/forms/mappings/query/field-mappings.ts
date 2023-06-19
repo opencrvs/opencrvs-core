@@ -267,8 +267,8 @@ interface IAddress {
   [key: string]: any
 }
 
-export const addressToFieldTransformer =
-  (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
+export const addressLineToFieldTransformer =
+  (addressType: string, lineNumber = 0) =>
   (
     transformedData: IFormData,
     queryData: any,
@@ -285,13 +285,35 @@ export const addressToFieldTransformer =
     if (!address) {
       return transformedData
     }
-    if (lineNumber > 0) {
-      transformedData[sectionId][field.name] =
-        (address.line && address.line[lineNumber - 1]) || ''
-    } else {
-      transformedData[sectionId][field.name] =
-        address[transformedFieldName ? transformedFieldName : field.name]
+
+    transformedData[sectionId][field.name] =
+      (address.line && address.line[lineNumber]) || ''
+
+    return transformedData
+  }
+
+export const addressFhirPropertyToFieldTransformer =
+  (addressType: string, transformedFieldName: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const address: IAddress | undefined =
+      queryData[sectionId] &&
+      queryData[sectionId].address &&
+      (queryData[sectionId].address as GQLAddress[]).find(
+        (addr) => addr.type === addressType
+      )
+
+    if (!address) {
+      return transformedData
     }
+
+    transformedData[sectionId][field.name] =
+      address[transformedFieldName ? transformedFieldName : field.name]
+
     return transformedData
   }
 
@@ -444,8 +466,10 @@ export function attachmentToFieldTransformer(
 
 export const eventLocationQueryTransformer =
   (
-    lineNumber = 0,
-    transformedFieldName?: string,
+    transformationParams: {
+      lineNumber?: number
+      transformedFieldName?: string
+    },
     ignoreAddressFields?: IIgnoreAddressFields
   ) =>
   (
@@ -462,9 +486,14 @@ export const eventLocationQueryTransformer =
     const line = address.line as string[]
     const country = address.country
     const fieldValue =
-      address[transformedFieldName ? transformedFieldName : field.name]
-    if (lineNumber > 0) {
-      transformedData[sectionId][field.name] = line[lineNumber - 1]
+      address[
+        transformationParams.transformedFieldName
+          ? transformationParams.transformedFieldName
+          : field.name
+      ]
+    if (transformationParams.lineNumber) {
+      transformedData[sectionId][field.name] =
+        line[transformationParams.lineNumber]
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
@@ -991,7 +1020,7 @@ export const addressLineTemplateTransformer =
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const index = lineNumber
     const addCase =
       addressCase === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
     const newTransformedName = camelCase(
@@ -1019,7 +1048,7 @@ export const eventLocationAddressLineTemplateTransformer =
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const index = lineNumber
     transformedData[sectionId][transformedFieldName] =
       queryData.eventLocation?.address.line[index] || ''
   }

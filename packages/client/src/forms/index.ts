@@ -881,6 +881,11 @@ export type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
 
+export type X = FunctionParamsToDescriptor<
+  Params<typeof mutations['birthEventLocationMutationTransformer']>,
+  IMutationDescriptor
+>
+
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
