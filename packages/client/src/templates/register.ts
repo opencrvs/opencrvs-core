@@ -12,9 +12,20 @@
 export const certificateBaseTemplate = {
   definition: {
     pageMargins: [0, 0, 0, 0] as [number, number, number, number],
-    defaultStyle: {},
+    defaultStyle: {
+      font: 'arial'
+    },
     content: []
   },
-  fonts: { en: {} },
+  fonts: {
+    en: {
+      arial: {
+        normal: 'Arial.ttf',
+        bold: 'Arial-Bold.ttf',
+        italics: 'Arial-Italic.ttf',
+        bolditalics: 'Arial-BoldItalic.ttf'
+      }
+    }
+  },
   vfs: {}
 }
