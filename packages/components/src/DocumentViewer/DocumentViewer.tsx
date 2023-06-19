@@ -17,29 +17,15 @@ import { isEqual } from 'lodash'
 
 const Container = styled.div`
   position: relative;
-  background-color: ${({ theme }) => theme.colors.grey100};
+  background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
   box-sizing: border-box;
-  height: 720px;
+  height: calc(100vh - 104px);
+  width: 100%;
+  overflow: hidden;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-
-  > div {
-    width: 100%;
-    padding-top: 16px;
-    padding-left: 16px;
-  }
-
-  > div#select_document {
-    z-index: 2;
-    background: ${({ theme }) => theme.colors.white};
-    top: 16px;
-    left: 16px;
-    width: 250px;
-    padding-top: 0px;
-    padding-left: 0px;
   }
 
   > div#document_image {
@@ -47,6 +33,19 @@ const Container = styled.div`
     padding-left: 0px;
   }
 `
+const DoucumentViewerHeader = styled.div`
+  height: 64px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  > div#select_document {
+    z-index: 99;
+    padding-left: 16px;
+  }
+`
+
 export interface IDocumentViewerOptions {
   selectOptions: SelectComponentOptions[]
   documentOptions: SelectComponentOptions[]
@@ -99,8 +98,8 @@ export class DocumentViewer extends React.Component<IProps, IState> {
 
     return (
       <Container id={id}>
-        {options.documentOptions.length > 0 && (
-          <>
+        <>
+          <DoucumentViewerHeader>
             <Select
               id="select_document"
               options={options.selectOptions}
@@ -118,15 +117,13 @@ export class DocumentViewer extends React.Component<IProps, IState> {
                 }
               }}
             />
-            {this.state.selectedDocument && (
-              <DocumentImage
-                id="document_image"
-                image={this.state.selectedDocument}
-              />
-            )}
-          </>
-        )}
-        {options.documentOptions.length === 0 && children}
+          </DoucumentViewerHeader>
+          <DocumentImage
+            id="document_image"
+            image={this.state.selectedDocument}
+          />
+          {children}
+        </>
       </Container>
     )
   }

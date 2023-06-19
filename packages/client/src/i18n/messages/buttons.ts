@@ -272,8 +272,8 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.saving'
   },
   saveExitButton: {
-    defaultMessage: 'Save & Exit',
-    description: 'Save & Exit Button Text',
+    defaultMessage: 'Save & exit',
+    description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
   },
   deleteDeclaration: {

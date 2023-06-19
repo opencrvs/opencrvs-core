@@ -11,8 +11,10 @@
  */
 import * as React from 'react'
 import ReactPanZoom from './PanDraggable'
+import { Button } from '../../Button'
+import { Icon } from '../../Icon'
 import styled, { css } from 'styled-components'
-import { ZoomIn, ZoomOut, RotateLeft } from '../../icons'
+
 const Container = css`
   width: 100%;
   min-height: calc(100vh - 200px);
@@ -25,39 +27,17 @@ const Container = css`
   }
 `
 const ControlsContainer = styled.div<{ centerController?: boolean }>`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  height: 64px;
+  width: 100%;
   position: absolute;
-  z-index: 2;
-  ${({ centerController }) =>
-    centerController
-      ? `right: 24px;
-  top: 40%;`
-      : `right: 16px;
-  top: 16px;`}
-  user-select: none;
-  border-radius: 2px;
-
-  background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  & div {
-    text-align: center;
-    cursor: pointer;
-    height: 40px;
-    width: 40px;
-
-    border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-    & svg {
-      height: 100%;
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    &:last-child {
-      border: none;
-    }
-    &:active {
-      box-shadow: 0px 0px 5px 1px ${({ theme }) => theme.colors.disabled};
-    }
-  }
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
+  z-index: 10;
 `
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -69,7 +49,7 @@ const StyledReactPanZoom = styled(ReactPanZoom)`
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface IProps {
-  image: string
+  image?: string
   controllerCenter?: boolean
 }
 
@@ -81,25 +61,25 @@ export default class PanViewer extends React.Component<IProps> {
     rotation: 0
   }
 
-  renderPanZoomControls = (centerController?: boolean) => {
+  renderPanZoomControls = () => {
     return (
-      <ControlsContainer centerController={centerController}>
-        <div onClick={this.zoomIn}>
-          <ZoomIn />
-        </div>
-        <div onClick={this.zoomOut}>
-          <ZoomOut />
-        </div>
-        <div onClick={this.rotateLeft}>
-          <RotateLeft />
-        </div>
+      <ControlsContainer>
+        <Button type="icon" size="medium" onClick={this.zoomIn}>
+          <Icon name="MagnifyingGlassPlus" />
+        </Button>
+        <Button type="icon" size="medium" onClick={this.zoomOut}>
+          <Icon name="MagnifyingGlassMinus" />
+        </Button>
+        <Button type="icon" size="medium" onClick={this.rotateLeft}>
+          <Icon name="ArrowCounterClockwise" />
+        </Button>
       </ControlsContainer>
     )
   }
   render() {
     return (
       <React.Fragment>
-        {this.renderPanZoomControls(this.props.controllerCenter)}
+        {this.renderPanZoomControls()}
         <StyledReactPanZoom
           zoom={this.state.zoom}
           pandx={this.state.dx}

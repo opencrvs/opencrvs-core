@@ -153,6 +153,7 @@ export enum ContentSize {
 }
 
 interface IProps {
+  id?: string
   icon?: () => React.ReactNode
   backButtonLabel?: string
   backButtonAction?: () => void
