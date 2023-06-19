@@ -17,7 +17,6 @@ export const Divider = styled.div`
 `
 
 export const DividerVertical = styled.div`
-  padding: 0 2px;
   background: ${({ theme }) => theme.colors.grey200};
   width: 1px;
   height: 100%;
