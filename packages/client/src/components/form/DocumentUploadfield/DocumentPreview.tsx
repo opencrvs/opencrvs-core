@@ -94,16 +94,8 @@ export class DocumentPreview extends React.Component<IProps, IState> {
     return (
       <ViewerWrapper id="preview_image_field">
         <AppBar
-          desktopLeft={
-            <Button
-              aria-label="Go back"
-              size="medium"
-              type="icon"
-              onClick={goBack}
-            >
-              <Icon name="ArrowLeft" size="medium" />
-            </Button>
-          }
+          desktopLeft={<Icon name="Paperclip" />}
+          desktopTitle={title}
           desktopRight={
             <Stack gap={8}>
               <PanControls
@@ -120,13 +112,18 @@ export class DocumentPreview extends React.Component<IProps, IState> {
                   <Icon name="TrashSimple" color="red" />
                 </Button>
               )}
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={goBack}
+              >
+                <Icon name="X" size="medium" />
+              </Button>
             </Stack>
           }
-          mobileLeft={
-            <Button aria-label="Go back" size="medium" type="icon">
-              <Icon name="ArrowLeft" size="medium" />
-            </Button>
-          }
+          mobileLeft={<Icon name="Paperclip" />}
+          mobileTitle={title}
           mobileRight={
             <Stack gap={8}>
               <PanControls
@@ -143,6 +140,14 @@ export class DocumentPreview extends React.Component<IProps, IState> {
                   <Icon name="TrashSimple" color="red" />
                 </Button>
               )}
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={goBack}
+              >
+                <Icon name="X" size="medium" />
+              </Button>
             </Stack>
           }
         />
