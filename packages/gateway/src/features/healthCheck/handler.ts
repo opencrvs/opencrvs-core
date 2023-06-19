@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
+
 import {
   AUTH_URL,
   SEARCH_URL,
@@ -73,20 +73,3 @@ export default async function healthCheckHandler(
   }
   return responses
 }
-
-export const querySchema = Joi.object({
-  service: Joi.array()
-    .items(
-      Joi.string().valid(
-        Services.AUTH,
-        Services.USER_MGNT,
-        Services.METRICS,
-        Services.NOTIFICATION,
-        Services.COUNTRY_CONFIG,
-        Services.SEARCH,
-        Services.WORKFLOW,
-        Services.GATEWAY
-      )
-    )
-    .single()
-})
