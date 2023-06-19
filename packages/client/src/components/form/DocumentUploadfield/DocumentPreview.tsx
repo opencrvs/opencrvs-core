@@ -12,10 +12,14 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { IFileValue, IAttachmentValue } from '@client/forms'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
-const PreviewContainer = styled.div`
+
+const ViewerWrapper = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
@@ -24,25 +28,17 @@ const PreviewContainer = styled.div`
   z-index: 4;
   width: 100%;
   height: 100%;
-  background: ${({ theme }) => theme.colors.grey600};
-`
-const PreviewContainerHeader = styled.div`
-  width: 100%;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 99999;
+  background: ${({ theme }) => theme.colors.white};
 `
 
-const ImageHolder = styled.div`
+const ViewerContainer = styled.div`
   position: relative;
+  top: -24px;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   display: flex;
+  align-items: center;
   & img {
     max-height: 80vh;
     max-width: 80vw;
@@ -50,20 +46,6 @@ const ImageHolder = styled.div`
   }
 `
 
-const Title = styled.span`
-  padding-left: 16px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.reg16};
-`
-const BackButton = styled.button`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.white};
-`
 type IProps = {
   previewImage: IFileValue | IAttachmentValue
   disableDelete?: boolean
@@ -72,36 +54,111 @@ type IProps = {
   onDelete: (image: IFileValue | IAttachmentValue) => void
 }
 
-export class DocumentPreview extends React.Component<IProps> {
+interface IState {
+  zoom: number
+  rotation: number
+}
+
+export class DocumentPreview extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props)
+
+    this.state = {
+      zoom: 1,
+      rotation: 0
+    }
+  }
+
+  zoomIn = () => {
+    this.setState((prevState) => ({ ...prevState, zoom: prevState.zoom + 0.2 }))
+  }
+
+  zoomOut = () => {
+    this.setState((prevState) => {
+      if (prevState.zoom >= 1) {
+        return { ...prevState, zoom: prevState.zoom - 0.2 }
+      } else {
+        return prevState
+      }
+    })
+  }
+
+  rotateLeft = () => {
+    this.setState((prevState) => ({
+      rotation: (prevState.rotation - 90) % 360
+    }))
+  }
+
   render = () => {
     const { previewImage, title, goBack, onDelete, disableDelete } = this.props
     return (
-      <PreviewContainer id="preview_image_field">
-        <PreviewContainerHeader>
-          <BackButton id="preview_back" onClick={goBack}>
-            <ArrowBack />
-            <Title>{title}</Title>
-          </BackButton>
-          {!disableDelete && (
-            <span>
-              <Button
-                id="preview_delete"
-                icon={() => <Delete color="white" />}
-                onClick={() => onDelete(previewImage)}
+      <ViewerWrapper id="preview_image_field">
+        <AppBar
+          desktopLeft={
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={goBack}
+            >
+              <Icon name="ArrowLeft" size="medium" />
+            </Button>
+          }
+          desktopRight={
+            <Stack gap={8}>
+              <PanControls
+                zoomIn={this.zoomIn}
+                zoomOut={this.zoomOut}
+                rotateLeft={this.rotateLeft}
               />
-            </span>
-          )}
-        </PreviewContainerHeader>
-        <ImageHolder>
+              {!disableDelete && (
+                <Button
+                  id="preview_delete"
+                  type="icon"
+                  onClick={() => onDelete(previewImage)}
+                >
+                  <Icon name="TrashSimple" color="red" />
+                </Button>
+              )}
+            </Stack>
+          }
+          mobileLeft={
+            <Button aria-label="Go back" size="medium" type="icon">
+              <Icon name="ArrowLeft" size="medium" />
+            </Button>
+          }
+          mobileRight={
+            <Stack gap={8}>
+              <PanControls
+                zoomIn={this.zoomIn}
+                zoomOut={this.zoomOut}
+                rotateLeft={this.rotateLeft}
+              />
+              {!disableDelete && (
+                <Button
+                  id="preview_delete"
+                  type="icon"
+                  onClick={() => onDelete(previewImage)}
+                >
+                  <Icon name="TrashSimple" color="red" />
+                </Button>
+              )}
+            </Stack>
+          }
+        />
+
+        <ViewerContainer>
           {previewImage.data && (
             <PanViewer
               key={Math.random()}
+              id="document_image"
               image={previewImage.data}
-              controllerCenter={true}
+              zoom={this.state.zoom}
+              rotation={this.state.rotation}
             />
           )}
-        </ImageHolder>
-      </PreviewContainer>
+        </ViewerContainer>
+      </ViewerWrapper>
     )
   }
 }

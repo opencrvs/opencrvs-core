@@ -9,37 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from '../Select'
-import { DocumentImage } from './components/DocumentImage'
+import PanViewer from './components/PanViewer'
+import PanControls from './components/PanControls'
 import { isEqual } from 'lodash'
 
-const Container = styled.div`
+const ViewerWrapper = styled.div`
   position: relative;
-  background-color: ${({ theme }) => theme.colors.grey100};
+  background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
   box-sizing: border-box;
-  height: 720px;
+  height: calc(100vh - 104px);
+  width: 100%;
+  overflow: hidden;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-
-  > div {
-    width: 100%;
-    padding-top: 16px;
-    padding-left: 16px;
-  }
-
-  > div#select_document {
-    z-index: 2;
-    background: ${({ theme }) => theme.colors.white};
-    top: 16px;
-    left: 16px;
-    width: 250px;
-    padding-top: 0px;
-    padding-left: 0px;
   }
 
   > div#document_image {
@@ -47,6 +34,26 @@ const Container = styled.div`
     padding-left: 0px;
   }
 `
+
+const ViewerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+const ViewerHeader = styled.div`
+  height: 64px;
+  display: flex;
+  align-items: center;
+  z-index: 99;
+  justify-content: space-between;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  > div#select_document {
+    z-index: 99;
+    padding-left: 16px;
+  }
+`
+
 export interface IDocumentViewerOptions {
   selectOptions: SelectComponentOptions[]
   documentOptions: SelectComponentOptions[]
@@ -61,6 +68,8 @@ interface IProps {
 interface IState {
   selectedOption: string
   selectedDocument: string
+  zoom: number
+  rotation: number
 }
 
 export class DocumentViewer extends React.Component<IProps, IState> {
@@ -75,7 +84,9 @@ export class DocumentViewer extends React.Component<IProps, IState> {
       selectedDocument:
         typeof this.props.options.documentOptions[0] !== 'undefined'
           ? this.props.options.documentOptions[0].value
-          : ''
+          : '',
+      zoom: 1,
+      rotation: 0
     }
   }
 
@@ -94,40 +105,72 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     }
   }
 
+  zoomIn = () => {
+    this.setState((prevState) => ({ ...prevState, zoom: prevState.zoom + 0.2 }))
+  }
+
+  zoomOut = () => {
+    this.setState((prevState) => {
+      if (prevState.zoom >= 1) {
+        return { ...prevState, zoom: prevState.zoom - 0.2 }
+      } else {
+        return prevState
+      }
+    })
+  }
+
+  rotateLeft = () => {
+    this.setState((prevState) => ({
+      rotation: (prevState.rotation - 90) % 360
+    }))
+  }
+
   render() {
     const { options, children, id } = this.props
+    const isSupportingDocumentsEmpty =
+      this.state.selectedDocument && this.state.selectedDocument.length > 0
 
     return (
-      <Container id={id}>
-        {options.documentOptions.length > 0 && (
-          <>
-            <Select
-              id="select_document"
-              options={options.selectOptions}
-              color="inherit"
-              value={this.state.selectedOption as string}
-              onChange={(val: string) => {
-                const imgArray = options.documentOptions.filter((doc) => {
-                  return doc.label === val
-                })
-                if (imgArray[0]) {
-                  this.setState({
-                    selectedOption: val,
-                    selectedDocument: imgArray[0].value
+      <ViewerWrapper id={id}>
+        <>
+          <ViewerContainer>
+            <ViewerHeader>
+              <Select
+                id="select_document"
+                options={options.selectOptions}
+                color="inherit"
+                value={this.state.selectedOption as string}
+                onChange={(val: string) => {
+                  const imgArray = options.documentOptions.filter((doc) => {
+                    return doc.label === val
                   })
-                }
-              }}
-            />
-            {this.state.selectedDocument && (
-              <DocumentImage
+                  if (imgArray[0]) {
+                    this.setState({
+                      selectedOption: val,
+                      selectedDocument: imgArray[0].value
+                    })
+                  }
+                }}
+              />
+              <PanControls
+                zoomIn={this.zoomIn}
+                zoomOut={this.zoomOut}
+                rotateLeft={this.rotateLeft}
+              />
+            </ViewerHeader>
+            {isSupportingDocumentsEmpty && (
+              <PanViewer
+                key={Math.random()}
                 id="document_image"
                 image={this.state.selectedDocument}
+                zoom={this.state.zoom}
+                rotation={this.state.rotation}
               />
             )}
-          </>
-        )}
-        {options.documentOptions.length === 0 && children}
-      </Container>
+            {children}
+          </ViewerContainer>
+        </>
+      </ViewerWrapper>
     )
   }
 }

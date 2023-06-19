@@ -9,13 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+/*
+  FROKED from https://github.com/gomezhyuuga/react-pan-zoom
+
+  This is the source code from the above library
+*/
+
 import * as React from 'react'
 import ReactPanZoom from './PanDraggable'
 import styled, { css } from 'styled-components'
-import { ZoomIn, ZoomOut, RotateLeft } from '../../icons'
+
 const Container = css`
   width: 100%;
-  min-height: calc(100vh - 200px);
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,52 +30,16 @@ const Container = css`
     width: 100%;
   }
 `
-const ControlsContainer = styled.div<{ centerController?: boolean }>`
-  position: absolute;
-  z-index: 2;
-  ${({ centerController }) =>
-    centerController
-      ? `right: 24px;
-  top: 40%;`
-      : `right: 16px;
-  top: 16px;`}
-  user-select: none;
-  border-radius: 2px;
 
-  background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  & div {
-    text-align: center;
-    cursor: pointer;
-    height: 40px;
-    width: 40px;
-
-    border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-    & svg {
-      height: 100%;
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    &:last-child {
-      border: none;
-    }
-    &:active {
-      box-shadow: 0px 0px 5px 1px ${({ theme }) => theme.colors.disabled};
-    }
-  }
-`
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// cast to any because of styled-components bug
-// https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
 const StyledReactPanZoom = styled(ReactPanZoom)`
   ${Container};
 ` as any
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface IProps {
+  id?: string
   image: string
+  zoom: number
+  rotation: number
   controllerCenter?: boolean
 }
 
@@ -81,74 +51,24 @@ export default class PanViewer extends React.Component<IProps> {
     rotation: 0
   }
 
-  renderPanZoomControls = (centerController?: boolean) => {
-    return (
-      <ControlsContainer centerController={centerController}>
-        <div onClick={this.zoomIn}>
-          <ZoomIn />
-        </div>
-        <div onClick={this.zoomOut}>
-          <ZoomOut />
-        </div>
-        <div onClick={this.rotateLeft}>
-          <RotateLeft />
-        </div>
-      </ControlsContainer>
-    )
-  }
   render() {
+    const { zoom, rotation } = this.props
     return (
       <React.Fragment>
-        {this.renderPanZoomControls(this.props.controllerCenter)}
         <StyledReactPanZoom
-          zoom={this.state.zoom}
+          zoom={zoom}
           pandx={this.state.dx}
           pandy={this.state.dy}
-          onPan={this.onPan}
-          rotation={this.state.rotation}
+          rotation={rotation}
           key={this.state.dx}
         >
           <img
-            style={{
-              transform: `rotate(${this.state.rotation * 90}deg)`
-            }}
             src={this.props.image}
             alt="Supporting Document"
+            style={{ transform: `rotate(${rotation}deg)` }}
           />
         </StyledReactPanZoom>
       </React.Fragment>
     )
-  }
-
-  zoomIn = () => {
-    this.setState({
-      zoom: this.state.zoom + 0.2
-    })
-  }
-
-  zoomOut = () => {
-    if (this.state.zoom >= 1) {
-      this.setState({
-        zoom: this.state.zoom - 0.2
-      })
-    }
-  }
-  rotateLeft = () => {
-    if (this.state.rotation === -3) {
-      this.setState({
-        rotation: 0
-      })
-    } else {
-      this.setState({
-        rotation: this.state.rotation - 1
-      })
-    }
-  }
-
-  onPan = (dx: number, dy: number) => {
-    this.setState({
-      dx,
-      dy
-    })
   }
 }
