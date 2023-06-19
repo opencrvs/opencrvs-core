@@ -118,7 +118,7 @@ export function SignatureGenerator({
               </SecondaryButton>
               <CustomImageUpload
                 id="signature-file-upload"
-                title="Upload"
+                title={intl.formatMessage(buttonMessages.upload)}
                 handleFileChange={async (file) => {
                   const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
                   if (fileSizeMB > 2) {

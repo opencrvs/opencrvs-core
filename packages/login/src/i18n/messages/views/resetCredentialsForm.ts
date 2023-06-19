@@ -27,9 +27,16 @@ const messagesToDefine = {
   // Phone number confirmation form messages
   phoneNumberConfirmationFormBodyHeader: {
     id: 'resetCredentials.phoneNumberConfirmation.form.body.header',
-    defaultMessage: 'What is your phone number?',
+    defaultMessage: 'Enter your phone number',
     description:
       'Form body header used in the body of phone number confirmation step'
+  },
+  // Email address confirmation form messages
+  emailAddressConfirmationFormBodyHeader: {
+    id: 'resetCredentials.emailAddressConfirmation.form.body.header',
+    defaultMessage: 'Enter your email address',
+    description:
+      'Form body header used in the body of email address confirmation step'
   },
   // Recovery code entry form messages
   recoveryCodeEntryFormBodyHeader: {
@@ -37,11 +44,19 @@ const messagesToDefine = {
     defaultMessage: 'Enter the 6-digit recovery code',
     description: 'Form body header used for recovery code entry step'
   },
-  recoveryCodeEntryFormBodySubheader: {
+  recoveryCodeEntryFormBodySubheaderMobile: {
     id: 'resetCredentials.recoveryCodeEntry.form.body.subheader',
     defaultMessage:
       "The recovery code was sent to your phone number. Please enter the code. Didn't receive it? {link}",
-    description: 'Form body subheader used for recovery code entry step'
+    description:
+      'Form body subheader used for recovery code entry step in mobile flow'
+  },
+  recoveryCodeEntryFormBodySubheaderEmail: {
+    id: 'resetCredentials.recoveryCodeEntry.form.body.subheader.email',
+    defaultMessage:
+      "The recovery code was sent to your email. Please enter the code. Didn't receive it? {link}",
+    description:
+      'Form body subheader used for recovery code entry step in email flow'
   },
   codeResentTitle: {
     id: 'resetCredentials.recoveryCodeEntry.codeResent.form.body.header',
@@ -102,13 +117,18 @@ const messagesToDefine = {
       '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful} other {}}',
     description: 'Title for success page'
   },
-  successPageSubtitle: {
-    id: 'resetCredentials.success.page.subtitle',
+  successPageSubtitlePhone: {
+    id: 'resetCredentials.success.page.subtitle.phone',
     defaultMessage:
       '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}',
-    description: 'Subtitle for success page'
+    description: 'Subtitle for success page for phone'
   },
-
+  successPageSubtitleEmail: {
+    id: 'resetCredentials.success.page.subtitle.email',
+    defaultMessage:
+      '{forgottenItem, select, username {Check your email for a reminder of your username} password {You can now login with your new password} other {}}',
+    description: 'Subtitle for success page for email'
+  },
   usernameOptionLabel: {
     id: 'resetCredentials.option.username',
     defaultMessage: 'My username',
@@ -129,6 +149,11 @@ const messagesToDefine = {
     id: 'constants.phoneNumber',
     defaultMessage: 'Phone number',
     description: 'Label used for phone number input field'
+  },
+  emailAddressFieldLabel: {
+    id: 'constants.emailAddress',
+    defaultMessage: 'Email Address',
+    description: 'Label used for email address input field'
   },
   verificationCodeFieldLabel: {
     id: 'resetCredentials.label.field.verificationCode',
@@ -190,10 +215,16 @@ const messagesToDefine = {
     defaultMessage: 'Mobile phone number not found.',
     description: 'Error message for phone number not found'
   },
+  errorEmailAddressNotFound: {
+    id: 'error.errorEmailAddressNotFound',
+    defaultMessage: 'Email address not found.',
+    description: 'Error message for email address not found'
+  },
   resend: {
     id: 'resend.sms',
-    defaultMessage: 'Resend SMS',
-    description: 'Text for button that resends SMS verification code'
+    defaultMessage:
+      'Resend {notificationMethod, select, sms {SMS} email {Email} other {}}',
+    description: 'Text for button that resend SMS or email verification code'
   }
 }
 

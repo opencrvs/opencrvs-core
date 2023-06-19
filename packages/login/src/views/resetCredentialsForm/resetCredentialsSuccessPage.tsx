@@ -78,9 +78,13 @@ export class ResetCredentialsSuccessView extends React.Component<
                   color="grey500"
                   id="authenticating-label"
                 >
-                  {intl.formatMessage(messages.successPageSubtitle, {
-                    forgottenItem
-                  })}
+                  {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                    ? intl.formatMessage(messages.successPageSubtitlePhone, {
+                        forgottenItem
+                      })
+                    : intl.formatMessage(messages.successPageSubtitleEmail, {
+                        forgottenItem
+                      })}
                 </Text>
               </Stack>
 

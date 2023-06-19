@@ -58,8 +58,10 @@ export default async function sendUserNameHandler(
     )
   } else {
     await sendUserName(
+      retrievalStepInformation.username,
+      retrievalStepInformation.userFullName,
       retrievalStepInformation.mobile,
-      retrievalStepInformation.username
+      retrievalStepInformation.email
     )
   }
 
