@@ -18,16 +18,14 @@ import {
   getUserData,
   IDeclaration,
   SUBMISSION_STATUS,
-  updateWorkqueueData
+  updateWorkqueueData,
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -178,9 +176,7 @@ function mergeWorkQueueData(
     ) {
       return
     }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
+    destinationWorkQueue.data[workQueueId].results?.forEach((declaration) => {
       if (declaration == null) {
         return
       }
@@ -192,7 +188,11 @@ function mergeWorkQueueData(
           currentApplications[declarationIndex].submissionStatus ===
             SUBMISSION_STATUS.FAILED_NETWORK ||
           currentApplications[declarationIndex].submissionStatus ===
-            SUBMISSION_STATUS.FAILED
+            SUBMISSION_STATUS.FAILED ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            DOWNLOAD_STATUS.FAILED
 
         if (!isDownloadFailed) {
           updateWorkqueueData(

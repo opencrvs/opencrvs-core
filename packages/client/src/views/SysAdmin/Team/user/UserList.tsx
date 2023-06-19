@@ -58,7 +58,6 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -213,15 +212,15 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
-  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+  const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
+  const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
-  const [showResendSMSError, setShowResendSMSError] = useState(false)
-  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+  const [showResendInviteError, setShowResendInviteError] = useState(false)
+  const [showUsernameReminderError, setShowUsernameReminderError] =
     useState(false)
-  const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
+  const [showResetPasswordSuccess, setShowResetPasswordSuccess] =
     useState(false)
-  const [showResetPasswordSMSError, setResetPasswordSMSError] = useState(false)
+  const [showResetPasswordError, setResetPasswordError] = useState(false)
   const {
     intl,
     userDetails,
@@ -261,6 +260,7 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
+  const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
@@ -321,39 +321,39 @@ function UserListComponent(props: IProps) {
     [toggleResetPassword]
   )
 
-  const resendSMS = useCallback(
-    async function resendSMS(userId: string) {
+  const resendInvite = useCallback(
+    async function resendInvite(userId: string) {
       try {
-        const res = await userMutations.resendSMSInvite(userId, [
+        const res = await userMutations.resendInvite(userId, [
           {
             query: SEARCH_USERS,
             variables: { primaryOfficeId: locationId, count: recordCount }
           }
         ])
-        if (res && res.data && res.data.resendSMSInvite) {
-          setShowResendSMSSuccess(true)
+        if (res && res.data && res.data.resendInvite) {
+          setShowResendInviteSuccess(true)
         }
       } catch (err) {
-        setShowResendSMSError(true)
+        setShowResendInviteError(true)
       }
     },
     [locationId, recordCount]
   )
 
-  const usernameSMSReminder = useCallback(
-    async function usernameSMSReminder(userId: string) {
+  const usernameReminder = useCallback(
+    async function usernameReminder(userId: string) {
       try {
-        const res = await userMutations.usernameSMSReminderSend(userId, [
+        const res = await userMutations.usernameReminderSend(userId, [
           {
             query: SEARCH_USERS,
             variables: { primaryOfficeId: locationId, count: recordCount }
           }
         ])
-        if (res && res.data && res.data.usernameSMSReminder) {
-          setShowUsernameSMSReminderSuccess(true)
+        if (res && res.data && res.data.usernameReminder) {
+          setShowUsernameReminderSuccess(true)
         }
       } catch (err) {
-        setShowUsernameSMSReminderError(true)
+        setShowUsernameReminderError(true)
       }
     },
     [locationId, recordCount]
@@ -362,24 +362,20 @@ function UserListComponent(props: IProps) {
   const resetPassword = useCallback(
     async function resetPassword(userId: string) {
       try {
-        const res = await userMutations.sendResetPasswordSMS(
-          userId,
-          offlineCountryConfig.config.APPLICATION_NAME,
-          [
-            {
-              query: SEARCH_USERS,
-              variables: { primaryOfficeId: locationId, count: recordCount }
-            }
-          ]
-        )
-        if (res && res.data && res.data.resetPasswordSMS) {
-          setShowResetPasswordSMSSuccess(true)
+        const res = await userMutations.sendResetPasswordInvite(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.resetPasswordInvite) {
+          setShowResetPasswordSuccess(true)
         }
       } catch (err) {
-        setResetPasswordSMSError(true)
+        setResetPasswordError(true)
       }
     },
-    [recordCount, locationId, offlineCountryConfig.config.APPLICATION_NAME]
+    [recordCount, locationId]
   )
 
   const getMenuItems = useCallback(
@@ -396,7 +392,7 @@ function UserListComponent(props: IProps) {
       if (user.status === 'pending' || user.status === 'active') {
         menuItems.push(
           {
-            label: intl.formatMessage(messages.sendUsernameReminderSMS),
+            label: intl.formatMessage(messages.sendUsernameReminderInvite),
             handler: () => {
               toggleUsernameReminderModal(user)
             }
@@ -412,9 +408,9 @@ function UserListComponent(props: IProps) {
 
       if (user.status === 'pending') {
         menuItems.push({
-          label: intl.formatMessage(messages.resendSMS),
+          label: intl.formatMessage(messages.resendInvite),
           handler: () => {
-            resendSMS(user.id as string)
+            resendInvite(user.id as string)
           }
         })
       }
@@ -438,7 +434,7 @@ function UserListComponent(props: IProps) {
     [
       goToReviewUserDetails,
       intl,
-      resendSMS,
+      resendInvite,
       toggleUserActivationModal,
       toggleUsernameReminderModal,
       toggleUserResetPasswordModal
@@ -474,8 +470,8 @@ function UserListComponent(props: IProps) {
     const userName =
       (user &&
         user.name &&
-        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+        ((createNamesMap(user.name)[intl.locale] as string) ||
+          (createNamesMap(user.name)[LANG_EN] as string))) ||
       ''
     return userName
   }
@@ -542,12 +538,8 @@ function UserListComponent(props: IProps) {
             const name =
               (user &&
                 user.name &&
-                ((createNamesMap(user.name as GQLHumanName[])[
-                  intl.locale
-                ] as string) ||
-                  (createNamesMap(user.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string))) ||
+                ((createNamesMap(user.name)[intl.locale] as string) ||
+                  (createNamesMap(user.name)[LANG_EN] as string))) ||
               ''
             const role = intl.formatMessage({
               id: getUserRoleIntlKey(user.role._id)
@@ -623,6 +615,7 @@ function UserListComponent(props: IProps) {
     if (!getViewOnly(locationId, userDetails, onlyNational)) {
       buttons.push(
         <LocationPicker
+          key={`location-picker-${locationId}`}
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
             props.goToTeamUserList(locationId)
@@ -630,7 +623,13 @@ function UserListComponent(props: IProps) {
           requiredLocationTypes={'CRVS_OFFICE'}
         />
       )
-      buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)
+      buttons.push(
+        <AddUserIcon
+          id="add-user"
+          key={`add-user-${locationId}`}
+          onClick={onClickAddUser}
+        />
+      )
     }
     return buttons
   }
@@ -702,7 +701,7 @@ function UserListComponent(props: IProps) {
               show={toggleUsernameReminder.modalVisible}
               handleClose={() => toggleUsernameReminderModal()}
               title={intl.formatMessage(
-                messages.sendUsernameReminderSMSModalTitle
+                messages.sendUsernameReminderInviteModalTitle
               )}
               actions={[
                 <Button
@@ -719,9 +718,7 @@ function UserListComponent(props: IProps) {
                   key="username-reminder-send"
                   onClick={() => {
                     if (toggleUsernameReminder.selectedUser?.id) {
-                      usernameSMSReminder(
-                        toggleUsernameReminder.selectedUser.id
-                      )
+                      usernameReminder(toggleUsernameReminder.selectedUser.id)
                     }
                     toggleUsernameReminderModal()
                   }}
@@ -733,8 +730,14 @@ function UserListComponent(props: IProps) {
               autoHeight={true}
             >
               {intl.formatMessage(
-                messages.sendUsernameReminderSMSModalMessage,
-                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
+                messages.sendUsernameReminderInviteModalMessage,
+                {
+                  recipient:
+                    deliveryMethod === 'sms'
+                      ? toggleUsernameReminder.selectedUser?.mobile
+                      : toggleUsernameReminder.selectedUser?.email,
+                  deliveryMethod
+                }
               )}
             </ResponsiveModal>
             <ResponsiveModal
@@ -769,7 +772,11 @@ function UserListComponent(props: IProps) {
               autoHeight={true}
             >
               {intl.formatMessage(messages.resetUserPasswordModalMessage, {
-                phoneNumber: toggleResetPassword.selectedUser?.mobile ?? ''
+                deliveryMethod,
+                recipient:
+                  deliveryMethod == 'sms'
+                    ? toggleResetPassword.selectedUser?.mobile
+                    : toggleResetPassword.selectedUser?.email
               })}
             </ResponsiveModal>
           </UserTable>
@@ -787,11 +794,12 @@ function UserListComponent(props: IProps) {
       toggleUsernameReminder.modalVisible,
       toggleUsernameReminder.selectedUser,
       toggleUsernameReminderModal,
-      usernameSMSReminder,
+      usernameReminder,
       resetPassword,
       toggleResetPassword.modalVisible,
       toggleResetPassword.selectedUser,
-      toggleUserResetPasswordModal
+      toggleUserResetPasswordModal,
+      deliveryMethod
     ]
   )
 
@@ -869,70 +877,70 @@ function UserListComponent(props: IProps) {
         </Content>
       )}
 
-      {showResendSMSSuccess && (
+      {showResendInviteSuccess && (
         <Toast
           id="resend_invite_success"
           type="success"
-          onClose={() => setShowResendSMSSuccess(false)}
+          onClose={() => setShowResendInviteSuccess(false)}
         >
-          {intl.formatMessage(messages.resendSMSSuccess)}
+          {intl.formatMessage(messages.resendInviteSuccess)}
         </Toast>
       )}
-      {showResendSMSError && (
+      {showResendInviteError && (
         <Toast
           id="resend_invite_error"
           type="warning"
-          onClose={() => setShowResendSMSError(false)}
+          onClose={() => setShowResendInviteError(false)}
         >
-          {intl.formatMessage(messages.resendSMSError)}
+          {intl.formatMessage(messages.resendInviteError)}
         </Toast>
       )}
 
-      {showUsernameSMSReminderSuccess && (
+      {showUsernameReminderSuccess && (
         <Toast
           id="username_reminder_success"
           type="success"
-          onClose={() => setShowUsernameSMSReminderSuccess(false)}
+          onClose={() => setShowUsernameReminderSuccess(false)}
         >
-          {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
+          {intl.formatMessage(messages.sendUsernameReminderInviteSuccess, {
             name: getUserName(toggleUsernameReminder.selectedUser as User)
           })}
         </Toast>
       )}
-      {showUsernameSMSReminderError && (
+      {showUsernameReminderError && (
         <Toast
           id="username_reminder_error"
           type="warning"
-          onClose={() => setShowUsernameSMSReminderError(false)}
+          onClose={() => setShowUsernameReminderError(false)}
         >
-          {intl.formatMessage(messages.sendUsernameReminderSMSError)}
+          {intl.formatMessage(messages.sendUsernameReminderInviteError)}
         </Toast>
       )}
 
-      {showResetPasswordSMSSuccess && (
+      {showResetPasswordSuccess && (
         <Toast
           id="reset_password_success"
           type="success"
           onClose={() => {
-            setShowResetPasswordSMSSuccess(false)
+            setShowResetPasswordSuccess(false)
             setToggleResetPassword({
               ...toggleResetPassword,
               selectedUser: null
             })
           }}
         >
-          {intl.formatMessage(messages.resetPasswordSMSSuccess, {
+          {intl.formatMessage(messages.resetPasswordSuccess, {
             username: getUserName(toggleResetPassword.selectedUser as User)
           })}
         </Toast>
       )}
-      {showResetPasswordSMSError && (
+      {showResetPasswordError && (
         <Toast
           id="reset_password_error"
           type="warning"
-          onClose={() => setResetPasswordSMSError(false)}
+          onClose={() => setResetPasswordError(false)}
         >
-          {intl.formatMessage(messages.resetPasswordSMSError)}
+          {intl.formatMessage(messages.resetPasswordError)}
         </Toast>
       )}
     </SysAdminContentWrapper>

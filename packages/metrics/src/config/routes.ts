@@ -23,6 +23,7 @@ import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
 import {
   metricsDeleteMeasurementHandler,
+  deletePerformanceHandler,
   metricsHandler
 } from '@metrics/features/metrics/handler'
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
@@ -747,6 +748,18 @@ export const getRoutes = () => {
       method: 'DELETE',
       path: '/influxMeasurement',
       handler: metricsDeleteMeasurementHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        tags: ['api']
+      }
+    },
+    //delete performance
+    {
+      method: 'DELETE',
+      path: '/performance',
+      handler: deletePerformanceHandler,
       config: {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]

@@ -128,7 +128,7 @@ describe('date picker tests', () => {
 
       const { startDate, endDate } = onDatesChangeHandlerArgs[0]
       expect((startDate as Date).getMonth()).toBe(1)
-      expect((endDate as Date).getMonth()).toBe(2)
+      expect((endDate as Date).getMonth()).toBe(5)
     })
   })
 })

@@ -74,6 +74,7 @@ interface IConstantsMessages
   labelLanguage: MessageDescriptor
   labelPassword: MessageDescriptor
   labelPhone: MessageDescriptor
+  labelEmail: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   labelSystemRole: MessageDescriptor
@@ -281,6 +282,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Integrations',
     description: 'Integration title',
     id: 'constants.integrations'
+  },
+  vsExportTitle: {
+    defaultMessage: 'Vital statistics',
+    description: 'Vital statistics title',
+    id: 'config.application.vsexport'
   },
   declarationUpdatedOn: {
     defaultMessage: 'Updated on',
@@ -501,6 +507,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Phone label',
     id: 'constants.phoneNumber'
   },
+  labelEmail: {
+    defaultMessage: 'Email Address',
+    description: 'Email label',
+    id: 'constants.emailAddress'
+  },
+
   labelPin: {
     defaultMessage: 'PIN',
     description: 'PIN label',
@@ -983,6 +995,11 @@ const dynamicMessagesToDefine: Record<
   string | number | symbol,
   MessageDescriptor
 > = {
+  draft: {
+    id: 'constants.draft',
+    defaultMessage: 'Draft',
+    description: 'A label for draft'
+  },
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',

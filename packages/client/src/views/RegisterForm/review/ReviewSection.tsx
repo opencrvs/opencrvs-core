@@ -72,6 +72,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
+  NID_VERIFICATION_BUTTON,
   SUBSECTION,
   WARNING
 } from '@client/forms'
@@ -114,7 +115,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
+import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -122,7 +123,7 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { clone, flatten, flattenDeep, get, isArray, pick } from 'lodash'
+import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
 import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
@@ -146,18 +147,22 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   SignatureGenerator,
   SignatureInputProps
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
+<<<<<<< HEAD
 import {
   AddressCases,
   getAddressCaseFields
 } from '@client/forms/configuration/administrative/addresses'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+=======
+>>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -242,11 +247,24 @@ const FormData = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
   }
 `
+<<<<<<< HEAD
 const ReviewContainter = styled.div`
   padding: 0px 32px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px 16px;
   }
+=======
+const StyledAlert = styled(Alert)`
+  margin-top: 24px;
+`
+const Title = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  ${({ theme }) => theme.fonts.h3};
+  padding: 16px 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+>>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
 `
 
 const DeclarationDataContainer = styled.div``
@@ -314,7 +332,7 @@ function renderSelectOrRadioLabel(
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
@@ -340,9 +358,11 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation =
-          offlineCountryConfig[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = offlineCountryConfig[OFFLINE_LOCATIONS_KEY][
+          locationId
+        ] || { name: locationId, alias: locationId }
       } else {
         selectedLocation =
           offlineCountryConfig[OFFLINE_FACILITIES_KEY][locationId]
@@ -426,11 +446,15 @@ const renderValue = (
     [
       'statePrimary',
       'districtPrimary',
+      'cityUrbanOptionPrimary',
       'internationalStatePrimary',
       'internationalDistrictPrimary',
+      'internationalCityPrimary',
       'stateSecondary',
       'districtSecondary',
+      'cityUrbanOptionSecondary',
       'internationalStateSecondary',
+      'internationalCitySecondary',
       'internationalDistrictSecondary'
     ].includes(field.name) &&
     isOriginalData
@@ -548,6 +572,25 @@ const renderValue = (
       (location) => location.id === value
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
+  }
+  if (field.type === NID_VERIFICATION_BUTTON) {
+    return (
+      <VerificationButton
+        onClick={() => {}}
+        labelForVerified={intl.formatMessage(
+          formMessageDescriptors.nidVerified
+        )}
+        labelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerified
+        )}
+        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
+        reviewLabelForUnverified={intl.formatMessage(
+          formMessageDescriptors.nidNotVerifiedReviewSection
+        )}
+        status={value ? 'verified' : 'unverified'}
+        useAsReviewLabel={true}
+      />
+    )
   }
 
   if (typeof value === 'boolean') {
@@ -930,12 +973,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  isVisibleField(
-    draft: IDeclaration,
-    field: IFormField,
-    section: IFormSection
-  ) {
-    const { offlineCountryConfiguration } = this.props
+  isVisibleField(field: IFormField, section: IFormSection) {
+    const { draft, offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
@@ -944,7 +983,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     return (
       !conditionalActions.includes('hide') &&
-      !conditionalActions.includes('disable') &&
       !conditionalActions.includes('hideInPreview')
     )
   }
@@ -978,7 +1016,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getRenderableField(
-    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -986,7 +1023,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { intl } = this.props
+    const { draft: declaration, intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -1126,7 +1163,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getPreviewGroupsField(
-    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
@@ -1135,23 +1171,22 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
+    const { draft } = this.props
+
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
       const baseTag = field.previewGroup
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
-        if (
-          this.isVisibleField(draft, field, section) &&
-          !this.isViewOnly(field)
-        ) {
+        if (this.isVisibleField(field, section) && !this.isViewOnly(field)) {
           if (field.previewGroup === baseTag) {
             taggedFields.push(field)
           }
           for (const index in field.nestedFields) {
             field.nestedFields[index].forEach((tempField) => {
               if (
-                this.isVisibleField(draft, tempField, section) &&
+                this.isVisibleField(tempField, section) &&
                 !this.isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
               ) {
@@ -1244,7 +1279,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
 
       return this.getRenderableField(
-        draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -1322,14 +1356,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getSinglePreviewField(
-    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const { data, originalData } = draft
+    const {
+      draft: { data, originalData }
+    } = this.props
 
     let value = this.getValueOrError(
       section,
@@ -1363,7 +1398,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return this.getRenderableField(
-      draft,
       section,
       group,
       field.label,
@@ -1374,24 +1408,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getNestedPreviewField(
-    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection
   ) {
+    const { draft } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
-      this.getSinglePreviewField(
-        draft,
-        section,
-        group,
-        field,
-        sectionErrors,
-        true
-      )
+      this.getSinglePreviewField(section, group, field, sectionErrors, true)
     )
     ;(
       (field.nestedFields &&
@@ -1407,7 +1434,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (nestedField.previewGroup) {
         nestedItems.push(
           this.getPreviewGroupsField(
-            draft,
             section,
             group,
             nestedField,
@@ -1423,7 +1449,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         nestedItems.push(
           this.getRenderableField(
-            draft,
             section,
             group,
             nestedField.label,
@@ -1443,7 +1468,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverriddenFieldsListForPreview(
-    draft: IDeclaration,
     formSections: IFormSection[]
   ): IFormField[] {
     const overriddenFields = formSections
@@ -1472,7 +1496,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })
               .filter((field) => !Boolean(field.hideInPreview))
               .filter((field) => Boolean(field.reviewOverrides))
-              .filter((field) => this.isVisibleField(draft, field, section))
+              .filter((field) => this.isVisibleField(field, section))
           })
           .filter((item) => item.length)
       })
@@ -1481,7 +1505,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverRiddenPreviewField(
-    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -1501,7 +1524,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ) as IFormSection
 
     const result = this.getSinglePreviewField(
-      draft,
       residingSection,
       group,
       overriddenField,
@@ -1614,14 +1636,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    offlineCountryConfiguration: IOfflineData,
+    declaration: IDeclaration
   ) => {
-    const { intl } = this.props
-    const draft = addSameAddressValues(this.props.draft)
-    const overriddenFields = this.getOverriddenFieldsListForPreview(
-      draft,
-      formSections
-    )
+    const { intl, draft } = this.props
+    const overriddenFields =
+      this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
     return formSections.map((section) => {
       let items: any[] = []
@@ -1635,42 +1656,47 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group.fields
           .filter(
             (field) =>
-              this.isVisibleField(draft, field, section) &&
-              !this.isViewOnly(field)
+              this.isVisibleField(field, section) && !this.isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
+            const fieldDisabled = getConditionalActionsForField(
+              field,
+              draft.data[section.id] || {},
+              offlineCountryConfiguration,
+              draft.data
+            )
+
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
-                  draft,
                   section,
                   group,
                   field,
                   visitedTags,
                   errorsOnFields,
                   draft.data[section.id],
-                  draft.originalData?.[section.id]
+                  (draft.originalData && draft.originalData[section.id]) ||
+                    undefined
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
-                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
               : this.getSinglePreviewField(
-                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
-
+            if (fieldDisabled.includes('disable') && tempItem?.action) {
+              tempItem.action.disabled = true
+            }
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
-                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -1792,7 +1818,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
-      errorsOnFields
+      errorsOnFields,
+      offlineCountryConfiguration,
+      declaration
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
@@ -1930,7 +1958,48 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           sec.action && (
                             <Link font="reg16" onClick={sec.action.handler}>
                               {sec.action.label}
+<<<<<<< HEAD
                             </Link>
+=======
+                            </LinkButton>
+                          )}
+                        </Title>
+                      )}
+                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
+                        <DocumentListPreviewContainer>
+                          <DocumentListPreview
+                            id={sec.id}
+                            documents={uploadedDocuments}
+                            onSelect={this.selectForPreview}
+                            dropdownOptions={selectOptions}
+                            inReviewSection={true}
+                          />
+                        </DocumentListPreviewContainer>
+                      )}
+                      <ListViewSimplified id={'Section_' + sec.id}>
+                        {sec.items.map((item, index) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={index}
+                              label={<Label>{item.label}</Label>}
+                              value={
+                                <Value id={item.label.split(' ')[0]}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={
+                                !item?.action?.disabled && (
+                                  <LinkButton
+                                    id={item.action.id}
+                                    disabled={item.action.disabled}
+                                    onClick={item.action.handler}
+                                  >
+                                    {item.action.label}
+                                  </LinkButton>
+                                )
+                              }
+                            />
+>>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
                           )
                         }
                         labelForHideAction="Hide"
@@ -2007,11 +2076,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   !viewRecord &&
                   getSignature(declaration?.event as Event)}
                 {totalFileSizeExceeded && (
-                  <Alert type="warning">
+                  <StyledAlert type="warning">
                     {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
                       fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                     })}
-                  </Alert>
+                  </StyledAlert>
                 )}
               </ReviewContainter>
               {viewRecord || isDuplicate ? null : (
@@ -2201,54 +2270,6 @@ function fatherDoesNotExistAndStateIsFather(
     selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
     selectedInformantAndContactType.selectedContactType !== 'FATHER'
   )
-}
-
-function addSameAddressValues(draft: IDeclaration) {
-  if (draft.event === Event.Marriage) {
-    return draft
-  }
-  /*
-   *  Address of y is same as x
-   */
-  const [xSection, ySection] =
-    draft.event === Event.Birth
-      ? (['mother', 'father'] as const)
-      : (['deceased', 'informant'] as const)
-
-  const fieldNames = getAddressCaseFields(
-    AddressCases.PRIMARY_ADDRESS,
-    true
-  ).map((address) => address.name)
-
-  const modifiedDraft = {
-    ...draft
-  }
-
-  if (modifiedDraft.data[ySection]?.primaryAddressSameAsOtherPrimary) {
-    modifiedDraft.data = {
-      ...modifiedDraft.data,
-      [ySection]: {
-        ...modifiedDraft.data[ySection],
-        ...pick(modifiedDraft.data[xSection], fieldNames)
-      }
-    }
-    modifiedDraft.data[ySection].primaryAddressSameAsOtherPrimary = false
-  }
-
-  if (
-    modifiedDraft.originalData?.[ySection]?.primaryAddressSameAsOtherPrimary
-  ) {
-    modifiedDraft.originalData = {
-      ...modifiedDraft.originalData,
-      [ySection]: {
-        ...modifiedDraft.originalData[ySection],
-        ...pick(modifiedDraft.originalData[xSection], fieldNames)
-      }
-    }
-    modifiedDraft.originalData[ySection].primaryAddressSameAsOtherPrimary =
-      false
-  }
-  return modifiedDraft
 }
 
 export const ReviewSection = connect(

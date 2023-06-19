@@ -11,13 +11,17 @@
  */
 import {
   GQLAddress,
-  GQLAttachment,
-  GQLComment,
   GQLHumanName,
-  GQLRegWorkflow,
   GQLLocationType,
-  GQLAddressType
+  GQLAddressType,
+  GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  BirthRegistration,
+  DeathRegistration,
+  MarriageRegistration,
+  Address
+} from '@client/utils/gateway'
 import {
   IAttachment,
   IFormData,
@@ -48,6 +52,14 @@ interface IName {
   [key: string]: any
 }
 
+type QueryData = BirthRegistration | DeathRegistration | MarriageRegistration
+
+export type SectionId = keyof (
+  | BirthRegistration
+  | DeathRegistration
+  | MarriageRegistration
+)
+
 interface IIgnoreAddressFields {
   fieldsToIgnoreForLocalAddress: string[]
   fieldsToIgnoreForInternationalAddress: string[]
@@ -56,14 +68,14 @@ interface IIgnoreAddressFields {
 export const nameToFieldTransformer =
   (
     language: string,
-    transformedFieldName?: string,
-    fromSectionId?: string,
+    transformedFieldName?: keyof GQLHumanName,
+    fromSectionId?: SectionId,
     nestedField?: string //nestedField is necessary for GQL data informant->individual
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     const selectSectionId = fromSectionId ? fromSectionId : sectionId
@@ -76,26 +88,29 @@ export const nameToFieldTransformer =
       selectedName =
         queryData[selectSectionId] &&
         queryData[selectSectionId][nestedField].name &&
-        (queryData[selectSectionId][nestedField].name as GQLHumanName[]).find(
-          (name) => name.use === language
+        queryData[selectSectionId][nestedField].name.find(
+          (name: GQLHumanName) => name.use === language
         )
     } else {
       selectedName =
         queryData[selectSectionId] &&
         queryData[selectSectionId].name &&
-        (queryData[selectSectionId].name as GQLHumanName[]).find(
-          (name) => name.use === language
+        queryData[selectSectionId].name.find(
+          (name: GQLHumanName) => name.use === language
         )
     }
 
-    const nameKey = transformedFieldName ? transformedFieldName : field.name
+    const nameKey = transformedFieldName
+      ? transformedFieldName
+      : (field.name as keyof GQLHumanName)
     if (!selectedName || !selectedName[nameKey]) {
       return transformedData
     }
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] = selectedName[nameKey]
+    if (selectedName[nameKey])
+      transformedData[sectionId][field.name] = selectedName[nameKey]
     return transformedData
   }
 
@@ -103,8 +118,8 @@ export const fieldValueTransformer =
   (transformedFieldName: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     if (queryData[sectionId] && queryData[sectionId][transformedFieldName]) {
@@ -115,16 +130,16 @@ export const fieldValueTransformer =
   }
 
 export const bundleFieldToSectionFieldTransformer =
-  (transformedFieldName?: string) =>
+  (transformedFieldName?: SectionId) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     const selectedFieldName = transformedFieldName
       ? transformedFieldName
-      : field.name
+      : (field.name as SectionId)
     if (
       queryData[selectedFieldName] !== null &&
       queryData[selectedFieldName] !== undefined &&
@@ -137,8 +152,8 @@ export const bundleFieldToSectionFieldTransformer =
 
 export function arrayToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) {
   if (
@@ -155,8 +170,8 @@ export const identifierToFieldTransformer =
   (identifierField: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     if (
@@ -176,8 +191,8 @@ export const identifierWithTypeToFieldTransformer =
   (identifierType: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     let identifier
@@ -194,8 +209,8 @@ export const identityToFieldTransformer =
   (identifierField: string, identityType: string, nestedField = '') =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     //nestedField is necessary for GQL data informant->individual
@@ -234,6 +249,36 @@ export const identityToFieldTransformer =
     }
     return transformedData
   }
+
+export const identityToNidVerificationFieldTransformer = (
+  transformedData: IFormData,
+  queryData: QueryData,
+  sectionId: SectionId,
+  field: IFormField
+) => {
+  identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+    transformedData,
+    queryData,
+    sectionId,
+    field
+  )
+  const existingIdentity = queryData[sectionId]?.identifier?.find(
+    (identity: fhir.Identifier) =>
+      (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
+  )
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (existingIdentity) {
+    const modifiedFields = existingIdentity[
+      'fieldsModifiedByIdentity'
+    ] as string[]
+    transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+  }
+
+  return transformedData
+}
 interface IAddress {
   [key: string]: any
 }
@@ -242,15 +287,15 @@ export const addressToFieldTransformer =
   (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
-    const address: IAddress | undefined =
+    const address =
       queryData[sectionId] &&
       queryData[sectionId].address &&
-      (queryData[sectionId].address as GQLAddress[]).find(
-        (addr) => addr.type === addressType
+      queryData[sectionId].address.find(
+        (addr: Address) => addr.type === addressType
       )
 
     if (!address) {
@@ -269,24 +314,25 @@ export const addressToFieldTransformer =
 export const sameAddressFieldTransformer =
   (
     fromAddressType: string,
-    fromSection: string,
+    fromSection: SectionId,
     toAddressType: string,
-    toSection: string
+    toSection: SectionId
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: QueryData,
     sectionId: string,
     field: IFormField
   ) => {
     const fromAddress =
       queryData[fromSection] &&
       queryData[fromSection].address &&
-      (queryData[fromSection].address as [GQLAddress]).find(
-        (addr) => addr.type === fromAddressType
+      queryData[fromSection].address.find(
+        (addr: Address) => addr.type === fromAddressType
       )
+
     let toAddress
-    if (toSection === 'informant') {
+    if (toSection === ('informant' as SectionId)) {
       // informant's address is stored inside individual for death
       // declarations and toSection will be informant for death declarations
       toAddress =
@@ -303,6 +349,7 @@ export const sameAddressFieldTransformer =
           (addr) => addr.type === toAddressType
         )
     }
+
     if (!fromAddress || !toAddress) {
       transformedData[sectionId][field.name] = false
       return transformedData
@@ -330,11 +377,11 @@ export const sameAddressFieldTransformer =
   }
 
 export const sectionFieldExchangeTransformer =
-  (fromSectionId: string, fromSectionField?: string) =>
+  (fromSectionId: SectionId, fromSectionField?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     if (
@@ -352,17 +399,15 @@ export const sectionFieldExchangeTransformer =
 
 export function commentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) {
+  // Check this one
   const comment =
     queryData[sectionId].status &&
-    (queryData[sectionId].status as GQLRegWorkflow[])[0].comments &&
-    (
-      (queryData[sectionId].status as GQLRegWorkflow[])[0]
-        .comments as GQLComment[]
-    )[0].comment
+    queryData[sectionId].status[0].comments &&
+    queryData[sectionId].status[0].comments[0].comment
   if (comment) {
     transformedData[sectionId][field.name] = comment
   }
@@ -371,41 +416,49 @@ export function commentToFieldTransformer(
 
 export function attachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField,
-  alternateSectionId?: string,
+  alternateSectionId?: SectionId,
   subjectMapper?: any,
   typeMapper?: any,
   fieldNameMapping?: any
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
+  const queryDataAttatchments = queryData[selectedSectionId].attachments
 
-  if (queryData[selectedSectionId].attachments) {
-    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
-      (attachment) => {
-        const subject = attachment.subject as string
-        let type = attachment.type
-        if (typeMapper) {
-          // @ts-ignore
-          type =
-            Object.keys(typeMapper).find(
-              (key) => typeMapper[key] === attachment.type
-            ) || attachment.type
-        }
-        if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-          attachments.push({
-            data: attachment.data,
-            uri: attachment.uri,
-            type: attachment.contentType,
-            optionValues: [subject, type],
-            title: subject,
-            description: type
-          } as IAttachment)
-        }
+  if (queryDataAttatchments) {
+    ;(queryDataAttatchments as GQLAttachment[]).forEach((attachment) => {
+      const subject = attachment.subject as string
+      let type = attachment.type
+      if (typeMapper) {
+        // @ts-ignore
+        type =
+          Object.keys(typeMapper).find(
+            (key) => typeMapper[key] === attachment.type
+          ) || attachment.type
       }
-    )
+      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+        attachments.push({
+          data: attachment.data,
+          uri: attachment.uri,
+          type: attachment.contentType,
+          optionValues: [subject, type],
+          title: subject,
+          description: type
+        } as IAttachment)
+      }
+      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+        attachments.push({
+          data: attachment.data,
+          type: attachment.contentType,
+          optionValues: [subject, type],
+          title: subject,
+          description: type
+        } as IAttachment)
+      }
+    })
   }
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
@@ -421,21 +474,23 @@ export const eventLocationQueryTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: QueryData,
     sectionId: string,
     field: IFormField
   ) => {
     if (!queryData.eventLocation || !queryData.eventLocation.address) {
       return transformedData
     }
-    const eventLocation = queryData.eventLocation as fhir.Location
-    const address = eventLocation.address as IAddress
-    const line = address.line as string[]
-    const country = address.country
-    const fieldValue =
-      address[transformedFieldName ? transformedFieldName : field.name]
+    const eventLocation = queryData.eventLocation
+    const address = eventLocation.address
+    const line = address?.line
+    const country = address?.country
+    const addressKey = transformedFieldName ? transformedFieldName : field.name
+    const fieldValue = address && address[addressKey as keyof Address]
+
     if (lineNumber > 0) {
-      transformedData[sectionId][field.name] = line[lineNumber - 1]
+      transformedData[sectionId][field.name] =
+        (line && line[lineNumber - 1]) || []
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
@@ -462,7 +517,7 @@ export const eventLocationTypeQueryTransformer =
   () =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: QueryData,
     sectionId: string,
     field: IFormField
   ) => {
@@ -482,7 +537,7 @@ export const eventLocationIDQueryTransformer =
   () =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: QueryData,
     sectionId: string,
     field: IFormField
   ) => {
@@ -503,8 +558,8 @@ export const locationIDToFieldTransformer =
   (transformedName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     const fieldName = transformedName || field.name
@@ -520,7 +575,7 @@ export const eventLocationNameQueryOfflineTransformer =
   (resourceKey: string, transformedFieldName?: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
+    queryData: QueryData,
     sectionId: string,
     field: IFormField,
     _?: IFormField,
@@ -576,8 +631,8 @@ export const nestedValueToFieldTransformer =
   (nestedFieldName: string, transformMethod?: IFormFieldQueryMapFunction) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField
   ) => {
     if (!queryData[sectionId] || !queryData[sectionId][nestedFieldName]) {
@@ -602,10 +657,56 @@ export const nestedValueToFieldTransformer =
     return transformedData
   }
 
+export const nestedIdentityValueToFieldTransformer =
+  (nestedField: SectionId) =>
+  (
+    transformedData: IFormData,
+    queryData: QueryData,
+    sectionId: SectionId,
+    field: IFormField
+  ) => {
+    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
+      return transformedData
+    }
+    const clonedData = cloneDeep(transformedData)
+    if (!clonedData[nestedField]) {
+      clonedData[nestedField] = {}
+    }
+
+    identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
+      clonedData,
+      queryData[sectionId],
+      nestedField,
+      field
+    )
+
+    if (clonedData[nestedField][field.name] === undefined) {
+      return transformedData
+    }
+    transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
+
+    const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
+      (identity: fhir.Identifier) =>
+        (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
+    )
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    if (existingIdentity) {
+      const modifiedFields = existingIdentity[
+        'fieldsModifiedByIdentity'
+      ] as string[]
+      transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
+    }
+
+    return transformedData
+  }
+
 export const booleanTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) => {
   // graphql boolean ignored unless forced like this
@@ -783,7 +884,7 @@ const isLocationFacilityOrCRVSOffice = (
 
 const transformAddressTemplateArray = (
   transformedData: IFormData,
-  addressFromQuery: GQLAddress,
+  addressFromQuery: Address,
   addressLocationLevel: keyof typeof LocationLevel,
   sectionId: string,
   nameKey: string,
@@ -819,15 +920,15 @@ const transformAddressTemplateArray = (
 
 export const addressOfflineTransformer =
   (
-    transformedFieldName: string,
+    transformedFieldName: SectionId,
     addressType: GQLAddressType,
     addressLocationLevel: keyof typeof LocationLevel,
     targetFieldName?: string
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -838,9 +939,9 @@ export const addressOfflineTransformer =
     ) {
       return
     }
-    const addressFromQuery = (
-      queryData[transformedFieldName]?.address as GQLAddress[]
-    )?.find((address) => address.type === addressType)
+    const addressFromQuery = queryData[transformedFieldName]?.address?.find(
+      (address: GQLAddress) => address.type === addressType
+    )
     const nameKey = targetFieldName || field.name
     if (addressFromQuery) {
       transformAddressTemplateArray(
@@ -861,8 +962,8 @@ export const individualAddressTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -898,8 +999,8 @@ export const addressLineTemplateTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -930,8 +1031,8 @@ export const eventLocationAddressLineTemplateTransformer =
   (lineNumber: number, transformedFieldName: string) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -947,7 +1048,10 @@ export const eventLocationAddressLineTemplateTransformer =
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
     transformedData[sectionId][transformedFieldName] =
-      queryData.eventLocation?.address.line[index] || ''
+      (queryData.eventLocation?.address &&
+        queryData.eventLocation.address.line &&
+        queryData.eventLocation.address.line[index]) ||
+      ''
   }
 
 export const eventLocationAddressOfflineTransformer =
@@ -957,8 +1061,8 @@ export const eventLocationAddressOfflineTransformer =
   ) =>
   (
     transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
+    queryData: QueryData,
+    sectionId: SectionId,
     field: IFormField,
     _?: IFormField,
     offlineData?: IOfflineData
@@ -990,10 +1094,11 @@ export const eventLocationAddressOfflineTransformer =
 
 export const selectTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) => {
+  const fieldName = field.name as SectionId
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
@@ -1003,13 +1108,13 @@ export const selectTransformer = (
         queryData[sectionId][field.name],
         (field as ISelectFormFieldWithOptions).options
       )?.label as IFormSectionData) || ''
-  } else if (queryData[field.name]) {
+  } else if (queryData[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
     transformedData[sectionId][field.name] =
       (getSelectedOption(
-        queryData[field.name],
+        queryData[fieldName],
         (field as ISelectFormFieldWithOptions).options
       )?.label as IFormSectionData) || ''
   }
@@ -1017,8 +1122,8 @@ export const selectTransformer = (
 
 export const nationalityTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) => {
   if (queryData[sectionId]?.[field.name]) {
@@ -1043,20 +1148,21 @@ export const nationalityTransformer = (
 
 export const plainInputTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField
 ) => {
-  if (queryData[sectionId]?.[field.name]) {
+  const fieldName = field.name as SectionId
+  if (queryData[sectionId]?.[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] =
+    transformedData[sectionId][fieldName] =
       queryData[sectionId][field.name] || ''
-  } else if (queryData[field.name]) {
+  } else if (queryData[fieldName]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    transformedData[sectionId][field.name] = queryData[field.name] || ''
+    transformedData[sectionId][field.name] = queryData[fieldName] || ''
   }
 }

@@ -105,6 +105,7 @@ export function SignatureGenerator({
           </ErrorMessage>
           {!signatureData && (
             <>
+<<<<<<< HEAD
               <Stack gap={8}>
                 <Button
                   type="secondary"
@@ -145,6 +146,42 @@ export function SignatureGenerator({
                   disabled={disabled}
                 />
               </Stack>
+=======
+              <SecondaryButton
+                onClick={() => setSignatureDialogOpen(true)}
+                disabled={disabled}
+              >
+                {intl.formatMessage(messages.signatureOpenSignatureInput)}
+              </SecondaryButton>
+              <CustomImageUpload
+                id="signature-file-upload"
+                title={intl.formatMessage(buttonMessages.upload)}
+                handleFileChange={async (file) => {
+                  const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
+                  if (fileSizeMB > 2) {
+                    setSignatureError(
+                      intl.formatMessage(formMessages.fileSizeError)
+                    )
+                    return
+                  }
+                  if (!allowedSignatureFormat.includes(file.type)) {
+                    setSignatureError(
+                      intl.formatMessage(formMessages.fileUploadError, {
+                        type: allowedSignatureFormat
+                          .map((signatureFormat) =>
+                            signatureFormat.split('/').pop()
+                          )
+                          .join(', ')
+                      })
+                    )
+                    return
+                  }
+                  onChange((await getBase64String(file)).toString())
+                  setSignatureError('')
+                }}
+                disabled={disabled}
+              />
+>>>>>>> 0dce8d78f97bdc72ddcb0a37437c2b4854a819af
             </>
           )}
           {signatureData && (
