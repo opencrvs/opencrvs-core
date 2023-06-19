@@ -128,7 +128,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     WORKQUEUE_TABS.readyToIssue,
@@ -141,7 +140,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     WORKQUEUE_TABS.readyToIssue,
@@ -154,7 +152,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     WORKQUEUE_TABS.readyToIssue,
@@ -166,7 +163,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
@@ -176,7 +172,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.analytics
   ],
   LOCAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.performance,
     GROUP_ID.menuGroup
@@ -184,7 +179,6 @@ const USER_SCOPE: IUSER_SCOPE = {
   NATIONAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
-    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
