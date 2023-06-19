@@ -21,7 +21,7 @@ import { Icon } from '../../Icon'
 import styled from 'styled-components'
 
 const ControlsContainer = styled.div<{ centerController?: boolean }>`
-  height: 64px;
+  height: 56px;
   position: relative;
   gap: 2px;
   display: flex;

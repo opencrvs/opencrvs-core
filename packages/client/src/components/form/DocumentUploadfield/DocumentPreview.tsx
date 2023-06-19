@@ -34,7 +34,6 @@ const ViewerWrapper = styled.div`
 
 const ViewerContainer = styled.div`
   position: relative;
-  top: -24px;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -45,12 +44,6 @@ const ViewerContainer = styled.div`
     max-width: 80vw;
     width: auto;
   }
-`
-
-const Divider = styled.div`
-  width: 1px;
-  height: 24px;
-  background-color: ${({ theme }) => theme.colors.grey200};
 `
 
 type IProps = {
@@ -101,7 +94,7 @@ export class DocumentPreview extends React.Component<IProps, IState> {
     return (
       <ViewerWrapper id="preview_image_field">
         <AppBar
-          desktopLeft={<Icon name="Paperclip" />}
+          desktopLeft={<Icon name="Paperclip" size="large" />}
           desktopTitle={title}
           desktopRight={
             <Stack gap={8}>
@@ -133,7 +126,7 @@ export class DocumentPreview extends React.Component<IProps, IState> {
               </Button>
             </Stack>
           }
-          mobileLeft={<Icon name="Paperclip" />}
+          mobileLeft={<Icon name="Paperclip" size="large" />}
           mobileTitle={title}
           mobileRight={
             <Stack gap={8}>
