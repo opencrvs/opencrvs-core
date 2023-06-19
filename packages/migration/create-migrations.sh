@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -10,15 +10,15 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 # Define the target directory and filename
 
-if [[ "$1" =~ ^create:(hearth|application-config|openhim|performance|user-mgnt)$ ]]; then
+if [[ "$1" =~ ^(hearth|application-config|openhim|performance|user-mgnt)$ ]]; then
   TARGET_FOLDER="${BASH_REMATCH[1]}"
 else
-  echo "Invalid command. Usage: yarn create:hearth <filename> or yarn create:app <filename>"
+  echo "Example usage: yarn create:hearth <filename>"
   exit 1
 fi
 
 if [ -z "$2" ]; then
-  echo "Usage: yarn create:hearth <filename> or yarn create:app <filename>"
+  echo "Example usage: yarn create:hearth <filename>"
   exit 1
 fi
 
