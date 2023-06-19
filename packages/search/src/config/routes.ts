@@ -27,6 +27,7 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 import { marriageEventHandler } from '@search/features/registration/marriage/handler'
+import { client } from '@search/elasticsearch/client'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -56,10 +57,16 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
-        // Perform any health checks and return true or false for success prop
-        return {
-          success: true
+      handler: async (request: any, h: any) => {
+        try {
+          const res = await client.ping()
+          return {
+            success: res.statusCode === 200
+          }
+        } catch (error) {
+          return {
+            success: false
+          }
         }
       },
       config: {
