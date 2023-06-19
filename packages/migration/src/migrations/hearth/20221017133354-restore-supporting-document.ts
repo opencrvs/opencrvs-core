@@ -11,8 +11,8 @@
  */
 
 import {
-  getBirthEncounterCompositionCursor,
-  getBirthEncounterCompositionCount
+  getBirthCompositionsCursor,
+  getBirthCompositionsCount
 } from '../../utils/hearth-helper.js'
 import { Db, MongoClient } from 'mongodb'
 
@@ -23,9 +23,9 @@ export const up = async (db: Db, client: MongoClient) => {
   let processedDocCount = 0
   try {
     await session.withTransaction(async () => {
-      const totalCompositionCount = await getBirthEncounterCompositionCount(db)
+      const totalCompositionCount = await getBirthCompositionsCount(db)
       while (totalCompositionCount > processedDocCount) {
-        const compositionCursor = await getBirthEncounterCompositionCursor(
+        const compositionCursor = await getBirthCompositionsCursor(
           db,
           limit,
           skip
@@ -39,24 +39,23 @@ export const up = async (db: Db, client: MongoClient) => {
           } of ${totalCompositionCount} compositions...`
         )
         while (await compositionCursor.hasNext()) {
-          const composition =
-            (await compositionCursor.next()) as unknown as fhir.Composition
+          const composition = (await compositionCursor.next())!
           const compositionHistory = await db
             .collection('Composition_history')
-            .find({
+            .find<fhir.Composition & { id: string }>({
               id: composition.id
             })
             .toArray()
-          compositionHistory.push(composition as any)
+          compositionHistory.push(composition)
           const correctionIndex = compositionHistory.findIndex((composition) =>
-            composition.section.find(
+            composition.section?.find(
               (section: fhir.CompositionSection) =>
                 section?.code?.coding?.[0].code ===
                 'birth-correction-encounters'
             )
           )
           const immediatePrevComp = compositionHistory[correctionIndex - 1]
-          const hasDocumentSection = immediatePrevComp.section.find(
+          const hasDocumentSection = immediatePrevComp.section?.find(
             (section: fhir.CompositionSection) =>
               section?.code?.coding?.[0].code === 'supporting-documents'
           )

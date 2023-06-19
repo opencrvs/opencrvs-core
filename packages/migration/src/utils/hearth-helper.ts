@@ -21,20 +21,18 @@ export const COLLECTION_NAMES = {
   TASK: 'Task'
 }
 
-export async function getBirthEncounterCompositionCursor<T extends Document>(
-  db: Db,
-  limit = 50,
-  skip = 0
-) {
-  return db.collection(COLLECTION_NAMES.COMPOSITION).find<T>(
-    {
-      'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
-    },
-    { limit, skip }
-  )
+export async function getBirthCompositionsCursor(db: Db, limit = 50, skip = 0) {
+  return db
+    .collection(COLLECTION_NAMES.COMPOSITION)
+    .find<fhir.Composition & { id: string }>(
+      {
+        'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
+      },
+      { limit, skip }
+    )
 }
 
-export async function getBirthEncounterCompositionCount(db: Db) {
+export async function getBirthCompositionsCount(db: Db) {
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
