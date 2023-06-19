@@ -66,6 +66,11 @@ export const getRoutes = () => {
           }
         } catch (error) {
           logger.error(error)
+          if (error?.meta?.connection?.status === 'alive') {
+            return {
+              success: true
+            }
+          }
           return {
             success: false
           }
