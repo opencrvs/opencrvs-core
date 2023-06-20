@@ -405,10 +405,7 @@ export function attachmentToFieldTransformer(
   queryData: any,
   sectionId: string,
   field: IFormField,
-  alternateSectionId?: string,
-  subjectMapper?: any,
-  typeMapper?: any,
-  fieldNameMapping?: any
+  alternateSectionId: string
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
@@ -416,25 +413,14 @@ export function attachmentToFieldTransformer(
   if (queryData[selectedSectionId].attachments) {
     ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
       (attachment) => {
-        const subject = attachment.subject as string
-        let type = attachment.type
-        if (typeMapper) {
-          // @ts-ignore
-          type =
-            Object.keys(typeMapper).find(
-              (key) => typeMapper[key] === attachment.type
-            ) || attachment.type
-        }
-        if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-          attachments.push({
-            data: attachment.data,
-            uri: attachment.uri,
-            type: attachment.contentType,
-            optionValues: [subject, type],
-            title: subject,
-            description: type
-          } as IAttachment)
-        }
+        attachments.push({
+          data: attachment.data,
+          uri: attachment.uri,
+          type: attachment.contentType,
+          optionValues: [attachment.subject, attachment.type],
+          title: attachment.subject,
+          description: attachment.type
+        } as IAttachment)
       }
     )
   }

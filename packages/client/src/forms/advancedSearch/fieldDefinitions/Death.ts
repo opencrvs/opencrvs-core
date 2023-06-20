@@ -21,7 +21,6 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
     fields: [
       {
         name: 'placeOfRegistration',
-        customisable: false,
         type: 'LOCATION_SEARCH_INPUT',
         label: advancedSearchForm.placeOfRegistrationlabel,
         helperText: advancedSearchForm.placeOfRegistrationHelperText,
@@ -34,7 +33,6 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
       },
       {
         name: 'dateOfRegistration',
-        customisable: false,
         type: 'DATE_RANGE_PICKER',
         label: advancedSearchForm.dateOfRegistration,
         required: false,
@@ -43,7 +41,6 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
       },
       {
         name: 'registrationStatuses',
-        customisable: false,
         type: 'SELECT_WITH_OPTIONS',
         label: advancedSearchForm.statusOfRecordLabel,
         required: false,
@@ -90,7 +87,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'deceasedDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -99,7 +95,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
     },
     {
       name: 'deceasedFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstName,
       maxLength: 32,
@@ -109,7 +104,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
     },
     {
       name: 'deceasedFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
@@ -119,7 +113,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
     },
     {
       name: 'deceasedGender',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: formMessageDescriptors.sex,
       required: false,
@@ -150,7 +143,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'eventLocationType',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       previewGroup: 'placeOfBirth',
       ignoreFieldLabelOnErrorMessage: true,
@@ -172,7 +164,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationId',
-      customisable: false,
       type: 'LOCATION_SEARCH_INPUT',
       label: formMessageDescriptors.healthInstitution,
       required: false,
@@ -192,7 +183,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventCountry',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: {
         defaultMessage: 'Country',
@@ -216,7 +206,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel1',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'Province',
@@ -253,7 +242,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel2',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'District',
@@ -301,7 +289,6 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'informantDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -311,7 +298,6 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
     {
       name: 'informantFirstNames',
 
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstName,
       maxLength: 32,
@@ -322,7 +308,6 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
     {
       name: 'informantFamilyName',
 
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,

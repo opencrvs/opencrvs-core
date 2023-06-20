@@ -366,7 +366,6 @@ describe('when in device of large viewport', () => {
           sections: [
             {
               id: BirthSection.Registration,
-              hasDocumentSection: true,
               viewType: 'form' as ViewType,
               title: {
                 defaultMessage: 'Informant',
@@ -570,7 +569,6 @@ describe('when in device of large viewport', () => {
               viewType: 'form' as ViewType,
               title: formMessages.childTitle,
               name: formMessages.childTitle,
-              hasDocumentSection: true,
               groups: [
                 {
                   id: 'child-view-group',
@@ -666,7 +664,6 @@ describe('when in device of small viewport', () => {
           {
             id: BirthSection.Mother,
             name: formMessages.motherTitle,
-            hasDocumentSection: true,
             title: formMessages.motherTitle,
             viewType: 'form' as ViewType,
             groups: [

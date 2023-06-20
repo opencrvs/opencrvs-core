@@ -62,7 +62,9 @@ describe('Form deserializer', () => {
   )
 
   it('throws errors when developer passes in invalid operations', async () => {
-    const { birth } = forms
+    const {
+      forms: { birth }
+    } = forms
 
     birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
       'non_existing_123' as any

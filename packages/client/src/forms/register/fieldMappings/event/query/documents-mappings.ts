@@ -11,19 +11,8 @@
  */
 import { IFormField, IFormData } from '@client/forms'
 import { attachmentToFieldTransformer } from '@client/forms/mappings/query/field-mappings'
-import {
-  marriageDocumentForWhomFhirMapping,
-  marriageDocumentTypeFhirMapping
-} from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 
-const fieldNameMapping = {
-  [marriageDocumentForWhomFhirMapping.GROOM]: 'uploadDocForGroom',
-  [marriageDocumentForWhomFhirMapping.BRIDE]: 'uploadDocForBride',
-  [marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF]:
-    'uploadDocForMarriageProof'
-}
-
-export function marriageAttachmentToFieldTransformer(
+export function eventAttachmentToFieldTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -34,9 +23,6 @@ export function marriageAttachmentToFieldTransformer(
     queryData,
     sectionId,
     field,
-    'registration',
-    marriageDocumentForWhomFhirMapping,
-    marriageDocumentTypeFhirMapping,
-    fieldNameMapping
+    'registration'
   )
 }
