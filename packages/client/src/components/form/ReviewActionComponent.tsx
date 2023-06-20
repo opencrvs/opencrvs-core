@@ -44,7 +44,6 @@ const Container = styled.div`
   position: relative;
   margin-top: 48px;
   border-top: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-radius: 0px 0px 4px 4px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100vw;
   }
@@ -63,12 +62,11 @@ const Content = styled.div`
 const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
-      ? theme.colors.primaryLighter
+      ? theme.colors.greenLighter
       : background === 'error'
       ? theme.colors.redLighter
-      : theme.colors.primaryLighter};
+      : theme.colors.greenLighter};
   position: absolute;
-  border-radius: 0px 0px 4px 4px;
   top: 0;
   left: 0;
   width: 100%;
