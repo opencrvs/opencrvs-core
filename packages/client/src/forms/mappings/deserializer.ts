@@ -16,9 +16,8 @@ import * as labels from '@client/forms/mappings/label'
 import * as responseTransformers from '@client/forms/mappings/response-transformers'
 import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
-import * as validators from '@opencrvs/client/src/utils/validate'
-
 import {
+  validators,
   IForm,
   ISerializedForm,
   IFormSectionMutationMapFunction,
@@ -51,6 +50,7 @@ import {
   IFormFieldTemplateMapOperation,
   IQueryTemplateDescriptor
 } from '@client/forms'
+
 import { countries } from '@client/forms/countries'
 
 /**
