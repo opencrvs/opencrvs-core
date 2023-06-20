@@ -37,12 +37,14 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { merge } from 'lodash'
+import { merge, pick } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
-import { ISerializedForm } from '@client/forms'
+import {
+  initValidators,
+  initConditionals,
+  ISerializedForm
+} from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
-import { Validation } from '@client/utils/validate'
-import { AnyFn } from '@client/forms/mappings/deserializer'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -72,7 +74,6 @@ export interface IOfflineData {
     death: ISerializedForm
     marriage: ISerializedForm
   }
-  validators: Record<string, Validation | AnyFn<Validation>>
   facilities: ILocationDataResponse
   offices: ILocationDataResponse
   languages: ILanguage[]
@@ -107,8 +108,24 @@ export const initialState: IOfflineDataState = {
   loadingError: false
 }
 
+const OFFLINE_KEYS_TO_SAVE: (keyof IOfflineData)[] = [
+  'locations',
+  'forms',
+  'facilities',
+  'offices',
+  'languages',
+  'templates',
+  'assets',
+  'systems',
+  'config',
+  'anonymousConfig'
+]
+
 async function saveOfflineData(offlineData: IOfflineData) {
-  return storage.setItem('offline', JSON.stringify(offlineData))
+  return storage.setItem(
+    'offline',
+    JSON.stringify(pick(offlineData, OFFLINE_KEYS_TO_SAVE))
+  )
 }
 
 export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
@@ -206,7 +223,7 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const FORMS_CMD = Cmd.run(() => referenceApi.loadFormsAndValidators(), {
+const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
   successActionCreator: actions.formsLoaded,
   failActionCreator: actions.formsFailed
 })
@@ -219,6 +236,16 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
+})
+
+const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
+  successActionCreator: actions.conditionalsLoaded,
+  failActionCreator: actions.conditionalsFailed
+})
+
+const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
+  successActionCreator: actions.validatorsLoaded,
+  failActionCreator: actions.validatorsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -236,7 +263,9 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     CONFIG_CMD,
     FORMS_CMD,
-    CONTENT_CMD
+    CONTENT_CMD,
+    CONDITIONALS_CMD,
+    VALIDATORS_CMD
   ])
 }
 
@@ -575,8 +604,7 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          forms: action.payload.forms,
-          validators: action.payload.validators
+          forms: action.payload.forms
         }
       }
     }

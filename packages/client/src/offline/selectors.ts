@@ -14,6 +14,7 @@ import { IStoreState } from '@client/store'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
 import { UserDetails } from '@client/utils/userUtils'
+import { conditionals, validators } from '@client/forms'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -33,7 +34,10 @@ export function isOfflineDataLoaded(
     state.templates &&
     state.languages
 
-  const isOfflineDataLoaded = Boolean(hasAllRequiredData)
+  const hasDynamicallyImportedJavaScript = validators && conditionals
+
+  const isOfflineDataLoaded =
+    Boolean(hasAllRequiredData) && Boolean(hasDynamicallyImportedJavaScript)
   if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
 }

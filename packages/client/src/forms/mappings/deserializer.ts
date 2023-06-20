@@ -217,8 +217,7 @@ function fieldMutationDescriptorToMutationFunction(
 }
 
 export function fieldValidationDescriptorToValidationFunction(
-  descriptor: IValidatorDescriptor,
-  validators: Record<string, Validation | AnyFn<Validation>>
+  descriptor: IValidatorDescriptor
 ): Validation {
   const validator: Validation | AnyFn<Validation> =
     validators[descriptor.operation as ValidatorFunctionExports]
@@ -289,16 +288,13 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-export function deserializeFormField(
-  field: SerializedFormField,
-  validators: Record<string, Validation | AnyFn<Validation>>
-): IFormField {
+export function deserializeFormField(field: SerializedFormField): IFormField {
   const baseFields = {
     ...field,
     validator:
       field.validator &&
       field.validator.map((descriptor) =>
-        fieldValidationDescriptorToValidationFunction(descriptor, validators)
+        fieldValidationDescriptorToValidationFunction(descriptor)
       ),
     mapping: field.mapping && {
       query:
@@ -327,7 +323,7 @@ export function deserializeFormField(
         return {
           ...fields,
           [key]: field.nestedFields[key].map((field) =>
-            deserializeFormField(field, validators)
+            deserializeFormField(field)
           )
         }
       },
@@ -364,8 +360,7 @@ export function deserializeFormField(
 }
 
 export function deserializeFormSection(
-  section: ISerializedFormSection,
-  validators: Record<string, Validation | AnyFn<Validation>>
+  section: ISerializedFormSection
 ): IFormSection {
   const mapping = {
     query:
@@ -389,7 +384,7 @@ export function deserializeFormSection(
   const groups = section.groups.map((group) => ({
     ...group,
     fields: group.fields.map((field) => {
-      return deserializeFormField(field, validators)
+      return deserializeFormField(field)
     })
   }))
 
@@ -400,16 +395,9 @@ export function deserializeFormSection(
   }
 }
 
-export function deserializeForm(
-  form: ISerializedForm,
-  countryConfigValidators: Record<string, Validation | AnyFn<Validation>>
-): IForm {
+export function deserializeForm(form: ISerializedForm): IForm {
   const sections = form.sections.map((section) =>
-    deserializeFormSection(section, {
-      // `any` because validators can include functions that aren't "Validation" -type
-      ...(validators as Record<string, any>),
-      ...countryConfigValidators
-    })
+    deserializeFormSection(section)
   )
 
   return {

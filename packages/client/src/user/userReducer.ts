@@ -15,7 +15,9 @@ import {
   IFormSectionData,
   ISelectFormFieldWithOptions,
   ISelectOption,
-  UserSection
+  UserSection,
+  validators,
+  conditionals
 } from '@client/forms'
 import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -67,7 +69,7 @@ const initialState: IUserFormState = {
   submitting: false,
   loadingRoles: false,
   submissionError: false,
-  userAuditForm,
+  userAuditForm: null,
   systemRoleMap: {}
 }
 
@@ -261,7 +263,7 @@ export interface IUserFormState {
   submitting: boolean
   loadingRoles: boolean
   submissionError: boolean
-  userAuditForm: IUserAuditForm
+  userAuditForm: IUserAuditForm | null
   systemRoleMap: ISystemRolesMap
 }
 
@@ -328,7 +330,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
-          loadingRoles: true
+          userAuditForm: userAuditForm({
+            validators,
+            conditionals
+          })
         },
         Cmd.run(fetchRoles, {
           successActionCreator: rolesLoaded
@@ -439,9 +444,9 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case ROLES_LOADED:
-      const { systemRoles, validators } = action.payload
+      const { systemRoles } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm, validators)
+      const form = deserializeForm(createUserForm)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)
