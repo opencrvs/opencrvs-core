@@ -37,7 +37,7 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { merge, pick } from 'lodash'
+import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import {
   initValidators,
@@ -108,24 +108,8 @@ export const initialState: IOfflineDataState = {
   loadingError: false
 }
 
-const OFFLINE_KEYS_TO_SAVE: (keyof IOfflineData)[] = [
-  'locations',
-  'forms',
-  'facilities',
-  'offices',
-  'languages',
-  'templates',
-  'assets',
-  'systems',
-  'config',
-  'anonymousConfig'
-]
-
 async function saveOfflineData(offlineData: IOfflineData) {
-  return storage.setItem(
-    'offline',
-    JSON.stringify(pick(offlineData, OFFLINE_KEYS_TO_SAVE))
-  )
+  return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
 export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
