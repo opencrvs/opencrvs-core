@@ -87,6 +87,7 @@ interface IConstantsMessages
   newMarriageRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
   noResults: MessageDescriptor
+  noUsers: MessageDescriptor
   pendingConnection: MessageDescriptor
   performanceTitle: MessageDescriptor
   reason: MessageDescriptor
@@ -542,17 +543,17 @@ const messagesToDefine: IConstantsMessages = {
   },
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth declaration',
+    defaultMessage: 'Birth declaration',
     description: 'The title that appears for new birth registrations'
   },
   newDeathRegistration: {
     id: 'register.selectInformant.newDeathRegistration',
-    defaultMessage: 'New death declaration',
+    defaultMessage: 'Death declaration',
     description: 'The title that appears for new death registrations'
   },
   newMarriageRegistration: {
     id: 'register.selectInformant.newMarriageRegistration',
-    defaultMessage: 'New marriage declaration',
+    defaultMessage: 'Marriage declaration',
     description: 'The title that appears for new marriage registrations'
   },
   noNameProvided: {
@@ -565,6 +566,11 @@ const messagesToDefine: IConstantsMessages = {
     description:
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
+  },
+  noUsers: {
+    defaultMessage: 'No users',
+    description: 'Text to display if the office has no users',
+    id: 'constants.noUsers'
   },
   noResultsOutbox: {
     defaultMessage: 'No records require processing',

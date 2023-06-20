@@ -121,35 +121,14 @@ const AddUserIcon = styled(AddUser)`
   cursor: pointer;
 `
 
-const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2};
-  margin: 8px 0;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const LocationInfo = styled.div`
-  padding: 8px 0px;
-`
-
-const LocationInfoValue = styled.div`
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg18};
-`
-
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg16}
 `
 
-const NoRecord = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h3};
-  text-align: left;
-  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+const NoUser = styled.div`
+  ${({ theme }) => theme.fonts.bold18};
   color: ${({ theme }) => theme.colors.copy};
-  margin-top: 20px;
 `
 
 const ConnectivityContainer = styled.div`
@@ -675,9 +654,9 @@ function UserListComponent(props: IProps) {
           <UserTable id="user_list">
             <ListViewSimplified>
               {userContent.length <= 0 ? (
-                <NoRecord id="no-record">
-                  {intl.formatMessage(constantsMessages.noResults)}
-                </NoRecord>
+                <NoUser id="no-record">
+                  {intl.formatMessage(constantsMessages.noUsers)}
+                </NoUser>
               ) : (
                 userContent.map((content, index) => {
                   return (
@@ -865,19 +844,6 @@ function UserListComponent(props: IProps) {
                   </Loading>
                 ) : (
                   <>
-                    <Header id="header">
-                      {(searchedLocation && searchedLocation.name) || ''}
-                    </Header>
-                    <LocationInfo>
-                      {searchedLocation && (
-                        <LocationInfoValue>
-                          {getAddressName(
-                            offlineCountryConfig,
-                            getParentLocation(searchedLocation)
-                          )}
-                        </LocationInfoValue>
-                      )}
-                    </LocationInfo>
                     <RenderUserList
                       data={data}
                       locationId={locationId}
