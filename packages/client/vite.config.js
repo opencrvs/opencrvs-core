@@ -49,9 +49,10 @@ export default defineConfig(({ mode }) => {
         globPatterns: ['**/*.{json,ico,ttf,html,js}'],
         globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-        swDest: 'build/service-worker.js',
-        swSrc: 'src/src-sw.js'
+        swDest: 'build/src-sw.js'
       },
+      srcDir: 'src/',
+      filename: 'src-sw.js',
       devOptions: {
         enabled: false
       }
