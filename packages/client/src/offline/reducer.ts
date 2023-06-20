@@ -569,7 +569,6 @@ function reducer(
      */
 
     case actions.FORMS_LOADED: {
-      console.log('FORMS: ', action.payload.forms)
       return {
         ...state,
         offlineData: {

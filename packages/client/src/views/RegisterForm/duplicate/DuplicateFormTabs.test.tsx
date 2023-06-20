@@ -1042,7 +1042,7 @@ const actualDeclarationMock = {
     ],
     uploadDocForFather: [],
     uploadDocForInformant: [],
-    uploadDocForProofOfLegarGuardian: []
+    uploadDocForProofOfLegalGuardian: []
   },
   _fhirIDMap: {
     composition: '26d3b815-917d-4e72-8efa-835e5ecb86af',

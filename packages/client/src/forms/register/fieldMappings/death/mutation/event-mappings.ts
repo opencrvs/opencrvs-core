@@ -14,8 +14,7 @@ import {
   IFormData,
   ICertificate,
   TransformedData,
-  IFormFieldMutationMapFunction,
-  DeathSection
+  IFormFieldMutationMapFunction
 } from '@client/forms'
 import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'

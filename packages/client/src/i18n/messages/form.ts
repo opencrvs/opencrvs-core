@@ -270,10 +270,8 @@ interface IFormMessages
   proofOfBridesID: MessageDescriptor
   proofOfParentPrimaryAddress: MessageDescriptor
   placeOfBirthPreview: MessageDescriptor
-  registrationName: MessageDescriptor
   registrationOffice: MessageDescriptor
   registrationPhoneLabel: MessageDescriptor
-  registrationTitle: MessageDescriptor
   relationExtendedFamily: MessageDescriptor
   relationOther: MessageDescriptor
   relationshipPlaceHolder: MessageDescriptor
@@ -1743,11 +1741,6 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for list item Parent Primary Address Proof',
     id: 'form.field.label.proofOfParentPrimaryAddress'
   },
-  registrationName: {
-    defaultMessage: 'Registration',
-    description: 'Form section name for Registration',
-    id: 'form.section.declaration.name'
-  },
   registrationOffice: {
     defaultMessage: 'Registration Office',
     description: 'Registration office',
@@ -1757,11 +1750,6 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',
     id: 'form.field.label.declaration.phone'
-  },
-  registrationTitle: {
-    defaultMessage: 'Registration',
-    description: 'Form section title for Registration',
-    id: 'form.section.declaration.title'
   },
   relationExtendedFamily: {
     defaultMessage: 'Extended Family',

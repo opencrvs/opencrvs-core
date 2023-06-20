@@ -418,9 +418,7 @@ export function fieldToAttachmentTransformer(
   draftData: IFormData,
   sectionId: string,
   field: IFormField,
-  alternateSectionId?: string,
-  subjectMapper?: any,
-  typeMapper?: any
+  alternateSectionId?: string
 ) {
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     (attachment) => {
@@ -431,9 +429,7 @@ export function fieldToAttachmentTransformer(
             }
           : { data: attachment.data }),
         subject: attachment.optionValues[0],
-        type: typeMapper
-          ? typeMapper[attachment.optionValues[1]]
-          : attachment.optionValues[1],
+        type: attachment.optionValues[1],
         contentType: attachment.type
       }
     }

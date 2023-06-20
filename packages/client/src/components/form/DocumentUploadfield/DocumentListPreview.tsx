@@ -15,7 +15,6 @@ import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
@@ -102,8 +101,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                   onClick={(_) => this.props.onSelect(document)}
                 >
                   <span>
-                    {(!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                      this.props.inReviewSection &&
+                    {(this.props.inReviewSection &&
                       this.props.dropdownOptions &&
                       this.props.dropdownOptions[key]?.label) ||
                       this.getFormattedLabelForDocType(
