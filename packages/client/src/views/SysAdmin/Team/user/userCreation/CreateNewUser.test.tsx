@@ -230,7 +230,7 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#phoneNumber_error')
+          .find('#familyNameEng_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')

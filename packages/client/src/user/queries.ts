@@ -26,6 +26,7 @@ export const SEARCH_USERS = gql`
         username
         systemRole
         mobile
+        email
         role {
           _id
         }
@@ -91,6 +92,7 @@ export const GET_USER = gql`
       }
       username
       mobile
+      email
       identifier {
         system
         value

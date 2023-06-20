@@ -25,8 +25,12 @@ export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
 export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
 export const SHOW_CREATE_USER_ERROR_TOAST = 'SHOW_CREATE_USER_ERROR_TOAST'
+export const SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST =
+  'SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
 export const HIDE_CREATE_USER_ERROR_TOAST = 'HIDE_CREATE_USER_ERROR_TOAST'
+export const HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST =
+  'HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST'
 
 export const HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST =
   'HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST'
@@ -82,6 +86,14 @@ export type ShowCreateUserErrorToast = {
   }
 }
 
+export type ShowCreateUserDuplicateEmailErrorToast = {
+  type: typeof SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
+  payload: {
+    data: string
+    email: string
+  }
+}
+
 export type HideDownloadDeclarationFailedToast = {
   type: typeof HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
@@ -96,6 +108,10 @@ export type HideSubmitFormErrorToast = {
 
 export type HideCreateUserErrorToast = {
   type: typeof HIDE_CREATE_USER_ERROR_TOAST
+}
+
+export type HideCreateUserDuplicateEmailErrorToast = {
+  type: typeof HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
 }
 
 export type ShowUserAuditSuccessToast = {
@@ -188,6 +204,14 @@ export const showCreateUserErrorToast = (
   payload: { data, mobile }
 })
 
+export const showCreateUserDuplicateEmailErrorToast = (
+  data: string,
+  email: string
+): ShowCreateUserDuplicateEmailErrorToast => ({
+  type: SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST,
+  payload: { data, email }
+})
+
 export const showDownloadDeclarationFailedToast =
   (): ShowDownloadDeclarationFailedToast => ({
     type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
@@ -205,6 +229,11 @@ export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
 export const hideCreateUserErrorToast = (): HideCreateUserErrorToast => ({
   type: HIDE_CREATE_USER_ERROR_TOAST
 })
+
+export const hideCreateUserFormDuplicateEmailErrorToast =
+  (): HideCreateUserDuplicateEmailErrorToast => ({
+    type: HIDE_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
+  })
 
 export const showUserAuditSuccessToast = (
   userFullName: string,
@@ -287,6 +316,8 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
+  | ShowCreateUserDuplicateEmailErrorToast
+  | HideCreateUserDuplicateEmailErrorToast
   | ShowDuplicateRecordsToast
   | HideDuplicateRecordsToast
   | ShowUserReconnectedToastAction

@@ -15,6 +15,7 @@ import {
   birthDocumentForWhomFhirMapping,
   birthDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import { EventRegistration } from '@client/utils/gateway'
 
 const fieldNameMapping = {
   [birthDocumentForWhomFhirMapping.MOTHER]: 'uploadDocForMother',
@@ -27,8 +28,8 @@ const fieldNameMapping = {
 
 export function birthAttachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
   field: IFormField
 ) {
   return attachmentToFieldTransformer(

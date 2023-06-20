@@ -81,7 +81,7 @@ describe('Verify birth handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -171,7 +171,7 @@ describe('Verify birth handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -260,7 +260,7 @@ describe('Verify birth handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
@@ -351,7 +351,7 @@ describe('Verify birth handlers', () => {
     })
     it('returns 500 the sms is not sent', async () => {
       const spy = jest
-        .spyOn(utils, 'buildAndSendSMS')
+        .spyOn(utils, 'sendNotification')
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
