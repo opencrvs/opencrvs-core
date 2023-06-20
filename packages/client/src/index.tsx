@@ -14,7 +14,6 @@ import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from '@client/App'
-import registerServiceWorker from '@client/registerServiceWorker'
 import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
@@ -82,13 +81,6 @@ if (
   }
 }
 
-function onNewContentAvailable(waitingSW: ServiceWorker | null) {
-  if (waitingSW) {
-    waitingSW.postMessage('skipWaiting')
-    window.location.reload()
-  }
-}
-
 function userReconnectedToast() {
   const action = actions.showUserReconnectedToast()
   store.dispatch(action)
@@ -100,5 +92,4 @@ const container = document.getElementById('root')
 const root = createRoot(container!)
 root.render(<App store={store} history={history} />)
 
-registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()

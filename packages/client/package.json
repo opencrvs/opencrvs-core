@@ -104,6 +104,11 @@
     "vite-plugin-svgr": "^0.3.0",
     "vite-tsconfig-paths": "^3.5.0",
     "webfontloader": "^1.6.28",
+    "workbox-background-sync": "^7.0.0",
+    "workbox-core": "^7.0.0",
+    "workbox-precaching": "^7.0.0",
+    "workbox-routing": "^7.0.0",
+    "workbox-strategies": "^7.0.0",
     "xregexp": "^4.2.0"
   },
   "devDependencies": {

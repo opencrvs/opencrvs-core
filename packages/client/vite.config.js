@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
         swSrc: 'src/src-sw.js'
       },
       devOptions: {
-        enabled: true
+        enabled: false
       }
     })
   }
