@@ -753,6 +753,14 @@ function createAgeOfIndividualInYearsBuilder(
       valueString: fieldValue
     })
   }
+
+  resource.birthDate = new Date(
+    new Date().getFullYear() - parseInt(fieldValue.toString(), 10),
+    0,
+    1
+  )
+    .toISOString()
+    .slice(0, 10)
 }
 
 function createEducationalAttainmentBuilder(
