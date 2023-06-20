@@ -12,10 +12,15 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
-import { fetchFHIR, fetchFromHearth } from '@gateway/features/fhir/utils'
+import {
+  fetchFHIR,
+  fetchFromHearth,
+  findExtension
+} from '@gateway/features/fhir/utils'
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
@@ -68,7 +73,7 @@ export function validationFailedAction(
   throw e
 }
 
-function validateTask(bundle: fhir.Bundle) {
+async function validateTask(bundle: fhir.Bundle) {
   const taskEntry = bundle.entry?.find(
     (entry) => entry.resource?.resourceType === 'Task'
   )
@@ -88,6 +93,61 @@ function validateTask(bundle: fhir.Bundle) {
   if (task.focus?.reference !== compositionEntry.fullUrl) {
     throw new Error('Task must reference the composition entry')
   }
+
+  if (!task.extension) {
+    throw new Error('Task extensions not found')
+  }
+
+  // validate office id and office location
+  const regLastOfficeIdeRef = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    task.extension
+  )?.valueReference?.reference
+
+  const regLastOfficeLocationRef = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    task.extension
+  )?.valueReference?.reference
+
+  if (!regLastOfficeLocationRef) {
+    throw BoomErrorWithCustomMessage(
+      `Could not process the Event Notification, as office's location was not provided`
+    )
+  }
+  if (!regLastOfficeIdeRef) {
+    throw BoomErrorWithCustomMessage(
+      `Could not process the Event Notification, as office id was not provided`
+    )
+  }
+
+  // check if the office location is valid
+  const officeLocation = await fetchFromHearth(regLastOfficeLocationRef)
+  if (
+    !officeLocation ||
+    !officeLocation.type ||
+    officeLocation.type.coding?.[0]?.code !== Code.ADMIN_STRUCTURE
+  ) {
+    throw BoomErrorWithCustomMessage(
+      `Could not process the Event Notification, as the provided office location with id ${regLastOfficeLocationRef} was not found`
+    )
+  }
+
+  // check if the office id is valid and it is part of the provided office location
+  const office = await fetchFromHearth(regLastOfficeIdeRef)
+  if (
+    !office ||
+    !officeLocation.type ||
+    office.type.coding?.[0]?.code !== Code.CRVS_OFFICE
+  ) {
+    throw BoomErrorWithCustomMessage(
+      `Could not process the Event Notification, as the provided office with id ${regLastOfficeIdeRef} was not found`
+    )
+  }
+  if (!office.partof || office.partof.reference !== regLastOfficeLocationRef) {
+    throw BoomErrorWithCustomMessage(
+      `Could not process the Event Notification, as the provided office isn't part of the provided office location`
+    )
+  }
 }
 
 export async function eventNotificationHandler(
@@ -96,7 +156,7 @@ export async function eventNotificationHandler(
 ) {
   try {
     const bundle = req.payload as fhir.Bundle
-    validateTask(bundle)
+    await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
     if (e.isBoom) {
