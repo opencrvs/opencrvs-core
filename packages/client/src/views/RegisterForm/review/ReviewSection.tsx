@@ -81,7 +81,6 @@ import {
   getConditionalActionsForField,
   getListOfLocations,
   getSectionFields,
-  getSelectedInformantAndContactType,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {

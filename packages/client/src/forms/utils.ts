@@ -43,8 +43,6 @@ import {
   IFormFieldValue,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
-  IInformant,
-  IContactPoint,
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton
@@ -71,7 +69,6 @@ import { IDynamicValues } from '@client/navigation'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-import _ from 'lodash'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -514,33 +511,6 @@ export function getQueryData(
   const variables = getInputValues(queryData.inputs, values)
   queryData.variables = variables
   return queryData
-}
-
-export function getSelectedInformantAndContactType(draftData?: IFormData) {
-  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
-  // informantType is a special case where both the nested field and the selected parent are required
-  // this means an object was required for the fieldValue
-  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
-  // creating selectedInformantType to be a value which will be used in the conditional
-  let selectedInformantType = ''
-  let selectedContactType = ''
-  if (
-    draftData &&
-    draftData.registration &&
-    draftData.registration.informantType
-  ) {
-    const informantType = draftData.registration.informantType as IInformant
-    selectedInformantType = informantType.value
-  }
-  if (
-    draftData &&
-    draftData.registration &&
-    draftData.registration.contactPoint
-  ) {
-    const contactPoint = draftData.registration.contactPoint as IContactPoint
-    selectedContactType = contactPoint.value
-  }
-  return { selectedInformantType, selectedContactType }
 }
 
 export const getConditionalActionsForField = (
