@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import {
+  IntlShape,
+  MessageDescriptor,
+  createIntl,
+  createIntlCache
+} from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
@@ -22,12 +27,15 @@ import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 import { UserDetails } from '@client/utils/userUtils'
 import { EMPTY_STRING, MARRIAGE_SIGNATURE_KEYS } from '@client/utils/constants'
+import { IStoreState } from '@client/store'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
+type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
   obj: Record<string, unknown>
 ): obj is MessageDescriptor & Record<string, string> {
   return (
+    obj !== null &&
     obj.hasOwnProperty('id') &&
     obj.hasOwnProperty('defaultMessage') &&
     typeof (obj as MessageDescriptor).id === 'string' &&
@@ -36,15 +44,17 @@ function isMessageDescriptor(
 }
 
 export function formatAllNonStringValues(
-  templateData: Record<string, string | MessageDescriptor | Array<string>>
+  templateData: Record<string, TemplateDataType>,
+  intl: IntlShape
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
     if (
       typeof templateData[key] === 'object' &&
       isMessageDescriptor(templateData[key] as Record<string, unknown>)
     ) {
-      templateData[key] = (templateData[key] as MessageDescriptor)
-        .defaultMessage as string
+      templateData[key] = intl.formatMessage(
+        templateData[key] as MessageDescriptor
+      )
     } else if (Array.isArray(templateData[key])) {
       // For address field, country label is a MessageDescriptor
       // but state, province is string
@@ -54,20 +64,89 @@ export function formatAllNonStringValues(
         .filter(Boolean)
         .map((item) =>
           isMessageDescriptor(item as Record<string, unknown>)
-            ? (item as MessageDescriptor).defaultMessage
+            ? intl.formatMessage(item as MessageDescriptor)
             : item
         )
         .join(', ')
+    } else if (
+      typeof templateData[key] === 'object' &&
+      templateData[key] !== null
+    ) {
+      templateData[key] = formatAllNonStringValues(
+        templateData[key] as Record<string, TemplateDataType>,
+        intl
+      )
     }
   }
   return templateData as Record<string, string>
 }
+
+const cache = createIntlCache()
+
 export function executeHandlebarsTemplate(
   templateString: string,
-  data: Record<string, any> = {}
+  data: Record<string, any> = {},
+  state: IStoreState
 ): string {
+  const intl = createIntl(
+    {
+      locale: state.i18n.language,
+      messages: state.i18n.messages
+    },
+    cache
+  )
+
+  Handlebars.registerHelper(
+    'intl',
+    function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
+      // If even one of the parts is undefined, then return empty string
+      const idParts = args.slice(0, -1)
+      if (idParts.some((part) => part === undefined)) {
+        return ''
+      }
+
+      const id = idParts.join('.')
+
+      return intl.formatMessage({
+        id,
+        defaultMessage: 'Missing translation for ' + id
+      })
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  Handlebars.registerHelper(
+    'ifCond',
+    function (
+      this: any,
+      v1: string,
+      operator: string,
+      v2: string,
+      options: Handlebars.HelperOptions
+    ) {
+      switch (operator) {
+        case '===':
+          return v1 === v2 ? options.fn(this) : options.inverse(this)
+        case '!==':
+          return v1 !== v2 ? options.fn(this) : options.inverse(this)
+        case '<':
+          return v1 < v2 ? options.fn(this) : options.inverse(this)
+        case '<=':
+          return v1 <= v2 ? options.fn(this) : options.inverse(this)
+        case '>':
+          return v1 > v2 ? options.fn(this) : options.inverse(this)
+        case '>=':
+          return v1 >= v2 ? options.fn(this) : options.inverse(this)
+        case '&&':
+          return v1 && v2 ? options.fn(this) : options.inverse(this)
+        case '||':
+          return v1 || v2 ? options.fn(this) : options.inverse(this)
+        default:
+          return options.inverse(this)
+      }
+    }
+  )
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data)
+  const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)
   return output
 }
@@ -78,6 +157,7 @@ export async function previewCertificate(
   userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
+  state: IStoreState,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'
 ) {
@@ -86,7 +166,7 @@ export async function previewCertificate(
   }
 
   createPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -102,6 +182,7 @@ export async function printCertificate(
   declaration: IDeclaration,
   userDetails: UserDetails | null,
   offlineResource: IOfflineData,
+  state: IStoreState,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'
 ) {
@@ -109,7 +190,7 @@ export async function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    await getPDFTemplateWithSVG(offlineResource, declaration, pageSize, state),
     declaration,
     userDetails,
     offlineResource,
@@ -121,7 +202,8 @@ export async function printCertificate(
 async function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize
+  pageSize: PageSize,
+  state: IStoreState
 ): Promise<IPDFTemplate> {
   const svgTemplate =
     offlineResource.templates.certificates![declaration.event]?.definition ||
@@ -144,7 +226,11 @@ async function getPDFTemplateWithSVG(
     ...declaration.data.template,
     ...resolvedSignatures
   }
-  const svgCode = executeHandlebarsTemplate(svgTemplate, declarationTemplate)
+  const svgCode = executeHandlebarsTemplate(
+    svgTemplate,
+    declarationTemplate,
+    state
+  )
 
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
