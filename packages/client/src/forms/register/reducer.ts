@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, BirthSection, DeathSection } from '@client/forms'
+import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { messages } from '@client/i18n/messages/views/review'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
@@ -71,24 +71,15 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         registerForm: {
           birth: {
             ...birth,
-            sections: [
-              ...birth.sections,
-              { ...preview, id: BirthSection.Preview }
-            ]
+            sections: [...birth.sections, { ...preview, id: 'preview' }]
           },
           death: {
             ...death,
-            sections: [
-              ...death.sections,
-              { ...preview, id: DeathSection.Preview }
-            ]
+            sections: [...death.sections, { ...preview, id: 'preview' }]
           },
           marriage: {
             ...marriage,
-            sections: [
-              ...marriage.sections,
-              { ...preview, id: DeathSection.Preview }
-            ]
+            sections: [...marriage.sections, { ...preview, id: 'preview' }]
           }
         }
       }

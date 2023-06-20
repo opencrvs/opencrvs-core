@@ -139,12 +139,11 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   father?: GQLPerson
   informant?: GQLRelatedPerson
   eventLocation?: GQLLocation
-  birthType?: GQLBirthType
+  birthType?: string
   questionnaire?: Array<GQLQuestionnaireQuestion | null>
   weightAtBirth?: number
-  attendantAtBirth?: GQLAttendantType
+  attendantAtBirth?: string
   otherAttendantAtBirth?: string
-  birthRegistrationType?: GQLBirthRegType
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -164,9 +163,9 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   spouse?: GQLPerson
   eventLocation?: GQLLocation
   questionnaire?: Array<GQLQuestionnaireQuestion | null>
-  mannerOfDeath?: GQLMannerOfDeath
+  mannerOfDeath?: string
   deathDescription?: string
-  causeOfDeathMethod?: GQLCauseOfDeathMethodType
+  causeOfDeathMethod?: string
   causeOfDeathEstablished?: string
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
@@ -186,7 +185,7 @@ export interface GQLPerson {
   gender?: string
   birthDate?: string
   age?: number
-  maritalStatus?: GQLMaritalStatusType
+  maritalStatus?: string
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
@@ -196,7 +195,7 @@ export interface GQLPerson {
   photo?: Array<GQLAttachment | null>
   deceased?: GQLDeceased
   nationality?: Array<string | null>
-  educationalAttainment?: GQLEducationType
+  educationalAttainment?: string
   ageOfIndividualInYears?: number
   exactDateOfBirthUnknown?: boolean
 }
@@ -240,7 +239,7 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   witnessOne?: GQLRelatedPerson
   witnessTwo?: GQLRelatedPerson
   eventLocation?: GQLLocation
-  typeOfMarriage?: GQLMarriageType
+  typeOfMarriage?: string
   questionnaire?: Array<GQLQuestionnaireQuestion | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -269,7 +268,7 @@ export interface GQLLocation {
   alias?: Array<string>
   description?: string
   partOf?: string
-  type?: GQLLocationType
+  type?: string
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number
@@ -570,12 +569,11 @@ export interface GQLBirthRegistrationInput {
   father?: GQLPersonInput
   informant?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
-  birthType?: GQLBirthType
+  birthType?: string
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   weightAtBirth?: number
-  attendantAtBirth?: GQLAttendantType
+  attendantAtBirth?: string
   otherAttendantAtBirth?: string
-  birthRegistrationType?: GQLBirthRegType
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -598,9 +596,9 @@ export interface GQLDeathRegistrationInput {
   spouse?: GQLPersonInput
   eventLocation?: GQLLocationInput
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
-  mannerOfDeath?: GQLMannerOfDeath
+  mannerOfDeath?: string
   deathDescription?: string
-  causeOfDeathMethod?: GQLCauseOfDeathMethodType
+  causeOfDeathMethod?: string
   causeOfDeathEstablished?: string
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
@@ -618,7 +616,7 @@ export interface GQLMarriageRegistrationInput {
   witnessOne?: GQLRelatedPersonInput
   witnessTwo?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
-  typeOfMarriage?: GQLMarriageType
+  typeOfMarriage?: string
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -766,7 +764,7 @@ export interface GQLRegistration {
   paperFormID?: string
   page?: string
   book?: string
-  informantType?: GQLInformantType
+  informantType?: string
   otherInformantType?: string
   assignment?: GQLAssignmentData
   contact?: string
@@ -801,37 +799,9 @@ export interface GQLRelatedPerson {
   ageOfIndividualInYears?: number
 }
 
-export const enum GQLBirthType {
-  SINGLE = 'SINGLE',
-  TWIN = 'TWIN',
-  TRIPLET = 'TRIPLET',
-  QUADRUPLET = 'QUADRUPLET',
-  HIGHER_MULTIPLE_DELIVERY = 'HIGHER_MULTIPLE_DELIVERY'
-}
-
 export interface GQLQuestionnaireQuestion {
   fieldId?: string
   value?: string
-}
-
-export const enum GQLAttendantType {
-  PHYSICIAN = 'PHYSICIAN',
-  NURSE = 'NURSE',
-  NURSE_MIDWIFE = 'NURSE_MIDWIFE',
-  MIDWIFE = 'MIDWIFE',
-  TRADITIONAL_BIRTH_ATTENDANT = 'TRADITIONAL_BIRTH_ATTENDANT',
-  OTHER_PARAMEDICAL_PERSONNEL = 'OTHER_PARAMEDICAL_PERSONNEL',
-  LAYPERSON = 'LAYPERSON',
-  NONE = 'NONE',
-  OTHER = 'OTHER'
-}
-
-export const enum GQLBirthRegType {
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'SELF',
-  INFORMANT_ONLY = 'INFORMANT_ONLY',
-  MOTHER_ONLY = 'MOTHER_ONLY',
-  FATHER_ONLY = 'FATHER_ONLY'
 }
 
 export interface GQLHistory {
@@ -858,21 +828,6 @@ export interface GQLHistory {
   potentialDuplicates?: Array<string>
 }
 
-export const enum GQLMannerOfDeath {
-  NATURAL_CAUSES = 'NATURAL_CAUSES',
-  ACCIDENT = 'ACCIDENT',
-  SUICIDE = 'SUICIDE',
-  HOMICIDE = 'HOMICIDE',
-  MANNER_UNDETERMINED = 'MANNER_UNDETERMINED'
-}
-
-export const enum GQLCauseOfDeathMethodType {
-  PHYSICIAN = 'PHYSICIAN',
-  LAY_REPORTED = 'LAY_REPORTED',
-  VERBAL_AUTOPSY = 'VERBAL_AUTOPSY',
-  MEDICALLY_CERTIFIED = 'MEDICALLY_CERTIFIED'
-}
-
 export interface GQLMedicalPractitioner {
   name?: string
   qualification?: string
@@ -881,7 +836,7 @@ export interface GQLMedicalPractitioner {
 
 export interface GQLIdentityType {
   id?: string
-  type?: GQLIdentityIDType
+  type?: string
   otherType?: string
   fieldsModifiedByIdentity?: Array<string | null>
 }
@@ -899,18 +854,9 @@ export interface GQLContactPoint {
   use?: string
 }
 
-export const enum GQLMaritalStatusType {
-  SINGLE = 'SINGLE',
-  MARRIED = 'MARRIED',
-  WIDOWED = 'WIDOWED',
-  DIVORCED = 'DIVORCED',
-  NOT_STATED = 'NOT_STATED',
-  SEPARATED = 'SEPARATED'
-}
-
 export interface GQLAddress {
   use?: string
-  type?: GQLAddressType
+  type?: string
   text?: string
   line?: Array<string | null>
   lineName?: Array<string | null>
@@ -934,9 +880,9 @@ export interface GQLAttachment {
   status?: string
   originalFileName?: string
   systemFileName?: string
-  type?: GQLAttachmentType
+  type?: string
   description?: string
-  subject?: GQLAttachmentSubject
+  subject?: string
   createdAt?: GQLDate
 }
 
@@ -945,47 +891,14 @@ export interface GQLDeceased {
   deathDate?: string
 }
 
-export const enum GQLEducationType {
-  NO_SCHOOLING = 'NO_SCHOOLING',
-  PRIMARY_ISCED_1 = 'PRIMARY_ISCED_1',
-  LOWER_SECONDARY_ISCED_2 = 'LOWER_SECONDARY_ISCED_2',
-  UPPER_SECONDARY_ISCED_3 = 'UPPER_SECONDARY_ISCED_3',
-  POST_SECONDARY_ISCED_4 = 'POST_SECONDARY_ISCED_4',
-  FIRST_STAGE_TERTIARY_ISCED_5 = 'FIRST_STAGE_TERTIARY_ISCED_5',
-  SECOND_STAGE_TERTIARY_ISCED_6 = 'SECOND_STAGE_TERTIARY_ISCED_6',
-  NOT_STATED = 'NOT_STATED'
-}
-
 export interface GQLStatusWiseRegistrationCount {
   status: string
   count: number
 }
 
-export const enum GQLMarriageType {
-  POLYGAMY = 'POLYGAMY',
-  MONOGAMY = 'MONOGAMY'
-}
-
 export interface GQLIdentifier {
   system?: string
   value?: string
-}
-
-export const enum GQLLocationType {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  COMMUNITY = 'COMMUNITY',
-  HOSPITAL = 'HOSPITAL',
-  OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
-  CRVS_OFFICE = 'CRVS_OFFICE',
-  PRIVATE_HOME = 'PRIVATE_HOME',
-  DECEASED_USUAL_RESIDENCE = 'DECEASED_USUAL_RESIDENCE',
-  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS',
-  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
-  MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
-  IDP_CAMP = 'IDP_CAMP',
-  UNHCR_CAMP = 'UNHCR_CAMP',
-  OTHER = 'OTHER'
 }
 
 export const enum GQLSystemRoleType {
@@ -1185,7 +1098,7 @@ export interface GQLPersonInput {
   gender?: string
   birthDate?: string
   age?: number
-  maritalStatus?: GQLMaritalStatusType
+  maritalStatus?: string
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
@@ -1195,7 +1108,7 @@ export interface GQLPersonInput {
   photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
-  educationalAttainment?: GQLEducationType
+  educationalAttainment?: string
   ageOfIndividualInYears?: number
 }
 
@@ -1207,7 +1120,7 @@ export interface GQLLocationInput {
   alias?: Array<string | null>
   description?: string
   partOf?: string
-  type?: GQLLocationType
+  type?: string
   telecom?: Array<GQLContactPointInput | null>
   address?: GQLAddressInput
   longitude?: number
@@ -1230,7 +1143,7 @@ export interface GQLRegistrationInput {
   brideSignature?: string
   witnessOneSignature?: string
   witnessTwoSignature?: string
-  informantType?: GQLInformantType
+  informantType?: string
   otherInformantType?: string
   contact?: string
   contactRelationship?: string
@@ -1382,28 +1295,6 @@ export interface GQLWebhookInput {
   permissions: Array<string | null>
 }
 
-export const enum GQLInformantType {
-  INFORMANT = 'INFORMANT',
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  GRANDFATHER = 'GRANDFATHER',
-  GRANDMOTHER = 'GRANDMOTHER',
-  BROTHER = 'BROTHER',
-  SISTER = 'SISTER',
-  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
-  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
-  SPOUSE = 'SPOUSE',
-  SON = 'SON',
-  DAUGHTER = 'DAUGHTER',
-  SON_IN_LAW = 'SON_IN_LAW',
-  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
-  GRANDSON = 'GRANDSON',
-  GRANDDAUGHTER = 'GRANDDAUGHTER',
-  BRIDE = 'BRIDE',
-  GROOM = 'GROOM',
-  OTHER = 'OTHER'
-}
-
 export interface GQLAssignmentData {
   userId?: string
   firstName?: string
@@ -1469,72 +1360,6 @@ export interface GQLInputOutput {
   valueCode?: string
   valueId?: string
   valueString?: string
-}
-
-export const enum GQLIdentityIDType {
-  PASSPORT = 'PASSPORT',
-  NATIONAL_ID = 'NATIONAL_ID',
-  MOSIP_PSUT_TOKEN_ID = 'MOSIP_PSUT_TOKEN_ID',
-  DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
-  BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
-  DRIVING_LICENSE = 'DRIVING_LICENSE',
-  BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
-  DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
-  MARRIAGE_REGISTRATION_NUMBER = 'MARRIAGE_REGISTRATION_NUMBER',
-  REFUGEE_NUMBER = 'REFUGEE_NUMBER',
-  ALIEN_NUMBER = 'ALIEN_NUMBER',
-  OTHER = 'OTHER',
-  NO_ID = 'NO_ID',
-  SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
-}
-
-export const enum GQLAddressType {
-  HEALTH_FACILITY = 'HEALTH_FACILITY',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
-  CRVS_OFFICE = 'CRVS_OFFICE',
-  PRIVATE_HOME = 'PRIVATE_HOME',
-  DECEASED_USUAL_RESIDENCE = 'DECEASED_USUAL_RESIDENCE',
-  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS',
-  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
-  MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
-  IDP_CAMP = 'IDP_CAMP',
-  UNHCR_CAMP = 'UNHCR_CAMP',
-  OTHER = 'OTHER'
-}
-
-export const enum GQLAttachmentType {
-  BIRTH_CERTIFICATE = 'BIRTH_CERTIFICATE',
-  NATIONAL_ID = 'NATIONAL_ID',
-  PASSPORT = 'PASSPORT',
-  NOTIFICATION_OF_BIRTH = 'NOTIFICATION_OF_BIRTH',
-  PROOF_OF_LEGAL_GUARDIANSHIP = 'PROOF_OF_LEGAL_GUARDIANSHIP',
-  PROOF_OF_ASSIGNED_RESPONSIBILITY = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
-  HOSPITAL_CERTIFICATE_OF_DEATH = 'HOSPITAL_CERTIFICATE_OF_DEATH',
-  ATTESTED_LETTER_OF_DEATH = 'ATTESTED_LETTER_OF_DEATH',
-  BURIAL_RECEIPT = 'BURIAL_RECEIPT',
-  POLICE_CERTIFICATE_OF_DEATH = 'POLICE_CERTIFICATE_OF_DEATH',
-  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
-  VERBAL_AUTOPSY_REPORT = 'VERBAL_AUTOPSY_REPORT',
-  CORONERS_REPORT = 'CORONERS_REPORT',
-  MARRIAGE_NOTICE = 'MARRIAGE_NOTICE',
-  OTHER = 'OTHER'
-}
-
-export const enum GQLAttachmentSubject {
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  CHILD = 'CHILD',
-  OTHER = 'OTHER',
-  PARENT = 'PARENT',
-  GROOM = 'GROOM',
-  BRIDE = 'BRIDE',
-  CHILD_AGE = 'CHILD_AGE',
-  DECEASED_ID_PROOF = 'DECEASED_ID_PROOF',
-  DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
-  DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
-  INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
-  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
-  MARRIAGE_NOTICE_PROOF = 'MARRIAGE_NOTICE_PROOF'
 }
 
 export interface GQLRoleLabel {
@@ -1740,7 +1565,7 @@ export interface GQLOIDPUserAddress {
 
 export interface GQLIdentityInput {
   id?: string
-  type?: GQLIdentityIDType
+  type?: string
   otherType?: string
   fieldsModifiedByIdentity?: Array<string | null>
 }
@@ -1753,7 +1578,7 @@ export interface GQLContactPointInput {
 
 export interface GQLAddressInput {
   use?: string
-  type?: GQLAddressType
+  type?: string
   text?: string
   line?: Array<string | null>
   city?: string
@@ -1773,9 +1598,9 @@ export interface GQLAttachmentInput {
   status?: string
   originalFileName?: string
   systemFileName?: string
-  type?: GQLAttachmentType
+  type?: string
   description?: string
-  subject?: GQLAttachmentSubject
+  subject?: string
   createdAt?: GQLDate
 }
 
@@ -3747,7 +3572,6 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
   otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
-  birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<TParent>
   childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<TParent>
   foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<TParent>
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<TParent>
@@ -3898,18 +3722,6 @@ export interface BirthRegistrationToAttendantAtBirthResolver<
 }
 
 export interface BirthRegistrationToOtherAttendantAtBirthResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface BirthRegistrationToBirthRegistrationTypeResolver<
   TParent = any,
   TResult = any
 > {

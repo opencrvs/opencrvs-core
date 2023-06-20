@@ -16,13 +16,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  BirthSection,
-  DeathSection
-} from '@client/forms'
+import { IForm, IFormSection, IFormField } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -35,7 +29,6 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { isEmpty, find, flatten, values } from 'lodash'
 import {
   getFieldValue,
-  getFormattedDate,
   getStatusLabel,
   isSystemInitiated,
   isVerifiedAction
@@ -299,10 +292,7 @@ export const ActionDetailsModalListTable = ({
         (section) => section.id === item?.valueCode
       ) as IFormSection
 
-      if (
-        section.id === BirthSection.Documents ||
-        section.id === DeathSection.DeathDocuments
-      ) {
+      if (section.id === 'documents') {
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )

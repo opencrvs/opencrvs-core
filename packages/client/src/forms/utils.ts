@@ -552,21 +552,6 @@ export const getConditionalActionsForField = (
   offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
-  // set some constants that are used in conditionals
-  const selectedInformantAndContactType =
-    getSelectedInformantAndContactType(draftData)
-  // eslint-disable-next-line no-unused-vars
-  const mothersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
-    selectedInformantAndContactType.selectedContactType === 'MOTHER'
-      ? true
-      : false
-  // eslint-disable-next-line no-unused-vars
-  const fathersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
-    selectedInformantAndContactType.selectedContactType === 'FATHER'
-      ? true
-      : false
   if (!field.conditionals) {
     return []
   }
@@ -586,22 +571,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
 ): IFormSectionGroup[] => {
   // eslint-disable-next-line no-unused-vars
   const values = sectionData
-  // set some constants that are used in conditionals
-  const selectedInformantAndContactType =
-    getSelectedInformantAndContactType(draftData)
 
-  // eslint-disable-next-line no-unused-vars
-  const mothersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
-    selectedInformantAndContactType.selectedContactType === 'MOTHER'
-      ? true
-      : false
-  // eslint-disable-next-line no-unused-vars
-  const fathersDetailsExistBasedOnContactAndInformant =
-    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
-    selectedInformantAndContactType.selectedContactType === 'FATHER'
-      ? true
-      : false
   // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {

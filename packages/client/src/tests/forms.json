@@ -750,14 +750,12 @@
             "description": "Form section title for Child",
             "id": "form.section.child.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "child-view-group",
               "fields": [
                 {
                   "name": "childBirthDate",
-                  "customisable": false,
                   "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
@@ -790,7 +788,6 @@
                 {
                   "name": "firstNamesEng",
                   "previewGroup": "childNameInEnglish",
-                  "customisable": false,
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের প্রথমাংশ বাংলায়",
@@ -824,7 +821,6 @@
                 {
                   "name": "familyNameEng",
                   "previewGroup": "childNameInEnglish",
-                  "customisable": false,
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের শেষাংশ বাংলায়",
@@ -857,7 +853,6 @@
                 },
                 {
                   "name": "gender",
-                  "customisable": false,
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
                     "defaultMessage": "Sex",
@@ -920,7 +915,6 @@
                 },
                 {
                   "name": "attendantAtBirth",
-                  "customisable": true,
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
                     "defaultMessage": "Attendant at birth",
@@ -1006,7 +1000,6 @@
                 },
                 {
                   "name": "birthType",
-                  "customisable": true,
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
                     "defaultMessage": "Type of birth",
@@ -1083,7 +1076,6 @@
                     "description": "Label for form field: Weight at birth",
                     "id": "form.field.label.weightAtBirth"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -1120,7 +1112,6 @@
                 },
                 {
                   "name": "placeOfBirth",
-                  "customisable": false,
                   "type": "SELECT_WITH_OPTIONS",
                   "previewGroup": "placeOfBirth",
                   "ignoreFieldLabelOnErrorMessage": true,
@@ -1176,7 +1167,6 @@
                 },
                 {
                   "name": "birthLocation",
-                  "customisable": false,
                   "type": "LOCATION_SEARCH_INPUT",
                   "label": {
                     "defaultMessage": "Health Institution",
@@ -1247,7 +1237,6 @@
             "description": "Form section title for informants",
             "id": "form.section.informant.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "informant-view-group",
@@ -1307,7 +1296,6 @@
                     "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -1352,7 +1340,6 @@
                     "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -1436,7 +1423,6 @@
                     "description": "Label for form field: Age of informant",
                     "id": "form.field.label.ageOfInformant"
                   },
-                  "customisable": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [
@@ -1583,7 +1569,6 @@
             "description": "Form section title for Mother",
             "id": "form.section.mother.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "mother-view-group",
@@ -1601,12 +1586,7 @@
                   "hideHeader": true,
                   "initialValue": true,
                   "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "mothersDetailsExistBasedOnContactAndInformant"
-                    }
-                  ],
+                  "conditionals": [],
                   "mapping": {
                     "query": {
                       "operation": "booleanTransformer"
@@ -1615,12 +1595,7 @@
                 },
                 {
                   "name": "reasonNotApplying",
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "mothersDetailsExistBasedOnContactAndInformant || values.detailsExist"
-                    }
-                  ],
+                  "conditionals": [],
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Reason for mother",
@@ -1629,7 +1604,6 @@
                   },
                   "validate": [],
                   "initialValue": "",
-                  "customisable": true,
                   "required": true
                 },
                 {
@@ -1654,7 +1628,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -1679,7 +1653,6 @@
                     "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -1694,7 +1667,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -1724,7 +1697,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "disable",
@@ -1778,7 +1751,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant)"
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -1795,7 +1768,6 @@
                     "description": "Label for form field: Age of mother",
                     "id": "form.field.label.ageOfMother"
                   },
-                  "customisable": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [
@@ -1807,7 +1779,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
+                      "expression": "!values.exactDateOfBirthUnknown || !values.detailsExist"
                     }
                   ],
                   "postfix": "years",
@@ -1833,7 +1805,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -1864,7 +1836,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "maxLength": 32,
@@ -1905,7 +1877,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -1917,7 +1889,6 @@
                     "description": "Label for form field: Marital status",
                     "id": "form.field.label.maritalStatus"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1935,7 +1906,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "options": [
@@ -2000,10 +1971,9 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2024,14 +1994,13 @@
                     "description": "text for occupation form field",
                     "id": "form.field.label.occupation"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -2044,13 +2013,12 @@
                     "id": "form.field.label.educationAttainment"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "placeholder": {
@@ -2127,7 +2095,6 @@
             "description": "Form section title for Father",
             "id": "form.section.father.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "father-view-group",
@@ -2145,12 +2112,7 @@
                   "hideHeader": true,
                   "initialValue": true,
                   "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "fathersDetailsExistBasedOnContactAndInformant"
-                    }
-                  ],
+                  "conditionals": [],
                   "mapping": {
                     "query": {
                       "operation": "booleanTransformer"
@@ -2159,19 +2121,13 @@
                 },
                 {
                   "name": "reasonNotApplying",
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "fathersDetailsExistBasedOnContactAndInformant || values.detailsExist"
-                    }
-                  ],
+                  "conditionals": [],
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Reason for father",
                     "description": "Label for form field: reasonFatherNotApplying",
                     "id": "form.field.label.reasonFatherNotApplying"
                   },
-                  "customisable": true,
                   "validate": [],
                   "initialValue": "",
                   "required": true
@@ -2198,7 +2154,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2223,7 +2179,6 @@
                     "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -2238,7 +2193,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2284,7 +2239,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "disable",
@@ -2322,7 +2277,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -2339,7 +2294,6 @@
                     "description": "Label for form field: Age of father",
                     "id": "form.field.label.ageOfFather"
                   },
-                  "customisable": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [
@@ -2351,7 +2305,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
+                      "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist)"
                     }
                   ],
                   "postfix": "years",
@@ -2377,7 +2331,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2416,7 +2370,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2449,7 +2403,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -2461,7 +2415,6 @@
                     "description": "Label for form field: Marital status",
                     "id": "form.field.label.maritalStatus"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2473,7 +2426,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2541,14 +2494,13 @@
                     "description": "text for occupation form field",
                     "id": "form.field.label.occupation"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -2560,7 +2512,6 @@
                     "description": "Label for form field: Mother education",
                     "id": "form.field.label.educationAttainment"
                   },
-                  "customisable": true,
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2572,7 +2523,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "options": [
@@ -2747,7 +2698,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "draftData && draftData.mother && !draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "draftData && draftData.mother && !draftData.mother.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2809,7 +2760,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "draftData && draftData.father && !draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "draftData && draftData.father && !draftData.father.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -2883,7 +2834,7 @@
                   }
                 },
                 {
-                  "name": "uploadDocForProofOfLegarGuardian",
+                  "name": "uploadDocForProofOfLegalGuardian",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Other",
@@ -3744,7 +3695,6 @@
             "description": "Form section title for Deceased",
             "id": "form.section.deceased.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "deceased-view-group",
@@ -3790,7 +3740,6 @@
                     "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -3884,7 +3833,6 @@
                     "description": "Label for form field: Age of deceased",
                     "id": "form.field.label.ageOfDeceased"
                   },
-                  "customisable": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [
@@ -4039,7 +3987,6 @@
                     "id": "form.field.label.maritalStatus"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -4252,7 +4199,6 @@
                     "id": "form.field.label.causeOfDeathEstablished"
                   },
                   "required": true,
-                  "customisable": true,
                   "initialValue": "true",
                   "size": "normal",
                   "validate": [],
@@ -4294,7 +4240,6 @@
                     "id": "form.field.label.causeOfDeathMethod"
                   },
                   "required": true,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -4370,7 +4315,6 @@
                   "initialValue": "",
                   "validate": [],
                   "required": true,
-                  "customisable": true,
                   "maxLength": 500,
                   "mapping": {
                     "mutation": {
@@ -4385,7 +4329,6 @@
                 },
                 {
                   "name": "placeOfDeath",
-                  "customisable": false,
                   "type": "SELECT_WITH_OPTIONS",
                   "previewGroup": "placeOfDeath",
                   "ignoreFieldLabelOnErrorMessage": true,
@@ -4441,7 +4384,6 @@
                 },
                 {
                   "name": "deathLocation",
-                  "customisable": false,
                   "type": "LOCATION_SEARCH_INPUT",
                   "label": {
                     "defaultMessage": "Health institution",
@@ -4500,7 +4442,6 @@
             "description": "Form section title for informants",
             "id": "form.section.informant.title"
           },
-          "hasDocumentSection": true,
           "groups": [
             {
               "id": "informant-view-group",
@@ -4554,7 +4495,6 @@
                     "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": false,
-                  "customisable": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -4599,7 +4539,6 @@
                     "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
-                  "customisable": true,
                   "initialValue": "",
                   "conditionals": [
                     {
@@ -4683,7 +4622,6 @@
                     "description": "Label for form field: Age of informant",
                     "id": "form.field.label.ageOfInformant"
                   },
-                  "customisable": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [

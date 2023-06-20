@@ -488,7 +488,6 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
-  customisable?: boolean
   customQuesstionMappingId?: string
   ignoreMediaQuery?: boolean
 }
@@ -921,38 +920,6 @@ export type IFormSectionQueryMapFunction = (
   userDetails?: UserDetails // user for template user mappings
 ) => void
 
-export enum BirthSection {
-  Registration = 'registration',
-  Child = 'child',
-  Mother = 'mother',
-  Father = 'father',
-  Informant = 'informant',
-  Documents = 'documents',
-  Preview = 'preview'
-}
-
-export enum DeathSection {
-  Registration = 'registration',
-  Deceased = 'deceased',
-  Event = 'deathEvent',
-  Informant = 'informant',
-  DeathDocuments = 'documents',
-  Preview = 'preview'
-}
-
-export enum MarriageSection {
-  Registration = 'registration',
-  Groom = 'groom',
-  Bride = 'bride',
-  Event = 'marriageEvent',
-  WitnessOne = 'witnessOne',
-  WitnessTwo = 'witnessTwo',
-  Documents = 'documents',
-  Preview = 'preview'
-}
-
-export type WizardSection = BirthSection | DeathSection | 'settings'
-
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
@@ -985,32 +952,28 @@ export enum ReviewSection {
   Review = 'review'
 }
 
-export enum InformantSection {
+export enum RegistrationSection {
   Registration = 'registration'
 }
 
 export type Section =
   | ReviewSection
   | PaymentSection
-  | BirthSection
-  | DeathSection
   | UserSection
   | CertificateSection
   | CorrectionSection
-  | InformantSection
-  | MarriageSection
+  | RegistrationSection
 
 export interface IFormSection {
-  id: Section
+  id: Section | string
   viewType: ViewType
   name: MessageDescriptor
-  title: MessageDescriptor
+  title?: MessageDescriptor
   groups: IFormSectionGroup[]
   disabled?: boolean
   optional?: boolean
   notice?: MessageDescriptor
   mapping?: IFormSectionMapping
-  hasDocumentSection?: boolean
 }
 
 export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
