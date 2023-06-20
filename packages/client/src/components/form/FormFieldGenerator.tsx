@@ -680,6 +680,50 @@ export function getInitialValueForSelectDynamicValue(
   return fieldInitialValue
 }
 
+export function getPureInitialValueForSelectDynamicValue(
+  field: ISelectFormFieldWithDynamicOptions,
+  userDetails: UserDetails | null
+) {
+  const catchmentAreas = userDetails?.catchmentArea
+  let district = ''
+  let state = ''
+  let locationLevel3 = ''
+
+  if (catchmentAreas) {
+    catchmentAreas.forEach((catchmentArea) => {
+      if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
+        )
+      ) {
+        locationLevel3 = catchmentArea.id
+      } else if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'DISTRICT'
+        )
+      ) {
+        district = catchmentArea.id
+      } else if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'STATE'
+        )
+      ) {
+        state = catchmentArea.id
+      }
+    })
+  }
+
+  if (field.dynamicOptions.jurisdictionType === 'DISTRICT') {
+    return district
+  }
+  if (field.dynamicOptions.jurisdictionType === 'STATE') {
+    return state
+  }
+  if (field.dynamicOptions.jurisdictionType === 'LOCATION_LEVEL_3') {
+    return locationLevel3
+  }
+}
+
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: UserDetails | null
@@ -879,7 +923,8 @@ class FormSectionComponent extends React.Component<Props> {
       intl,
       draftData,
       setValues,
-      dynamicDispatch
+      dynamicDispatch,
+      userDetails
     } = this.props
 
     const language = this.props.intl.locale
@@ -903,7 +948,8 @@ class FormSectionComponent extends React.Component<Props> {
             field,
             { ...draftData?.[sectionName], ...values },
             offlineCountryConfig,
-            draftData
+            draftData,
+            userDetails
           )
 
           if (conditionalActions.includes('hide')) {
