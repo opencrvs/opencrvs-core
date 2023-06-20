@@ -17,7 +17,6 @@ import * as responseTransformers from '@client/forms/mappings/response-transform
 import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
 import {
-  validators,
   IForm,
   ISerializedForm,
   IFormSectionMutationMapFunction,
@@ -50,8 +49,8 @@ import {
   IFormFieldTemplateMapOperation,
   IQueryTemplateDescriptor
 } from '@client/forms'
-
 import { countries } from '@client/forms/countries'
+import { validators } from '@client/forms/functions'
 
 /**
  * Some of the exports of mutations and queries are not functions
@@ -217,7 +216,8 @@ function fieldMutationDescriptorToMutationFunction(
 }
 
 export function fieldValidationDescriptorToValidationFunction(
-  descriptor: IValidatorDescriptor
+  descriptor: IValidatorDescriptor,
+  validators: Record<string, Validation | AnyFn<Validation>>
 ): Validation {
   const validator: Validation | AnyFn<Validation> =
     validators[descriptor.operation as ValidatorFunctionExports]
@@ -288,13 +288,16 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-export function deserializeFormField(field: SerializedFormField): IFormField {
+export function deserializeFormField(
+  field: SerializedFormField,
+  validators: Record<string, Validation | AnyFn<Validation>>
+): IFormField {
   const baseFields = {
     ...field,
     validator:
       field.validator &&
       field.validator.map((descriptor) =>
-        fieldValidationDescriptorToValidationFunction(descriptor)
+        fieldValidationDescriptorToValidationFunction(descriptor, validators)
       ),
     mapping: field.mapping && {
       query:
@@ -323,7 +326,7 @@ export function deserializeFormField(field: SerializedFormField): IFormField {
         return {
           ...fields,
           [key]: field.nestedFields[key].map((field) =>
-            deserializeFormField(field)
+            deserializeFormField(field, validators)
           )
         }
       },
@@ -360,7 +363,8 @@ export function deserializeFormField(field: SerializedFormField): IFormField {
 }
 
 export function deserializeFormSection(
-  section: ISerializedFormSection
+  section: ISerializedFormSection,
+  validators: Record<string, Validation | AnyFn<Validation>>
 ): IFormSection {
   const mapping = {
     query:
@@ -384,7 +388,7 @@ export function deserializeFormSection(
   const groups = section.groups.map((group) => ({
     ...group,
     fields: group.fields.map((field) => {
-      return deserializeFormField(field)
+      return deserializeFormField(field, validators)
     })
   }))
 
@@ -395,9 +399,12 @@ export function deserializeFormSection(
   }
 }
 
-export function deserializeForm(form: ISerializedForm): IForm {
+export function deserializeForm(
+  form: ISerializedForm,
+  validators: Record<string, Validation | AnyFn<Validation>>
+): IForm {
   const sections = form.sections.map((section) =>
-    deserializeFormSection(section)
+    deserializeFormSection(section, validators)
   )
 
   return {

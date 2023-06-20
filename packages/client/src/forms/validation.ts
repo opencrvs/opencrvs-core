@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { required, IValidationResult, Validation } from '@client/utils/validate'
+import { required, IValidationResult } from '@client/utils/validate'
 import {
   IFormField,
   IFormSectionData,
@@ -23,20 +23,6 @@ import {
 } from '@opencrvs/client/src/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
-import * as builtInValidators from '@client/utils/validate'
-import { referenceApi } from '@client/utils/referenceApi'
-import { AnyFn } from './mappings/deserializer'
-
-// Initialize validations from country configuration, and amend them with the built in ones
-export let validators: Record<string, Validation | AnyFn<Validation>>
-export async function initValidators() {
-  const countryConfigValidators = await referenceApi.importValidators()
-  validators = {
-    // Needs to be casted as any as there are non-validator functions in the import
-    ...(builtInValidators as Record<string, any>),
-    ...countryConfigValidators
-  }
-}
 
 export interface IFieldErrors {
   errors: IValidationResult[]

@@ -39,12 +39,9 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
-import {
-  initValidators,
-  initConditionals,
-  ISerializedForm
-} from '@client/forms'
+import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
+import { initConditionals, initValidators } from '@client/forms/functions'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'

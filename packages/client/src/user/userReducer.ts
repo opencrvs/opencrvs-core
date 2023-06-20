@@ -15,9 +15,7 @@ import {
   IFormSectionData,
   ISelectFormFieldWithOptions,
   ISelectOption,
-  UserSection,
-  validators,
-  conditionals
+  UserSection
 } from '@client/forms'
 import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -45,6 +43,7 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Validation } from '@client/utils/validate'
+import { validators, conditionals } from '@client/forms/functions'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -446,7 +445,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case ROLES_LOADED:
       const { systemRoles } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm)
+      const form = deserializeForm(createUserForm, validators)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)

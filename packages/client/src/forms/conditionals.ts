@@ -9,17 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as referenceApi from '@client/utils/referenceApi'
-
-// Initialize conditionals from country configuration and amend in the built in ones
-export let conditionals: Record<string, Conditional>
-export async function initConditionals() {
-  const countryConfigConditionals = await referenceApi.importConditionals()
-  conditionals = {
-    ...builtInConditionals,
-    ...countryConfigConditionals
-  }
-}
 
 export interface Conditional {
   description?: string
@@ -80,7 +69,7 @@ export interface BuiltInConditionals {
   isAuditActionReactivate: Conditional
 }
 
-const builtInConditionals: BuiltInConditionals = {
+export const builtInConditionals: BuiltInConditionals = {
   informantType: {
     action: 'hide',
     expression:

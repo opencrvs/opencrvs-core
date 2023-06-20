@@ -14,6 +14,7 @@ import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { validators } from '@client/forms/functions'
 
 export type IReviewFormState =
   | {
@@ -47,7 +48,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.FORMS_LOADED:
-      const { forms, validators } = action.payload
+      const { forms } = action.payload
 
       const birth = deserializeForm(forms.birth, validators)
       const death = deserializeForm(forms.death, validators)

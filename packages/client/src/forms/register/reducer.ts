@@ -14,6 +14,7 @@ import { IForm, BirthSection, DeathSection } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { messages } from '@client/i18n/messages/views/review'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { validators } from '@client/forms/functions'
 
 export type IRegisterFormState =
   | {
@@ -49,9 +50,9 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case offlineActions.FORMS_LOADED:
       const { forms } = action.payload
 
-      const birth = deserializeForm(forms.birth)
-      const death = deserializeForm(forms.death)
-      const marriage = deserializeForm(forms.marriage)
+      const birth = deserializeForm(forms.birth, validators)
+      const death = deserializeForm(forms.death, validators)
+      const marriage = deserializeForm(forms.marriage, validators)
 
       const preview = {
         viewType: 'preview' as const,

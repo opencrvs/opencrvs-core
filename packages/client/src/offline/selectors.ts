@@ -14,7 +14,7 @@ import { IStoreState } from '@client/store'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
 import { UserDetails } from '@client/utils/userUtils'
-import { conditionals, validators } from '@client/forms'
+import { validators, conditionals } from '@client/forms/functions'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline

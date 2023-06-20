@@ -14,7 +14,6 @@ import {
   Ii18nFormField,
   ISelectOption,
   IFormSectionData,
-  Conditional,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
@@ -72,6 +71,7 @@ import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
+import { Conditional } from './conditionals'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',

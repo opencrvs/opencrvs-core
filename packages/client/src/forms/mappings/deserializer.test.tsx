@@ -14,6 +14,7 @@ import { IForm } from '@client/forms'
 import { deserializeForm } from './deserializer'
 import { registerForms } from '@client/forms/configuration/default/index'
 import { Mock } from 'vitest'
+import * as builtInValidators from '@client/utils/validate'
 
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives
@@ -38,11 +39,16 @@ describe('Form desearializer', () => {
     expect(
       hasOperatorDescriptors(deserializeForm(birth))[0].length
     ).toBeGreaterThan(5)
-    expect(hasOperatorDescriptors(deserializeForm(birth))[1]).toBeTruthy()
     expect(
-      hasOperatorDescriptors(deserializeForm(death))[0].length
+      hasOperatorDescriptors(deserializeForm(birth, builtInValidators))[1]
+    ).toBeTruthy()
+    expect(
+      hasOperatorDescriptors(deserializeForm(death, builtInValidators))[0]
+        .length
     ).toBeGreaterThan(5)
-    expect(hasOperatorDescriptors(deserializeForm(death))[1]).toBeTruthy()
+    expect(
+      hasOperatorDescriptors(deserializeForm(death, builtInValidators))[1]
+    ).toBeTruthy()
   })
 
   it('throws errors when developer passes in invalid operations', async () => {
@@ -51,7 +57,7 @@ describe('Form desearializer', () => {
     birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
       'non_existing_123' as any
 
-    expect(() => deserializeForm(birth)).toThrow()
+    expect(() => deserializeForm(birth, builtInValidators)).toThrow()
     /* eslint-disable no-console */
     expect((console.error as Mock).mock.calls).toHaveLength(1)
     expect((console.error as Mock).mock.calls[0][0]).toMatch('non_existing_123')
