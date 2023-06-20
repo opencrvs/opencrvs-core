@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Layout, LayoutCentered } from './components/Layout'
-import { Section } from './components/Section'
+import { Layout, LayoutCentered, LayoutForm } from './components/Layout'
+import { Section, SectionFormBackAction } from './components/Section'
 import {
   SkipToContent,
   MAIN_CONTENT_ANCHOR_ID
@@ -72,5 +72,7 @@ export function Frame({
 }
 
 Frame.Layout = Layout
+Frame.LayoutForm = LayoutForm
 Frame.LayoutCentered = LayoutCentered
 Frame.Section = Section
+Frame.SectionFormBackAction = SectionFormBackAction
