@@ -11,13 +11,12 @@
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
-import { AnyFn } from '@client/forms/mappings/deserializer'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { merge } from 'lodash'
-import { Validation } from './validate'
+import { Validator } from '@client/forms/validators'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
@@ -186,11 +185,7 @@ async function loadForms(): Promise<LoadFormsResponse> {
   }
 }
 
-export type LoadValidatorsResponse = Record<
-  string,
-  Validation | AnyFn<Validation>
->
-
+export type LoadValidatorsResponse = Record<string, Validator>
 async function importValidators(): Promise<LoadValidatorsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const validators = await import(

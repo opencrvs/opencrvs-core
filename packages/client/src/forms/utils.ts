@@ -69,7 +69,6 @@ import { IDynamicValues } from '@client/navigation'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-import _ from 'lodash'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 export const VIEW_TYPE = {
@@ -554,13 +553,13 @@ export const getConditionalActionsForField = (
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mothersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
     selectedInformantAndContactType.selectedContactType === 'MOTHER'
       ? true
       : false
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fathersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
     selectedInformantAndContactType.selectedContactType === 'FATHER'
@@ -583,19 +582,19 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   sectionData: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mothersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
     selectedInformantAndContactType.selectedContactType === 'MOTHER'
       ? true
       : false
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fathersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
     selectedInformantAndContactType.selectedContactType === 'FATHER'

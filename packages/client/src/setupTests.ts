@@ -100,10 +100,13 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
 }))
 
-vi.mock('@client/forms/functions', async () => ({
-  ...((await vi.importActual('@client/forms/functions')) as any),
+vi.mock('@client/forms/conditionals', async () => ({
+  ...((await vi.importActual('@client/forms/conditionals')) as any),
   conditionals: ((await vi.importActual('@client/forms/conditionals')) as any)
-    .builtInConditionals,
+    .builtInConditionals
+}))
+
+vi.mock('@client/forms/validators', async () => ({
   validators: await vi.importActual('@client/utils/validate')
 }))
 

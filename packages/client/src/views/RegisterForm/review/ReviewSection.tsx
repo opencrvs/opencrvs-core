@@ -114,7 +114,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,

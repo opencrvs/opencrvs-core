@@ -14,7 +14,7 @@ import { IForm, BirthSection, DeathSection } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { messages } from '@client/i18n/messages/views/review'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { validators } from '@client/forms/functions'
+import { validators } from '@client/forms/validators'
 
 export type IRegisterFormState =
   | {

@@ -42,8 +42,8 @@ import { Role, SystemRole } from '@client/utils/gateway'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
-import { Validation } from '@client/utils/validate'
-import { validators, conditionals } from '@client/forms/functions'
+import { validators, Validator } from '@client/forms/validators'
+import { conditionals } from '@client/forms/conditionals'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -177,13 +177,13 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
-    validators: Record<string, Validation | AnyFn<Validation>>
+    validators: Record<string, Validator>
   }
 }
 
 export function rolesLoaded(
   systemRoles: SystemRole[],
-  validators: Record<string, Validation | AnyFn<Validation>>
+  validators: Record<string, Validator>
 ): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
