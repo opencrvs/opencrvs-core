@@ -76,4 +76,5 @@ interface Window {
     LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
+  __WB_MANIFEST: Array<{ url: string; revision: string }>
 }

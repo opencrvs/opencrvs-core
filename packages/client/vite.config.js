@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
         swDest: 'build/src-sw.js'
       },
       srcDir: 'src/',
-      filename: 'src-sw.js',
+      filename: 'src-sw.ts',
       devOptions: {
         enabled: false
       }
