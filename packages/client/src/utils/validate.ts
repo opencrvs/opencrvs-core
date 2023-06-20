@@ -11,11 +11,7 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import {
-  IFormFieldValue,
-  IFormData,
-  IFormField
-} from '@opencrvs/client/src/forms'
+import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,

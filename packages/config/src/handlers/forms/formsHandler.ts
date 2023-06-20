@@ -60,5 +60,5 @@ export default async function getForm(
       return h.response().code(400)
     }
   }
-  return h.response({ forms }).code(201)
+  return h.response(forms).code(201)
 }

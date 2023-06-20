@@ -108,7 +108,6 @@
     "handlebars": "^4.7.6"
   },
   "devDependencies": {
-    "@types/handlebars": "^4.1.0",
     "@graphql-codegen/add": "^3.1.1",
     "@graphql-codegen/cli": "^3.0.0",
     "@graphql-codegen/introspection": "^3.0.0",

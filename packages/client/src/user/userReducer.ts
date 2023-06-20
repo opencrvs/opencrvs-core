@@ -17,7 +17,7 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
@@ -42,6 +42,7 @@ import { Role, SystemRole } from '@client/utils/gateway'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Validation } from '@client/utils/validate'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -175,14 +176,19 @@ export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
+    validators: Record<string, Validation | AnyFn<Validation>>
   }
 }
 
-export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
+export function rolesLoaded(
+  systemRoles: SystemRole[],
+  validators: Record<string, Validation | AnyFn<Validation>>
+): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
-      systemRoles
+      systemRoles,
+      validators
     }
   }
 }
@@ -433,9 +439,9 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case ROLES_LOADED:
-      const { systemRoles } = action.payload
+      const { systemRoles, validators } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm)
+      const form = deserializeForm(createUserForm, validators)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)
