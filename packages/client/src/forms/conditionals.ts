@@ -11,7 +11,7 @@
  */
 import * as referenceApi from '@client/utils/referenceApi'
 
-// Initialize validations from country configuration and built in ones
+// Initialize conditionals from country configuration and amend in the built in ones
 export let conditionals: Record<string, Conditional>
 export async function initConditionals() {
   const countryConfigConditionals = await referenceApi.importConditionals()

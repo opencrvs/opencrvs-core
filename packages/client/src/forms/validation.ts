@@ -27,7 +27,7 @@ import * as builtInValidators from '@client/utils/validate'
 import { referenceApi } from '@client/utils/referenceApi'
 import { AnyFn } from './mappings/deserializer'
 
-// Initialize validations from country configuration and built in ones
+// Initialize validations from country configuration, and amend them with the built in ones
 export let validators: Record<string, Validation | AnyFn<Validation>>
 export async function initValidators() {
   const countryConfigValidators = await referenceApi.importValidators()
