@@ -203,6 +203,7 @@ const LeftColumn = styled.div`
   max-width: 840px;
   margin-bottom: 200px;
   border-radius: 4px;
+  overflow: hidden;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
 
