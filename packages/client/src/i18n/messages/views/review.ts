@@ -111,14 +111,14 @@ const messagesToDefine = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage} } declaration for {name}',
+      '{name} {eventType, select, birth {Birth} death {Death} other {Marriage} } declaration',
     description:
       'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'
   },
   headerSubjectWithoutName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Marriage}} Declaration',
+      '{eventType, select, birth {Birth} death {Death} other {Marriage}} declaration',
     description: 'Header subject that shows which declaration type to review',
     id: 'review.header.subject.subjectWithoutName'
   },
@@ -215,6 +215,11 @@ const messagesToDefine = {
       '{completeDeclaration, select, true {Send declaration for review?} false {Send incomplete declaration?}}',
     description: 'Submit title text on modal',
     id: 'review.modal.title.submitConfirmation'
+  },
+  supportingDocuments: {
+    defaultMessage: 'Supporting documents',
+    description: 'Section heading title for supporting documents',
+    id: 'review.inputs.supportingDocuments'
   },
   validateConfirmationDesc: {
     defaultMessage:
