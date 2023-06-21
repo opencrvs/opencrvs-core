@@ -475,6 +475,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         { sections: (state.userForm as IForm).sections as IFormSection[] },
         { [UserSection.User]: queryData.data.getUser }
       )
+      if (
+        formData.user.systemRole === 'FIELD_AGENT' &&
+        Boolean(formData.user.primaryFacilityId)
+      ) {
+        return {
+          ...state,
+          userFormData: {
+            ...formData.user,
+            primaryFacilityType: 'HEALTH_FACILITY'
+          },
+          userDetailsStored: true
+        }
+      }
       return {
         ...state,
         userFormData: formData.user,

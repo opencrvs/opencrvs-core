@@ -772,7 +772,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IBaseAdvancedSearchState
+  initialValues?: Record<string, IFormFieldValue>
 }
 
 interface IStateProps {

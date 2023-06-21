@@ -234,6 +234,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
       ...formData,
       skippedOfficeSelction: true
     }
+    formData.mobile = formData.mobile ?? ''
   } else {
     formData = {
       ...formData,

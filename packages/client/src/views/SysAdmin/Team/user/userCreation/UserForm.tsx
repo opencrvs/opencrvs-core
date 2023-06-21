@@ -11,6 +11,7 @@
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
+  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup
@@ -160,6 +161,11 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
+    const visibleFields = getVisibleGroupFields(activeGroup)
+    const formValues = visibleFields.reduce((memo, field) => {
+      const fieldInitialValue = field.initialValue as IFormFieldValue
+      return { ...memo, [field.name]: fieldInitialValue }
+    }, {})
 
     return (
       <>
@@ -179,9 +185,13 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               id={section.id}
               onChange={(values) => this.modifyData(values)}
               setAllFieldsDirty={false}
-              fields={getVisibleGroupFields(activeGroup)}
+              fields={visibleFields}
               onSetTouched={(setTouchedFunc) => {
                 this.setAllFormFieldsTouched = setTouchedFunc
+              }}
+              initialValues={{
+                ...formValues,
+                ...formData
               }}
               requiredErrorMessage={messages.requiredForNewUser}
               onUploadingStateChanged={this.onUploadingStateChanged}

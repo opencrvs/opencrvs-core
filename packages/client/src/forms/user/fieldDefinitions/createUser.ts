@@ -126,7 +126,7 @@ export const userSectionFormType: ISerializedFormSection = {
           hidden: true
         },
         {
-          name: 'phoneNumber',
+          name: 'mobile',
           type: TEXT,
           label: userFormMessages.phoneNumber,
           required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
