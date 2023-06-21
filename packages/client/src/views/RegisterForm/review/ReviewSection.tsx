@@ -601,6 +601,8 @@ const renderValue = (
   if (typeof value === 'string' || typeof value === 'number') {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : field.unit
+      ? String(value).concat(intl.formatMessage(field.unit))
       : value
   }
 

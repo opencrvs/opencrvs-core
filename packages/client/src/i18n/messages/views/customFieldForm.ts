@@ -28,9 +28,16 @@ interface ICustomFieldFormMessages
   label: MessageDescriptor
   placeholderLabel: MessageDescriptor
   descriptionLabel: MessageDescriptor
+  unitLabel: MessageDescriptor
+  unitOptionEmpty: MessageDescriptor
+  unitOptionG: MessageDescriptor
+  unitOptionKg: MessageDescriptor
+  unitOptionCm: MessageDescriptor
+  unitOptionM: MessageDescriptor
   tooltipLabel: MessageDescriptor
   errorMessage: MessageDescriptor
   maxLengthLabel: MessageDescriptor
+  inputWidthLabel: MessageDescriptor
   duplicateField: MessageDescriptor
   copyHeading: MessageDescriptor
   copyDescription: MessageDescriptor
@@ -123,6 +130,36 @@ const messagesToDefine: ICustomFieldFormMessages = {
     defaultMessage: 'Description',
     description: 'Heading of Custom FieldForm'
   },
+  unitLabel: {
+    id: 'custom.field.form.unit',
+    defaultMessage: 'Unit',
+    description: 'Heading of Custom FieldForm'
+  },
+  unitOptionEmpty: {
+    id: 'custom.field.form.unitOptionEmpty',
+    defaultMessage: 'None',
+    description: 'Option of unit'
+  },
+  unitOptionG: {
+    id: 'custom.field.form.unitOptionG',
+    defaultMessage: 'Gram (G)',
+    description: 'Option of unit'
+  },
+  unitOptionKg: {
+    id: 'custom.field.form.unitOptionKg',
+    defaultMessage: 'Kilogram (Kg)',
+    description: 'Option of unit'
+  },
+  unitOptionCm: {
+    id: 'custom.field.form.unitOptionCm',
+    defaultMessage: 'Centimeter (Cm)',
+    description: 'Option of unit'
+  },
+  unitOptionM: {
+    id: 'custom.field.form.unitOptionM',
+    defaultMessage: 'Meter (M)',
+    description: 'Option of unit'
+  },
   tooltipLabel: {
     id: 'custom.field.form.tooltip',
     defaultMessage: 'Tooltip',
@@ -136,6 +173,11 @@ const messagesToDefine: ICustomFieldFormMessages = {
   maxLengthLabel: {
     id: 'custom.field.form.maxLength',
     defaultMessage: 'Max length',
+    description: 'Heading of Custom FieldForm'
+  },
+  inputWidthLabel: {
+    id: 'custom.field.form.inputWidth',
+    defaultMessage: 'Input width',
     description: 'Heading of Custom FieldForm'
   },
   duplicateField: {
