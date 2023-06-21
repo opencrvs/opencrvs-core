@@ -12,16 +12,20 @@
 
 import bcryptjs from 'bcryptjs'
 const { genSaltSync, hashSync } = bcryptjs
+import { Db, MongoClient } from 'mongodb'
 
 const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
 
-export const up = async (db, client) => {
+export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
 
   try {
     const role = await db.collection('userroles').findOne({
       'labels.label': 'National System Admin'
     })
+    if (!role) {
+      throw new Error('National System Admin role not found')
+    }
     const salt = genSaltSync(10)
     const passwordHash = hashSync(SUPER_USER_PASSWORD, salt)
 
@@ -46,10 +50,6 @@ export const up = async (db, client) => {
   } finally {
     await session.endSession()
   }
-};
+}
 
-export const down = async (db, client) => {
-    // TODO write the statements to rollback your migration (if possible)
-    // Example:
-    // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});
-};
+export const down = async () => {}
