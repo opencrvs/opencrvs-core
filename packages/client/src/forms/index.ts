@@ -34,6 +34,8 @@ import * as queries from './mappings/query'
 import * as responseTransformers from './mappings/response-transformers'
 import * as types from './mappings/type'
 import { UserDetails } from '@client/utils/userUtils'
+import { Conditional } from './conditionals'
+import { AnyFn } from './mappings/deserializer'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -459,7 +461,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
-  conditionals?: IConditional[]
+  conditionals?: Conditional[]
   description?: MessageDescriptor
   placeholder?: MessageDescriptor
   mapping?: IFormFieldMapping
@@ -484,7 +486,7 @@ export interface IFormFieldBase {
     }
     position?: REVIEW_OVERRIDE_POSITION
     labelAs?: MessageDescriptor
-    conditionals?: IConditional[]
+    conditionals?: Conditional[]
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
@@ -730,65 +732,6 @@ export interface IDynamicFormField
   type: any
 }
 
-export interface IConditional {
-  description?: string
-  action: string
-  expression: string
-}
-
-export interface IConditionals {
-  informantType: IConditional
-  iDType: IConditional
-  isOfficePreSelected: IConditional
-  fathersDetailsExist: IConditional
-  primaryAddressSameAsOtherPrimary: IConditional
-  countryPrimary: IConditional
-  statePrimary: IConditional
-  districtPrimary: IConditional
-  addressLine4Primary: IConditional
-  addressLine3Primary: IConditional
-  country: IConditional
-  state: IConditional
-  district: IConditional
-  addressLine4: IConditional
-  addressLine3: IConditional
-  uploadDocForWhom: IConditional
-  motherCollectsCertificate: IConditional
-  fatherCollectsCertificate: IConditional
-  informantCollectsCertificate: IConditional
-  otherPersonCollectsCertificate: IConditional
-  birthCertificateCollectorNotVerified: IConditional
-  deathCertificateCollectorNotVerified: IConditional
-  placeOfBirthHospital: IConditional
-  placeOfDeathTypeHeathInstitue: IConditional
-  otherBirthEventLocation: IConditional
-  isNotCityLocation: IConditional
-  isCityLocation: IConditional
-  isDefaultCountry: IConditional
-  isNotCityLocationPrimary: IConditional
-  isDefaultCountryPrimary: IConditional
-  isCityLocationPrimary: IConditional
-  informantPrimaryAddressSameAsCurrent: IConditional
-  iDAvailable: IConditional
-  deathPlaceOther: IConditional
-  deathPlaceAtPrivateHome: IConditional
-  deathPlaceAtOtherLocation: IConditional
-  causeOfDeathEstablished: IConditional
-  isMarried: IConditional
-  identifierIDSelected: IConditional
-  fatherContactDetailsRequired: IConditional
-  withInTargetDays: IConditional
-  between46daysTo5yrs: IConditional
-  after5yrs: IConditional
-  deceasedNationIdSelected: IConditional
-  isRegistrarRoleSelected: IConditional
-  certCollectorOther: IConditional
-  userAuditReasonSpecified: IConditional
-  userAuditReasonOther: IConditional
-  isAuditActionDeactivate: IConditional
-  isAuditActionReactivate: IConditional
-}
-
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
@@ -999,7 +942,7 @@ export interface IFormSectionGroup {
   previewGroups?: IPreviewGroup[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
-  conditionals?: IConditional[]
+  conditionals?: Conditional[]
   error?: MessageDescriptor
   preventContinueIfError?: boolean
   showExitButtonOnly?: boolean
@@ -1032,7 +975,7 @@ export interface Ii18nFormFieldBase {
   postfix?: string
   unit?: string
   disabled?: boolean
-  conditionals?: IConditional[]
+  conditionals?: Conditional[]
   hideAsterisk?: boolean
   hideHeader?: boolean
   mode?: THEME_MODE
@@ -1268,3 +1211,14 @@ export interface ICertificate {
   payments?: Payment[]
   data?: string
 }
+
+export type ValidatorConditionalFactory<T> = ({
+  validators,
+  conditionals
+}: {
+  validators: Record<
+    string,
+    validators.Validation | AnyFn<validators.Validation>
+  >
+  conditionals: Record<string, Conditional>
+}) => T

@@ -41,8 +41,8 @@ import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
-import { Validation } from '@client/utils/validate'
-import { AnyFn } from '@client/forms/mappings/deserializer'
+import { initConditionals } from '@client/forms/conditionals'
+import { initValidators } from '@client/forms/validators'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -72,7 +72,6 @@ export interface IOfflineData {
     death: ISerializedForm
     marriage: ISerializedForm
   }
-  validators: Record<string, Validation | AnyFn<Validation>>
   facilities: ILocationDataResponse
   offices: ILocationDataResponse
   languages: ILanguage[]
@@ -206,7 +205,7 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const FORMS_CMD = Cmd.run(() => referenceApi.loadFormsAndValidators(), {
+const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
   successActionCreator: actions.formsLoaded,
   failActionCreator: actions.formsFailed
 })
@@ -219,6 +218,16 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
+})
+
+const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
+  successActionCreator: actions.conditionalsLoaded,
+  failActionCreator: actions.conditionalsFailed
+})
+
+const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
+  successActionCreator: actions.validatorsLoaded,
+  failActionCreator: actions.validatorsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -236,7 +245,9 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     CONFIG_CMD,
     FORMS_CMD,
-    CONTENT_CMD
+    CONTENT_CMD,
+    CONDITIONALS_CMD,
+    VALIDATORS_CMD
   ])
 }
 
@@ -575,8 +586,7 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          forms: action.payload.forms,
-          validators: action.payload.validators
+          forms: action.payload.forms
         }
       }
     }

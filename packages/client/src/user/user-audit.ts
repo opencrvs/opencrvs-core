@@ -9,16 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, RADIO_GROUP, TEXTAREA } from '@client/forms'
+import {
+  IFormField,
+  RADIO_GROUP,
+  TEXTAREA,
+  ValidatorConditionalFactory
+} from '@client/forms'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
-import { conditionals } from '@client/forms/utils'
 
 export interface IUserAuditForm {
   fields: IFormField[]
 }
 
-export const userAuditForm: IUserAuditForm = {
+export const userAuditForm: ValidatorConditionalFactory<IUserAuditForm> = ({
+  conditionals
+}) => ({
   fields: [
     {
       name: 'reason',
@@ -78,4 +84,4 @@ export const userAuditForm: IUserAuditForm = {
       conditionals: [conditionals.userAuditReasonOther]
     }
   ]
-}
+})

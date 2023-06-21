@@ -10,14 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ISerializedForm } from '@client/forms'
-import { AnyFn } from '@client/forms/mappings/deserializer'
+import { Conditional } from '@client/forms/conditionals'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
 import { merge } from 'lodash'
-import { Validation } from './validate'
-
+import { Validator } from '@client/forms/validators'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
@@ -29,10 +28,12 @@ export interface IContentResponse {
 }
 
 export interface LoadFormsResponse {
-  version: string
-  birth: ISerializedForm
-  death: ISerializedForm
-  marriage: ISerializedForm
+  forms: {
+    version: string
+    birth: ISerializedForm
+    death: ISerializedForm
+    marriage: ISerializedForm
+  }
 }
 
 export interface ICountryLogo {
@@ -180,30 +181,27 @@ async function loadForms(): Promise<LoadFormsResponse> {
   const response = await res.json()
 
   return {
-    ...response
+    forms: { ...response }
   }
 }
 
-export type LoadValidatorsResponse = Record<
-  string,
-  Validation | AnyFn<Validation>
->
-
-async function loadValidators(): Promise<LoadValidatorsResponse> {
+export type LoadValidatorsResponse = Record<string, Validator>
+async function importValidators(): Promise<LoadValidatorsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  /* @vite-ignore */
-  return import(`${window.config.COUNTRY_CONFIG_URL}/validators.js`)
-}
-
-export type LoadFormsAndValidatorsResponse = {
-  forms: LoadFormsResponse
-  validators: LoadValidatorsResponse
-}
-
-async function loadFormsAndValidators() {
-  return Promise.all([loadForms(), loadValidators()]).then(
-    ([forms, validators]) => ({ forms, validators })
+  const validators = await import(
+    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/validators.js`
   )
+
+  return validators
+}
+
+export type LoadConditionalsResponse = Record<string, Conditional>
+export async function importConditionals(): Promise<LoadConditionalsResponse> {
+  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+  const { conditionals } = await import(
+    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`
+  )
+  return conditionals
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -345,6 +343,8 @@ export const referenceApi = {
   loadFacilities,
   loadContent,
   loadConfig,
-  loadFormsAndValidators,
+  loadForms,
+  importValidators,
+  importConditionals,
   loadConfigAnonymousUser
 }

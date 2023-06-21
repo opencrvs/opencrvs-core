@@ -100,6 +100,16 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
 }))
 
+vi.mock('@client/forms/conditionals', async () => ({
+  ...((await vi.importActual('@client/forms/conditionals')) as any),
+  conditionals: ((await vi.importActual('@client/forms/conditionals')) as any)
+    .builtInConditionals
+}))
+
+vi.mock('@client/forms/validators', async () => ({
+  validators: await vi.importActual('@client/utils/validate')
+}))
+
 /*
  * Initialize mocks
  */
@@ -167,7 +177,10 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
-      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse)
+      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
+      loadForms: () => Promise.resolve(mockOfflineData.forms),
+      importConditionals: () => Promise.resolve({}),
+      importValidators: () => Promise.resolve({})
     }
   })
 )

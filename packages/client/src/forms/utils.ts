@@ -13,9 +13,7 @@ import {
   IFormField,
   Ii18nFormField,
   ISelectOption,
-  IConditionals,
   IFormSectionData,
-  IConditional,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
@@ -70,6 +68,7 @@ import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
+import { Conditional } from './conditionals'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -530,7 +529,7 @@ export const getConditionalActionsForField = (
     field.conditionals
       // eslint-disable-next-line no-eval
       .filter((conditional) => eval(conditional.expression))
-      .map((conditional: IConditional) => conditional.action)
+      .map((conditional: Conditional) => conditional.action)
   )
 }
 
@@ -539,7 +538,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   sectionData: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const values = sectionData
 
   // handling all possible group visibility conditionals
@@ -551,7 +550,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
       group.conditionals
         // eslint-disable-next-line no-eval
         .filter((conditional) => eval(conditional.expression))
-        .map((conditional: IConditional) => conditional.action)
+        .map((conditional: Conditional) => conditional.action)
         .includes('hide') !== true
     )
   })
@@ -569,7 +568,7 @@ export const getVisibleOptions = (
       option.conditionals
         // eslint-disable-next-line no-eval
         .filter((conditional) => eval(conditional.expression))
-        .map((conditional: IConditional) => conditional.action)
+        .map((conditional: Conditional) => conditional.action)
         .includes('hide') !== true
     )
   })
@@ -693,222 +692,4 @@ export function getSelectedOption(
   }
 
   return null
-}
-
-export const conditionals: IConditionals = {
-  informantType: {
-    action: 'hide',
-    expression:
-      '(!draftData || !draftData.registration || draftData.registration.informantType !== "OTHER" || draftData.registration.informantType === "BOTH_PARENTS" )'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
-  },
-  isOfficePreSelected: {
-    action: 'hide',
-    expression: 'values.skippedOfficeSelction && values.registrationOffice'
-  },
-  iDType: {
-    action: 'hide',
-    expression: "!values.iDType || (values.iDType !== 'OTHER')"
-  },
-  fathersDetailsExist: {
-    action: 'hide',
-    expression: '!values.detailsExist'
-  },
-  primaryAddressSameAsOtherPrimary: {
-    action: 'hide',
-    expression: 'values.primaryAddressSameAsOtherPrimary'
-  },
-  countryPrimary: {
-    action: 'hide',
-    expression: '!values.countryPrimary'
-  },
-  isDefaultCountryPrimary: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.countryPrimary)'
-  },
-  statePrimary: {
-    action: 'hide',
-    expression: '!values.statePrimary'
-  },
-  districtPrimary: {
-    action: 'hide',
-    expression: '!values.districtPrimary'
-  },
-  addressLine4Primary: {
-    action: 'hide',
-    expression: '!values.addressLine4Primary'
-  },
-  addressLine3Primary: {
-    action: 'hide',
-    expression: '!values.addressLine3Primary'
-  },
-  country: {
-    action: 'hide',
-    expression: '!values.country'
-  },
-  isDefaultCountry: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.country)'
-  },
-  state: {
-    action: 'hide',
-    expression: '!values.state'
-  },
-  district: {
-    action: 'hide',
-    expression: '!values.district'
-  },
-  addressLine4: {
-    action: 'hide',
-    expression: '!values.addressLine4'
-  },
-  addressLine3: {
-    action: 'hide',
-    expression: '!values.addressLine3'
-  },
-  uploadDocForWhom: {
-    action: 'hide',
-    expression: '!values.uploadDocForWhom'
-  },
-  motherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="MOTHER"'
-  },
-  fatherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="FATHER"'
-  },
-  informantCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="INFORMANT"'
-  },
-  otherPersonCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="OTHER"'
-  },
-  birthCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  deathCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="INFORMANT" && values.informantDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  placeOfBirthHospital: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
-  },
-  placeOfDeathTypeHeathInstitue: {
-    action: 'hide',
-    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
-  },
-  otherBirthEventLocation: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
-  },
-  isNotCityLocation: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isCityLocation: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isNotCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  isCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  iDAvailable: {
-    action: 'hide',
-    expression: '!values.iDType || values.iDType === "NO_ID"'
-  },
-  informantPrimaryAddressSameAsCurrent: {
-    action: 'hide',
-    expression: 'values.informantPrimaryAddressSameAsCurrent'
-  },
-  deathPlaceOther: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  deathPlaceAtPrivateHome: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
-  },
-  deathPlaceAtOtherLocation: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  causeOfDeathEstablished: {
-    action: 'hide',
-    expression: '!values.causeOfDeathEstablished'
-  },
-  isMarried: {
-    action: 'hide',
-    expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
-  },
-  identifierIDSelected: {
-    action: 'hide',
-    expression:
-      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
-  },
-  fatherContactDetailsRequired: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
-  },
-  withInTargetDays: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  between46daysTo5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  after5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")  || !draftData.child || !draftData.child.childBirthDate'
-  },
-  deceasedNationIdSelected: {
-    action: 'hide',
-    expression:
-      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  certCollectorOther: {
-    action: 'hide',
-    expression: 'values.type !== "OTHER"'
-  },
-  userAuditReasonSpecified: {
-    action: 'hide',
-    expression: 'values.reason === "OTHER"'
-  },
-  userAuditReasonOther: {
-    action: 'hide',
-    expression: 'values.reason !== "OTHER"'
-  },
-  isAuditActionDeactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "DEACTIVATE"'
-  },
-  isAuditActionReactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "REACTIVATE"'
-  }
 }

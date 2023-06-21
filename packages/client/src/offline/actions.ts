@@ -23,8 +23,9 @@ import {
   IApplicationConfig,
   ICertificateTemplateData,
   IApplicationConfigAnonymous,
+  LoadFormsResponse,
   LoadValidatorsResponse,
-  LoadFormsAndValidatorsResponse
+  LoadConditionalsResponse
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -62,24 +63,12 @@ export type LocationsFailedAction = {
 export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
 export type FormsLoadedAction = {
   type: typeof FORMS_LOADED
-  payload: LoadFormsAndValidatorsResponse
+  payload: LoadFormsResponse
 }
 
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
 export type FormsFailedAction = {
   type: typeof FORMS_FAILED
-  payload: Error
-}
-
-export const VALIDATORS_LOADED = 'OFFLINE/VALIDATORS_LOADED'
-export type ValidatorsLoadedAction = {
-  type: typeof VALIDATORS_LOADED
-  payload: LoadValidatorsResponse
-}
-
-export const VALIDATORS_FAILED = 'OFFLINE/VALIDATORS_FAILED'
-export type ValidatorsFailedAction = {
-  type: typeof VALIDATORS_FAILED
   payload: Error
 }
 
@@ -195,9 +184,7 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const formsLoaded = (
-  payload: LoadFormsAndValidatorsResponse
-): FormsLoadedAction => ({
+export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
   type: FORMS_LOADED,
   payload: payload
 })
@@ -205,13 +192,6 @@ export const formsLoaded = (
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
-})
-
-export const validatorsLoaded = (
-  payload: LoadValidatorsResponse
-): ValidatorsLoadedAction => ({
-  type: VALIDATORS_LOADED,
-  payload
 })
 
 export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({
@@ -349,6 +329,26 @@ export const updateOfflineCertificate = (
   }
 })
 
+export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
+  type: 'OFFLINE/VALIDATORS_LOADED' as const,
+  payload: payload
+})
+
+export const validatorsFailed = (error: Error) => ({
+  type: 'OFFLINE/VALIDATORS_FAILED' as const,
+  payload: error
+})
+
+export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
+  type: 'OFFLINE/CONDITIONALS_LOADED' as const,
+  payload: payload
+})
+
+export const conditionalsFailed = (error: Error) => ({
+  type: 'OFFLINE/CONDITIONALS_FAILED' as const,
+  payload: error
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -378,3 +378,7 @@ export type Action =
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
+  | ReturnType<typeof validatorsLoaded>
+  | ReturnType<typeof validatorsFailed>
+  | ReturnType<typeof conditionalsLoaded>
+  | ReturnType<typeof conditionalsFailed>

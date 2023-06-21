@@ -16,8 +16,6 @@ import * as labels from '@client/forms/mappings/label'
 import * as responseTransformers from '@client/forms/mappings/response-transformers'
 import * as graphQLQueries from '@client/forms/mappings/queries'
 import * as types from '@client/forms/mappings/type'
-import * as validators from '@opencrvs/client/src/utils/validate'
-
 import {
   IForm,
   ISerializedForm,
@@ -52,9 +50,11 @@ import {
   IQueryTemplateDescriptor
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
+import * as builtInValidators from '@client/utils/validate'
+import { Validator } from '@client/forms/validators'
 
 /**
- * Some of the exports of mutations and queries are not functions
+ * Some of the exports of mutations, queries and validators are not functions
  * There are for instance some Enums and value mappings that are exported
  *
  * This here removes those from the type, so we don't have to cast anything to any
@@ -77,9 +77,9 @@ type QueryFunctionExports = FilterType<
 >[keyof typeof queries]
 
 type ValidatorFunctionExports = FilterType<
-  typeof validators,
-  Validation | AnyFn<Validation>
->[keyof typeof validators]
+  typeof builtInValidators,
+  Validator
+>[keyof typeof builtInValidators]
 
 function isFactoryOperation(
   descriptor: IQueryDescriptor
@@ -218,9 +218,9 @@ function fieldMutationDescriptorToMutationFunction(
 
 export function fieldValidationDescriptorToValidationFunction(
   descriptor: IValidatorDescriptor,
-  validators: Record<string, Validation | AnyFn<Validation>>
+  validators: Record<string, Validator>
 ): Validation {
-  const validator: Validation | AnyFn<Validation> =
+  const validator: Validator =
     validators[descriptor.operation as ValidatorFunctionExports]
 
   if (!validator) {
@@ -236,7 +236,8 @@ export function fieldValidationDescriptorToValidationFunction(
 }
 
 function deserializeDynamicDefinitions(
-  descriptor: ISerializedDynamicFormFieldDefinitions
+  descriptor: ISerializedDynamicFormFieldDefinitions,
+  validators: Record<string, Validator>
 ): IDynamicFormFieldDefinitions {
   return {
     label: descriptor.label && {
@@ -291,7 +292,7 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
 
 export function deserializeFormField(
   field: SerializedFormField,
-  validators: Record<string, Validation | AnyFn<Validation>>
+  validators: Record<string, Validator>
 ): IFormField {
   const baseFields = {
     ...field,
@@ -316,7 +317,8 @@ export function deserializeFormField(
     return {
       ...baseFields,
       dynamicDefinitions: deserializeDynamicDefinitions(
-        field.dynamicDefinitions
+        field.dynamicDefinitions,
+        validators
       )
     } as IFormFieldWithDynamicDefinitions
   }
@@ -365,7 +367,7 @@ export function deserializeFormField(
 
 export function deserializeFormSection(
   section: ISerializedFormSection,
-  validators: Record<string, Validation | AnyFn<Validation>>
+  validators: Record<string, Validator>
 ): IFormSection {
   const mapping = {
     query:
@@ -402,14 +404,10 @@ export function deserializeFormSection(
 
 export function deserializeForm(
   form: ISerializedForm,
-  countryConfigValidators: Record<string, Validation | AnyFn<Validation>>
+  validators: Record<string, Validator>
 ): IForm {
   const sections = form.sections.map((section) =>
-    deserializeFormSection(section, {
-      // `any` because validators can include functions that aren't "Validation" -type
-      ...(validators as Record<string, any>),
-      ...countryConfigValidators
-    })
+    deserializeFormSection(section, validators)
   )
 
   return {
