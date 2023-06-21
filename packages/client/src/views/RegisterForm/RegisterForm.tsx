@@ -609,7 +609,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ></TimeMounted>
         <Frame
           header={<AppBar title="OpenCRVS" />}
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           {isErrorOccured && (
             <ErrorText id="error_message_section">

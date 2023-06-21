@@ -110,7 +110,9 @@ class SelectVitalEventView extends React.Component<
             }
           />
         }
-        skipToContentText="Skip to main content"
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         <Content
           id="select-vital-event-view"
