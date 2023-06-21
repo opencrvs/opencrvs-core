@@ -79,24 +79,6 @@ export const userSectionFormType: ISerializedFormSection = {
       title: userFormMessages.userDetails,
       fields: [
         {
-          name: 'firstNamesEng',
-          type: TEXT,
-          label: userFormMessages.firstNameEn,
-          required: true,
-          initialValue: '',
-          validator: [{ operation: 'englishOnlyNameFormat' }],
-          mapping: {
-            mutation: {
-              operation: 'fieldToNameTransformer',
-              parameters: ['en', 'firstNames']
-            },
-            query: {
-              operation: 'nameToFieldTransformer',
-              parameters: ['en', 'firstNames']
-            }
-          }
-        },
-        {
           name: 'familyNameEng',
           type: TEXT,
           label: userFormMessages.lastNameEn,
@@ -111,6 +93,24 @@ export const userSectionFormType: ISerializedFormSection = {
             query: {
               operation: 'nameToFieldTransformer',
               parameters: ['en', 'familyName']
+            }
+          }
+        },
+        {
+          name: 'firstNamesEng',
+          type: TEXT,
+          label: userFormMessages.firstNameEn,
+          required: true,
+          initialValue: '',
+          validator: [{ operation: 'englishOnlyNameFormat' }],
+          mapping: {
+            mutation: {
+              operation: 'fieldToNameTransformer',
+              parameters: ['en', 'firstNames']
+            },
+            query: {
+              operation: 'nameToFieldTransformer',
+              parameters: ['en', 'firstNames']
             }
           }
         },

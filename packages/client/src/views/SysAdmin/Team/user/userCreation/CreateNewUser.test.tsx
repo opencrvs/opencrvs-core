@@ -285,13 +285,13 @@ describe('create new user tests', () => {
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_firstNamesEng')
+        .find('#btn_change_familyNameEng')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstNamesEng')
+      expect(history.location.hash).toBe('#familyNameEng')
     })
 
     it('clicking submit button submits the form data', async () => {
