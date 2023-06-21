@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { FHIR_URL } from '@gateway/constants'
+
 import { GQLResolver } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 
@@ -30,7 +30,7 @@ export const resolvers: GQLResolver = {
       return childLocation
     },
     async locationById(_, { locationId }, { headers: authHeader }) {
-      return fetchFHIR(`${FHIR_URL}/Location/${locationId}`, authHeader)
+      return fetchFHIR(`/Location/${locationId}`, authHeader)
     }
   }
 }

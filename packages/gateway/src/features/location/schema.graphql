@@ -26,6 +26,7 @@ input LocationInput {
 
 enum LocationType {
   HEALTH_FACILITY
+  COMMUNITY
   HOSPITAL
   OTHER_HEALTH_INSTITUTION
   ADMIN_STRUCTURE
