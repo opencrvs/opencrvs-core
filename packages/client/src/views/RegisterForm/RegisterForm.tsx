@@ -74,7 +74,7 @@ import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled, { keyframes } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
@@ -88,11 +88,7 @@ import {
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import {
-  buttonMessages,
-  constantsMessages,
-  formMessages
-} from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import {
   DECLARED,
   REJECTED,
@@ -110,6 +106,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -423,7 +420,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration.id)
+    this.props.deleteDeclaration(declaration.id, client)
   }
 
   onCloseDeclaration = () => {
@@ -820,8 +817,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 )}
 
                               <FormFieldGenerator
-                                id={activeSectionGroup.id}
-                                key={activeSectionGroup.id}
+                                id={`${activeSection.id}-${activeSectionGroup.id}`}
+                                key={`${activeSection.id}-${activeSectionGroup.id}`}
                                 onChange={(values) => {
                                   debouncedModifyDeclaration(
                                     values,

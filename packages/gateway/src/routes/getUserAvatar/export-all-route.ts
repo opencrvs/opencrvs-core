@@ -12,7 +12,6 @@
 
 import { getUserAvatarHandler } from '@gateway/routes/getUserAvatar/handler'
 
-// curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/sendVerifyCode
 export default {
   method: 'GET',
   path: '/files/avatar/{userId}.jpg',

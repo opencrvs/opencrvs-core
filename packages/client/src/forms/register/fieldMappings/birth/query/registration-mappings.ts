@@ -32,6 +32,7 @@ import { MessageDescriptor } from 'react-intl'
 import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 
 export function transformStatusData(
@@ -42,7 +43,7 @@ export function transformStatusData(
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   transformedData[sectionId] = {
     ...transformedData[sectionId],
@@ -104,11 +105,7 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].status) {
-    transformStatusData(
-      transformedData,
-      queryData[sectionId].status as GQLRegWorkflow[],
-      sectionId
-    )
+    transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
 
   if (queryData[sectionId].informantsSignature) {
@@ -120,6 +117,22 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].informantsSignatureURI =
       queryData[sectionId].informantsSignatureURI
   }
+}
+
+export function informantTypeTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'informantType'
+  ] = queryData[sectionId].informantType
+    ? (informantMessageDescriptors[
+        queryData[sectionId].informantType
+      ] as MessageDescriptor & Record<string, string>)
+    : ''
 }
 
 export function registrationNumberTransformer(
@@ -363,11 +376,11 @@ export const registrationLocationUserTransformer = (
   targetFieldName?: string,
   offlineData?: IOfflineData
 ) => {
-  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
+  const statusData: GQLRegWorkflow[] = queryData[REGISTRATION_SECTION].status
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   if (!registrationStatus?.office || !offlineData) {
     transformedData[targetSectionId || sectionId][

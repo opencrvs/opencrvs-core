@@ -22,6 +22,7 @@ import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 import getSystems from '@config/handlers/system/systemHandler'
 import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
+import { getDocumentUrl } from '@config/services/documents'
 
 export default async function configHandler(
   request: Hapi.Request,
@@ -36,7 +37,16 @@ export default async function configHandler(
       systems,
       formDataset
     ] = await Promise.all([
-      getActiveCertificatesHandler(request, h),
+      getActiveCertificatesHandler(request, h).then((certs) =>
+        Promise.all(
+          certs.map(async (cert) => ({
+            ...cert,
+            svgCode: await getDocumentUrl(cert.svgCode, {
+              Authorization: request.headers.authorization
+            })
+          }))
+        )
+      ),
       getQuestionsHandler(request, h),
       getFormDrafts(request, h),
       getApplicationConfig(request, h),

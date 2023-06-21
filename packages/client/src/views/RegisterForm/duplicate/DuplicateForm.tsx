@@ -104,6 +104,7 @@ export const DuplicateForm = (props: IProps) => {
   const notADuplicateButton = (
     <Button
       id="not-a-duplicate"
+      key="btn-not-a-duplicate"
       onClick={() => {
         toggleNotDuplicateModal()
       }}
@@ -117,6 +118,7 @@ export const DuplicateForm = (props: IProps) => {
   const markAsDuplicateButton = (
     <Button
       id="mark-as-duplicate"
+      key="btn-mark-as-duplicate"
       onClick={() => {
         toggleModal()
       }}

@@ -76,7 +76,7 @@ const mockUser: IUser & { _id: string } = {
   ]
 }
 
-describe('resetPasswordSMS handler', () => {
+describe('resetPasswordInvite handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -88,10 +88,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -106,10 +105,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -123,10 +121,9 @@ describe('resetPasswordSMS handler', () => {
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/resetPasswordSMS',
+      url: '/resetPasswordInvite',
       payload: {
-        userId: '5d10885374be318fa7689f0b',
-        applicationName: 'opencrvs'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`

@@ -15,19 +15,21 @@ import styled from 'styled-components'
 import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
 import { BackArrow } from '../icons'
-import { Box } from '../Box'
 
-const Container = styled(Box)<{ size: string }>`
+const Container = styled.div<{ size: string }>`
   position: relative;
+  border-radius: 4px;
+  box-sizing: border-box;
   margin: 24px auto;
   max-width: min(
     ${({ size }) => (size === 'large' ? '1140px' : '778px')},
     100% - 24px - 24px
   );
-  box-sizing: border-box;
-
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
+    height: 100%;
     border: 0;
     border-radius: 0;
     max-width: 100%;
@@ -36,16 +38,16 @@ const Container = styled(Box)<{ size: string }>`
 const Header = styled.div`
   position: relative;
   display: flex;
+  justify-content: center;
   flex-direction: column;
-  margin: -24px -24px 24px;
-  padding: 0 24px;
+  padding: 0 20px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0 -16px;
+    margin: 0;
   }
 `
 const TopActionBar = styled.div`
@@ -54,9 +56,9 @@ const TopActionBar = styled.div`
   gap: 8px;
 `
 export const SubHeader = styled.div`
-  padding-bottom: 16px;
+  padding-bottom: 24px;
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg16};
 `
 export const Body = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -64,8 +66,10 @@ export const Body = styled.div`
 `
 const Footer = styled.div`
   display: flex;
-  height: 72px;
-  padding-top: 24px;
+  padding: 24px 20px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 16px;
+  }
 `
 const HeaderBottom = styled.div`
   display: flex;
@@ -101,7 +105,8 @@ const TopBar = styled.div<{ keepShowing?: boolean }>`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 16px 0;
+  min-height: 64px;
+  padding: 12px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ keepShowing }) => {
       return !keepShowing ? 'display:none;' : 'padding:16px;'
@@ -128,22 +133,25 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
-const Title = styled.div<{ truncateOnMobile?: boolean }>`
+const Title = styled.div`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
-
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ truncateOnMobile }) => !truncateOnMobile && 'white-space:normal'}
-  }
+  white-space: nowrap;
 `
 const Icon = styled.div`
+  height: 24px;
   background-color: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
+  }
+`
+
+const Contents = styled.div<{ noPadding?: boolean }>`
+  padding: ${(props) => (props.noPadding ? 0 : '16px 20px')};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: ${(props) => (props.noPadding ? 0 : '16px')};
   }
 `
 
@@ -160,7 +168,7 @@ interface IProps {
   title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
-  truncateTitleOnMobile?: boolean
+  noPadding?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
@@ -180,10 +188,10 @@ export class UnstyledContent extends React.Component<IProps> {
       title,
       titleColor,
       showTitleOnMobile,
-      truncateTitleOnMobile,
       topActionButtons,
       tabBarContent,
       filterContent,
+      noPadding,
       subtitle,
       children,
       bottomActionButtons,
@@ -209,14 +217,7 @@ export class UnstyledContent extends React.Component<IProps> {
             <TopBar keepShowing={showTitleOnMobile}>
               <TitleContainer titleColor={titleColor}>
                 {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-                {title && (
-                  <Title
-                    id={`content-name`}
-                    truncateOnMobile={truncateTitleOnMobile}
-                  >
-                    {title}
-                  </Title>
-                )}
+                {title && <Title id={`content-name`}>{title}</Title>}
               </TitleContainer>
               {topActionButtons && (
                 <TopActionBar>{topActionButtons}</TopActionBar>
@@ -230,9 +231,10 @@ export class UnstyledContent extends React.Component<IProps> {
             </HeaderBottom>
           )}
         </Header>
-        {subtitle && <SubHeader>{subtitle}</SubHeader>}
-        {children && <Body>{children}</Body>}
-
+        <Contents noPadding={noPadding}>
+          {subtitle && <SubHeader>{subtitle}</SubHeader>}
+          {children && <Body>{children}</Body>}
+        </Contents>
         {bottomActionButtons && (
           <Footer>
             <BottomActionBar>{bottomActionButtons}</BottomActionBar>
