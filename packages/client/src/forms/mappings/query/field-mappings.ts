@@ -12,8 +12,6 @@
 import {
   GQLAddress,
   GQLHumanName,
-  GQLLocationType,
-  GQLAddressType,
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
@@ -280,9 +278,6 @@ export const identityToNidVerificationFieldTransformer = (
   }
 
   return transformedData
-}
-interface IAddress {
-  [key: string]: any
 }
 
 export const addressToFieldTransformer =
@@ -1102,8 +1097,8 @@ export const selectTransformer = (
 
 export const nationalityTransformer = (
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: QueryData,
+  sectionId: SectionId,
   field: IFormField,
   _?: IFormField,
   __?: IOfflineData
