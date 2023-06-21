@@ -118,6 +118,7 @@ class SelectVitalEventView extends React.Component<
           title={intl.formatMessage(messages.registerNewEventHeading)}
           bottomActionButtons={[
             <Button
+              key="select-vital-event-continue"
               id="continue"
               type="primary"
               size="large"
