@@ -524,7 +524,6 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
