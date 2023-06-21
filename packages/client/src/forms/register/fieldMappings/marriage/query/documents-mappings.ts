@@ -15,6 +15,7 @@ import {
   marriageDocumentForWhomFhirMapping,
   marriageDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
+import { EventRegistration } from '@client/utils/gateway'
 
 const fieldNameMapping = {
   [marriageDocumentForWhomFhirMapping.GROOM]: 'uploadDocForGroom',
@@ -25,8 +26,8 @@ const fieldNameMapping = {
 
 export function marriageAttachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
   field: IFormField
 ) {
   return attachmentToFieldTransformer(

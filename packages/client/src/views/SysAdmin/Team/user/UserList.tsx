@@ -58,7 +58,6 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -492,8 +491,8 @@ function UserListComponent(props: IProps) {
     const userName =
       (user &&
         user.name &&
-        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+        ((createNamesMap(user.name)[intl.locale] as string) ||
+          (createNamesMap(user.name)[LANG_EN] as string))) ||
       ''
     return userName
   }
@@ -560,12 +559,8 @@ function UserListComponent(props: IProps) {
             const name =
               (user &&
                 user.name &&
-                ((createNamesMap(user.name as GQLHumanName[])[
-                  intl.locale
-                ] as string) ||
-                  (createNamesMap(user.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string))) ||
+                ((createNamesMap(user.name)[intl.locale] as string) ||
+                  (createNamesMap(user.name)[LANG_EN] as string))) ||
               ''
             const role = intl.formatMessage({
               id: getUserRoleIntlKey(user.role._id)
