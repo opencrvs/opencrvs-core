@@ -10,11 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
