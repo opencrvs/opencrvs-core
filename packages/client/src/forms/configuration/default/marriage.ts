@@ -680,6 +680,20 @@ export const marriageRegisterForms: ISerializedForm = {
               },
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'groomPlaceOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
+            },
+            {
+              id: 'groomPlaceOfResidenceAddress',
+              label: {
+                id: 'form.field.label.placeOfResidenceSeparator',
+                defaultMessage: 'Place of residence'
+              }
             }
           ]
         }
@@ -963,6 +977,20 @@ export const marriageRegisterForms: ISerializedForm = {
               },
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'bridePlaceOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
+            },
+            {
+              id: 'bridePlaceOfResidenceAddress',
+              label: {
+                id: 'form.field.label.placeOfResidenceSeparator',
+                defaultMessage: 'Place of residence'
+              }
             }
           ]
         }

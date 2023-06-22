@@ -1228,7 +1228,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (completeValue = (
             <>
               {completeValue}
-              {tagDef[0].delimiter ? (
+              {tagDef[0]?.delimiter ? (
                 <span>{tagDef[0].delimiter}</span>
               ) : (
                 <br />
