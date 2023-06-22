@@ -47,8 +47,7 @@ import {
   IContactPoint,
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  INidVerificationButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -74,9 +73,6 @@ import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
 import _ from 'lodash'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
-import { getPureInitialValueForSelectDynamicValue } from '@client/components/form'
-import { UserDetails } from '@client/utils/userUtils'
-
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -554,8 +550,7 @@ export const getConditionalActionsForField = (
    */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
+  draftData?: IFormData
 ): string[] => {
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
@@ -572,13 +567,6 @@ export const getConditionalActionsForField = (
     selectedInformantAndContactType.selectedContactType === 'FATHER'
       ? true
       : false
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const agentDefaultInitialValue =
-    field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-    field.dynamicOptions.initialValue === 'agentDefault' &&
-    userDetails
-      ? getPureInitialValueForSelectDynamicValue(field, userDetails)
-      : null
   if (!field.conditionals) {
     return []
   }
