@@ -34,6 +34,12 @@ const birthBulletListItemsToDefine: MessageDescriptor[] = [
     defaultMessage:
       'Once I complete the declaration, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for birth'
+  },
+  {
+    id: 'register.eventInfo.birth.listItem2',
+    defaultMessage:
+      'Make sure you collect the certificate. A birth certificate is critical for this child, especially to make their life easy later on. It will help to access health services, school examinations and government benefits.',
+    description: 'Event info bullet list item for birth'
   }
 ]
 
@@ -48,6 +54,12 @@ const deathBulletListItemsToDefine: MessageDescriptor[] = [
     id: 'register.eventInfo.death.listItem1',
     defaultMessage:
       'Once I complete the declaration, it will be sent to the registration office for review.',
+    description: 'Event info bullet list item for death'
+  },
+  {
+    id: 'register.eventInfo.death.listItem2',
+    defaultMessage:
+      'A death certificate is critical to support with inheritance claims and to resolve the affairs of the deceased e.g. closing bank accounts and settling loans.',
     description: 'Event info bullet list item for death'
   }
 ]
