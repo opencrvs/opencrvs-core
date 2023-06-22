@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, ISerializedForm } from '@client/forms/index'
+import {
+  IFormConfig,
+  ISerializedForm,
+  SerializedFormField
+} from '@client/forms/index'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig,
@@ -17,7 +21,8 @@ import {
   getFieldIdentifiers,
   getCustomizedDefaultField,
   getGroupIdentifiers,
-  IFieldIdentifiers
+  IFieldIdentifiers,
+  getConfiguredQuestions
 } from '@client/forms/questionConfig'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
@@ -191,66 +196,50 @@ function getPrecedingFieldIdentifiers(
 }
 
 function getFormWithCustomizedFields(
-  configuredForm: ISerializedForm,
-  defaultForm: ISerializedForm,
-  questionConfigs: IQuestionConfig[]
+  serializedFormFields: SerializedFormField[][],
+  defaultForm: ISerializedForm
 ) {
-  const questionLists = getQuestionConfigLists(questionConfigs)
-
-  questionLists.forEach((list) => {
-    const { sectionIndex, groupIndex, fieldIndex } =
-      getPrecedingFieldIdentifiers(list, configuredForm)
-    configuredForm = {
-      ...configuredForm,
-      sections: configuredForm.sections.map((section, idx) => {
-        if (idx !== sectionIndex) {
-          return section
-        }
-        return {
-          ...section,
-          groups: section.groups.map((group, idx) => {
-            if (idx !== groupIndex) {
-              return group
-            }
-            const modifiedFields = getCustomizedFields(
-              defaultForm,
-              list.questions
-            )
+  return {
+    ...defaultForm,
+    sections: defaultForm.sections.map((section, sectionIndex) => {
+      return {
+        ...section,
+        groups: defaultForm.sections[sectionIndex].groups.map(
+          (group, gIndex) => {
             return {
               ...group,
-              fields: [
-                ...group.fields.slice(0, fieldIndex + 1),
-                ...modifiedFields,
-                ...group.fields.slice(fieldIndex + 1)
-              ]
+              fields: serializedFormFields[sectionIndex].filter((field) => {
+                const { groupIndex } = getFieldIdentifiers(
+                  (field as SerializedFormField & { fieldId: string })
+                    .fieldId || (field.customQuesstionMappingId as string),
+                  defaultForm
+                )
+                return gIndex === groupIndex
+              })
             }
-          })
-        }
-      })
-    }
-  })
-
-  return configuredForm
+          }
+        )
+      }
+    })
+  }
 }
 
 function getConfiguredForm(
+  event: Event,
   defaultForm: ISerializedForm,
   questionConfig: IQuestionConfig[]
 ) {
-  const defaultQuestionConfigs = questionConfig.filter(
-    (question): question is IDefaultQuestionConfig =>
-      isDefaultQuestionConfig(question)
-  )
-  const configuredForm = filterOutDefaultFields(
-    defaultForm,
-    defaultQuestionConfigs
-  )
-
-  return getFormWithCustomizedFields(
-    configuredForm,
+  const serializedQuestions = getConfiguredQuestions(
+    event,
     defaultForm,
     questionConfig
+  ).map((quesionConfigs) => getCustomizedFields(defaultForm, quesionConfigs))
+
+  const formWithCustomFields = getFormWithCustomizedFields(
+    serializedQuestions,
+    defaultForm
   )
+  return formWithCustomFields
 }
 
 function filterOutDisabledFields(
@@ -290,6 +279,7 @@ export function getConfiguredOrDefaultForm(
 
   const form = isConfigurable(status)
     ? getConfiguredForm(
+        event,
         formWithAddresses,
         formConfig.questionConfig.filter(({ fieldId }) =>
           fieldId.startsWith(event)

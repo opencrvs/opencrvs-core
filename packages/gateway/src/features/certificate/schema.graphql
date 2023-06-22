@@ -15,24 +15,29 @@ type CertificateSVG {
   svgDateUpdated: String!
   svgDateCreated: String!
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
 }
 
 input CertificateSVGInput {
-  id: ID!
+  id: ID
   svgCode: String!
   svgFilename: String!
   svgDateUpdated: Int
   svgDateCreated: Int
   user: String!
-  event: String!
-  status: String!
+  event: Event!
+  status: CertificateStatus!
+}
+
+enum CertificateStatus {
+  ACTIVE
+  INACTIVE
 }
 
 type Query {
-  getCertificateSVG(status: String, event: String): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG]
+  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG!]
 }
 
 type Mutation {

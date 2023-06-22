@@ -69,6 +69,8 @@ export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
+export const TIME = 'TIME'
+export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 
 export enum Sort {
   ASC = 'asc',
@@ -158,6 +160,10 @@ export type IDynamicFormFieldToolTipMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
+export type IDynamicFormFieldUnitMapper = (
+  key: string
+) => MessageDescriptor | undefined
+
 export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
@@ -175,6 +181,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
     dependency: string
     tooltipMapper: Operation<typeof labels>
   }
+  unit?: {
+    dependency: string
+    unitMapper: Operation<typeof labels>
+  }
   type?:
     | IStaticFieldType
     | {
@@ -182,7 +192,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
         dependency: string
         typeMapper: Operation<typeof types>
       }
-  validate?: Array<{
+  validator?: Array<{
     dependencies: string[]
     validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
@@ -192,8 +202,9 @@ export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
+  unit?: IDynamicFieldUnit
   type?: IDynamicFieldType | IStaticFieldType
-  validate?: IDynamicFormFieldValidators[]
+  validator?: IDynamicFormFieldValidators[]
 }
 
 export interface IDynamicFieldLabel {
@@ -209,6 +220,11 @@ export interface IDynamicFieldHelperText {
 export interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
+}
+
+export interface IDynamicFieldUnit {
+  dependency: string
+  unitMapper: IDynamicFormFieldUnitMapper
 }
 
 export interface IDynamicFieldType {
@@ -387,6 +403,7 @@ type SerializedSelectFormFieldWithOptions = Omit<
   'options'
 > & {
   options: ISelectOption[] | { resource: string }
+  optionCondition?: string
 }
 
 type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
@@ -398,6 +415,12 @@ type SerializedRadioGroupWithNestedFields = Omit<
   'nestedFields'
 > & {
   nestedFields: { [key: string]: SerializedFormField[] }
+}
+
+export type IMapping = {
+  mutation?: IMutationDescriptor
+  query?: IQueryDescriptor
+  template?: ITemplateDescriptor
 }
 
 export type SerializedFormField = UnionOmit<
@@ -412,14 +435,10 @@ export type SerializedFormField = UnionOmit<
   | SerializedFormFieldWithDynamicDefinitions
   | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
-  'validate' | 'mapping'
+  'validator' | 'mapping'
 > & {
-  validate: IValidatorDescriptor[]
-  mapping?: {
-    mutation?: IMutationDescriptor
-    query?: IQueryDescriptor
-    template?: ITemplateDescriptor
-  }
+  validator: IValidatorDescriptor[]
+  mapping?: IMapping
 }
 export interface IAttachment {
   data: string
@@ -441,10 +460,14 @@ export interface IFormFieldBase {
   label: MessageDescriptor
   helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
+  // Whether or not to run validation functions on the field if it's empty
+  // Default false
+  validateEmpty?: boolean
   prefix?: string
   postfix?: string
+  unit?: MessageDescriptor
   disabled?: boolean
   enabled?: string
   custom?: boolean
@@ -488,6 +511,7 @@ export interface IFormFieldBase {
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
   options: ISelectOption[]
+  optionCondition?: string
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
   type: typeof SELECT_WITH_DYNAMIC_OPTIONS
@@ -548,6 +572,7 @@ export interface INumberFormField extends IFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -663,6 +688,17 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
+export interface ITimeFormFIeld extends IFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
+export interface INidVerificationButton extends IFormFieldBase {
+  type: typeof NID_VERIFICATION_BUTTON
+  labelForVerified: MessageDescriptor
+  labelForUnverified: MessageDescriptor
+  labelForOffline: MessageDescriptor
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -692,6 +728,8 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
+  | ITimeFormFIeld
+  | INidVerificationButton
 
 export interface IPreviewGroup {
   id: string
@@ -1038,12 +1076,13 @@ export interface Ii18nFormFieldBase {
   helperText?: string
   tooltip?: string
   description?: string
-  validate: validators.Validation[]
+  validator: validators.Validation[]
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue
   extraValue?: IFormFieldValue
   postfix?: string
+  unit?: string
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
@@ -1058,6 +1097,7 @@ export interface Ii18nFormFieldBase {
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
+  optionCondition?: string
   options: SelectComponentOption[]
 }
 
@@ -1114,6 +1154,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   step?: number
   max?: number
   inputFieldWidth?: string
+  inputWidth?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
@@ -1211,7 +1252,18 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   errorText: string
   networkErrorText: string
 }
+export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
+  type: typeof NID_VERIFICATION_BUTTON
+  onClick: () => void
+  labelForVerified: string
+  labelForUnverified: string
+  labelForOffline: string
+}
 
+export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
+  type: typeof TIME
+  ignorePlaceHolder?: boolean
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1238,6 +1290,8 @@ export type Ii18nFormField =
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
+  | Ii18nTimeFormField
+  | Ii18nNidVerificationButtonField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1298,7 +1352,9 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
-    DYNAMIC_LIST: messages.dynamicList
+    DYNAMIC_LIST: messages.dynamicList,
+    TIME: messages.time,
+    NID_VERIFICATION_BUTTON: messages.nidVerificationButton
   }
 
   return labelDict[type]

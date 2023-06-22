@@ -122,16 +122,16 @@ export async function getNumberOfAppStartedByPractitioners(
                   OR locationLevel3 = $locationId
                   OR locationLevel4 = $locationId
                   OR locationLevel5 = $locationId ) 
-              $eventClause
-              $statusClause    
+              ${eventClause}
+              ${statusClause}    
               GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause,
-        statusClause
+        event,
+        status
       }
     }
   )
@@ -164,14 +164,13 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
                     OR locationLevel3 = $locationId
                     OR locationLevel4 = $locationId
                     OR locationLevel5 = $locationId ) 
-                $eventClause
+                ${eventClause}
                 GROUP BY startedBy`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause,
         event
       }
     }
@@ -210,14 +209,15 @@ export async function getAvgTimeSpentOnAppByPractitioners(
                         OR locationLevel3 = $locationId
                         OR locationLevel4 = $locationId
                         OR locationLevel5 = $locationId ) 
-                    $eventClause
+                    ${eventClause}
                     GROUP BY practitionerId`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         locationId,
-        eventClause
+        event,
+        status
       }
     }
   )

@@ -37,6 +37,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             id
             type
             otherType
+            fieldsModifiedByIdentity
           }
           name {
             use
@@ -81,6 +82,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           id
           type
           otherType
+          fieldsModifiedByIdentity
         }
         address {
           type
@@ -117,6 +119,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           id
           type
           otherType
+          fieldsModifiedByIdentity
         }
         address {
           type
@@ -212,6 +215,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -439,6 +446,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
               district
               state
             }
+            partOf
           }
         }
         trackingId
@@ -482,6 +490,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name

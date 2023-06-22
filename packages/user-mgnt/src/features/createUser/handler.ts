@@ -111,15 +111,25 @@ export default async function createUser(
     logger.error(err)
     await rollbackCreateUser(token, practitionerId, roleId)
     if (err.code === 11000) {
-      return h.response().code(403)
+      // check if phone or email has thrown unique constraint errors
+      const errorThrowingProperty =
+        err.keyPattern && Object.keys(err.keyPattern)[0]
+      return h.response({ errorThrowingProperty }).code(403)
     }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
-    Authorization: request.headers.authorization
-  })
+  sendCredentialsNotification(
+    user.name,
+    user.username,
+    autoGenPassword,
+    {
+      Authorization: request.headers.authorization
+    },
+    user.mobile,
+    user.emailForNotification
+  )
 
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress

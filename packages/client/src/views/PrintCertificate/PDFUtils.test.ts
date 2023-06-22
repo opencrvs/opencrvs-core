@@ -13,7 +13,11 @@ import {
   previewCertificate,
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
-import { mockDeathDeclarationData, mockOfflineData } from '@client/tests/util'
+import {
+  createTestStore,
+  mockDeathDeclarationData,
+  mockOfflineData
+} from '@client/tests/util'
 import { createIntl } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { omit } from 'lodash'
@@ -25,8 +29,9 @@ const intl = createIntl({
 })
 
 describe('PDFUtils related tests', () => {
-  it('Throws exception if invalid userDetails found for previewCertificate', () => {
+  it('Throws exception if invalid userDetails found for previewCertificate', async () => {
     const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
+    const { store } = await createTestStore()
     expect(
       previewCertificate(
         intl,
@@ -37,7 +42,8 @@ describe('PDFUtils related tests', () => {
         },
         null,
         mockOfflineData,
-        (pdf: string) => {}
+        (pdf: string) => {},
+        store.getState()
       )
     ).rejects.toThrowError('No user details found')
   })

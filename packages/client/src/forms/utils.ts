@@ -44,7 +44,10 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
-  IContactPoint
+  IContactPoint,
+  ISelectFormFieldWithOptions,
+  NID_VERIFICATION_BUTTON,
+  INidVerificationButton
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -56,8 +59,7 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData,
-  LocationType
+  IOfflineData
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -66,7 +68,6 @@ import {
 } from '@client/utils/validate'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
-import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
@@ -112,6 +113,7 @@ export const internationaliseFieldObject = (
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
+    unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
   }
@@ -154,6 +156,18 @@ export const internationaliseFieldObject = (
     )
     ;(base as any).errorTitle = intl.formatMessage(
       (field as ILoaderButton).errorTitle
+    )
+  }
+
+  if (base.type === NID_VERIFICATION_BUTTON) {
+    ;(base as any).labelForVerified = intl.formatMessage(
+      (field as INidVerificationButton).labelForVerified
+    )
+    ;(base as any).labelForUnverified = intl.formatMessage(
+      (field as INidVerificationButton).labelForUnverified
+    )
+    ;(base as any).labelForOffline = intl.formatMessage(
+      (field as INidVerificationButton).labelForOffline
     )
   }
 
@@ -237,26 +251,26 @@ export const getFieldValidation = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): Validation[] => {
-  const validate: Validation[] = []
+  const validator: Validation[] = []
   if (
     field.dynamicDefinitions &&
-    field.dynamicDefinitions.validate &&
-    field.dynamicDefinitions.validate.length > 0
+    field.dynamicDefinitions.validator &&
+    field.dynamicDefinitions.validator.length > 0
   ) {
-    field.dynamicDefinitions.validate.map(
+    field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
         )
         const fun = element.validator(...params)
-        validate.push(fun)
+        validator.push(fun)
         return element
       }
     )
   }
 
-  return validate
+  return validator
 }
 
 export function getNextSectionIds(
@@ -307,10 +321,20 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithDynamicOptions,
+  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData
 ) => {
+  if (field.type === SELECT_WITH_OPTIONS) {
+    if (field.optionCondition) {
+      // eslint-disable-next-line no-eval
+      const conditionEvaluator = eval(field.optionCondition!)
+      return field.options.filter(conditionEvaluator)
+    }
+
+    return field.options
+  }
+
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   if (!field.dynamicOptions.dependency) {
     throw new Error(
@@ -546,6 +570,7 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
+
   return (
     field.conditionals
       // eslint-disable-next-line no-eval

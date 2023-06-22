@@ -717,6 +717,7 @@ export async function updatePatientIdentifierWithRN(
 interface Integration {
   name: string
   status: string
+  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
 }
 
 const statuses = {
@@ -764,7 +765,7 @@ export async function validateDeceasedDetails(
   )
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
-      return integration.name === 'MOSIP'
+      return integration.integratingSystemType === 'MOSIP'
     })[0]
     if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
@@ -809,7 +810,7 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.type === 'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )

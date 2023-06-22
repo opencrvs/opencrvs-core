@@ -111,6 +111,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
+import { client } from '@client/utils/apolloClient'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -463,7 +464,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration.id)
+    this.props.deleteDeclaration(declaration.id, client)
   }
 
   onCloseDeclaration = () => {
@@ -627,6 +628,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup,
       declaration
     )
+
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const menuItemDeleteOrClose =
@@ -834,8 +836,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               </Alert>
                             )}
                           <FormFieldGenerator
-                            id={activeSectionGroup.id}
-                            key={activeSectionGroup.id}
+                            id={`${activeSection.id}-${activeSectionGroup.id}`}
+                            key={`${activeSection.id}-${activeSectionGroup.id}`}
                             onChange={(values) => {
                               debouncedModifyDeclaration(
                                 values,
@@ -952,7 +954,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               messages.saveDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
-
           <ResponsiveModal
             id="delete_declaration_confirmation"
             title={intl.formatMessage(

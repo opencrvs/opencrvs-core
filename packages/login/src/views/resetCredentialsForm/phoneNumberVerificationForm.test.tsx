@@ -64,7 +64,9 @@ const server = setupServer(
 )
 
 // Enable API mocking before tests.
-beforeAll(() => server.listen())
+beforeAll(() => {
+  server.listen()
+})
 
 // Reset any runtime request handlers we may add during the tests.
 afterEach(() => server.resetHandlers())
@@ -75,7 +77,7 @@ afterAll(() => server.close())
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
   let history: History
-
+  window.config.USER_NOTIFICATION_DELIVERY_METHOD = 'sms'
   beforeEach(async () => {
     const testApp = await createTestApp()
     app = testApp.app
@@ -123,7 +125,9 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '123' } })
-      expect(app.find('#phone-number_error').hostNodes()).toHaveLength(1)
+      expect(
+        app.find('#phone-or-email-for-notification_error').hostNodes()
+      ).toHaveLength(1)
     })
 
     it("continue button doesn't forward to next form when invalid phone number is given", () => {

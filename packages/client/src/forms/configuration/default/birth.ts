@@ -18,6 +18,32 @@ import {
   birthDocumentForWhomFhirMapping,
   birthDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import { IntegratingSystemType } from '@client/utils/gateway'
+
+const nidIntegrationConditionals = {
+  hideIfNidIntegrationEnabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+        offlineCountryConfig &&
+        offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
+        nationalIdSystem &&
+        nationalIdSystem.settings.openIdProviderBaseUrl &&
+        nationalIdSystem.settings.openIdProviderClientId &&
+        nationalIdSystem.settings.openIdProviderClaims;
+    `
+  },
+  hideIfNidIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+      offlineCountryConfig &&
+      offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
+      !nationalIdSystem ||
+      !nationalIdSystem.settings.openIdProviderBaseUrl ||
+      !nationalIdSystem.settings.openIdProviderClientId ||
+      !nationalIdSystem.settings.openIdProviderClaims;
+    `
+  }
+}
 
 export const birthRegisterForms: ISerializedForm = {
   sections: [
@@ -42,44 +68,44 @@ export const birthRegisterForms: ISerializedForm = {
               required: true,
               hideInPreview: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               options: [
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDFATHER',
-                  label: informantMessageDescriptors.grandfather
+                  label: informantMessageDescriptors.GRANDFATHER
                 },
                 {
                   value: 'GRANDMOTHER',
-                  label: informantMessageDescriptors.grandmother
+                  label: informantMessageDescriptors.GRANDMOTHER
                 },
                 {
                   value: 'BROTHER',
-                  label: informantMessageDescriptors.brother
+                  label: informantMessageDescriptors.BROTHER
                 },
                 {
                   value: 'SISTER',
-                  label: informantMessageDescriptors.sister
+                  label: informantMessageDescriptors.SISTER
                 },
                 {
                   value: 'OTHER_FAMILY_MEMBER',
-                  label: informantMessageDescriptors.otherFamilyMember
+                  label: informantMessageDescriptors.OTHER_FAMILY_MEMBER
                 },
                 {
                   value: 'LEGAL_GUARDIAN',
-                  label: informantMessageDescriptors.legalGuardian
+                  label: informantMessageDescriptors.LEGAL_GUARDIAN
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -100,7 +126,7 @@ export const birthRegisterForms: ISerializedForm = {
                     placeholder: formMessageDescriptors.relationshipPlaceHolder,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'englishOnlyNameFormat'
                       }
@@ -156,45 +182,45 @@ export const birthRegisterForms: ISerializedForm = {
               required: true,
               hideHeader: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDFATHER',
-                  label: informantMessageDescriptors.grandfather
+                  label: informantMessageDescriptors.GRANDFATHER
                 },
                 {
                   value: 'GRANDMOTHER',
-                  label: informantMessageDescriptors.grandmother
+                  label: informantMessageDescriptors.GRANDMOTHER
                 },
                 {
                   value: 'BROTHER',
-                  label: informantMessageDescriptors.brother
+                  label: informantMessageDescriptors.BROTHER
                 },
                 {
                   value: 'SISTER',
-                  label: informantMessageDescriptors.sister
+                  label: informantMessageDescriptors.SISTER
                 },
                 {
                   value: 'OTHER_FAMILY_MEMBER',
-                  label: informantMessageDescriptors.otherFamilyMember
+                  label: informantMessageDescriptors.OTHER_FAMILY_MEMBER
                 },
                 {
                   value: 'LEGAL_GUARDIAN',
-                  label: informantMessageDescriptors.legalGuardian
+                  label: informantMessageDescriptors.LEGAL_GUARDIAN
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -205,7 +231,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -241,7 +267,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -277,7 +303,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -313,7 +339,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -349,7 +375,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -385,7 +411,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -421,7 +447,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -457,7 +483,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -493,7 +519,7 @@ export const birthRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -544,6 +570,10 @@ export const birthRegisterForms: ISerializedForm = {
             operation: 'registrationNumberTransformer'
           },
           {
+            fieldName: 'informantType',
+            operation: 'informantTypeTransformer'
+          },
+          {
             fieldName: 'qrCode',
             operation: 'QRCodeTransformerTransformer'
           },
@@ -560,6 +590,17 @@ export const birthRegisterForms: ISerializedForm = {
             operation: 'certificateDateTransformer',
             parameters: ['en', 'dd MMMM yyyy']
           },
+          {
+            fieldName: 'registrar',
+            operation: 'userTransformer',
+            parameters: ['REGISTERED']
+          },
+          {
+            fieldName: 'registrationAgent',
+            operation: 'userTransformer',
+            parameters: ['VALIDATED']
+          },
+          // backward compatibility
           {
             fieldName: 'registrarName',
             operation: 'registrarNameUserTransformer'
@@ -607,7 +648,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.dateOfBirth,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'isValidChildBirthDate'
                 }
@@ -637,7 +678,7 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -667,7 +708,7 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -695,7 +736,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.sex,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               mapping: {
                 template: {
@@ -728,7 +769,7 @@ export const birthRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: []
             },
             {
@@ -738,7 +779,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.attendantAtBirth,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -798,7 +839,7 @@ export const birthRegisterForms: ISerializedForm = {
               },
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -845,7 +886,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [0, 6]
@@ -875,7 +916,7 @@ export const birthRegisterForms: ISerializedForm = {
               previewGroup: 'placeOfBirth',
               ignoreBottomMargin: true,
               initialValue: '',
-              validate: []
+              validator: []
             },
             {
               name: 'placeOfBirth',
@@ -886,7 +927,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.placeOfBirth,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -926,7 +967,7 @@ export const birthRegisterForms: ISerializedForm = {
               dynamicOptions: {
                 resource: 'facilities'
               },
-              validate: [
+              validator: [
                 {
                   operation: 'facilityMustBeSelected'
                 }
@@ -973,7 +1014,7 @@ export const birthRegisterForms: ISerializedForm = {
         description: 'Form section name for Informant',
         id: 'form.section.informant.name'
       },
-      title: formMessageDescriptors.informantTitle,
+      title: formMessageDescriptors.birthInformantTitle,
       hasDocumentSection: true,
       groups: [
         {
@@ -995,7 +1036,7 @@ export const birthRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -1032,7 +1073,7 @@ export const birthRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -1050,7 +1091,9 @@ export const birthRegisterForms: ISerializedForm = {
                   parameters: ['father.iD']
                 }
               ],
-              conditionals: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationEnabled
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1080,13 +1123,47 @@ export const birthRegisterForms: ISerializedForm = {
               }
             },
             {
+              name: 'informantNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validator: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
+            },
+            {
               name: 'informantBirthDate',
               type: 'DATE',
               label: formMessageDescriptors.dateOfBirth,
               required: true,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -1100,6 +1177,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                 }
               ],
               mapping: {
@@ -1143,7 +1224,7 @@ export const birthRegisterForms: ISerializedForm = {
               required: false,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1171,7 +1252,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.ageOfInformant,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [12, 120]
@@ -1208,9 +1289,15 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -1250,9 +1337,15 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {
@@ -1291,7 +1384,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'informantNameInEnglish',
               label: {
-                defaultMessage: "Informant's fullname",
+                defaultMessage: 'Full name',
                 description: "Label for informant's name in english",
                 id: 'form.preview.group.label.informant.english.name'
               },
@@ -1329,7 +1422,7 @@ export const birthRegisterForms: ISerializedForm = {
               uncheckedValue: true,
               hideHeader: true,
               initialValue: true,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1357,7 +1450,7 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               type: 'TEXT',
               label: formMessageDescriptors.reasonNA,
-              validate: [],
+              validator: [],
               initialValue: '',
               customisable: true,
               required: true,
@@ -1377,7 +1470,7 @@ export const birthRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -1409,7 +1502,7 @@ export const birthRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -1424,7 +1517,8 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
-                }
+                },
+                nidIntegrationConditionals.hideIfNidIntegrationEnabled
               ],
               mapping: {
                 template: {
@@ -1443,6 +1537,38 @@ export const birthRegisterForms: ISerializedForm = {
               }
             },
             {
+              name: 'motherNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validator: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `values.motherNidVerification`
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'nidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
+            },
+            {
               name: 'motherBirthDate',
               type: 'DATE',
               label: formMessageDescriptors.dateOfBirth,
@@ -1455,11 +1581,15 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('motherBirthDate')`
                 }
               ],
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -1501,7 +1631,7 @@ export const birthRegisterForms: ISerializedForm = {
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1524,7 +1654,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.ageOfMother,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [12, 120]
@@ -1556,7 +1686,7 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1566,6 +1696,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -1594,12 +1728,16 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.mother?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -1630,7 +1768,7 @@ export const birthRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1650,7 +1788,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               mapping: {
                 template: {
@@ -1734,7 +1872,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'greaterThanZero'
                 },
@@ -1761,7 +1899,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1783,7 +1921,7 @@ export const birthRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1843,7 +1981,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'motherNameInEnglish',
               label: {
-                defaultMessage: "Mother's English name",
+                defaultMessage: 'Full name',
                 description: "Group label for mother's name in english",
                 id: 'form.preview.group.label.mother.english.name'
               },
@@ -1886,7 +2024,7 @@ export const birthRegisterForms: ISerializedForm = {
               uncheckedValue: true,
               hideHeader: true,
               initialValue: true,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1915,7 +2053,7 @@ export const birthRegisterForms: ISerializedForm = {
               type: 'TEXT',
               label: formMessageDescriptors.reasonNA,
               customisable: true,
-              validate: [],
+              validator: [],
               initialValue: '',
               required: true,
               mapping: {
@@ -1934,7 +2072,7 @@ export const birthRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -1966,7 +2104,7 @@ export const birthRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -1981,7 +2119,8 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
-                }
+                },
+                nidIntegrationConditionals.hideIfNidIntegrationEnabled
               ],
               mapping: {
                 template: {
@@ -2000,12 +2139,44 @@ export const birthRegisterForms: ISerializedForm = {
               }
             },
             {
+              name: 'fatherNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validator: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'hide',
+                  expression:
+                    '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `values.fatherNidVerification`
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'nidVerificationFieldToIdentityTransformer'
+                },
+                query: {
+                  operation: 'identityToNidVerificationFieldTransformer'
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
+            },
+            {
               name: 'fatherBirthDate',
               type: 'DATE',
               label: formMessageDescriptors.dateOfBirth,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -2028,6 +2199,10 @@ export const birthRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('fatherBirthDate')`
                 }
               ],
               mapping: {
@@ -2058,7 +2233,7 @@ export const birthRegisterForms: ISerializedForm = {
               hideInPreview: true,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -2081,7 +2256,7 @@ export const birthRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.ageOfFather,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [12, 120]
@@ -2113,7 +2288,7 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -2123,6 +2298,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -2149,7 +2328,7 @@ export const birthRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -2159,6 +2338,10 @@ export const birthRegisterForms: ISerializedForm = {
                   action: 'hide',
                   expression:
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.father?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {
@@ -2187,7 +2370,7 @@ export const birthRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -2207,7 +2390,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               conditionals: [
                 {
@@ -2284,7 +2467,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -2306,7 +2489,7 @@ export const birthRegisterForms: ISerializedForm = {
               customisable: true,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               conditionals: [
                 {
@@ -2367,7 +2550,7 @@ export const birthRegisterForms: ISerializedForm = {
             {
               id: 'fatherNameInEnglish',
               label: {
-                defaultMessage: "Father's fullname",
+                defaultMessage: 'Full name',
                 description: "Group label for father's name in english",
                 id: 'form.preview.group.label.father.english.name'
               },
@@ -2401,7 +2584,7 @@ export const birthRegisterForms: ISerializedForm = {
               type: 'PARAGRAPH',
               label: formMessageDescriptors.documentsParagraph,
               initialValue: '',
-              validate: []
+              validator: []
             },
             {
               name: 'uploadDocForChildDOB',
@@ -2410,7 +2593,7 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: birthDocumentForWhomFhirMapping.CHILD,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
@@ -2433,7 +2616,7 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: birthDocumentForWhomFhirMapping.MOTHER,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2476,7 +2659,7 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: birthDocumentForWhomFhirMapping.FATHER,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2519,7 +2702,7 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: birthDocumentTypeFhirMapping.NATIONAL_ID,
@@ -2561,7 +2744,7 @@ export const birthRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value:

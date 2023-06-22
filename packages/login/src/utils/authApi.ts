@@ -51,7 +51,8 @@ export const client = axios.create({
 export interface IAuthenticateResponse {
   nonce: string
   token?: string
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 export enum QUESTION_KEYS {
@@ -65,6 +66,10 @@ export enum QUESTION_KEYS {
   FIRST_CHILD_NAME = 'FIRST_CHILD_NAME'
 }
 
+export enum NotificationEvent {
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  PASSWORD_RESET = 'PASSWORD_RESET'
+}
 export interface ITokenResponse {
   token: string
 }
@@ -105,11 +110,18 @@ const authenticate = (data: IAuthenticationData) => {
   })
 }
 
-const resendSMS = (nonce: string, retrievalFlow = false) => {
+const resendAuthenticationCode = (
+  nonce: string,
+  notificationEvent: NotificationEvent,
+  retrievalFlow = false
+) => {
   return request({
-    url: new URL('/resendSms', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      '/resendAuthenticationCode',
+      window.config.AUTH_API_URL
+    ).toString(),
     method: 'POST',
-    data: { nonce, retrievalFlow }
+    data: { nonce, notificationEvent, retrievalFlow }
   })
 }
 
@@ -126,14 +138,19 @@ interface IUserVerifyResponse {
   securityQuestionKey?: string
 }
 
-const verifyUser = (
-  mobile: string,
+interface IUserVerificationDetails {
+  mobile?: string
+  email?: string
   retrieveFlow: string
+}
+
+const verifyUser = (
+  verificationDetails: IUserVerificationDetails
 ): Promise<IUserVerifyResponse> => {
   return request({
     url: new URL('verifyUser', window.config.AUTH_API_URL).toString(),
     method: 'POST',
-    data: { mobile, retrieveFlow }
+    data: verificationDetails
   })
 }
 
@@ -192,7 +209,7 @@ export const authApi = {
   request,
   authenticate,
   verifyCode,
-  resendSMS,
+  resendAuthenticationCode,
   verifyNumber,
   verifyUser,
   verifySecurityAnswer,
