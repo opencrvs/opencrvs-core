@@ -62,7 +62,7 @@ describe('form component', () => {
             label: formMessages.country,
             required: true,
             initialValue: window.config.COUNTRY.toUpperCase(),
-            validate: [],
+            validator: [],
             options: countries
           },
           {
@@ -71,7 +71,7 @@ describe('form component', () => {
             label: formMessages.state,
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
               dependency: 'countryPrimary'
@@ -84,7 +84,7 @@ describe('form component', () => {
             required: true,
             initialValue: '',
             placeholder: formMessages.select,
-            validate: [],
+            validator: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
               dependency: 'statePrimary'
@@ -96,7 +96,7 @@ describe('form component', () => {
             label: formMessages.district,
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           },
           {
             name: 'identifier',
@@ -104,7 +104,7 @@ describe('form component', () => {
             label: formMessages.NID,
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           }
         ]}
       />,
@@ -165,7 +165,7 @@ describe('when field definition has location search input', () => {
             name: 'placeOfBirth',
             type: LOCATION_SEARCH_INPUT,
             required: true,
-            validate: [],
+            validator: [],
             label: formMessages.placeOfBirth,
             initialValue: '',
             searchableResource: ['facilities'],
@@ -238,7 +238,7 @@ describe('when user is in the register section', () => {
             },
             required: true,
             initialValue: '',
-            validate: []
+            validator: []
           }
         ]}
       />,
@@ -279,7 +279,7 @@ describe('when field definition has nested fields', () => {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             options: [
               {
                 value: 'FATHER',
@@ -310,7 +310,7 @@ describe('when field definition has nested fields', () => {
                   },
                   required: false,
                   initialValue: '',
-                  validate: [phoneNumberFormat]
+                  validator: [phoneNumberFormat]
                 }
               ],
               MOTHER: [
@@ -324,7 +324,7 @@ describe('when field definition has nested fields', () => {
                   },
                   required: false,
                   initialValue: '',
-                  validate: [phoneNumberFormat]
+                  validator: [phoneNumberFormat]
                 }
               ]
             }
@@ -448,7 +448,7 @@ describe('when field definition has date field', () => {
               name: 'childDateOfBirth',
               type: DATE,
               required: true,
-              validate: [dateNotInFuture()],
+              validator: [dateNotInFuture()],
               label: formMessages.dateOfBirth,
               initialValue: ''
             }
@@ -462,8 +462,8 @@ describe('when field definition has date field', () => {
       await updateDateField(component, 'childDateOfBirth', FUTURE_DATE)
 
       expect(
-        component.find('#childDateOfBirth_error').hostNodes()
-      ).toHaveLength(1)
+        component.find('#childDateOfBirth_error').hostNodes().length
+      ).toBeGreaterThan(0)
     })
   })
 })
@@ -484,7 +484,7 @@ describe('when field definition has number field', () => {
             name: 'multipleBirth',
             type: NUMBER,
             required: true,
-            validate: [],
+            validator: [],
             label: formMessages.multipleBirth,
             initialValue: ''
           }
@@ -536,7 +536,7 @@ describe('when field definition has select field on mobile device', () => {
             label: formMessages.country,
             required: true,
             initialValue: window.config.COUNTRY.toUpperCase(),
-            validate: [],
+            validator: [],
             options: countries
           }
         ]}

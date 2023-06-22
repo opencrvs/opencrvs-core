@@ -37,9 +37,11 @@ type Query {
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String
+    email: String
     status: String
     systemRole: String
     primaryOfficeId: String
@@ -242,6 +244,12 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
+  changeEmail(
+    userId: String!
+    email: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
   changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
@@ -249,9 +257,9 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
-  resetPasswordSMS(userId: String!, applicationName: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
+  resetPasswordInvite(userId: String!): String
   updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
@@ -427,7 +435,7 @@ type User {
   practitionerId: String!
   name: [HumanName!]!
   username: String
-  mobile: String!
+  mobile: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
@@ -777,7 +785,7 @@ input UserInput {
   name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String!
+  mobile: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -814,7 +822,7 @@ input SystemRoleInput {
 }
 
 input CertificateSVGInput {
-  id: ID!
+  id: ID
   svgCode: String!
   svgFilename: String!
   svgDateUpdated: Int
@@ -1148,6 +1156,7 @@ type Identifier {
 
 enum LocationType {
   HEALTH_FACILITY
+  COMMUNITY
   HOSPITAL
   OTHER_HEALTH_INSTITUTION
   ADMIN_STRUCTURE
@@ -1546,18 +1555,32 @@ input QuestionInput {
   label: [MesssageInput!]
   placeholder: [MesssageInput!]
   description: [MesssageInput!]
+  helperText: [MesssageInput!]
   tooltip: [MesssageInput!]
+  unit: [MesssageInput!]
   errorMessage: [MesssageInput!]
+  initialValue: String
   maxLength: Int
+  inputWidth: Int
   fieldName: String
   fieldType: CustomFieldType
   precedingFieldId: String!
+  validateEmpty: Boolean
   required: Boolean
   enabled: String
   custom: Boolean
+  ignoreBottomMargin: Boolean
   conditionals: [ConditionalInput!]
   datasetId: String
   options: [CustomSelectOption!]
+  validator: [ValidatorInput!]
+  mapping: MappingInput
+  extraValue: String
+  dynamicOptions: DynamicOptionInput
+  hideInPreview: Boolean
+  optionCondition: String
+  hideHeader: Boolean
+  previewGroup: String
 }
 
 input SystemSettingsInput {
@@ -2062,6 +2085,8 @@ enum CustomFieldType {
   SUBSECTION
   PARAGRAPH
   SELECT_WITH_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS
+  TIME
 }
 
 input ConditionalInput {
@@ -2072,6 +2097,22 @@ input ConditionalInput {
 input CustomSelectOption {
   value: String!
   label: MesssageDescriptorInput!
+}
+
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
+input DynamicOptionInput {
+  resource: String
+  dependency: String!
+  jurisdictionType: String
 }
 
 type Payment {
@@ -2129,6 +2170,10 @@ input MesssageDescriptorInput {
   id: String!
   description: String
   defaultMessage: String!
+}
+
+input Operation {
+  operation: String!
 }
 
 enum PaymentType {

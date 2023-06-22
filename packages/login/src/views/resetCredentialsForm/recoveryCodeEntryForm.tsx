@@ -14,7 +14,7 @@ import {
   goToPhoneNumberVerificationForm,
   goToSecurityQuestionForm
 } from '@login/login/actions'
-import { authApi } from '@login/utils/authApi'
+import { NotificationEvent, authApi } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import * as React from 'react'
@@ -42,7 +42,12 @@ interface BaseProps
   extends RouteComponentProps<
     {},
     {},
-    { forgottenItem: FORGOTTEN_ITEMS; nonce: string; mobile: string }
+    {
+      forgottenItem: FORGOTTEN_ITEMS
+      nonce: string
+      mobile?: string
+      email?: string
+    }
   > {
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
@@ -52,7 +57,7 @@ interface State {
   recoveryCode: string
   touched: boolean
   error: boolean
-  resentSMS: boolean
+  resentAuthenticationCode: boolean
 }
 
 type Props = BaseProps & WrappedComponentProps
@@ -64,7 +69,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
       recoveryCode: '',
       touched: false,
       error: true,
-      resentSMS: false
+      resentAuthenticationCode: false
     }
   }
 
@@ -73,7 +78,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
       error: value.length !== 6,
       recoveryCode: value,
       touched: true,
-      resentSMS: false
+      resentAuthenticationCode: false
     })
   }
 
@@ -99,15 +104,20 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     }
   }
 
-  resendSMS = async () => {
-    await authApi.resendSMS(this.props.location.state.nonce, true)
-    this.setState({ resentSMS: true })
+  resendAuthenticationCode = async (notificationEvent: NotificationEvent) => {
+    await authApi.resendAuthenticationCode(
+      this.props.location.state.nonce,
+      notificationEvent,
+      true
+    )
+    this.setState({ resentAuthenticationCode: true })
   }
   render() {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
-
-    const { resentSMS } = this.state
+    const { resentAuthenticationCode } = this.state
+    const notificationEvent = NotificationEvent.PASSWORD_RESET
+    const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
     return (
       <>
@@ -156,16 +166,22 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 messages.recoveryCodeEntryFormBodyHeader
               )}
               subtitle={intl.formatMessage(
-                messages.recoveryCodeEntryFormBodySubheader,
+                notificationMethod === 'sms'
+                  ? messages.recoveryCodeEntryFormBodySubheaderMobile
+                  : messages.recoveryCodeEntryFormBodySubheaderEmail,
                 {
                   link: (
                     <Link
-                      onClick={this.resendSMS}
+                      onClick={() => {
+                        this.resendAuthenticationCode(notificationEvent)
+                      }}
                       id="retrieve-login-mobile-resend"
                       font="bold16"
                       type="button"
                     >
-                      {intl.formatMessage(messages.resend)}
+                      {intl.formatMessage(messages.resend, {
+                        notificationMethod
+                      })}
                     </Link>
                   )
                 }
@@ -182,10 +198,13 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 </Button>
               ]}
             >
-              {resentSMS && (
+              {resentAuthenticationCode && (
                 <Toast type="success">
                   {intl.formatMessage(messages.resentSMS, {
-                    number: this.props.location.state.mobile
+                    number:
+                      notificationMethod === 'sms'
+                        ? this.props.location.state.mobile
+                        : this.props.location.state.email
                   })}
                 </Toast>
               )}
@@ -203,14 +222,14 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                       ? this.props.intl.formatMessage(messages.error)
                       : ''
                   }
-                  hideAsterisk={true}
+                  hideAsterisk
                 >
                   <TextInput
                     id="recovery-code-input"
                     type="number"
                     key="recoveryCodeInputField"
                     name="recoveryCodeInput"
-                    isSmallSized={true}
+                    isSmallSized
                     value={this.state.recoveryCode}
                     onChange={(e) => this.handleChange(e.target.value)}
                     touched={this.state.touched}

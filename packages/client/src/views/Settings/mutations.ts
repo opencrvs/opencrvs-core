@@ -27,3 +27,19 @@ export const changePhoneMutation = gql`
     )
   }
 `
+
+export const changeEmailMutation = gql`
+  mutation changeEmail(
+    $userId: String!
+    $email: String!
+    $nonce: String!
+    $verifyCode: String!
+  ) {
+    changeEmail(
+      userId: $userId
+      email: $email
+      nonce: $nonce
+      verifyCode: $verifyCode
+    )
+  }
+`
