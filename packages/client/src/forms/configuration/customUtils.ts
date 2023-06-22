@@ -28,6 +28,7 @@ import {
   MOTHER_DETAILS_DONT_EXIST
 } from './administrative/addresses'
 import { CustomFieldType } from '@client/utils/gateway'
+import { countries } from '@client/forms/countries'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -109,14 +110,18 @@ export function createCustomField({
     validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
-    options: (options || []).map((option) => {
-      return {
-        ...option,
-        label: Array.isArray(option.label)
-          ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
-          : option.label
-      }
-    }),
+    options: Array.isArray(options)
+      ? (options || []).map((option) => {
+          return {
+            ...option,
+            label: Array.isArray(option.label)
+              ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+              : option.label
+          }
+        })
+      : options?.resource
+      ? countries
+      : [],
     dynamicOptions: {},
     hideHeader,
     disabled,
@@ -185,15 +190,18 @@ export function createCustomField({
     baseField.dynamicOptions = dynamicOptions || { dependency: undefined }
   }
   if (baseField.type === CustomFieldType.SelectWithOptions) {
-    baseField.options =
-      options?.map((option) => {
-        return {
-          ...option,
-          label: Array.isArray(option.label)
-            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
-            : option.label
-        }
-      }) || []
+    baseField.options = Array.isArray(options)
+      ? options?.map((option) => {
+          return {
+            ...option,
+            label: Array.isArray(option.label)
+              ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+              : option.label
+          }
+        }) || []
+      : options?.resource
+      ? countries
+      : []
   }
 
   return baseField

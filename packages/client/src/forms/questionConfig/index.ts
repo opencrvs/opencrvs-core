@@ -95,7 +95,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   extraValue?: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
-  options?: ICustomSelectOption[]
+  options?: ICustomSelectOption[] | { resource: string }
   datasetId?: string
   validator?: IValidatorDescriptor[]
   mapping?: IMapping

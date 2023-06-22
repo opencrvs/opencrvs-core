@@ -180,11 +180,13 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     const errorMessage = find(question.errorMessage, {
       lang: language
     })
-    const optionMessages = question?.options?.map((option) => {
-      return find(option.label, {
-        lang: language
-      })
-    })
+    const optionMessages = Array.isArray(question?.options)
+      ? question?.options?.map((option) => {
+          return find(option.label, {
+            lang: language
+          })
+        })
+      : []
     if (labelMessage?.descriptor?.id) {
       const labelID: string = labelMessage.descriptor.id as string
       messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
