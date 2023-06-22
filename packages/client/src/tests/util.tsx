@@ -3256,7 +3256,7 @@ export const mockDataWithRegistarRoleSelected = {
   firstNamesEng: 'Jeff',
   nid: '101488192',
   title: 'Test user',
-  phoneNumber: '01662132132',
+  mobile: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   systemRole: 'LOCAL_REGISTRAR',
   role: 'SECRETARY',
