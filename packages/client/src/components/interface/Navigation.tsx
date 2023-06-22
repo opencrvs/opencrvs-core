@@ -179,6 +179,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   NATIONAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
