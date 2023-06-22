@@ -129,7 +129,7 @@ export const userSectionFormType: ISerializedFormSection = {
           name: 'mobile',
           type: TEXT,
           label: userFormMessages.phoneNumber,
-          required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
+          required: true,
           initialValue: '',
           validator: [{ operation: 'phoneNumberFormat' }],
           mapping: {
