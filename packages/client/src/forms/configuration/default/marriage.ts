@@ -1403,6 +1403,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'uploadDocForMarriageProof',
               type: 'DOCUMENT_UPLOADER_WITH_OPTION',
               label: formMessageDescriptors.proofOfMarriageNotice,
+              placeholder: formMessageDescriptors.formSelectPlaceholder,
               required: false,
               initialValue: '',
               extraValue:
@@ -1428,6 +1429,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'uploadDocForGroom',
               type: 'DOCUMENT_UPLOADER_WITH_OPTION',
               label: formMessageDescriptors.proofOfGroomsID,
+              placeholder: formMessageDescriptors.formSelectPlaceholder,
               initialValue: '',
               extraValue: marriageDocumentForWhomFhirMapping.GROOM,
               hideAsterisk: true,
@@ -1464,6 +1466,7 @@ export const marriageRegisterForms: ISerializedForm = {
               name: 'uploadDocForBride',
               type: 'DOCUMENT_UPLOADER_WITH_OPTION',
               label: formMessageDescriptors.proofOfBridesID,
+              placeholder: formMessageDescriptors.formSelectPlaceholder,
               initialValue: '',
               required: false,
               extraValue: marriageDocumentForWhomFhirMapping.BRIDE,

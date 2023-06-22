@@ -161,7 +161,9 @@ export function createCustomField({
     baseField.type === 'TEXT' ||
     baseField.type === 'NUMBER' ||
     baseField.type === 'TEXTAREA' ||
-    baseField.type === 'TEL'
+    baseField.type === 'TEL' ||
+    baseField.type === 'SELECT_WITH_OPTIONS' ||
+    baseField.type === 'DOCUMENT_UPLOADER_WITH_OPTION'
   ) {
     baseField.placeholder = getDefaultLanguageMessage(placeholder)
   }
