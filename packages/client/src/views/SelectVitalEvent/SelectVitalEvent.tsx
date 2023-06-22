@@ -29,6 +29,7 @@ import {
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import {
+  FIELD_AGENT_ROLES,
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
@@ -38,6 +39,9 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
+import { IStoreState } from '@client/store'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -86,6 +90,7 @@ class SelectVitalEventView extends React.Component<
     goToEventInfo: typeof goToEventInfo
     goToBirthInformant: typeof goToBirthInformant
     goToDeathInformant: typeof goToDeathInformant
+    user: UserDetails | null
   }
 > {
   state = {
@@ -125,6 +130,9 @@ class SelectVitalEventView extends React.Component<
 
   render() {
     const { intl } = this.props
+    const systemRole = this.props.user?.systemRole
+    const isFieldAgent =
+      systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
     return (
       <StyledContainer
         id="select-vital-event-view"
@@ -169,21 +177,23 @@ class SelectVitalEventView extends React.Component<
                   this.setState({ goTo: 'death', noEventSelectedError: false })
                 }
               />
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
+              {!isFieldAgent && (
+                <RadioButton
+                  size="large"
+                  key="marriagevent"
+                  name="marriageevent"
+                  label={intl.formatMessage(constantsMessages.marriage)}
+                  value="marriage"
+                  id="select_marriage_event"
+                  selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+                  onChange={() =>
+                    this.setState({
+                      goTo: 'marriage',
+                      noEventSelectedError: false
+                    })
+                  }
+                />
+              )}
             </Actions>
             <PrimaryButton id="continue" onClick={this.handleContinue}>
               {intl.formatMessage(buttonMessages.continueButton)}
@@ -195,11 +205,16 @@ class SelectVitalEventView extends React.Component<
   }
 }
 
-export const SelectVitalEvent = connect(null, {
-  goBack,
-  goToHome,
-  storeDeclaration,
-  goToBirthInformant,
-  goToDeathInformant,
-  goToEventInfo
-})(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = connect(
+  (state: IStoreState) => ({
+    user: getUserDetails(state)
+  }),
+  {
+    goBack,
+    goToHome,
+    storeDeclaration,
+    goToBirthInformant,
+    goToDeathInformant,
+    goToEventInfo
+  }
+)(injectIntl(SelectVitalEventView))
