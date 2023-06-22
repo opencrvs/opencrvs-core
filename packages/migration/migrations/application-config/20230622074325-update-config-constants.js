@@ -14,7 +14,7 @@ export const up = async (db, client) => {
   await db.collection('configs').updateMany(
     {},
     {
-      $unset: { HIDE_EVENT_REGISTER_INFORMATION: false },
+      $unset: { HIDE_EVENT_REGISTER_INFORMATION: '' },
       $set: {
         HIDE_BIRTH_EVENT_REGISTER_INFORMATION: false,
         HIDE_DEATH_EVENT_REGISTER_INFORMATION: false,
@@ -30,9 +30,9 @@ export const down = async (db, client) => {
     {
       $set: { HIDE_EVENT_REGISTER_INFORMATION: false },
       $unset: {
-        HIDE_BIRTH_EVENT_REGISTER_INFORMATION: false,
-        HIDE_DEATH_EVENT_REGISTER_INFORMATION: false,
-        HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: false
+        HIDE_BIRTH_EVENT_REGISTER_INFORMATION: '',
+        HIDE_DEATH_EVENT_REGISTER_INFORMATION: '',
+        HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: ''
       }
     }
   )

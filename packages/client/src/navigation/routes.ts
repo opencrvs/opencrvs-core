@@ -14,7 +14,6 @@ import { Event } from '@client/utils/gateway'
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
-export const EVENT_INFO = '/events/:eventType/info'
 export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.Birth}/registration/informantType`
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`

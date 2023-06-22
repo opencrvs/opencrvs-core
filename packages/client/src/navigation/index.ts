@@ -20,7 +20,6 @@ import {
   DRAFT_BIRTH_INFORMANT_FORM,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
-  EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
@@ -165,10 +164,6 @@ export function goToMarriageInformant(declarationId: string) {
       declarationId
     })
   )
-}
-
-export function goToEventInfo(eventType: Event) {
-  return push(formatUrl(EVENT_INFO, { eventType }))
 }
 
 export function goToEvents() {
