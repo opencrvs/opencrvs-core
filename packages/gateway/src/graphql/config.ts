@@ -53,6 +53,7 @@ import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNot
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 import { Context } from '@gateway/graphql/context'
+import MinioAPI from '@gateway/features/fhir/minioAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -178,7 +179,8 @@ export const getApolloConfig = (): Config<Context> => {
     introspection: true,
     dataSources: (): Context['dataSources'] => ({
       locationsAPI: new LocationsAPI(),
-      practitionerRoleAPI: new PractitionerRoleAPI()
+      practitionerRoleAPI: new PractitionerRoleAPI(),
+      minioAPI: new MinioAPI()
     }),
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {

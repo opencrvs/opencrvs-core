@@ -260,6 +260,7 @@ export type ApplicationConfigurationInput = {
 
 export type AssignmentData = {
   __typename?: 'AssignmentData'
+  avatarURL: Scalars['String']
   firstName?: Maybe<Scalars['String']>
   lastName?: Maybe<Scalars['String']>
   officeName?: Maybe<Scalars['String']>
@@ -3200,6 +3201,7 @@ export type SearchEventsQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -3248,6 +3250,7 @@ export type SearchEventsQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -3302,6 +3305,7 @@ export type SearchEventsQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -5789,6 +5793,7 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
+      avatarURL: string
     } | null
   } | null
   operationHistories?: Array<{
@@ -5840,6 +5845,7 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
+      avatarURL: string
     } | null
   } | null
   operationHistories?: Array<{
@@ -5897,6 +5903,7 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
       firstName?: string | null
       lastName?: string | null
       officeName?: string | null
+      avatarURL: string
     } | null
   } | null
   operationHistories?: Array<{
@@ -5975,6 +5982,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6025,6 +6033,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6081,6 +6090,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6138,6 +6148,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6188,6 +6199,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6244,6 +6256,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6301,6 +6314,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6351,6 +6365,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6407,6 +6422,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6464,6 +6480,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6514,6 +6531,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6570,6 +6588,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6627,6 +6646,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6677,6 +6697,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6733,6 +6754,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6790,6 +6812,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6840,6 +6863,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6896,6 +6920,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -6953,6 +6978,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7003,6 +7029,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7059,6 +7086,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7116,6 +7144,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7166,6 +7195,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7222,6 +7252,7 @@ export type RegistrationHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7291,6 +7322,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7341,6 +7373,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7397,6 +7430,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7454,6 +7488,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7504,6 +7539,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7560,6 +7596,7 @@ export type FieldAgentHomeQuery = {
               firstName?: string | null
               lastName?: string | null
               officeName?: string | null
+              avatarURL: string
             } | null
           } | null
           operationHistories?: Array<{
@@ -7639,6 +7676,7 @@ export type FetchDeclarationShortInfoQuery = {
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null
+            avatarURL: string
           } | null
         } | null
       }
@@ -7675,6 +7713,7 @@ export type FetchDeclarationShortInfoQuery = {
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null
+            avatarURL: string
           } | null
         } | null
       }
@@ -7721,6 +7760,7 @@ export type FetchDeclarationShortInfoQuery = {
             firstName?: string | null
             lastName?: string | null
             officeName?: string | null
+            avatarURL: string
           } | null
         } | null
       }
