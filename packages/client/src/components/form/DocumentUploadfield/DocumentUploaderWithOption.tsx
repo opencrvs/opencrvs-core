@@ -58,6 +58,7 @@ export const ErrorMessage = styled.div`
 type IFullProps = {
   name: string
   label: string
+  placeholder?: string
   extraValue: IFormFieldValue
   options: ISelectOption[]
   splitView?: boolean
@@ -274,12 +275,13 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   renderDocumentUploaderWithDocumentTypeBlock = () => {
-    const { name, intl } = this.props
+    const { name, intl, placeholder } = this.props
     return this.props.splitView ? (
       this.state.dropDownOptions.map((opt, idx) => (
         <Flex splitView key={idx}>
           <Select
             id={`${name}${idx}`}
+            placeholder={placeholder}
             options={[opt]}
             value={opt.value}
             onChange={this.onChange}
@@ -301,6 +303,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       <Flex>
         <Select
           id={name}
+          placeholder={placeholder}
           options={this.state.dropDownOptions}
           value={this.state.fields.documentType}
           onChange={this.onChange}
