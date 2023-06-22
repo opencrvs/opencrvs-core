@@ -25,7 +25,6 @@ import styled, {
   ThemeProvider
 } from '@client/styledComponents'
 import { useApolloClient } from '@client/utils/apolloClient'
-import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -141,11 +140,6 @@ export function App(props: IAppProps) {
                                               exact
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.EVENT_INFO}
-                                              component={EventInfo}
                                             />
                                             <ProtectedRoute
                                               exact
