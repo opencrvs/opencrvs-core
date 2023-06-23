@@ -187,7 +187,9 @@ const Row = styled.div`
     padding: 0;
   }
 `
-const Wrapper = styled.div``
+const Wrapper = styled.div`
+  margin-top: 48px;
+`
 
 const RightColumn = styled.div`
   width: 40%;
@@ -239,6 +241,7 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px;
   }
 `
 const ReviewContainter = styled.div`
