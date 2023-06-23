@@ -67,9 +67,14 @@ export function questionnaireToTemplateFieldTransformer(
       const option = field.options.find(
         (option) => option.value === selectedQuestion.value
       )
-      transformedData[sectionId][field.name] = option
-        ? (option.label as unknown as IFormFieldValue)
-        : selectedQuestion.value
+      if (field.name.toLowerCase().includes('country')) {
+        transformedData[sectionId][field.name] = selectedQuestion.value
+      } else {
+        transformedData[sectionId][field.name] = option
+          ? (option.label as unknown as IFormFieldValue)
+          : selectedQuestion.value
+      }
+
       break
     case CHECKBOX:
       transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
