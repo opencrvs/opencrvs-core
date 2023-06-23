@@ -105,8 +105,7 @@ import changeEmailHandler, {
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
 import {
   createSystemRole,
-  createSystemRoleReqSchema,
-  createSystemRoleResSchema
+  createSystemRoleReqSchema
 } from '@user-mgnt/features/systemRole/create'
 
 const enum RouteScope {
@@ -759,7 +758,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/updateRole',
       handler: updateRole,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Update user role for particular system role',
         notes: 'This is responsible for update userRole',
@@ -786,9 +785,6 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
         },
         validate: {
           payload: createSystemRoleReqSchema
-        },
-        response: {
-          schema: createSystemRoleResSchema
         }
       }
     }
