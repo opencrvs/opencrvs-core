@@ -103,6 +103,11 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
+import {
+  createSystemRole,
+  createSystemRoleReqSchema,
+  createSystemRoleResSchema
+} from '@user-mgnt/features/systemRole/create'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -116,8 +121,8 @@ const enum RouteScope {
   VERIFY = 'verify'
 }
 
-export const getRoutes = () => {
-  const routes = [
+export const getRoutes: () => Hapi.ServerRoute[] = () => {
+  return [
     // add ping route by default for health check
     {
       method: 'GET',
@@ -768,7 +773,24 @@ export const getRoutes = () => {
           schema: systemRoleResponseSchema
         }
       }
+    },
+    {
+      method: 'POST',
+      path: '/systemRole',
+      handler: createSystemRole,
+      options: {
+        tags: ['api', 'system-role'],
+        description: 'Create a new System Role',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: createSystemRoleReqSchema
+        },
+        response: {
+          schema: createSystemRoleResSchema
+        }
+      }
     }
   ]
-  return routes
 }

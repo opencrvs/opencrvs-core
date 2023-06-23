@@ -82,7 +82,7 @@ export const up = async (db: Db, client: MongoClient) => {
             (c) => c.coding?.[0].system === systemRoles
           )?.coding?.[0]?.code as keyof typeof usersLabels
 
-          const titleCase = (code: string = '') =>
+          const titleCase = (code = '') =>
             code
               .replace(/_/g, ' ')
               .split(' ')
