@@ -1048,6 +1048,20 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.nameInEnglishPreviewGroup,
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'deceasedPlaceOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
+            },
+            {
+              id: 'deceasedPlaceOfResidenceAddress',
+              label: {
+                id: 'form.field.label.placeOfResidenceSeparator',
+                defaultMessage: 'Place of residence'
+              }
             }
           ]
         }

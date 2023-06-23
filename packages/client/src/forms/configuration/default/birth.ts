@@ -2053,6 +2053,20 @@ export const birthRegisterForms: ISerializedForm = {
               },
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'motherPlaceOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
+            },
+            {
+              id: 'motherPlaceOfResidenceAddress',
+              label: {
+                id: 'form.field.label.placeOfResidenceSeparator',
+                defaultMessage: 'Place of residence'
+              }
             }
           ]
         }
@@ -2632,6 +2646,20 @@ export const birthRegisterForms: ISerializedForm = {
               },
               fieldToRedirect: 'familyNameEng',
               delimiter: ' '
+            },
+            {
+              id: 'fatherPlaceOfBirthAddress',
+              label: {
+                id: 'form.field.label.placeOfBirthSubsection',
+                defaultMessage: 'Place of birth'
+              }
+            },
+            {
+              id: 'fatherPlaceOfResidenceAddress',
+              label: {
+                id: 'form.field.label.placeOfResidenceSeparator',
+                defaultMessage: 'Place of residence'
+              }
             }
           ]
         }
