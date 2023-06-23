@@ -101,8 +101,12 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
-        let declaration: IDeclaration
+      let declaration: IDeclaration
+      if (this.state.goTo === Event.Marriage) {
+        declaration = createDeclaration(Event.Marriage)
+        this.props.storeDeclaration(declaration)
+        this.props.goToDeathInformant(declaration.id)
+      } else if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
         switch (this.state.goTo as Event) {
           case Event.Birth:
             declaration = createDeclaration(Event.Birth)
@@ -111,11 +115,6 @@ class SelectVitalEventView extends React.Component<
             break
           case Event.Death:
             declaration = createDeclaration(Event.Death)
-            this.props.storeDeclaration(declaration)
-            this.props.goToDeathInformant(declaration.id)
-            break
-          case Event.Marriage:
-            declaration = createDeclaration(Event.Marriage)
             this.props.storeDeclaration(declaration)
             this.props.goToDeathInformant(declaration.id)
             break
