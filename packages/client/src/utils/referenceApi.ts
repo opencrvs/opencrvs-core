@@ -97,6 +97,7 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean
