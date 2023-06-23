@@ -32,7 +32,6 @@ import {
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
-  SELECT_BIRTH_INFORMANT,
   SELECT_DEATH_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
@@ -140,14 +139,6 @@ type GoToSysAdminHome = {
   payload: {
     tabId: string
   }
-}
-
-export function goToBirthInformant(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_INFORMANT, {
-      declarationId
-    })
-  )
 }
 
 export function goToDeathInformant(declarationId: string) {

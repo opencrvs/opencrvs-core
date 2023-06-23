@@ -141,13 +141,7 @@ export function App(props: IAppProps) {
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
                                             />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.SELECT_BIRTH_INFORMANT
-                                              }
-                                              component={DeclarationForm}
-                                            />
+
                                             <ProtectedRoute
                                               exact
                                               path={

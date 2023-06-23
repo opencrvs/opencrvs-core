@@ -22,8 +22,8 @@ import { Event } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
-  goToBirthInformant,
-  goToDeathInformant
+  goToDeathInformant,
+  goToBirthRegistrationAsParent
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
@@ -82,7 +82,7 @@ class SelectVitalEventView extends React.Component<
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeDeclaration: typeof storeDeclaration
-    goToBirthInformant: typeof goToBirthInformant
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToDeathInformant: typeof goToDeathInformant
   }
 > {
@@ -99,7 +99,7 @@ class SelectVitalEventView extends React.Component<
         case Event.Birth:
           declaration = createDeclaration(Event.Birth)
           this.props.storeDeclaration(declaration)
-          this.props.goToBirthInformant(declaration.id)
+          this.props.goToBirthRegistrationAsParent(declaration.id)
           break
         case Event.Death:
           declaration = createDeclaration(Event.Death)
@@ -193,6 +193,6 @@ export const SelectVitalEvent = connect(null, {
   goBack,
   goToHome,
   storeDeclaration,
-  goToBirthInformant,
+  goToBirthRegistrationAsParent,
   goToDeathInformant
 })(injectIntl(SelectVitalEventView))
