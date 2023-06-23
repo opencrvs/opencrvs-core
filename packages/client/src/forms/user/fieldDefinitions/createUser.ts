@@ -273,7 +273,7 @@ export const userSectionFormType: ISerializedFormSection = {
           customisable: false,
           type: 'LOCATION_SEARCH_INPUT',
           label: userFormMessages.userOrganisation,
-          required: true,
+          required: false,
           initialValue: '',
           searchableResource: ['facilities'],
           searchableType: ['HEALTH_FACILITY'],
