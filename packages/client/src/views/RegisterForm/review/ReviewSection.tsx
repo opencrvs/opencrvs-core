@@ -187,9 +187,7 @@ const Row = styled.div`
     padding: 0;
   }
 `
-const Wrapper = styled.div`
-  margin-top: 48px;
-`
+const Wrapper = styled.div``
 
 const RightColumn = styled.div`
   width: 40%;
