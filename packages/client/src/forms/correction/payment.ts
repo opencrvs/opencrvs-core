@@ -29,7 +29,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
       hideAsterisk: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'REQUIRED',
@@ -52,7 +52,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           },
           {
@@ -62,7 +62,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             description: messages.correctionSummaryProofOfPayment,
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]

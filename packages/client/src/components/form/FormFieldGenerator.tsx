@@ -16,6 +16,7 @@ import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
+import { TimeField } from '@opencrvs/components/lib/TimeField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -82,6 +83,7 @@ import {
   TEXT,
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
+  TIME,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton
 } from '@client/forms'
@@ -225,6 +227,7 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
+    unit: fieldDefinition.unit,
     hideAsterisk: fieldDefinition.hideAsterisk,
     hideInputHeader: fieldDefinition.hideHeader,
     error,
@@ -234,6 +237,10 @@ function GeneratedInputField({
   }
 
   const intl = useIntl()
+  const onChangeGroupInput = React.useCallback(
+    (val: string) => onSetFieldValue(fieldDefinition.name, val),
+    [fieldDefinition.name, onSetFieldValue]
+  )
   const isOnline = useOnlineStatus()
 
   const inputProps = {
@@ -394,7 +401,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={String(value)}
           selected={(value as string) === checkedValue}
-          onChange={(event) =>
+          onChange={(event: { target: { value: string } }) =>
             onSetFieldValue(
               fieldDefinition.name,
               event.target.value === String(checkedValue)
@@ -415,6 +422,18 @@ function GeneratedInputField({
           notice={fieldDefinition.notice}
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
+          value={value as string}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === TIME) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TimeField
+          {...inputProps}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={onChangeGroupInput}
           value={value as string}
         />
       </InputField>
@@ -486,6 +505,11 @@ function GeneratedInputField({
     return <FormList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
+    let inputFieldWidth = fieldDefinition.inputFieldWidth
+    if (fieldDefinition?.inputWidth) {
+      inputFieldWidth = fieldDefinition.inputWidth + 'px'
+    }
+
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -493,7 +517,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           max={fieldDefinition.max}
           {...inputProps}
-          onKeyPress={(e) => {
+          onKeyPress={(e: { key: string; preventDefault: () => void }) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
@@ -502,7 +526,7 @@ function GeneratedInputField({
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
           }}
-          inputFieldWidth={fieldDefinition.inputFieldWidth}
+          inputFieldWidth={inputFieldWidth}
         />
       </InputField>
     )
@@ -618,10 +642,17 @@ export function getInitialValueForSelectDynamicValue(
   const catchmentAreas = userDetails?.catchmentArea
   let district = ''
   let state = ''
+  let locationLevel3 = ''
 
   if (catchmentAreas) {
     catchmentAreas.forEach((catchmentArea) => {
       if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'LOCATION_LEVEL_3'
+        )
+      ) {
+        locationLevel3 = catchmentArea.id
+      } else if (
         catchmentArea?.identifier?.find(
           (identifier) => identifier?.value === 'DISTRICT'
         )
@@ -642,6 +673,9 @@ export function getInitialValueForSelectDynamicValue(
   }
   if (field.name.includes('state') && !field.initialValue && state) {
     fieldInitialValue = state as IFormFieldValue
+  }
+  if (!field.initialValue && locationLevel3) {
+    fieldInitialValue = locationLevel3 as IFormFieldValue
   }
   return fieldInitialValue
 }
@@ -895,7 +929,17 @@ class FormSectionComponent extends React.Component<Props> {
           }
 
           const withDynamicallyGeneratedFields =
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_OPTIONS
+              ? ({
+                  ...field,
+                  type: SELECT_WITH_OPTIONS,
+                  options: getFieldOptions(
+                    field as ISelectFormFieldWithOptions,
+                    values,
+                    offlineCountryConfig
+                  )
+                } as ISelectFormFieldWithOptions)
+              : field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
                   ...field,
                   type: SELECT_WITH_OPTIONS,

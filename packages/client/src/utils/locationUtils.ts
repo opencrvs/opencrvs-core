@@ -16,6 +16,16 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
 import { UserDetails } from './userUtils'
+import { lookup } from 'country-data'
+
+export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
+  const alpha2 =
+    isoCode === 'FAR'
+      ? 'FA'
+      : lookup.countries({ alpha3: isoCode.toUpperCase() })[0]?.alpha2
+
+  return alpha2
+}
 
 export function filterLocations(
   locations: { [key: string]: ILocation },

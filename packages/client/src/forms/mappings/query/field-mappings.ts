@@ -45,8 +45,11 @@ import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
-import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  countryAlpha3toAlpha2,
+  getLocationNameMapOfFacility
+} from '@client/utils/locationUtils'
+
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
@@ -279,9 +282,6 @@ export const identityToNidVerificationFieldTransformer = (
   }
 
   return transformedData
-}
-interface IAddress {
-  [key: string]: any
 }
 
 export const addressToFieldTransformer =
@@ -1040,7 +1040,7 @@ export const eventLocationAddressLineTemplateTransformer =
   ) => {
     if (
       queryData.eventLocation?.type &&
-      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
     ) {
       return
     }
@@ -1125,25 +1125,27 @@ export const nationalityTransformer = (
   transformedData: IFormData,
   queryData: QueryData,
   sectionId: SectionId,
-  field: IFormField
+  field: IFormField,
+  _?: IFormField,
+  __?: IOfflineData
 ) => {
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId][field.name] && queryData[sectionId][field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   } else if (queryData[sectionId]?.individual) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId].individual[field.name] &&
         queryData[sectionId].individual[field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   }
 }
 

@@ -149,14 +149,6 @@ type CertificationProps = {
   item: ICertification
 }
 
-function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
-  return new Promise((resolve, _) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
-    reader.readAsDataURL(blob)
-  })
-}
-
 export const printDummyCertificate = async (
   event: string,
   registerForm: { birth: IForm; death: IForm; marriage: IForm },

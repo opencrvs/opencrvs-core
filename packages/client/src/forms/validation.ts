@@ -64,13 +64,14 @@ const getValidationErrors = {
       }
     }
 
-    let validators = Array.from(field.validate)
+    let validators = field.validator ? Array.from(field.validator) : []
 
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
     if (field.required) {
       validators.push(required(requiredErrorMessage))
-    } else if (!value) {
+    } else if (field.validateEmpty) {
+    } else if (!value && value !== 0) {
       validators = []
     }
 

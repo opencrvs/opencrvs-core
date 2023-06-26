@@ -72,7 +72,7 @@ export const responseSchema = Joi.object({
     }).unknown(true)
   ),
   mobile: Joi.string().optional(),
-  email: Joi.string().optional(),
+  email: Joi.string().allow(null, '').optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

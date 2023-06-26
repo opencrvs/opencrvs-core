@@ -422,6 +422,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               district
               state
             }
+            partOf
           }
         }
         type
