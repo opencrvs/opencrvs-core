@@ -47,6 +47,7 @@ export {
   NotePencil,
   Paperclip,
   PaperPlaneTilt,
+  Pencil,
   Pen,
   PencilSimpleLine,
   Phone,

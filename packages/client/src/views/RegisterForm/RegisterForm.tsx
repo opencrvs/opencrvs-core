@@ -610,6 +610,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ></TimeMounted>
         <Frame
           header={<AppBar title="OpenCRVS" />}
+          key={activeSection.id}
           skipToContentText={intl.formatMessage(
             constantsMessages.skipToMainContent
           )}
