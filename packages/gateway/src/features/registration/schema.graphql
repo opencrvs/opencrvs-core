@@ -116,6 +116,7 @@ enum AttachmentType {
   MARRIAGE_CERTIFICATE
   RECOGNITION_PROOF
   ADOPTION_PROOF
+  PASSPORT_PHOTO
 }
 
 enum AttachmentSubject {
@@ -137,6 +138,7 @@ enum AttachmentSubject {
   MARRIAGE_NOTICE_PROOF
   WITNESS_ONE
   WITNESS_TWO
+  MARRIAGE_DETAILS
 }
 
 enum RegistrationType {

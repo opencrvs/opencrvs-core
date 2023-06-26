@@ -22,14 +22,16 @@ export const marriageDocumentForWhomFhirMapping = {
   BRIDE: 'BRIDE',
   MARRIAGE_NOTICE_PROOF: 'MARRIAGE_NOTICE_PROOF',
   FAMILY_HEADS: 'FAMILY_HEADS',
-  WITNESSES: 'WITNESSES'
+  WITNESSES: 'WITNESSES',
+  MARRIAGE_DETAILS: 'MARRIAGE_DETAILS'
 }
 
 export const marriageSectionMapping = {
   [MarriageSection.Registration]: [
     marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF,
     marriageDocumentForWhomFhirMapping.FAMILY_HEADS,
-    marriageDocumentForWhomFhirMapping.WITNESSES
+    marriageDocumentForWhomFhirMapping.WITNESSES,
+    marriageDocumentForWhomFhirMapping.MARRIAGE_DETAILS
   ],
   [MarriageSection.Groom]: [marriageDocumentForWhomFhirMapping.GROOM],
   [MarriageSection.Bride]: [marriageDocumentForWhomFhirMapping.BRIDE]
@@ -44,6 +46,7 @@ export const marriageDocumentTypeFhirMapping = {
   BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
   NATIONAL_POLICE_ID: 'NATIONAL_POLICE_ID',
   RETIRED_POLICE_ID: 'RETIRED_POLICE_ID',
+  PASSPORT_PHOTO: 'PASSPORT_PHOTO',
   OTHER: 'OTHER'
 }
 
