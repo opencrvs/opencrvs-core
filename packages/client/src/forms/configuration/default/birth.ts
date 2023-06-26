@@ -578,6 +578,10 @@ export const birthRegisterForms: ISerializedForm = {
             operation: 'informantTypeTransformer'
           },
           {
+            fieldName: 'informantTypeValue',
+            operation: 'informantTypeTransformerValue'
+          },
+          {
             fieldName: 'qrCode',
             operation: 'QRCodeTransformerTransformer'
           },

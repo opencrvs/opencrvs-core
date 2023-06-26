@@ -144,6 +144,18 @@ export function informantTypeTransformer(
     : ''
 }
 
+export function informantTypeTransformerValue(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'informantType'
+  ] = queryData[sectionId].informantType
+}
+
 export function registrationNumberTransformer(
   transformedData: IFormData,
   queryData: any,
