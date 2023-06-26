@@ -628,6 +628,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup,
       declaration
     )
+
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const menuItemDeleteOrClose =
@@ -953,7 +954,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               messages.saveDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
-
           <ResponsiveModal
             id="delete_declaration_confirmation"
             title={intl.formatMessage(

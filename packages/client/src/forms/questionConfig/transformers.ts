@@ -15,17 +15,25 @@ import {
   IFieldIdentifiers,
   getFieldIdentifiers,
   IQuestionConfig,
-  getIdentifiersFromFieldId
+  getIdentifiersFromFieldId,
+  IMessage
 } from '.'
-import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
+import {
+  ISerializedForm,
+  BirthSection,
+  DeathSection,
+  IValidatorDescriptor
+} from '@client/forms'
 import {
   getField,
   getFieldId,
   getPrecedingDefaultFieldIdAcrossGroups
 } from '@client/forms/configuration/defaultUtils'
-import { Event, QuestionInput } from '@client/utils/gateway'
+import { CustomSelectOption, Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default/index'
+import { MessageDescriptor } from 'react-intl'
+import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
@@ -89,6 +97,10 @@ export function questionsTransformer(
       Event.Marriage
     )
   }
+  /*
+   * If you're adding a new field you want country config to be configuring,
+   * you need to also add it to function named "createCustomField"
+   */
   return questionsPayload.map(
     ({
       fieldId,
@@ -96,17 +108,31 @@ export function questionsTransformer(
       placeholder,
       description,
       tooltip,
+      hideInPreview,
+      helperText,
+      unit,
       errorMessage,
+      validateEmpty,
       maxLength,
+      inputWidth,
       fieldName,
       fieldType,
       precedingFieldId,
+      initialValue,
       required,
       enabled,
       custom,
       conditionals,
       datasetId,
-      options
+      options,
+      ignoreBottomMargin,
+      optionCondition,
+      validator,
+      extraValue,
+      mapping,
+      dynamicOptions,
+      hideHeader,
+      previewGroup
     }) => {
       if (custom) {
         return {
@@ -114,17 +140,31 @@ export function questionsTransformer(
           label,
           placeholder,
           description,
+          hideInPreview,
+          validateEmpty,
           tooltip,
+          unit,
           errorMessage,
+          helperText,
           maxLength,
+          inputWidth,
           fieldName,
           fieldType,
+          initialValue,
           precedingFieldId,
-          required: required ?? false,
+          ignoreBottomMargin,
+          required,
           custom,
           conditionals,
           datasetId,
-          options
+          options,
+          optionCondition,
+          validator,
+          extraValue,
+          mapping,
+          dynamicOptions,
+          hideHeader,
+          previewGroup
         } as ICustomQuestionConfig
       }
 
@@ -134,14 +174,54 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
+        validateEmpty: validateEmpty ?? false,
+        conditionals: conditionals || undefined,
+        hideInPreview: hideInPreview ?? false,
+        optionCondition: optionCondition || undefined,
+        ignoreBottomMargin: ignoreBottomMargin ?? false,
+        hideHeader: hideHeader ?? false,
         identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
       }
+
+      if (validator && validator.length > 0) {
+        defaultQuestionConfig['validator'] = validator as IValidatorDescriptor[]
+      }
+      if (label && label.length > 0) {
+        defaultQuestionConfig.label = getDefaultLanguageMessage(
+          label as IMessage[]
+        )
+      }
+
+      if (helperText) {
+        defaultQuestionConfig.helperText = getDefaultLanguageMessage(
+          helperText as IMessage[]
+        )
+      }
+
+      if (options) {
+        defaultQuestionConfig.options =
+          /*
+           * This is done like this as the function parameters are typed incorrectly.
+           * The actual argument type for this function should be whatever the backend returns as part of configuration.
+           * Currently the type used here is whatever the frontend is expected to send to the backend as part of form configuration UI.
+           */
+          (options as Array<
+            Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
+          >) ?? undefined
+      }
+
       /* Setting required = false for default fields results
        * in "optional" showing up in some of the fields
        */
+
       if (required) {
         defaultQuestionConfig.required = true
       }
+
+      if (required === false) {
+        defaultQuestionConfig.required = false
+      }
+
       return defaultQuestionConfig
     }
   )

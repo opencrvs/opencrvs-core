@@ -88,6 +88,7 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -213,29 +214,39 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 function generateLocationResource(fhirLocation: fhir.Location): ILocation {
-  const loc = {} as ILocation
-  loc.id = fhirLocation.id as string
-  loc.name = fhirLocation.name as string
-  loc.alias =
-    fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : ''
-  loc.status = fhirLocation.status as string
-  loc.physicalType =
-    fhirLocation.physicalType &&
-    fhirLocation.physicalType.coding &&
-    fhirLocation.physicalType.coding[0].display
-      ? fhirLocation.physicalType.coding[0].display
-      : ''
-  loc.type =
-    fhirLocation.type &&
-    fhirLocation.type.coding &&
-    fhirLocation.type.coding[0].code
-      ? fhirLocation.type.coding[0].code
-      : ''
-  loc.partOf =
-    fhirLocation.partOf && fhirLocation.partOf.reference
-      ? fhirLocation.partOf.reference
-      : ''
-  return loc
+  return {
+    id: fhirLocation.id as string,
+    name: fhirLocation.name as string,
+    statisticalId:
+      fhirLocation.identifier
+        ?.find(
+          (id) => id.system === 'http://opencrvs.org/specs/id/statistical-code'
+        )
+        ?.value?.replace('ADMIN_STRUCTURE_', '') ?? '',
+    alias:
+      fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : '',
+    status: fhirLocation.status as string,
+    physicalType:
+      fhirLocation.physicalType &&
+      fhirLocation.physicalType.coding &&
+      fhirLocation.physicalType.coding[0].display
+        ? fhirLocation.physicalType.coding[0].display
+        : '',
+    jurisdictionType:
+      fhirLocation.identifier?.find(
+        (id) => id.system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+      )?.value ?? '',
+    type:
+      fhirLocation.type &&
+      fhirLocation.type.coding &&
+      fhirLocation.type.coding[0].code
+        ? fhirLocation.type.coding[0].code
+        : '',
+    partOf:
+      fhirLocation.partOf && fhirLocation.partOf.reference
+        ? fhirLocation.partOf.reference
+        : ''
+  }
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
