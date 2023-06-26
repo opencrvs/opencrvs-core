@@ -11,7 +11,6 @@
  */
 import { Db, MongoClient } from 'mongodb'
 import * as mongoose from 'mongoose'
-import { getTotalDocCountByCollectionName } from './20230127063226-update-practitioner-role.js'
 
 const USER_MGNT_MONGO_URL =
   process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt'
@@ -38,13 +37,13 @@ export const up = async (db: Db, client: MongoClient) => {
         'identifier.system': systemIdentifier
       })
 
-      const tasksWithSystemCount = await getTotalDocCountByCollectionName(
+      const tasksWithSystemCount = await getTotalTaskCountByCollectionName(
         db,
         'Task'
       )
 
       const tasksHistoryWithSystemCount =
-        await getTotalDocCountByCollectionName(db, 'Task_history')
+        await getTotalTaskCountByCollectionName(db, 'Task_history')
 
       // eslint-disable-next-line no-console
       console.log(
@@ -129,3 +128,10 @@ export const up = async (db: Db, client: MongoClient) => {
 }
 
 export const down = async (db: Db, client: MongoClient) => {}
+
+async function getTotalTaskCountByCollectionName(
+  db: Db,
+  collectionName: string
+) {
+  return await db.collection(collectionName).count()
+}
