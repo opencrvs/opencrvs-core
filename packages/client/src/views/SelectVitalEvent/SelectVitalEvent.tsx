@@ -115,7 +115,6 @@ class SelectVitalEventView extends React.Component<
         )}
       >
         <Content
-          id="select-vital-event-view"
           title={intl.formatMessage(messages.registerNewEventHeading)}
           bottomActionButtons={[
             <Button
@@ -159,21 +158,23 @@ class SelectVitalEventView extends React.Component<
                 this.setState({ goTo: 'death', noEventSelectedError: false })
               }
             />
-            <RadioButton
-              size="large"
-              key="marriagevent"
-              name="marriageevent"
-              label={intl.formatMessage(constantsMessages.marriage)}
-              value="marriage"
-              id="select_marriage_event"
-              selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-              onChange={() =>
-                this.setState({
-                  goTo: 'marriage',
-                  noEventSelectedError: false
-                })
-              }
-            />
+            {window.config.MARRIAGE_REGISTRATION && (
+              <RadioButton
+                size="large"
+                key="marriagevent"
+                name="marriageevent"
+                label={intl.formatMessage(constantsMessages.marriage)}
+                value="marriage"
+                id="select_marriage_event"
+                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+                onChange={() =>
+                  this.setState({
+                    goTo: 'marriage',
+                    noEventSelectedError: false
+                  })
+                }
+              />
+            )}
           </Actions>
         </Content>
       </Frame>
