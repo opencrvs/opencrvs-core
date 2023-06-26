@@ -91,7 +91,7 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 
-import { FormList } from '@client/components/form/FormList'
+import { FormBulletList } from '@client/components/form/FormBulletList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -502,7 +502,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === LIST) {
-    return <FormList {...inputProps} list={fieldDefinition.items} />
+    return <FormBulletList {...inputProps} list={fieldDefinition.items} />
   }
   if (fieldDefinition.type === NUMBER) {
     let inputFieldWidth = fieldDefinition.inputFieldWidth

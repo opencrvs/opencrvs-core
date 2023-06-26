@@ -33,4 +33,4 @@ const FormListComponent = ({
   return <BulletList items={localizedList} font="reg16" />
 }
 
-export const FormList = injectIntl(FormListComponent)
+export const FormBulletList = injectIntl(FormListComponent)

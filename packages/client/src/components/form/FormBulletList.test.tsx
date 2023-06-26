@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { createTestComponent } from '@client/tests/util'
-import { FormList } from '@client/components/form/FormList'
+import { FormBulletList } from '@client/components/form/FormBulletList'
 import { ReactWrapper } from 'enzyme'
 import * as actions from '@client/i18n/actions'
 import { createStore, AppStore } from '@client/store'
@@ -49,7 +49,7 @@ describe('when user is in the document upload page', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
 
-    component = await createTestComponent(<FormList list={listItems} />, {
+    component = await createTestComponent(<FormBulletList list={listItems} />, {
       store,
       history
     })
