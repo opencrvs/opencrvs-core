@@ -299,10 +299,6 @@ export const collectBirthCertificateFormSection: IFormSection = {
               dependency: 'iDType',
               labelMapper: identityNameMapper
             },
-            helperText: {
-              dependency: 'iDType',
-              helperTextMapper: identityHelperTextMapper
-            },
             type: {
               kind: 'dynamic',
               dependency: 'iDType',
