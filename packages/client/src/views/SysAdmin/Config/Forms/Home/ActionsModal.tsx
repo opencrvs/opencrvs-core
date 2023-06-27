@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React, { useContext } from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import {
   actionsModalTitleMessages,
@@ -18,7 +19,6 @@ import {
 } from '@client/i18n/messages/views/formConfig'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import {
-  TertiaryButton,
   SuccessButton,
   DangerButton,
   PrimaryButton
@@ -172,21 +172,26 @@ export function ActionsModal() {
   const closeModal = () => setAction({ status: ActionStatus.IDLE })
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show={status === ActionStatus.MODAL}
+    <Dialog
+      onOpen={status === ActionStatus.MODAL}
       title={intl.formatMessage(actionsModalTitleMessages[action], {
         event: intl.formatMessage(constantsMessages[event])
       })}
-      handleClose={closeModal}
+      supportingCopy={intl.formatMessage(
+        actionsModalDescriptionMessages[action]
+      )}
+      onClose={closeModal}
       actions={[
-        <TertiaryButton id="cancel-btn" key="cancel" onClick={closeModal}>
+        <Button
+          id="cancel-btn"
+          key="cancel"
+          type="tertiary"
+          onClick={closeModal}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <ActionButton key="action-button" />
+        </Button>,
+        <Button key="action-button" type="primary" />
       ]}
-    >
-      {intl.formatMessage(actionsModalDescriptionMessages[action])}
-    </ResponsiveModal>
+    />
   )
 }

@@ -12,22 +12,16 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { identityNameMapper } from '@client/forms/identity'
 import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -160,53 +154,55 @@ class IDVerifierComponent extends React.Component<
         <Content title={this.props.title}>
           <Container>{this.renderLabelValue()}</Container>
           <ActionContainer>
-            <SuccessButton
+            <Button
               id="verifyPositive"
               onClick={positiveAction.handler}
-              icon={() => <Check />}
-              align={ICON_ALIGNMENT.LEFT}
+              type="positive"
             >
+              <Icon name="Check" />
               {positiveAction.label}
-            </SuccessButton>
-            <DangerButton
+            </Button>
+            <Button
               id="verifyNegative"
+              type="negative"
               onClick={this.togglePrompt}
-              icon={() => <Cross color="currentColor" />}
-              align={ICON_ALIGNMENT.LEFT}
             >
+              <Icon name="X" />
               {negativeAction.label}
-            </DangerButton>
+            </Button>
           </ActionContainer>
         </Content>
 
-        <ResponsiveModal
+        <Dialog
           id="withoutVerificationPrompt"
-          show={showPrompt}
           title={modalTitle}
-          contentHeight={96}
-          handleClose={this.togglePrompt}
+          supportingCopy={intl.formatMessage(
+            certificateMessages.idCheckDialogDescription
+          )}
+          onOpen={showPrompt}
+          onClose={this.togglePrompt}
           actions={[
-            <TertiaryButton
+            <Button
               id="cancel"
               key="cancel"
+              type="tertiary"
               onClick={this.togglePrompt}
             >
               {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
-            </TertiaryButton>,
-            <PrimaryButton
+            </Button>,
+            <Button
               id="send"
               key="continue"
+              type="primary"
               onClick={() => {
                 this.props.actionProps.negativeAction.handler()
                 this.togglePrompt()
               }}
             >
               {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
-            </PrimaryButton>
+            </Button>
           ]}
-        >
-          {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
-        </ResponsiveModal>
+        />
       </div>
     )
   }

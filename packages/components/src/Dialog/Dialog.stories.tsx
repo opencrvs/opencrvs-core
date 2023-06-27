@@ -14,6 +14,7 @@ import { ComponentStory, Meta } from '@storybook/react'
 import { Dialog } from './Dialog'
 import { Button } from '../Button'
 import { Text } from '../Text'
+import { Icon } from '../Icon'
 
 export default {
   title: 'Layout/Dialog',
@@ -38,8 +39,8 @@ const Template: ComponentStory<typeof Dialog> = ({ children, ...args }) => {
         Open
       </Button>
 
-      <Dialog {...args} isOpen={isOpen} onClose={() => setIsVisible(false)}>
-        <p>{children}</p>
+      <Dialog {...args} onOpen={isOpen} onClose={() => setIsVisible(false)}>
+        {children}
       </Dialog>
     </>
   )
@@ -48,11 +49,7 @@ const Template: ComponentStory<typeof Dialog> = ({ children, ...args }) => {
 export const SmallDialog = Template.bind({})
 SmallDialog.args = {
   title: 'Small dialog',
-  children: (
-    <Text variant="reg16" element="p">
-      This is a small dialog
-    </Text>
-  ),
+  supportingCopy: 'This is a small dialog',
   actions: [
     <Button
       key="cancel"
@@ -69,23 +66,17 @@ SmallDialog.args = {
 
 export const SmallDialogNoButtons = Template.bind({})
 SmallDialogNoButtons.args = {
+  icon: <Icon name="WarningCircle" size="xlarge" color="negativeDark" />,
   title: 'Small dialog',
-  children: (
-    <Text variant="reg16" element="p">
-      This is a small dialog
-    </Text>
-  )
+  titleColor: 'negativeDark',
+  supportingCopy: 'This is a small dialog'
 }
 
 export const LargeDialog = Template.bind({})
 LargeDialog.args = {
   title: 'Large dialog',
-  children: (
-    <Text variant="reg16" element="p">
-      This is a large dialog
-    </Text>
-  ),
-  variant: 'large',
+  supportingCopy: 'This is a large dialog',
+  size: 'large',
   actions: [
     <Button
       key="cancel"
@@ -103,6 +94,7 @@ LargeDialog.args = {
 export const SmallDialogWithOverflow = Template.bind({})
 SmallDialogWithOverflow.args = {
   title: 'A small dialog with the content overflowing',
+  supportingCopy: 'This is a large dialog',
   children: (
     <>
       <Text element="p" variant="reg16">
@@ -197,7 +189,7 @@ SmallDialogWithOverflow.args = {
       </Text>
     </>
   ),
-  variant: 'small',
+  size: 'small',
   actions: [
     <Button
       key="cancel"
@@ -215,6 +207,7 @@ SmallDialogWithOverflow.args = {
 export const LargeDialogWithOverflow = Template.bind({})
 LargeDialogWithOverflow.args = {
   title: 'A large dialog with the content overflowing',
+  supportingCopy: 'This is a large dialog',
   children: (
     <>
       <Text element="p" variant="reg16">
@@ -309,7 +302,7 @@ LargeDialogWithOverflow.args = {
       </Text>
     </>
   ),
-  variant: 'large',
+  size: 'large',
   actions: [
     <Button
       key="cancel"

@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import * as React from 'react'
+import { useState } from 'react'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Button } from '@opencrvs/components/lib/Button'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -22,7 +25,6 @@ import styled from '@client/styledComponents'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { gql } from '@apollo/client'
 import { get } from 'lodash'
-import * as React from 'react'
 import { Mutation } from '@apollo/client/react/components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -33,7 +35,7 @@ const Message = styled.div`
 `
 const PasswordContents = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  max-width: 50%;
+  max-width: 100%;
   & input {
     width: 100%;
   }
@@ -47,36 +49,19 @@ const PasswordContents = styled.div`
 const ValidationRulesSection = styled.div`
   background: ${({ theme }) => theme.colors.background};
   margin: 16px 0 24px;
-  padding: 8px 24px;
+  padding: 8px 16px;
+  border-radius: 4px;
   & div {
     padding: 8px 0;
     display: flex;
+    gap: 8px;
     align-items: center;
     & span {
       margin-left: 8px;
     }
   }
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
 `
-const ValidationRulesSectionLg = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  margin: 30px 20px 24px;
-  width: 100%;
-  padding: 8px 24px;
-  & div {
-    padding: 8px 0;
-    display: flex;
-    align-items: center;
-    & span {
-      margin-left: 8px;
-    }
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
+
 const PasswordMatch = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.positive};
@@ -228,11 +213,12 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
   render() {
     const { intl, showPasswordChange } = this.props
     return (
-      <ResponsiveModal
+      <Dialog
         id="ChangePasswordModal"
         title={intl.formatMessage(messages.changePassword)}
-        show={showPasswordChange}
-        contentHeight={420}
+        supportingCopy={intl.formatMessage(messages.changePasswordMessage)}
+        onOpen={showPasswordChange}
+        size="small"
         actions={[
           <Mutation
             key="change-password-mutation"
@@ -247,9 +233,10 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
           >
             {(changePassword: any) => {
               return (
-                <PrimaryButton
+                <Button
                   id="confirm-button"
                   key="confirm"
+                  type="primary"
                   onClick={() => this.changePassword(changePassword)}
                   disabled={
                     !Boolean(this.state.currentPassword.length) ||
@@ -260,16 +247,13 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   }
                 >
                   {intl.formatMessage(messages.confirmButtonLabel)}
-                </PrimaryButton>
+                </Button>
               )
             }}
           </Mutation>
         ]}
-        width={1000}
-        handleClose={this.hideModal}
+        onClose={this.hideModal}
       >
-        <Message>{intl.formatMessage(messages.changePasswordMessage)}</Message>
-
         <form
           id="password-update-modal-form"
           onSubmit={(e) => {
@@ -285,7 +269,6 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   </ErrorMessage>
                 )}
               </BoxedError>
-
               <Field>
                 <InputField
                   id="currentPassword"
@@ -324,43 +307,96 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                 </InputField>
                 <ValidationRulesSection>
                   <div>
-                    {intl.formatMessage(
-                      messages.passwordUpdateFormValidationMsg
+                    {this.state.validLength && (
+                      <>
+                        <Icon
+                          name="CheckCircle"
+                          color="positiveDark"
+                          weight="fill"
+                        />
+                        <Text variant="bold16" element="p" color="positiveDark">
+                          {intl.formatMessage(
+                            messages.passwordLengthCharacteristicsForPasswordUpdateForm,
+                            {
+                              min: intl.formatMessage({
+                                defaultMessage: '8',
+                                description: 'Minimum length password',
+                                id: 'number.eight'
+                              })
+                            }
+                          )}
+                        </Text>
+                      </>
+                    )}
+                    {!this.state.validLength && (
+                      <>
+                        <Icon name="CheckCircle" color="grey400" />
+                        <Text variant="reg16" element="p" color="grey500">
+                          {intl.formatMessage(
+                            messages.passwordLengthCharacteristicsForPasswordUpdateForm,
+                            {
+                              min: intl.formatMessage({
+                                defaultMessage: '8',
+                                description: 'Minimum length password',
+                                id: 'number.eight'
+                              })
+                            }
+                          )}
+                        </Text>
+                      </>
                     )}
                   </div>
                   <div>
-                    {this.state.validLength && <TickOn />}
-                    {!this.state.validLength && <TickOff />}
-                    <span>
-                      {intl.formatMessage(
-                        messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                        {
-                          min: intl.formatMessage({
-                            defaultMessage: '8',
-                            description: 'Minimum length password',
-                            id: 'number.eight'
-                          })
-                        }
-                      )}
-                    </span>
+                    {this.state.hasCases && (
+                      <>
+                        <Icon
+                          name="CheckCircle"
+                          color="positiveDark"
+                          weight="fill"
+                        />
+                        <Text variant="bold16" element="p" color="positiveDark">
+                          {intl.formatMessage(
+                            messages.passwordCaseCharacteristicsForPasswordUpdateForm
+                          )}
+                        </Text>
+                      </>
+                    )}
+                    {!this.state.hasCases && (
+                      <>
+                        <Icon name="CheckCircle" color="grey400" />
+                        <Text variant="reg16" element="p" color="grey500">
+                          {intl.formatMessage(
+                            messages.passwordCaseCharacteristicsForPasswordUpdateForm
+                          )}
+                        </Text>
+                      </>
+                    )}
                   </div>
                   <div>
-                    {this.state.hasCases && <TickOn />}
-                    {!this.state.hasCases && <TickOff />}
-                    <span>
-                      {intl.formatMessage(
-                        messages.passwordCaseCharacteristicsForPasswordUpdateForm
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    {this.state.hasNumber && <TickOn />}
-                    {!this.state.hasNumber && <TickOff />}
-                    <span>
-                      {intl.formatMessage(
-                        messages.passwordNumberCharacteristicsForPasswordUpdateForm
-                      )}
-                    </span>
+                    {this.state.hasNumber && (
+                      <>
+                        <Icon
+                          name="CheckCircle"
+                          color="positiveDark"
+                          weight="fill"
+                        />
+                        <Text variant="bold16" element="p" color="positiveDark">
+                          {intl.formatMessage(
+                            messages.passwordNumberCharacteristicsForPasswordUpdateForm
+                          )}
+                        </Text>
+                      </>
+                    )}
+                    {!this.state.hasNumber && (
+                      <>
+                        <Icon name="CheckCircle" color="grey400" />
+                        <Text variant="reg16" element="p" color="grey500">
+                          {intl.formatMessage(
+                            messages.passwordNumberCharacteristicsForPasswordUpdateForm
+                          )}
+                        </Text>
+                      </>
+                    )}
                   </div>
                 </ValidationRulesSection>
               </Field>
@@ -393,48 +429,9 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                 )}
               </Field>
             </PasswordContents>
-            <ValidationRulesSectionLg>
-              <div>
-                {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
-              </div>
-              <div>
-                {this.state.validLength && <TickOn />}
-                {!this.state.validLength && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                    {
-                      min: intl.formatMessage({
-                        defaultMessage: '8',
-                        description: 'Minimum length password',
-                        id: 'number.eight'
-                      })
-                    }
-                  )}
-                </span>
-              </div>
-              <div>
-                {this.state.hasCases && <TickOn />}
-                {!this.state.hasCases && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordCaseCharacteristicsForPasswordUpdateForm
-                  )}
-                </span>
-              </div>
-              <div>
-                {this.state.hasNumber && <TickOn />}
-                {!this.state.hasNumber && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordNumberCharacteristicsForPasswordUpdateForm
-                  )}
-                </span>
-              </div>
-            </ValidationRulesSectionLg>
           </Row>
         </form>
-      </ResponsiveModal>
+      </Dialog>
     )
   }
 }

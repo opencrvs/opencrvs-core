@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
 import { Download } from '@opencrvs/components/lib/icons'
@@ -354,20 +354,19 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         )}
       </DownloadAction>
       {assignModal !== null && (
-        <ResponsiveModal
+        <Dialog
           id="assignment"
-          show
+          onOpen={true}
           title={intl.formatMessage(assignModal.title)}
+          supportingCopy={intl.formatMessage(
+            assignModal.content,
+            assignModal.contentArgs
+          )}
           actions={assignModal.actions.map((action) =>
             renderModalAction(action, intl)
           )}
-          autoHeight
-          responsive={false}
-          preventClickOnParent
-          handleClose={hideModal}
-        >
-          {intl.formatMessage(assignModal.content, assignModal.contentArgs)}
-        </ResponsiveModal>
+          onClose={hideModal}
+        />
       )}
     </>
   )

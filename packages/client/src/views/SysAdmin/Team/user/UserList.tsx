@@ -50,7 +50,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { AddUser, SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import {
   BodyContent,
@@ -717,10 +717,10 @@ function UserListComponent(props: IProps) {
               ]}
             />
 
-            <ResponsiveModal
+            <Dialog
               id="username-reminder-modal"
-              show={toggleUsernameReminder.modalVisible}
-              handleClose={() => toggleUsernameReminderModal()}
+              onOpen={toggleUsernameReminder.modalVisible}
+              onClose={() => toggleUsernameReminderModal()}
               title={intl.formatMessage(
                 messages.sendUsernameReminderInviteModalTitle
               )}
@@ -747,8 +747,6 @@ function UserListComponent(props: IProps) {
                   {intl.formatMessage(buttonMessages.send)}
                 </Button>
               ]}
-              responsive={false}
-              autoHeight={true}
             >
               {intl.formatMessage(
                 messages.sendUsernameReminderInviteModalMessage,
@@ -760,11 +758,11 @@ function UserListComponent(props: IProps) {
                   deliveryMethod
                 }
               )}
-            </ResponsiveModal>
-            <ResponsiveModal
+            </Dialog>
+            <Dialog
               id="user-reset-password-modal"
-              show={toggleResetPassword.modalVisible}
-              handleClose={() => toggleUserResetPasswordModal()}
+              onOpen={toggleResetPassword.modalVisible}
+              onClose={() => toggleUserResetPasswordModal()}
               title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
               actions={[
                 <Button
@@ -789,8 +787,6 @@ function UserListComponent(props: IProps) {
                   {intl.formatMessage(buttonMessages.send)}
                 </Button>
               ]}
-              responsive={false}
-              autoHeight={true}
             >
               {intl.formatMessage(messages.resetUserPasswordModalMessage, {
                 deliveryMethod,
@@ -799,7 +795,7 @@ function UserListComponent(props: IProps) {
                     ? toggleResetPassword.selectedUser?.mobile
                     : toggleResetPassword.selectedUser?.email
               })}
-            </ResponsiveModal>
+            </Dialog>
           </UserTable>
         </>
       )

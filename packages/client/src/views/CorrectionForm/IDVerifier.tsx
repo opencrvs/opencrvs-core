@@ -11,22 +11,16 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { identityNameMapper } from '@client/forms/identity'
 import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -151,27 +145,27 @@ class IDVerifierComponent extends React.Component<
     const { correctorInformation, intl, id } = this.props
 
     const positiveActionButton = (
-      <SuccessButton
+      <Button
         id="verifyPositive"
         key="verifyPositive"
+        type="positive"
         onClick={positiveAction.handler}
-        icon={() => <Check />}
-        align={ICON_ALIGNMENT.LEFT}
       >
+        <Icon name="Check" />
         {positiveAction.label}
-      </SuccessButton>
+      </Button>
     )
 
     const negativeActionButton = (
-      <DangerButton
+      <Button
         id="verifyNegative"
         key="verifyNegative"
+        type="negative"
         onClick={this.togglePrompt}
-        icon={() => <Cross color="currentColor" />}
-        align={ICON_ALIGNMENT.LEFT}
       >
+        <Icon name="X" />
         {negativeAction.label}
-      </DangerButton>
+      </Button>
     )
 
     return (
@@ -188,21 +182,25 @@ class IDVerifierComponent extends React.Component<
             </Container>
           )}
         </Content>
-        <ResponsiveModal
+        <Dialog
           id="withoutVerificationPrompt"
-          show={showPrompt}
+          onOpen={showPrompt}
           title={intl.formatMessage(certificateMessages.idCheckDialogTitle)}
-          contentHeight={96}
-          handleClose={this.togglePrompt}
+          supportingCopy={intl.formatMessage(
+            certificateMessages.correctorIDCheckDialogDescription
+          )}
+          onClose={this.togglePrompt}
           actions={[
-            <TertiaryButton
+            <Button
+              type="tertiary"
               id="cancel"
               key="cancel"
               onClick={this.togglePrompt}
             >
               {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
-            </TertiaryButton>,
-            <PrimaryButton
+            </Button>,
+            <Button
+              type="primary"
               id="send"
               key="continue"
               onClick={() => {
@@ -211,13 +209,9 @@ class IDVerifierComponent extends React.Component<
               }}
             >
               {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
-            </PrimaryButton>
+            </Button>
           ]}
-        >
-          {intl.formatMessage(
-            certificateMessages.correctorIDCheckDialogDescription
-          )}
-        </ResponsiveModal>
+        />
       </div>
     )
   }

@@ -25,7 +25,7 @@ import { useMutation } from '@apollo/client'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
@@ -134,13 +134,15 @@ export function BookmarkAdvancedSearchModal({
 
   return (
     <>
-      <ResponsiveModal
+      <Dialog
         id="bookmarkModal"
-        show={showBookmarkModal}
+        onOpen={showBookmarkModal}
         title={intl.formatMessage(
           messagesSearch.bookmarkAdvancedSearchModalTitle
         )}
-        autoHeight={true}
+        supportingCopy={intl.formatMessage(
+          messagesSearch.bookmarkAdvancedSearchModalBody
+        )}
         actions={[
           <Button
             type="tertiary"
@@ -173,15 +175,11 @@ export function BookmarkAdvancedSearchModal({
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => {
+        onClose={() => {
           toggleBookmarkModal()
           setQueryName('')
         }}
       >
-        <Message>
-          {intl.formatMessage(messagesSearch.bookmarkAdvancedSearchModalBody)}
-        </Message>
-
         <InputField id="queryName" touched={true} required={false}>
           <TextInput
             id="queryName"
@@ -193,7 +191,7 @@ export function BookmarkAdvancedSearchModal({
             onChange={onChangeQueryName}
           />
         </InputField>
-      </ResponsiveModal>
+      </Dialog>
     </>
   )
 }

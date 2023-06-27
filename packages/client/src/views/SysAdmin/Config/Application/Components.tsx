@@ -11,7 +11,6 @@
  */
 import { Text } from '@opencrvs/components/lib/Text'
 import styled from '@client/styledComponents'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 
 export const Content = styled.div`
@@ -42,25 +41,11 @@ export const SmallWidthInput = styled(TextInput)`
 
 export const InputContainer = styled.div`
   display: flex;
-  margin-top: 30px;
   justify-content: center;
   align-items: center;
   gap: 8px;
 `
 
-export const CancelButton = styled(TertiaryButton)`
-  height: 40px;
-  & div {
-    padding: 0;
-  }
-`
-
-export const ApplyButton = styled(PrimaryButton)`
-  height: 40px;
-  & div {
-    padding: 0 8px;
-  }
-`
 export const ErrorContent = styled.div`
   display: flex;
   margin-bottom: 10px;

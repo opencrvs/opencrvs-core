@@ -13,8 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
   Label,
   Message,
   Value
@@ -22,7 +20,8 @@ import {
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -104,19 +103,24 @@ export function NIDNumPattern() {
         }
       />
 
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.nidPatternTitle)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        supportingCopy={intl.formatMessage(messages.nidPatternChangeMessage)}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !isValidRegEx(nidPattern) ||
               !Boolean(nidPattern) ||
@@ -127,13 +131,10 @@ export function NIDNumPattern() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Message>
-          {intl.formatMessage(messages.nidPatternChangeMessage)}
-        </Message>
         <ContentComponent
           intl={intl}
           changeModalName={GeneralActionId.NID_NUMBER_PATTERN}
@@ -145,7 +146,7 @@ export function NIDNumPattern() {
             messages.nidPatternChangeError
           )}
         />
-      </ResponsiveModal>
+      </Dialog>
 
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast

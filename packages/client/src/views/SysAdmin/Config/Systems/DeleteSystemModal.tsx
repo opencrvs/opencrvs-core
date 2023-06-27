@@ -14,9 +14,8 @@ import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { System } from '@client/utils/gateway'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Text } from '@opencrvs/components/lib/Text'
 import React, { ReactNode } from 'react'
 
 interface ISystemProps {
@@ -36,10 +35,14 @@ export function DeleteSystemModal({
 
   return (
     <>
-      <ResponsiveModal
+      <Dialog
         title={system.name}
-        contentHeight={70}
-        responsive={false}
+        supportingCopy={intl.formatMessage(
+          integrationMessages.deleteSystemText,
+          {
+            b: (chunks: ReactNode) => <strong>{chunks}</strong>
+          }
+        )}
         actions={[
           <Button
             type="tertiary"
@@ -63,15 +66,9 @@ export function DeleteSystemModal({
             {intl.formatMessage(buttonMessages.delete)}
           </Button>
         ]}
-        show={true}
-        handleClose={() => closeModal()}
-      >
-        <Text variant="reg16" element="span">
-          {intl.formatMessage(integrationMessages.deleteSystemText, {
-            b: (chunks: ReactNode) => <strong>{chunks}</strong>
-          })}
-        </Text>
-      </ResponsiveModal>
+        onOpen={true}
+        onClose={() => closeModal()}
+      />
     </>
   )
 }

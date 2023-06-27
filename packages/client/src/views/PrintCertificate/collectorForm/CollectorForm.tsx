@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Content } from '@opencrvs/components/lib/Content'
 
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   modifyDeclaration,
   storeDeclaration,
@@ -405,8 +405,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               draftData={declarationToBeCertified.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
             />
-            <PrimaryButton
+            <Button
               id="confirm_form"
+              type="primary"
+              size="large"
               onClick={() => {
                 this.continueButtonHandler(
                   declarationToBeCertified.id,
@@ -421,27 +423,31 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               disabled={this.state.isFileUploading}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
+            </Button>
           </Content>
         </ActionPageLight>
         {showModalForNoSignedAffidavit && (
-          <ResponsiveModal
+          <Dialog
             id="noAffidavitAgreementConfirmationModal"
             title={intl.formatMessage(
               certificateMessages.noAffidavitModalTitle
             )}
-            contentHeight={96}
+            supportingCopy={intl.formatMessage(
+              certificateMessages.noAffidavitModalDescription
+            )}
             actions={[
-              <TertiaryButton
+              <Button
                 id="cancel-btn"
                 key="cancel"
+                type="tertiary"
                 onClick={this.toggleSubmitModalOpen}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
-              </TertiaryButton>,
-              <PrimaryButton
+              </Button>,
+              <Button
                 key="submit"
                 id="submit_confirm"
+                type="primary"
                 onClick={() =>
                   this.goToNextFormForSomeoneElse(
                     declarationId,
@@ -452,15 +458,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 disabled={this.state.isFileUploading}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
-              </PrimaryButton>
+              </Button>
             ]}
-            show={showModalForNoSignedAffidavit}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {intl.formatMessage(
-              certificateMessages.noAffidavitModalDescription
-            )}
-          </ResponsiveModal>
+            onOpen={showModalForNoSignedAffidavit}
+            onClose={this.toggleSubmitModalOpen}
+          />
         )}
       </>
     )

@@ -10,14 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { gql } from '@apollo/client'
 import Cropper from 'react-easy-crop'
 import { Point, Area, Size } from 'react-easy-crop/types'
@@ -39,8 +36,8 @@ import { UserDetails } from '@client/utils/userUtils'
 
 const Container = styled.div`
   align-self: center;
+  border-radius: 4px;
   position: relative;
-  width: min(600px, 90%);
   aspect-ratio: 1;
 `
 
@@ -53,11 +50,10 @@ const Description = styled.div`
 `
 
 const SliderContainer = styled.div`
-  width: min(600px, 90%);
   display: flex;
   align-self: center;
   align-items: center;
-  margin: 30px 0;
+  margin: 24px 0;
   padding: 0 16px;
   gap: 8px;
 `
@@ -71,7 +67,7 @@ function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
     <SliderContainer>
       <Square width={12} height={12} color="grey400" />
       <StyledInput {...props} />
-      <Square width={18} height={18} color="grey400" />
+      <Square width={20} height={20} color="grey400" />
     </SliderContainer>
   )
 }
@@ -186,16 +182,19 @@ function AvatarChangeModalComp({
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangeAvatarModal"
-      width={1080}
-      autoHeight
-      show={showChangeAvatar}
+      onOpen={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
+        <Button
+          key="cancel"
+          id="modal_cancel"
+          type="tertiary"
+          onClick={handleCancel}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
+        </Button>,
         <Mutation<{ changeAvatar: IImage }, { userId: string; avatar: IImage }>
           key="change-avatar-mutation"
           mutation={changeAvatarMutation}
@@ -206,9 +205,10 @@ function AvatarChangeModalComp({
         >
           {(changeAvatar) => {
             return (
-              <PrimaryButton
+              <Button
                 key="apply"
                 id="apply_change"
+                type="primary"
                 disabled={!isOnline || !!error}
                 onClick={async () => {
                   const croppedImage = await getCroppedImage(
@@ -231,12 +231,12 @@ function AvatarChangeModalComp({
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
-              </PrimaryButton>
+              </Button>
             )
           }}
         </Mutation>
       ]}
-      handleClose={handleCancel}
+      onClose={handleCancel}
     >
       <Description>
         {!error && intl.formatMessage(messages.resizeAvatar)}
@@ -284,7 +284,7 @@ function AvatarChangeModalComp({
           />
         </>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

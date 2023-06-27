@@ -49,7 +49,8 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components/src/Button'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -84,7 +85,6 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
 import { getBase64String } from '@client/utils/imageUtils'
-import { ResponsiveModal } from '@client/../../components/lib'
 import { client } from '@client/utils/apolloClient'
 import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { Alert } from '@opencrvs/components/lib/Alert'
@@ -1261,19 +1261,16 @@ class CustomFieldToolsComp extends React.Component<
   CSVUploadModal() {
     const { intl } = this.props
     return (
-      <ResponsiveModal
+      <Dialog
         title={intl.formatMessage(customFieldFormMessages.validatingCSVFile)}
-        handleClose={this.closeCSVUploadModal.bind(this)}
-        show={this.state.showCSVUploadingModal}
+        supportingCopy={intl.formatMessage(
+          customFieldFormMessages.validatingCSVFilesValidatingDescription
+        )}
+        onClose={this.closeCSVUploadModal.bind(this)}
+        onOpen={this.state.showCSVUploadingModal}
         actions={this.state.CSVUploaderModalActions}
       >
         <>
-          {intl.formatMessage(
-            customFieldFormMessages.validatingCSVFilesValidatingDescription
-          )}
-          <br />
-          <br />
-
           {this.state.CSVUploadStatuses.map((status, key) => {
             return (
               <>
@@ -1289,7 +1286,7 @@ class CustomFieldToolsComp extends React.Component<
             )
           })}
         </>
-      </ResponsiveModal>
+      </Dialog>
     )
   }
 

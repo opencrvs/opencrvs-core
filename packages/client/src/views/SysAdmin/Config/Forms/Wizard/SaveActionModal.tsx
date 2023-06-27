@@ -25,12 +25,9 @@ import {
   CreateFormDraftMutationVariables
 } from '@client/utils/gateway'
 import { Mutation } from '@apollo/client/react/components'
-import {
-  SecondaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -79,8 +76,9 @@ function SaveActionButton({ comment }: { comment: string }) {
       }}
     >
       {(createFormDraft) => (
-        <PrimaryButton
+        <Button
           id="save-btn"
+          type="primary"
           disabled={!comment}
           onClick={() => {
             setStatus(ActionStatus.PROCESSING)
@@ -94,7 +92,7 @@ function SaveActionButton({ comment }: { comment: string }) {
           }}
         >
           {intl.formatMessage(buttonMessages.save)}
-        </PrimaryButton>
+        </Button>
       )}
     </Mutation>
   )
@@ -109,19 +107,18 @@ export function SaveActionModal() {
   const closeModal = () => setStatus(ActionStatus.IDLE)
 
   return (
-    <ResponsiveModal
-      autoHeight
+    <Dialog
       title={intl.formatMessage(messages.saveDraftTitle)}
-      show={status === ActionStatus.MODAL}
-      handleClose={closeModal}
+      supportingCopy={intl.formatMessage(messages.saveDraftDescription)}
+      onOpen={status === ActionStatus.MODAL}
+      onClose={closeModal}
       actions={[
-        <SecondaryButton key="close-modal-button" onClick={closeModal}>
+        <Button type="secondary" key="close-modal-button" onClick={closeModal}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </SecondaryButton>,
+        </Button>,
         <SaveActionButton key="save-action-button" comment={comment} />
       ]}
     >
-      {intl.formatMessage(messages.saveDraftDescription)}
       <InputField
         id="comment"
         label={intl.formatMessage(messages.saveDraftCommentLabel)}
@@ -144,6 +141,6 @@ export function SaveActionModal() {
           }}
         />
       </InputField>
-    </ResponsiveModal>
+    </Dialog>
   )
 }

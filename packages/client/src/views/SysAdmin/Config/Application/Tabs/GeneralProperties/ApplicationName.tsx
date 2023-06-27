@@ -13,8 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
   Content,
   Field,
   HalfWidthInput,
@@ -26,7 +24,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -99,19 +98,26 @@ export function ApplicationName() {
         }
       />
 
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.applicationNameLabel)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        supportingCopy={intl.formatMessage(
+          messages.applicationNameChangeMessage
+        )}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(applicationName) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -121,27 +127,20 @@ export function ApplicationName() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Message>
-          {intl.formatMessage(messages.applicationNameChangeMessage)}
-        </Message>
-        <Content>
-          <Field>
-            <InputField id="applicationName" touched={true} required={false}>
-              <HalfWidthInput
-                id="applicationName"
-                type="text"
-                error={false}
-                value={applicationName}
-                onChange={handleApplicationName}
-              />
-            </InputField>
-          </Field>
-        </Content>
-      </ResponsiveModal>
+        <InputField id="applicationName" touched={true} required={false}>
+          <HalfWidthInput
+            id="applicationName"
+            type="text"
+            error={false}
+            value={applicationName}
+            onChange={handleApplicationName}
+          />
+        </InputField>
+      </Dialog>
 
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast

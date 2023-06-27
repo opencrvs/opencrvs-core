@@ -30,14 +30,11 @@ import {
   FormTabs,
   Link,
   ListViewItemSimplified,
-  ResponsiveModal,
   Stack,
   Text,
   Toast
 } from '@opencrvs/components/lib'
 import {
-  ApplyButton,
-  CancelButton,
   ErrorContent,
   ErrorMessage,
   Field,
@@ -48,7 +45,8 @@ import {
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { IAttachmentValue } from '@client/forms'
-
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Button } from '@opencrvs/components/lib/Button'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { InputField } from '@client/components/form/InputField'
@@ -68,7 +66,8 @@ const Box = styled.span`
   width: 40px;
   height: 40px;
   margin-left: 5px;
-  border: 2px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${(p) => (p.color ? p.color : '#fff')};
 `
 
@@ -78,6 +77,7 @@ const HexInput = styled(HalfWidthInput)`
 
 export const LoginBackground = () => {
   const intl = useIntl()
+  const [supportingCopy, setSupportingCopy] = React.useState('')
   const dispatch = useDispatch()
   const [hexValue, setHexValue] = React.useState(EMPTY_STRING)
   const [isRequestValid, setRequestValid] = React.useState(false)
@@ -149,6 +149,17 @@ export const LoginBackground = () => {
       type: EMPTY_STRING,
       data: EMPTY_STRING
     })
+  }
+
+  const getSupportingCopy = (activeTabId: TabId) => {
+    switch (activeTabId) {
+      case TabId.COLOUR:
+        return intl.formatMessage(messages.loginColorText)
+      case TabId.IMAGE:
+        return intl.formatMessage(messages.loginImageText)
+      default:
+        return null
+    }
   }
 
   const handleBackgroundImageFile = (data: IAttachmentValue) => {
@@ -246,19 +257,34 @@ export const LoginBackground = () => {
           </Link>
         }
       />
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.loginBackgroundLabel)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        supportingCopy={getSupportingCopy(activeTabId)}
+        tabs={
+          <FormTabs
+            sections={tabSections}
+            activeTabId={activeTabId}
+            onTabClick={(id: TabId) => {
+              setActiveTabId(id)
+              clearInputs()
+            }}
+          />
+        }
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(isRequestValid) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -268,9 +294,9 @@ export const LoginBackground = () => {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
         {errorOccurred && (
           <ErrorContent>
@@ -279,64 +305,43 @@ export const LoginBackground = () => {
             </ErrorMessage>
           </ErrorContent>
         )}
-        <FormTabs
-          sections={tabSections}
-          activeTabId={activeTabId}
-          onTabClick={(id: TabId) => {
-            setActiveTabId(id)
-            clearInputs()
-          }}
-        />
+
         {activeTabId === TabId.COLOUR && (
-          <Field id="colortab">
-            <InputField
-              id="applicationField"
-              touched={false}
-              required={false}
-              label={intl.formatMessage(messages.colourTabText)}
-            >
-              <HexInput
-                id="applicationHexColor"
-                type="text"
-                value={hexValue}
-                maxLength={6}
-                onChange={handleColorChange}
-              />
-              {showColour ? (
-                <Box id="Box" color={'#' + hexValue}></Box>
-              ) : (
-                <Box id="Box"></Box>
-              )}
-              <Message></Message>
-            </InputField>
-          </Field>
+          <InputField id="colortab" touched={false} required={false}>
+            <HexInput
+              id="applicationHexColor"
+              type="text"
+              placeholder="eg. 36304E"
+              value={hexValue}
+              maxLength={6}
+              onChange={handleColorChange}
+            />
+            {showColour ? (
+              <Box id="Box" color={'#' + hexValue}></Box>
+            ) : (
+              <Box id="Box"></Box>
+            )}
+            <Message></Message>
+          </InputField>
         )}
         {activeTabId === TabId.IMAGE && (
           <>
-            <Field id="backgroundImageFile">
-              <Text variant="reg16" element="span">
-                {intl.formatMessage(messages.loginImageText)}
-              </Text>
-
-              <SimpleDocumentUploader
-                label={backgroundFile.name ? backgroundFile.name : ''}
-                disableDeleteInPreview={false}
-                name={intl.formatMessage(messages.loginBackgroundLabel)}
-                allowedDocType={['image/png', 'image/jpeg']}
-                onComplete={(file) => {
-                  setErrorOccurred(false)
-                  setErrorMessages(EMPTY_STRING)
-                  handleBackgroundImage(
-                    (file as IAttachmentValue).data as string
-                  )
-                  handleBackgroundImageFile(file as IAttachmentValue)
-                  handleBackgroundImageFileName(file as IAttachmentValue)
-                }}
-                files={backgroundFile}
-                touched
-                error={errorMessages}
-              />
-            </Field>
+            <SimpleDocumentUploader
+              label={backgroundFile.name ? backgroundFile.name : ''}
+              disableDeleteInPreview={false}
+              name={intl.formatMessage(messages.loginBackgroundLabel)}
+              allowedDocType={['image/png', 'image/jpeg']}
+              onComplete={(file) => {
+                setErrorOccurred(false)
+                setErrorMessages(EMPTY_STRING)
+                handleBackgroundImage((file as IAttachmentValue).data as string)
+                handleBackgroundImageFile(file as IAttachmentValue)
+                handleBackgroundImageFileName(file as IAttachmentValue)
+              }}
+              files={backgroundFile}
+              touched
+              error={errorMessages}
+            />
             {backgroundImage && (
               <Stack
                 alignItems="center"
@@ -355,7 +360,7 @@ export const LoginBackground = () => {
             )}
           </>
         )}
-      </ResponsiveModal>
+      </Dialog>
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast
           id="print-cert-notification"

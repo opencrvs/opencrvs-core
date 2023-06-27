@@ -20,7 +20,6 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import styled from '@client/styledComponents'
 import { Event } from '@client/utils/gateway'
 import {
   IRejectRegistrationForm,
@@ -28,7 +27,7 @@ import {
 } from '@opencrvs/client/src/review/reject-registration'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Button } from '@opencrvs/components/lib/Button'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -37,9 +36,6 @@ import { goToHome } from '@client/navigation'
 import { HOME } from '@client/navigation/routes'
 import { RouteComponentProps } from 'react-router'
 
-const Instruction = styled.div`
-  margin-bottom: 28px;
-`
 interface IState {
   data: IFormSectionData
   enableSendForUpdateBtn: boolean
@@ -127,13 +123,11 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 
     return (
       <div id="reject-registration-form-container">
-        <ResponsiveModal
+        <Dialog
           title={intl.formatMessage(messages.rejectionFormTitle)}
-          show={true}
-          width={918}
-          contentHeight={270}
-          handleClose={this.props.onClose}
-          showHeaderBorder={true}
+          supportingCopy={intl.formatMessage(messages.rejectionFormInstruction)}
+          onOpen={true}
+          onClose={this.props.onClose}
           actions={[
             <Button
               id="cancel"
@@ -180,16 +174,13 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             </Button>
           ]}
         >
-          <Instruction>
-            {intl.formatMessage(messages.rejectionFormInstruction)}
-          </Instruction>
           <FormFieldGenerator
             id="reject_form"
             fields={fields}
             onChange={this.storeData}
             setAllFieldsDirty={false}
           />
-        </ResponsiveModal>
+        </Dialog>
       </div>
     )
   }

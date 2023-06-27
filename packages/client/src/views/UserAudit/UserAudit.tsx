@@ -49,7 +49,7 @@ import {
   SystemRoleType
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { getOfflineData } from '@client/offline/selectors'
 import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
@@ -404,13 +404,13 @@ export const UserAudit = () => {
               }
             ]}
           />
-          <ResponsiveModal
+          <Dialog
             id="username-reminder-modal"
-            show={toggleUsernameReminder}
-            handleClose={() => toggleUsernameReminderModal()}
             title={intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalTitle
             )}
+            onOpen={toggleUsernameReminder}
+            onClose={() => toggleUsernameReminderModal()}
             actions={[
               <Button
                 type="tertiary"
@@ -434,8 +434,6 @@ export const UserAudit = () => {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalMessage,
@@ -444,12 +442,12 @@ export const UserAudit = () => {
                 deliveryMethod
               }
             )}
-          </ResponsiveModal>
-          <ResponsiveModal
+          </Dialog>
+          <Dialog
             id="user-reset-password-modal"
-            show={toggleResetPassword}
-            handleClose={() => toggleUserResetPasswordModal()}
             title={intl.formatMessage(sysMessages.resetUserPasswordModalTitle)}
+            onOpen={toggleResetPassword}
+            onClose={() => toggleUserResetPasswordModal()}
             actions={[
               <Button
                 type="tertiary"
@@ -473,14 +471,12 @@ export const UserAudit = () => {
                 {intl.formatMessage(buttonMessages.send)}
               </Button>
             ]}
-            responsive={false}
-            autoHeight={true}
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
               deliveryMethod,
               recipient: deliveryMethod == 'sms' ? user.number : user.email
             })}
-          </ResponsiveModal>
+          </Dialog>
           {showResendInviteSuccess && (
             <Toast
               id="resend_invite_success"

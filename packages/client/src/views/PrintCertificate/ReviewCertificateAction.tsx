@@ -9,17 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  PrimaryButton,
-  SuccessButton,
-  DangerButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check } from '@opencrvs/components/lib/icons'
 import { Content } from '@opencrvs/components/lib/Content'
 
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import {
   IPrintableDeclaration,
   modifyDeclaration,
@@ -64,14 +57,9 @@ import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
-const CustomTertiaryButton = styled(TertiaryButton)`
-  height: 48px;
-  &:disabled {
-    background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.grey300};
-  }
-`
 const ButtonWrapper = styled.div`
   display: flex;
 
@@ -259,16 +247,17 @@ class ReviewCertificateActionComponent extends React.Component<
           subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
         >
           <ButtonWrapper>
-            <SuccessButton
-              align={0}
+            <Button
+              type="positive"
               id="confirm-print"
               onClick={this.toggleModal}
-              icon={() => <Check />}
             >
+              <Icon name="Check" />
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
-            </SuccessButton>
+            </Button>
             {!isEventMarriage && hasRegisterScope(scope) && (
-              <DangerButton
+              <Button
+                type="negative"
                 onClick={() =>
                   this.props.goToCertificateCorrection(
                     this.props.registrationId,
@@ -276,42 +265,45 @@ class ReviewCertificateActionComponent extends React.Component<
                   )
                 }
               >
+                <Icon name="PencilSimpleLine" />
                 {intl.formatMessage(buttonMessages.editRecord)}
-              </DangerButton>
+              </Button>
             )}
           </ButtonWrapper>
         </Content>
-        <ResponsiveModal
+        <Dialog
           id="confirm-print-modal"
           title={
             isPrintInAdvanced
               ? intl.formatMessage(certificateMessages.printModalTitle)
               : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
           }
+          supportingCopy={
+            isPrintInAdvanced
+              ? intl.formatMessage(certificateMessages.printModalBody)
+              : intl.formatMessage(certificateMessages.printAndIssueModalBody)
+          }
           actions={[
-            <CustomTertiaryButton
+            <Button
               key="close-modal"
+              type="tertiary"
               onClick={this.toggleModal}
               id="close-modal"
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </CustomTertiaryButton>,
-            <PrimaryButton
+            </Button>,
+            <Button
               key="print-certificate"
+              type="primary"
               onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >
               {intl.formatMessage(buttonMessages.print)}
-            </PrimaryButton>
+            </Button>
           ]}
-          show={this.state.showConfirmationModal}
-          handleClose={this.toggleModal}
-          contentHeight={100}
-        >
-          {isPrintInAdvanced
-            ? intl.formatMessage(certificateMessages.printModalBody)
-            : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
-        </ResponsiveModal>
+          onOpen={this.state.showConfirmationModal}
+          onClose={this.toggleModal}
+        />
       </ActionPageLight>
     )
   }

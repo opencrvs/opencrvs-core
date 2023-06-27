@@ -23,11 +23,12 @@ import {
 } from '@opencrvs/components/lib/'
 
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@opencrvs/components/lib/DocumentViewer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
@@ -2117,21 +2118,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             </ResponsiveDocumentViewer>
           </RightColumn>
         </Row>
-        <ResponsiveModal
+        <Dialog
           title={intl.formatMessage(messages.editDeclarationConfirmationTitle)}
-          contentHeight={96}
-          responsive={false}
+          supportingCopy={intl.formatMessage(
+            messages.editDeclarationConfirmation
+          )}
           actions={[
-            <TertiaryButton
+            <Button
               id="cancel-btn"
               key="cancel"
+              type="tertiary"
               onClick={this.toggleDisplayDialog}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
+            </Button>,
+            <Button
               id="edit_confirm"
               key="submit"
+              type="primary"
               onClick={() => {
                 this.editLinkClickHandlerForDraft(
                   this.state.editClickedSectionId!,
@@ -2141,13 +2145,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
+            </Button>
           ]}
-          show={this.state.displayEditDialog}
-          handleClose={this.toggleDisplayDialog}
-        >
-          {intl.formatMessage(messages.editDeclarationConfirmation)}
-        </ResponsiveModal>
+          onOpen={this.state.displayEditDialog}
+          onClose={this.toggleDisplayDialog}
+        />
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}

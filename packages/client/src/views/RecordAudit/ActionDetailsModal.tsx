@@ -15,7 +15,7 @@ import { goToUserProfile, IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import {
   IForm,
   IFormSection,
@@ -643,14 +643,12 @@ export const ActionDetailsModal = ({
   }
 
   return (
-    <ResponsiveModal
-      actions={[]}
-      handleClose={() => toggleActionDetails(null)}
-      show={show}
-      responsive={true}
+    <Dialog
       title={title}
-      width={1024}
-      autoHeight={true}
+      actions={[]}
+      size="large"
+      onClose={() => toggleActionDetails(null)}
+      onOpen={show}
     >
       <>
         <div>
@@ -674,6 +672,6 @@ export const ActionDetailsModal = ({
           draft={draft}
         />
       </>
-    </ResponsiveModal>
+    </Dialog>
   )
 }

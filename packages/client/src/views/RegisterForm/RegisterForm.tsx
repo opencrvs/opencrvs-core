@@ -20,8 +20,7 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  SecondaryButton,
-  DangerButton
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
 import {
@@ -30,7 +29,8 @@ import {
   IEventTopBarMenuAction
 } from '@opencrvs/components/lib/EventTopBar'
 import { Alert } from '@opencrvs/components/lib/Alert'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
@@ -924,66 +924,64 @@ class RegisterFormView extends React.Component<FullProps, State> {
               declaration={declaration}
             />
           )}
-          <ResponsiveModal
+          <Dialog
             id="save_declaration_confirmation"
             title={intl.formatMessage(
               messages.saveDeclarationConfirmModalTitle
             )}
-            show={this.state.showConfirmationModal}
-            handleClose={this.toggleConfirmationModal}
-            responsive={false}
-            contentHeight={80}
+            supportingCopy={intl.formatMessage(
+              messages.saveDeclarationConfirmModalDescription
+            )}
+            onOpen={this.state.showConfirmationModal}
+            onClose={this.toggleConfirmationModal}
             actions={[
-              <TertiaryButton
+              <Button
                 id="cancel_save"
                 key="cancel_save"
+                type="tertiary"
                 onClick={this.toggleConfirmationModal}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
-              </TertiaryButton>,
-              <PrimaryButton
+              </Button>,
+              <Button
                 id="confirm_save"
                 key="confirm_save"
+                type="primary"
                 onClick={this.writeDeclarationAndGoToHome}
               >
                 {intl.formatMessage(buttonMessages.save)}
-              </PrimaryButton>
+              </Button>
             ]}
-          >
-            {intl.formatMessage(
-              messages.saveDeclarationConfirmModalDescription
-            )}
-          </ResponsiveModal>
-          <ResponsiveModal
+          />
+          <Dialog
             id="delete_declaration_confirmation"
             title={intl.formatMessage(
               messages.deleteDeclarationConfirmModalTitle
             )}
-            show={this.state.confirmDeleteDeclarationModal}
-            handleClose={this.toggleConfirmDeleteModalOpen}
-            responsive={false}
-            contentHeight={80}
+            supportingCopy={intl.formatMessage(
+              messages.deleteDeclarationConfirmModalDescription
+            )}
+            onOpen={this.state.confirmDeleteDeclarationModal}
+            onClose={this.toggleConfirmDeleteModalOpen}
             actions={[
-              <TertiaryButton
+              <Button
                 id="cancel_delete"
                 key="cancel_delete"
+                type="tertiary"
                 onClick={this.toggleConfirmDeleteModalOpen}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
-              </TertiaryButton>,
-              <DangerButton
+              </Button>,
+              <Button
                 id="confirm_delete"
                 key="confirm_delete"
+                type="negative"
                 onClick={() => this.onDeleteDeclaration(declaration)}
               >
                 {intl.formatMessage(buttonMessages.delete)}
-              </DangerButton>
+              </Button>
             ]}
-          >
-            {intl.formatMessage(
-              messages.deleteDeclarationConfirmModalDescription
-            )}
-          </ResponsiveModal>
+          />
         </StyledContainer>
       </>
     )

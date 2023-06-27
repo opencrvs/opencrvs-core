@@ -18,7 +18,8 @@ import { IconWeight } from 'phosphor-react'
 enum IconSize {
   small = 16,
   medium = 20,
-  large = 24
+  large = 24,
+  xlarge = 36
 }
 
 type IconColor = keyof typeof colors | 'currentColor'

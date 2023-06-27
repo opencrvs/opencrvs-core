@@ -10,12 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  TertiaryButton,
-  DangerButton,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Button } from '@opencrvs/components/lib/Button'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
@@ -25,7 +22,6 @@ import { IUserAuditForm } from '@client/user/user-audit'
 import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { FormFieldGenerator } from '@client/components/form'
-import styled from '@client/styledComponents'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -68,13 +64,6 @@ interface IUserAuditVariables {
   comment: string
 }
 
-const Subtitle = styled.h2`
-  ${({ theme }) => theme.fonts.reg18};
-  color: ${({ theme }) => theme.colors.copy};
-  padding-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-`
-
 export enum AUDIT_ACTION {
   DEACTIVATE = 'DEACTIVATE',
   REACTIVATE = 'REACTIVATE'
@@ -104,9 +93,14 @@ function UserAuditActionModalComponent(
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
-    <TertiaryButton key="modal-cancel" id="modal-cancel" onClick={onClose}>
+    <Button
+      type="tertiary"
+      key="modal-cancel"
+      id="modal-cancel"
+      onClick={onClose}
+    >
       {intl.formatMessage(buttonMessages.cancel)}
-    </TertiaryButton>
+    </Button>
   ]
 
   if (user) {
@@ -187,9 +181,9 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'active') {
     actions.push(
-      <DangerButton id="deactivate-action" onClick={handleConfirm}>
+      <Button type="negative" id="deactivate-action" onClick={handleConfirm}>
         {intl.formatMessage(buttonMessages.deactivate)}
-      </DangerButton>
+      </Button>
     )
 
     modalTitle = intl.formatMessage(messages.deactivateUserTitle, { name })
@@ -200,9 +194,9 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'deactivated') {
     actions.push(
-      <SuccessButton id="reactivate-action" onClick={handleConfirm}>
+      <Button type="positive" id="reactivate-action" onClick={handleConfirm}>
         {intl.formatMessage(buttonMessages.reactivate)}
-      </SuccessButton>
+      </Button>
     )
 
     modalTitle = intl.formatMessage(messages.reactivateUserTitle, { name })
@@ -212,18 +206,14 @@ function UserAuditActionModalComponent(
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="user-audit-modal"
       title={modalTitle}
-      hideHeaderBoxShadow
-      show={show}
-      width={920}
-      contentHeight={504}
-      handleClose={onClose}
-      responsive
+      supportingCopy={modalSubtitle}
+      onOpen={show}
+      onClose={onClose}
       actions={actions}
     >
-      <Subtitle id="modal-subtitle">{modalSubtitle}</Subtitle>
       {formError && isErrorVisible && (
         <ErrorText id="form-error">{formError}</ErrorText>
       )}
@@ -234,7 +224,7 @@ function UserAuditActionModalComponent(
         setAllFieldsDirty={false}
         draftData={{ formValues }}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 

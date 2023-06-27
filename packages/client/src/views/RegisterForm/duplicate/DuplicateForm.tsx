@@ -16,18 +16,12 @@ import { archiveDeclaration, IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { useIntl } from 'react-intl'
+import { Dialog } from '@opencrvs/components/src/Dialog'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useDispatch } from 'react-redux'
 import { updateDeclaration } from '@client/declarations/submissionMiddleware'
-import {
-  ResponsiveModal,
-  Select,
-  Stack,
-  Text,
-  TextArea
-} from '@opencrvs/components/lib'
-import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
+import { Select, Stack, Text, TextArea } from '@opencrvs/components/lib'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToHome } from '@client/navigation'
 
@@ -145,22 +139,25 @@ export const DuplicateForm = (props: IProps) => {
         bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
       ></SubPageContent>
 
-      <ResponsiveModal
+      <Dialog
         id="mark-as-duplicate-modal"
-        width={840}
+        size="large"
         title={intl.formatMessage(
           duplicateMessages.markAsDuplicateConfirmationTitle,
           {
             trackingId: String(data.registration.trackingId)
           }
         )}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
+          </Button>,
           <Button
             key="mark-as-duplicate-button"
             id="mark-as-duplicate-button"
@@ -183,7 +180,7 @@ export const DuplicateForm = (props: IProps) => {
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
         {
           <>
@@ -215,14 +212,9 @@ export const DuplicateForm = (props: IProps) => {
             </Stack>
           </>
         }
-      </ResponsiveModal>
-      <ResponsiveModal
+      </Dialog>
+      <Dialog
         id="not-duplicate-modal"
-        show={toggleNotDuplicate}
-        autoHeight={true}
-        responsive={false}
-        titleHeightAuto={true}
-        handleClose={() => toggleNotDuplicateModal()}
         title={intl.formatMessage(
           duplicateMessages.notDuplicateContentConfirmationTitle,
           {
@@ -230,6 +222,8 @@ export const DuplicateForm = (props: IProps) => {
             trackingId: String(data.registration.trackingId)
           }
         )}
+        onOpen={toggleNotDuplicate}
+        onClose={() => toggleNotDuplicateModal()}
         actions={[
           <Button
             type="tertiary"
@@ -254,7 +248,7 @@ export const DuplicateForm = (props: IProps) => {
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
-      ></ResponsiveModal>
+      />
     </>
   )
 }

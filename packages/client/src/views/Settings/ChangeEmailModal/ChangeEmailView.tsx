@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import * as React from 'react'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -95,28 +95,32 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="ChangeEmailAddressModal"
-      show={show}
       title={intl.formatMessage(messages.changeEmailLabel)}
+      onOpen={show}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          key="cancel"
+          id="modal_cancel"
+          type="tertiary"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <PrimaryButton
+        </Button>,
+        <Button
           id="continue-button"
           key="continue"
+          type="primary"
           onClick={() => {
             continueButtonHandler(emailAddress)
           }}
           disabled={!Boolean(emailAddress.length) || isInvalidEmailAddress}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        </Button>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <InputField
         id="emailAddress"
@@ -148,6 +152,6 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           })}
         </Toast>
       )}
-    </ResponsiveModal>
+    </Dialog>
   )
 }

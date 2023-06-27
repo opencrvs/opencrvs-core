@@ -96,92 +96,88 @@ function ContentComponent({
   const [showExampleValidation, setShowExampleValidation] =
     React.useState(false)
   return (
-    <Content>
-      <Field>
-        <InputContainer>
-          <InputField
+    <>
+      <InputContainer>
+        <InputField
+          id={`${changeModalName}Input`}
+          touched={false}
+          required={true}
+          label={intl.formatMessage(messages.pattern)}
+          error={patternErrorMessage}
+          ignoreMediaQuery={true}
+        >
+          <HalfWidthInput
             id={`${changeModalName}Input`}
+            type="text"
+            error={!isValidRegEx(pattern)}
+            value={pattern}
+            onChange={setPattern}
+            ignoreMediaQuery={true}
+          />
+        </InputField>
+        <ErrorMessage id={`${changeModalName}-regex-error`}>
+          {!isValidRegEx(pattern) && patternErrorMessage}
+        </ErrorMessage>
+      </InputContainer>
+      <InputContainer displayFlex={true}>
+        <div>
+          <InputField
+            id={`${changeModalName}Example`}
             touched={false}
-            required={true}
-            label={intl.formatMessage(messages.pattern)}
-            error={patternErrorMessage}
+            required={false}
+            label={intl.formatMessage(messages.example)}
             ignoreMediaQuery={true}
           >
             <HalfWidthInput
-              id={`${changeModalName}Input`}
+              id={`${changeModalName}ExampleInput`}
               type="text"
-              error={!isValidRegEx(pattern)}
-              value={pattern}
-              onChange={setPattern}
+              error={false}
+              value={example}
+              onChange={setExample}
               ignoreMediaQuery={true}
             />
           </InputField>
-          <ErrorMessage id={`${changeModalName}-regex-error`}>
-            {!isValidRegEx(pattern) && patternErrorMessage}
-          </ErrorMessage>
-        </InputContainer>
-        <InputContainer displayFlex={true}>
-          <div>
-            <InputField
-              id={`${changeModalName}Example`}
-              touched={false}
-              required={false}
-              label={intl.formatMessage(messages.example)}
-              ignoreMediaQuery={true}
-            >
-              <HalfWidthInput
-                id={`${changeModalName}ExampleInput`}
-                type="text"
-                error={false}
-                value={example}
-                onChange={setExample}
-                ignoreMediaQuery={true}
-              />
-            </InputField>
-            <LinkContainer
-              id={`test-${changeModalName}-example`}
-              onClick={() => {
-                setShowExampleValidation(true)
-              }}
-            >
-              {intl.formatMessage(messages.testNumber)}
-            </LinkContainer>
-          </div>
-          {showExampleValidation && (
-            <ExampleValidityContainer>
-              {isValidExample(pattern, example) ? (
-                <>
-                  <ValidityIconContainer>
-                    <SuccessSmall
-                      id={`${changeModalName}-example-valid-icon`}
-                    />
-                  </ValidityIconContainer>
-                  <ExampleSuccessMessage
-                    id={`${changeModalName}-example-valid-message`}
-                  >
-                    {intl.formatMessage(messages.validExample)}
-                  </ExampleSuccessMessage>
-                </>
-              ) : (
-                <>
-                  <ValidityIconContainer>
-                    <Cross
-                      color={'red'}
-                      id={`${changeModalName}-example-invalid-icon`}
-                    />
-                  </ValidityIconContainer>
-                  <ExampleErrorMessage
-                    id={`${changeModalName}-example-invalid-message`}
-                  >
-                    {intl.formatMessage(messages.invalidExample)}
-                  </ExampleErrorMessage>
-                </>
-              )}
-            </ExampleValidityContainer>
-          )}
-        </InputContainer>
-      </Field>
-    </Content>
+          <LinkContainer
+            id={`test-${changeModalName}-example`}
+            onClick={() => {
+              setShowExampleValidation(true)
+            }}
+          >
+            {intl.formatMessage(messages.testNumber)}
+          </LinkContainer>
+        </div>
+        {showExampleValidation && (
+          <ExampleValidityContainer>
+            {isValidExample(pattern, example) ? (
+              <>
+                <ValidityIconContainer>
+                  <SuccessSmall id={`${changeModalName}-example-valid-icon`} />
+                </ValidityIconContainer>
+                <ExampleSuccessMessage
+                  id={`${changeModalName}-example-valid-message`}
+                >
+                  {intl.formatMessage(messages.validExample)}
+                </ExampleSuccessMessage>
+              </>
+            ) : (
+              <>
+                <ValidityIconContainer>
+                  <Cross
+                    color={'red'}
+                    id={`${changeModalName}-example-invalid-icon`}
+                  />
+                </ValidityIconContainer>
+                <ExampleErrorMessage
+                  id={`${changeModalName}-example-invalid-message`}
+                >
+                  {intl.formatMessage(messages.invalidExample)}
+                </ExampleErrorMessage>
+              </>
+            )}
+          </ExampleValidityContainer>
+        )}
+      </InputContainer>
+    </>
   )
 }
 

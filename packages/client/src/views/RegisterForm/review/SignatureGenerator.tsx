@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
+import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
@@ -17,37 +17,34 @@ import {
   ErrorText,
   ImageUploader,
   InputField,
-  ResponsiveModal
+  Button
 } from '@opencrvs/components'
 import {
   SecondaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
-import {
-  ApplyButton,
-  CancelButton
-} from '@client/views/SysAdmin/Config/Application/Components'
-import * as React from 'react'
 import styled from '@client/styledComponents'
 import SignatureCanvas from 'react-signature-canvas'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const InputWrapper = styled.div`
-  margin-top: 56px;
+  margin-top: 40px;
 `
 
 const SignatureContainer = styled.div`
   border: 2px solid ${({ theme }) => theme.colors.grey600};
   border-radius: 4px;
   width: 100%;
+  margin-bottom: 8px;
 `
 const SignatureInputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
 `
 const SignaturePreview = styled.img`
   max-width: 50%;
@@ -150,42 +147,42 @@ export function SignatureGenerator({
             <SignaturePreview alt={label} src={signatureData} />
           )}
           {signatureData && (
-            <TertiaryButton onClick={() => onChange('')}>
+            <Button type="tertiary" onClick={() => onChange('')}>
               {intl.formatMessage(messages.signatureDelete)}
-            </TertiaryButton>
+            </Button>
           )}
 
-          <ResponsiveModal
+          <Dialog
             id={`${id}_modal`}
             title={label}
-            autoHeight={true}
-            titleHeightAuto={true}
-            width={600}
-            show={signatureDialogOpen}
+            size="large"
+            supportingCopy={intl.formatMessage(
+              messages.signatureInputDescription
+            )}
+            onOpen={signatureDialogOpen}
             actions={[
-              <CancelButton
+              <Button
                 key="cancel"
                 id="modal_cancel"
+                type="tertiary"
                 onClick={() => setSignatureDialogOpen(false)}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
-              </CancelButton>,
-              <ApplyButton
+              </Button>,
+              <Button
                 key="apply"
                 id="apply_change"
+                type="primary"
                 disabled={false}
                 onClick={apply}
               >
                 {intl.formatMessage(buttonMessages.apply)}
-              </ApplyButton>
+              </Button>
             ]}
-            handleClose={() => setSignatureDialogOpen(false)}
+            onClose={() => setSignatureDialogOpen(false)}
           >
-            <SignatureDescription>
-              {intl.formatMessage(messages.signatureInputDescription)}
-            </SignatureDescription>
             <SignCanvas value={value} onChange={setSignatureValue} />
-          </ResponsiveModal>
+          </Dialog>
         </div>
       </InputField>
     </InputWrapper>
@@ -248,13 +245,13 @@ function SignCanvas({
           penColor="black"
           canvasProps={{
             width: canvasWidth,
-            height: 200
+            height: 360
           }}
         />
       </SignatureContainer>
-      <TertiaryButton onClick={clear}>
+      <Button type="tertiary" onClick={clear}>
         {intl.formatMessage(messages.clear)}
-      </TertiaryButton>
+      </Button>
     </SignatureInputContainer>
   )
 }

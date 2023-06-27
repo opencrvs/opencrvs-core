@@ -13,10 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
-  Content,
-  Field,
   HalfWidthInput,
   InputContainer,
   Label,
@@ -26,7 +22,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Button } from '@opencrvs/components/lib/Button'
 import { DeathActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -122,19 +119,23 @@ export function DeathDelayedFee() {
         }
       />
 
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.delayedFeeDialogTitle)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(deathDelayedFee) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -144,35 +145,29 @@ export function DeathDelayedFee() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Content>
-          <Field>
-            <InputField
+        <InputField
+          id="applicationDeathDelayedFee"
+          touched={true}
+          required={false}
+        >
+          <InputContainer>
+            <span>
+              {getCurrencySymbol(offlineCountryConfiguration.config.CURRENCY)}
+            </span>
+            <HalfWidthInput
               id="applicationDeathDelayedFee"
-              touched={true}
-              required={false}
-            >
-              <InputContainer>
-                <span>
-                  {getCurrencySymbol(
-                    offlineCountryConfiguration.config.CURRENCY
-                  )}
-                </span>
-                <HalfWidthInput
-                  id="applicationDeathDelayedFee"
-                  type="text"
-                  error={false}
-                  value={deathDelayedFee}
-                  onChange={handleDeathDelayedFee}
-                />
-              </InputContainer>
-            </InputField>
-          </Field>
-        </Content>
-      </ResponsiveModal>
+              type="text"
+              error={false}
+              value={deathDelayedFee}
+              onChange={handleDeathDelayedFee}
+            />
+          </InputContainer>
+        </InputField>
+      </Dialog>
 
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast

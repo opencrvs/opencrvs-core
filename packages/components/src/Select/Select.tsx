@@ -46,6 +46,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
+  z-index: 99999;
   ${({ theme }) => theme.fonts.reg18};
   .react-select__control {
     background: ${({ theme }) => theme.colors.white};
@@ -125,7 +126,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__menu {
-    z-index: 2;
+    z-index: 99999;
     padding: 0px 4px;
   }
 `

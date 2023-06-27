@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
@@ -95,13 +95,12 @@ export function RemoveBookmarkAdvancedSearchModal({
   }
   return (
     <>
-      <ResponsiveModal
+      <Dialog
         id="removeBookmarkModal"
-        show={showRemoveBookmarkModal}
+        onOpen={showRemoveBookmarkModal}
         title={intl.formatMessage(
           messagesSearch.removeBookmarkAdvancedSearchModalTitle
         )}
-        autoHeight={true}
         actions={[
           <Button
             type="tertiary"
@@ -130,14 +129,14 @@ export function RemoveBookmarkAdvancedSearchModal({
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
-        handleClose={toggleRemoveBookmarkModal}
+        onClose={toggleRemoveBookmarkModal}
       >
         <Message>
           {intl.formatMessage(
             messagesSearch.removeBookmarkAdvancedSearchModalBody
           )}
         </Message>
-      </ResponsiveModal>
+      </Dialog>
     </>
   )
 }

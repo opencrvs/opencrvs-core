@@ -59,6 +59,7 @@ interface IConfigMessages
   govermentLogoLabel: MessageDescriptor
   loginBackgroundLabel: MessageDescriptor
   loginImageText: MessageDescriptor
+  loginColorText: MessageDescriptor
   backgroundImageError: MessageDescriptor
   currencyLabel: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
@@ -358,6 +359,11 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage:
       'Upload an image and set how you would like it to display in the background',
     description: 'Login Image config label'
+  },
+  loginColorText: {
+    id: 'config.application.loginColorText',
+    defaultMessage: 'Choose a background colour by adding a color hex code',
+    description: 'Login color config label'
   },
   currencyLabel: {
     id: 'config.application.currencyLabel',

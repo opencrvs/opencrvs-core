@@ -13,8 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
   Content,
   Field,
   HalfWidthInput,
@@ -26,7 +24,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { MarriageActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -121,19 +120,23 @@ export function MarriageFeeOnTime() {
         }
       />
 
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.onTimeFeeDialogTitle)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(marriageOnTimeFee) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -143,35 +146,29 @@ export function MarriageFeeOnTime() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Content>
-          <Field>
-            <InputField
+        <InputField
+          id="applicationMarriageOnTimeFee"
+          touched={true}
+          required={false}
+        >
+          <InputContainer>
+            <span>
+              {getCurrencySymbol(offlineCountryConfiguration.config.CURRENCY)}
+            </span>
+            <HalfWidthInput
               id="applicationMarriageOnTimeFee"
-              touched={true}
-              required={false}
-            >
-              <InputContainer>
-                <span>
-                  {getCurrencySymbol(
-                    offlineCountryConfiguration.config.CURRENCY
-                  )}
-                </span>
-                <HalfWidthInput
-                  id="applicationMarriageOnTimeFee"
-                  type="text"
-                  error={false}
-                  value={marriageOnTimeFee}
-                  onChange={handleMarriageOnTimeFee}
-                />
-              </InputContainer>
-            </InputField>
-          </Field>
-        </Content>
-      </ResponsiveModal>
+              type="text"
+              error={false}
+              value={marriageOnTimeFee}
+              onChange={handleMarriageOnTimeFee}
+            />
+          </InputContainer>
+        </InputField>
+      </Dialog>
 
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast

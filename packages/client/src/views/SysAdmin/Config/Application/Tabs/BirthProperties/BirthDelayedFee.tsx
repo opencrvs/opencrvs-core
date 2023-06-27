@@ -13,8 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
   Content,
   Field,
   HalfWidthInput,
@@ -26,7 +24,8 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { BirthActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -125,19 +124,23 @@ export function BirthDelayedFee() {
         }
       />
 
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.delayedFeeDialogTitle)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(birthDelayedFee) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -147,35 +150,29 @@ export function BirthDelayedFee() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Content>
-          <Field>
-            <InputField
+        <InputField
+          id="applicationBirthDelayedFee"
+          touched={true}
+          required={false}
+        >
+          <InputContainer>
+            <span>
+              {getCurrencySymbol(offlineCountryConfiguration.config.CURRENCY)}
+            </span>
+            <HalfWidthInput
               id="applicationBirthDelayedFee"
-              touched={true}
-              required={false}
-            >
-              <InputContainer>
-                <span>
-                  {getCurrencySymbol(
-                    offlineCountryConfiguration.config.CURRENCY
-                  )}
-                </span>
-                <HalfWidthInput
-                  id="applicationBirthDelayedFee"
-                  type="text"
-                  error={false}
-                  value={birthDelayedFee}
-                  onChange={handleBirthDelayedFee}
-                />
-              </InputContainer>
-            </InputField>
-          </Field>
-        </Content>
-      </ResponsiveModal>
+              type="text"
+              error={false}
+              value={birthDelayedFee}
+              onChange={handleBirthDelayedFee}
+            />
+          </InputContainer>
+        </InputField>
+      </Dialog>
 
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast

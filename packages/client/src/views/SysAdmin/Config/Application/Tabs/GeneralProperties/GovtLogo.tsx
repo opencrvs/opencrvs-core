@@ -13,8 +13,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ApplyButton,
-  CancelButton,
   Content,
   ErrorContent,
   ErrorMessage,
@@ -25,8 +23,9 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -135,19 +134,24 @@ export function GovtLogo() {
           </Link>
         }
       />
-      <ResponsiveModal
+      <Dialog
         id={`${id}Modal`}
         title={intl.formatMessage(messages.govermentLogoLabel)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
+        supportingCopy={intl.formatMessage(messages.govtLogoChangeMessage)}
+        onOpen={showModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+          <Button
+            key="cancel"
+            id="modal_cancel"
+            type="tertiary"
+            onClick={toggleModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
+          </Button>,
+          <Button
             key="apply"
             id="apply_change"
+            type="primary"
             disabled={
               !Boolean(govtLogo) ||
               notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -157,11 +161,10 @@ export function GovtLogo() {
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
+          </Button>
         ]}
-        handleClose={toggleModal}
+        onClose={toggleModal}
       >
-        <Message>{intl.formatMessage(messages.govtLogoChangeMessage)}</Message>
         {errorOccured && (
           <ErrorContent>
             <Alert color="invert" />
@@ -170,28 +173,25 @@ export function GovtLogo() {
             </ErrorMessage>
           </ErrorContent>
         )}
-        <Content>
-          <Field id="govtLogoFile">
-            <SimpleDocumentUploader
-              label={logoFile.name ? logoFile.name : ''}
-              disableDeleteInPreview={false}
-              name={intl.formatMessage(messages.govermentLogoLabel)}
-              allowedDocType={['image/png', 'image/svg']}
-              onComplete={(file) => {
-                setErrorOccured(false)
-                setErrorMessages(EMPTY_STRING)
-                handleGovtLogo((file as IAttachmentValue).data as string)
-                handleLogoFile(file as IAttachmentValue)
-                handleLogoFileName(file as IAttachmentValue)
-              }}
-              files={logoFile}
-              onUploadingStateChanged={onUploadingStateChanged}
-              touched
-              error={errorMessages}
-            />
-          </Field>
-        </Content>
-      </ResponsiveModal>
+
+        <SimpleDocumentUploader
+          label={logoFile.name ? logoFile.name : ''}
+          disableDeleteInPreview={false}
+          name={intl.formatMessage(messages.govermentLogoLabel)}
+          allowedDocType={['image/png', 'image/svg']}
+          onComplete={(file) => {
+            setErrorOccured(false)
+            setErrorMessages(EMPTY_STRING)
+            handleGovtLogo((file as IAttachmentValue).data as string)
+            handleLogoFile(file as IAttachmentValue)
+            handleLogoFileName(file as IAttachmentValue)
+          }}
+          files={logoFile}
+          onUploadingStateChanged={onUploadingStateChanged}
+          touched
+          error={errorMessages}
+        />
+      </Dialog>
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast
           id="print-cert-notification"

@@ -44,7 +44,7 @@ import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem
 } from '@client/utils/gateway'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -442,16 +442,13 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                         />
 
                         {this.state.actionDetailsData && (
-                          <ResponsiveModal
-                            actions={[]}
-                            handleClose={() => this.toggleActionDetails(null)}
-                            show={this.state.showModal}
-                            responsive={true}
+                          <Dialog
                             title={this.getActionMessage(
                               this.state.actionDetailsData
                             )}
-                            width={1024}
-                            autoHeight={true}
+                            size="large"
+                            onClose={() => this.toggleActionDetails(null)}
+                            onOpen={this.state.showModal}
                           >
                             <>
                               <AuditContent>
@@ -464,7 +461,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                                 {this.getIpAdress(this.state.actionDetailsData)}
                               </AuditContent>
                             </>
-                          </ResponsiveModal>
+                          </Dialog>
                         )}
                       </TableDiv>
                     )

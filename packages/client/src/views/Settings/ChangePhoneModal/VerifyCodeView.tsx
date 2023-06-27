@@ -12,8 +12,8 @@
 import * as React from 'react'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Mutation } from '@apollo/client/react/components'
 import {
   changeEmailMutation,
@@ -92,14 +92,19 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
   }, [show])
 
   return (
-    <ResponsiveModal
+    <Dialog
       id="VerifyCodeModal"
-      show={show}
+      onOpen={show}
       title={intl.formatMessage(messages.verifyPhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
+        <Button
+          key="cancel"
+          id="modal_cancel"
+          type="tertiary"
+          onClick={onClose}
+        >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
+        </Button>,
         <Mutation<
           ChangePasswordMutation,
           ChangePhoneMutationVariables | ChangeEmailMutationVariables
@@ -113,9 +118,10 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
         >
           {(changePhoneOrEmail) => {
             return (
-              <PrimaryButton
+              <Button
                 id="verify-button"
                 key="verify"
+                type="primary"
                 onClick={() => {
                   if (userDetails?.userMgntUserID) {
                     if (phoneNumber) {
@@ -145,14 +151,12 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
                 disabled={!Boolean(verifyCode.length) || !isInvalidLength}
               >
                 {intl.formatMessage(buttonMessages.verify)}
-              </PrimaryButton>
+              </Button>
             )
           }}
         </Mutation>
       ]}
-      handleClose={onClose}
-      contentHeight={150}
-      contentScrollableY={true}
+      onClose={onClose}
     >
       <Message>
         {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
@@ -181,6 +185,6 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
           onChange={onChangeVerifyCode}
         />
       </InputField>
-    </ResponsiveModal>
+    </Dialog>
   )
 }

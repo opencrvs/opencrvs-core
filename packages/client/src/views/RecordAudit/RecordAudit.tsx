@@ -54,7 +54,7 @@ import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
@@ -637,7 +637,7 @@ function RecordAuditBody({
         />
       </Content>
       <ActionDetailsModal {...actionDetailsModalProps} />
-      <ResponsiveModal
+      <Dialog
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
             ? intl.formatMessage(
@@ -645,8 +645,7 @@ function RecordAuditBody({
               )
             : intl.formatMessage(recordAuditMessages.confirmationTitle)
         }
-        contentHeight={96}
-        responsive={false}
+        size="small"
         actions={[
           <TertiaryButton
             id="cancel-btn"
@@ -672,15 +671,15 @@ function RecordAuditBody({
             </DangerButton>
           )
         ]}
-        show={showDialog}
-        handleClose={toggleDisplayDialog}
+        onOpen={showDialog}
+        onClose={toggleDisplayDialog}
       >
         {declaration.status && ARCHIVED.includes(declaration.status)
           ? intl.formatMessage(
               recordAuditMessages.reinstateDeclarationDialogDescription
             )
           : intl.formatMessage(recordAuditMessages.confirmationBody)}
-      </ResponsiveModal>
+      </Dialog>
     </>
   )
 }

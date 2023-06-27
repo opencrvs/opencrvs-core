@@ -17,12 +17,16 @@ import { Icon } from '../Icon'
 
 export interface IDialogProps {
   id?: string
-  title: string
-  isOpen: boolean
-  children?: React.ReactNode
-  actions: JSX.Element[]
+  icon?: React.ReactNode
+  title?: string
+  titleColor?: 'copy' | 'negativeDark' | 'neutralDark' | 'positiveDark'
+  tabs?: React.ReactNode
+  supportingCopy?: React.ReactNode
+  size?: 'small' | 'large'
+  onOpen: boolean
   onClose?: () => void
-  variant?: 'small' | 'large'
+  children?: React.ReactNode
+  actions?: JSX.Element[]
 }
 
 const DialogWrapper = styled.div`
@@ -38,10 +42,10 @@ const DialogWrapper = styled.div`
   z-index: 100;
 `
 
-const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
+const DialogContainer = styled.div<{ size?: 'small' | 'large' }>`
   position: relative;
-  ${({ variant }) =>
-    variant === 'small'
+  ${({ size }) =>
+    size === 'small'
       ? `
         width: 480px;
         max-width: 90%;
@@ -66,39 +70,69 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
 `
 const DialogHeader = styled.div<{ hasOverflow?: boolean }>`
   display: flex;
-  padding: 16px 16px 14px 24px;
+  padding: 12px 16px 14px 24px;
   justify-content: space-between;
   align-items: flex-start;
   gap: 24px;
   ${({ hasOverflow }) => hasOverflow && `border-bottom: 1px solid #ccc`}
 `
+
+const DialogTabs = styled.div`
+  padding: 0px 24px;
+  margin-top: -16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+
 const DialogTitle = styled.div`
-  padding-top: 2px;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  padding-top: 6px;
+`
+
+const DialogBody = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+`
+
+const DialogSupportingCopy = styled.div`
+  width: 90%;
+  padding: 4px 24px 24px 24px;
+  text-wrap: wrap;
 `
 
 const DialogContent = styled.div`
   padding: 8px 24px 24px 24px;
-  flex-grow: 1;
-  overflow-y: auto;
+  ${({ theme }) => theme.fonts.reg16}
+  color: ${({ theme }) => theme.colors.grey500};
 `
 
 const DialogFooter = styled.div`
   padding: 16px 24px;
   display: flex;
   gap: 8px;
+  align-items: center;
   justify-content: flex-end;
   border-top: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
 export function Dialog({
   id,
+  icon,
   title,
+  titleColor = 'copy',
+  tabs,
+  supportingCopy,
   onClose,
-  isOpen,
+  onOpen,
   children,
   actions,
-  variant = 'small'
+  size = 'small'
 }: IDialogProps) {
+  const hasTabs = Boolean(tabs)
+  const hasSupportingCopy = Boolean(supportingCopy)
+  const hasContent = Boolean(children)
   const contentRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
@@ -140,18 +174,19 @@ export function Dialog({
     return () => {
       contentReference?.removeEventListener('scroll', handleScroll)
     }
-  }, [contentRef, isOpen])
+  }, [contentRef, onOpen])
 
   const headerHasBorder = hasOverflow && hasScrolled
 
   return (
     <>
-      {isOpen && (
+      {onOpen && (
         <DialogWrapper onClick={handleClickOutside}>
-          <DialogContainer id={id} variant={variant} ref={dialogRef}>
+          <DialogContainer id={id} size={size} ref={dialogRef}>
             <DialogHeader hasOverflow={headerHasBorder}>
               <DialogTitle>
-                <Text variant="h2" element="h2" color="grey600">
+                {icon}
+                <Text variant="h2" element="h2" color={titleColor}>
                   {title}
                 </Text>
               </DialogTitle>
@@ -159,7 +194,17 @@ export function Dialog({
                 <Icon name="X" size="medium" weight="bold" />
               </Button>
             </DialogHeader>
-            <DialogContent ref={contentRef}>{children}</DialogContent>
+            {hasTabs && <DialogTabs>{tabs}</DialogTabs>}
+            <DialogBody ref={contentRef}>
+              {hasSupportingCopy && (
+                <DialogSupportingCopy>
+                  <Text variant="reg16" element="p" color="grey500">
+                    {supportingCopy}
+                  </Text>
+                </DialogSupportingCopy>
+              )}
+              {hasContent && <DialogContent>{children}</DialogContent>}
+            </DialogBody>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}
           </DialogContainer>
         </DialogWrapper>

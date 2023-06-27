@@ -11,8 +11,8 @@
  */
 
 import React, { useState } from 'react'
-import { Text } from '@opencrvs/components/lib/Text'
-import { ResponsiveModal, Select, Stack, TextInput } from '@opencrvs/components'
+import { Select, Stack, TextInput } from '@opencrvs/components'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
@@ -137,13 +137,15 @@ export function UserRoleManagementModal(props: IProps) {
   }
 
   return (
-    <ResponsiveModal
+    <Dialog
       key={props.systemRole.id}
       title={
         getUserSystemRole({ systemRole: props.systemRole.value }, intl) || ''
       }
-      autoHeight
-      responsive={false}
+      supportingCopy={intl.formatMessage(messages.roleUpdateInstruction, {
+        systemRole:
+          getUserSystemRole({ systemRole: props.systemRole.value }, intl) || ''
+      })}
       actions={[
         <Button
           type="tertiary"
@@ -167,17 +169,9 @@ export function UserRoleManagementModal(props: IProps) {
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      show={true}
-      handleClose={() => props.closeCallback(null)}
+      onOpen={true}
+      onClose={() => props.closeCallback(null)}
     >
-      <Text variant="reg16" element="p" color="grey500">
-        {intl.formatMessage(messages.roleUpdateInstruction, {
-          systemRole:
-            getUserSystemRole({ systemRole: props.systemRole.value }, intl) ||
-            ''
-        })}
-      </Text>
-
       <Stack direction="column" alignItems="stretch">
         <LanguageSelect
           id="SelectLanguage"
@@ -253,6 +247,6 @@ export function UserRoleManagementModal(props: IProps) {
           </Button>
         </Stack>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }

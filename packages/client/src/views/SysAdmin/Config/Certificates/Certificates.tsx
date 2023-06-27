@@ -22,7 +22,6 @@ import {
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -32,7 +31,8 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -58,10 +58,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
-import {
-  ApplyButton,
-  Field
-} from '@client/views/SysAdmin/Config/Application/Components'
+import { Field } from '@client/views/SysAdmin/Config/Application/Components'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
@@ -698,23 +695,27 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             </Toast>
           )}
 
-          <ResponsiveModal
+          <Dialog
             id="withoutVerificationPrompt"
-            show={showPrompt}
+            onOpen={showPrompt}
             title={intl.formatMessage(messages.uploadCertificateDialogTitle)}
-            autoHeight={true}
-            handleClose={this.togglePrompt}
+            supportingCopy={intl.formatMessage(
+              messages.uploadCertificateDialogDescription
+            )}
+            onClose={this.togglePrompt}
             actions={[
-              <TertiaryButton
+              <Button
                 id="cancel"
                 key="cancel"
+                type="tertiary"
                 onClick={this.togglePrompt}
               >
                 {intl.formatMessage(messages.uploadCertificateDialogCancel)}
-              </TertiaryButton>,
-              <ApplyButton
+              </Button>,
+              <Button
                 key="apply"
                 id="apply_change"
+                type="primary"
                 disabled={!Boolean(this.state.imageFile.name)}
                 onClick={() => {
                   this.togglePrompt()
@@ -734,10 +735,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
-              </ApplyButton>
+              </Button>
             ]}
           >
-            {intl.formatMessage(messages.uploadCertificateDialogDescription)}
             <Field id="certificate">
               <SimpleDocumentUploader
                 label={
@@ -770,7 +770,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 }}
               />
             </Field>
-          </ResponsiveModal>
+          </Dialog>
           {this.state.previewImage && (
             <DocumentPreview
               previewImage={this.state.previewImage}

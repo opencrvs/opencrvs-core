@@ -44,13 +44,9 @@ import {
   ActionPageLight,
   Content,
   Summary,
-  Currency,
-  ResponsiveModal
+  Currency
 } from '@client/../../components/lib'
-import {
-  SuccessButton,
-  TertiaryButton
-} from '@client/../../components/lib/buttons'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
@@ -186,26 +182,28 @@ export const IssuePayment = () => {
             />
           </Summary>
           <Action>
-            <SuccessButton id="Continue" onClick={() => toggleModal()}>
+            <Button type="positive" id="Continue" onClick={() => toggleModal()}>
               {intl.formatMessage(issueMessages.issueCertificate)}
-            </SuccessButton>
+            </Button>
           </Action>
         </Content>
-        <ResponsiveModal
+        <Dialog
           id="issue-certificate-confirm"
           title={intl.formatMessage(issueMessages.issueCertificate)}
-          responsive={false}
-          autoHeight={true}
-          show={showConfirmationModal}
-          handleClose={toggleModal}
+          supportingCopy={intl.formatMessage(
+            issueMessages.issueConfirmationMessage
+          )}
+          onOpen={showConfirmationModal}
+          onClose={toggleModal}
           actions={[
-            <TertiaryButton
+            <Button
+              type="tertiary"
               key="close-issue-modal"
               onClick={toggleModal}
               id="close-issue-modal"
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
+            </Button>,
             <Button
               key="issue-certificate-confirmation"
               onClick={() => readyToIssue()}
@@ -215,9 +213,7 @@ export const IssuePayment = () => {
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
           ]}
-        >
-          {intl.formatMessage(issueMessages.issueConfirmationMessage)}
-        </ResponsiveModal>
+        />
       </ActionPageLight>
     </>
   )

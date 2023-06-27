@@ -13,15 +13,15 @@ import {
   DangerButton,
   ICON_ALIGNMENT,
   PrimaryButton,
-  SuccessButton,
-  TertiaryButton
+  SuccessButton
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
 import * as React from 'react'
@@ -399,17 +399,17 @@ class ReviewActionComponent extends React.Component<
           </ActionContainer>
         </Content>
         {actionContent.modal && (
-          <ResponsiveModal
+          <Dialog
             title={intl.formatMessage(actionContent.modal.title.message, {
               ...actionContent.modal.title.payload,
               event: declaration.event
             })}
-            responsive={false}
-            autoHeight={true}
             actions={[
-              <TertiaryButton
+              <Button
                 id="cancel-btn"
                 key="cancel"
+                type="tertiary"
+                size="medium"
                 onClick={() => {
                   this.toggleSubmitModalOpen()
                   if (document.documentElement) {
@@ -418,10 +418,12 @@ class ReviewActionComponent extends React.Component<
                 }}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
-              </TertiaryButton>,
-              <PrimaryButton
+              </Button>,
+              <Button
                 key="submit"
                 id="submit_confirm"
+                type="primary"
+                size="medium"
                 onClick={() =>
                   draftDeclaration
                     ? submitDeclarationAction(
@@ -447,17 +449,17 @@ class ReviewActionComponent extends React.Component<
                   : declarationToBeValidated
                   ? intl.formatMessage(buttonMessages.send)
                   : intl.formatMessage(buttonMessages.send)}
-              </PrimaryButton>
+              </Button>
             ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
+            onOpen={this.state.showSubmitModal}
+            onClose={this.toggleSubmitModalOpen}
           >
             {actionContent.modal.description &&
               intl.formatMessage(actionContent.modal.description.message, {
                 ...actionContent.modal.description.payload,
                 event: declaration.event
               })}
-          </ResponsiveModal>
+          </Dialog>
         )}
       </Container>
     )
