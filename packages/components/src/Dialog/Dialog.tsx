@@ -114,7 +114,7 @@ const DialogContent = styled.div`
 `
 
 const DialogFooter = styled.div`
-  padding: 16px 24px;
+  padding: 12px 20px;
   display: flex;
   gap: 8px;
   align-items: center;
