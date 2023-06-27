@@ -35,18 +35,11 @@ import { Square } from '@opencrvs/components/lib/icons'
 import { UserDetails } from '@client/utils/userUtils'
 
 const Container = styled.div`
-  align-self: center;
+  width: 100%;
+  max-height: 320px;
   border-radius: 4px;
   position: relative;
   aspect-ratio: 1;
-`
-
-const Description = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
 `
 
 const SliderContainer = styled.div`
@@ -158,7 +151,7 @@ function useCropSize(breakpoint: number) {
   React.useEffect(() => {
     function handleResize() {
       if (window.innerWidth > breakpoint) {
-        setValue(360)
+        setValue(300)
       } else {
         setValue(240)
       }
@@ -212,6 +205,27 @@ function AvatarChangeModalComp({
       id="ChangeAvatarModal"
       onOpen={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
+      supportingCopy={
+        <>
+          {!error && intl.formatMessage(messages.resizeAvatar)}
+          {error && (
+            <>
+              <Error>{error}</Error>
+              <ImageLoader
+                onImageLoaded={(image) => {
+                  reset()
+                  setImgSrc(image)
+                }}
+                onError={(error) => setError(error)}
+              >
+                <LinkButton size="small">
+                  {intl.formatMessage(messages.changeImage)}
+                </LinkButton>
+              </ImageLoader>
+            </>
+          )}
+        </>
+      }
       actions={[
         <Button
           key="cancel"
@@ -264,21 +278,6 @@ function AvatarChangeModalComp({
       ]}
       onClose={handleCancel}
     >
-      <Description>
-        {!error && intl.formatMessage(messages.resizeAvatar)}
-        {error && <Error>{error}</Error>}
-        <ImageLoader
-          onImageLoaded={(image) => {
-            reset()
-            setImgSrc(image)
-          }}
-          onError={(error) => setError(error)}
-        >
-          <LinkButton size="small">
-            {intl.formatMessage(messages.changeImage)}
-          </LinkButton>
-        </ImageLoader>
-      </Description>
       {error ? (
         <DefaultImage {...cropSize}></DefaultImage>
       ) : (
