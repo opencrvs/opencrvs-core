@@ -65,7 +65,7 @@ interface IDispatchProps {
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
-export type Props = RouteComponentProps<IMatchParams> &
+type Props = RouteComponentProps<IMatchParams> &
   IUserProps &
   IDispatchProps &
   IntlShapeProps

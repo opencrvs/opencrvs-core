@@ -123,7 +123,7 @@ export const getVisibleSections = (
   )
 }
 
-export const getViewableSection = (
+const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
 ): IFormSection[] => {

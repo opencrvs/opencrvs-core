@@ -95,7 +95,7 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
-export const initialState: IOfflineDataState = {
+const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
   loadingError: false

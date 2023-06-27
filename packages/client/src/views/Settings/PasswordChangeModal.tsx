@@ -104,7 +104,7 @@ const BoxedError = styled.div`
   margin-bottom: 10px;
   display: flex;
 `
-export const changePasswordMutation = gql`
+const changePasswordMutation = gql`
   mutation changePassword(
     $userId: String!
     $existingPassword: String!

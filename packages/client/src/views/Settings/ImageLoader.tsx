@@ -27,7 +27,7 @@ type IProps = {
   onError: (error: string) => void
 } & IntlShapeProps
 
-export function ImageLoaderComp({
+function ImageLoaderComp({
   children,
   onImageLoaded,
   onLoadingStarted,

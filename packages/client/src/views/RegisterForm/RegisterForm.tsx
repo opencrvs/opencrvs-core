@@ -172,7 +172,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-export interface IFormProps {
+interface IFormProps {
   declaration: IDeclaration
   registerForm: IForm
   pageRoute: string

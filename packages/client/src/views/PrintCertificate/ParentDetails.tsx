@@ -48,7 +48,7 @@ type Identifier = {
   id: string
   type: string
 }
-export type IParentDetails = {
+type IParentDetails = {
   name: Name[]
   birthDate: string
   nationality: [string]

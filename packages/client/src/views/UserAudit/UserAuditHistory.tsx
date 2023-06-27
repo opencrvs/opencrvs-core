@@ -96,7 +96,7 @@ type Props = WrappedComponentProps &
     theme: ITheme
   }
 
-export enum SORTED_COLUMN {
+enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',

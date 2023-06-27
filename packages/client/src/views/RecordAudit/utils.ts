@@ -76,7 +76,7 @@ export interface IDeclarationData {
   assignment?: GQLAssignmentData
 }
 
-export interface IGQLDeclaration {
+interface IGQLDeclaration {
   id: string
   child?: { name: Array<GQLHumanName | null> }
   deceased?: { name: Array<GQLHumanName | null> }
@@ -133,7 +133,7 @@ export const getFieldValue = (
   return original
 }
 
-export const getLocation = (
+const getLocation = (
   declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
@@ -297,25 +297,25 @@ export const removeUnderscore = (word: string): string => {
   return finalWord
 }
 
-export const isBirthDeclaration = (
+const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
   return (declaration && declaration.type === 'Birth') || false
 }
 
-export const isDeathDeclaration = (
+const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
   return (declaration && declaration.type === 'Death') || false
 }
 
-export const isMarriageDeclaration = (
+const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
   return (declaration && declaration.type === 'Marriage') || false
 }
 
-export const getDraftDeclarationName = (declaration: IDeclaration) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = EMPTY_STRING
   const declarationName = []
   if (declaration.event === Event.Birth) {
@@ -337,10 +337,6 @@ export const getDraftDeclarationName = (declaration: IDeclaration) => {
       .join(' & ')
   }
   return name
-}
-
-export function notNull<T>(value: T | null): value is T {
-  return value !== null
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {

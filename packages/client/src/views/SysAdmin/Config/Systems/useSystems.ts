@@ -69,7 +69,7 @@ function useNewSystemDraft() {
 }
 
 /** Handles communication with global state management */
-export function useSystemsGlobalState() {
+function useSystemsGlobalState() {
   const { systems: existingSystems } = useSelector(getOfflineData)
   const doesNationalIdAlreadyExist = existingSystems.some(
     (system) => system.type === SystemType.NationalId

@@ -169,7 +169,7 @@ export const TitleContent = styled.div`
     margin-right: 8px;
   }
 `
-export const ModalBody = styled.div`
+const ModalBody = styled.div`
   display: flex;
   flex: 1;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -179,7 +179,7 @@ export const ModalBody = styled.div`
     display: none;
   }
 `
-export const ModalBodyMobile = styled(ModalBody)`
+const ModalBodyMobile = styled(ModalBody)`
   border: none;
   display: none;
 

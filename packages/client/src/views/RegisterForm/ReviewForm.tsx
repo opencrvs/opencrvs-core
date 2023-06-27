@@ -50,10 +50,6 @@ type IProps = IReviewProps &
   IntlShapeProps &
   RouteComponentProps<{}>
 
-export interface IReviewSectionDetails {
-  [key: string]: any
-}
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg16};
@@ -61,7 +57,7 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-export class ReviewFormView extends React.Component<IProps> {
+class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -118,7 +114,7 @@ function mapStatetoProps(
     event: string
   }>
 ) {
-  const { match, history } = props
+  const { match } = props
   if (!match.params.event) {
     throw new Error('Event is not provided as path param')
   }

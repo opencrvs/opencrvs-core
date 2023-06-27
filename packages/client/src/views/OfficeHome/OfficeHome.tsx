@@ -67,12 +67,7 @@ import { Event } from '@client/utils/gateway'
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
-export const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-  margin-top: 100px;
-`
+
 const FABContainer = styled.div`
   position: fixed;
   right: 40px;

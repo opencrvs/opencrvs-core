@@ -125,7 +125,7 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-export class InProgressComponent extends React.Component<
+class InProgressComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {

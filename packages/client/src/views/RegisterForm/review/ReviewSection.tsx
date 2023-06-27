@@ -167,7 +167,7 @@ export const RequiredField = styled.span`
   }
 `
 
-export const ErrorField = styled.p`
+const ErrorField = styled.p`
   margin-top: 0;
   margin-bottom: 0;
 `

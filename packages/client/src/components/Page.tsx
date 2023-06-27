@@ -71,16 +71,6 @@ const StyledSpinner = styled(Spinner)`
   /** Show spinner after 2 seconds */
   animation: ${spinnerAppearAnimation} 2s forwards;
 `
-export const StyledText = styled.div`
-  position: absolute;
-  top: 44%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 251px;
-  height: 32px;
-  ${({ theme }) => theme.fonts.h3};
-  color: ${({ theme }) => theme.colors.grey600};
-`
 
 interface IPageProps {
   initialDeclarationsLoaded: boolean

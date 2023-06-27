@@ -46,7 +46,7 @@ export const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-export const StyledTooltip = styled(Tooltip)`
+const StyledTooltip = styled(Tooltip)`
   height: 16px;
   width: 16px;
 `

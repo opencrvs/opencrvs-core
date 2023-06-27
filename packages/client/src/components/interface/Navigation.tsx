@@ -295,7 +295,7 @@ const getSettingsAndLogout = (props: IFullProps) => {
   )
 }
 
-export const NavigationView = (props: IFullProps) => {
+const NavigationView = (props: IFullProps) => {
   const {
     intl,
     match,
