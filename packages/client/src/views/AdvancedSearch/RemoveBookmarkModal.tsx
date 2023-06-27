@@ -101,6 +101,9 @@ export function RemoveBookmarkAdvancedSearchModal({
         title={intl.formatMessage(
           messagesSearch.removeBookmarkAdvancedSearchModalTitle
         )}
+        supportingCopy={intl.formatMessage(
+          messagesSearch.removeBookmarkAdvancedSearchModalBody
+        )}
         actions={[
           <Button
             type="tertiary"
@@ -130,13 +133,7 @@ export function RemoveBookmarkAdvancedSearchModal({
           </Button>
         ]}
         onClose={toggleRemoveBookmarkModal}
-      >
-        <Message>
-          {intl.formatMessage(
-            messagesSearch.removeBookmarkAdvancedSearchModalBody
-          )}
-        </Message>
-      </Dialog>
+      />
     </>
   )
 }
