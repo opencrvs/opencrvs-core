@@ -66,9 +66,15 @@ SmallDialog.args = {
 
 export const SmallDialogNoButtons = Template.bind({})
 SmallDialogNoButtons.args = {
-  icon: <Icon name="WarningCircle" size="xlarge" color="negativeDark" />,
   title: 'Small dialog',
-  titleColor: 'negativeDark',
+  supportingCopy: 'This is a small dialog'
+}
+
+export const SmallDialogIcon = Template.bind({})
+SmallDialogIcon.args = {
+  icon: <Icon name="WarningCircle" size="xlarge" color="negative" />,
+  title: 'Small dialog with icon',
+  titleColor: 'negative',
   supportingCopy: 'This is a small dialog'
 }
 
