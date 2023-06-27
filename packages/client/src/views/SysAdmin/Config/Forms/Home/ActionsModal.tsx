@@ -190,7 +190,7 @@ export function ActionsModal() {
         >
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
-        <Button key="action-button" type="primary" />
+        <ActionButton key="action-button" />
       ]}
     />
   )
