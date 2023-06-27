@@ -21,11 +21,7 @@ import {
   isValidRegEx,
   isValidExample
 } from '@client/views/SysAdmin/Config/Application/utils'
-import {
-  Content,
-  Field,
-  HalfWidthInput
-} from '@client/views/SysAdmin/Config/Application/Components'
+import { HalfWidthInput } from '@client/views/SysAdmin/Config/Application/Components'
 import { Link } from '@opencrvs/components/lib/Link'
 
 const ErrorMessage = styled.div`

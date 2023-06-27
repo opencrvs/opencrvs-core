@@ -22,7 +22,6 @@ import {
   SystemType,
   WebhookPermission
 } from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
 import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
@@ -45,7 +44,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
@@ -315,14 +314,17 @@ export function SystemList() {
           ))}
 
           {systemToToggleActivation && (
-            <ResponsiveModal
+            <Dialog
               title={
                 systemToToggleActivation.status === SystemStatus.Active
                   ? intl.formatMessage(integrationMessages.deactivateClient)
                   : intl.formatMessage(integrationMessages.activateClient)
               }
-              contentHeight={50}
-              responsive={false}
+              supportingCopy={
+                systemToToggleActivation.status === SystemStatus.Active
+                  ? intl.formatMessage(integrationMessages.deactivateClientText)
+                  : intl.formatMessage(integrationMessages.activateClientText)
+              }
               actions={[
                 <Button
                   type="tertiary"
@@ -361,16 +363,12 @@ export function SystemList() {
                   </Button>
                 )
               ]}
-              show={true}
-              handleClose={() => setSystemToToggleActivation(undefined)}
-            >
-              {systemToToggleActivation.status === SystemStatus.Active
-                ? intl.formatMessage(integrationMessages.deactivateClientText)
-                : intl.formatMessage(integrationMessages.activateClientText)}
-            </ResponsiveModal>
+              onOpen={true}
+              onClose={() => setSystemToToggleActivation(undefined)}
+            />
           )}
         </ListViewSimplified>
-        <ResponsiveModal
+        <Dialog
           actions={[
             <Link
               key="cancel-link"
@@ -382,20 +380,16 @@ export function SystemList() {
               {intl.formatMessage(buttonMessages.cancel)}
             </Link>
           ]}
-          autoHeight={true}
-          width={512}
-          titleHeightAuto={true}
-          show={toggleKeyModal.modalVisible}
-          handleClose={() => {
+          onOpen={toggleKeyModal.modalVisible}
+          onClose={() => {
             toggleRevealKeyModal()
             resetData()
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
+          supportingCopy={intl.formatMessage(
+            integrationMessages.uniqueKeysDescription
+          )}
         >
-          <Text variant="reg16" element="p" id="revealKeyId">
-            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
-          </Text>
-
           <Stack alignItems="stretch" direction="column" gap={16}>
             <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
@@ -458,9 +452,9 @@ export function SystemList() {
               </Stack>
             </Stack>
           </Stack>
-        </ResponsiveModal>
+        </Dialog>
       </Content>
-      <ResponsiveModal
+      <Dialog
         actions={
           registerSystemData
             ? []
@@ -492,11 +486,8 @@ export function SystemList() {
                 </Button>
               ]
         }
-        width={512}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={showModal}
-        handleClose={() => {
+        onOpen={showModal}
+        onClose={() => {
           toggleModal()
           clearNewSystemDraft()
           resetData()
@@ -505,14 +496,13 @@ export function SystemList() {
           registerSystemData?.registerSystem?.system.name ??
           intl.formatMessage(integrationMessages.createClient)
         }
+        supportingCopy={
+          !registerSystemData && !registerSystemLoading
+            ? intl.formatMessage(integrationMessages.newIntegrationDescription)
+            : intl.formatMessage(integrationMessages.uniqueKeysDescription)
+        }
         id="createClientModal"
       >
-        <Text variant="reg16" element="p" id="uniqueKeyId">
-          {!registerSystemData && !registerSystemLoading
-            ? intl.formatMessage(integrationMessages.newIntegrationDescription)
-            : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
-        </Text>
-
         {!registerSystemData && !registerSystemLoading && (
           <>
             <Field>
@@ -687,33 +677,16 @@ export function SystemList() {
 
             {newSystemType === SystemType.Webhook && (
               <>
-                <PaddedAlert type="info">
-                  {intl.formatMessage(integrationMessages.webhookDescription)}
-                  {'\n'}
-                  <Link
-                    onClick={() => {
-                      window.open(
-                        'https://documentation.opencrvs.org/',
-                        '_blank'
-                      )
-                    }}
-                    font="bold16"
-                  >
-                    documentation.opencrvs.org
-                  </Link>
-                </PaddedAlert>
                 <Field>
                   <InputField
                     id="select-input"
                     touched={false}
                     label={intl.formatMessage(integrationMessages.label)}
+                    helperText={intl.formatMessage(
+                      integrationMessages.webhookPermissionsDescription
+                    )}
                   >
                     <div>
-                      <Label>
-                        {intl.formatMessage(
-                          integrationMessages.webhookPermissionsDescription
-                        )}
-                      </Label>
                       <FormTabs
                         sections={[
                           {
@@ -808,6 +781,21 @@ export function SystemList() {
                     </div>
                   </InputField>
                 </Field>
+                <PaddedAlert type="info">
+                  {intl.formatMessage(integrationMessages.webhookDescription)}
+                  {'\n'}
+                  <Link
+                    onClick={() => {
+                      window.open(
+                        'https://documentation.opencrvs.org/',
+                        '_blank'
+                      )
+                    }}
+                    font="bold16"
+                  >
+                    documentation.opencrvs.org
+                  </Link>
+                </PaddedAlert>
               </>
             )}
           </>
@@ -885,7 +873,7 @@ export function SystemList() {
             </Stack>
           </Stack>
         )}
-      </ResponsiveModal>
+      </Dialog>
 
       {systemToShowPermission && (
         <WebhookModal

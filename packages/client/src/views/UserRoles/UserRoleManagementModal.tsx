@@ -31,12 +31,12 @@ import {
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
-  height: 40px;
-  border: solid 1px ${({ theme }) => theme.colors.grey600};
+  height: 36px;
+  border: solid 2px ${({ theme }) => theme.colors.grey600};
   align-self: center;
 
   :disabled {
-    border-color: ${({ theme }) => theme.colors.grey300};
+    border: solid 2px ${({ theme }) => theme.colors.grey300};
     color: ${({ theme }) => theme.colors.grey500};
   }
 `
@@ -219,6 +219,7 @@ export function UserRoleManagementModal(props: IProps) {
                 <Button
                   id="editButton"
                   type="icon"
+                  size="small"
                   onClick={() => {
                     const newActiveItems = new Array(userRoles.length).fill(
                       true
@@ -242,7 +243,12 @@ export function UserRoleManagementModal(props: IProps) {
               setCurrentClipBoard(e.target.value)
             }}
           />
-          <Button disabled={!currentClipBoard} type="icon" onClick={updateRole}>
+          <Button
+            disabled={!currentClipBoard}
+            type="icon"
+            size="small"
+            onClick={updateRole}
+          >
             <Icon name="Plus" color="primary" />
           </Button>
         </Stack>

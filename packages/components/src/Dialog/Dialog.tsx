@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React, { useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
@@ -96,10 +96,15 @@ const DialogBody = styled.div`
   overflow-y: auto;
 `
 
-const DialogSupportingCopy = styled.div`
+const DialogSupportingCopy = styled.div<{ hasContent: boolean }>`
   width: 90%;
   padding: 4px 24px 24px 24px;
   text-wrap: wrap;
+  ${({ hasContent }) =>
+    hasContent &&
+    css`
+      padding-bottom: 8px;
+    `}
 `
 
 const DialogContent = styled.div`
@@ -197,7 +202,7 @@ export function Dialog({
             {hasTabs && <DialogTabs>{tabs}</DialogTabs>}
             <DialogBody ref={contentRef}>
               {hasSupportingCopy && (
-                <DialogSupportingCopy>
+                <DialogSupportingCopy hasContent={hasContent}>
                   <Text variant="reg16" element="p" color="grey500">
                     {supportingCopy}
                   </Text>

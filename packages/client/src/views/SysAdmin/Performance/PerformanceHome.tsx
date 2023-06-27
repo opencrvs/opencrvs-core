@@ -16,7 +16,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { parse } from 'query-string'
@@ -129,7 +129,7 @@ const LayoutRight = styled.div`
   }
 `
 
-const ResponsiveModalContent = styled.div`
+const DialogContent = styled.div`
   display: flex;
   gap: 16px;
   flex-direction: column;
@@ -594,13 +594,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               }
               return (
                 <>
-                  <ResponsiveModal
+                  <Dialog
                     title={intl.formatMessage(constantsMessages.status)}
-                    show={toggleStatus}
-                    handleClose={this.togglePerformanceStatus}
+                    onOpen={toggleStatus}
+                    onClose={this.togglePerformanceStatus}
                     actions={[]}
                   >
-                    <ResponsiveModalContent>
+                    <DialogContent>
                       {loading && !data ? (
                         <Spinner id="modal-data-loading" size={24} />
                       ) : (
@@ -635,8 +635,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                           )}
                         </>
                       )}
-                    </ResponsiveModalContent>
-                  </ResponsiveModal>
+                    </DialogContent>
+                  </Dialog>
                   <LayoutRight>
                     {!officeSelected && (
                       <LocationStats>

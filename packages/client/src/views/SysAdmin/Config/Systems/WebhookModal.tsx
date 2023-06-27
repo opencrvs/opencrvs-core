@@ -14,8 +14,9 @@ import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { System, WebhookPermission, Event } from '@client/utils/gateway'
-import { CheckboxGroup, FormTabs, ResponsiveModal } from '@opencrvs/components'
+import { CheckboxGroup, FormTabs } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog'
 import React, { useState } from 'react'
 
 interface ISystemProps {
@@ -50,7 +51,7 @@ export function WebhookModal({
 
   return (
     <>
-      <ResponsiveModal
+      <Dialog
         actions={[
           <Button key="close-modal" onClick={closeModal} type="secondary">
             {intl.formatMessage(buttonMessages.cancel)}
@@ -64,13 +65,10 @@ export function WebhookModal({
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
-        show
-        handleClose={closeModal}
+        onOpen
+        onClose={closeModal}
         title={system.name}
-        autoHeight
-        titleHeightAuto
-      >
-        <>
+        tabs={
           <FormTabs
             sections={[
               {
@@ -85,6 +83,9 @@ export function WebhookModal({
             activeTabId={selectedTab}
             onTabClick={(tabId: Event) => setSelectedTab(tabId)}
           />
+        }
+      >
+        <>
           {selectedTab === Event.Birth ? (
             <>
               <CheckboxGroup
@@ -165,7 +166,7 @@ export function WebhookModal({
             </>
           )}
         </>
-      </ResponsiveModal>
+      </Dialog>
     </>
   )
 }

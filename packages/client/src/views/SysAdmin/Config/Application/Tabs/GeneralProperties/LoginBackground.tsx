@@ -31,13 +31,11 @@ import {
   Link,
   ListViewItemSimplified,
   Stack,
-  Text,
   Toast
 } from '@opencrvs/components/lib'
 import {
   ErrorContent,
   ErrorMessage,
-  Field,
   HalfWidthInput,
   Label,
   Message
@@ -77,7 +75,6 @@ const HexInput = styled(HalfWidthInput)`
 
 export const LoginBackground = () => {
   const intl = useIntl()
-  const [supportingCopy, setSupportingCopy] = React.useState('')
   const dispatch = useDispatch()
   const [hexValue, setHexValue] = React.useState(EMPTY_STRING)
   const [isRequestValid, setRequestValid] = React.useState(false)
