@@ -199,440 +199,457 @@ type GeneratedInputFieldProps = {
   setFieldTouched?: (name: string, isTouched?: boolean) => void
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
-function GeneratedInputField({
-  fieldDefinition,
-  onChange,
-  onBlur,
-  onSetFieldValue,
-  resetDependentSelectValues,
-  resetNestedInputValues,
-  error,
-  touched,
-  value,
-  nestedFields,
-  draftData,
-  disabled,
-  dynamicDispatch,
-  onUploadingStateChanged,
-  setFieldTouched,
-  requiredErrorMessage
-}: GeneratedInputFieldProps) {
-  const inputFieldProps = {
-    id: fieldDefinition.name,
-    label: fieldDefinition.label,
-    helperText: fieldDefinition.helperText,
-    tooltip: fieldDefinition.tooltip,
-    description: fieldDefinition.description,
-    required: fieldDefinition.required,
-    disabled: fieldDefinition.disabled,
-    prefix: fieldDefinition.prefix,
-    postfix: fieldDefinition.postfix,
-    unit: fieldDefinition.unit,
-    hideAsterisk: fieldDefinition.hideAsterisk,
-    hideInputHeader: fieldDefinition.hideHeader,
-    error,
-    touched,
-    mode: fieldDefinition.mode,
-    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
-  }
-
-  const intl = useIntl()
-  const onChangeGroupInput = React.useCallback(
-    (val: string) => onSetFieldValue(fieldDefinition.name, val),
-    [fieldDefinition.name, onSetFieldValue]
-  )
-  const isOnline = useOnlineStatus()
-
-  const inputProps = {
-    id: fieldDefinition.name,
+const GeneratedInputField = React.memo(
+  ({
+    fieldDefinition,
     onChange,
     onBlur,
+    onSetFieldValue,
+    resetDependentSelectValues,
+    resetNestedInputValues,
+    error,
+    touched,
     value,
-    disabled: fieldDefinition.disabled ?? disabled,
-    error: Boolean(error),
-    touched: Boolean(touched),
-    placeholder: fieldDefinition.placeholder,
-    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
-  }
-  if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
-    return (
-      <InputField {...inputFieldProps}>
-        <Select
+    nestedFields,
+    draftData,
+    disabled,
+    dynamicDispatch,
+    onUploadingStateChanged,
+    setFieldTouched,
+    requiredErrorMessage
+  }: GeneratedInputFieldProps) => {
+    const inputFieldProps = {
+      id: fieldDefinition.name,
+      label: fieldDefinition.label,
+      helperText: fieldDefinition.helperText,
+      tooltip: fieldDefinition.tooltip,
+      description: fieldDefinition.description,
+      required: fieldDefinition.required,
+      disabled: fieldDefinition.disabled,
+      prefix: fieldDefinition.prefix,
+      postfix: fieldDefinition.postfix,
+      unit: fieldDefinition.unit,
+      hideAsterisk: fieldDefinition.hideAsterisk,
+      hideInputHeader: fieldDefinition.hideHeader,
+      error,
+      touched,
+      mode: fieldDefinition.mode,
+      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+    }
+
+    const intl = useIntl()
+    const onChangeGroupInput = React.useCallback(
+      (val: string) => onSetFieldValue(fieldDefinition.name, val),
+      [fieldDefinition.name, onSetFieldValue]
+    )
+    const isOnline = useOnlineStatus()
+
+    const inputProps = {
+      id: fieldDefinition.name,
+      onChange,
+      onBlur,
+      value,
+      disabled: fieldDefinition.disabled ?? disabled,
+      error: Boolean(error),
+      touched: Boolean(touched),
+      placeholder: fieldDefinition.placeholder,
+      ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+    }
+    if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Select
+            {...inputProps}
+            isDisabled={fieldDefinition.disabled}
+            value={value as string}
+            onChange={(val: string) => {
+              resetDependentSelectValues(fieldDefinition.name)
+              onSetFieldValue(fieldDefinition.name, val)
+            }}
+            onFocus={() =>
+              handleSelectFocus(
+                fieldDefinition.name,
+                fieldDefinition.options.length > 10
+              )
+            }
+            options={fieldDefinition.options}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+      return (
+        <DocumentUploaderWithOption
           {...inputProps}
-          isDisabled={fieldDefinition.disabled}
-          value={value as string}
-          onChange={(val: string) => {
-            resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(fieldDefinition.name, val)
-          }}
-          onFocus={() =>
-            handleSelectFocus(
-              fieldDefinition.name,
-              fieldDefinition.options.length > 10
-            )
-          }
-          options={fieldDefinition.options}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-    return (
-      <DocumentUploaderWithOption
-        {...inputProps}
-        name={fieldDefinition.name}
-        label={fieldDefinition.label}
-        options={fieldDefinition.options}
-        splitView={fieldDefinition.splitView}
-        files={value as IFileValue[]}
-        extraValue={fieldDefinition.extraValue || ''}
-        hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-        onComplete={(files: IFileValue[]) => {
-          onSetFieldValue(fieldDefinition.name, files)
-          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-        }}
-        onUploadingStateChanged={onUploadingStateChanged}
-        requiredErrorMessage={requiredErrorMessage}
-      />
-    )
-  }
-  if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
-    return (
-      <SimpleDocumentUploader
-        {...inputProps}
-        name={fieldDefinition.name}
-        label={fieldDefinition.label}
-        description={fieldDefinition.description}
-        allowedDocType={fieldDefinition.allowedDocType}
-        files={value as IAttachmentValue}
-        error={error}
-        onComplete={(file) => {
-          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-          onSetFieldValue(fieldDefinition.name, file)
-        }}
-        onUploadingStateChanged={onUploadingStateChanged}
-        requiredErrorMessage={requiredErrorMessage}
-      />
-    )
-  }
-  if (fieldDefinition.type === RADIO_GROUP) {
-    return (
-      <InputField {...inputFieldProps}>
-        <RadioGroup
-          {...inputProps}
-          size={fieldDefinition.size}
-          onChange={(val: string) => {
-            resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(fieldDefinition.name, val)
-          }}
-          options={fieldDefinition.options}
           name={fieldDefinition.name}
-          value={value as string}
-          notice={fieldDefinition.notice}
-          flexDirection={fieldDefinition.flexDirection}
-        />
-      </InputField>
-    )
-  }
-
-  if (
-    fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
-    nestedFields &&
-    resetNestedInputValues
-  ) {
-    const visibleRadioOptions = getVisibleOptions(
-      fieldDefinition.options,
-      draftData as IFormData
-    )
-    return (
-      <InputField {...inputFieldProps}>
-        <RadioGroup
-          {...inputProps}
-          size={RadioSize.LARGE}
-          onChange={(val: string) => {
-            resetNestedInputValues(fieldDefinition)
-            onSetFieldValue(`${fieldDefinition.name}.value`, val)
-          }}
-          nestedFields={nestedFields}
-          options={visibleRadioOptions}
-          name={fieldDefinition.name}
-          value={value as string}
-          notice={fieldDefinition.notice}
-        />
-      </InputField>
-    )
-  }
-
-  if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
-    return (
-      <InformativeRadioGroup
-        inputProps={inputProps}
-        value={value as string}
-        onSetFieldValue={onSetFieldValue}
-        fieldDefinition={fieldDefinition}
-        inputFieldProps={inputFieldProps}
-      />
-    )
-  }
-
-  if (fieldDefinition.type === CHECKBOX_GROUP) {
-    return (
-      <InputField {...inputFieldProps}>
-        <CheckboxGroup
-          {...inputProps}
-          options={fieldDefinition.options}
-          name={fieldDefinition.name}
-          value={value as string[]}
-          onChange={(val: string[]) =>
-            onSetFieldValue(fieldDefinition.name, val)
-          }
-        />
-      </InputField>
-    )
-  }
-
-  if (fieldDefinition.type === CHECKBOX) {
-    const { checkedValue = true, uncheckedValue = false } = fieldDefinition
-    return (
-      <InputField {...inputFieldProps}>
-        <Checkbox
-          {...inputProps}
           label={fieldDefinition.label}
-          name={fieldDefinition.name}
-          value={String(value)}
-          selected={(value as string) === checkedValue}
-          onChange={(event: { target: { value: string } }) =>
-            onSetFieldValue(
-              fieldDefinition.name,
-              event.target.value === String(checkedValue)
-                ? uncheckedValue
-                : checkedValue
-            )
-          }
-        />
-      </InputField>
-    )
-  }
-
-  if (fieldDefinition.type === DATE) {
-    return (
-      <InputField {...inputFieldProps}>
-        <DateField
-          {...inputProps}
-          notice={fieldDefinition.notice}
-          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-          onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
-          value={value as string}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === TIME) {
-    return (
-      <InputField {...inputFieldProps}>
-        <TimeField
-          {...inputProps}
-          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-          onChange={onChangeGroupInput}
-          value={value as string}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === DATE_RANGE_PICKER) {
-    return (
-      <InputField {...inputFieldProps}>
-        <DateRangePickerForFormField
-          inputProps={{ ...inputProps }}
-          notice={fieldDefinition.notice}
-          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-          onChange={(val: IDateRangePickerValue) =>
-            onSetFieldValue(fieldDefinition.name, val)
-          }
-          value={value as IDateRangePickerValue}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === TEXTAREA) {
-    return (
-      <InputField {...inputFieldProps}>
-        <TextArea
-          maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
-          {...inputProps}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === TEL) {
-    return (
-      <InputField {...inputFieldProps}>
-        <TextInput
-          type="tel"
-          {...inputProps}
-          isSmallSized={fieldDefinition.isSmallSized}
-          value={inputProps.value as string}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === SUBSECTION) {
-    return (
-      <SubSectionDivider
-        label={fieldDefinition.label}
-        required={inputFieldProps.required}
-      />
-    )
-  }
-  if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-    return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
-  }
-  if (fieldDefinition.type === PARAGRAPH) {
-    const label = fieldDefinition.label as unknown as MessageDescriptor
-
-    return (
-      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
-        <FormattedMessage
-          {...label}
-          values={{
-            [fieldDefinition.name]: value as any
+          options={fieldDefinition.options}
+          splitView={fieldDefinition.splitView}
+          files={value as IFileValue[]}
+          extraValue={fieldDefinition.extraValue || ''}
+          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+          onComplete={(files: IFileValue[]) => {
+            onSetFieldValue(fieldDefinition.name, files)
+            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
           }}
+          onUploadingStateChanged={onUploadingStateChanged}
+          requiredErrorMessage={requiredErrorMessage}
         />
-      </Text>
-    )
-  }
-  if (fieldDefinition.type === LIST) {
-    return <FormList {...inputProps} list={fieldDefinition.items} />
-  }
-  if (fieldDefinition.type === NUMBER) {
-    let inputFieldWidth = fieldDefinition.inputFieldWidth
-    if (fieldDefinition?.inputWidth) {
-      inputFieldWidth = fieldDefinition.inputWidth + 'px'
+      )
+    }
+    if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
+      return (
+        <SimpleDocumentUploader
+          {...inputProps}
+          name={fieldDefinition.name}
+          label={fieldDefinition.label}
+          description={fieldDefinition.description}
+          allowedDocType={fieldDefinition.allowedDocType}
+          files={value as IAttachmentValue}
+          error={error}
+          onComplete={(file) => {
+            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            onSetFieldValue(fieldDefinition.name, file)
+          }}
+          onUploadingStateChanged={onUploadingStateChanged}
+          requiredErrorMessage={requiredErrorMessage}
+        />
+      )
+    }
+    if (fieldDefinition.type === RADIO_GROUP) {
+      return (
+        <InputField {...inputFieldProps}>
+          <RadioGroup
+            {...inputProps}
+            size={fieldDefinition.size}
+            onChange={(val: string) => {
+              resetDependentSelectValues(fieldDefinition.name)
+              onSetFieldValue(fieldDefinition.name, val)
+            }}
+            options={fieldDefinition.options}
+            name={fieldDefinition.name}
+            value={value as string}
+            notice={fieldDefinition.notice}
+            flexDirection={fieldDefinition.flexDirection}
+          />
+        </InputField>
+      )
+    }
+
+    if (
+      fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+      nestedFields &&
+      resetNestedInputValues
+    ) {
+      const visibleRadioOptions = getVisibleOptions(
+        fieldDefinition.options,
+        draftData as IFormData
+      )
+      return (
+        <InputField {...inputFieldProps}>
+          <RadioGroup
+            {...inputProps}
+            size={RadioSize.LARGE}
+            onChange={(val: string) => {
+              resetNestedInputValues(fieldDefinition)
+              onSetFieldValue(`${fieldDefinition.name}.value`, val)
+            }}
+            nestedFields={nestedFields}
+            options={visibleRadioOptions}
+            name={fieldDefinition.name}
+            value={value as string}
+            notice={fieldDefinition.notice}
+          />
+        </InputField>
+      )
+    }
+
+    if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+      return (
+        <InformativeRadioGroup
+          inputProps={inputProps}
+          value={value as string}
+          onSetFieldValue={onSetFieldValue}
+          fieldDefinition={fieldDefinition}
+          inputFieldProps={inputFieldProps}
+        />
+      )
+    }
+
+    if (fieldDefinition.type === CHECKBOX_GROUP) {
+      return (
+        <InputField {...inputFieldProps}>
+          <CheckboxGroup
+            {...inputProps}
+            options={fieldDefinition.options}
+            name={fieldDefinition.name}
+            value={value as string[]}
+            onChange={(val: string[]) =>
+              onSetFieldValue(fieldDefinition.name, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (fieldDefinition.type === CHECKBOX) {
+      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
+      return (
+        <InputField {...inputFieldProps}>
+          <Checkbox
+            {...inputProps}
+            label={fieldDefinition.label}
+            name={fieldDefinition.name}
+            value={String(value)}
+            selected={(value as string) === checkedValue}
+            onChange={(event: { target: { value: string } }) =>
+              onSetFieldValue(
+                fieldDefinition.name,
+                event.target.value === String(checkedValue)
+                  ? uncheckedValue
+                  : checkedValue
+              )
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (fieldDefinition.type === DATE) {
+      return (
+        <InputField {...inputFieldProps}>
+          <DateField
+            {...inputProps}
+            notice={fieldDefinition.notice}
+            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+            onChange={(val: string) =>
+              onSetFieldValue(fieldDefinition.name, val)
+            }
+            value={value as string}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === TIME) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TimeField
+            {...inputProps}
+            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+            onChange={onChangeGroupInput}
+            value={value as string}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === DATE_RANGE_PICKER) {
+      return (
+        <InputField {...inputFieldProps}>
+          <DateRangePickerForFormField
+            inputProps={{ ...inputProps }}
+            notice={fieldDefinition.notice}
+            ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+            onChange={(val: IDateRangePickerValue) =>
+              onSetFieldValue(fieldDefinition.name, val)
+            }
+            value={value as IDateRangePickerValue}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === TEXTAREA) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TextArea
+            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            {...inputProps}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === TEL) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TextInput
+            type="tel"
+            {...inputProps}
+            isSmallSized={fieldDefinition.isSmallSized}
+            value={inputProps.value as string}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === SUBSECTION) {
+      return (
+        <SubSectionDivider
+          label={fieldDefinition.label}
+          required={inputFieldProps.required}
+        />
+      )
+    }
+    if (fieldDefinition.type === FIELD_GROUP_TITLE) {
+      return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
+    }
+    if (fieldDefinition.type === PARAGRAPH) {
+      const label = fieldDefinition.label as unknown as MessageDescriptor
+
+      return (
+        <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
+          <FormattedMessage
+            {...label}
+            values={{
+              [fieldDefinition.name]: value as any
+            }}
+          />
+        </Text>
+      )
+    }
+    if (fieldDefinition.type === LIST) {
+      return <FormList {...inputProps} list={fieldDefinition.items} />
+    }
+    if (fieldDefinition.type === NUMBER) {
+      let inputFieldWidth = fieldDefinition.inputFieldWidth
+      if (fieldDefinition?.inputWidth) {
+        inputFieldWidth = fieldDefinition.inputWidth + 'px'
+      }
+
+      return (
+        <InputField {...inputFieldProps}>
+          <TextInput
+            type="number"
+            step={fieldDefinition.step}
+            max={fieldDefinition.max}
+            {...inputProps}
+            onKeyPress={(e: { key: string; preventDefault: () => void }) => {
+              if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+                e.preventDefault()
+              }
+            }}
+            value={inputProps.value as string}
+            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+              event.currentTarget.blur()
+            }}
+            inputFieldWidth={inputFieldWidth}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === BIG_NUMBER) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TextInput
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            step={fieldDefinition.step}
+            {...inputProps}
+            value={inputProps.value as string}
+            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+              event.currentTarget.blur()
+            }}
+          />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === WARNING) {
+      return <ErrorText>{fieldDefinition.label}</ErrorText>
+    }
+
+    if (fieldDefinition.type === LINK) {
+      return (
+        <Link
+          type="reg16"
+          onClick={() => onSetFieldValue(fieldDefinition.name, true)}
+        >
+          {fieldDefinition.label}
+        </Link>
+      )
+    }
+
+    if (
+      fieldDefinition.type === LOCATION_SEARCH_INPUT &&
+      fieldDefinition.locationList
+    ) {
+      const selectedLocation = fieldDefinition.locationList.find(
+        (location) => location.id === value
+      )
+
+      return (
+        <InputField {...inputFieldProps}>
+          <LocationSearchFormField
+            buttonLabel={intl.formatMessage(buttonMessages.search)}
+            {...inputProps}
+            selectedLocation={selectedLocation}
+            locationList={fieldDefinition.locationList}
+            searchHandler={(item) => {
+              onSetFieldValue(fieldDefinition.name, item.id)
+              if (fieldDefinition.dispatchOptions) {
+                dynamicDispatch(fieldDefinition.dispatchOptions.action, {
+                  [fieldDefinition.dispatchOptions.payloadKey]: item.id
+                })
+              }
+            }}
+          />
+        </InputField>
+      )
+    }
+
+    if (fieldDefinition.type === FETCH_BUTTON) {
+      return (
+        <FetchButtonField
+          id={fieldDefinition.name}
+          queryData={fieldDefinition.queryData}
+          modalTitle={fieldDefinition.modalTitle}
+          label={fieldDefinition.label}
+          successTitle={fieldDefinition.successTitle}
+          errorTitle={fieldDefinition.errorTitle}
+          onFetch={fieldDefinition.onFetch}
+          isDisabled={disabled}
+        />
+      )
+    }
+
+    if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
+      return (
+        <InputField {...inputFieldProps}>
+          <VerificationButton
+            id={fieldDefinition.name}
+            onClick={fieldDefinition.onClick}
+            labelForVerified={fieldDefinition.labelForVerified}
+            labelForUnverified={fieldDefinition.labelForUnverified}
+            labelForOffline={fieldDefinition.labelForOffline}
+            status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
+          />
+        </InputField>
+      )
     }
 
     return (
       <InputField {...inputFieldProps}>
         <TextInput
-          type="number"
-          step={fieldDefinition.step}
-          max={fieldDefinition.max}
-          {...inputProps}
-          onKeyPress={(e: { key: string; preventDefault: () => void }) => {
-            if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
-              e.preventDefault()
-            }
-          }}
-          value={inputProps.value as string}
-          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-            event.currentTarget.blur()
-          }}
-          inputFieldWidth={inputFieldWidth}
-        />
-      </InputField>
-    )
-  }
-  if (fieldDefinition.type === BIG_NUMBER) {
-    return (
-      <InputField {...inputFieldProps}>
-        <TextInput
           type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          step={fieldDefinition.step}
           {...inputProps}
           value={inputProps.value as string}
-          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
-            event.currentTarget.blur()
-          }}
+          maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
+          isDisabled={disabled}
         />
       </InputField>
     )
-  }
-  if (fieldDefinition.type === WARNING) {
-    return <ErrorText>{fieldDefinition.label}</ErrorText>
-  }
+  },
 
-  if (fieldDefinition.type === LINK) {
-    return (
-      <Link
-        type="reg16"
-        onClick={() => onSetFieldValue(fieldDefinition.name, true)}
-      >
-        {fieldDefinition.label}
-      </Link>
+  // Are props equal? This will optimize the rendering of selects
+  (prevProps, nextProps) =>
+    prevProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
+    nextProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
+    prevProps.value === nextProps.value &&
+    prevProps.touched === nextProps.touched &&
+    prevProps.error === nextProps.error &&
+    prevProps.disabled === nextProps.disabled &&
+    isEqual(
+      prevProps.fieldDefinition.options,
+      nextProps.fieldDefinition.options
     )
-  }
-
-  if (
-    fieldDefinition.type === LOCATION_SEARCH_INPUT &&
-    fieldDefinition.locationList
-  ) {
-    const selectedLocation = fieldDefinition.locationList.find(
-      (location) => location.id === value
-    )
-
-    return (
-      <InputField {...inputFieldProps}>
-        <LocationSearchFormField
-          buttonLabel={intl.formatMessage(buttonMessages.search)}
-          {...inputProps}
-          selectedLocation={selectedLocation}
-          locationList={fieldDefinition.locationList}
-          searchHandler={(item) => {
-            onSetFieldValue(fieldDefinition.name, item.id)
-            if (fieldDefinition.dispatchOptions) {
-              dynamicDispatch(fieldDefinition.dispatchOptions.action, {
-                [fieldDefinition.dispatchOptions.payloadKey]: item.id
-              })
-            }
-          }}
-        />
-      </InputField>
-    )
-  }
-
-  if (fieldDefinition.type === FETCH_BUTTON) {
-    return (
-      <FetchButtonField
-        id={fieldDefinition.name}
-        queryData={fieldDefinition.queryData}
-        modalTitle={fieldDefinition.modalTitle}
-        label={fieldDefinition.label}
-        successTitle={fieldDefinition.successTitle}
-        errorTitle={fieldDefinition.errorTitle}
-        onFetch={fieldDefinition.onFetch}
-        isDisabled={disabled}
-      />
-    )
-  }
-
-  if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
-    return (
-      <InputField {...inputFieldProps}>
-        <VerificationButton
-          id={fieldDefinition.name}
-          onClick={fieldDefinition.onClick}
-          labelForVerified={fieldDefinition.labelForVerified}
-          labelForUnverified={fieldDefinition.labelForUnverified}
-          labelForOffline={fieldDefinition.labelForOffline}
-          status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
-        />
-      </InputField>
-    )
-  }
-
-  return (
-    <InputField {...inputFieldProps}>
-      <TextInput
-        type="text"
-        {...inputProps}
-        value={inputProps.value as string}
-        maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
-        isDisabled={disabled}
-      />
-    </InputField>
-  )
-}
+)
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
