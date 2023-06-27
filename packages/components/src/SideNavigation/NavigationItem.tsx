@@ -65,6 +65,7 @@ const LabelContainer = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-right: auto;
 `
 
 const ValueContainer = styled.span`
