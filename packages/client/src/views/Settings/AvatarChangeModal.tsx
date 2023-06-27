@@ -60,6 +60,32 @@ const SliderContainer = styled.div`
 
 const StyledInput = styled.input`
   flex-grow: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: ${({ theme }) => theme.colors.grey200};
+  outline: none;
+  border-radius: 4px;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.yellowDark};
+    cursor: pointer;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    box-shadow: ${({ theme }) => theme.colors.yellowLight} 0px 0px 0px 8px;
+  }
+
+  &::-webkit-slider-thumb:active {
+    box-shadow: ${({ theme }) => theme.colors.yellowLight} 0px 0px 0px 10px;
+    transition: box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+      left 350ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+      bottom 350ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  }
 `
 
 function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
