@@ -389,7 +389,7 @@ describe('Record audit for a draft declaration', () => {
 
     component.update()
 
-    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+    expect(component.find('Dialog').prop('show')).toBeTruthy()
   })
 
   it('should close the confirmation modal when cancel button is clicked', async () => {
@@ -401,7 +401,7 @@ describe('Record audit for a draft declaration', () => {
 
     component.update()
 
-    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+    expect(component.find('Dialog').prop('show')).toBe(false)
   })
 })
 
@@ -590,7 +590,7 @@ describe('Record audit for a reinstate declaration', () => {
   it('should show the confirmation modal when reinstate button is clicked', async () => {
     component.find('#reinstate_button').hostNodes().simulate('click')
     component.update()
-    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+    expect(component.find('Dialog').prop('show')).toBeTruthy()
   })
 
   it('should close the confirmation modal when cancel button is clicked', async () => {
@@ -598,6 +598,6 @@ describe('Record audit for a reinstate declaration', () => {
     component.update()
     component.find('#cancel-btn').hostNodes().simulate('click')
     component.update()
-    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+    expect(component.find('Dialog').prop('show')).toBe(false)
   })
 })

@@ -89,7 +89,7 @@ describe('render create system integrations', () => {
 
   it('should show the system creation modal after click the create button', async () => {
     component.find('#createClientButton').hostNodes().simulate('click')
-    expect(component.exists('ResponsiveModal')).toBeTruthy()
+    expect(component.exists('Dialog')).toBeTruthy()
   })
 
   it('should show the registered system modal ', async () => {
@@ -175,7 +175,7 @@ describe('render create webhook system integrations', () => {
 
   it('should show the system creation modal after click the create button', async () => {
     component.find('#createClientButton').hostNodes().simulate('click')
-    expect(component.exists('ResponsiveModal')).toBeTruthy()
+    expect(component.exists('Dialog')).toBeTruthy()
   })
 
   it('should show the registered system modal ', async () => {

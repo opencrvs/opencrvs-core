@@ -118,7 +118,7 @@ describe('DraftsTab', () => {
         openOptionsMenu()
         selectMenuItem(0)
         expect(
-          component.find('ActionsModal').find('ResponsiveModal').prop('show')
+          component.find('ActionsModal').find('Dialog').prop('show')
         ).toBeTruthy()
       })
 
@@ -126,7 +126,7 @@ describe('DraftsTab', () => {
         openOptionsMenu()
         selectMenuItem(1)
         expect(
-          component.find('ActionsModal').find('ResponsiveModal').prop('show')
+          component.find('ActionsModal').find('Dialog').prop('show')
         ).toBeTruthy()
       })
     })

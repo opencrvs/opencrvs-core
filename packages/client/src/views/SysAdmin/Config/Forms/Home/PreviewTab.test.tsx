@@ -75,14 +75,14 @@ describe('PreviewTab', () => {
   it('should show edit modal when clicked', () => {
     component.find('#edit-btn').hostNodes().first().simulate('click')
     expect(
-      component.find('ActionsModal').find('ResponsiveModal').prop('show')
+      component.find('ActionsModal').find('Dialog').prop('show')
     ).toBeTruthy()
   })
 
   it('should show publish modal when clicked', () => {
     component.find('#publish-btn').hostNodes().first().simulate('click')
     expect(
-      component.find('ActionsModal').find('ResponsiveModal').prop('show')
+      component.find('ActionsModal').find('Dialog').prop('show')
     ).toBeTruthy()
   })
 })

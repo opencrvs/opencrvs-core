@@ -130,7 +130,7 @@ describe('render update system role', () => {
 
   it('should show the update system model after click the change button', async () => {
     component.find('#changeButton').hostNodes().first().simulate('click')
-    expect(component.exists('ResponsiveModal')).toBeTruthy()
+    expect(component.exists('Dialog')).toBeTruthy()
   })
 
   it('should show the update system  role success message after click the confirm button', async () => {
