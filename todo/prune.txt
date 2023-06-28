@@ -1,0 +1,300 @@
+src/styledComponents.ts:39 - css (used in module)
+src/navigation/index.ts:325 - goToBirthRegistrationAsParent
+src/navigation/index.ts:332 - goToDeclarationContact
+src/navigation/index.ts:457 - goToDeathRegistration
+src/navigation/index.ts:472 - goToSysAdminHomeTab
+src/navigation/index.ts:119 - GO_TO_REVIEW_USER_DETAILS (used in module)
+src/navigation/index.ts:127 - GO_TO_USER_PROFILE (used in module)
+src/navigation/index.ts:140 - GO_TO_SYS_ADMIN_HOME (used in module)
+src/navigation/index.ts:593 - GO_TO_CREATE_USER_SECTION (used in module)
+src/navigation/index.ts:604 - GO_TO_USER_REVIEW_FORM (used in module)
+src/navigation/routes.ts:23 - DRAFT_BIRTH_PARENT_FORM_TAB
+src/navigation/routes.ts:45 - SAVED_REGISTRATION
+src/navigation/routes.ts:46 - REJECTED_REGISTRATION
+src/navigation/routes.ts:49 - MY_RECORDS
+src/navigation/routes.ts:50 - MY_DRAFTS
+src/navigation/routes.ts:51 - CONFIRMATION_SCREEN
+src/navigation/routes.ts:81 - DECLARATION_DETAIL
+src/navigation/routes.ts:84 - SYS_ADMIN_HOME
+src/notification/actions.ts:52 - ShowConfigurationErrorAction (used in module)
+src/notification/actions.ts:56 - HideConfigurationErrorAction (used in module)
+src/notification/actions.ts:60 - toggleDraftSavedNotificationAction (used in module)
+src/notification/actions.ts:64 - ShowSubmitFormSuccessToast (used in module)
+src/notification/actions.ts:71 - HideSubmitFormSuccessToast (used in module)
+src/notification/actions.ts:75 - ShowSubmitFormErrorToast (used in module)
+src/notification/actions.ts:97 - HideDownloadDeclarationFailedToast (used in module)
+src/notification/actions.ts:105 - HideSubmitFormErrorToast (used in module)
+src/notification/actions.ts:109 - HideCreateUserErrorToast (used in module)
+src/notification/actions.ts:113 - HideCreateUserDuplicateEmailErrorToast (used in module)
+src/notification/actions.ts:125 - HideUserAuditSuccessToast (used in module)
+src/notification/actions.ts:144 - ShowUserReconnectedToastAction (used in module)
+src/notification/actions.ts:148 - HideUserReconnectedToastAction (used in module)
+src/notification/actions.ts:152 - SessionExpiredAction (used in module)
+src/notification/actions.ts:160 - ShowUnassigned (used in module)
+src/notification/actions.ts:165 - HideUnassigned (used in module)
+src/notification/actions.ts:253 - ShowDuplicateRecordsToast (used in module)
+src/notification/actions.ts:266 - HideDuplicateRecordsToast (used in module)
+src/notification/actions.ts:274 - ShowPINUpdateSuccessAction (used in module)
+src/notification/actions.ts:278 - HidePINUpdateSuccessAction (used in module)
+src/notification/reducer.ts:57 - initialState (used in module)
+src/offline/actions.ts:33 - GET_LOCATIONS (used in module)
+src/offline/actions.ts:40 - ContentLoadedAction (used in module)
+src/offline/actions.ts:46 - ContentFailedAction (used in module)
+src/offline/actions.ts:52 - LocationsLoadedAction (used in module)
+src/offline/actions.ts:58 - LocationsFailedAction (used in module)
+src/offline/actions.ts:64 - FacilitiesLoadedAction (used in module)
+src/offline/actions.ts:70 - FacilitiesFailedAction (used in module)
+src/offline/actions.ts:75 - PILOT_LOCATIONS_LOADED (used in module)
+src/offline/actions.ts:76 - PilotLocationsLoadedAction (used in module)
+src/offline/actions.ts:81 - PILOT_LOCATIONS_FAILED (used in module)
+src/offline/actions.ts:82 - PilotLocationsFailedAction (used in module)
+src/offline/actions.ts:88 - ApplicationConfigLoadedAction (used in module)
+src/offline/actions.ts:94 - CertificateLoadedAction (used in module)
+src/offline/actions.ts:99 - CERTIFICATE_LOAD_FAILED (used in module)
+src/offline/actions.ts:100 - CertificateLoadFailedAction (used in module)
+src/offline/actions.ts:106 - CertificatesLoadedAction (used in module)
+src/offline/actions.ts:112 - CertificatesLoadFailedAction (used in module)
+src/offline/actions.ts:117 - ApplicationConfigUpdatedAction (used in module)
+src/offline/actions.ts:124 - ApplicationConfigAnonymousUserAction (used in module)
+src/offline/actions.ts:130 - UpdateOfflineSystemsAction (used in module)
+src/offline/actions.ts:136 - ApplicationConfigFailedAction (used in module)
+src/offline/actions.ts:141 - GET_EXISTING_OFFLINE_DATA (used in module)
+src/offline/actions.ts:147 - IGetOfflineDataSuccessAction (used in module)
+src/offline/actions.ts:151 - GET_OFFLINE_DATA_FAILED (used in module)
+src/offline/actions.ts:152 - IGetOfflineDataFailedAction (used in module)
+src/offline/actions.ts:155 - FORMAT_LOCATIONS (used in module)
+src/offline/actions.ts:156 - IFilterLocationsAction (used in module)
+src/offline/actions.ts:256 - certificatesLoadFailed
+src/offline/actions.ts:263 - configAnonymousUserLoaded
+src/offline/actions.ts:294 - UpdateOfflineFormConfigAction (used in module)
+src/offline/actions.ts:304 - UpdateOfflineCertificateAction (used in module)
+src/offline/actions.ts:334 - OfflineFormConfigUpdatedAction (used in module)
+src/offline/actions.ts:351 - OfflineFormConfigAddFormDatasetAction (used in module)
+src/offline/reducer.ts:98 - initialState (used in module)
+src/offline/selectors.ts:41 - isSystemAdmin
+src/offline/selectors.ts:49 - isNationalSystemAdmin
+src/offline/selectors.ts:18 - getOfflineState (used in module)
+src/profile/profileActions.ts:22 - FETCH_USER_DETAILS
+src/profile/profileActions.ts:29 - GET_USER_DETAILS_FAILED (used in module)
+src/profile/profileActions.ts:90 - ISetInitialUserDetails (used in module)
+src/profile/queries.ts:20 - FETCH_USER (used in module)
+src/profile/serviceApi.ts:22 - ISendVerifyCodeData (used in module)
+src/profile/serviceApi.ts:33 - ISendVerifyCodeResponse (used in module)
+src/profile/serviceApi.ts:41 - client (used in module)
+src/tests/fetchMock.ts:13 - fetch
+src/tests/mock-graphql-responses.ts:277 - deathDeclarationForReview
+src/tests/mock-graphql-responses.ts:507 - lateBirthCertificationResponse
+src/tests/mock-graphql-responses.ts:787 - lateBirthCertificationResponseNoMotherOrFather
+src/tests/mock-graphql-responses.ts:1348 - onTimeBirthCertificationResponse
+src/tests/mock-graphql-responses.ts:1620 - deathCertificationResponse
+src/tests/mock-offline-data.ts:48 - formConfig (used in module)
+src/tests/mock-offline-data.ts:120 - systems (used in module)
+src/tests/mock-offline-data.ts:164 - mockConditionals
+src/tests/util.tsx:2369 - setPinCode
+src/tests/util.tsx:66 - fieldAgentScopeToken
+src/tests/util.tsx:70 - sysadminToken
+src/tests/util.tsx:167 - wait
+src/tests/util.tsx:222 - graphQLEventLocationAddressMock
+src/tests/util.tsx:238 - graphQLPersonAddressMock
+src/tests/util.tsx:330 - currentUserDeclarations
+src/tests/util.tsx:2068 - mockFetchCertificatesTemplatesDefinition (used in module)
+src/tests/util.tsx:3227 - mockIncompleteFormData
+src/tests/util.tsx:3266 - mockOfflineDataWithLocationHierarchy
+src/tests/wait-for-element.ts:20 - waitForSeconds
+src/transformer/index.ts:65 - transformRegistrationCorrection (used in module)
+src/type/i18n.ts:16 - IntlMessages
+src/user/queries.ts:165 - VERIFY_PASSWORD_BY_ID (used in module)
+src/user/userReducer.ts:145 - submitSuccess (used in module)
+src/user/userReducer.ts:165 - submitFail (used in module)
+src/user/userReducer.ts:181 - rolesLoaded (used in module)
+src/user/userReducer.ts:221 - storeUserFormData (used in module)
+src/user/userReducer.ts:262 - fetchRoles (used in module)
+src/user/userReducer.ts:267 - getRoleWiseSystemRoles (used in module)
+src/utils/authApi.ts:16 - client (used in module)
+src/utils/constants.ts:12 - DECLARATIONS_STATUS
+src/utils/constants.ts:13 - REJECTED_STATUS
+src/utils/constants.ts:14 - NOTIFICATION_STATUS
+src/utils/constants.ts:15 - DECLARATION
+src/utils/constants.ts:16 - REGISTRATION
+src/utils/constants.ts:17 - CERTIFICATION
+src/utils/constants.ts:18 - DUPLICATION
+src/utils/constants.ts:19 - SUBMISSION
+src/utils/constants.ts:20 - REJECTION
+src/utils/constants.ts:21 - COMPLETION
+src/utils/constants.ts:22 - APPROVED
+src/utils/constants.ts:27 - DECLARATION_DATE_FORMAT
+src/utils/constants.ts:28 - CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
+src/utils/constants.ts:30 - LOCAL_DATE_FORMAT
+src/utils/constants.ts:31 - OFFLINE
+src/utils/constants.ts:34 - REJECT_REASON
+src/utils/constants.ts:35 - REJECT_COMMENTS
+src/utils/constants.ts:41 - REGEXP_ALPHA_NUMERIC
+src/utils/constants.ts:42 - REGEXP_BLOCK_ALPHA_NUMERIC
+src/utils/constants.ts:47 - SECURITY_PIN_INDEX
+src/utils/constants.ts:60 - ROLE_FIELD_AGENT (used in module)
+src/utils/constants.ts:62 - ROLE_LOCAL_REGISTRAR (used in module)
+src/utils/constants.ts:88 - ROLE_TYPE_SECRETARY
+src/utils/constants.ts:89 - ROLE_TYPE_MAYOR
+src/utils/constants.ts:90 - ROLE_TYPE_CHAIRMAN
+src/utils/constants.ts:92 - PERFORMANCE_REPORT_TYPE_MONTHLY
+src/utils/constants.ts:94 - PHONE_NO_FIELD_STRING
+src/utils/constants.ts:95 - CONTACT_POINT_FIELD_STRING
+src/utils/constants.ts:96 - INFORMANT_FIELD_STRING
+src/utils/constants.ts:98 - RADIO_BUTTON_LARGE_STRING
+src/utils/constants.ts:108 - MONTHS_IN_YEAR
+src/utils/constants.ts:110 - DECLARED_DECLARATION_SEARCH_QUERY_COUNT (used in module)
+src/utils/constants.ts:119 - MARRIAGE_MINIMUM_AGE
+src/utils/constants.ts:120 - BACKGROUND_SYNC_BROADCAST_CHANNEL
+src/utils/draftUtils.ts:282 - getAttachmentSectionKey
+src/utils/react.ts:12 - ComponentProps
+src/utils/referenceApi.test.ts:21 - mockFetchLocations (used in module)
+src/utils/referenceApi.test.ts:201 - parsedLocations (used in module)
+src/utils/referenceApi.test.ts:226 - mockFetchOffices (used in module)
+src/utils/referenceApi.test.ts:350 - mockFetchFacilities (used in module)
+src/utils/referenceApi.test.ts:470 - parsedFacilities (used in module)
+src/utils/referenceApi.test.ts:517 - mockCertificatesTemplatesDefinitionData
+src/utils/referenceApi.test.ts:526 - mockFetchCertificatesTemplatesDefinition
+src/utils/referenceApi.test.ts:547 - mockCertificateTemplate
+src/utils/referenceApi.test.ts:583 - mockFetchConfig (used in module)
+src/utils/referenceApi.ts:30 - ICountryLogo (used in module)
+src/utils/referenceApi.ts:34 - ILoginBackground (used in module)
+src/utils/timeoutLink.ts:20 - TimeoutError (used in module)
+src/utils/timeoutLink.ts:24 - throwTimeoutError (used in module)
+src/workqueue/index.ts:133 - getWorkqueueOfCurrentUser
+src/workqueue/index.ts:294 - writeRegistrarWorkqueueByUser
+src/workqueue/index.ts:15 - GET_WORKQUEUE_SUCCESS
+src/workqueue/index.ts:16 - GET_WORKQUEUE_FAILED
+src/workqueue/index.ts:17 - UPDATE_REGISTRAR_WORKQUEUE
+src/workqueue/index.ts:19 - UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
+src/workqueue/index.ts:21 - UPDATE_REGISTRAR_WORKQUEUE_FAIL
+src/workqueue/index.ts:23 - UPDATE_WORKQUEUE_PAGINATION
+src/workqueue/index.ts:37 - UpdateWorkqueuePaginationAction
+src/workqueue/index.ts:51 - IGetWorkqueueOfCurrentUserSuccessAction
+src/workqueue/index.ts:56 - IGetWorkqueueOfCurrentUserFailedAction
+src/workqueue/index.ts:60 - getCurrentUserWorkqueueFailed
+src/workqueue/index.ts:72 - updateRegistrarWorkqueueSuccessActionCreator
+src/workqueue/index.ts:79 - updateRegistrarWorkqueueFailActionCreator
+src/workqueue/index.ts:91 - WorkqueueActions
+src/components/form/FormFieldGenerator.test.tsx:41 - IMotherSectionFormData
+src/components/form/index.ts:20 - IProps
+src/components/form/index.ts:36 - FormList
+src/components/interface/DeclarationStatusWindow.tsx:85 - DeclarationStatusWindow
+src/components/interface/Navigation.tsx:298 - NavigationView (used in module)
+src/pdfRenderer/transformer/constants.ts:12 - TRANSFORMER_BASE_USER_DECLARATION
+src/pdfRenderer/transformer/constants.ts:13 - TRANSFORMER_BASE_USER_DETAILS
+src/pdfRenderer/transformer/constants.ts:14 - TRANSFORMER_BASE_RESOURCE_DATA
+src/pdfRenderer/transformer/types.ts:54 - IFieldTransformer (used in module)
+src/pdfRenderer/transformer/types.ts:86 - ICondition (used in module)
+src/pdfRenderer/transformer/types.ts:175 - ConditionType (used in module)
+src/pdfRenderer/transformer/types.ts:188 - ArithmeticOperationType (used in module)
+src/pdfRenderer/transformer/utils.ts:69 - getExecutorKeyValue (used in module)
+src/search/advancedSearch/actions.ts:17 - ModifyAdvancedSearchParamAction (used in module)
+src/search/advancedSearch/utils.ts:459 - determineDateFromDateRangePickerVal (used in module)
+src/search/advancedSearch/utils.ts:481 - convertDateValuesToDateRangePicker (used in module)
+src/utils/persistence/index.ts:95 - PersistLink
+src/utils/persistence/transform.ts:173 - addPersistFieldToDocument (used in module)
+src/views/AdvancedSearch/BookmarkAdvancedSearchResult.tsx:24 - Message
+src/views/AdvancedSearch/BookmarkAdvancedSearchResult.tsx:27 - Field
+src/views/AdvancedSearch/BookmarkAdvancedSearchResult.tsx:34 - IBookmarkAdvancedSearch
+src/views/common/Common.tsx:19 - IProps (used in module)
+src/views/common/Common.tsx:65 - Container (used in module)
+src/views/CorrectionForm/index.ts:63 - getGroupWithVisibleFields
+src/views/CorrectionForm/utils.ts:275 - renderSelectOrRadioLabel (used in module)
+src/views/CorrectionForm/utils.ts:284 - renderSelectDynamicLabel (used in module)
+src/views/CorrectionForm/utils.ts:557 - hasNestedDataChanged (used in module)
+src/views/CorrectionForm/utils.ts:345 - getCheckBoxGroupFieldValue (used in module)
+src/views/CorrectionForm/utils.ts:359 - getFormFieldValue (used in module)
+src/views/CorrectionForm/VerifyCorrector.tsx:52 - ICertificateCorrectorField (used in module)
+src/views/OfficeHome/components.tsx:140 - SubmissionStatusMap
+src/views/OfficeHome/LoadingIndicator.tsx:78 - LoadingIndicatorComp (used in module)
+src/views/OfficeHome/OfficeHome.tsx:70 - ErrorText
+src/views/OfficeHome/utils.ts:16 - IQueryData
+src/views/OfficeHome/utils.ts:27 - EVENT_STATUS
+src/views/OIDPVerificationCallback/OIDPVerificationCallback.tsx:41 - Page (used in module)
+src/views/OIDPVerificationCallback/utils.ts:181 - generateNonce (used in module)
+src/views/OIDPVerificationCallback/utils.ts:185 - splitName (used in module)
+src/views/OIDPVerificationCallback/utils.ts:23 - OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY (used in module)
+src/views/OIDPVerificationCallback/utils.ts:66 - INidCallbackState (used in module)
+src/views/Performance/RegistrationsList.tsx:126 - EVENT_OPTIONS (used in module)
+src/views/PrintCertificate/ParentDetails.tsx:51 - IParentDetails (used in module)
+src/views/PrintCertificate/utils.ts:141 - calculateDays (used in module)
+src/views/RecordAudit/ActionDetailsModal.tsx:183 - ActionDetailsModalListTable (used in module)
+src/views/RecordAudit/utils.ts:342 - notNull
+src/views/RecordAudit/utils.ts:79 - IGQLDeclaration (used in module)
+src/views/RecordAudit/utils.ts:136 - getLocation (used in module)
+src/views/RecordAudit/utils.ts:300 - isBirthDeclaration (used in module)
+src/views/RecordAudit/utils.ts:306 - isDeathDeclaration (used in module)
+src/views/RecordAudit/utils.ts:312 - isMarriageDeclaration (used in module)
+src/views/RecordAudit/utils.ts:318 - getDraftDeclarationName (used in module)
+src/views/RegisterForm/DeclarationForm.tsx:44 - DeclarationFormView (used in module)
+src/views/RegisterForm/RegisterForm.tsx:175 - IFormProps (used in module)
+src/views/RegisterForm/ReviewForm.test.tsx:48 - mockDeclarationData (used in module)
+src/views/RegisterForm/ReviewForm.tsx:53 - IReviewSectionDetails
+src/views/RegisterForm/ReviewForm.tsx:64 - ReviewFormView (used in module)
+src/views/RegisterForm/StickyFormTabs.tsx:52 - StickyFormTabs
+src/views/SearchResult/AdvancedSearch.tsx:48 - TabId (used in module)
+src/views/SearchResult/SearchResult.tsx:91 - ActionPageWrapper
+src/views/SearchResult/SearchResult.tsx:119 - ISerachInputCustomProps (used in module)
+src/views/SearchResult/SearchResult.tsx:161 - SearchResultView (used in module)
+src/views/Settings/ImageLoader.tsx:30 - ImageLoaderComp (used in module)
+src/views/Settings/PasswordChangeModal.tsx:107 - changePasswordMutation (used in module)
+src/views/Settings/queries.ts:15 - GET_USER_BY_MOBILE (used in module)
+src/views/Settings/queries.ts:31 - GET_USER_BY_EMAIL (used in module)
+src/views/Unlock/Unlock.tsx:73 - EnterPinLabel (used in module)
+src/views/UserAudit/UserAudit.tsx:67 - InformationTitle
+src/views/UserAudit/UserAuditHistory.tsx:99 - SORTED_COLUMN (used in module)
+src/views/VerifyCertificate/VerifyCertificatePage.tsx:86 - ContentSize (used in module)
+src/components/formConfig/formTools/components.tsx:49 - StyledTooltip (used in module)
+src/i18n/messages/views/confirmationScreen.ts:70 - messages
+src/i18n/messages/views/secureAccount.ts:40 - secureAccountMessages
+src/i18n/messages/views/selectPrimaryApplicant.ts:46 - messages
+src/views/DataProvider/birth/mutations.ts:16 - SUBMIT_BIRTH_DECLARATION (used in module)
+src/views/DataProvider/birth/mutations.ts:25 - APPROVE_BIRTH_DECLARATION (used in module)
+src/views/DataProvider/birth/mutations.ts:30 - REGISTER_BIRTH_DECLARATION (used in module)
+src/views/DataProvider/birth/mutations.ts:70 - REJECT_BIRTH_DECLARATION (used in module)
+src/views/DataProvider/birth/mutations.ts:80 - ARCHIVE_BIRTH_DECLARATION (used in module)
+src/views/DataProvider/birth/mutations.ts:96 - COLLECT_BIRTH_CERTIFICATE (used in module)
+src/views/DataProvider/birth/mutations.ts:102 - ISSUE_BIRTH_CERTIFICATE (used in module)
+src/views/DataProvider/death/mutations.ts:16 - SUBMIT_DEATH_DECLARATION (used in module)
+src/views/DataProvider/death/mutations.ts:25 - APPROVE_DEATH_DECLARATION (used in module)
+src/views/DataProvider/death/mutations.ts:30 - REGISTER_DEATH_DECLARATION (used in module)
+src/views/DataProvider/death/mutations.ts:70 - REJECT_DEATH_DECLARATION (used in module)
+src/views/DataProvider/death/mutations.ts:80 - ARCHIVE_DEATH_DECLARATION (used in module)
+src/views/DataProvider/death/mutations.ts:96 - COLLECT_DEATH_CERTIFICATE (used in module)
+src/views/DataProvider/death/mutations.ts:102 - ISSUE_DEATH_CERTIFICATE (used in module)
+src/views/DataProvider/marriage/mutations.ts:16 - SUBMIT_MARRIAGE_DECLARATION (used in module)
+src/views/DataProvider/marriage/mutations.ts:24 - APPROVE_MARRIAGE_DECLARATION (used in module)
+src/views/DataProvider/marriage/mutations.ts:32 - REGISTER_MARRIAGE_DECLARATION (used in module)
+src/views/DataProvider/marriage/mutations.ts:75 - REJECT_MARRIAGE_DECLARATION (used in module)
+src/views/DataProvider/marriage/mutations.ts:85 - ARCHIVE_MARRIAGE_DECLARATION (used in module)
+src/views/DataProvider/marriage/mutations.ts:101 - COLLECT_MARRIAGE_CERTIFICATE (used in module)
+src/views/DataProvider/marriage/mutations.ts:110 - MARK_EVENT_UNASSIGNED
+src/views/DataProvider/marriage/mutations.ts:116 - ISSUE_MARRIAGE_CERTIFICATE (used in module)
+src/views/DataProvider/marriage/queries.ts:15 - GET_MARRIAGE_REGISTRATION_FOR_REVIEW (used in module)
+src/views/DataProvider/marriage/queries.ts:279 - GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE (used in module)
+src/views/OfficeHome/inExternalValidation/inExternalValidationTab.test.tsx:33 - registerScopeToken (used in module)
+src/views/OfficeHome/inProgress/InProgress.tsx:128 - InProgressComponent (used in module)
+src/views/OfficeHome/inProgress/localInProgressDataDetails.tsx:187 - LocalInProgressDataDetails
+src/views/RegisterForm/duplicate/DuplicateFormTabs.tsx:126 - getViewableSection (used in module)
+src/views/RegisterForm/review/ReviewSection.tsx:170 - ErrorField (used in module)
+src/views/SysAdmin/Performance/ApplicationSourcesReport.tsx:45 - ApplicationSourcesReport (used in module)
+src/views/SysAdmin/Performance/LocationStatsView.tsx:34 - IPerformanceStatsProps (used in module)
+src/views/SysAdmin/Team/utils.ts:133 - checkIfLocalLanguageProvided
+src/views/SysAdmin/Team/utils.ts:31 - transformRoleDataToDefinitions
+src/views/SysAdmin/Config/Application/Application.test.tsx:24 - validImageB64String (used in module)
+src/views/SysAdmin/Config/Application/index.ts:60 - TabId
+src/views/SysAdmin/Config/Application/utils.ts:28 - IActionType (used in module)
+src/views/SysAdmin/Config/Certificates/Certificates.test.tsx:29 - validImageB64String (used in module)
+src/views/SysAdmin/Config/Certificates/index.ts:106 - Scope
+src/views/SysAdmin/Config/Certificates/index.ts:108 - SVGFile
+src/views/SysAdmin/Config/Certificates/index.ts:152 - printDummyCertificate
+src/views/SysAdmin/Config/Forms/index.ts:45 - UnpublishedWarning
+src/views/SysAdmin/Config/Forms/utils.ts:22 - INotifiableStatus (used in module)
+src/views/SysAdmin/Config/Forms/utils.ts:27 - NOTIFIABLE_STATUSES (used in module)
+src/views/SysAdmin/Config/Systems/useSystems.ts:72 - useSystemsGlobalState (used in module)
+src/views/SysAdmin/Config/Forms/Wizard/query.ts:14 - FETCH_FORM_DATA_SET
+src/views/SysAdmin/Team/user/userCreation/CreateNewUser.test.tsx:41 - mockUsers (used in module)
+src/views/SysAdmin/Team/user/userCreation/CreateNewUser.tsx:68 - Props (used in module)
+src/views/SysAdmin/Team/user/userCreation/UserForm.tsx:52 - FormTitle
+src/views/SysAdmin/Team/user/userCreation/UserReviewForm.tsx:77 - IUserReviewFormProps (used in module)
+src/views/SysAdmin/Config/Application/Tabs/GeneralProperties/index.ts:57 - TabId
