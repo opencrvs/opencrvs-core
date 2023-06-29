@@ -12,7 +12,8 @@
 import * as React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   RegisterForm,
   FullProps

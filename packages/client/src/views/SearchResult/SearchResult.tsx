@@ -40,7 +40,8 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,

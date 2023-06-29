@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { IImage, validateImage, ERROR_TYPES } from '@client/utils/imageUtils'
 import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 import { messages } from '@client/i18n/messages/views/imageUpload'

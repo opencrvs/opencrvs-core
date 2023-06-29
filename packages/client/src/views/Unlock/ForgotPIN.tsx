@@ -15,7 +15,7 @@ import React, {
   useCallback,
   useState
 } from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'

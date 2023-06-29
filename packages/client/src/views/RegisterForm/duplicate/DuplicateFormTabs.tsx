@@ -56,7 +56,7 @@ import {
   recordAuditMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'

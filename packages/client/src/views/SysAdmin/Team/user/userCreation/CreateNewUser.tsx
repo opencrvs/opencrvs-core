@@ -19,7 +19,7 @@ import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,

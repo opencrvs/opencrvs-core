@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate } from '@opencrvs/components/lib/icons'

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
 import {
   CircleButton,

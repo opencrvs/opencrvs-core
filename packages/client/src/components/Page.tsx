@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'

@@ -31,7 +31,7 @@ import {
   goToUserReviewForm
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   clearUserFormData,
   ISystemRolesMap,

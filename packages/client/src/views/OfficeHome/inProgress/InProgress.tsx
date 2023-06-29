@@ -37,7 +37,8 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { ITheme, withTheme } from '@client/styledComponents'
+import { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
