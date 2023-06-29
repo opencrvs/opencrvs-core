@@ -178,29 +178,13 @@ export const getLocation = (
 
     return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
-    if (declaration.data?.child?.placeOfBirthNotOnTheList) {
-      return (
-        declaration.data?.child?.placeOfBirthOther?.toString() || EMPTY_STRING
-      )
-    }
+    const municipality =
+      resources.locations[
+        `${declaration.data?.child?.placeOfBirthMunicipality}`
+      ]
 
-    let localityValue = ''
-
-    if (currentDataset) {
-      const currentValue = currentDataset?.options.find(
-        (r) => r.value === declaration.data?.child?.placeOfBirthLocality
-      )
-
-      if (currentValue) {
-        const currentValueLanguage = currentValue.label.find(
-          (r) => r.lang === intl.locale
-        )
-
-        localityValue = currentValueLanguage
-          ? intl.formatMessage(currentValueLanguage.descriptor)
-          : ''
-      }
-    }
+    const localityValue =
+      declaration.data?.child?.placeOfBirthLocality + ', ' + municipality.name
 
     return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Marriage) {
