@@ -199,7 +199,7 @@ type GeneratedInputFieldProps = {
   setFieldTouched?: (name: string, isTouched?: boolean) => void
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
-const GeneratedInputField = React.memo(
+const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
   ({
     fieldDefinition,
     onChange,
@@ -217,7 +217,7 @@ const GeneratedInputField = React.memo(
     onUploadingStateChanged,
     setFieldTouched,
     requiredErrorMessage
-  }: GeneratedInputFieldProps) => {
+  }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
       label: fieldDefinition.label,
@@ -637,7 +637,13 @@ const GeneratedInputField = React.memo(
     )
   },
 
-  // Are props equal? This will optimize the rendering of selects
+  // This is a hack to workaround slow renders of Selects.
+  // A proper solution would not pass new props to this component everytime,
+  // rather they should pass the variable / function references.
+  // This may be achieved by useMemo / useCallback'ing the props before passing.
+
+  // If the function returns false, props are not equal and it will re-render
+  // If function returns true, they are equal and no rerender happens
   (prevProps, nextProps) =>
     prevProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
     nextProps.fieldDefinition.type === 'SELECT_WITH_OPTIONS' &&
@@ -650,6 +656,8 @@ const GeneratedInputField = React.memo(
       nextProps.fieldDefinition.options
     )
 )
+
+GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
