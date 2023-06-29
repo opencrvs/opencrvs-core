@@ -155,7 +155,7 @@ export const getLocation = (
     const localityValue =
       declaration.data?.deathEvent?.placeOfDeathLocality +
       ', ' +
-      municipality.name
+      municipality?.name
 
     return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
@@ -165,7 +165,7 @@ export const getLocation = (
       ]
 
     const localityValue =
-      declaration.data?.child?.placeOfBirthLocality + ', ' + municipality.name
+      declaration.data?.child?.placeOfBirthLocality + ', ' + municipality?.name
 
     return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Marriage) {
