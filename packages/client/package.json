@@ -25,8 +25,7 @@
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "graphql-codegen --config codegen.yml && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",
-    "serve": "node serve-static.js",
-    "prune": "npx ts-prune -i '(root|gateway.ts|forms)'"
+    "serve": "node serve-static.js"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -149,7 +148,6 @@
     "express": "^4.17.1",
     "fetch-mock": "^7.3.3",
     "json2csv": "^4.3.2",
-    "knip": "^2.14.3",
     "opener": "^1.5.1",
     "prettier": "^2.5.1",
     "qrcode": "^1.5.1",
@@ -160,7 +158,6 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "traverse": "^0.6.6",
     "ts-node": "^7.0.1",
-    "ts-prune": "^0.10.3",
     "typescript": "^4.7.4",
     "typescript-react-intl": "^0.3.0",
     "vitest": "^0.25.5",
