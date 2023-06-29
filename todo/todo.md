@@ -1,3 +1,0 @@
-- [] remove styled component custom import, packages/client/src/styledComponents.ts remove file, fix errors
-- [] fix src/forms/mappings/mutation/field-mappings.ts:140:26 TS problem
-- [] remove unused if sentence? packages/client/src/views/RegisterForm/duplicate/DuplicateFormTabs.tsx:367
