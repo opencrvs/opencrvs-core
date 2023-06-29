@@ -35,10 +35,7 @@ export function isOfflineDataLoaded(
     state.templates &&
     state.languages
 
-  const hasDynamicallyImportedJavaScript = validators && conditionals
-
-  const isOfflineDataLoaded =
-    Boolean(hasAllRequiredData) && Boolean(hasDynamicallyImportedJavaScript)
+  const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
 }
