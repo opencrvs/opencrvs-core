@@ -25,6 +25,10 @@ import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
+/**
+ * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
+ */
+
 export interface IValidationResult {
   message: MessageDescriptor
   props?: { [key: string]: any }
