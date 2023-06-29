@@ -146,35 +146,16 @@ export const getLocation = (
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
 
-  const currentDataset = resources.formConfig.formDataset?.find(
-    (r) => r.fileName === 'cameroon-locality-list'
-  )
-
   if (declaration.event === Event.Death) {
-    if (declaration.data?.deathEvent?.placeOfDeathNotOnTheList) {
-      return (
-        declaration.data?.deathEvent?.placeOfDeathOther?.toString() ||
-        EMPTY_STRING
-      )
-    }
+    const municipality =
+      resources.locations[
+        `${declaration.data?.deathEvent?.placeOfDeathMunicipality}`
+      ]
 
-    let localityValue = ''
-
-    if (currentDataset) {
-      const currentValue = currentDataset?.options.find(
-        (r) => r.value === declaration.data?.deathEvent?.placeOfDeathLocality
-      )
-
-      if (currentValue) {
-        const currentValueLanguage = currentValue.label.find(
-          (r) => r.lang === intl.locale
-        )
-
-        localityValue = currentValueLanguage
-          ? intl.formatMessage(currentValueLanguage.descriptor)
-          : ''
-      }
-    }
+    const localityValue =
+      declaration.data?.deathEvent?.placeOfDeathLocality +
+      ', ' +
+      municipality.name
 
     return localityValue.toString() || EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
