@@ -126,18 +126,7 @@ type GoToUserProfile = {
   }
 }
 
-export type Action =
-  | GoToPageAction
-  | GoToSysAdminHome
-  | GoToReviewUserDetails
-  | GoToUserProfile
-export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
-type GoToSysAdminHome = {
-  type: typeof GO_TO_SYS_ADMIN_HOME
-  payload: {
-    tabId: string
-  }
-}
+export type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
 
 export function goToBirthInformant(declarationId: string) {
   return push(

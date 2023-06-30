@@ -824,6 +824,30 @@ input MappingInput {
   query: Operation!
 }
 
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
+}
+
+input Operation {
+  operation: String!
+}
+
+input ValidatorInput {
+  operation: String!
+  parameters: [Int!]
+}
+
+input MappingInput {
+  mutation: Operation!
+  query: Operation!
+}
+
 type LocalRegistrar {
   name: [HumanName]!
   role: String!
@@ -1111,8 +1135,6 @@ input QuestionInput {
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
   mapping: MappingInput
-<<<<<<< HEAD
-=======
 }
 
 enum InformantType {

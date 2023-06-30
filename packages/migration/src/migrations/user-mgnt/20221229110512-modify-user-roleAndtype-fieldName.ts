@@ -116,7 +116,8 @@ const DEFAULT_SYSTEM_ROLES = [
       'HEALTHCARE_WORKER',
       'POLICE_OFFICER',
       'SOCIAL_WORKER',
-      'LOCAL_LEADER'
+      'LOCAL_LEADER',
+      'FIELD_AGENT'
     ],
     active: true
   },
@@ -162,7 +163,7 @@ const DEFAULT_SYSTEM_ROLES = [
     roles: ['NATIONAL_REGISTRAR'],
     active: true
   }
-]
+] as const
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
