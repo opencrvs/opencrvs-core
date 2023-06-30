@@ -45,6 +45,7 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   IInformant,
   IContactPoint,
+  ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton
 } from '@client/forms'
@@ -112,6 +113,7 @@ export const internationaliseFieldObject = (
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
+    unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
   }
@@ -249,26 +251,26 @@ export const getFieldValidation = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): Validation[] => {
-  const validate: Validation[] = []
+  const validator: Validation[] = []
   if (
     field.dynamicDefinitions &&
-    field.dynamicDefinitions.validate &&
-    field.dynamicDefinitions.validate.length > 0
+    field.dynamicDefinitions.validator &&
+    field.dynamicDefinitions.validator.length > 0
   ) {
-    field.dynamicDefinitions.validate.map(
+    field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
         const params: any[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
         )
         const fun = element.validator(...params)
-        validate.push(fun)
+        validator.push(fun)
         return element
       }
     )
   }
 
-  return validate
+  return validator
 }
 
 export function getNextSectionIds(
@@ -319,10 +321,20 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithDynamicOptions,
+  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData
 ) => {
+  if (field.type === SELECT_WITH_OPTIONS) {
+    if (field.optionCondition) {
+      // eslint-disable-next-line no-eval
+      const conditionEvaluator = eval(field.optionCondition!)
+      return field.options.filter(conditionEvaluator)
+    }
+
+    return field.options
+  }
+
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   if (!field.dynamicOptions.dependency) {
     throw new Error(

@@ -12,7 +12,7 @@
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
 
-export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
+const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
   query fetchMarriageRegistrationForReview($id: ID!) {
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
@@ -276,7 +276,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
   }
 `
 
-export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
+const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
   query fetchMarriageRegistrationForCertificate($id: ID!) {
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
@@ -422,6 +422,7 @@ export const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               district
               state
             }
+            partOf
           }
         }
         type

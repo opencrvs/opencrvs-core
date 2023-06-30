@@ -31,7 +31,7 @@ import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult

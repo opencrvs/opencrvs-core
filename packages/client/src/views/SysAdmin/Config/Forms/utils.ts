@@ -19,12 +19,12 @@ export enum ActionStatus {
   ERROR = 'ERROR'
 }
 
-export type INotifiableStatus =
+type INotifiableStatus =
   | ActionStatus.ERROR
   | ActionStatus.COMPLETED
   | ActionStatus.PROCESSING
 
-export const NOTIFIABLE_STATUSES = [
+const NOTIFIABLE_STATUSES = [
   ActionStatus.ERROR,
   ActionStatus.PROCESSING,
   ActionStatus.COMPLETED

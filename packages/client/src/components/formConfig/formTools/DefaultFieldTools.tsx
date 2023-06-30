@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   ListViewSimplified,
   ListViewItemSimplified

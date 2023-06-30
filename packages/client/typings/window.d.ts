@@ -50,6 +50,7 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
+    MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string

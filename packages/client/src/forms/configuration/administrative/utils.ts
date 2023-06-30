@@ -247,7 +247,7 @@ export function getAddressLineLocationSelect(
     previewGroup: `${useCase}Address`,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     placeholder: {
       defaultMessage: 'Select',
       description: 'Placeholder text for a select',
@@ -557,7 +557,7 @@ export function getPlaceOfEventLocationSelect(
     previewGroup: configCase,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     placeholder: {
       defaultMessage: 'Select',
       description: 'Placeholder text for a select',

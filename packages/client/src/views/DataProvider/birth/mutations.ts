@@ -13,7 +13,7 @@ import { gql } from '@apollo/client'
 import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
-export const SUBMIT_BIRTH_DECLARATION = gql`
+const SUBMIT_BIRTH_DECLARATION = gql`
   mutation createBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details) {
       trackingId
@@ -22,12 +22,12 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_BIRTH_DECLARATION = gql`
+const APPROVE_BIRTH_DECLARATION = gql`
   mutation markBirthAsValidated($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_BIRTH_DECLARATION = gql`
+const REGISTER_BIRTH_DECLARATION = gql`
   mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsRegistered(id: $id, details: $details) {
       id
@@ -67,7 +67,7 @@ export const REGISTER_BIRTH_DECLARATION = gql`
     }
   }
 `
-export const REJECT_BIRTH_DECLARATION = gql`
+const REJECT_BIRTH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -77,7 +77,7 @@ export const REJECT_BIRTH_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_BIRTH_DECLARATION = gql`
+const ARCHIVE_BIRTH_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -93,13 +93,13 @@ export const ARCHIVE_BIRTH_DECLARATION = gql`
   }
 `
 
-export const COLLECT_BIRTH_CERTIFICATE = gql`
+const COLLECT_BIRTH_CERTIFICATE = gql`
   mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsCertified(id: $id, details: $details)
   }
 `
 
-export const ISSUE_BIRTH_CERTIFICATE = gql`
+const ISSUE_BIRTH_CERTIFICATE = gql`
   mutation markBirthAsIssued($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsIssued(id: $id, details: $details)
   }

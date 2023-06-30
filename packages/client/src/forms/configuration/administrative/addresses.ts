@@ -434,7 +434,7 @@ export const getAddressSubsection = (
     label,
     previewGroup: previewGroup,
     initialValue: '',
-    validate: []
+    validator: []
   }
 
   if (conditionalCase) {
@@ -462,7 +462,7 @@ export const getXAddressSameAsY = (
     required: true,
     initialValue: true,
     previewGroup: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-    validate: [],
+    validator: [],
     options: [
       {
         value: true,
@@ -701,7 +701,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -788,7 +788,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       hideValueInPreview: true,
       required: false,
-      validate: [],
+      validator: [],
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
@@ -847,7 +847,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -916,7 +916,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -985,7 +985,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -1054,7 +1054,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -1123,7 +1123,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -1192,7 +1192,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `district${sentenceCase(useCase)}`,
       conditionals: getRuralOrUrbanConditionals(useCase, [
         {
@@ -1261,7 +1261,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1324,7 +1324,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1387,7 +1387,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1450,7 +1450,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1513,7 +1513,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1572,7 +1572,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1631,7 +1631,7 @@ function getAddressCaseFields(
       previewGroup: `${useCase}Address`,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: `country${sentenceCase(useCase)}`,
       conditionals: [
         {
@@ -1701,7 +1701,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -1773,7 +1773,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       hideValueInPreview: true,
       previewGroup: configCase,
-      validate: [],
+      validator: [],
       conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
@@ -1819,7 +1819,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -1875,7 +1875,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -1931,7 +1931,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -1987,7 +1987,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -2043,7 +2043,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -2099,7 +2099,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'district',
       conditionals: getRuralOrUrbanConditionals('', [
         {
@@ -2155,7 +2155,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2212,7 +2212,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2269,7 +2269,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2312,7 +2312,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2360,7 +2360,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2408,7 +2408,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
@@ -2456,7 +2456,7 @@ export function getPlaceOfEventAddressFields(
       previewGroup: configCase,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       dependency: 'country',
       conditionals: [
         {
