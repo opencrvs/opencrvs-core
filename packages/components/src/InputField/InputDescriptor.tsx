@@ -13,10 +13,11 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const StyledInputDescriptor = styled.p`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.supportingCopy};
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
+  margin-top: 5px;
   display: inline-block;
 `
 
