@@ -307,6 +307,10 @@ export const addressLineToFieldTransformer =
     return transformedData
   }
 
+interface IAddress {
+  [key: string]: any
+}
+
 export const addressFhirPropertyToFieldTransformer =
   (addressType: string, transformedFieldName: string) =>
   (
@@ -315,7 +319,7 @@ export const addressFhirPropertyToFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    const address: IAddress | undefined =
+    const address =
       queryData[sectionId] &&
       queryData[sectionId].address &&
       (queryData[sectionId].address as GQLAddress[]).find(
