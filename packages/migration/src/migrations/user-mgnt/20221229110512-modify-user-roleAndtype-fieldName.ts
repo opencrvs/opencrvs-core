@@ -112,57 +112,6 @@ const DEFAULT_SYSTEM_ROLES = [
   {
     title: 'Field Agent',
     value: 'FIELD_AGENT',
-    roles: ['FIELD_AGENT'],
-    active: true
-  },
-
-  {
-    title: 'Registration Agent',
-    value: 'REGISTRATION_AGENT',
-    roles: ['REGISTRATION_AGENT'],
-    active: true
-  },
-
-  {
-    title: 'Registrar',
-    value: 'LOCAL_REGISTRAR',
-    roles: ['LOCAL_REGISTRAR'],
-    active: true
-  },
-
-  {
-    title: 'System admin (local)',
-    value: 'LOCAL_SYSTEM_ADMIN',
-    roles: ['LOCAL_SYSTEM_ADMIN'],
-    active: true
-  },
-
-  {
-    title: 'System admin (national)',
-    value: 'NATIONAL_SYSTEM_ADMIN',
-    roles: ['NATIONAL_SYSTEM_ADMIN'],
-    active: true
-  },
-
-  {
-    title: 'Performance Management',
-    value: 'PERFORMANCE_MANAGEMENT',
-    roles: ['PERFORMANCE_MANAGEMENT'],
-    active: true
-  },
-
-  {
-    title: 'National Registrar',
-    value: 'NATIONAL_REGISTRAR',
-    roles: ['NATIONAL_REGISTRAR'],
-    active: true
-  }
-] as const
-
-const DEFAULT_SYSTEM_ROLES = [
-  {
-    title: 'Field Agent',
-    value: 'FIELD_AGENT',
     roles: [
       'HEALTHCARE_WORKER',
       'POLICE_OFFICER',

@@ -24,26 +24,6 @@ input LocationInput {
   geoData: String
 }
 
-<<<<<<< HEAD
-=======
-enum LocationType {
-  HEALTH_FACILITY
-  COMMUNITY
-  HOSPITAL
-  OTHER_HEALTH_INSTITUTION
-  ADMIN_STRUCTURE
-  CRVS_OFFICE
-  PRIVATE_HOME
-  DECEASED_USUAL_RESIDENCE
-  SECONDARY_ADDRESS
-  PRIMARY_ADDRESS
-  MILITARY_BASE_OR_CANTONMENT
-  IDP_CAMP # -> Disaster Camp
-  UNHCR_CAMP # -> UNHCR Camp
-  OTHER
-}
-
->>>>>>> 83cec2a1a (Cameroon core branch (#4847))
 type Location { # -> Location (mostly the same property name except:)
   id: ID!
   _fhirID: ID # -> .id
