@@ -28,7 +28,7 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   LANG_EN,
@@ -67,7 +67,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'

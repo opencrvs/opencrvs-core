@@ -10424,6 +10424,11 @@ cosmiconfig@^7, cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+country-code-lookup@^0.0.23:
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/country-code-lookup/-/country-code-lookup-0.0.23.tgz#a5fb8fd338878b9066a653f93a979602da303ad8"
+  integrity sha512-kxhIGcau9/X+tgPg9yO2q1OLu8jiYYsdwXuiXzHdsgNChd36xrJMlOba7ka9O1xShCVTiVQPQpq/tcuy4WiW+Q==
+
 country-data@^0.0.31:
   version "0.0.31"
   resolved "https://registry.npmjs.org/country-data/-/country-data-0.0.31.tgz"
