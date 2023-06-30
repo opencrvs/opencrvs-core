@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import * as React from 'react'
 import Bowser from 'bowser'
 import { goToDeclarationRecordAudit } from '@client/navigation'
@@ -25,7 +25,6 @@ import {
   GQLUserAuditLogResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
