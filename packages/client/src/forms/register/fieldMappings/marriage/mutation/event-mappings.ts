@@ -50,7 +50,10 @@ export const marriageEventLocationMutationTransformer =
       }
       transformedData.eventLocation = defaultLocation
     }
-    if (transformationParams.lineNumber) {
+    if (
+      transformationParams.lineNumber ||
+      transformationParams.lineNumber === 0
+    ) {
       transformedData.eventLocation.address.line[
         transformationParams.lineNumber
       ] = `${draftData[sectionId][field.name]}`

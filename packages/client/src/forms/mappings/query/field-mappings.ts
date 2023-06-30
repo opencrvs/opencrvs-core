@@ -304,7 +304,6 @@ export const addressLineToFieldTransformer =
 
     transformedData[sectionId][field.name] =
       (address.line && address.line[lineNumber]) || ''
-
     return transformedData
   }
 
@@ -515,7 +514,10 @@ export const eventLocationQueryTransformer =
           ? transformationParams.transformedFieldName
           : field.name
       ]
-    if (transformationParams.lineNumber) {
+    if (
+      transformationParams.lineNumber ||
+      transformationParams.lineNumber === 0
+    ) {
       transformedData[sectionId][field.name] =
         line[transformationParams.lineNumber]
     } else if (fieldValue && ignoreAddressFields) {

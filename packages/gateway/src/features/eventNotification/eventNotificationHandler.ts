@@ -99,13 +99,13 @@ async function validateTask(bundle: fhir.Bundle) {
   }
 
   // validate office id and office location
-  const regLastOfficeIdeRef = findExtension(
+  const regLastOfficeIdRef = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
     task.extension
   )?.valueReference?.reference
 
   const regLastOfficeLocationRef = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+    `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
     task.extension
   )?.valueReference?.reference
 
@@ -114,14 +114,14 @@ async function validateTask(bundle: fhir.Bundle) {
       `Could not process the Event Notification, as office's location was not provided`
     )
   }
-  if (!regLastOfficeIdeRef) {
+  if (!regLastOfficeIdRef) {
     throw BoomErrorWithCustomMessage(
       `Could not process the Event Notification, as office id was not provided`
     )
   }
 
   // check if the office location is valid
-  const officeLocation = await fetchFromHearth(regLastOfficeLocationRef)
+  const officeLocation = await fetchFromHearth(`/${regLastOfficeLocationRef}`)
   if (
     !officeLocation ||
     !officeLocation.type ||
@@ -133,17 +133,18 @@ async function validateTask(bundle: fhir.Bundle) {
   }
 
   // check if the office id is valid and it is part of the provided office location
-  const office = await fetchFromHearth(regLastOfficeIdeRef)
+
+  const office = await fetchFromHearth(`/${regLastOfficeIdRef}`)
   if (
     !office ||
     !officeLocation.type ||
     office.type.coding?.[0]?.code !== Code.CRVS_OFFICE
   ) {
     throw BoomErrorWithCustomMessage(
-      `Could not process the Event Notification, as the provided office with id ${regLastOfficeIdeRef} was not found`
+      `Could not process the Event Notification, as the provided office with id ${regLastOfficeIdRef} was not found`
     )
   }
-  if (!office.partof || office.partof.reference !== regLastOfficeLocationRef) {
+  if (!office.partOf || office.partOf.reference !== regLastOfficeLocationRef) {
     throw BoomErrorWithCustomMessage(
       `Could not process the Event Notification, as the provided office isn't part of the provided office location`
     )
