@@ -17,7 +17,7 @@ import { getAuthenticated } from '@client/profile/profileSelectors'
 import { hasAccessToRoute } from '@client/utils/authUtils'
 import { SystemRoleType } from '@client/utils/gateway'
 
-export interface IProps {
+interface IProps {
   roles?: SystemRoleType[]
 }
 

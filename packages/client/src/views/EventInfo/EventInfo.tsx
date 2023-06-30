@@ -21,7 +21,7 @@ import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { messages } from '@client/i18n/messages/views/eventInfo'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   TertiaryButton,
   ICON_ALIGNMENT,

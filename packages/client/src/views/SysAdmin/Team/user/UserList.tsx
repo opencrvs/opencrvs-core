@@ -28,7 +28,7 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { withTheme } from '@client/styledComponents'
+import { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   LANG_EN,

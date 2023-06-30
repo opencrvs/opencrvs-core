@@ -34,7 +34,7 @@ import {
   getFieldHelperText
 } from '@client/forms/utils'
 
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
 import {
   SELECT_WITH_DYNAMIC_OPTIONS,

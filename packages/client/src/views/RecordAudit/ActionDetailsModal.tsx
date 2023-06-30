@@ -41,7 +41,6 @@ import {
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -173,7 +172,7 @@ const getReasonForRequest = (
   }
 }
 
-export const ActionDetailsModalListTable = ({
+const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
   registerForm,

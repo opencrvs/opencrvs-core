@@ -17,8 +17,6 @@ import {
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  DRAFT_BIRTH_INFORMANT_FORM,
-  DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
@@ -37,7 +35,6 @@ import {
   SELECT_DEATH_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
-  SYS_ADMIN_HOME_TAB,
   TEAM_SEARCH,
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
@@ -60,7 +57,6 @@ import {
   USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION,
-  SELECT_MARRIAGE_INFORMANT,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT
@@ -114,7 +110,7 @@ type GoToPageAction = {
   }
 }
 
-export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
+const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
   payload: {
@@ -122,7 +118,7 @@ type GoToReviewUserDetails = {
   }
 }
 
-export const GO_TO_USER_PROFILE = 'navigation/GO_TO_USER_PROFILE'
+const GO_TO_USER_PROFILE = 'navigation/GO_TO_USER_PROFILE'
 type GoToUserProfile = {
   type: typeof GO_TO_USER_PROFILE
   payload: {
@@ -154,14 +150,6 @@ export function goToBirthInformant(declarationId: string) {
 export function goToDeathInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_DEATH_INFORMANT, {
-      declarationId
-    })
-  )
-}
-
-export function goToMarriageInformant(declarationId: string) {
-  return push(
-    formatUrl(SELECT_MARRIAGE_INFORMANT, {
       declarationId
     })
   )
@@ -322,21 +310,6 @@ export function goToDeclarationRecordAudit(
   declarationId: string
 ) {
   return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
-}
-
-export function goToBirthRegistrationAsParent(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
-      declarationId: declarationId.toString()
-    })
-  )
-}
-export function goToDeclarationContact(informant: string) {
-  return push(
-    formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
-      informant: informant.toString()
-    })
-  )
 }
 
 export function goToPrintCertificate(
@@ -583,7 +556,7 @@ export function goToUserProfile(userId: string): GoToUserProfile {
   }
 }
 
-export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
+const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
@@ -594,7 +567,7 @@ type GoToCreateUserSection = {
   }
 }
 
-export const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
+const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
 type GoToUserReviewForm = {
   type: typeof GO_TO_USER_REVIEW_FORM
   payload: {
@@ -752,14 +725,6 @@ export function navigationReducer(state: INavigationState, action: any) {
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
           )
-        )
-      )
-    case GO_TO_SYS_ADMIN_HOME:
-      const { tabId: SysAdminHomeTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
         )
       )
     case GO_TO_CREATE_USER_SECTION:

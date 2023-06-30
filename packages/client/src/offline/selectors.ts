@@ -11,14 +11,9 @@
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
-import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
-import { UserDetails } from '@client/utils/userUtils'
-import { validators } from '@client/forms/validators'
-import { conditionals } from '@client/forms/conditionals'
 
-export const getOfflineState = (store: IStoreState): IOfflineDataState =>
-  store.offline
+const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
 function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
   return getOfflineState(store)[key]
@@ -38,22 +33,6 @@ export function isOfflineDataLoaded(
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
-}
-
-export function isSystemAdmin(userDetails: UserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.systemRole &&
-    SYS_ADMIN_ROLES.includes(userDetails.systemRole)
-  )
-}
-
-export function isNationalSystemAdmin(userDetails: UserDetails | undefined) {
-  return (
-    userDetails &&
-    userDetails.systemRole &&
-    NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-  )
 }
 
 export const getOfflineDataLoaded = (

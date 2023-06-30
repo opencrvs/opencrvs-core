@@ -36,11 +36,11 @@ export interface LoadFormsResponse {
   }
 }
 
-export interface ICountryLogo {
+interface ICountryLogo {
   fileName: string
   file: string
 }
-export interface ILoginBackground {
+interface ILoginBackground {
   backgroundColor?: string
   backgroundImage?: string
   imageFit?: string
