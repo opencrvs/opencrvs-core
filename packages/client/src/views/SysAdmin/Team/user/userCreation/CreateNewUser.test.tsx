@@ -38,7 +38,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
 
-export const mockUsers = {
+const mockUsers = {
   data: {
     searchUsers: {
       totalItems: 8,

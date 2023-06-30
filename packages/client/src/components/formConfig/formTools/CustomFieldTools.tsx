@@ -47,7 +47,7 @@ import {
 } from '@client/i18n/reducer'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/src/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'

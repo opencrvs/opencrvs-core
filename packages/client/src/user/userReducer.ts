@@ -142,7 +142,7 @@ interface ISubmitSuccessAction {
   }
 }
 
-export function submitSuccess(
+function submitSuccess(
   locationId: string,
   isUpdate = false
 ): ISubmitSuccessAction {
@@ -162,7 +162,7 @@ interface ISubmitFailedAction {
   }
 }
 
-export function submitFail(errorData: ApolloError): ISubmitFailedAction {
+function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
     type: SUBMIT_USER_FORM_DATA_FAIL,
     payload: {
@@ -178,7 +178,7 @@ export interface IRoleLoadedAction {
   }
 }
 
-export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
+function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
@@ -218,7 +218,7 @@ interface IStoreUserFormDataAction {
   }
 }
 
-export function storeUserFormData(
+function storeUserFormData(
   queryData: ApolloQueryResult<GQLQuery>
 ): IStoreUserFormDataAction {
   return {
@@ -259,12 +259,12 @@ export interface IUserFormState {
   systemRoleMap: ISystemRolesMap
 }
 
-export const fetchRoles = async () => {
+const fetchRoles = async () => {
   const roles = await roleQueries.fetchRoles()
   return roles.data.getSystemRoles
 }
 
-export const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
+const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
   const roleMap: ISystemRolesMap = {}
   systemRoles.forEach((systemRole: SystemRole) => {
     systemRole.roles.forEach((role: Role) => {

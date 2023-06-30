@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { withTheme } from '@client/styledComponents'
+import { withTheme } from 'styled-components'
 import * as React from 'react'
 import Bowser from 'bowser'
 import { goToDeclarationRecordAudit } from '@client/navigation'
@@ -96,7 +96,7 @@ type Props = WrappedComponentProps &
     theme: ITheme
   }
 
-export enum SORTED_COLUMN {
+enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',
