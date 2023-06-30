@@ -16,7 +16,6 @@ import {
   EventLocationAddressCases
 } from '@client/forms/configuration/administrative/addresses'
 import { IConditional, SerializedFormField } from '@client/forms/index'
-import { Address } from '@client/utils/gateway'
 
 export function getDependency(location: string, useCase: string) {
   switch (location) {
@@ -334,7 +333,7 @@ export function getAddrressFhirPropertyLocationSelect(
     previewGroup: `${useCase}Address`,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     placeholder: {
       defaultMessage: 'Select',
       description: 'Placeholder text for a select',
