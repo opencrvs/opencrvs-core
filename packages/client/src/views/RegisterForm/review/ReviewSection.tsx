@@ -59,7 +59,7 @@ import {
   IPreviewGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
@@ -888,7 +888,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [BULLET_LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }

@@ -26,7 +26,7 @@ import {
   IFormSectionGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
@@ -654,9 +654,14 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
-    (type) => type === field.type
-  )
+  return [
+    BULLET_LIST,
+    PARAGRAPH,
+    WARNING,
+    TEXTAREA,
+    SUBSECTION,
+    FETCH_BUTTON
+  ].find((type) => type === field.type)
 }
 
 export const getNestedFieldValue = (

@@ -62,7 +62,7 @@ import {
   ITextFormField,
   Ii18nTextFormField,
   LINK,
-  LIST,
+  BULLET_LIST,
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
@@ -501,7 +501,7 @@ function GeneratedInputField({
       </Text>
     )
   }
-  if (fieldDefinition.type === LIST) {
+  if (fieldDefinition.type === BULLET_LIST) {
     return <FormBulletList {...inputProps} list={fieldDefinition.options} />
   }
   if (fieldDefinition.type === NUMBER) {
@@ -966,7 +966,7 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === DYNAMIC_LIST
               ? ({
                   ...field,
-                  type: LIST,
+                  type: BULLET_LIST,
                   items: getFieldOptionsByValueMapper(
                     field as IDynamicListFormField,
                     draftData as IFormData,

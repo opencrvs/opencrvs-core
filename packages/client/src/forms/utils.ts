@@ -44,7 +44,7 @@ import {
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
-  LIST
+  BULLET_LIST
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -131,7 +131,7 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === LIST) {
+  if (base.type === BULLET_LIST) {
     ;(base as any).options = internationaliseListFieldObject(intl, base.items)
   }
 
