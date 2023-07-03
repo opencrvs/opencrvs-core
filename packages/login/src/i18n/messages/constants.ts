@@ -9,26 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
+import { defineMessages } from 'react-intl'
 
-export const Section = styled.div`
-  display: grid;
-  gap: 24px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    gap: 0;
+export const constantsMessages = defineMessages({
+  skipToMainContent: {
+    defaultMessage: 'Skip to main content',
+    description:
+      'Label for a keyboard accessibility link which skips to the main content',
+    id: 'constants.skipToMainContent'
   }
-`
-
-export const SectionFormBackAction = styled.div`
-  display: grid;
-  gap: 24px;
-  justify-items: end;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    gap: 0;
-    background: ${({ theme }) => theme.colors.white};
-    align-items: centre;
-    justify-items: start;
-  }
-`
+})
