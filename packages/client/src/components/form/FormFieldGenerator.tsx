@@ -502,7 +502,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === LIST) {
-    return <FormBulletList {...inputProps} list={fieldDefinition.items} />
+    return <FormBulletList {...inputProps} list={fieldDefinition.options} />
   }
   if (fieldDefinition.type === NUMBER) {
     let inputFieldWidth = fieldDefinition.inputFieldWidth
