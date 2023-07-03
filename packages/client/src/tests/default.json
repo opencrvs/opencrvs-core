@@ -1166,7 +1166,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationTypeQueryTransformer",
@@ -1210,7 +1210,7 @@
                     },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationIDQueryTransformer",
@@ -4420,7 +4420,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationTypeQueryTransformer",
@@ -4464,7 +4464,7 @@
                     },
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationIDQueryTransformer",

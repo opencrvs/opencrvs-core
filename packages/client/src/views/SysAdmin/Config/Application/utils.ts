@@ -25,7 +25,7 @@ import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
-export type IActionType =
+type IActionType =
   | keyof typeof GeneralActionId
   | keyof typeof BirthActionId
   | keyof typeof DeathActionId

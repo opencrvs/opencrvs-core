@@ -1239,7 +1239,7 @@ export const deathRegisterForms: ISerializedForm = {
               mapping: {
                 mutation: {
                   operation: 'deathEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationTypeQueryTransformer',
@@ -1284,7 +1284,7 @@ export const deathRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'deathEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationIDQueryTransformer',

@@ -72,7 +72,7 @@ import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
@@ -172,7 +172,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-export interface IFormProps {
+interface IFormProps {
   declaration: IDeclaration
   registerForm: IForm
   pageRoute: string

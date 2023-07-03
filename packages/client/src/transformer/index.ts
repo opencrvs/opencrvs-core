@@ -62,7 +62,7 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const transformRegistrationCorrection = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,

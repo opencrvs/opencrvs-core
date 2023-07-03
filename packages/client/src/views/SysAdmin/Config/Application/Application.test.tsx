@@ -21,7 +21,7 @@ import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from './mutations'
 import { vi } from 'vitest'
 
-export const validImageB64String =
+const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 let testComponent: ReactWrapper
 beforeEach(async () => {

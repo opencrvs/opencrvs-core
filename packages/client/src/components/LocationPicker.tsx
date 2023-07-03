@@ -31,7 +31,7 @@ import {
   TitleContent,
   CancelableArea
 } from '@client/components/DateRangePicker'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ILocation, LocationType } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
