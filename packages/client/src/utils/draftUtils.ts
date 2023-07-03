@@ -14,13 +14,7 @@ import {
   SUBMISSION_STATUS,
   IPrintableDeclaration
 } from '@client/declarations'
-import {
-  BirthSection,
-  DeathSection,
-  IForm,
-  IFormSectionData,
-  MarriageSection
-} from '@client/forms'
+import { IFormSectionData } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,

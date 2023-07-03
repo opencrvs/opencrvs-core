@@ -19,7 +19,8 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
-  TEXT
+  TEXT,
+  ValidatorConditionalFactory
 } from '@client/forms'
 import {
   identityOptions,
@@ -28,7 +29,6 @@ import {
   identityTypeMapper
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
-import { conditionals } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
@@ -252,7 +252,9 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
     ]
   }
 
-export const collectBirthCertificateFormSection: IFormSection = {
+export const collectBirthCertificateFormSection: ValidatorConditionalFactory<
+  IFormSection
+> = ({ conditionals, validators }) => ({
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -271,9 +273,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           placeholder: formMessages.select,
           options: identityOptions
@@ -285,9 +290,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDType]
         },
@@ -319,9 +327,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDAvailable]
         },
@@ -332,9 +343,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -344,9 +358,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -356,9 +373,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         }
       ]
@@ -416,9 +436,11 @@ export const collectBirthCertificateFormSection: IFormSection = {
       ]
     }
   ]
-}
+})
 
-export const collectDeathCertificateFormSection: IFormSection = {
+export const collectDeathCertificateFormSection: ValidatorConditionalFactory<
+  IFormSection
+> = ({ conditionals, validators }) => ({
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -439,9 +461,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: true,
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           options: [
             { value: 'INFORMANT', label: formMessages.informantName },
@@ -467,9 +492,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           placeholder: formMessages.select,
           options: identityOptions
@@ -481,9 +509,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDType]
         },
@@ -511,9 +542,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDAvailable]
         },
@@ -524,9 +558,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -536,9 +573,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -548,9 +588,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         }
       ]
@@ -608,9 +651,11 @@ export const collectDeathCertificateFormSection: IFormSection = {
       ]
     }
   ]
-}
+})
 
-export const collectMarriageCertificateFormSection: IFormSection = {
+export const collectMarriageCertificateFormSection: ValidatorConditionalFactory<
+  IFormSection
+> = ({ conditionals, validators }) => ({
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -631,9 +676,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: true,
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           options: [
             { value: 'BRIDE', label: formMessages.brideName },
@@ -660,9 +708,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           placeholder: formMessages.select,
           options: identityOptions
@@ -674,9 +725,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDType]
         },
@@ -704,9 +758,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ],
           conditionals: [conditionals.iDAvailable]
         },
@@ -717,9 +774,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -729,9 +789,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         },
         {
@@ -741,9 +804,12 @@ export const collectMarriageCertificateFormSection: IFormSection = {
           required: true,
           initialValue: '',
           validator: [
-            fieldValidationDescriptorToValidationFunction({
-              operation: 'requiredBasic'
-            })
+            fieldValidationDescriptorToValidationFunction(
+              {
+                operation: 'requiredBasic'
+              },
+              validators
+            )
           ]
         }
       ]
@@ -801,4 +867,4 @@ export const collectMarriageCertificateFormSection: IFormSection = {
       ]
     }
   ]
-}
+})

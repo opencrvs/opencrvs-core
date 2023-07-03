@@ -12,8 +12,6 @@
 import {
   GQLAddress,
   GQLHumanName,
-  GQLLocationType,
-  GQLAddressType,
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
@@ -29,7 +27,8 @@ import {
   IFormFieldQueryMapFunction,
   TransformedData,
   IFormSectionData,
-  ISelectFormFieldWithOptions
+  ISelectFormFieldWithOptions,
+  AddressCases
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
@@ -48,8 +47,6 @@ import {
   countryAlpha3toAlpha2,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
-
-import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
   [key: string]: any
@@ -441,49 +438,27 @@ export function commentToFieldTransformer(
 
 export function attachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: QueryData,
-  sectionId: SectionId,
+  queryData: any,
+  sectionId: string,
   field: IFormField,
-  alternateSectionId?: SectionId,
-  subjectMapper?: any,
-  typeMapper?: any,
-  fieldNameMapping?: any
+  alternateSectionId: string
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
   const attachments: IAttachment[] = []
-  const queryDataAttatchments = queryData[selectedSectionId].attachments
 
-  if (queryDataAttatchments) {
-    ;(queryDataAttatchments as GQLAttachment[]).forEach((attachment) => {
-      const subject = attachment.subject as string
-      let type = attachment.type
-      if (typeMapper) {
-        // @ts-ignore
-        type =
-          Object.keys(typeMapper).find(
-            (key) => typeMapper[key] === attachment.type
-          ) || attachment.type
-      }
-      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+  if (queryData[selectedSectionId].attachments) {
+    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
+      (attachment) => {
         attachments.push({
           data: attachment.data,
           uri: attachment.uri,
           type: attachment.contentType,
-          optionValues: [subject, type],
-          title: subject,
-          description: type
+          optionValues: [attachment.subject, attachment.type],
+          title: attachment.subject,
+          description: attachment.type
         } as IAttachment)
       }
-      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-        attachments.push({
-          data: attachment.data,
-          type: attachment.contentType,
-          optionValues: [subject, type],
-          title: subject,
-          description: type
-        } as IAttachment)
-      }
-    })
+    )
   }
   if (attachments) {
     transformedData[sectionId][field.name] = attachments

@@ -17,13 +17,11 @@ import { RouteComponentProps } from 'react-router'
 import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
-  ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  SecondaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
+import { Duplicate } from '@opencrvs/components/lib/icons'
 import {
   FixedEventTopBar,
   IEventTopBarProps,
@@ -32,7 +30,11 @@ import {
 import { Alert } from '@opencrvs/components/lib/Alert'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Container, BodyContent } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   deleteDeclaration,
   IDeclaration,
@@ -86,15 +88,8 @@ import {
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import {
-  buttonMessages,
-  constantsMessages,
-  formMessages
-} from '@client/i18n/messages'
-import {
-  PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
-  PAGE_TRANSITIONS_EXIT_TIME,
   DECLARED,
   REJECTED,
   VALIDATED,
@@ -113,20 +108,6 @@ import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/Duplicat
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
 
-const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 16px;
-  margin-bottom: 24px;
-`
-const FooterArea = styled.div`
-  height: 260px;
-  padding: 16px 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 160px;
-  }
-`
-
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
@@ -136,27 +117,20 @@ const Notice = styled.div`
   margin: 30px -25px;
 `
 
-const BackReviewButton = styled(SecondaryButton)`
-  height: 48px;
-  margin-left: 16px;
-`
-const Required = styled.span<
-  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->`
-  ${({ theme }) => theme.fonts.reg18};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.negative};
-  flex-grow: 0;
+const BackButtonContainer = styled.div`
+  position: fixed;
+  padding: 16px 0px;
+  height: 64px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    position: relative;
+    margin: 0 16px;
+  }
 `
 
-const Optional = styled.span<
-  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->`
-  ${({ theme }) => theme.fonts.reg18};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.supportingCopy};
-  flex-grow: 0;
+const PageFooter = styled.div`
+  height: 200px;
 `
+
 const SpinnerWrapper = styled.div`
   height: 80vh;
   display: flex;
@@ -223,24 +197,6 @@ type State = {
   isDuplicateDeclarationLoading: boolean
 }
 
-const fadeFromTop = keyframes`
-  to {
-    -webkit-transform: translateY(100vh);
-    transform: translateY(100vh);
-  }
-`
-const StyledContainer = styled(Container)`
-  &.${PAGE_TRANSITIONS_CLASSNAME}-exit {
-    top: 0;
-    z-index: 999;
-    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_EXIT_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-  }
-
-  &.${PAGE_TRANSITIONS_CLASSNAME}-exit-active {
-    z-index: 999;
-  }
-`
 function getDeclarationIconColor(declaration: IDeclaration): string {
   return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
     ? 'purple'
@@ -544,16 +500,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { declaration, intl } = this.props
 
     const backButton = (
-      <TertiaryButton
-        align={ICON_ALIGNMENT.LEFT}
-        icon={() => <BackArrow />}
+      <Button
+        type="tertiary"
+        size="small"
         onClick={() => {
           this.props.goToCertificateCorrection(
             declaration.id,
             CorrectionSection.Corrector
           )
         }}
-      />
+      >
+        <Icon name="ArrowLeft" size="medium" />
+        {intl.formatMessage(buttonMessages.back)}
+      </Button>
     )
 
     return {
@@ -588,7 +547,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
           label: declaration.review
-            ? intl.formatMessage(buttonMessages.saveExitButton)
+            ? intl.formatMessage(buttonMessages.save)
             : intl.formatMessage(buttonMessages.exitButton)
         }
       }
@@ -597,7 +556,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ...eventTopBarProps,
         saveAction: {
           handler: this.onSaveAsDraftClicked,
-          label: intl.formatMessage(buttonMessages.saveExitButton)
+          label: intl.formatMessage(buttonMessages.save)
         },
         menuItems: [menuOption]
       }
@@ -649,10 +608,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.logTime(duration)
           }}
         ></TimeMounted>
-
-        <StyledContainer
-          className={PAGE_TRANSITIONS_CLASSNAME}
-          id="informant_parent_view"
+        <Frame
+          header={<AppBar title="OpenCRVS" />}
+          key={activeSection.id}
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           {isErrorOccured && (
             <ErrorText id="error_message_section">
@@ -673,7 +634,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     iconColor={getDeclarationIconColor(declaration)}
                     saveAction={{
                       handler: this.onSaveAsDraftClicked,
-                      label: intl.formatMessage(buttonMessages.saveExitButton)
+                      label: intl.formatMessage(buttonMessages.save)
                     }}
                     menuItems={[menuItemDeleteOrClose]}
                   />
@@ -750,137 +711,55 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <FixedEventTopBar
                     {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
                   />
-                  <BodyContent id="register_form">
-                    {this.props.isWritingDraft ? (
-                      <SpinnerWrapper>
-                        <Spinner id="draft_write_loading" />
-                      </SpinnerWrapper>
-                    ) : (
-                      <>
-                        <TertiaryButton
-                          align={ICON_ALIGNMENT.LEFT}
-                          icon={() => <BackArrow />}
+                  <Frame.LayoutForm>
+                    <Frame.SectionFormBackAction>
+                      <BackButtonContainer>
+                        <Button
+                          type="tertiary"
+                          size="small"
                           onClick={this.props.goBack}
                         >
+                          <Icon name="ArrowLeft" size="medium" />
                           {intl.formatMessage(buttonMessages.back)}
-                        </TertiaryButton>
-                        <FormSectionTitle
-                          id={`form_section_title_${activeSectionGroup.id}`}
-                        >
-                          {(!activeSectionGroup.ignoreSingleFieldView &&
-                            activeSectionGroup.fields.length === 1 && (
-                              <>
-                                {
-                                  (activeSectionGroup.fields[0].hideHeader =
-                                    true)
-                                }
-                                {intl.formatMessage(
-                                  activeSectionGroup.fields[0].label
-                                )}
-                                {activeSectionGroup.fields[0].required && (
-                                  <Required
-                                    disabled={
-                                      activeSectionGroup.disabled ||
-                                      activeSection.disabled ||
-                                      false
-                                    }
-                                  >
-                                    &nbsp;*
-                                  </Required>
-                                )}
-                              </>
-                            )) || (
-                            <>
-                              {intl.formatMessage(
-                                activeSectionGroup.title || activeSection.title
-                              )}
-                              {activeSection.optional && (
-                                <Optional
-                                  id={`form_section_opt_label_${activeSectionGroup.id}`}
-                                  disabled={
-                                    activeSectionGroup.disabled ||
-                                    activeSection.disabled
-                                  }
-                                >
-                                  &nbsp;&nbsp;•&nbsp;
-                                  {intl.formatMessage(
-                                    formMessages.optionalLabel
-                                  )}
-                                </Optional>
-                              )}
-                            </>
-                          )}
-                        </FormSectionTitle>
-                        {activeSection.notice && (
-                          <Notice
-                            id={`form_section_notice_${activeSectionGroup.id}`}
-                          >
-                            {intl.formatMessage(activeSection.notice)}
-                          </Notice>
+                        </Button>
+                      </BackButtonContainer>
+                    </Frame.SectionFormBackAction>
+                    <Frame.Section>
+                      <Content
+                        size={ContentSize.NORMAL}
+                        id="register_form"
+                        title={intl.formatMessage(
+                          activeSectionGroup.title || activeSection.title
                         )}
-                        <form
-                          id={`form_section_id_${activeSectionGroup.id}`}
-                          onSubmit={(event: React.FormEvent) =>
-                            event.preventDefault()
-                          }
-                        >
-                          {isFileSizeExceeded(declaration) &&
-                            isDocumentUploadPage && (
-                              <Alert type="warning">
+                        showTitleOnMobile={true}
+                        bottomActionButtons={
+                          [
+                            nextSectionGroup && (
+                              <Button
+                                id="next_section"
+                                type="primary"
+                                size="large"
+                                onClick={() => {
+                                  this.continueButtonHandler(
+                                    this.props.pageRoute,
+                                    declaration.id,
+                                    nextSectionGroup.sectionId,
+                                    nextSectionGroup.groupId,
+                                    declaration.event.toLowerCase()
+                                  )
+                                }}
+                                disabled={this.state.isFileUploading}
+                              >
                                 {intl.formatMessage(
-                                  constantsMessages.totalFileSizeExceed,
-                                  {
-                                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
-                                  }
+                                  buttonMessages.continueButton
                                 )}
-                              </Alert>
-                            )}
-                          <FormFieldGenerator
-                            id={`${activeSection.id}-${activeSectionGroup.id}`}
-                            key={`${activeSection.id}-${activeSectionGroup.id}`}
-                            onChange={(values) => {
-                              debouncedModifyDeclaration(
-                                values,
-                                activeSection,
-                                declaration
-                              )
-                            }}
-                            setAllFieldsDirty={this.setAllFieldsDirty()}
-                            fieldsToShowValidationErrors={
-                              fieldsToShowValidationErrors
-                            }
-                            fields={getVisibleGroupFields(activeSectionGroup)}
-                            draftData={declaration.data}
-                            onSetTouched={(setTouchedFunc) => {
-                              this.setAllFormFieldsTouched = setTouchedFunc
-                            }}
-                            onUploadingStateChanged={
-                              this.onUploadingStateChanged
-                            }
-                          />
-                        </form>
-                        {nextSectionGroup && (
-                          <FooterArea>
-                            <PrimaryButton
-                              id="next_section"
-                              onClick={() => {
-                                this.continueButtonHandler(
-                                  this.props.pageRoute,
-                                  declaration.id,
-                                  nextSectionGroup.sectionId,
-                                  nextSectionGroup.groupId,
-                                  declaration.event.toLowerCase()
-                                )
-                              }}
-                              disabled={this.state.isFileUploading}
-                            >
-                              {intl.formatMessage(
-                                buttonMessages.continueButton
-                              )}
-                            </PrimaryButton>
-                            {declaration.review && (
-                              <BackReviewButton
+                              </Button>
+                            ),
+                            declaration.review && (
+                              <Button
                                 id="back-to-review-button"
+                                type="secondary"
+                                size="large"
                                 className="item"
                                 onClick={() => {
                                   this.continueButtonHandler(
@@ -903,13 +782,76 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 {intl.formatMessage(
                                   messages.backToReviewButton
                                 )}
-                              </BackReviewButton>
+                              </Button>
+                            )
+                          ].filter(Boolean) as React.ReactElement[]
+                        }
+                      >
+                        {this.props.isWritingDraft ? (
+                          <SpinnerWrapper>
+                            <Spinner id="draft_write_loading" />
+                          </SpinnerWrapper>
+                        ) : (
+                          <>
+                            {activeSection.notice && (
+                              <Notice
+                                id={`form_section_notice_${activeSectionGroup.id}`}
+                              >
+                                {intl.formatMessage(activeSection.notice)}
+                              </Notice>
                             )}
-                          </FooterArea>
+                            <form
+                              id={`form_section_id_${activeSectionGroup.id}`}
+                              onSubmit={(event: React.FormEvent) =>
+                                event.preventDefault()
+                              }
+                            >
+                              {isFileSizeExceeded(declaration) &&
+                                isDocumentUploadPage && (
+                                  <Alert type="warning">
+                                    {intl.formatMessage(
+                                      constantsMessages.totalFileSizeExceed,
+                                      {
+                                        fileSize: bytesToSize(
+                                          ACCUMULATED_FILE_SIZE
+                                        )
+                                      }
+                                    )}
+                                  </Alert>
+                                )}
+
+                              <FormFieldGenerator
+                                id={`${activeSection.id}-${activeSectionGroup.id}`}
+                                key={`${activeSection.id}-${activeSectionGroup.id}`}
+                                onChange={(values) => {
+                                  debouncedModifyDeclaration(
+                                    values,
+                                    activeSection,
+                                    declaration
+                                  )
+                                }}
+                                setAllFieldsDirty={this.setAllFieldsDirty()}
+                                fieldsToShowValidationErrors={
+                                  fieldsToShowValidationErrors
+                                }
+                                fields={getVisibleGroupFields(
+                                  activeSectionGroup
+                                )}
+                                draftData={declaration.data}
+                                onSetTouched={(setTouchedFunc) => {
+                                  this.setAllFormFieldsTouched = setTouchedFunc
+                                }}
+                                onUploadingStateChanged={
+                                  this.onUploadingStateChanged
+                                }
+                              />
+                            </form>
+                          </>
                         )}
-                      </>
-                    )}
-                  </BodyContent>
+                      </Content>
+                      <PageFooter />
+                    </Frame.Section>
+                  </Frame.LayoutForm>
                 </>
               )}
             </>
@@ -984,7 +926,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               messages.deleteDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
-        </StyledContainer>
+        </Frame>
       </>
     )
   }

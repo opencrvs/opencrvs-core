@@ -10,13 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
+import { UserSection, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
+  DRAFT_DEATH_FORM,
   EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
   HOME,
@@ -44,8 +45,6 @@ import {
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
-  FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
   SYSTEM_LIST,
   VS_EXPORTS,
@@ -193,10 +192,6 @@ export function goToDashboardView() {
 
 export function goToAdvancedSearch() {
   return push(ADVANCED_SEARCH)
-}
-
-export function goToFormConfigHome() {
-  return push(FORM_CONFIG_HOME)
 }
 
 export function goToApplicationConfig() {
@@ -423,13 +418,17 @@ export function goToIssueCertificatePayment(
   )
 }
 
-export function goToFormConfigWizard(event: Event, section: WizardSection) {
+export function goToDeathRegistration(declarationId: string) {
   return push(
-    formatUrl(FORM_CONFIG_WIZARD, {
-      event: event,
-      section: section
-    })
+    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
+}
+
+export function goToSysAdminHomeTab(tabId: string) {
+  return {
+    type: GO_TO_SYS_ADMIN_HOME,
+    payload: { tabId }
+  }
 }
 
 export function goToSettings() {

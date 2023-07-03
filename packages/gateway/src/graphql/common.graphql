@@ -34,106 +34,16 @@ enum Event {
   marriage
 }
 
-enum Relationship {
-  GUARDIAN
-  NON_LEGAL_GUARDIAN
-  MATERNAL_GRANDMOTHER
-  MATERNAL_GRANDFATHER
-  PATERNAL_GRANDMOTHER
-  PATERNAL_GRANDFATHER
-}
-
-enum IdentityIDType {
-  PASSPORT
-  NATIONAL_ID
-  MOSIP_PSUT_TOKEN_ID
-  DECEASED_PATIENT_ENTRY
-  BIRTH_PATIENT_ENTRY
-  DRIVING_LICENSE
-  BIRTH_REGISTRATION_NUMBER
-  DEATH_REGISTRATION_NUMBER
-  MARRIAGE_REGISTRATION_NUMBER
-  REFUGEE_NUMBER
-  ALIEN_NUMBER
-  OTHER
-  NO_ID
-  SOCIAL_SECURITY_NO
-}
-
-enum EducationType {
-  NO_SCHOOLING
-  PRIMARY_ISCED_1
-  LOWER_SECONDARY_ISCED_2
-  UPPER_SECONDARY_ISCED_3
-  POST_SECONDARY_ISCED_4
-  FIRST_STAGE_TERTIARY_ISCED_5
-  SECOND_STAGE_TERTIARY_ISCED_6
-  NOT_STATED
-}
-
-enum MaritalStatusType {
-  SINGLE
-  MARRIED
-  WIDOWED
-  DIVORCED
-  NOT_STATED
-  SEPARATED
-}
-
-enum AddressType {
-  HEALTH_FACILITY
-  ADMIN_STRUCTURE
-  CRVS_OFFICE
-  PRIVATE_HOME
-  DECEASED_USUAL_RESIDENCE
-  SECONDARY_ADDRESS
-  PRIMARY_ADDRESS
-  MILITARY_BASE_OR_CANTONMENT
-  IDP_CAMP # -> Disaster Camp
-  UNHCR_CAMP # -> UNHCR Camp
-  OTHER
-}
-
-enum RelationshipType {
-  FATHER
-  MOTHER
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  EXTENDED_FAMILY
-  OTHER
-  INFORMANT
-  GRANDFATHER
-  GRANDMOTHER
-  GRANDSON
-  GRANDDAUGHTER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  INSTITUTION_HEAD_PLACE_OF_BIRTH
-  HOUSE_OWNER
-  OPERATOR
-  OFFICE_IN_CHARGE
-  LEGAL_GUARDIAN
-  BOTH_PARENTS
-  HEAD_OF_THE_INSTITUTE
-  OWNER_OF_THE_HOUSE
-  DRIVER_OF_THE_VEHICLE
-  OFFICER_IN_CHARGE
-}
-
 input IdentityInput {
   id: ID
-  type: IdentityIDType
+  type: String
   otherType: String
   fieldsModifiedByIdentity: [String]
 }
 
 type IdentityType { # -> Identifier
   id: ID # -> .value
-  type: IdentityIDType # -> .system
+  type: String # -> .system
   otherType: String
   fieldsModifiedByIdentity: [String]
 }
@@ -178,7 +88,7 @@ input PersonInput {
   gender: String
   birthDate: String
   age: Float
-  maritalStatus: MaritalStatusType # Not in BDRIS2 - keep as optional
+  maritalStatus: String # Not in BDRIS2 - keep as optional
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
@@ -189,7 +99,7 @@ input PersonInput {
   photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
-  educationalAttainment: EducationType # Not in BDRIS2
+  educationalAttainment: String # Not in BDRIS2
   ageOfIndividualInYears: Int
 }
 
@@ -202,7 +112,7 @@ type Person { # -> Patient
   gender: String # -> .gender
   birthDate: String # -> birthDate
   age: Float # -> .extension(url='http://opencrvs.org/specs/age').valueInteger
-  maritalStatus: MaritalStatusType # -> .maritalStatus
+  maritalStatus: String # -> .maritalStatus
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
@@ -213,7 +123,7 @@ type Person { # -> Patient
   photo: [Attachment] # -> .photo
   deceased: Deceased # -> .deceased
   nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
-  educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
+  educationalAttainment: String # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
   ageOfIndividualInYears: Int
   exactDateOfBirthUnknown: Boolean
 }
@@ -243,7 +153,7 @@ type Identifier {
 
 input AddressInput {
   use: String
-  type: AddressType
+  type: String
   text: String # Reserve for geo-code
   line: [String]
   city: String
@@ -257,7 +167,7 @@ input AddressInput {
 
 type Address { # -> Address (mostly the same property name except:)
   use: String
-  type: AddressType
+  type: String
   text: String # Reserve for geo-code
   line: [String]
   lineName: [String]

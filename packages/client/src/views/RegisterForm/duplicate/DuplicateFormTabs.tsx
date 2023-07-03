@@ -587,7 +587,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item)
       }
     })

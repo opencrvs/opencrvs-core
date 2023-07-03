@@ -25,7 +25,6 @@ import {
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_REG_TYPE_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
@@ -221,7 +220,6 @@ test('should build a minimal FHIR registration document without error', async ()
       birthType: 2,
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
-      birthRegistrationType: 'INFORMANT_ONLY',
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
@@ -233,8 +231,6 @@ test('should build a minimal FHIR registration document without error', async ()
           birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
           weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
           attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
-          birthRegistrationType:
-            '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
           childrenBornAliveToMother:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
           foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
@@ -672,13 +668,6 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[17].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[17].resource.code.coding).toEqual([
-    {
-      system: 'http://loinc.org',
-      code: BIRTH_REG_TYPE_CODE,
-      display: 'Birth registration type'
-    }
-  ])
   expect(fhir.entry[18].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )

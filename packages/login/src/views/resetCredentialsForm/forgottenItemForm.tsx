@@ -23,6 +23,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
   & > div {
@@ -108,7 +109,9 @@ class ForgottenItemComponent extends React.Component<Props, State> {
               desktopTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="forgotten-item-form" onSubmit={this.handleContinue}>
             <Content

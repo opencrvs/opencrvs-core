@@ -236,7 +236,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.reject'
   },
   rejectDeclaration: {
-    defaultMessage: 'Reject Declaration',
+    defaultMessage: 'Reject declaration',
     description: 'Reject declaration button text',
     id: 'buttons.rejectDeclaration'
   },
@@ -272,17 +272,17 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.saving'
   },
   saveExitButton: {
-    defaultMessage: 'Save & Exit',
-    description: 'Save & Exit Button Text',
+    defaultMessage: 'Save & exit',
+    description: 'Save & exit Button Text',
     id: 'buttons.saveAndExit'
   },
   deleteDeclaration: {
-    defaultMessage: 'Delete Declaration',
+    defaultMessage: 'Delete declaration',
     description: 'Delete declaration button text',
     id: 'buttons.deleteDeclaration'
   },
   closeDeclaration: {
-    defaultMessage: 'Close Declaration',
+    defaultMessage: 'Close declaration',
     description: 'Close declaration button text',
     id: 'buttons.closeDeclaration'
   },
@@ -307,7 +307,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.send'
   },
   sendForReview: {
-    defaultMessage: 'Send For Review',
+    defaultMessage: 'Send For review',
     description: 'Submit Button Text',
     id: 'buttons.sendForReview'
   },
@@ -317,7 +317,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendIncomplete'
   },
   sendForApproval: {
-    defaultMessage: 'Send For Approval',
+    defaultMessage: 'Send For approval',
     description: 'Title for complete submit button',
     id: 'buttons.sendForApproval'
   },

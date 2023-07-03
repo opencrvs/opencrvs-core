@@ -22,6 +22,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
+import * as builtInValidators from '@client/utils/validate'
 
 const { store, history } = createStore()
 
@@ -33,11 +34,16 @@ describe('Create new user page tests', () => {
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(
-          mockOfflineData.forms.userForm.sections[0]
+          mockOfflineData.forms.userForm.sections[0],
+          // Needs to be casted as any as there are non-validator functions in the import
+          builtInValidators as Record<string, any>
         )}
         activeGroup={
-          deserializeFormSection(mockOfflineData.forms.userForm.sections[0])
-            .groups[0]
+          deserializeFormSection(
+            mockOfflineData.forms.userForm.sections[0],
+            // Needs to be casted as any as there are non-validator functions in the import
+            builtInValidators as Record<string, any>
+          ).groups[0]
         }
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"

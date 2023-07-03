@@ -27,9 +27,7 @@ import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
-import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
 import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
@@ -79,12 +77,9 @@ const resolvers: StringIndexed<IResolvers> = merge(
   roleTypeResolvers as IResolvers,
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  formDraftResolvers as IResolvers,
   applicationRootResolvers as IResolvers,
   integrationResolver as IResolvers,
-  formDatasetResolvers as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  formDatasetResolvers as IResolvers,
   informantSMSNotificationResolvers as IResolvers,
   informantSMSNotiTypeResolvers as IResolvers,
   OIDPUserInfoResolvers as IResolvers

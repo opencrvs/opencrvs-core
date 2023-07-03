@@ -429,7 +429,6 @@ export type BirthRegistration = EventRegistration & {
   __typename?: 'BirthRegistration'
   _fhirIDMap?: Maybe<Scalars['Map']>
   attendantAtBirth?: Maybe<AttendantType>
-  birthRegistrationType?: Maybe<BirthRegType>
   birthType?: Maybe<BirthType>
   child?: Maybe<Person>
   childrenBornAliveToMother?: Maybe<Scalars['Int']>
@@ -452,7 +451,6 @@ export type BirthRegistration = EventRegistration & {
 export type BirthRegistrationInput = {
   _fhirIDMap?: InputMaybe<Scalars['Map']>
   attendantAtBirth?: InputMaybe<AttendantType>
-  birthRegistrationType?: InputMaybe<BirthRegType>
   birthType?: InputMaybe<BirthType>
   child?: InputMaybe<PersonInput>
   childrenBornAliveToMother?: InputMaybe<Scalars['Int']>

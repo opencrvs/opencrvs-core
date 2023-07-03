@@ -11,12 +11,10 @@
  */
 export * from './field-mappings'
 export * from '@client/forms/register/fieldMappings/birth/mutation/child-mappings'
-export * from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
 export * from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
 export * from '@client/forms/register/fieldMappings/death/mutation/informant-mapping'
 export * from '@client/forms/register/fieldMappings/death/mutation/event-mappings'
-export * from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/mutation/registration-mappings'
-export * from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
+export * from '@client/forms/register/fieldMappings/event/mutation/documents-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/mutation/event-mappings'
 export * from '@client/forms/register/customFieldMappings/mutation/customField-mappings'
