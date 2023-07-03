@@ -13,7 +13,7 @@
 import { Event, CustomFieldType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,

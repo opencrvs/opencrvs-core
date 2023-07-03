@@ -54,7 +54,7 @@ export type NotificationState = {
   userReconnectedToast: boolean
 }
 
-export const initialState: NotificationState = {
+const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
   configurationErrorVisible: false,
   waitingSW: null,

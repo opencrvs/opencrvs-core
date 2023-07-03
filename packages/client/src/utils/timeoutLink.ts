@@ -17,11 +17,11 @@ const REQUEST_TIMEOUT_ERROR_CODE = 408
 /**
  * Aborts the request if the timeout expires before the response is received.
  */
-export type TimeoutError = Error & {
+type TimeoutError = Error & {
   statusCode: number
 }
 
-export const throwTimeoutError = (message: string) => {
+const throwTimeoutError = (message: string) => {
   const error = new Error(message) as TimeoutError
 
   error.name = 'RequestTimeoutError'
