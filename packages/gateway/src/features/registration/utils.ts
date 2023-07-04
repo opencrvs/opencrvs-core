@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { fetchDocuments } from '@gateway/features/fhir/utils'
+import { fetchDocuments, fetchFHIR } from '@gateway/features/fhir/utils'
 import { IAuthHeader } from '@gateway/common-types'
 
 export async function getPresignedUrlFromUri(
@@ -24,4 +24,24 @@ export async function getPresignedUrlFromUri(
     JSON.stringify({ fileUri })
   )) as { presignedURL: string }
   return response.presignedURL
+}
+
+export async function getPatientResource(
+  relatedPerson: fhir.RelatedPerson,
+  authHeader: IAuthHeader
+) {
+  if (
+    !relatedPerson ||
+    !relatedPerson.patient ||
+    !relatedPerson.patient.reference
+  ) {
+    return null
+  }
+  if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
+    relatedPerson = await fetchFHIR(
+      `/${relatedPerson.patient.reference}`,
+      authHeader
+    )
+  }
+  return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
 }

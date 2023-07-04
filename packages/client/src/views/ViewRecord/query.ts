@@ -121,17 +121,15 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -152,32 +150,30 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          id
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            occupation
-            nationality
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         mother {
@@ -312,36 +308,34 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          id
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
-            nationality
-            occupation
-            birthDate
-            ageOfIndividualInYears
-            exactDateOfBirthUnknown
-            telecom {
-              system
-              value
-            }
-            address {
-              type
-              line
-              district
-              state
-              city
-              postalCode
-              country
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          occupation
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          telecom {
+            system
+            value
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
           }
         }
         father {
@@ -471,36 +465,32 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          individual {
+          id
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
           }
         }
         witnessTwo {
           id
           relationship
           otherRelationship
-          individual {
+          id
+          identifier {
             id
-            identifier {
-              id
-              type
-              otherType
-            }
-            name {
-              use
-              firstNames
-              familyName
-            }
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
           }
         }
         typeOfMarriage

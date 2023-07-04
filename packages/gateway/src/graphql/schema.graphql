@@ -926,9 +926,25 @@ type RelatedPerson {
   relationship: String
   otherRelationship: String
   affidavit: [Attachment]
-  individual: Person
-  exactDateOfBirthUnknown: Boolean
+  identifier: [IdentityType]
+  name: [HumanName]
+  telecom: [ContactPoint]
+  gender: String
+  birthDate: String
+  age: Float
+  maritalStatus: String
+  occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
+  dateOfMarriage: Date
+  multipleBirth: Int
+  address: [Address]
+  photo: [Attachment]
+  deceased: Deceased
+  nationality: [String]
+  educationalAttainment: String
   ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type QuestionnaireQuestion {
@@ -1271,8 +1287,24 @@ input RelatedPersonInput {
   relationship: String
   otherRelationship: String
   affidavit: [AttachmentInput!]
-  individual: PersonInput
   exactDateOfBirthUnknown: Boolean
+  identifier: [IdentityInput]
+  name: [HumanNameInput]
+  telecom: [ContactPointInput]
+  gender: String
+  birthDate: String
+  age: Float
+  maritalStatus: String
+  occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
+  dateOfMarriage: Date
+  multipleBirth: Int
+  address: [AddressInput]
+  photo: [AttachmentInput!]
+  deceased: DeceasedInput
+  nationality: [String]
+  educationalAttainment: String
   ageOfIndividualInYears: Int
 }
 

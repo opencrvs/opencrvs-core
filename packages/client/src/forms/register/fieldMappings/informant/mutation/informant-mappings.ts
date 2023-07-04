@@ -9,5 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export { transformRegistrationData } from '@client/forms/register/queries/registration'
-export { transformPersonData } from '@client/forms/register/queries/person'
+
+import { IFormData, TransformedData } from '@client/forms'
+
+export function setInformantSectionTransformer(
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string
+) {
+  if (draftData[sectionId]._fhirIDPatient) {
+    transformedData[sectionId]._fhirIDPatient =
+      draftData[sectionId]._fhirIDPatient
+  }
+}

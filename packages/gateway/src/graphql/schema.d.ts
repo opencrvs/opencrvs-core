@@ -794,9 +794,25 @@ export interface GQLRelatedPerson {
   relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
-  individual?: GQLPerson
-  exactDateOfBirthUnknown?: boolean
+  identifier?: Array<GQLIdentityType | null>
+  name?: Array<GQLHumanName | null>
+  telecom?: Array<GQLContactPoint | null>
+  gender?: string
+  birthDate?: string
+  age?: number
+  maritalStatus?: string
+  occupation?: string
+  detailsExist?: boolean
+  reasonNotApplying?: string
+  dateOfMarriage?: GQLDate
+  multipleBirth?: number
+  address?: Array<GQLAddress | null>
+  photo?: Array<GQLAttachment | null>
+  deceased?: GQLDeceased
+  nationality?: Array<string | null>
+  educationalAttainment?: string
   ageOfIndividualInYears?: number
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLQuestionnaireQuestion {
@@ -1163,8 +1179,24 @@ export interface GQLRelatedPersonInput {
   relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput>
-  individual?: GQLPersonInput
   exactDateOfBirthUnknown?: boolean
+  identifier?: Array<GQLIdentityInput | null>
+  name?: Array<GQLHumanNameInput | null>
+  telecom?: Array<GQLContactPointInput | null>
+  gender?: string
+  birthDate?: string
+  age?: number
+  maritalStatus?: string
+  occupation?: string
+  detailsExist?: boolean
+  reasonNotApplying?: string
+  dateOfMarriage?: GQLDate
+  multipleBirth?: number
+  address?: Array<GQLAddressInput | null>
+  photo?: Array<GQLAttachmentInput>
+  deceased?: GQLDeceasedInput
+  nationality?: Array<string | null>
+  educationalAttainment?: string
   ageOfIndividualInYears?: number
 }
 
@@ -6626,9 +6658,25 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   relationship?: RelatedPersonToRelationshipResolver<TParent>
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
-  individual?: RelatedPersonToIndividualResolver<TParent>
-  exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
+  identifier?: RelatedPersonToIdentifierResolver<TParent>
+  name?: RelatedPersonToNameResolver<TParent>
+  telecom?: RelatedPersonToTelecomResolver<TParent>
+  gender?: RelatedPersonToGenderResolver<TParent>
+  birthDate?: RelatedPersonToBirthDateResolver<TParent>
+  age?: RelatedPersonToAgeResolver<TParent>
+  maritalStatus?: RelatedPersonToMaritalStatusResolver<TParent>
+  occupation?: RelatedPersonToOccupationResolver<TParent>
+  detailsExist?: RelatedPersonToDetailsExistResolver<TParent>
+  reasonNotApplying?: RelatedPersonToReasonNotApplyingResolver<TParent>
+  dateOfMarriage?: RelatedPersonToDateOfMarriageResolver<TParent>
+  multipleBirth?: RelatedPersonToMultipleBirthResolver<TParent>
+  address?: RelatedPersonToAddressResolver<TParent>
+  photo?: RelatedPersonToPhotoResolver<TParent>
+  deceased?: RelatedPersonToDeceasedResolver<TParent>
+  nationality?: RelatedPersonToNationalityResolver<TParent>
+  educationalAttainment?: RelatedPersonToEducationalAttainmentResolver<TParent>
   ageOfIndividualInYears?: RelatedPersonToAgeOfIndividualInYearsResolver<TParent>
+  exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
@@ -6685,7 +6733,7 @@ export interface RelatedPersonToAffidavitResolver<
   ): TResult
 }
 
-export interface RelatedPersonToIndividualResolver<
+export interface RelatedPersonToIdentifierResolver<
   TParent = any,
   TResult = any
 > {
@@ -6697,7 +6745,166 @@ export interface RelatedPersonToIndividualResolver<
   ): TResult
 }
 
-export interface RelatedPersonToExactDateOfBirthUnknownResolver<
+export interface RelatedPersonToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToTelecomResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToGenderResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToBirthDateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToAgeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToMaritalStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToOccupationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToDetailsExistResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToReasonNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToDateOfMarriageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToMultipleBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToAddressResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToPhotoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToDeceasedResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToNationalityResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToEducationalAttainmentResolver<
   TParent = any,
   TResult = any
 > {
@@ -6710,6 +6917,18 @@ export interface RelatedPersonToExactDateOfBirthUnknownResolver<
 }
 
 export interface RelatedPersonToAgeOfIndividualInYearsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonToExactDateOfBirthUnknownResolver<
   TParent = any,
   TResult = any
 > {

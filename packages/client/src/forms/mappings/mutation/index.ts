@@ -16,5 +16,6 @@ export * from '@client/forms/register/fieldMappings/death/mutation/informant-map
 export * from '@client/forms/register/fieldMappings/death/mutation/event-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/mutation/registration-mappings'
 export * from '@client/forms/register/fieldMappings/event/mutation/documents-mappings'
+export * from '@client/forms/register/fieldMappings/informant/mutation/informant-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/mutation/event-mappings'
 export * from '@client/forms/register/customFieldMappings/mutation/customField-mappings'
