@@ -456,7 +456,7 @@ export const getAccordionActiveStateMap = (
   }
 }
 
-export const determineDateFromDateRangePickerVal = (
+const determineDateFromDateRangePickerVal = (
   dateRangePickerValue?: IDateRangePickerValue
 ): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
   if (!dateRangePickerValue) {
@@ -478,7 +478,7 @@ export const determineDateFromDateRangePickerVal = (
   return value
 }
 
-export const convertDateValuesToDateRangePicker = (
+const convertDateValuesToDateRangePicker = (
   exact?: string,
   rangeStart?: string,
   rangeEnd?: string

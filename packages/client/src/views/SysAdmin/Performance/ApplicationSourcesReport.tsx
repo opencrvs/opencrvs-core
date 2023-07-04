@@ -42,12 +42,11 @@ interface IDispatchProps {
   goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesReport(
+function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
   const { data, isAccessibleOffice } = props
   const intl = useIntl()
-  const userDetails = useSelector(getUserDetails)
 
   return (
     <ListContainer>

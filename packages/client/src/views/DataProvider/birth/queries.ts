@@ -440,6 +440,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
               district
               state
             }
+            partOf
           }
         }
         trackingId

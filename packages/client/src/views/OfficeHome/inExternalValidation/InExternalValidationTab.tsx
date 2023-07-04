@@ -15,7 +15,8 @@ import {
   COLUMNS,
   SORT_ORDER
 } from '@opencrvs/components/lib/Workqueue'
-import { ITheme, withTheme } from '@client/styledComponents'
+import { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { transformData } from '@client/search/transformer'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'

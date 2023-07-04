@@ -74,7 +74,7 @@ import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
-export interface IUserReviewFormProps {
+interface IUserReviewFormProps {
   userId?: string
   section: IFormSection
   formData: IFormSectionData

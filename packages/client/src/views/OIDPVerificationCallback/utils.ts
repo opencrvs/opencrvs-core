@@ -20,8 +20,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 import { v4 as uuid } from 'uuid'
 
-export const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY =
-  'oidp-verification-nonce'
+const OIDP_VERIFICATION_NONCE_LOCALSTORAGE_KEY = 'oidp-verification-nonce'
 
 interface OIDPUserAddress {
   formatted?: string | null
@@ -63,7 +62,7 @@ interface UserInfo {
   locationLevel3FhirId?: string | null
 }
 
-export interface INidCallbackState {
+interface INidCallbackState {
   pathname: string | undefined
   declarationId: string | undefined
   section: string | undefined
@@ -178,11 +177,11 @@ export function addNidUserInfoToDeclaration(
   declarationDataSection[`${section}NidVerification`] = oidpUserInfo.sub
 }
 
-export function generateNonce() {
+function generateNonce() {
   return uuid()
 }
 
-export function splitName(name: string | undefined | null = '') {
+function splitName(name: string | undefined | null = '') {
   if (!name) {
     return { firstName: '', lastName: '' }
   }

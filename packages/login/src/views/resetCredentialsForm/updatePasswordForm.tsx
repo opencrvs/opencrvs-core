@@ -30,18 +30,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
-
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  margin: 0px;
-`
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-  margin: 13px 64px 27px 0px;
-`
-const Action = styled.div`
-  margin-top: 58px;
-`
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -208,7 +197,9 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
               )}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="password-update-form" onSubmit={this.whatNext}>
             <Content

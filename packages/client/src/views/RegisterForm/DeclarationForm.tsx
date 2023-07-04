@@ -41,9 +41,7 @@ const pageRoute: { [key in Event]: string } = {
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-export class DeclarationFormView extends React.Component<
-  IFormProps & RouteProps
-> {
+class DeclarationFormView extends React.Component<IFormProps & RouteProps> {
   render() {
     const { declaration, ...rest } = this.props
     if (!declaration) {
