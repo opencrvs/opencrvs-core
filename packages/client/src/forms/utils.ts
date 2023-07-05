@@ -43,7 +43,8 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
   NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  INidVerificationButton,
+  BULLET_LIST
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -99,6 +100,13 @@ export const internationaliseOptions = (
   })
 }
 
+export const internationaliseListFieldObject = (
+  intl: IntlShape,
+  options: MessageDescriptor[]
+) => {
+  return options.map((opt) => intl.formatMessage(opt))
+}
+
 export const internationaliseFieldObject = (
   intl: IntlShape,
   field: IFormField
@@ -121,6 +129,10 @@ export const internationaliseFieldObject = (
     base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+
+  if (base.type === BULLET_LIST) {
+    ;(base as any).items = internationaliseListFieldObject(intl, base.items)
   }
 
   if (

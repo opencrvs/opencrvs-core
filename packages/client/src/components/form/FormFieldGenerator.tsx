@@ -62,7 +62,7 @@ import {
   ITextFormField,
   Ii18nTextFormField,
   LINK,
-  LIST,
+  BULLET_LIST,
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
@@ -91,7 +91,6 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 
-import { FormList } from '@client/components/form/FormList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -142,6 +141,7 @@ import {
 } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
+import { BulletList } from '@opencrvs/components'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -504,8 +504,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </Text>
       )
     }
-    if (fieldDefinition.type === LIST) {
-      return <FormList {...inputProps} list={fieldDefinition.items} />
+    if (fieldDefinition.type === BULLET_LIST) {
+      return (
+        <BulletList
+          font={'reg16'}
+          {...inputProps}
+          items={fieldDefinition.items}
+        />
+      )
     }
     if (fieldDefinition.type === NUMBER) {
       let inputFieldWidth = fieldDefinition.inputFieldWidth
@@ -991,7 +997,7 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === DYNAMIC_LIST
               ? ({
                   ...field,
-                  type: LIST,
+                  type: BULLET_LIST,
                   items: getFieldOptionsByValueMapper(
                     field as IDynamicListFormField,
                     draftData as IFormData,
