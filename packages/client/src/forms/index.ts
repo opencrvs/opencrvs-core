@@ -1087,8 +1087,8 @@ export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
 export interface Ii18nListFormField extends Ii18nFormFieldBase {
-  options: string[]
   type: typeof BULLET_LIST
+  items: string[]
 }
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH

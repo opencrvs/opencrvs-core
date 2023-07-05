@@ -504,9 +504,9 @@ function GeneratedInputField({
   if (fieldDefinition.type === BULLET_LIST) {
     return (
       <BulletList
-        font={'reg18'}
+        font={'reg16'}
         {...inputProps}
-        items={fieldDefinition.options}
+        items={fieldDefinition.items}
       />
     )
   }

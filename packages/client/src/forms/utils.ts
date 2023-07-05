@@ -132,7 +132,7 @@ export const internationaliseFieldObject = (
   }
 
   if (base.type === BULLET_LIST) {
-    ;(base as any).options = internationaliseListFieldObject(intl, base.items)
+    ;(base as any).items = internationaliseListFieldObject(intl, base.items)
   }
 
   if (
