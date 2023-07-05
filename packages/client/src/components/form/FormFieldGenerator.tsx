@@ -91,7 +91,6 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 
-import { FormBulletList } from '@client/components/form/FormBulletList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -142,6 +141,7 @@ import {
 } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
+import { BulletList } from '@opencrvs/components'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -502,7 +502,13 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === BULLET_LIST) {
-    return <FormBulletList {...inputProps} list={fieldDefinition.options} />
+    return (
+      <BulletList
+        font={'reg18'}
+        {...inputProps}
+        items={fieldDefinition.options}
+      />
+    )
   }
   if (fieldDefinition.type === NUMBER) {
     let inputFieldWidth = fieldDefinition.inputFieldWidth
