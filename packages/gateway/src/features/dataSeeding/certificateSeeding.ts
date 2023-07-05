@@ -11,12 +11,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import { COUNTRY_CONFIG_URL, APPLICATION_CONFIG_URL } from '@gateway/constants'
 
-import { resolvers } from '@gateway/features/certificate/root-resolvers'
 import { GQLCertificateStatus } from '@gateway/graphql/schema'
 
 import fetch from 'node-fetch'
+
+import { hasScope } from '@gateway/features/user/utils'
+import { uploadSvg } from '@gateway/utils/documents'
 
 async function getCertificate() {
   const url = new URL('certificates', COUNTRY_CONFIG_URL).toString()
@@ -27,8 +29,8 @@ async function getCertificate() {
   return res.json()
 }
 
-async function updateCertificate(token: string, certificate: any) {
-  const authHeaderNatlSYSAdmin = {
+async function uploadCertificate(token: string, certificate: any) {
+  const authHeader = {
     Authorization: `Bearer ${token}`
   }
   const certificateSVG = {
@@ -39,19 +41,40 @@ async function updateCertificate(token: string, certificate: any) {
     status: GQLCertificateStatus.ACTIVE
   }
 
-  if (resolvers.Mutation?.createOrUpdateCertificateSVG) {
-    const response = await resolvers.Mutation?.createOrUpdateCertificateSVG(
-      {},
-      { certificateSVG } as any,
-      { headers: authHeaderNatlSYSAdmin } as any,
-      { info: 'seeding birth certificate' } as any
+  if (!hasScope(authHeader, 'natlsysadmin')) {
+    return await Promise.reject(
+      new Error('Create or update certificate is only allowed for natlsysadmin')
     )
+  }
+
+  certificateSVG.svgCode = await uploadSvg(certificateSVG.svgCode, authHeader)
+
+  const action = 'create'
+  const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {
+    method: 'POST',
+    body: JSON.stringify(certificateSVG),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (res.status !== 201) {
+    return await Promise.reject(
+      new Error(
+        `Something went wrong on config service. Couldn't create certificate SVG`
+      )
+    )
+  }
+  return await res.json()
+}
+
+export async function seedCertificate(token: string) {
+  const certificates = await getCertificate()
+  certificates.map(async (certificate: any) => {
+    const response = await uploadCertificate(token, certificate)
     console.log(response)
     const url = 'http://localhost:3535' + response.svgCode
     console.log(url)
-  }
-}
-export async function seedCertificate(token: string) {
-  const certificates = await getCertificate()
-  certificates.map((certificate: any) => updateCertificate(token, certificate))
+  })
 }
