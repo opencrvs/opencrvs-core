@@ -12,6 +12,7 @@
 
 import { fetchDocuments, fetchFHIR } from '@gateway/features/fhir/utils'
 import { IAuthHeader } from '@gateway/common-types'
+import { Context } from '@gateway/graphql/context'
 
 export async function getPresignedUrlFromUri(
   fileUri: string,
@@ -28,7 +29,8 @@ export async function getPresignedUrlFromUri(
 
 export async function getPatientResource(
   relatedPerson: fhir.RelatedPerson,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  dataSources: Context['dataSources']
 ) {
   if (
     !relatedPerson ||
@@ -43,5 +45,6 @@ export async function getPatientResource(
       authHeader
     )
   }
-  return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
+  const patientId = relatedPerson.patient.reference?.replace('Patient/', '')
+  return await dataSources.patientAPI.getPatient(String(patientId))
 }

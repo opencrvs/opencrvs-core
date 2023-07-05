@@ -266,6 +266,18 @@ export const typeResolvers: GQLResolver = {
     id: (relatedPerson) => {
       return relatedPerson && relatedPerson.id
     },
+    _fhirIDPatient: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person && person.id
+    },
     relationship: (relatedPerson) => {
       return (
         relatedPerson &&
@@ -281,36 +293,72 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.text
       )
     },
-    dateOfMarriage: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    dateOfMarriage: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
         person.extension
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
-    age: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    age: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
         person.extension
       )
       return (marriageExtension && marriageExtension.valueString) || null
     },
-    maritalStatus: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    maritalStatus: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       return person && person.maritalStatus && person.maritalStatus.text
     },
-    occupation: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    occupation: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
         person.extension
       )
       return (occupationExtension && occupationExtension.valueString) || null
     },
-    reasonNotApplying: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    reasonNotApplying: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
         person.extension
@@ -324,9 +372,13 @@ export const typeResolvers: GQLResolver = {
     ageOfIndividualInYears: async (
       relatedPerson,
       _,
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person.extension
@@ -340,9 +392,13 @@ export const typeResolvers: GQLResolver = {
     exactDateOfBirthUnknown: async (
       relatedPerson,
       _,
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person.extension
@@ -353,20 +409,52 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    detailsExist: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    detailsExist: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       return person.active
     },
-    multipleBirth: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    multipleBirth: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       return person.multipleBirthInteger
     },
-    deceased: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    deceased: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       return person
     },
-    nationality: async (relatedPerson, _, { headers: authHeader }) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+    nationality: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
         person.extension
@@ -396,9 +484,13 @@ export const typeResolvers: GQLResolver = {
     educationalAttainment: async (
       relatedPerson,
       _,
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) => {
-      const person = await getPatientResource(relatedPerson, authHeader)
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
         person.extension

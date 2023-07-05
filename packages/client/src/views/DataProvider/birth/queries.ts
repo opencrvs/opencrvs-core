@@ -31,7 +31,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type
@@ -389,7 +389,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type

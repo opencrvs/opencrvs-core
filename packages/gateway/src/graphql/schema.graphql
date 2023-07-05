@@ -924,6 +924,7 @@ type Registration {
 type RelatedPerson {
   id: ID
   _fhirID: ID
+  _fhirIDPatient: ID
   relationship: String
   otherRelationship: String
   affidavit: [Attachment]
@@ -1285,6 +1286,7 @@ input RegistrationInput {
 input RelatedPersonInput {
   id: ID
   _fhirID: ID
+  _fhirIDPatient: ID
   relationship: String
   otherRelationship: String
   affidavit: [AttachmentInput!]

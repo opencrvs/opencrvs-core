@@ -3548,100 +3548,98 @@ export const builders: IFieldBuilders = {
           }
         },
         /* expecting value for this only when other is selected as relationship */
-        individual: {
-          identifier: {
-            id: (
-              fhirBundle: ITemplatedBundle,
-              fieldValue: string,
-              context: any
-            ) => {
-              const person = selectOrCreateCollectorPersonResource(
-                fhirBundle,
-                context,
-                context.event
-              )
-              setObjectPropInResourceArray(
-                person,
-                'identifier',
-                fieldValue,
-                'id',
-                context
-              )
-            },
-            type: (
-              fhirBundle: ITemplatedBundle,
-              fieldValue: string,
-              context: any
-            ) => {
-              const person = selectOrCreateCollectorPersonResource(
-                fhirBundle,
-                context,
-                context.event
-              )
-              setObjectPropInResourceArray(
-                person,
-                'identifier',
-                fieldValue,
-                'type',
-                context
-              )
-            }
+        identifier: {
+          id: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const person = selectOrCreateCollectorPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            setObjectPropInResourceArray(
+              person,
+              'identifier',
+              fieldValue,
+              'id',
+              context
+            )
           },
-          name: {
-            use: (
-              fhirBundle: ITemplatedBundle,
-              fieldValue: string,
-              context: any
-            ) => {
-              const person = selectOrCreateCollectorPersonResource(
-                fhirBundle,
-                context,
-                context.event
-              )
-              setObjectPropInResourceArray(
-                person,
-                'name',
-                fieldValue,
-                'use',
-                context
-              )
-            },
-            firstNames: (
-              fhirBundle: ITemplatedBundle,
-              fieldValue: string,
-              context: any
-            ) => {
-              const person = selectOrCreateCollectorPersonResource(
-                fhirBundle,
-                context,
-                context.event
-              )
-              setObjectPropInResourceArray(
-                person,
-                'name',
-                fieldValue.split(' '),
-                'given',
-                context
-              )
-            },
-            familyName: (
-              fhirBundle: ITemplatedBundle,
-              fieldValue: string,
-              context: any
-            ) => {
-              const person = selectOrCreateCollectorPersonResource(
-                fhirBundle,
-                context,
-                context.event
-              )
-              setObjectPropInResourceArray(
-                person,
-                'name',
-                [fieldValue],
-                'family',
-                context
-              )
-            }
+          type: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const person = selectOrCreateCollectorPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            setObjectPropInResourceArray(
+              person,
+              'identifier',
+              fieldValue,
+              'type',
+              context
+            )
+          }
+        },
+        name: {
+          use: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const person = selectOrCreateCollectorPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            setObjectPropInResourceArray(
+              person,
+              'name',
+              fieldValue,
+              'use',
+              context
+            )
+          },
+          firstNames: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const person = selectOrCreateCollectorPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            setObjectPropInResourceArray(
+              person,
+              'name',
+              fieldValue.split(' '),
+              'given',
+              context
+            )
+          },
+          familyName: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const person = selectOrCreateCollectorPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            setObjectPropInResourceArray(
+              person,
+              'name',
+              [fieldValue],
+              'family',
+              context
+            )
           }
         }
       },

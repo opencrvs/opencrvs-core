@@ -792,6 +792,7 @@ export interface GQLRegistration {
 export interface GQLRelatedPerson {
   id?: string
   _fhirID?: string
+  _fhirIDPatient?: string
   relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
@@ -1177,6 +1178,7 @@ export interface GQLRegistrationInput {
 export interface GQLRelatedPersonInput {
   id?: string
   _fhirID?: string
+  _fhirIDPatient?: string
   relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput>
@@ -6669,6 +6671,7 @@ export interface RegistrationToDuplicatesResolver<
 export interface GQLRelatedPersonTypeResolver<TParent = any> {
   id?: RelatedPersonToIdResolver<TParent>
   _fhirID?: RelatedPersonTo_fhirIDResolver<TParent>
+  _fhirIDPatient?: RelatedPersonTo_fhirIDPatientResolver<TParent>
   relationship?: RelatedPersonToRelationshipResolver<TParent>
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
@@ -6703,6 +6706,18 @@ export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface RelatedPersonTo_fhirIDResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RelatedPersonTo_fhirIDPatientResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

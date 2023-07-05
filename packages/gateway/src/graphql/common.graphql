@@ -50,7 +50,8 @@ type IdentityType { # -> Identifier
 
 input RelatedPersonInput {
   id: ID
-  _fhirID: ID # -> .id
+  _fhirID: ID # -> .id relatedPerson ID
+  _fhirIDPatient: ID # -> .id patient ID
   relationship: String
   otherRelationship: String
   affidavit: [AttachmentInput!]
@@ -78,7 +79,8 @@ input RelatedPersonInput {
 
 type RelatedPerson { # -> Related Person
   id: ID
-  _fhirID: ID # -> .id
+  _fhirID: ID # -> .id relatedPerson ID
+  _fhirIDPatient: ID # -> .id patient ID
   relationship: String # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
   affidavit: [Attachment] # -> .extension

@@ -87,7 +87,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type
@@ -103,7 +103,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type
@@ -345,7 +345,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type
@@ -361,7 +361,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type

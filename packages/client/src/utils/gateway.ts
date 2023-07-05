@@ -1943,6 +1943,7 @@ export type Reinstated = {
 export type RelatedPerson = {
   __typename?: 'RelatedPerson'
   _fhirID?: Maybe<Scalars['ID']>
+  _fhirIDPatient?: Maybe<Scalars['ID']>
   address?: Maybe<Array<Maybe<Address>>>
   affidavit?: Maybe<Array<Maybe<Attachment>>>
   age?: Maybe<Scalars['Float']>
@@ -1970,6 +1971,7 @@ export type RelatedPerson = {
 
 export type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
+  _fhirIDPatient?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<Array<InputMaybe<AddressInput>>>
   affidavit?: InputMaybe<Array<AttachmentInput>>
   age?: InputMaybe<Scalars['Float']>
@@ -3336,6 +3338,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       occupation?: string | null
       nationality?: Array<string | null> | null
       birthDate?: string | null
@@ -3743,6 +3746,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       nationality?: Array<string | null> | null
       occupation?: string | null
       birthDate?: string | null
@@ -3800,6 +3804,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4086,6 +4091,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       nationality?: Array<string | null> | null
       occupation?: string | null
       birthDate?: string | null
@@ -4385,6 +4391,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       nationality?: Array<string | null> | null
       occupation?: string | null
       birthDate?: string | null
@@ -4487,6 +4494,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -4809,6 +4817,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       identifier?: Array<{
         __typename?: 'IdentityType'
         id?: string | null
@@ -4827,6 +4836,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       identifier?: Array<{
         __typename?: 'IdentityType'
         id?: string | null
@@ -5103,6 +5113,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       identifier?: Array<{
         __typename?: 'IdentityType'
         id?: string | null
@@ -5121,6 +5132,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       id?: string | null
       relationship?: string | null
       otherRelationship?: string | null
+      _fhirIDPatient?: string | null
       identifier?: Array<{
         __typename?: 'IdentityType'
         id?: string | null
@@ -5179,6 +5191,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
           __typename?: 'Location'
           name?: string | null
           alias?: Array<string> | null
+          partOf?: string | null
           address?: {
             __typename?: 'Address'
             district?: string | null
@@ -8195,6 +8208,7 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           relationship?: string | null
           otherRelationship?: string | null
+          _fhirIDPatient?: string | null
           occupation?: string | null
           nationality?: Array<string | null> | null
           birthDate?: string | null
@@ -8517,6 +8531,7 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           relationship?: string | null
           otherRelationship?: string | null
+          _fhirIDPatient?: string | null
           nationality?: Array<string | null> | null
           occupation?: string | null
           birthDate?: string | null
@@ -8831,6 +8846,7 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           relationship?: string | null
           otherRelationship?: string | null
+          _fhirIDPatient?: string | null
           identifier?: Array<{
             __typename?: 'IdentityType'
             id?: string | null
@@ -8849,6 +8865,7 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           relationship?: string | null
           otherRelationship?: string | null
+          _fhirIDPatient?: string | null
           identifier?: Array<{
             __typename?: 'IdentityType'
             id?: string | null

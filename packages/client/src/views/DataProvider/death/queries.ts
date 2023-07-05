@@ -54,7 +54,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type
@@ -318,7 +318,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         id
         relationship
         otherRelationship
-        id
+        _fhirIDPatient
         identifier {
           id
           type

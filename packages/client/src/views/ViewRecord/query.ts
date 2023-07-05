@@ -150,7 +150,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          id
+          _fhirIDPatient
           identifier {
             id
             type
@@ -308,7 +308,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          id
+          _fhirIDPatient
           identifier {
             id
             type
@@ -465,7 +465,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          id
+          _fhirIDPatient
           identifier {
             id
             type
@@ -481,7 +481,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           id
           relationship
           otherRelationship
-          id
+          _fhirIDPatient
           identifier {
             id
             type
