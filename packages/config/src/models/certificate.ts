@@ -39,7 +39,7 @@ const certificateSchema = new Schema({
   user: { type: String, required: false },
   event: {
     type: String,
-    enum: [Event.BIRTH, Event.DEATH],
+    enum: [Event.BIRTH, Event.DEATH, Event.MARRIAGE],
     required: false
   },
   status: {
