@@ -15,7 +15,6 @@ import { CreatePassword } from '@client/views/UserSetup/CreatePassword'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
 import { UserSetupReview } from '@client/views/UserSetup/SetupReviewPage'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
-export const SCREEN_LOCK = 'screenLock'
 
 export enum ProtectedAccoutStep {
   LANDING,

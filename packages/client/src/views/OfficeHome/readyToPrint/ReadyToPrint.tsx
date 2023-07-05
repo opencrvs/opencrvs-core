@@ -15,7 +15,7 @@ import {
   goToPrintCertificate
 } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
-import { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   ColumnContentAlignment,
   Workqueue,

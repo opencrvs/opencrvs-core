@@ -681,6 +681,7 @@ export interface GQLApplicationConfiguration {
   CURRENCY?: GQLCurrency
   DEATH?: GQLDeath
   MARRIAGE?: GQLMarriage
+  MARRIAGE_REGISTRATION?: boolean
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -5982,6 +5983,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
   MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
+  MARRIAGE_REGISTRATION?: ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
@@ -6056,6 +6058,18 @@ export interface ApplicationConfigurationToDEATHResolver<
 }
 
 export interface ApplicationConfigurationToMARRIAGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<
   TParent = any,
   TResult = any
 > {

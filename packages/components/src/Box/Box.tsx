@@ -21,7 +21,6 @@ const Wrapper = styled.div<IBox>`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 100%;
     border: 0;
     padding: 16px;
   }

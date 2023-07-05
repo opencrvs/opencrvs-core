@@ -11,11 +11,12 @@
  */
 import { IFormField, IFormData } from '@client/forms'
 import { attachmentToFieldTransformer } from '@client/forms/mappings/query/field-mappings'
+import { EventRegistration } from '@client/utils/gateway'
 
 export function eventAttachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
   field: IFormField
 ) {
   return attachmentToFieldTransformer(

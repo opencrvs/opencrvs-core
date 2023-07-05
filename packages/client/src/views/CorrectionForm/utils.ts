@@ -272,7 +272,7 @@ export function sectionHasError(
   return false
 }
 
-export function renderSelectOrRadioLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
@@ -281,7 +281,7 @@ export function renderSelectOrRadioLabel(
   return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
@@ -342,7 +342,7 @@ const getCheckboxFieldValue = (
   )
 }
 
-export const getCheckBoxGroupFieldValue = (
+const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
   intl: IntlShape
@@ -356,7 +356,7 @@ export const getCheckBoxGroupFieldValue = (
   return ''
 }
 
-export const getFormFieldValue = (
+const getFormFieldValue = (
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -554,7 +554,7 @@ export function hasFieldChanged(
   return data[field.name] !== originalData[field.name]
 }
 
-export function hasNestedDataChanged(
+function hasNestedDataChanged(
   nestedFieldData: IFormData,
   previousNestedFieldData: IFormData
 ) {

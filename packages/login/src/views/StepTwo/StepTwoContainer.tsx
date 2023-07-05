@@ -65,6 +65,8 @@ export function StepTwoContainer() {
 
   const field = stepTwoFields.code
   const notificationEvent = NotificationEvent.TWO_FACTOR_AUTHENTICATION
+  const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
+
   return (
     <Container id="login-step-two-box">
       <Box id="Box">
@@ -82,11 +84,11 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms' &&
+              {notificationMethod === 'sms' &&
                 intl.formatMessage(messages.resentSMS, {
                   number: mobileNumber
                 })}
-              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email' &&
+              {notificationMethod === 'email' &&
                 intl.formatMessage(messages.resentEMAIL, {
                   email: emailAddress
                 })}
@@ -104,11 +106,11 @@ export function StepTwoContainer() {
               color="supportingCopy"
               element="p"
             >
-              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms' &&
+              {notificationMethod === 'sms' &&
                 intl.formatMessage(messages.stepTwoInstructionSMS, {
                   number: mobileNumber
                 })}
-              {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email' &&
+              {notificationMethod === 'email' &&
                 intl.formatMessage(messages.stepTwoInstructionEMAIL, {
                   email: emailAddress
                 })}
@@ -165,7 +167,7 @@ export function StepTwoContainer() {
                   }}
                   id="login-mobile-resend"
                 >
-                  {intl.formatMessage(messages.resend)}
+                  {intl.formatMessage(messages.resend, { notificationMethod })}
                 </Button>
               </Stack>
             </FormWrapper>

@@ -124,11 +124,16 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           }
         },
         (action.payload.token &&
-          Cmd.run(() => {
-            window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
-            )
-          })) ||
+          Cmd.run(
+            (getState: () => IStoreState) => {
+              window.location.assign(
+                `${window.config.CLIENT_APP_URL}?token=${
+                  action.payload.token
+                }&lang=${getState().i18n.language}`
+              )
+            },
+            { args: [Cmd.getState] }
+          )) ||
           Cmd.action(push(routes.STEP_TWO))
       )
     case actions.RESEND_AUTHENTICATION_CODE:
