@@ -683,7 +683,9 @@ export interface GQLApplicationConfiguration {
   MARRIAGE?: GQLMarriage
   MARRIAGE_REGISTRATION?: boolean
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
@@ -703,7 +705,9 @@ export interface GQLApplicationConfigurationInput {
   DEATH?: GQLDeathInput
   MARRIAGE?: GQLMarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
@@ -6019,7 +6023,9 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
   MARRIAGE_REGISTRATION?: ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
-  HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_BIRTH_EVENT_REGISTER_INFORMATIONResolver<TParent>
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_DEATH_EVENT_REGISTER_INFORMATIONResolver<TParent>
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_MARRIAGE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
@@ -6127,7 +6133,31 @@ export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
   ): TResult
 }
 
-export interface ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<
+export interface ApplicationConfigurationToHIDE_BIRTH_EVENT_REGISTER_INFORMATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToHIDE_DEATH_EVENT_REGISTER_INFORMATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToHIDE_MARRIAGE_EVENT_REGISTER_INFORMATIONResolver<
   TParent = any,
   TResult = any
 > {

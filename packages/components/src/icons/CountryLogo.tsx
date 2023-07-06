@@ -13,7 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Logo = styled.img<{ size: ISize }>`
-  max-height: ${({ size }) => (size === 'small' ? 104 : 128)}px;
+  max-height: ${({ size }) => (size === 'small' ? 88 : 128)}px;
   max-width: 100%;
 `
 

@@ -394,6 +394,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
         return Event.Birth
       case 'death':
         return Event.Death
+      case 'marriage':
+        return Event.Marriage
       default:
         return Event.Birth
     }
@@ -932,6 +934,48 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
+function firstVisibleGroup(
+  section: IFormSection,
+  declaration: IDeclaration
+): IFormSectionGroup | undefined {
+  return getVisibleSectionGroupsBasedOnConditions(
+    section,
+    declaration.data[section.id] || {},
+    declaration.data
+  )[0]
+}
+
+function getValidSectionGroup(
+  sections: IFormSection[],
+  declaration: IDeclaration,
+  sectionId: string,
+  groupId?: string
+) {
+  const currentSection = sectionId
+    ? sections.find((sec) => sec.id === sectionId)
+    : firstVisibleSection(sections)
+  if (!currentSection) {
+    throw new Error(`Section with id "${sectionId}" not found `)
+  }
+
+  const currentGroup = groupId
+    ? currentSection.groups.find((group) => group.id === groupId)
+    : firstVisibleGroup(currentSection, declaration)
+
+  const sectionIndex = sections.findIndex((sec) => sec.id === currentSection.id)
+  if (!currentGroup) {
+    return getValidSectionGroup(
+      sections,
+      declaration,
+      sections[sectionIndex + 1].id
+    )
+  }
+  return {
+    activeSection: currentSection,
+    activeSectionGroup: currentGroup
+  }
+}
+
 function getInitialValue(
   field: IFormField,
   data: IFormData,
@@ -970,38 +1014,27 @@ export function replaceInitialValues(
   }))
 }
 
-function firstVisibleSection(form: IForm) {
-  return form.sections.filter(({ viewType }) => viewType !== 'hidden')[0]
+function firstVisibleSection(sections: IFormSection[]) {
+  return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
-  const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
+  const sectionId =
+    match.params.pageId || firstVisibleSection(registerForm.sections).id
 
-  const activeSection = registerForm.sections.find(
-    (section) => section.id === sectionId
+  const groupId = match.params.groupId
+  const { activeSection, activeSectionGroup } = getValidSectionGroup(
+    registerForm.sections,
+    declaration,
+    sectionId,
+    groupId
   )
-  if (!activeSection) {
-    throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
-  }
-  const groupId =
-    match.params.groupId ||
-    getVisibleSectionGroupsBasedOnConditions(
-      activeSection,
-      declaration.data[activeSection.id] || {},
-      declaration.data
-    )[0].id
-  const activeSectionGroup = activeSection.groups.find(
-    (group) => group.id === groupId
-  )
+
   if (!activeSectionGroup) {
     throw new Error(
       `Configuration for group "${match.params.groupId}" missing!`
     )
-  }
-
-  if (!declaration) {
-    throw new Error(`Draft "${match.params.declarationId}" missing!`)
   }
 
   const setAllFieldsDirty =
