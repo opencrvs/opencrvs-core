@@ -13,12 +13,18 @@
 
 import { COUNTRY_CONFIG_URL, APPLICATION_CONFIG_URL } from '@gateway/constants'
 
-import { GQLCertificateStatus } from '@gateway/graphql/schema'
+import { GQLCertificateStatus, GQLEvent } from '@gateway/graphql/schema'
 
 import fetch from 'node-fetch'
 
 import { hasScope } from '@gateway/features/user/utils'
 import { uploadSvg } from '@gateway/utils/documents'
+
+interface IcertificateMeta {
+  event: GQLEvent
+  fileName: string
+  svgCode: string
+}
 
 async function getCertificate() {
   const url = new URL('certificates', COUNTRY_CONFIG_URL).toString()
@@ -29,13 +35,13 @@ async function getCertificate() {
   return res.json()
 }
 
-async function uploadCertificate(token: string, certificate: any) {
+async function uploadCertificate(token: string, certificate: IcertificateMeta) {
   const authHeader = {
     Authorization: `Bearer ${token}`
   }
   const certificateSVG = {
     svgCode: certificate.svgCode as string,
-    svgFilename: certificate.svgFileName,
+    svgFilename: certificate.fileName,
     user: 'jonathan.campbell',
     event: certificate.event,
     status: GQLCertificateStatus.ACTIVE
@@ -71,10 +77,7 @@ async function uploadCertificate(token: string, certificate: any) {
 
 export async function seedCertificate(token: string) {
   const certificates = await getCertificate()
-  certificates.map(async (certificate: any) => {
-    const response = await uploadCertificate(token, certificate)
-    console.log(response)
-    const url = 'http://localhost:3535' + response.svgCode
-    console.log(url)
+  certificates.map(async (certificate: IcertificateMeta) => {
+    await uploadCertificate(token, certificate)
   })
 }
