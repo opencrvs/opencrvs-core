@@ -1,21 +1,5 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * OpenCRVS is also distributed under the terms of the Civil Registration
- * & Healthcare Disclaimer located at http://opencrvs.org/license.
- *
- * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
- * graphic logo are (registered/a) trademark(s) of Plan International.
- */
-/*
-  FROKED from https://github.com/gomezhyuuga/react-pan-zoom
-
-  This is the source code from the above library
-*/
-
 import * as React from 'react'
+import { useState } from 'react'
 import ReactPanZoom from './PanDraggable'
 import styled, { css } from 'styled-components'
 
@@ -31,9 +15,14 @@ const Container = css`
   }
 `
 
-const StyledReactPanZoom = styled(ReactPanZoom)`
+const StyledReactPanZoom = styled(ReactPanZoom)<{
+  zoom: number
+  pandx: number
+  pandy: number
+  rotation: number
+}>`
   ${Container};
-` as any
+`
 
 interface IProps {
   id?: string
@@ -43,32 +32,27 @@ interface IProps {
   controllerCenter?: boolean
 }
 
-export default class PanViewer extends React.Component<IProps> {
-  state = {
-    dx: 0,
-    dy: 0,
-    zoom: 1,
-    rotation: 0
-  }
+const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
+  const [dx] = useState(0)
+  const [dy] = useState(0)
 
-  render() {
-    const { zoom, rotation } = this.props
-    return (
-      <React.Fragment>
-        <StyledReactPanZoom
-          zoom={zoom}
-          pandx={this.state.dx}
-          pandy={this.state.dy}
-          rotation={rotation}
-          key={this.state.dx}
-        >
-          <img
-            src={this.props.image}
-            alt="Supporting Document"
-            style={{ transform: `rotate(${rotation}deg)` }}
-          />
-        </StyledReactPanZoom>
-      </React.Fragment>
-    )
-  }
+  return (
+    <React.Fragment>
+      <StyledReactPanZoom
+        zoom={zoom}
+        pandx={dx}
+        pandy={dy}
+        rotation={rotation}
+        key={dx}
+      >
+        <img
+          src={image}
+          alt="Supporting Document"
+          style={{ transform: `rotate(${rotation}deg)` }}
+        />
+      </StyledReactPanZoom>
+    </React.Fragment>
+  )
 }
+
+export default PanViewer
