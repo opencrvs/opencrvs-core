@@ -37,11 +37,7 @@ interface ControlProps {
   rotateLeft: () => void
 }
 
-const PanControls: React.FC<ControlProps> = ({
-  zoomIn,
-  zoomOut,
-  rotateLeft
-}) => {
+const PanControls = ({ zoomIn, zoomOut, rotateLeft }: ControlProps) => {
   return (
     <ControlsContainer>
       <Button type="icon" size="medium" onClick={zoomIn}>

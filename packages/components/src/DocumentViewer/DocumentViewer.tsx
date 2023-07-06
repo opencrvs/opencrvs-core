@@ -158,7 +158,6 @@ export class DocumentViewer extends React.Component<IProps, IState> {
             {isSupportingDocumentsEmpty && (
               <ViewerImage>
                 <PanViewer
-                  key={Math.random()}
                   id="document_image"
                   image={this.state.selectedDocument}
                   zoom={this.state.zoom}

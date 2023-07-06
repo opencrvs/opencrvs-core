@@ -226,8 +226,10 @@ export const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  height: 640px;
+  text-align: center;
+  justify-content: center;
+  align-items: flex-center;
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`

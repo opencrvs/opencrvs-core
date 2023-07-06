@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import styled from '@client/styledComponents'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -46,7 +46,7 @@ const ViewerContainer = styled.div`
   }
 `
 
-type IProps = {
+interface IProps {
   previewImage: IFileValue | IAttachmentValue
   disableDelete?: boolean
   title?: string
@@ -54,89 +54,36 @@ type IProps = {
   onDelete: (image: IFileValue | IAttachmentValue) => void
 }
 
-interface IState {
-  zoom: number
-  rotation: number
-}
+export const DocumentPreview = ({
+  previewImage,
+  title,
+  goBack,
+  onDelete,
+  disableDelete
+}: IProps) => {
+  const [zoom, setZoom] = useState(1)
+  const [rotation, setRotation] = useState(0)
 
-export class DocumentPreview extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props)
+  const zoomIn = () => setZoom((prevState) => prevState + 0.2)
+  const zoomOut = () =>
+    setZoom((prevState) => (prevState >= 1 ? prevState - 0.2 : prevState))
+  const rotateLeft = () => setRotation((prevState) => (prevState - 90) % 360)
 
-    this.state = {
-      zoom: 1,
-      rotation: 0
-    }
-  }
-
-  zoomIn = () => {
-    this.setState((prevState) => ({ ...prevState, zoom: prevState.zoom + 0.2 }))
-  }
-
-  zoomOut = () => {
-    this.setState((prevState) => {
-      if (prevState.zoom >= 1) {
-        return { ...prevState, zoom: prevState.zoom - 0.2 }
-      } else {
-        return prevState
-      }
-    })
-  }
-
-  rotateLeft = () => {
-    this.setState((prevState) => ({
-      rotation: (prevState.rotation - 90) % 360
-    }))
-  }
-
-  render = () => {
-    const { previewImage, title, goBack, onDelete, disableDelete } = this.props
-    return (
-      <ViewerWrapper id="preview_image_field">
-        <AppBar
-          desktopLeft={<Icon name="Paperclip" size="large" />}
-          desktopTitle={title}
-          desktopRight={
-            <Stack gap={8}>
-              <PanControls
-                zoomIn={this.zoomIn}
-                zoomOut={this.zoomOut}
-                rotateLeft={this.rotateLeft}
-              />
-              {!disableDelete && (
-                <>
-                  <DividerVertical />
-                  <Button
-                    id="preview_delete"
-                    type="icon"
-                    onClick={() => onDelete(previewImage)}
-                  >
-                    <Icon name="TrashSimple" color="red" />
-                  </Button>
-                </>
-              )}
-              <DividerVertical />
-              <Button
-                id="preview_close"
-                aria-label="Go close"
-                size="medium"
-                type="icon"
-                onClick={goBack}
-              >
-                <Icon name="X" size="medium" />
-              </Button>
-            </Stack>
-          }
-          mobileLeft={<Icon name="Paperclip" size="large" />}
-          mobileTitle={title}
-          mobileRight={
-            <Stack gap={8}>
-              <PanControls
-                zoomIn={this.zoomIn}
-                zoomOut={this.zoomOut}
-                rotateLeft={this.rotateLeft}
-              />
-              {!disableDelete && (
+  return (
+    <ViewerWrapper id="preview_image_field">
+      <AppBar
+        desktopLeft={<Icon name="Paperclip" size="large" />}
+        desktopTitle={title}
+        desktopRight={
+          <Stack gap={8}>
+            <PanControls
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              rotateLeft={rotateLeft}
+            />
+            {!disableDelete && (
+              <>
+                <DividerVertical />
                 <Button
                   id="preview_delete"
                   type="icon"
@@ -144,31 +91,61 @@ export class DocumentPreview extends React.Component<IProps, IState> {
                 >
                   <Icon name="TrashSimple" color="red" />
                 </Button>
-              )}
-              <Button
-                aria-label="Go back"
-                size="medium"
-                type="icon"
-                onClick={goBack}
-              >
-                <Icon name="X" size="medium" />
-              </Button>
-            </Stack>
-          }
-        />
-
-        <ViewerContainer>
-          {previewImage.data && (
-            <PanViewer
-              key={Math.random()}
-              id="document_image"
-              image={previewImage.data}
-              zoom={this.state.zoom}
-              rotation={this.state.rotation}
+              </>
+            )}
+            <DividerVertical />
+            <Button
+              id="preview_close"
+              aria-label="Go close"
+              size="medium"
+              type="icon"
+              onClick={goBack}
+            >
+              <Icon name="X" size="medium" />
+            </Button>
+          </Stack>
+        }
+        mobileLeft={<Icon name="Paperclip" size="large" />}
+        mobileTitle={title}
+        mobileRight={
+          <Stack gap={8}>
+            <PanControls
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              rotateLeft={rotateLeft}
             />
-          )}
-        </ViewerContainer>
-      </ViewerWrapper>
-    )
-  }
+            {!disableDelete && (
+              <Button
+                id="preview_delete"
+                type="icon"
+                onClick={() => onDelete(previewImage)}
+              >
+                <Icon name="TrashSimple" color="red" />
+              </Button>
+            )}
+            <Button
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={goBack}
+            >
+              <Icon name="X" size="medium" />
+            </Button>
+          </Stack>
+        }
+      />
+
+      <ViewerContainer>
+        {previewImage.data && (
+          <PanViewer
+            key={Math.random()}
+            id="document_image"
+            image={previewImage.data}
+            zoom={zoom}
+            rotation={rotation}
+          />
+        )}
+      </ViewerContainer>
+    </ViewerWrapper>
+  )
 }
