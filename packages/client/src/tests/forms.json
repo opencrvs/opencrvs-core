@@ -1546,15 +1546,7 @@
                 }
               ]
             }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setInformantSectionTransformer"
-            },
-            "query": {
-              "operation": "getInformantSectionTransformer"
-            }
-          }
+          ]
         },
         {
           "id": "mother",
@@ -4734,15 +4726,7 @@
                 }
               ]
             }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setInformantSectionTransformer"
-            },
-            "query": {
-              "operation": "getInformantSectionTransformer"
-            }
-          }
+          ]
         },
         {
           "id": "documents",

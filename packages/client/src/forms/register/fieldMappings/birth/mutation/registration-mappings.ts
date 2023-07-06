@@ -37,14 +37,14 @@ export function transformCertificateData(
   ]
   // for collector mapping
   if (certificateData && certificateData.collector) {
-    const collector: GQLRelatedPerson = {}
+    let collector: GQLRelatedPerson = {}
     if (certificateData.collector.type) {
       collector.relationship = certificateData.collector.type as string
     }
     if (certificateData.collector.relationship) {
       collector.otherRelationship = certificateData.collector
         .relationship as string
-      collector.individual = {
+      collector = {
         name: [
           {
             use: 'en',
