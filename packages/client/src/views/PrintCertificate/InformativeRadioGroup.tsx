@@ -20,7 +20,7 @@ import {
 } from '@client/forms'
 
 import { ParentDetails } from '@client/views/PrintCertificate/ParentDetails'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 
 const RadioGroupWrapper = styled.div`
   > div > span {

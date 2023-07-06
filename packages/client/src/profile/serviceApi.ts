@@ -19,7 +19,7 @@ export enum NotificationEvent {
   CHANGE_EMAIL_ADDRESS = 'CHANGE_EMAIL_ADDRESS'
 }
 
-export interface ISendVerifyCodeData {
+interface ISendVerifyCodeData {
   userFullName: {
     use: string
     family: string
@@ -30,7 +30,7 @@ export interface ISendVerifyCodeData {
   email?: string
 }
 
-export interface ISendVerifyCodeResponse {
+interface ISendVerifyCodeResponse {
   userId: string
   nonce: string
   status: string
@@ -38,7 +38,7 @@ export interface ISendVerifyCodeResponse {
   email?: string
 }
 
-export const client = axios.create({
+const client = axios.create({
   baseURL: window.config.API_GATEWAY_URL,
   headers: {
     Authorization: `Bearer ${getToken()}`

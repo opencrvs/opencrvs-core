@@ -6684,7 +6684,7 @@
   resolved "https://registry.npmjs.org/@types/fetch-mock/-/fetch-mock-7.3.5.tgz"
   integrity sha512-sLecm9ohBdGIpYUP9rWk5/XIKY2xHMYTBJIcJuBBM8IJWnYoQ1DAj8F4OVjnfD0API1drlkWEV0LPNk+ACuhsg==
 
-"@types/fhir@^0.0.30":
+"@types/fhir@0.0.30", "@types/fhir@^0.0.30":
   version "0.0.30"
   resolved "https://registry.npmjs.org/@types/fhir/-/fhir-0.0.30.tgz"
   integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
@@ -10423,6 +10423,11 @@ cosmiconfig@^7, cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     parse-json "^5.0.0"
     path-type "^4.0.0"
     yaml "^1.10.0"
+
+country-code-lookup@^0.0.23:
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/country-code-lookup/-/country-code-lookup-0.0.23.tgz#a5fb8fd338878b9066a653f93a979602da303ad8"
+  integrity sha512-kxhIGcau9/X+tgPg9yO2q1OLu8jiYYsdwXuiXzHdsgNChd36xrJMlOba7ka9O1xShCVTiVQPQpq/tcuy4WiW+Q==
 
 country-data@^0.0.31:
   version "0.0.31"

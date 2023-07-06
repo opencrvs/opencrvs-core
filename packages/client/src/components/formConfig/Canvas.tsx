@@ -29,7 +29,7 @@ import {
 } from '@client/forms/configuration/formConfig/utils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { FormConfigElementCard } from '@opencrvs/components/lib/FormConfigElementCard'
 import React from 'react'

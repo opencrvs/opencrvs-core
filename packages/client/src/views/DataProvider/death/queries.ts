@@ -199,6 +199,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -456,6 +460,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
