@@ -245,7 +245,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
     it('should go back from preview page if click on back arrow', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
       await waitForElement(testComponent, '#preview_image_field')
-      testComponent.find('#preview_back').hostNodes().simulate('click')
+      testComponent.find('#preview_close').hostNodes().simulate('click')
       testComponent.update()
 
       expect(

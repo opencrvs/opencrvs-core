@@ -806,7 +806,7 @@ describe('when in device of small viewport', () => {
       reviewSectionComponent
         .find('#preview_image_field')
         .hostNodes()
-        .find('#preview_back')
+        .find('#preview_close')
         .hostNodes()
         .simulate('click')
 

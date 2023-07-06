@@ -117,7 +117,8 @@ export class DocumentPreview extends React.Component<IProps, IState> {
               )}
               <DividerVertical />
               <Button
-                aria-label="Go back"
+                id="preview_close"
+                aria-label="Go close"
                 size="medium"
                 type="icon"
                 onClick={goBack}
