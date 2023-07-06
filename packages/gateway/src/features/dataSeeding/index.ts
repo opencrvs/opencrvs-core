@@ -12,6 +12,7 @@
 
 import { AUTH_URL, SUPER_USER_PASSWORD } from '@gateway/constants'
 import fetch from 'node-fetch'
+import { seedApplicationConfig } from './apllicationConfigurationSeeding'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -27,12 +28,14 @@ async function getToken(): Promise<string> {
   })
   const body = await res.json()
   if (!res.ok) {
-    throw Error(`authenticating super user failed with error ${body}`)
+    throw Error(
+      `authenticating super user failed with error ${JSON.stringify(body)}`
+    )
   }
   return body.token
 }
 
 export async function seedData() {
   const token = await getToken()
-  console.log(token)
+  seedApplicationConfig(token)
 }
