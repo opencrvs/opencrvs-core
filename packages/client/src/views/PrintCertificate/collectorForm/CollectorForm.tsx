@@ -52,7 +52,8 @@ import {
   REGISTRAR_HOME_TAB
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   getEvent,
   getEventDate,
@@ -66,7 +67,6 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {

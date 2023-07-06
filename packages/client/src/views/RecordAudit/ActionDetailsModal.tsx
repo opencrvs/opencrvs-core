@@ -41,7 +41,6 @@ import {
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -173,7 +172,7 @@ const getReasonForRequest = (
   }
 }
 
-export const ActionDetailsModalListTable = ({
+const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
   registerForm,
@@ -374,7 +373,7 @@ export const ActionDetailsModalListTable = ({
 
     const name = certificate.collector?.individual?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name as GQLHumanName[],
+          certificate.collector.individual.name,
           window.config.LANGUAGES
         )
       : {}
@@ -619,7 +618,7 @@ export const ActionDetailsModal = ({
   } else if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
-          actionDetailsData.user.name as GQLHumanName[],
+          actionDetailsData.user.name,
           window.config.LANGUAGES
         )
       : null

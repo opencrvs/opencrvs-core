@@ -20,10 +20,7 @@ import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import TransitionWrapper from '@client/components/TransitionWrapper'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
-import styled, {
-  createGlobalStyle,
-  ThemeProvider
-} from '@client/styledComponents'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'

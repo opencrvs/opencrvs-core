@@ -813,6 +813,7 @@ type ApplicationConfiguration {
   CURRENCY: Currency
   DEATH: Death
   MARRIAGE: Marriage
+  MARRIAGE_REGISTRATION: Boolean
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Boolean
   HIDE_DEATH_EVENT_REGISTER_INFORMATION: Boolean
@@ -927,12 +928,29 @@ type Registration {
 type RelatedPerson {
   id: ID
   _fhirID: ID
+  _fhirIDPatient: ID
   relationship: String
   otherRelationship: String
   affidavit: [Attachment]
-  individual: Person
-  exactDateOfBirthUnknown: Boolean
+  identifier: [IdentityType]
+  name: [HumanName]
+  telecom: [ContactPoint]
+  gender: String
+  birthDate: String
+  age: Float
+  maritalStatus: String
+  occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
+  dateOfMarriage: Date
+  multipleBirth: Int
+  address: [Address]
+  photo: [Attachment]
+  deceased: Deceased
+  nationality: [String]
+  educationalAttainment: String
   ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type QuestionnaireQuestion {
@@ -1272,11 +1290,28 @@ input RegistrationInput {
 input RelatedPersonInput {
   id: ID
   _fhirID: ID
+  _fhirIDPatient: ID
   relationship: String
   otherRelationship: String
   affidavit: [AttachmentInput!]
-  individual: PersonInput
   exactDateOfBirthUnknown: Boolean
+  identifier: [IdentityInput]
+  name: [HumanNameInput]
+  telecom: [ContactPointInput]
+  gender: String
+  birthDate: String
+  age: Float
+  maritalStatus: String
+  occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
+  dateOfMarriage: Date
+  multipleBirth: Int
+  address: [AddressInput]
+  photo: [AttachmentInput!]
+  deceased: DeceasedInput
+  nationality: [String]
+  educationalAttainment: String
   ageOfIndividualInYears: Int
 }
 

@@ -50,7 +50,8 @@ export const OFFLINE_FACILITIES_KEY = 'facilities'
 export enum LocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
   CRVS_OFFICE = 'CRVS_OFFICE',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  PRIVATE_HOME = 'PRIVATE_HOME'
 }
 export interface ILocation {
   id: string
@@ -100,7 +101,7 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
-export const initialState: IOfflineDataState = {
+const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
   loadingError: false
@@ -244,10 +245,10 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
-    FORMS_CMD,
-    CONTENT_CMD,
     CONDITIONALS_CMD,
-    VALIDATORS_CMD
+    VALIDATORS_CMD,
+    FORMS_CMD,
+    CONTENT_CMD
   ])
 }
 

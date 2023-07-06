@@ -19,24 +19,23 @@ import {
   InputField,
   ResponsiveModal
 } from '@opencrvs/components'
-import {
-  SecondaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { getBase64String } from '@client/utils/imageUtils'
 import {
   ApplyButton,
   CancelButton
 } from '@client/views/SysAdmin/Config/Application/Components'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import SignatureCanvas from 'react-signature-canvas'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const InputWrapper = styled.div`
-  margin-top: 56px;
+  max-width: 640px;
 `
 
 const SignatureContainer = styled.div`
@@ -61,10 +60,6 @@ const SignatureDescription = styled.p`
   margin-top: 0;
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
-`
-
-const CustomImageUpload = styled(ImageUploader)`
-  border: 0 !important;
 `
 
 export interface SignatureInputProps {
@@ -110,49 +105,55 @@ export function SignatureGenerator({
           </ErrorMessage>
           {!signatureData && (
             <>
-              <SecondaryButton
-                onClick={() => setSignatureDialogOpen(true)}
-                disabled={disabled}
-              >
-                {intl.formatMessage(messages.signatureOpenSignatureInput)}
-              </SecondaryButton>
-              <CustomImageUpload
-                id="signature-file-upload"
-                title={intl.formatMessage(buttonMessages.upload)}
-                handleFileChange={async (file) => {
-                  const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
-                  if (fileSizeMB > 2) {
-                    setSignatureError(
-                      intl.formatMessage(formMessages.fileSizeError)
-                    )
-                    return
-                  }
-                  if (!allowedSignatureFormat.includes(file.type)) {
-                    setSignatureError(
-                      intl.formatMessage(formMessages.fileUploadError, {
-                        type: allowedSignatureFormat
-                          .map((signatureFormat) =>
-                            signatureFormat.split('/').pop()
-                          )
-                          .join(', ')
-                      })
-                    )
-                    return
-                  }
-                  onChange((await getBase64String(file)).toString())
-                  setSignatureError('')
-                }}
-                disabled={disabled}
-              />
+              <Stack gap={8}>
+                <Button
+                  type="secondary"
+                  size="medium"
+                  onClick={() => setSignatureDialogOpen(true)}
+                  disabled={disabled}
+                >
+                  <Icon name="Pen" />
+                  {intl.formatMessage(messages.signatureOpenSignatureInput)}
+                </Button>
+                <ImageUploader
+                  id="signature-file-upload"
+                  title={intl.formatMessage(buttonMessages.upload)}
+                  icon={() => <Icon name="UploadSimple" />}
+                  handleFileChange={async (file) => {
+                    const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
+                    if (fileSizeMB > 2) {
+                      setSignatureError(
+                        intl.formatMessage(formMessages.fileSizeError)
+                      )
+                      return
+                    }
+                    if (!allowedSignatureFormat.includes(file.type)) {
+                      setSignatureError(
+                        intl.formatMessage(formMessages.fileUploadError, {
+                          type: allowedSignatureFormat
+                            .map((signatureFormat) =>
+                              signatureFormat.split('/').pop()
+                            )
+                            .join(', ')
+                        })
+                      )
+                      return
+                    }
+                    onChange((await getBase64String(file)).toString())
+                    setSignatureError('')
+                  }}
+                  disabled={disabled}
+                />
+              </Stack>
             </>
           )}
           {signatureData && (
             <SignaturePreview alt={label} src={signatureData} />
           )}
           {signatureData && (
-            <TertiaryButton onClick={() => onChange('')}>
+            <Button type="tertiary" size="medium" onClick={() => onChange('')}>
               {intl.formatMessage(messages.signatureDelete)}
-            </TertiaryButton>
+            </Button>
           )}
 
           <ResponsiveModal
@@ -252,9 +253,9 @@ function SignCanvas({
           }}
         />
       </SignatureContainer>
-      <TertiaryButton onClick={clear}>
+      <Button type="tertiary" size="medium" onClick={clear}>
         {intl.formatMessage(messages.clear)}
-      </TertiaryButton>
+      </Button>
     </SignatureInputContainer>
   )
 }

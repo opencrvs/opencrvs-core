@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'

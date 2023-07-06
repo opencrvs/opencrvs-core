@@ -51,7 +51,7 @@ export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
-export const LIST = 'LIST'
+export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
@@ -598,7 +598,7 @@ export interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
 }
 export interface IListFormField extends IFormFieldBase {
-  type: typeof LIST
+  type: typeof BULLET_LIST
   items: MessageDescriptor[]
 }
 
@@ -836,6 +836,11 @@ type MutationDefaultOperation<
 export type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
+
+export type X = FunctionParamsToDescriptor<
+  Params<typeof mutations['birthEventLocationMutationTransformer']>,
+  IMutationDescriptor
+>
 
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
@@ -1087,8 +1092,8 @@ export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
 export interface Ii18nListFormField extends Ii18nFormFieldBase {
-  type: typeof LIST
-  items: MessageDescriptor[]
+  type: typeof BULLET_LIST
+  items: string[]
 }
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH

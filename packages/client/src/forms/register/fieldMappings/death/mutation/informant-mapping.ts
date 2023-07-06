@@ -71,6 +71,7 @@ const addressObjectProcessor = (
   return objValues
 }
 
+//we have to remove it after modify death and marriage informant mappings
 export const fieldValueNestingTransformer =
   (
     transformedFieldName: string,
@@ -115,23 +116,3 @@ export const fieldValueNestingTransformer =
     }
     return transformedData
   }
-
-export function setInformantSectionTransformer(
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string
-) {
-  if (
-    draftData[sectionId]._fhirIDMap &&
-    transformedData[sectionId].individual
-  ) {
-    transformedData[sectionId].individual._fhirID =
-      // @ts-ignore
-      draftData[sectionId]._fhirIDMap.individual
-  }
-  // Passing Informant's relationship data
-  if (draftData[sectionId].relationship) {
-    transformedData[sectionId].relationship = draftData[sectionId].relationship
-  }
-  return transformedData
-}

@@ -11,7 +11,11 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormField
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -24,6 +28,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
+
+/**
+ * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
+ */
 
 export interface IValidationResult {
   message: MessageDescriptor

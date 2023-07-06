@@ -1157,7 +1157,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationTypeQueryTransformer",
@@ -1200,7 +1200,7 @@
                     },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationIDQueryTransformer",
@@ -1546,15 +1546,7 @@
                 }
               ]
             }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setInformantSectionTransformer"
-            },
-            "query": {
-              "operation": "getInformantSectionTransformer"
-            }
-          }
+          ]
         },
         {
           "id": "mother",
@@ -2606,17 +2598,6 @@
                 }
               ],
               "fields": [
-                {
-                  "name": "paragraph",
-                  "type": "PARAGRAPH",
-                  "label": {
-                    "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
-                    "description": "Documents Paragraph text",
-                    "id": "form.section.documents.birth.requirements"
-                  },
-                  "initialValue": "",
-                  "validate": []
-                },
                 {
                   "name": "uploadDocForChildDOB",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
@@ -4374,7 +4355,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationTypeQueryTransformer",
@@ -4417,7 +4398,7 @@
                     },
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
+                      "parameters": [{}]
                     },
                     "query": {
                       "operation": "eventLocationIDQueryTransformer",
@@ -4745,15 +4726,7 @@
                 }
               ]
             }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setInformantSectionTransformer"
-            },
-            "query": {
-              "operation": "getInformantSectionTransformer"
-            }
-          }
+          ]
         },
         {
           "id": "documents",

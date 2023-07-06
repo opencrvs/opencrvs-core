@@ -20,7 +20,7 @@ import {
   updateStatisticalExtensions
 } from './utils'
 
-enum Code {
+export enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   HEALTH_FACILITY = 'HEALTH_FACILITY'

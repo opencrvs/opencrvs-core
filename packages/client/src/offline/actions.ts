@@ -30,32 +30,32 @@ import {
 import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
-export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
+const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
   type: typeof GET_LOCATIONS
   payload: string
 }
 
 export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
-export type ContentLoadedAction = {
+type ContentLoadedAction = {
   type: typeof CONTENT_LOADED
   payload: IContentResponse
 }
 
 export const CONTENT_FAILED = 'OFFLINE/CONTENT_FAILED'
-export type ContentFailedAction = {
+type ContentFailedAction = {
   type: typeof CONTENT_FAILED
   payload: Error
 }
 
 export const LOCATIONS_LOADED = 'OFFLINE/LOCATIONS_LOADED'
-export type LocationsLoadedAction = {
+type LocationsLoadedAction = {
   type: typeof LOCATIONS_LOADED
   payload: { [key: string]: ILocation }
 }
 
 export const LOCATIONS_FAILED = 'OFFLINE/LOCATIONS_FAILED'
-export type LocationsFailedAction = {
+type LocationsFailedAction = {
   type: typeof LOCATIONS_FAILED
   payload: Error
 }
@@ -73,99 +73,99 @@ export type FormsFailedAction = {
 }
 
 export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
-export type FacilitiesLoadedAction = {
+type FacilitiesLoadedAction = {
   type: typeof FACILITIES_LOADED
   payload: { [key: string]: ILocation }
 }
 
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'
-export type FacilitiesFailedAction = {
+type FacilitiesFailedAction = {
   type: typeof FACILITIES_FAILED
   payload: Error
 }
 
-export const PILOT_LOCATIONS_LOADED = 'OFFLINE/PILOT_LOCATIONS_LOADED'
-export type PilotLocationsLoadedAction = {
+const PILOT_LOCATIONS_LOADED = 'OFFLINE/PILOT_LOCATIONS_LOADED'
+type PilotLocationsLoadedAction = {
   type: typeof PILOT_LOCATIONS_LOADED
   payload: { [key: string]: ILocation }
 }
 
-export const PILOT_LOCATIONS_FAILED = 'OFFLINE/PILOT_LOCATIONS_FAILED'
-export type PilotLocationsFailedAction = {
+const PILOT_LOCATIONS_FAILED = 'OFFLINE/PILOT_LOCATIONS_FAILED'
+type PilotLocationsFailedAction = {
   type: typeof PILOT_LOCATIONS_FAILED
   payload: Error
 }
 
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
-export type ApplicationConfigLoadedAction = {
+type ApplicationConfigLoadedAction = {
   type: typeof APPLICATION_CONFIG_LOADED
   payload: IApplicationConfigResponse
 }
 
 export const CERTIFICATE_LOADED = 'OFFLINE/CERTIFICATE_LOADED'
-export type CertificateLoadedAction = {
+type CertificateLoadedAction = {
   type: typeof CERTIFICATE_LOADED
   payload: CertificatePayload
 }
 
-export const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
-export type CertificateLoadFailedAction = {
+const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
+type CertificateLoadFailedAction = {
   type: typeof CERTIFICATE_LOAD_FAILED
   payload: Error
 }
 
 export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
-export type CertificatesLoadedAction = {
+type CertificatesLoadedAction = {
   type: typeof CERTIFICATES_LOADED
   payload: CertificatePayload[]
 }
 
 export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
-export type CertificatesLoadFailedAction = {
+type CertificatesLoadFailedAction = {
   type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
-export type ApplicationConfigUpdatedAction = {
+type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
 }
 
 export const ANONYMOUS_USER_OFFLINE_CONFIG =
   'OFFLINE/ANONYMOUS_USER_OFFLINE_CONFIG' as const
-export type ApplicationConfigAnonymousUserAction = {
+type ApplicationConfigAnonymousUserAction = {
   type: typeof ANONYMOUS_USER_OFFLINE_CONFIG
   payload: { anonymousConfig: IApplicationConfigAnonymous }
 }
 
 export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
-export type UpdateOfflineSystemsAction = {
+type UpdateOfflineSystemsAction = {
   type: typeof UPDATE_OFFLINE_SYSTEMS
   payload: { systems: System[] }
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
-export type ApplicationConfigFailedAction = {
+type ApplicationConfigFailedAction = {
   type: typeof APPLICATION_CONFIG_FAILED
   payload: Error
 }
 
-export const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
+const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
   type: typeof GET_EXISTING_OFFLINE_DATA
   payload: UserDetails
 }
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
-export type IGetOfflineDataSuccessAction = {
+type IGetOfflineDataSuccessAction = {
   type: typeof GET_OFFLINE_DATA_SUCCESS
   payload: string
 }
-export const GET_OFFLINE_DATA_FAILED = 'OFFLINE/GET_OFFLINE_DATA_FAILED'
-export type IGetOfflineDataFailedAction = {
+const GET_OFFLINE_DATA_FAILED = 'OFFLINE/GET_OFFLINE_DATA_FAILED'
+type IGetOfflineDataFailedAction = {
   type: typeof GET_OFFLINE_DATA_FAILED
 }
-export const FORMAT_LOCATIONS = 'OFFLINE/FORMAT_LOCATIONS'
-export type IFilterLocationsAction = {
+const FORMAT_LOCATIONS = 'OFFLINE/FORMAT_LOCATIONS'
+type IFilterLocationsAction = {
   type: typeof FORMAT_LOCATIONS
   payload: ILanguageState
 }
@@ -275,20 +275,6 @@ export const certificatesLoaded = (
   payload
 })
 
-export const certificatesLoadFailed = (
-  payload: CertificatesLoadFailedAction['payload']
-): CertificatesLoadFailedAction => ({
-  type: CERTIFICATES_LOAD_FAILED,
-  payload
-})
-
-export const configAnonymousUserLoaded = (payload: {
-  anonymousConfig: IApplicationConfig
-}): ApplicationConfigAnonymousUserAction => ({
-  type: ANONYMOUS_USER_OFFLINE_CONFIG,
-  payload: payload
-})
-
 export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   type: APPLICATION_CONFIG_FAILED,
   payload: error
@@ -313,7 +299,7 @@ export const refreshOfflineData = () => ({
 })
 
 export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
-export type UpdateOfflineCertificateAction = {
+type UpdateOfflineCertificateAction = {
   type: typeof UPDATE_OFFLINE_CERTIFICATE
   payload: {
     certificate: ICertificateTemplateData

@@ -36,11 +36,11 @@ export interface LoadFormsResponse {
   }
 }
 
-export interface ICountryLogo {
+interface ICountryLogo {
   fileName: string
   file: string
 }
-export interface ILoginBackground {
+interface ILoginBackground {
   backgroundColor?: string
   backgroundImage?: string
   imageFit?: string
@@ -97,6 +97,7 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean

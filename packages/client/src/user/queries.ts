@@ -162,7 +162,7 @@ async function searchUsers(primaryOfficeId: string) {
   )
 }
 
-export const VERIFY_PASSWORD_BY_ID = gql`
+const VERIFY_PASSWORD_BY_ID = gql`
   query verifyPasswordById($id: String!, $password: String!) {
     verifyPasswordById(id: $id, password: $password) {
       id
