@@ -24,9 +24,9 @@ import { Event } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
-  goToBirthInformant,
   goToDeathInformant,
-  goToEventInfo
+  goToBirthRegistrationAsParent,
+  goToMarriageInformant
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
@@ -48,9 +48,9 @@ class SelectVitalEventView extends React.Component<
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeDeclaration: typeof storeDeclaration
-    goToEventInfo: typeof goToEventInfo
-    goToBirthInformant: typeof goToBirthInformant
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToDeathInformant: typeof goToDeathInformant
+    goToMarriageInformant: typeof goToMarriageInformant
   }
 > {
   state = {
@@ -61,29 +61,25 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
-        let declaration: IDeclaration
-        switch (this.state.goTo as Event) {
-          case Event.Birth:
-            declaration = createDeclaration(Event.Birth)
-            this.props.storeDeclaration(declaration)
-            this.props.goToBirthInformant(declaration.id)
-            break
-          case Event.Death:
-            declaration = createDeclaration(Event.Death)
-            this.props.storeDeclaration(declaration)
-            this.props.goToDeathInformant(declaration.id)
-            break
-          case Event.Marriage:
-            declaration = createDeclaration(Event.Marriage)
-            this.props.storeDeclaration(declaration)
-            this.props.goToDeathInformant(declaration.id)
-            break
-          default:
-            throw new Error(`Unknown eventType ${this.state.goTo}`)
-        }
-      } else {
-        this.props.goToEventInfo(this.state.goTo as Event)
+      let declaration: IDeclaration
+      switch (this.state.goTo as Event) {
+        case Event.Birth:
+          declaration = createDeclaration(Event.Birth)
+          this.props.storeDeclaration(declaration)
+          this.props.goToBirthRegistrationAsParent(declaration.id)
+          break
+        case Event.Death:
+          declaration = createDeclaration(Event.Death)
+          this.props.storeDeclaration(declaration)
+          this.props.goToDeathInformant(declaration.id)
+          break
+        case Event.Marriage:
+          declaration = createDeclaration(Event.Marriage)
+          this.props.storeDeclaration(declaration)
+          this.props.goToMarriageInformant(declaration.id)
+          break
+        default:
+          throw new Error(`Unknown eventType ${this.state.goTo}`)
       }
     }
   }
@@ -186,7 +182,7 @@ export const SelectVitalEvent = connect(null, {
   goBack,
   goToHome,
   storeDeclaration,
-  goToBirthInformant,
+  goToBirthRegistrationAsParent,
   goToDeathInformant,
-  goToEventInfo
+  goToMarriageInformant
 })(injectIntl(SelectVitalEventView))

@@ -18,7 +18,6 @@ import {
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
   DRAFT_DEATH_FORM,
-  EVENT_INFO,
   EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
@@ -31,8 +30,6 @@ import {
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
-  SELECT_BIRTH_INFORMANT,
-  SELECT_DEATH_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   TEAM_SEARCH,
@@ -59,7 +56,11 @@ import {
   INFORMANT_NOTIFICATION,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT
+  ISSUE_CERTIFICATE_PAYMENT,
+  SELECT_DEATH_INFORMANT,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_MARRIAGE_FORM,
+  SELECT_MARRIAGE_INFORMANT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -128,24 +129,20 @@ type GoToUserProfile = {
 
 export type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
 
-export function goToBirthInformant(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_INFORMANT, {
-      declarationId
-    })
-  )
-}
-
 export function goToDeathInformant(declarationId: string) {
   return push(
-    formatUrl(SELECT_DEATH_INFORMANT, {
-      declarationId
+    formatUrl(DRAFT_DEATH_FORM, {
+      declarationId: declarationId.toString()
     })
   )
 }
 
-export function goToEventInfo(eventType: Event) {
-  return push(formatUrl(EVENT_INFO, { eventType }))
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_MARRIAGE_FORM, {
+      declarationId: declarationId.toString()
+    })
+  )
 }
 
 export function goToEvents() {
@@ -301,6 +298,14 @@ export function goToDeclarationRecordAudit(
   return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
+export function goToBirthRegistrationAsParent(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+      declarationId: declarationId.toString()
+    })
+  )
+}
+
 export function goToPrintCertificate(
   registrationId: string,
   event: string,
@@ -422,13 +427,6 @@ export function goToDeathRegistration(declarationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
-}
-
-export function goToSysAdminHomeTab(tabId: string) {
-  return {
-    type: GO_TO_SYS_ADMIN_HOME,
-    payload: { tabId }
-  }
 }
 
 export function goToSettings() {

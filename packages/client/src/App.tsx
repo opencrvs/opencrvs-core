@@ -22,7 +22,6 @@ import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { useApolloClient } from '@client/utils/apolloClient'
-import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -139,18 +138,7 @@ export function App(props: IAppProps) {
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
                                             />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.EVENT_INFO}
-                                              component={EventInfo}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.SELECT_BIRTH_INFORMANT
-                                              }
-                                              component={DeclarationForm}
-                                            />
+
                                             <ProtectedRoute
                                               exact
                                               path={

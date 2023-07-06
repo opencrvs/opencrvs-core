@@ -146,7 +146,9 @@ export const updateApplicationConfig = Joi.object({
     PRINT_IN_ADVANCE: Joi.boolean()
   }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
-  HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
   PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),
