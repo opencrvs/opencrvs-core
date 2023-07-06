@@ -133,6 +133,25 @@ export const bundleFieldToSectionFieldTransformer =
     return transformedData
   }
 
+export const fieldValueSectionExchangeTransformer =
+  (fromSectionId: SectionId, fromSectionField: string) =>
+  (
+    transformedData: TransformedData,
+    queryData: QueryData,
+    sectionId: SectionId,
+    field: IFormField
+  ) => {
+    if (
+      queryData[sectionId] !== null &&
+      queryData[sectionId] !== undefined &&
+      queryData[sectionId] !== ''
+    ) {
+      transformedData[sectionId][field.name] =
+        queryData[fromSectionId][fromSectionField]
+    }
+    return transformedData
+  }
+
 export function arrayToFieldTransformer(
   transformedData: IFormData,
   queryData: QueryData,

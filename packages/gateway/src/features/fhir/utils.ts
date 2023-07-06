@@ -924,7 +924,7 @@ export function setArrayPropInResourceObject(
 
 export function findExtension(
   url: string,
-  extensions: fhir.Extension[]
+  extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   const extension =
     extensions &&
