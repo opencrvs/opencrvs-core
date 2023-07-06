@@ -41,6 +41,8 @@ import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { ILocation } from '@client/offline/reducer'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -290,7 +292,9 @@ export const GetHistory = ({
           goToTeamUserList && goToTeamUserList(item?.office?.id as string)
         }}
       >
-        {item.office?.name as string}
+        {item.office
+          ? getLocalizedLocationName(intl, item.office as unknown as ILocation)
+          : ''}
       </Link>
     )
   }))

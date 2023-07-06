@@ -17,6 +17,7 @@ import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
 import { UserDetails } from './userUtils'
 import { lookup } from 'country-data'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -77,7 +78,7 @@ export function generateLocationName(
   if (!location) {
     return ''
   }
-  let name = location.name
+  let name = getLocalizedLocationName(intl, location)
   location.jurisdictionType &&
     (name += ` ${
       intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
@@ -129,7 +130,7 @@ export function generateSearchableLocations(
 
     return {
       id: location.id,
-      searchableText: location.name,
+      searchableText: getLocalizedLocationName(intl, location),
       displayLabel: locationName
     }
   })
@@ -198,4 +199,12 @@ export function getLocationNameMapOfFacility(
     }
   }
   return map
+}
+
+export function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
+  if (intl.locale === getDefaultLanguage()) {
+    return location.name
+  } else {
+    return location.alias?.toString()
+  }
 }
