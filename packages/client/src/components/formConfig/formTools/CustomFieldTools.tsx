@@ -215,9 +215,6 @@ const ListColumn = styled.div`
   gap: 4px;
 `
 
-const CErrorText = styled(ErrorText)`
-  width: 200px;
-`
 const Body = styled.div`
   margin: 16px 0px;
 `
