@@ -52,6 +52,7 @@ interface IProps {
   title?: string
   goBack: () => void
   onDelete: (image: IFileValue | IAttachmentValue) => void
+  id?: string
 }
 
 export const DocumentPreview = ({
@@ -59,7 +60,8 @@ export const DocumentPreview = ({
   title,
   goBack,
   onDelete,
-  disableDelete
+  disableDelete,
+  id
 }: IProps) => {
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
@@ -70,7 +72,7 @@ export const DocumentPreview = ({
   const rotateLeft = () => setRotation((prevState) => (prevState - 90) % 360)
 
   return (
-    <ViewerWrapper id="preview_image_field">
+    <ViewerWrapper id={id ?? 'preview_image_field'}>
       <AppBar
         desktopLeft={<Icon name="Paperclip" size="large" />}
         desktopTitle={title}
