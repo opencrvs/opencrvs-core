@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,10 +16,9 @@ import { GQLCertificateStatus, GQLEvent } from '@gateway/graphql/schema'
 
 import fetch from 'node-fetch'
 
-import { hasScope } from '@gateway/features/user/utils'
 import { uploadSvg } from '@gateway/utils/documents'
 
-interface IcertificateMeta {
+interface CertificateMeta {
   event: GQLEvent
   fileName: string
   svgCode: string
@@ -35,7 +33,7 @@ async function getCertificate() {
   return res.json()
 }
 
-async function uploadCertificate(token: string, certificate: IcertificateMeta) {
+async function uploadCertificate(token: string, certificate: CertificateMeta) {
   const authHeader = {
     Authorization: `Bearer ${token}`
   }
@@ -47,16 +45,9 @@ async function uploadCertificate(token: string, certificate: IcertificateMeta) {
     status: GQLCertificateStatus.ACTIVE
   }
 
-  if (!hasScope(authHeader, 'natlsysadmin')) {
-    return await Promise.reject(
-      new Error('Create or update certificate is only allowed for natlsysadmin')
-    )
-  }
-
   certificateSVG.svgCode = await uploadSvg(certificateSVG.svgCode, authHeader)
 
-  const action = 'create'
-  const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {
+  const res = await fetch(`${APPLICATION_CONFIG_URL}createCertificate`, {
     method: 'POST',
     body: JSON.stringify(certificateSVG),
     headers: {
@@ -77,7 +68,7 @@ async function uploadCertificate(token: string, certificate: IcertificateMeta) {
 
 export async function seedCertificate(token: string) {
   const certificates = await getCertificate()
-  certificates.map(async (certificate: IcertificateMeta) => {
+  certificates.map(async (certificate: CertificateMeta) => {
     await uploadCertificate(token, certificate)
   })
 }
