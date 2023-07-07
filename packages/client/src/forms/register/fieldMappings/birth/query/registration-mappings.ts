@@ -21,7 +21,10 @@ import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
-import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
+import {
+  getUserName,
+  getUserNameObject
+} from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
@@ -350,6 +353,14 @@ const getUserFullName = (history: History): string => {
   return history?.user ? getUserName(history.user) : ''
 }
 
+const getUserFirstName = (history: History): string => {
+  return history?.user ? getUserNameObject(history.user)?.firstNames || '' : ''
+}
+
+const getUserFamilyName = (history: History): string => {
+  return history?.user ? getUserNameObject(history.user)?.familyName || '' : ''
+}
+
 const getUserRole = (history: History): MessageDescriptor => {
   return (
     (history?.user && userMessages[history.user.systemRole]) || {
@@ -532,7 +543,9 @@ export const userTransformer =
         name: getUserFullName(history),
         role: getUserRole(history),
         office: history?.office,
-        signature: getUserSignature(history)
+        signature: getUserSignature(history),
+        firstName: getUserFirstName(history),
+        familyName: getUserFamilyName(history)
       } as IFormSectionData
     }
   }
