@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,6 +22,7 @@ import {
   GQLSystemRoleInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
+import { seedCertificate } from './certificateSeeding'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -125,4 +127,5 @@ export async function seedData() {
       }))
   )
   console.log(res)
+  seedCertificate(token)
 }
