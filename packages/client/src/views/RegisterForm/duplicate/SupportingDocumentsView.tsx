@@ -27,7 +27,6 @@ import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@client/../../components/lib'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {
@@ -41,7 +40,6 @@ import {
   SECTION_MAPPING,
   ZeroDocument
 } from '@client/views/RegisterForm/review/ReviewSection'
-import { isBase64FileString } from '@client/utils/commonUtils'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
@@ -170,32 +168,26 @@ export const SupportingDocumentsView = (props: IProps) => {
     }
   }
 
-  const prepSectionDocsBasedOnScrollFlag = (
-    activeSection: Section
-  ): IDocumentViewerOptions & {
+  const prepSectionDocs = (): IDocumentViewerOptions & {
     uploadedDocuments: IFileValue[]
   } => {
-    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
-      let selectOptions: SelectComponentOptions[] = []
-      let documentOptions: SelectComponentOptions[] = []
-      let uploadedDocuments: IFileValue[] = []
-      const docSections = getDocumentSections()
-      for (const section of docSections) {
-        const prepDocumentOption = prepSectionDocuments(section.id)
-        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
-        documentOptions = [
-          ...documentOptions,
-          ...prepDocumentOption.documentOptions
-        ]
-        uploadedDocuments = [
-          ...uploadedDocuments,
-          ...prepDocumentOption.uploadedDocuments
-        ]
-      }
-      return { selectOptions, documentOptions, uploadedDocuments }
-    } else {
-      return prepSectionDocuments(activeSection)
+    let selectOptions: SelectComponentOptions[] = []
+    let documentOptions: SelectComponentOptions[] = []
+    let uploadedDocuments: IFileValue[] = []
+    const docSections = getDocumentSections()
+    for (const section of docSections) {
+      const prepDocumentOption = prepSectionDocuments(section.id)
+      selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+      documentOptions = [
+        ...documentOptions,
+        ...prepDocumentOption.documentOptions
+      ]
+      uploadedDocuments = [
+        ...uploadedDocuments,
+        ...prepDocumentOption.uploadedDocuments
+      ]
     }
+    return { selectOptions, documentOptions, uploadedDocuments }
   }
 
   const selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
@@ -204,7 +196,7 @@ export const SupportingDocumentsView = (props: IProps) => {
 
   const getAllAttachmentInPreviewList = () => {
     const docSections = getDocumentSections()
-    const options = prepSectionDocsBasedOnScrollFlag(docSections[0].id)
+    const options = prepSectionDocs()
     const sectionName = docSections[0].id
     return (
       <>
@@ -221,7 +213,7 @@ export const SupportingDocumentsView = (props: IProps) => {
         <DocumentViewer
           id={'document_section'}
           key={'Document_section'}
-          options={prepSectionDocsBasedOnScrollFlag(sectionName)}
+          options={prepSectionDocs()}
         >
           <ZeroDocument id={`zero_document_${sectionName}`}>
             {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}

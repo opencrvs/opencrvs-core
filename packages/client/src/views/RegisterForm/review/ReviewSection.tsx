@@ -113,16 +113,10 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import {
-  ACCUMULATED_FILE_SIZE,
-  ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
-  REJECTED
-} from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { clone, flatten, flattenDeep, get, isArray, pick } from 'lodash'
-import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
   IntlShape,
@@ -663,16 +657,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.hasChangesBeenMade = false
   }
 
-  componentDidMount() {
-    !isMobileDevice() &&
-      ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-      window.addEventListener('scroll', this.onScroll)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll)
-  }
-
   getVisibleSections = (formSections: IFormSection[]) => {
     const { draft } = this.props
     return formSections.filter(
@@ -706,43 +690,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.props.registerForm[this.props.draft.event]
   )
 
-  onScroll = () => {
-    const scrollY = window.scrollY + window.innerHeight / 2
-    let minDistance = 100000
-    let sectionYTop = 0
-    let sectionYBottom = 0
-    let distance = 0
-    let sectionElement: HTMLElement
-    let activeSection = this.state.activeSection
-
-    // TODO: Refactor "findDOMNode" away, as it's deprecated
-    // eslint-disable-next-line react/no-find-dom-node
-    const node = findDOMNode(this) as HTMLElement
-
-    this.docSections.forEach((section: IFormSection) => {
-      sectionElement = node.querySelector(
-        '#Section_' + section.id
-      ) as HTMLElement
-      sectionYTop = sectionElement.offsetTop
-      sectionYBottom = sectionElement.offsetTop + sectionElement.offsetHeight
-
-      distance = Math.abs(sectionYTop - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-
-      distance = Math.abs(sectionYBottom - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-    })
-    this.setState({
-      activeSection
-    })
-  }
-
   getLabelForDoc = (docForWhom: string, docType: string) => {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
@@ -771,10 +718,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
   getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
-    const options = this.prepSectionDocsBasedOnScrollFlag(
-      declaration,
-      this.state.activeSection || this.docSections[0].id
-    )
+    const options = this.prepSectionDocs(declaration)
 
     return (
       <DocumentListPreviewContainer>
@@ -789,32 +733,27 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
-  prepSectionDocsBasedOnScrollFlag = (
-    draft: IDeclaration,
-    activeSection: Section
+  prepSectionDocs = (
+    draft: IDeclaration
   ): IDocumentViewerOptions & {
     uploadedDocuments: IFileValue[]
   } => {
-    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
-      let selectOptions: SelectComponentOptions[] = []
-      let documentOptions: SelectComponentOptions[] = []
-      let uploadedDocuments: IFileValue[] = []
-      for (const section of this.docSections) {
-        const prepDocumentOption = this.prepSectionDocuments(draft, section.id)
-        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
-        documentOptions = [
-          ...documentOptions,
-          ...prepDocumentOption.documentOptions
-        ]
-        uploadedDocuments = [
-          ...uploadedDocuments,
-          ...prepDocumentOption.uploadedDocuments
-        ]
-      }
-      return { selectOptions, documentOptions, uploadedDocuments }
-    } else {
-      return this.prepSectionDocuments(draft, activeSection)
+    let selectOptions: SelectComponentOptions[] = []
+    let documentOptions: SelectComponentOptions[] = []
+    let uploadedDocuments: IFileValue[] = []
+    for (const section of this.docSections) {
+      const prepDocumentOption = this.prepSectionDocuments(draft, section.id)
+      selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+      documentOptions = [
+        ...documentOptions,
+        ...prepDocumentOption.documentOptions
+      ]
+      uploadedDocuments = [
+        ...uploadedDocuments,
+        ...prepDocumentOption.uploadedDocuments
+      ]
     }
+    return { selectOptions, documentOptions, uploadedDocuments }
   }
 
   prepSectionDocuments = (
@@ -1931,8 +1870,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               />
               <FormData>
                 {transformedSectionData.map((sec, index) => {
-                  const { uploadedDocuments, selectOptions } =
-                    this.prepSectionDocuments(declaration, sec.id)
                   return (
                     <SectionContainer key={index}>
                       {sec.title && (
@@ -1944,17 +1881,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             </LinkButton>
                           )}
                         </Title>
-                      )}
-                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
-                        <DocumentListPreviewContainer>
-                          <DocumentListPreview
-                            id={sec.id}
-                            documents={uploadedDocuments}
-                            onSelect={this.selectForPreview}
-                            dropdownOptions={selectOptions}
-                            inReviewSection={true}
-                          />
-                        </DocumentListPreviewContainer>
                       )}
                       <ListViewSimplified id={'Section_' + sec.id}>
                         {sec.items.map((item, index) => {
@@ -1983,8 +1909,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </SectionContainer>
                   )
                 })}
-                {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                  this.getAllAttachmentInPreviewList(declaration)}
+                {this.getAllAttachmentInPreviewList(declaration)}
                 {(!isCorrection(declaration) || viewRecord) && (
                   <InputWrapper>
                     <InputField
@@ -2063,18 +1988,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocsBasedOnScrollFlag(
-                  declaration,
-                  this.state.activeSection || this.docSections[0].id
-                )}
+                options={this.prepSectionDocs(declaration)}
               >
                 <ZeroDocument id={`zero_document_${sectionName}`}>
-                  {ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    intl.formatMessage(messages.zeroDocumentsText, {
-                      section: sectionName
-                    })}
-                  {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
+                  {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
                   {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"

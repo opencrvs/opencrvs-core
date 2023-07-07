@@ -1,9 +1,25 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import { useState } from 'react'
 import ReactPanZoom from './PanDraggable'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
-const Container = css`
+const StyledReactPanZoom = styled(ReactPanZoom)<{
+  zoom: number
+  pandx: number
+  pandy: number
+  rotation: number
+}>`
   width: 100%;
   height: 100%;
   display: flex;
@@ -13,15 +29,6 @@ const Container = css`
   & img {
     width: 100%;
   }
-`
-
-const StyledReactPanZoom = styled(ReactPanZoom)<{
-  zoom: number
-  pandx: number
-  pandy: number
-  rotation: number
-}>`
-  ${Container};
 `
 
 interface IProps {
