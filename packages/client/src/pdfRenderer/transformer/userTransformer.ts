@@ -40,6 +40,27 @@ export function getUserName(
     : ''
 }
 
+export function getUserNameObject(
+  userDetails: Pick<
+    UserDetails | NonNullable<UserDetails['localRegistrar']>,
+    'name'
+  >
+) {
+  const nameObj =
+    userDetails.name &&
+    (userDetails.name.find((storedName: HumanName | null) => {
+      const name = storedName as HumanName
+      return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
+    }) as GQLHumanName)
+
+  return nameObj
+    ? {
+        firstNames: String(nameObj.firstNames),
+        familyName: String(nameObj.familyName)
+      }
+    : {}
+}
+
 export const userTransformers: IFunctionTransformer = {
   /*
     LocalRegistrarUserName provides the username of the loggedIn user.
