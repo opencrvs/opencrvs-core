@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -22,7 +21,11 @@ import {
   GQLSystemRoleInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { seedCertificate } from './certificateSeeding'
+import { v4 as uuid } from 'uuid'
+import { generateStatisticalExtensions } from '@gateway/features/restLocation/utils'
+import { fetchFromHearth } from '@gateway/features/fhir/utils'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -83,6 +86,29 @@ type RoleResponse = {
   [K in typeof SYSTEM_ROLES[number]]?: GQLRoleInput[]
 }
 
+type LocationResponse = {
+  statisticalID: string
+  name: string
+  alias: string
+  partOf: string
+  code: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+  physicalType: 'Jurisdiction' | 'Building'
+  jurisdictionType?:
+    | 'STATE'
+    | 'DISTRICT'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_4'
+    | 'LOCATION_LEVEL_5'
+  statistics?: Array<{
+    year: number
+    male_population: number
+    female_population: number
+    population: number
+    crude_birth_rate: number
+  }>
+}
+
 async function getCountryRoles() {
   const url = new URL('roles', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -90,6 +116,15 @@ async function getCountryRoles() {
     throw new Error(`Expected to get the roles from ${url}`)
   }
   return res.json() as Promise<RoleResponse>
+}
+
+async function getLocations() {
+  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the locations from ${url}`)
+  }
+  return res.json() as Promise<LocationResponse[]>
 }
 
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
@@ -108,6 +143,77 @@ async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
   )
 }
 
+function buildLocationBundle(locations: LocationResponse[]): fhir.Bundle {
+  const locationsMap = new Map(
+    locations.map((location) => [
+      location.statisticalID,
+      { ...location, uid: `urn:uuid:${uuid()}` }
+    ])
+  )
+  return {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: locations.map(
+      (location): fhir.BundleEntry => ({
+        fullUrl: locationsMap.get(location.statisticalID)!.uid,
+        resource: {
+          resourceType: 'Location',
+          identifier: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}id/${
+                location.code === 'ADMIN_STRUCTURE'
+                  ? 'statistical-code'
+                  : 'internal-id'
+              }`,
+              value: `${location.code}_${location.statisticalID}`
+            },
+            ...(location.jurisdictionType
+              ? [
+                  {
+                    system: `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`,
+                    value: location.jurisdictionType
+                  }
+                ]
+              : [])
+          ],
+          name: location.name,
+          ...(location.code === 'ADMIN_STRUCTURE' && {
+            description: location.statisticalID
+          }),
+          alias: [location.alias],
+          status: 'active',
+          mode: 'instance',
+          partOf: {
+            // partOf is either statisticalID of another location or 'Location/0'
+            reference:
+              locationsMap.get(location.partOf.split('/')[1])?.uid ??
+              location.partOf
+          },
+          type: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+                code: location.code
+              }
+            ]
+          },
+          physicalType: {
+            coding: [
+              {
+                code: location.physicalType === 'Jurisdiction' ? 'jdn' : 'bu',
+                display: location.physicalType
+              }
+            ]
+          },
+          ...(location.statistics && {
+            extension: generateStatisticalExtensions(location.statistics)
+          })
+        }
+      })
+    )
+  }
+}
+
 export async function seedData() {
   const token = await getToken()
   const systemRoles = await createSystemRoles(token)
@@ -115,7 +221,7 @@ export async function seedData() {
   const usedSystemRoles = Object.keys(
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
-  const res = await updateRoles(
+  await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
@@ -126,6 +232,9 @@ export async function seedData() {
         roles: countryRoles[value]!
       }))
   )
+  const locations = await getLocations()
+  const locationsBundle = buildLocationBundle(locations)
+  const res = await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
   console.log(res)
   seedCertificate(token)
 }
