@@ -86,6 +86,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -800,7 +801,7 @@ function UserListComponent(props: IProps) {
               {intl.formatMessage(messages.resetUserPasswordModalMessage, {
                 deliveryMethod,
                 recipient:
-                  deliveryMethod == 'sms'
+                  deliveryMethod === 'sms'
                     ? toggleResetPassword.selectedUser?.mobile
                     : toggleResetPassword.selectedUser?.email
               })}
@@ -853,7 +854,9 @@ function UserListComponent(props: IProps) {
               <Content
                 title={
                   !loading && !error
-                    ? searchedLocation?.name || ''
+                    ? searchedLocation
+                      ? getLocalizedLocationName(intl, searchedLocation)
+                      : ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
@@ -879,7 +882,9 @@ function UserListComponent(props: IProps) {
                 ) : (
                   <>
                     <Header id="header">
-                      {(searchedLocation && searchedLocation.name) || ''}
+                      {(searchedLocation &&
+                        getLocalizedLocationName(intl, searchedLocation)) ||
+                        ''}
                     </Header>
                     <LocationInfo>
                       {searchedLocation && (

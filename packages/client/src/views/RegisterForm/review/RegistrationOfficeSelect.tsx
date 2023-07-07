@@ -16,6 +16,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { InputField } from '@client/components/form/InputField'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
 
 interface IRegistrationOfficeSelectProps {
   value: string
@@ -26,13 +27,13 @@ export function RegistrationOfficeSelect(
 ) {
   const offlineData = useSelector(getOfflineData)
   const offices = offlineData.offices
+  const intl = useIntl()
   const primaryOffices = Object.values(offices)
     .filter((office) => !office.primary)
     .map((office) => ({
-      label: office.name,
+      label: getLocalizedLocationName(intl, office),
       value: office.id
     }))
-  const intl = useIntl()
   return (
     <InputField
       id="registration-office-select"
