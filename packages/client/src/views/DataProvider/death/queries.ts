@@ -54,36 +54,34 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          telecom {
-            system
-            value
-          }
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        nationality
+        occupation
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        telecom {
+          system
+          value
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       father {
@@ -199,6 +197,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -255,17 +257,15 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -318,34 +318,32 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          telecom {
-            system
-            value
-          }
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        nationality
+        occupation
+        birthDate
+        telecom {
+          system
+          value
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       father {
@@ -407,6 +405,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
               district
               state
             }
+            partOf
           }
         }
         type
@@ -455,6 +454,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         office {
           id
           name
+          address {
+            state
+            district
+          }
         }
         system {
           name
@@ -511,17 +514,15 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }

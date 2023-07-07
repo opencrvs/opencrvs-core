@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 

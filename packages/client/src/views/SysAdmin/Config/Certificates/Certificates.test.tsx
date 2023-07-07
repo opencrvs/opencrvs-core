@@ -26,7 +26,7 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-export const validImageB64String =
+const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)
 fetch.enableMocks()

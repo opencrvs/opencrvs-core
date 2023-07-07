@@ -24,10 +24,8 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
@@ -243,6 +241,7 @@ const InformantNotification = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.informantNotifications)}
           />
         }
         navigation={<Navigation />}

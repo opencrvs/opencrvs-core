@@ -6,34 +6,41 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "./runMigrations.sh",
+    "start": "yarn build && ./runMigrations.sh",
     "revert": "./revertMigrations.sh",
     "start:prod": "./runMigrations.sh",
-    "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
-    "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
-    "create:performance": "migrate-mongo create -f migrate-mongo-config-performance.js",
-    "create:user-mgnt": "migrate-mongo create -f migrate-mongo-config-user-mgnt.js",
-    "create:application-config": "migrate-mongo create -f migrate-mongo-config-application-config.js",
-    "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
-    "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
-    "status:user-mgnt": "migrate-mongo status -f migrate-mongo-config-user-mgnt.js",
-    "status:application-config": "migrate-mongo status -f migrate-mongo-config-application-config.js",
-    "precommit": "lint-staged"
+    "create:hearth": "./create-migrations.sh hearth",
+    "create:openhim": "./create-migrations.sh openhim",
+    "create:performance": "./create-migrations.sh performance",
+    "create:user-mgnt": "./create-migrations.sh user-mgnt",
+    "create:application-config": "./create-migrations.sh application-config",
+    "status:hearth": "migrate-mongo status -f ./src/migrate-mongo-config-hearth.js",
+    "status:openhim": "migrate-mongo status -f ./src/migrate-mongo-config-openhim.js",
+    "status:user-mgnt": "migrate-mongo status -f ./src/migrate-mongo-config-user-mgnt.js",
+    "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
+    "precommit": "lint-staged",
+    "test:compilation": "tsc --noEmit",
+    "build": "rimraf build && tsc"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
     "file-type": "^16.5.3",
     "influx": "^5.0.7",
+    "is-svg": "^4.3.2",
     "lodash": "^4.17.21",
     "migrate-mongo": "^9.0.0",
     "minio": "^7.0.30",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "prettier": "^2.5.0"
+    "@types/fhir": "0.0.30",
+    "mongodb": "^4.4.1",
+    "prettier": "^2.5.0",
+    "rimraf": "^2.6.2",
+    "typescript": "^4.8.3"
   },
   "lint-staged": {
-    "src/**/*.{js}": [
+    "src/**/*.{ts}": [
       "prettier --write",
       "git add"
     ]

@@ -38,7 +38,7 @@ import {
   formatUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -129,6 +129,7 @@ class ReviewCertificateActionComponent extends React.Component<
             certificatePdf: svg
           })
         },
+        this.props.state,
         this.props.countries
       )
     }
@@ -199,6 +200,7 @@ class ReviewCertificateActionComponent extends React.Component<
       draft,
       this.props.userDetails,
       this.props.offlineCountryConfig,
+      this.props.state,
       this.props.countries
     )
     this.props.modifyDeclaration(draft)
@@ -376,7 +378,8 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
     offlineCountryConfig,
-    registerForm: getEventRegisterForm(state, event)
+    registerForm: getEventRegisterForm(state, event),
+    state
   }
 }
 

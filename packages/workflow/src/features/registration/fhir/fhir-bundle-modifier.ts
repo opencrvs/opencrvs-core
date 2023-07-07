@@ -56,7 +56,6 @@ import {
   USER_SCOPE
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
-import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { triggerEvent } from '@workflow/features/events/handler'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
@@ -102,9 +101,6 @@ export async function modifyRegistrationBundle(
     await setupLastRegLocation(taskResource, practitioner)
   }
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
@@ -128,9 +124,6 @@ export async function markBundleAsValidated(
   await setupLastRegLocation(taskResource, practitioner)
 
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -162,9 +155,6 @@ export async function markBundleAsRequestedForCorrection(
     getTokenPayload(token),
     regStatusCode?.code
   )
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -229,9 +219,6 @@ export async function invokeRegistrationValidation(
     /* setting lastRegUser here */
     setupLastRegUser(taskResource, practitioner)
 
-    /* check if the status of any event draft is not published and setting configuration extension*/
-    await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
     await updateResourceInHearth(taskResource)
 
     await triggerEvent(
@@ -265,9 +252,6 @@ export async function markBundleAsWaitingValidation(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -291,9 +275,6 @@ export async function markBundleAsDeclarationUpdated(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -345,9 +326,6 @@ export async function markBundleAsCertified(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -387,9 +365,6 @@ export async function markBundleAsIssued(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
-
   return bundle
 }
 
@@ -409,9 +384,6 @@ export async function touchBundle(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /* check if the status of any event draft is not published and setting configuration extension*/
-  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -617,28 +589,6 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  const testExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/configuration`
-    )
-  })
-  if (testExtension && testExtension.valueReference) {
-    testExtension.valueReference.reference = 'IN_CONFIGURATION'
-  } else {
-    taskResource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration`,
-      valueReference: { reference: 'IN_CONFIGURATION' }
-    })
-  }
-  taskResource.lastModified =
-    taskResource.lastModified || new Date().toISOString()
-  return taskResource
-}
-
 export function setupAuthorOnNotes(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner
@@ -717,6 +667,7 @@ export async function updatePatientIdentifierWithRN(
 interface Integration {
   name: string
   status: string
+  integratingSystemType: 'MOSIP' | 'OSIA' | 'OTHER'
 }
 
 const statuses = {
@@ -764,7 +715,7 @@ export async function validateDeceasedDetails(
   )
   if (configResponse?.length) {
     const mosipIntegration = configResponse.filter((integration) => {
-      return integration.name === 'MOSIP'
+      return integration.integratingSystemType === 'MOSIP'
     })[0]
     if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
@@ -809,7 +760,7 @@ export async function validateDeceasedDetails(
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
-                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.type === 'MOSIP_PSUT_TOKEN_ID' &&
                     identifier.value ===
                       mosipTokenSeederResponse.response.authToken
                   )

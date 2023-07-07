@@ -11,7 +11,7 @@
  */
 import React from 'react'
 
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   GQLLocation,
   GQLIdentifier,
@@ -177,7 +177,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 
   const jurisdictionTypeIdentifier =
     location.identifier &&
-    (location.identifier as GQLIdentifier[]).find(
+    location.identifier.find(
       ({ system }: GQLIdentifier) =>
         system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
     )
@@ -321,7 +321,6 @@ export const mockPerformanceMetricsRequest = {
           maleEstimation: 0,
           femaleEstimation: 0,
           locationId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
-          estimationYear: 2022,
           locationLevel: '',
           __typename: 'Estimation'
         },

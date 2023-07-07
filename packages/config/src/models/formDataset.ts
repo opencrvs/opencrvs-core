@@ -12,6 +12,8 @@
 import { Document, model, Schema } from 'mongoose'
 import { ISelectOption, message } from '@config/models/question'
 
+// keeping these models to migrate from v1.2 to v1.3
+
 export interface IDataset {
   fileName: string
   options: ISelectOption[]

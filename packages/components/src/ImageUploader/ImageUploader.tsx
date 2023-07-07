@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 const HiddenInput = styled.input`
   display: none;
@@ -52,7 +53,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
         }}
         disabled={disabled}
       >
-        {icon && icon()}
+        <Icon name="UploadSimple" />
         {title}
         <HiddenInput
           ref={this.fileUploader}

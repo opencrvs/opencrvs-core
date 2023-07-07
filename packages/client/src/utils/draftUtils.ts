@@ -14,13 +14,7 @@ import {
   SUBMISSION_STATUS,
   IPrintableDeclaration
 } from '@client/declarations'
-import {
-  BirthSection,
-  DeathSection,
-  IForm,
-  IFormSectionData,
-  MarriageSection
-} from '@client/forms'
+import { IFormSectionData } from '@client/forms'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
@@ -277,18 +271,6 @@ export const transformSearchQueryDataToDraft = (
   }
 
   return declaration
-}
-
-export const getAttachmentSectionKey = (declarationEvent: Event): string => {
-  switch (declarationEvent) {
-    case Event.Death:
-      return DeathSection.DeathDocuments
-    case Event.Birth:
-      return BirthSection.Documents
-    case Event.Marriage:
-    default:
-  }
-  return MarriageSection.Documents
 }
 
 export function isDeclarationInReadyToReviewStatus(

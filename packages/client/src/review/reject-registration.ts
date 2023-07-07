@@ -25,7 +25,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       required: true,
       hideAsterisk: true,
       hideHeader: true,
-      validate: [],
+      validator: [],
       maxLength: 500,
       ignoreMediaQuery: true,
       ignoreBottomMargin: true
@@ -37,7 +37,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       hideHeader: true,
       hideAsterisk: true,
       initialValue: [],
-      validate: [],
+      validator: [],
       ignoreBottomMargin: true,
       options: [
         {

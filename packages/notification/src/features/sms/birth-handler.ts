@@ -11,13 +11,8 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import {
-  buildAndSendSMS,
-  getTranslations,
-  ISMSPayload
-} from '@notification/features/sms/utils'
+import { sendNotification, ISMSPayload } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
-import { getDefaultLanguage } from '@notification/i18n/utils'
 import { messageKeys } from '@notification/i18n/messages'
 
 export interface IInProgressPayload extends ISMSPayload {
@@ -51,19 +46,18 @@ export async function sendBirthInProgressConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.birthInProgressNotification,
+  const templateName = messageKeys.birthInProgressNotification
+  await sendNotification(
+    request,
+    {
+      sms: templateName
+    },
+    { sms: payload.msisdn },
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
-    },
-    getDefaultLanguage()
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -77,19 +71,16 @@ export async function sendBirthDeclarationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.birthDeclarationNotification,
+  const templateName = messageKeys.birthDeclarationNotification
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
     {
       name: payload.name,
       trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -103,20 +94,17 @@ export async function sendBirthRegistrationConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.birthRegistrationNotification,
+  const templateName = messageKeys.birthRegistrationNotification
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
     {
       name: payload.name,
       trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
-    },
-    getDefaultLanguage()
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
@@ -130,19 +118,17 @@ export async function sendBirthRejectionConfirmation(
       payload
     )}`
   )
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-  const message = await getTranslations(
-    authHeader,
-    messageKeys.birthRejectionNotification,
+
+  const templateName = messageKeys.birthRejectionNotification
+  await sendNotification(
+    request,
+    { sms: templateName },
+    { sms: payload.msisdn },
     {
       name: payload.name,
       trackingId: payload.trackingId
-    },
-    getDefaultLanguage()
+    }
   )
-  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 

@@ -31,7 +31,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       mapping: {
         mutation: fieldValueSectionExchangeTransformer('correction', 'data')
       },
-      validate: [],
+      validator: [],
       options: [
         {
           value: 'Affidavit',
@@ -55,7 +55,7 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       hideAsterisk: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: messages.selectPlaceholder,
       options: [
         {

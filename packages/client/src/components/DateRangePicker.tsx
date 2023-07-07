@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
 import {
   CircleButton,
@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
-import endOfMonth from 'date-fns/endOfMonth'
+import endOfToday from 'date-fns/endOfToday'
 import endOfYear from 'date-fns/endOfYear'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
@@ -169,7 +169,7 @@ export const TitleContent = styled.div`
     margin-right: 8px;
   }
 `
-export const ModalBody = styled.div`
+const ModalBody = styled.div`
   display: flex;
   flex: 1;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -179,7 +179,7 @@ export const ModalBody = styled.div`
     display: none;
   }
 `
-export const ModalBodyMobile = styled(ModalBody)`
+const ModalBodyMobile = styled(ModalBody)`
   border: none;
   display: none;
 
@@ -643,7 +643,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: endOfMonth(date)
+              endDate: endOfToday()
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
@@ -733,7 +733,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate,
-                    endDate: endOfMonth(endDate)
+                    endDate: endOfToday()
                   })
                   setModalVisible(false)
                   props.closeModalFromHOC && props.closeModalFromHOC()

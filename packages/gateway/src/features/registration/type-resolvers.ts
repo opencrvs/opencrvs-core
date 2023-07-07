@@ -18,8 +18,7 @@ import {
   ITimeLoggedResponse,
   getCertificatesFromTask,
   getActionFromTask,
-  fetchTaskByCompositionIdFromHearth,
-  fetchDocuments
+  fetchTaskByCompositionIdFromHearth
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -30,7 +29,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
@@ -73,14 +71,17 @@ import {
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { MINIO_BUCKET, USER_MANAGEMENT_URL } from '@gateway/constants'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import { getSystem, getUser } from '@gateway/features/user/utils'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import {
+  getPatientResource,
+  getPresignedUrlFromUri
+} from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -126,6 +127,9 @@ export const typeResolvers: GQLResolver = {
     },
     otherType: (identifier) => {
       return identifier.otherType
+    },
+    fieldsModifiedByIdentity: (identifier) => {
+      return identifier.fieldsModifiedByIdentity
     }
   },
   Address: {
@@ -262,6 +266,18 @@ export const typeResolvers: GQLResolver = {
     id: (relatedPerson) => {
       return relatedPerson && relatedPerson.id
     },
+    _fhirIDPatient: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person && person.id
+    },
     relationship: (relatedPerson) => {
       return (
         relatedPerson &&
@@ -277,21 +293,213 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.text
       )
     },
-    individual: async (relatedPerson, _, { headers: authHeader }) => {
-      if (
-        !relatedPerson ||
-        !relatedPerson.patient ||
-        !relatedPerson.patient.reference
-      ) {
-        return
+    dateOfMarriage: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const marriageExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
+        person.extension
+      )
+      return (marriageExtension && marriageExtension.valueDateTime) || null
+    },
+    age: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const marriageExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age`,
+        person.extension
+      )
+      return (marriageExtension && marriageExtension.valueString) || null
+    },
+    maritalStatus: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person && person.maritalStatus && person.maritalStatus.text
+    },
+    occupation: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const occupationExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
+        person.extension
+      )
+      return (occupationExtension && occupationExtension.valueString) || null
+    },
+    reasonNotApplying: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const reasonNotApplyingExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
+        person.extension
+      )
+      return (
+        (reasonNotApplyingExtension &&
+          reasonNotApplyingExtension.valueString) ||
+        null
+      )
+    },
+    ageOfIndividualInYears: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const ageOfIndividualInYearsExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (ageOfIndividualInYearsExtension &&
+          ageOfIndividualInYearsExtension.valueString) ||
+        null
+      )
+    },
+    exactDateOfBirthUnknown: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const exactDateOfBirthUnknownExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (exactDateOfBirthUnknownExtension &&
+          exactDateOfBirthUnknownExtension.valueString) ||
+        null
+      )
+    },
+    detailsExist: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person.active
+    },
+    multipleBirth: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person.multipleBirthInteger
+    },
+    deceased: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person
+    },
+    nationality: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const nationalityExtension = findExtension(
+        `${FHIR_SPECIFICATION_URL}patient-nationality`,
+        person.extension
+      )
+      if (!nationalityExtension || !nationalityExtension.extension) {
+        return null
       }
-      if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
-        relatedPerson = await fetchFHIR(
-          `/${relatedPerson.patient.reference}`,
-          authHeader
-        )
-      }
-      return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
+      const countryCodeExtension = findExtension(
+        'code',
+        nationalityExtension.extension
+      )
+
+      const coding =
+        (countryCodeExtension &&
+          countryCodeExtension.valueCodeableConcept &&
+          countryCodeExtension.valueCodeableConcept.coding &&
+          countryCodeExtension.valueCodeableConcept.coding) ||
+        []
+
+      // Nationality could be multiple
+      const nationality = coding.map((n) => {
+        return n.code
+      })
+
+      return nationality
+    },
+    educationalAttainment: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      const educationalAttainmentExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
+        person.extension
+      )
+      return (
+        (educationalAttainmentExtension &&
+          educationalAttainmentExtension.valueString) ||
+        null
+      )
     }
   },
   Deceased: {
@@ -459,12 +667,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     informantsSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.INFORMANT}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -476,12 +687,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     groomSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.GROOM}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -493,12 +707,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     brideSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.BRIDE}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -510,12 +727,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     witnessOneSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_ONE}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -527,12 +747,15 @@ export const typeResolvers: GQLResolver = {
       return (contact && contact.valueString) || null
     },
     witnessTwoSignature: async (task, _, { headers: authHeader }) => {
-      const contact = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/${SignatureExtensionPostfix.WITNESS_TWO}`,
         task.extension
       )
-      if (contact && contact.valueString) {
-        return await getPresignedUrlFromUri(contact, authHeader)
+      if (signatureExtension && signatureExtension.valueString) {
+        return await getPresignedUrlFromUri(
+          signatureExtension.valueString,
+          authHeader
+        )
       }
       return null
     },
@@ -785,17 +1008,11 @@ export const typeResolvers: GQLResolver = {
       return (docRef.masterIdentifier && docRef.masterIdentifier.value) || null
     },
     async data(docRef: fhir.DocumentReference, _, { headers: authHeader }) {
-      const fileName = docRef.content[0].attachment.data?.replace(
-        `/${MINIO_BUCKET}/`,
-        ''
-      )
-      const response = (await fetchDocuments(
-        '/presigned-url',
-        authHeader,
-        'POST',
-        JSON.stringify({ fileName: fileName })
-      )) as { presignedURL: string }
-      return response.presignedURL
+      const fileUri = docRef.content[0].attachment.data
+      if (fileUri) {
+        return getPresignedUrlFromUri(fileUri, authHeader)
+      }
+      return null
     },
     uri(docRef: fhir.DocumentReference) {
       return docRef.content[0].attachment.data
@@ -1043,11 +1260,9 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
-      userResponse.role.labels.forEach((item) => {
-        if (item.lang === 'en') {
-          item.label = role ?? item.label
-        }
-      })
+      if (role) {
+        userResponse.role.labels = JSON.parse(role)
+      }
 
       return userResponse
     },
@@ -1099,7 +1314,12 @@ export const typeResolvers: GQLResolver = {
     },
     signature: async (task: fhir.Task, _: any, { headers: authHeader }) => {
       const action = getActionFromTask(task)
-      if (action || getStatusFromTask(task) !== GQLRegStatus.REGISTERED) {
+      const status = getStatusFromTask(task)
+      if (
+        action ||
+        (status !== GQLRegStatus.REGISTERED &&
+          status !== GQLRegStatus.VALIDATED)
+      ) {
         return null
       }
       const user = findExtension(
@@ -1648,7 +1868,6 @@ export const typeResolvers: GQLResolver = {
           weightAtBirth: BODY_WEIGHT_CODE,
           birthType: BIRTH_TYPE_CODE,
           attendantAtBirth: BIRTH_ATTENDANT_CODE,
-          birthRegistrationType: BIRTH_REG_TYPE_CODE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
@@ -1889,30 +2108,6 @@ export const typeResolvers: GQLResolver = {
       }
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_ATTENDANT_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    },
-    async birthRegistrationType(
-      composition: ITemplatedComposition,
-      _,
-      { headers: authHeader }
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_TYPE_CODE}`,
         authHeader
       )
       return (

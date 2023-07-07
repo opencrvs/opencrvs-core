@@ -47,11 +47,12 @@ import {
 import {
   IconWithName,
   NoNameContainer,
-  NameContainer
+  NameContainer,
+  IconWithNameEvent
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useEffect, useState } from 'react'
-import { useTheme } from '@client/styledComponents'
+import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
 interface IBasePrintTabProps {
@@ -154,7 +155,7 @@ export const ReadyToIssue = ({
         {
           label: intl.formatMessage(constantsMessages.record),
           width: 70,
-          key: COLUMNS.ICON_WITH_NAME
+          key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
           width: 30,
@@ -239,6 +240,13 @@ export const ReadyToIssue = ({
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
           <IconWithName status={reg.declarationStatus} name={NameComponent} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={NameComponent}
+            event={reg.event}
+          />
         ),
         dateOfEvent,
         trackingId: reg.trackingId,

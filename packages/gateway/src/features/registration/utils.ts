@@ -10,21 +10,41 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { fetchDocuments } from '@gateway/features/fhir/utils'
-import { MINIO_BUCKET } from '@gateway/constants'
+import { fetchDocuments, fetchFHIR } from '@gateway/features/fhir/utils'
 import { IAuthHeader } from '@gateway/common-types'
+import { Context } from '@gateway/graphql/context'
 
 export async function getPresignedUrlFromUri(
-  contact: fhir.Extension,
+  fileUri: string,
   authHeader: IAuthHeader
 ) {
-  const fileName =
-    contact && contact.valueString?.replace(`/${MINIO_BUCKET}/`, '')
   const response = (await fetchDocuments(
     '/presigned-url',
     authHeader,
     'POST',
-    JSON.stringify({ fileName: fileName })
+    JSON.stringify({ fileUri })
   )) as { presignedURL: string }
   return response.presignedURL
+}
+
+export async function getPatientResource(
+  relatedPerson: fhir.RelatedPerson,
+  authHeader: IAuthHeader,
+  dataSources: Context['dataSources']
+) {
+  if (
+    !relatedPerson ||
+    !relatedPerson.patient ||
+    !relatedPerson.patient.reference
+  ) {
+    return null
+  }
+  if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
+    relatedPerson = await fetchFHIR(
+      `/${relatedPerson.patient.reference}`,
+      authHeader
+    )
+  }
+  const patientId = relatedPerson.patient.reference?.replace('Patient/', '')
+  return await dataSources.patientAPI.getPatient(String(patientId))
 }

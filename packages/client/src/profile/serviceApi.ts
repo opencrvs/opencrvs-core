@@ -13,18 +13,32 @@ import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-export interface ISendVerifyCodeData {
-  phoneNumber: string
+
+export enum NotificationEvent {
+  CHANGE_PHONE_NUMBER = 'CHANGE_PHONE_NUMBER',
+  CHANGE_EMAIL_ADDRESS = 'CHANGE_EMAIL_ADDRESS'
 }
 
-export interface ISendVerifyCodeResponse {
+interface ISendVerifyCodeData {
+  userFullName: {
+    use: string
+    family: string
+    given: string[]
+  }[]
+  notificationEvent: NotificationEvent
+  phoneNumber?: string
+  email?: string
+}
+
+interface ISendVerifyCodeResponse {
   userId: string
   nonce: string
-  mobile: string
   status: string
+  mobile?: string
+  email?: string
 }
 
-export const client = axios.create({
+const client = axios.create({
   baseURL: window.config.API_GATEWAY_URL,
   headers: {
     Authorization: `Bearer ${getToken()}`

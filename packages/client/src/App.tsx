@@ -20,12 +20,8 @@ import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import TransitionWrapper from '@client/components/TransitionWrapper'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
-import styled, {
-  createGlobalStyle,
-  ThemeProvider
-} from '@client/styledComponents'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { useApolloClient } from '@client/utils/apolloClient'
-import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -48,7 +44,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { Route, Switch } from 'react-router'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
@@ -56,7 +52,6 @@ import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
@@ -71,10 +66,10 @@ import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
-
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 
@@ -143,18 +138,7 @@ export function App(props: IAppProps) {
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
                                             />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.EVENT_INFO}
-                                              component={EventInfo}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.SELECT_BIRTH_INFORMANT
-                                              }
-                                              component={DeclarationForm}
-                                            />
+
                                             <ProtectedRoute
                                               exact
                                               path={
@@ -321,16 +305,6 @@ export function App(props: IAppProps) {
                                               ]}
                                               path={routes.USER_ROLES_CONFIG}
                                               component={UserRoles}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_WIZARD}
-                                              component={FormConfigWizard}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_HOME}
-                                              component={FormConfigHome}
                                             />
                                             <ProtectedRoute
                                               path={
@@ -552,6 +526,15 @@ export function App(props: IAppProps) {
                                                 routes.ISSUE_CERTIFICATE_PAYMENT
                                               }
                                               component={IssuePayment}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.OIDP_VERIFICATION_CALLBACK
+                                              }
+                                              component={
+                                                OIDPVerificationCallback
+                                              }
                                             />
                                           </Switch>
                                         </TransitionWrapper>
