@@ -53,7 +53,7 @@ export function getLanguages() {
   const LANGUAGES = process.env.LANGUAGES || 'bn,en'
   return LANGUAGES.split(',')
 }
-
+export const DEFAULT_COUNTRY = process.env.COUNTRY || 'FAR'
 export const NATIVE_LANGUAGE = (() => {
   const languages = getLanguages()
   return languages.find((language) => language !== 'en')

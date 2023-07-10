@@ -123,7 +123,7 @@ type IProps = RouteComponentProps &
   IConnectProps &
   IDispatchProps
 
-export enum EVENT_OPTIONS {
+enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }

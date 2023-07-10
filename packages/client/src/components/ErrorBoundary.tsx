@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import * as Sentry from '@sentry/react'
 
 const ErrorMessage = styled.h1`

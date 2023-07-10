@@ -9,28 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormData } from '@client/forms'
+import { IFormData, IFormField } from '@client/forms'
+import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 
-export function getInformantSectionTransformer(
+export const phoneNumberToFieldTransformer = (
   transformedData: IFormData,
   queryData: any,
-  sectionId: string
-) {
-  if (
-    queryData[sectionId] &&
-    queryData[sectionId].id &&
-    queryData[sectionId].individual &&
-    queryData[sectionId].individual.id
-  ) {
-    transformedData[sectionId]._fhirIDMap = {
-      // @ts-ignore
-      relatedPerson: queryData[sectionId].id,
-      individual: queryData[sectionId].individual.id
-    }
-  }
-  // Getting Informant's relationship data
-  if (queryData[sectionId] && queryData[sectionId].relationship) {
-    transformedData[sectionId].relationship = queryData[sectionId].relationship
+  sectionId: string,
+  field: IFormField
+) => {
+  if (queryData[sectionId] && queryData[sectionId].telecom) {
+    ;(queryData[sectionId].telecom as GQLContactPoint[]).map((tel) => {
+      if (tel.system === 'phone' && tel.value) {
+        transformedData[sectionId][field.name] = tel.value
+      }
+      return tel
+    })
   }
   return transformedData
 }

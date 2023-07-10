@@ -56,7 +56,7 @@ import {
   recordAuditMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
@@ -123,7 +123,7 @@ export const getVisibleSections = (
   )
 }
 
-export const getViewableSection = (
+const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
 ): IFormSection[] => {
@@ -587,7 +587,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item)
       }
     })

@@ -13,9 +13,9 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData
 } from '@client/forms'
-import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
@@ -23,17 +23,13 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { Event, History, RegStatus } from '@client/utils/gateway'
-import {
-  GQLRegStatus,
-  GQLRegWorkflow
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-import { callingCountries } from 'country-data'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
-import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -117,22 +113,6 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].informantsSignatureURI =
       queryData[sectionId].informantsSignatureURI
   }
-}
-
-export function informantTypeTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) {
-  transformedData[targetSectionId || sectionId][
-    targetFieldName || 'informantType'
-  ] = queryData[sectionId].informantType
-    ? (informantMessageDescriptors[
-        queryData[sectionId].informantType
-      ] as MessageDescriptor & Record<string, string>)
-    : ''
 }
 
 export function registrationNumberTransformer(
@@ -258,10 +238,11 @@ export const convertToLocal = (
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
 
-  const countryCode =
-    alpha3CountryCode.toUpperCase() === 'FAR'
-      ? 'ZM'
-      : callingCountries[alpha3CountryCode].alpha2
+  const countryCode = countryAlpha3toAlpha2(alpha3CountryCode)
+
+  if (!countryCode) {
+    return
+  }
 
   const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -324,6 +305,24 @@ export const changeHirerchyQueryTransformer =
     return transformedData
   }
 
+const getUserFullName = (history: History): string => {
+  return history?.user ? getUserName(history.user) : ''
+}
+
+const getUserRole = (history: History): MessageDescriptor => {
+  return (
+    (history?.user && userMessages[history.user.systemRole]) || {
+      defaultMessage: ' ',
+      description: 'empty string',
+      id: 'form.field.label.empty'
+    }
+  )
+}
+
+const getUserSignature = (history: History): string => {
+  return history?.signature?.data as string
+}
+
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -376,7 +375,7 @@ export const registrationLocationUserTransformer = (
   targetFieldName?: string,
   offlineData?: IOfflineData
 ) => {
-  const statusData: GQLRegWorkflow[] = queryData[REGISTRATION_SECTION].status
+  const statusData: GQLRegWorkflow[] = queryData['registration'].status
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
@@ -420,6 +419,38 @@ export const registrarSignatureUserTransformer = (
   ] = history?.signature?.data as string
 }
 
+export const userTransformer =
+  (status: RegStatus) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    __?: IOfflineData
+  ) => {
+    if (!_.history) {
+      return
+    }
+    const history: History = _.history
+      .reverse()
+      .find(
+        ({ action, regStatus }: History) =>
+          !action && regStatus && regStatus === status
+      )
+
+    if (history) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrar'
+      ] = {
+        name: getUserFullName(history),
+        role: getUserRole(history),
+        office: history?.office,
+        signature: getUserSignature(history)
+      } as IFormSectionData
+    }
+  }
+
 export const registrationDateTransformer =
   (locale: string, dateFormat: string) =>
   (
@@ -433,7 +464,6 @@ export const registrationDateTransformer =
     if (!_.history) {
       return
     }
-
     const history = _.history.find(
       ({ action, regStatus }: History) =>
         !action && regStatus === RegStatus.Registered

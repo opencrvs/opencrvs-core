@@ -66,7 +66,7 @@ export function getEventMessageDescription(event: Event): MessageDescriptor {
   return eventMessageDescriptor[event]
 }
 
-export function getExecutorKeyValue(key: ExecutorKey) {
+function getExecutorKeyValue(key: ExecutorKey) {
   if (key === 'CURRENT_DATE') {
     return Date.now()
   }

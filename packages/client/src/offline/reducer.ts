@@ -24,33 +24,34 @@ import { storage } from '@client/storage'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
+  ILocationDataResponse,
   ICertificateTemplateData,
   referenceApi
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig } from '@client/forms'
 import { Event, System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  IQuestionConfig,
-  isDefaultQuestionConfig
-} from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { find, isEmpty, merge } from 'lodash'
+import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
+import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
+import { initConditionals } from '@client/forms/conditionals'
+import { initValidators } from '@client/forms/validators'
+
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
 export enum LocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
   CRVS_OFFICE = 'CRVS_OFFICE',
-  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
+  PRIVATE_HOME = 'PRIVATE_HOME'
 }
 export interface ILocation {
   id: string
@@ -59,14 +60,21 @@ export interface ILocation {
   alias: string
   physicalType: string
   jurisdictionType?: string
+  statisticalId: string
   type: string
   partOf: string
 }
 
 export interface IOfflineData {
-  locations: { [key: string]: ILocation }
-  facilities: { [key: string]: ILocation }
-  offices: { [key: string]: ILocation }
+  locations: ILocationDataResponse
+  forms: {
+    version: string
+    birth: ISerializedForm
+    death: ISerializedForm
+    marriage: ISerializedForm
+  }
+  facilities: ILocationDataResponse
+  offices: ILocationDataResponse
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
@@ -84,7 +92,6 @@ export interface IOfflineData {
   systems: System[]
   config: IApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
-  formConfig: IFormConfig
 }
 
 export type IOfflineDataState = {
@@ -94,7 +101,7 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
-export const initialState: IOfflineDataState = {
+const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
   loadingError: false
@@ -102,16 +109,6 @@ export const initialState: IOfflineDataState = {
 
 async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
-}
-
-function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
-  languages.forEach((language) => {
-    language.messages = {
-      ...language.messages,
-      ...extractMessages(formConfig.questionConfig, language.lang)
-    }
-  })
-  return languages
 }
 
 export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
@@ -155,70 +152,6 @@ async function loadCertificates(
       loadCertificate(savedCertificates?.[cert.event], cert)
     )
   )
-}
-
-function extractMessages(questions: IQuestionConfig[], language: string) {
-  const messages: { [key: string]: string } = {}
-  questions.forEach((question) => {
-    if (isDefaultQuestionConfig(question)) {
-      return
-    }
-    const labelMessage = find(question.label, {
-      lang: language
-    })
-    const placeholderMessage = find(question.placeholder, {
-      lang: language
-    })
-    const descriptionMessage = find(question.description, {
-      lang: language
-    })
-    const tooltipMessage = find(question.tooltip, {
-      lang: language
-    })
-    const errorMessage = find(question.errorMessage, {
-      lang: language
-    })
-    const optionMessages = question?.options?.map((option) => {
-      return find(option.label, {
-        lang: language
-      })
-    })
-    if (labelMessage?.descriptor?.id) {
-      const labelID: string = labelMessage.descriptor.id as string
-      messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
-    }
-
-    if (placeholderMessage?.descriptor?.id) {
-      const placeholderID: string = placeholderMessage.descriptor.id as string
-      messages[placeholderID] = placeholderMessage.descriptor
-        .defaultMessage as string
-    }
-
-    if (descriptionMessage?.descriptor?.id) {
-      const descID = descriptionMessage.descriptor.id as string
-      messages[descID] = descriptionMessage.descriptor.defaultMessage as string
-    }
-
-    if (tooltipMessage?.descriptor?.id) {
-      const tooltipID = tooltipMessage.descriptor.id as string
-      messages[tooltipID] = tooltipMessage.descriptor.defaultMessage as string
-    }
-
-    if (errorMessage?.descriptor?.id) {
-      const errID = errorMessage.descriptor.id as string
-      messages[errID] = errorMessage.descriptor.defaultMessage as string
-    }
-
-    if (!isEmpty(optionMessages)) {
-      optionMessages?.forEach((option) => {
-        if (option?.descriptor?.id) {
-          const errID = option.descriptor.id as string
-          messages[errID] = option.descriptor.defaultMessage as string
-        }
-      })
-    }
-  })
-  return messages
 }
 
 function checkIfDone(
@@ -273,6 +206,11 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
+const FORMS_CMD = Cmd.run(() => referenceApi.loadForms(), {
+  successActionCreator: actions.formsLoaded,
+  failActionCreator: actions.formsFailed
+})
+
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -281,6 +219,16 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
+})
+
+const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
+  successActionCreator: actions.conditionalsLoaded,
+  failActionCreator: actions.conditionalsFailed
+})
+
+const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
+  successActionCreator: actions.validatorsLoaded,
+  failActionCreator: actions.validatorsFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -297,6 +245,9 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
+    CONDITIONALS_CMD,
+    VALIDATORS_CMD,
+    FORMS_CMD,
     CONTENT_CMD
   ])
 }
@@ -451,39 +402,12 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_FORM_CONFIG: {
-      const { formConfig } = state.offlineData
 
-      if (!formConfig) return state
-
-      const {
-        formDrafts,
-        questionConfig = formConfig.questionConfig,
-        formDataset
-      } = action.payload
-
-      const newFormConfig = {
-        formDrafts,
-        questionConfig,
-        formDataset
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: {
-            ...state.offlineData,
-            formConfig: newFormConfig
-          }
-        },
-        Cmd.action(actions.offlineFormConfigUpdated(newFormConfig))
-      )
-    }
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig, systems } = action.payload
+      const { certificates, config, systems } = action.payload
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
@@ -509,7 +433,6 @@ function reducer(
             offlineData: {
               ...state.offlineData,
               config,
-              formConfig,
               systems
             }
           },
@@ -522,7 +445,6 @@ function reducer(
         newOfflineData = {
           ...state.offlineData,
           config,
-          formConfig,
           systems,
 
           // Field agents do not get certificate templates from the config service.
@@ -554,6 +476,7 @@ function reducer(
       const marriageCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Marriage
       )
+
       if (
         birthCertificateTemplate &&
         deathCertificateTemplate &&
@@ -572,14 +495,14 @@ function reducer(
             definition: deathCertificateTemplate.svgCode,
             fileName: deathCertificateTemplate.svgFilename,
             lastModifiedDate: deathCertificateTemplate.svgDateUpdated,
-            hash: deathCertificateTemplate.hash
+            hash: birthCertificateTemplate.hash
           },
           marriage: {
             id: marriageCertificateTemplate.id,
             definition: marriageCertificateTemplate.svgCode,
             fileName: marriageCertificateTemplate.svgFilename,
             lastModifiedDate: marriageCertificateTemplate.svgDateUpdated,
-            hash: marriageCertificateTemplate.hash
+            hash: birthCertificateTemplate.hash
           }
         }
         const newOfflineData = {
@@ -588,6 +511,7 @@ function reducer(
             certificates: certificatesTemplates
           }
         }
+
         return {
           ...state,
           offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
@@ -617,12 +541,7 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          languages: state.offlineData.formConfig
-            ? getAvailableContent(
-                state.offlineData.formConfig as IFormConfig,
-                action.payload.languages
-              )
-            : action.payload.languages
+          languages: action.payload.languages
         }
       }
     }
@@ -656,6 +575,29 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(LOCATIONS_CMD, RETRY_TIMEOUT)
+      )
+    }
+
+    /*
+     * Forms
+     */
+
+    case actions.FORMS_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          forms: action.payload.forms
+        }
+      }
+    }
+    case actions.FORMS_FAILED: {
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(FORMS_CMD, RETRY_TIMEOUT)
       )
     }
 
