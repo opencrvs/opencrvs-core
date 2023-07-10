@@ -31,7 +31,7 @@ const StatsRow = styled.div`
     color: ${({ theme }) => theme.colors.grey500}
   }
 `
-export interface IPerformanceStatsProps {
+interface IPerformanceStatsProps {
   registrationOffices: number
   totalRegistrars: number
   citizen: number

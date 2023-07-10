@@ -59,6 +59,7 @@ export interface ILocation {
   alias: string
   physicalType: string
   jurisdictionType?: string
+  statisticalId: string
   type: string
   partOf: string
 }
@@ -94,7 +95,7 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
-export const initialState: IOfflineDataState = {
+const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
   loadingError: false

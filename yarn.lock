@@ -10424,6 +10424,11 @@ cosmiconfig@^7, cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+country-code-lookup@^0.0.23:
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/country-code-lookup/-/country-code-lookup-0.0.23.tgz#a5fb8fd338878b9066a653f93a979602da303ad8"
+  integrity sha512-kxhIGcau9/X+tgPg9yO2q1OLu8jiYYsdwXuiXzHdsgNChd36xrJMlOba7ka9O1xShCVTiVQPQpq/tcuy4WiW+Q==
+
 country-data@^0.0.31:
   version "0.0.31"
   resolved "https://registry.npmjs.org/country-data/-/country-data-0.0.31.tgz"
@@ -22596,9 +22601,9 @@ touch@^3.1.0:
     nopt "~1.0.10"
 
 tough-cookie@^4.0.0:
-  version "4.1.2"
-  resolved "https://registry.npmjs.org/tough-cookie/-/tough-cookie-4.1.2.tgz"
-  integrity sha512-G9fqXWoYFZgTc2z8Q5zaHy/vJMjm+WV0AkAeHxVCQiEB1b+dGvWzFW6QV07cY5jQ5gRkeid2qIkzkxUnmoQZUQ==
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-4.1.3.tgz#97b9adb0728b42280aa3d814b6b999b2ff0318bf"
+  integrity sha512-aX/y5pVRkfRnfmuX+OdbSdXvPe6ieKX/G2s7e98f4poJHnqH3281gDPm/metm6E/WRamfx7WC4HUqkWHfQHprw==
   dependencies:
     psl "^1.1.33"
     punycode "^2.1.1"

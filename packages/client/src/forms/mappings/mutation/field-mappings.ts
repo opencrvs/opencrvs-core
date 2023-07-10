@@ -153,8 +153,8 @@ interface IAddress {
   [key: string]: any
 }
 
-export const fieldToAddressTransformer =
-  (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
+export const fieldToAddressLineTransformer =
+  (addressType: string, lineNumber = 0) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -176,13 +176,39 @@ export const fieldToAddressTransformer =
       }
       sectionData.address.push(address)
     }
-    if (lineNumber > 0) {
-      address.line[lineNumber - 1] = `${draftData[sectionId][field.name]}`
-    } else {
-      address[!transformedFieldName ? field.name : transformedFieldName] = `${
-        draftData[sectionId][field.name]
-      }`
+
+    address.line[lineNumber] = `${draftData[sectionId][field.name]}`
+
+    return transformedData
+  }
+
+export const fieldToAddressFhirPropertyTransformer =
+  (addressType: string, transformedFieldName: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const sectionData = transformedData[sectionId]
+
+    if (!sectionData.address) {
+      sectionData.address = []
     }
+    let address: IAddress | undefined = (
+      sectionData.address as [{ type: string; line: IFormFieldValue[] }]
+    ).find((addr) => addr.type === addressType)
+    if (!address) {
+      address = {
+        type: addressType,
+        line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''] // lines must be available as empty strings for GraphQL to parse all options
+      }
+      sectionData.address.push(address)
+    }
+
+    address[!transformedFieldName ? field.name : transformedFieldName] = `${
+      draftData[sectionId][field.name]
+    }`
 
     return transformedData
   }
