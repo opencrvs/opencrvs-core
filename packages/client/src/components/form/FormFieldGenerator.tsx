@@ -142,6 +142,7 @@ import {
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
 import { BulletList } from '@opencrvs/components'
+import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -154,12 +155,6 @@ const FormItem = styled.div<{
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '28px'};
-`
-
-// this
-const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-top: 16px;
 `
 
 const LocationSearchFormField = styled(LocationSearch)`
@@ -489,7 +484,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
+      return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor
