@@ -14,7 +14,10 @@ import * as Hapi from '@hapi/hapi'
 import { Types } from 'mongoose'
 import { logger } from '@user-mgnt/logger'
 import { UserRole } from '@user-mgnt/model/user'
-import SystemRole, { ISystemRoleModel } from '@user-mgnt/model/systemRole'
+import SystemRole, {
+  ISystemRoleModel,
+  SYSTEM_ROLE_TYPES
+} from '@user-mgnt/model/systemRole'
 import * as Joi from 'joi'
 
 const roleLabelSchema = Joi.object({
@@ -29,7 +32,9 @@ const roleRequestSchema = Joi.object({
 
 export const systemRolesRequestSchema = Joi.object({
   id: Joi.string().required(),
-  value: Joi.string().optional(),
+  value: Joi.string()
+    .allow(...SYSTEM_ROLE_TYPES)
+    .optional(),
   roles: Joi.array().items(roleRequestSchema).optional(),
   active: Joi.boolean().optional()
 })
@@ -50,7 +55,7 @@ export interface IRoleRequest {
 
 export interface ISystemRolesRequest {
   id: string
-  value?: string
+  value?: typeof SYSTEM_ROLE_TYPES[number]
   roles?: IRoleRequest[]
   active?: boolean
 }

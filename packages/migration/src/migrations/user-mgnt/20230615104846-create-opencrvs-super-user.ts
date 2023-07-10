@@ -20,12 +20,6 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
 
   try {
-    const role = await db.collection('userroles').findOne({
-      'labels.label': 'National System Admin'
-    })
-    if (!role) {
-      throw new Error('National System Admin role not found')
-    }
     const salt = genSaltSync(10)
     const passwordHash = hashSync(SUPER_USER_PASSWORD, salt)
 
@@ -42,7 +36,6 @@ export const up = async (db: Db, client: MongoClient) => {
       mobile: '0989898989',
       passwordHash,
       salt,
-      role: role._id,
       systemRole: 'NATIONAL_SYSTEM_ADMIN',
       scope: ['natlsysadmin'],
       status: 'active'
