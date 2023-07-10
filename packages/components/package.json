@@ -80,7 +80,7 @@
     "remark-gfm": "^3.0.1",
     "rimraf": "^2.6.2",
     "storybook": "^7.0.2",
-    "stylelint": "^14.11.0",
+    "stylelint": "^15.10.1",
     "stylelint-config-recommended": "^9.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
