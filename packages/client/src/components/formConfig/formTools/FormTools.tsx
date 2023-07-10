@@ -13,7 +13,7 @@
 import { Event, CustomFieldType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
@@ -46,7 +46,10 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   /* TODO */
   [CustomFieldType.Subsection]: messages.supportingCopy,
   [CustomFieldType.Paragraph]: messages.heading,
-  [CustomFieldType.SelectWithOptions]: messages.customSelect
+  [CustomFieldType.SelectWithOptions]: messages.customSelect,
+  [CustomFieldType.Time]: messages.time,
+  [CustomFieldType.SelectWithDynamicOptions]:
+    messages.customSelectWithDynamicOptions
 }
 
 type IRouteProps = {
@@ -105,7 +108,8 @@ export const FormTools = ({
                 /* TODO */
                 disabled={
                   fieldType === CustomFieldType.Paragraph ||
-                  fieldType === CustomFieldType.Subsection
+                  fieldType === CustomFieldType.Subsection ||
+                  fieldType === CustomFieldType.SelectWithDynamicOptions
                 }
               >
                 {intl.formatMessage(buttonMessages.add)}

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -169,21 +169,23 @@ class SelectVitalEventView extends React.Component<
                   this.setState({ goTo: 'death', noEventSelectedError: false })
                 }
               />
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
+              {window.config.MARRIAGE_REGISTRATION && (
+                <RadioButton
+                  size="large"
+                  key="marriagevent"
+                  name="marriageevent"
+                  label={intl.formatMessage(constantsMessages.marriage)}
+                  value="marriage"
+                  id="select_marriage_event"
+                  selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+                  onChange={() =>
+                    this.setState({
+                      goTo: 'marriage',
+                      noEventSelectedError: false
+                    })
+                  }
+                />
+              )}
             </Actions>
             <PrimaryButton id="continue" onClick={this.handleContinue}>
               {intl.formatMessage(buttonMessages.continueButton)}

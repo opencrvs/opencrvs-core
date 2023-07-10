@@ -112,7 +112,7 @@ import {
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
 import {
@@ -167,7 +167,7 @@ export const RequiredField = styled.span`
   }
 `
 
-export const ErrorField = styled.p`
+const ErrorField = styled.p`
   margin-top: 0;
   margin-bottom: 0;
 `
@@ -601,6 +601,8 @@ const renderValue = (
   if (typeof value === 'string' || typeof value === 'number') {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : field.unit
+      ? String(value).concat(intl.formatMessage(field.unit))
       : value
   }
 

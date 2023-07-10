@@ -28,7 +28,7 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   LANG_EN,
@@ -58,7 +58,6 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -68,7 +67,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
@@ -86,6 +84,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -492,8 +491,8 @@ function UserListComponent(props: IProps) {
     const userName =
       (user &&
         user.name &&
-        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+        ((createNamesMap(user.name)[intl.locale] as string) ||
+          (createNamesMap(user.name)[LANG_EN] as string))) ||
       ''
     return userName
   }
@@ -560,12 +559,8 @@ function UserListComponent(props: IProps) {
             const name =
               (user &&
                 user.name &&
-                ((createNamesMap(user.name as GQLHumanName[])[
-                  intl.locale
-                ] as string) ||
-                  (createNamesMap(user.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string))) ||
+                ((createNamesMap(user.name)[intl.locale] as string) ||
+                  (createNamesMap(user.name)[LANG_EN] as string))) ||
               ''
             const role = intl.formatMessage({
               id: getUserRoleIntlKey(user.role._id)
@@ -800,7 +795,7 @@ function UserListComponent(props: IProps) {
               {intl.formatMessage(messages.resetUserPasswordModalMessage, {
                 deliveryMethod,
                 recipient:
-                  deliveryMethod == 'sms'
+                  deliveryMethod === 'sms'
                     ? toggleResetPassword.selectedUser?.mobile
                     : toggleResetPassword.selectedUser?.email
               })}
@@ -853,7 +848,9 @@ function UserListComponent(props: IProps) {
               <Content
                 title={
                   !loading && !error
-                    ? searchedLocation?.name || ''
+                    ? searchedLocation
+                      ? getLocalizedLocationName(intl, searchedLocation)
+                      : ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
@@ -879,7 +876,9 @@ function UserListComponent(props: IProps) {
                 ) : (
                   <>
                     <Header id="header">
-                      {(searchedLocation && searchedLocation.name) || ''}
+                      {(searchedLocation &&
+                        getLocalizedLocationName(intl, searchedLocation)) ||
+                        ''}
                     </Header>
                     <LocationInfo>
                       {searchedLocation && (

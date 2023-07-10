@@ -14,7 +14,7 @@ import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
@@ -41,7 +41,7 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {

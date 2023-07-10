@@ -273,7 +273,7 @@ const AdvanceSearchParameters = new Schema(
 
 const SearchesSchema = new Schema(
   {
-    searchId: { type: String, required: true, unique: true },
+    searchId: { type: String, required: true },
     name: { type: String, required: true },
     parameters: { type: AdvanceSearchParameters, required: true }
   },
