@@ -201,6 +201,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          alias
         }
         system {
           name
@@ -465,6 +466,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         office {
           id
           name
+          alias
         }
         system {
           name
