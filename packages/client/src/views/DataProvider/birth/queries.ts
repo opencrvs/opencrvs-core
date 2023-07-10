@@ -213,6 +213,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          alias
           address {
             state
             district
@@ -484,6 +485,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         office {
           id
           name
+          alias
           address {
             state
             district
