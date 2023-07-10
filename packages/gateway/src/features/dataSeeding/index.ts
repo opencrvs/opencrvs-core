@@ -21,10 +21,12 @@ import {
   GQLSystemRoleInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { seedCertificate } from './certificateSeeding'
 import { v4 as uuid } from 'uuid'
-import { generateStatisticalExtensions } from '@gateway/features/restLocation/utils'
+import {
+  composeFhirLocation,
+  generateStatisticalExtensions
+} from '@gateway/features/restLocation/utils'
 import { fetchFromHearth } from '@gateway/features/fhir/utils'
 
 async function getToken(): Promise<string> {
@@ -153,64 +155,25 @@ function buildLocationBundle(locations: LocationResponse[]): fhir.Bundle {
   return {
     resourceType: 'Bundle',
     type: 'document',
-    entry: locations.map(
-      (location): fhir.BundleEntry => ({
-        fullUrl: locationsMap.get(location.statisticalID)!.uid,
-        resource: {
-          resourceType: 'Location',
-          identifier: [
-            {
-              system: `${OPENCRVS_SPECIFICATION_URL}id/${
-                location.code === 'ADMIN_STRUCTURE'
-                  ? 'statistical-code'
-                  : 'internal-id'
-              }`,
-              value: `${location.code}_${location.statisticalID}`
-            },
-            ...(location.jurisdictionType
-              ? [
-                  {
-                    system: `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`,
-                    value: location.jurisdictionType
-                  }
-                ]
-              : [])
-          ],
-          name: location.name,
-          ...(location.code === 'ADMIN_STRUCTURE' && {
-            description: location.statisticalID
-          }),
-          alias: [location.alias],
-          status: 'active',
-          mode: 'instance',
-          partOf: {
-            // partOf is either statisticalID of another location or 'Location/0'
-            reference:
-              locationsMap.get(location.partOf.split('/')[1])?.uid ??
-              location.partOf
-          },
-          type: {
-            coding: [
-              {
-                system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
-                code: location.code
-              }
-            ]
-          },
-          physicalType: {
-            coding: [
-              {
-                code: location.physicalType === 'Jurisdiction' ? 'jdn' : 'bu',
-                display: location.physicalType
-              }
-            ]
-          },
-          ...(location.statistics && {
-            extension: generateStatisticalExtensions(location.statistics)
-          })
-        }
-      })
-    )
+    entry: locations
+      .map((location) => ({
+        ...location,
+        // partOf is either Location/{statisticalID} of another location or 'Location/0'
+        partOf:
+          locationsMap.get(location.partOf.split('/')[1])?.uid ??
+          location.partOf
+      }))
+      .map(
+        (location): fhir.BundleEntry => ({
+          fullUrl: locationsMap.get(location.statisticalID)!.uid,
+          resource: {
+            ...composeFhirLocation(location),
+            ...(location.statistics && {
+              extension: generateStatisticalExtensions(location.statistics)
+            })
+          }
+        })
+      )
   }
 }
 
