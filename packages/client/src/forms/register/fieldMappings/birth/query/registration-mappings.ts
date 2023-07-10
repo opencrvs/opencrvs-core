@@ -594,3 +594,19 @@ export const QRCodeTransformerTransformer = async (
       )}`
     )
 }
+
+export const plainInputTransformerSection =
+  (fieldName: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    if (fieldName) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'informantType'
+      ] = queryData[sectionId][fieldName]
+    }
+  }
