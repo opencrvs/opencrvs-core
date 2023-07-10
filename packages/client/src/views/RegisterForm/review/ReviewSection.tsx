@@ -722,6 +722,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let selectOptions: SelectComponentOptions[] = []
     let documentOptions: SelectComponentOptions[] = []
     let uploadedDocuments: IFileValue[] = []
+
     const prepDocumentOption = this.prepSectionDocuments(draft)
     selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
     documentOptions = [
@@ -1873,7 +1874,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </DeclarationDataContainer>
                   )
                 })}
-
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}

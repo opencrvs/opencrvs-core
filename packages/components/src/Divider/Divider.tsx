@@ -15,3 +15,10 @@ export const Divider = styled.div`
   padding: 8px 0px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
+
+export const DividerVertical = styled.div`
+  background: ${({ theme }) => theme.colors.grey200};
+  width: 1px;
+  height: 100%;
+  min-height: 24px;
+`
