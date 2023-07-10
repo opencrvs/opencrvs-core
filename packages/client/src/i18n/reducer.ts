@@ -88,13 +88,13 @@ export const initLanguages = () => {
 
 const DEFAULT_MESSAGES = { default: 'default' }
 
-export const initialState: IntlState = {
+const initialState: IntlState = {
   language: getDefaultLanguage(),
   messages: DEFAULT_MESSAGES,
   languages: initLanguages()
 }
 
-export const formatLocationLanguageState = (
+const formatLocationLanguageState = (
   locations: ILocation[],
   languages: ILanguageState
 ): ILanguageState => {
@@ -117,7 +117,7 @@ export const formatLocationLanguageState = (
   return languages
 }
 
-export const formatRoleLanguageState = (
+const formatRoleLanguageState = (
   systemRoles: SystemRole[],
   languages: ILanguageState
 ): ILanguageState => {

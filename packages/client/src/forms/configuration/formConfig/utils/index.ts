@@ -160,7 +160,7 @@ export function generateConfigFields(
 ) {
   questions = questions.filter((question) => question.fieldId.startsWith(event))
 
-  return getConfiguredQuestions(event, defaultForm, questions)
+  const fields = getConfiguredQuestions(event, defaultForm, questions)
     .map((sectionQuestionConfigs) =>
       sectionQuestionConfigs
         .reduce<IConfigField[]>(
@@ -176,6 +176,13 @@ export function generateConfigFields(
           if (!index) return [currentConfigField]
           const previousConfigField = configFields[configFields.length - 1]
           if (
+            /**
+             *
+             * Bypass handle preview group for
+             * question config in case of custom question
+             *
+             */
+            !isCustomConfigField(currentConfigField) &&
             isPreviewGroupConfigField(previousConfigField) &&
             isPreviewGroupConfigField(currentConfigField) &&
             previousConfigField.previewGroup === currentConfigField.previewGroup
@@ -199,6 +206,8 @@ export function generateConfigFields(
         [sectionId]: sectionConfigFields
       }
     }, {})
+
+  return fields
 }
 
 function configFieldsToQuestionConfigs(
@@ -229,7 +238,7 @@ export function generateModifiedQuestionConfigs(
 ): QuestionInput[] {
   const questionConfigs = configFieldsToQuestionConfigs(configFields)
 
-  return questionConfigs
+  const fields = questionConfigs
     .filter((questionConfig) => {
       if (isDefaultQuestionConfig(questionConfig)) {
         return hasDefaultFieldChanged(questionConfig, defaultRegisterForm)
@@ -245,4 +254,6 @@ export function generateModifiedQuestionConfigs(
       delete questionConfig.options
       return questionConfig as QuestionInput
     })
+
+  return fields as QuestionInput[]
 }

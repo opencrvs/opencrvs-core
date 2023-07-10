@@ -49,7 +49,7 @@ interface INameFields {
   [language: string]: INameField
 }
 
-export interface ICertificateCorrectorField {
+interface ICertificateCorrectorField {
   identifierTypeField: string
   identifierOtherTypeField: string
   identifierField: string

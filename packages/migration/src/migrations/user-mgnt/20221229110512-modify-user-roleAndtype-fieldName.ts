@@ -106,7 +106,58 @@ const UserRolesIndex = {
   NATIONAL_SYSTEM_ADMIN: 4,
   PERFORMANCE_MANAGEMENT: 5,
   NATIONAL_REGISTRAR: 6
-}
+} as const
+
+const DEFAULT_SYSTEM_ROLES = [
+  {
+    title: 'Field Agent',
+    value: 'FIELD_AGENT',
+    roles: ['FIELD_AGENT'],
+    active: true
+  },
+
+  {
+    title: 'Registration Agent',
+    value: 'REGISTRATION_AGENT',
+    roles: ['REGISTRATION_AGENT'],
+    active: true
+  },
+
+  {
+    title: 'Registrar',
+    value: 'LOCAL_REGISTRAR',
+    roles: ['LOCAL_REGISTRAR'],
+    active: true
+  },
+
+  {
+    title: 'System admin (local)',
+    value: 'LOCAL_SYSTEM_ADMIN',
+    roles: ['LOCAL_SYSTEM_ADMIN'],
+    active: true
+  },
+
+  {
+    title: 'System admin (national)',
+    value: 'NATIONAL_SYSTEM_ADMIN',
+    roles: ['NATIONAL_SYSTEM_ADMIN'],
+    active: true
+  },
+
+  {
+    title: 'Performance Management',
+    value: 'PERFORMANCE_MANAGEMENT',
+    roles: ['PERFORMANCE_MANAGEMENT'],
+    active: true
+  },
+
+  {
+    title: 'National Registrar',
+    value: 'NATIONAL_REGISTRAR',
+    roles: ['NATIONAL_REGISTRAR'],
+    active: true
+  }
+] as const
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
@@ -176,27 +227,49 @@ export const up = async (db: Db, client: MongoClient) => {
 
     /* ==============Migration for "roles" Collection============== */
 
-    for await (const role of db.collection('roles').find()) {
-      await db.collection('roles').updateOne(
-        { _id: role._id },
-        {
-          $set: {
-            types: [
-              userRolesResult.insertedIds[
-                UserRolesIndex[role.value as keyof typeof UserRolesIndex]
+    const allCollections = await db.listCollections().toArray()
+
+    const rolesCollectionExists = allCollections.find(
+      ({ name }) => name === 'roles'
+    )
+    if (rolesCollectionExists) {
+      for await (const role of db.collection('roles').find()) {
+        await db.collection('roles').updateOne(
+          { _id: role._id },
+          {
+            $set: {
+              types: [
+                userRolesResult.insertedIds[
+                  UserRolesIndex[role.value as keyof typeof UserRolesIndex]
+                ]
               ]
-            ]
+            }
           }
-        }
-      )
-    }
-    //rename 'types' field to 'roles' for all 'roles' collection documents
-    await db.collection('roles').updateMany({}, { $rename: { types: 'roles' } })
-    //remove 'title' field from all 'roles' collection documents
-    await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
-    //rename 'roles' collection name to 'systemroles'
-    if ((await db.listCollections({ name: 'roles' }).toArray()).length == 1) {
+        )
+      }
+      //rename 'types' field to 'roles' for all 'roles' collection documents
+      await db
+        .collection('roles')
+        .updateMany({}, { $rename: { types: 'roles' } })
+      //remove 'title' field from all 'roles' collection documents
+      await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
+      //rename 'roles' collection name to 'systemroles'
       await db.collection('roles').rename('systemroles')
+    } else {
+      //create a new 'systemroles' collection
+      await db.createCollection('systemroles')
+
+      //insert all system roles to 'systemroles' collection
+      await db.collection('systemroles').insertMany(
+        DEFAULT_SYSTEM_ROLES.map((systemRole) => ({
+          ...systemRole,
+          roles: systemRole.roles.map(
+            (role) => userRolesResult.insertedIds[UserRolesIndex[role]]
+          ),
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString()
+        }))
+      )
     }
   } finally {
     await session.endSession()

@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   injectIntl,
   WrappedComponentProps as IntlShapeProps,
