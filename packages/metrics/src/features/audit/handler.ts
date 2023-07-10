@@ -34,7 +34,7 @@ export async function newAuditHandler(
     let practitionerId
     if (payload.practitionerId) {
       practitionerId = payload.practitionerId!
-    } else {
+    } else if (request.headers.authorization) {
       const userId = getClientIdFromToken(request.headers.authorization)
       const user = await getUser(userId, {
         Authorization: request.headers.authorization
