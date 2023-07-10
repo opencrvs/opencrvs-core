@@ -87,6 +87,11 @@ workbox.routing.registerRoute(
   /http(.+)config\.js$/,
   new workbox.strategies.NetworkFirst()
 )
+// This caches validations fetched from country config
+workbox.routing.registerRoute(
+  /http(.+)validation\.js$/,
+  new workbox.strategies.NetworkFirst()
+)
 // This caches config fetched from the config microservice
 workbox.routing.registerRoute(
   /http(.+)config$/,

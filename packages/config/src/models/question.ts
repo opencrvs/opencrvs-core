@@ -11,6 +11,8 @@
  */
 import { Document, model, Schema } from 'mongoose'
 
+// keeping these models to migrate from v1.2 to v1.3
+
 export enum FieldType {
   TEXT = 'TEXT',
   TEL = 'TEL',

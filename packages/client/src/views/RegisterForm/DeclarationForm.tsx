@@ -23,7 +23,7 @@ import {
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
-import { IForm, MarriageSection } from '@client/forms'
+import { IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Redirect } from 'react-router'

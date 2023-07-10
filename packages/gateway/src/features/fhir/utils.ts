@@ -960,7 +960,7 @@ export async function setCertificateCollector(
     if (!certificate) return
     if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
       certificate.collector = {
-        individual: { name },
+        name,
         relationship: 'PRINT_IN_ADVANCE',
         otherRelationship: role
       }

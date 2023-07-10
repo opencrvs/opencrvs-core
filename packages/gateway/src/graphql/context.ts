@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 /* eslint-disable import/no-relative-parent-imports */
+import PatientAPI from '@gateway/features/fhir/patientAPI'
 import { IAuthHeader } from '../common-types'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
@@ -20,6 +21,7 @@ export interface Context {
   dataSources: {
     locationsAPI: LocationsAPI
     practitionerRoleAPI: PractitionerRoleAPI
+    patientAPI: PatientAPI
   }
   headers: IAuthHeader
 }

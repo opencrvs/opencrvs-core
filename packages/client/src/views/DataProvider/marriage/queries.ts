@@ -87,36 +87,32 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       witnessTwo {
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       registration {
@@ -258,17 +254,15 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -352,36 +346,32 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       witnessTwo {
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       registration {
@@ -523,17 +513,16 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }

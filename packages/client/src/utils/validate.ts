@@ -23,12 +23,15 @@ import {
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
-import { isArray } from 'util'
 import { NATIONAL_ID } from '@client/forms/identity'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
+
+/**
+ * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
+ */
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -97,7 +100,7 @@ export const required =
     if (typeof value === 'string') {
       return value !== '' ? undefined : { message }
     }
-    if (isArray(value)) {
+    if (Array.isArray(value)) {
       return value.length > 0 ? undefined : { message }
     }
     return value !== undefined && value !== null ? undefined : { message }

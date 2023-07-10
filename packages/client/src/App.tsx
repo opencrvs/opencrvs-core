@@ -22,7 +22,6 @@ import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { useApolloClient } from '@client/utils/apolloClient'
-import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -53,7 +52,6 @@ import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
@@ -140,18 +138,7 @@ export function App(props: IAppProps) {
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
                                             />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.EVENT_INFO}
-                                              component={EventInfo}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.SELECT_BIRTH_INFORMANT
-                                              }
-                                              component={DeclarationForm}
-                                            />
+
                                             <ProtectedRoute
                                               exact
                                               path={
@@ -318,16 +305,6 @@ export function App(props: IAppProps) {
                                               ]}
                                               path={routes.USER_ROLES_CONFIG}
                                               component={UserRoles}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_WIZARD}
-                                              component={FormConfigWizard}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={routes.FORM_CONFIG_HOME}
-                                              component={FormConfigHome}
                                             />
                                             <ProtectedRoute
                                               path={
