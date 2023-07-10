@@ -35,6 +35,8 @@ export const COUNTRY_CONFIG_URL =
 export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
+export const CONFIG_MONGO_URL =
+  process.env.CONFIG_MONGO_URL || 'mongodb://localhost/application-config'
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false

@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import { COUNTRY_CONFIG_URL, CONFIG_MONGO_URL } from '@gateway/constants'
+import * as mongoose from 'mongoose'
+import Config, {
+  IApplicationConfigurationModel
+} from '@gateway/features/application/model/config'
 
 import fetch from 'node-fetch'
 
@@ -23,6 +27,31 @@ async function getApplicationConfig() {
   return res.json()
 }
 
-export async function seedApplicationConfig(token: string) {
-  await getApplicationConfig()
+async function populateAppConfig(appConfig: IApplicationConfigurationModel) {
+  mongoose.connect(CONFIG_MONGO_URL)
+
+  try {
+    const defaultConfig = new Config(appConfig)
+    const configs = [defaultConfig]
+    const onInsert = (err: any, values: any) => {
+      if (!err) {
+        mongoose.disconnect()
+      } else {
+        throw Error(
+          `Cannot save ${JSON.stringify(
+            values
+          )} to declaration config db ... ${err}`
+        )
+      }
+    }
+    Config.collection.insertMany(configs, onInsert)
+  } catch (err) {
+    throw new Error(err)
+  }
+  return true
+}
+
+export async function seedApplicationConfig() {
+  const appConfig = await getApplicationConfig()
+  populateAppConfig(appConfig)
 }

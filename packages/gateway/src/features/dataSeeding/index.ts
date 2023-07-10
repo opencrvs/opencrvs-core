@@ -36,6 +36,6 @@ async function getToken(): Promise<string> {
 }
 
 export async function seedData() {
-  const token = await getToken()
-  seedApplicationConfig(token)
+  await getToken()
+  await seedApplicationConfig()
 }
