@@ -67,6 +67,7 @@ export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
+export const DIVIDER = 'DIVIDER'
 
 export enum Sort {
   ASC = 'asc',
@@ -1156,6 +1157,10 @@ export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
   labelForOffline: string
 }
 
+export interface I18nDividerField extends Ii18nFormFieldBase {
+  type: typeof DIVIDER
+}
+
 export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
@@ -1188,6 +1193,7 @@ export type Ii18nFormField =
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
   | Ii18nNidVerificationButtonField
+  | I18nDividerField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

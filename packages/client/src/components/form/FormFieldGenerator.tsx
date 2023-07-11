@@ -85,7 +85,8 @@ import {
   IDateRangePickerValue,
   TIME,
   NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  INidVerificationButton,
+  DIVIDER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -141,7 +142,7 @@ import {
 } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
-import { BulletList } from '@opencrvs/components'
+import { BulletList, Divider } from '@opencrvs/components'
 import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
 
 const fadeIn = keyframes`
@@ -474,6 +475,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           />
         </InputField>
       )
+    }
+    if (fieldDefinition.type === DIVIDER) {
+      return <Divider />
     }
     if (fieldDefinition.type === SUBSECTION) {
       return (
