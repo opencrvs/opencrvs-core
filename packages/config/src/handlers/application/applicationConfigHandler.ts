@@ -14,12 +14,14 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config'
 import { logger } from '@config/config/logger'
-import { badRequest, internal } from '@hapi/boom'
+import { internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
 import { getDocumentUrl } from '@config/services/documents'
+import { COUNTRY_CONFIG_URL } from '@config/config/constants'
+import fetch from 'node-fetch'
 
 export default async function configHandler(
   request: Hapi.Request,
@@ -51,30 +53,34 @@ export default async function configHandler(
   }
 }
 
+async function getConfigFromCountry() {
+  const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the aplication config from ${url}`)
+  }
+  return res.json()
+}
+
 export async function getApplicationConfig(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let applicationConfig: IApplicationConfigurationModel | null
+  const configFromCountryConfig = await getConfigFromCountry()
   try {
-    applicationConfig = await ApplicationConfig.findOne({})
+    const confingFromDB = await ApplicationConfig.findOne({})
+    const finalConfig = merge(configFromCountryConfig, confingFromDB)
+    return finalConfig
   } catch (error) {
     throw internal(error.message)
   }
-  return applicationConfig
 }
 
 export async function getLoginConfigHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let loginConfig: IApplicationConfigurationModel | null
-  try {
-    loginConfig = await ApplicationConfig.findOne({})
-  } catch (error) {
-    throw internal(error.message)
-  }
-  const refineConfigResponse = pick(loginConfig, [
+  const refineConfigResponse = pick(await getApplicationConfig(request, h), [
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
     'PHONE_NUMBER_PATTERN',
@@ -89,19 +95,12 @@ export async function updateApplicationConfigHandler(
 ) {
   try {
     const applicationConfig = request.payload as IApplicationConfigurationModel
-    const existingApplicationConfig: IApplicationConfigurationModel | null =
-      await ApplicationConfig.findOne({})
-    if (!existingApplicationConfig) {
-      throw badRequest('No existing application config found')
-    }
-    // Update existing application config fields
-    merge(existingApplicationConfig, applicationConfig)
-
-    await ApplicationConfig.update(
-      { _id: existingApplicationConfig._id },
-      existingApplicationConfig
+    const res = await ApplicationConfig.updateOne(
+      {},
+      { $set: applicationConfig },
+      { upsert: true }
     )
-    return h.response(existingApplicationConfig).code(201)
+    return h.response(res).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
