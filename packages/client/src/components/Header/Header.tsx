@@ -72,9 +72,12 @@ import {
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { IForm } from '@client/forms'
 
 type IStateProps = {
   userDetails: UserDetails | null
+  registerForm: { birth: IForm; death: IForm; marriage: IForm }
   language: string
 }
 
@@ -324,7 +327,22 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
+  getFieldNames = (forms: IForm[]) => {
+    const fieldNames = []
+    for (const form in forms) {
+      for (const section of forms[form].sections) {
+        for (const group of section.groups) {
+          for (const field of group.fields) {
+            fieldNames.push(field.name)
+          }
+        }
+      }
+    }
+    return fieldNames
+  }
+
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
+    const fieldNames = this.getFieldNames(props.registerForm)
     const { intl, searchText, selectedSearchType, language } = props
 
     const searchTypeList: ISearchType[] = [
@@ -342,24 +360,30 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
-        label: intl.formatMessage(messages.nationalId),
-        value: NATIONAL_ID_TEXT,
-        icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
-      },
-      {
-        label: intl.formatMessage(messages.typePhone),
-        value: PHONE_TEXT,
-        icon: <Icon name="Phone" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
-      },
-      {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
+
+    if (fieldNames.includes('registrationPhone')) {
+      searchTypeList.splice(3, 0, {
+        label: intl.formatMessage(messages.typePhone),
+        value: PHONE_TEXT,
+        icon: <Icon name="Phone" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
+      })
+    }
+    if (fieldNames.includes('iD')) {
+      searchTypeList.splice(2, 0, {
+        label: intl.formatMessage(messages.nationalId),
+        value: NATIONAL_ID_TEXT,
+        icon: <Icon name="IdentificationCard" size="small" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+      })
+    }
+
     const navigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
@@ -546,7 +570,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    registerForm: getRegisterForm(store)
   }),
   {
     redirectToAuthentication,
