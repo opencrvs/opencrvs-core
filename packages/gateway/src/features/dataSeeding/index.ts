@@ -90,12 +90,11 @@ type RoleResponse = {
 }
 
 type LocationResponse = {
-  statisticalID: string
+  id: string
   name: string
   alias: string
   partOf: string
-  code: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
-  physicalType: 'Jurisdiction' | 'Building'
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
   jurisdictionType?:
     | 'STATE'
     | 'DISTRICT'
@@ -151,7 +150,7 @@ async function buildLocationBundle(
 ): Promise<fhir.Bundle> {
   const locationsMap = new Map(
     locations.map((location) => [
-      location.statisticalID,
+      location.id,
       { ...location, uid: `urn:uuid:${uuid()}` }
     ])
   )
@@ -180,9 +179,13 @@ async function buildLocationBundle(
     resourceType: 'Bundle',
     type: 'document',
     entry: locations
-      .filter((location) => !savedLocationsSet.has(location.statisticalID))
+      .filter((location) => !savedLocationsSet.has(location.id))
       .map((location) => ({
         ...location,
+        // statisticalID & code are legacy properties and need to be renamed
+        // to id & locationType
+        statisticalID: location.id,
+        code: location.locationType,
         // partOf is either Location/{statisticalID} of another location or 'Location/0'
         partOf:
           locationsMap.get(location.partOf.split('/')[1])?.uid ??
@@ -190,7 +193,7 @@ async function buildLocationBundle(
       }))
       .map(
         (location): fhir.BundleEntry => ({
-          fullUrl: locationsMap.get(location.statisticalID)!.uid,
+          fullUrl: locationsMap.get(location.id)!.uid,
           resource: {
             ...composeFhirLocation(location),
             ...(location.statistics && {
