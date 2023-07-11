@@ -18,7 +18,7 @@ import {
   findExtension
 } from '@gateway/features/fhir/utils'
 import { Code } from '@gateway/features/restLocation/locationHandler'
-import * as lookup from 'country-code-lookup'
+// import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
@@ -243,9 +243,7 @@ export function getResourceByType<T = fhir.Resource>(
 }
 
 export async function validateLocationLevelsAndCountry(address: fhir.Address) {
-  const isCountryValid =
-    address.country === 'FAR' ||
-    (address?.country && lookup.byIso(address?.country))
+  const isCountryValid = address.country === 'FAR'
 
   if (!isCountryValid) {
     throw BoomErrorWithCustomMessage(

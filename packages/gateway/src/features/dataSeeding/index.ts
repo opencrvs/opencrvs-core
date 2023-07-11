@@ -129,5 +129,5 @@ export async function seedData() {
   )
   console.log(res)
   seedCertificate(token)
-  await seedApplicationConfig()
+  await seedApplicationConfig(token)
 }

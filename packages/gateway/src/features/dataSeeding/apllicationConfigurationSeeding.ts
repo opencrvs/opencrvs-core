@@ -10,13 +10,75 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { COUNTRY_CONFIG_URL, CONFIG_MONGO_URL } from '@gateway/constants'
-import * as mongoose from 'mongoose'
-import Config, {
-  IApplicationConfigurationModel
-} from '@gateway/features/application/model/config'
+import { COUNTRY_CONFIG_URL, APPLICATION_CONFIG_URL } from '@gateway/constants'
 
 import fetch from 'node-fetch'
+
+interface IBirth {
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
+  }
+  PRINT_IN_ADVANCE: boolean
+}
+interface IDeath {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+  PRINT_IN_ADVANCE: boolean
+}
+interface IMarriage {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+  PRINT_IN_ADVANCE: boolean
+}
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
+
+interface ICountryLogo {
+  fileName: string
+  file: string
+}
+
+interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
+
+export interface IApplicationConfigurationModel extends Document {
+  APPLICATION_NAME: string
+  BIRTH: IBirth
+  COUNTRY_LOGO: ICountryLogo
+  CURRENCY: ICurrency
+  DEATH: IDeath
+  MARRIAGE: IMarriage
+  MARRIAGE_REGISTRATION: boolean
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  DECLARATION_AUDIT_LOCATIONS: string
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  PHONE_NUMBER_PATTERN: RegExp
+  NID_NUMBER_PATTERN: string
+  ADDRESSES: number
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
+  ADMIN_LEVELS: number
+  LOGIN_BACKGROUND: ILoginBackground
+}
 
 async function getApplicationConfig() {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
@@ -27,31 +89,24 @@ async function getApplicationConfig() {
   return res.json()
 }
 
-async function populateAppConfig(appConfig: IApplicationConfigurationModel) {
-  mongoose.connect(CONFIG_MONGO_URL)
-
-  try {
-    const defaultConfig = new Config(appConfig)
-    const configs = [defaultConfig]
-    const onInsert = (err: any, values: any) => {
-      if (!err) {
-        mongoose.disconnect()
-      } else {
-        throw Error(
-          `Cannot save ${JSON.stringify(
-            values
-          )} to declaration config db ... ${err}`
-        )
-      }
+async function populateAppConfig(
+  appConfig: IApplicationConfigurationModel,
+  token: string
+) {
+  const res = await fetch(`${APPLICATION_CONFIG_URL}createApplicationConfig`, {
+    method: 'POST',
+    body: JSON.stringify(appConfig),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
     }
-    Config.collection.insertMany(configs, onInsert)
-  } catch (err) {
-    throw new Error(err)
-  }
-  return true
+  })
+
+  return res.json()
 }
 
-export async function seedApplicationConfig() {
+export async function seedApplicationConfig(token: string) {
   const appConfig = await getApplicationConfig()
-  populateAppConfig(appConfig)
+  const res = await populateAppConfig(appConfig, token)
+  console.log(JSON.stringify(res))
 }

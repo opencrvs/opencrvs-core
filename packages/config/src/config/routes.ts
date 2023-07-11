@@ -20,8 +20,9 @@ import {
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
+  createOrUpdateApplicationConfig,
+  createApplicationConfigHandler,
   getLoginConfigHandler,
-  updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createInformantSMSNotificationHandler, {
@@ -203,7 +204,22 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: updateApplicationConfig
+          payload: createOrUpdateApplicationConfig
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createApplicationConfig',
+      handler: createApplicationConfigHandler,
+      config: {
+        tags: ['api'],
+        description: 'Creates a Config',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: createOrUpdateApplicationConfig
         }
       }
     },

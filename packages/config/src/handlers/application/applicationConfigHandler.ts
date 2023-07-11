@@ -109,7 +109,22 @@ export async function updateApplicationConfigHandler(
   }
 }
 
-export const updateApplicationConfig = Joi.object({
+export async function createApplicationConfigHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const applicationConfig = request.payload as IApplicationConfigurationModel
+    await ApplicationConfig.insertMany(applicationConfig)
+    return h.response(applicationConfig).code(201)
+  } catch (err) {
+    logger.error(err)
+    // return 400 if there is a validation error when saving to mongo
+    return h.response().code(400)
+  }
+}
+
+export const createOrUpdateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
   BIRTH: Joi.object().keys({
     REGISTRATION_TARGET: Joi.number(),
@@ -145,14 +160,14 @@ export const updateApplicationConfig = Joi.object({
     },
     PRINT_IN_ADVANCE: Joi.boolean()
   }),
+  MARRIAGE_REGISTRATION: Joi.boolean(),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
+  DECLARATION_AUDIT_LOCATIONS: Joi.string(),
   HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   HIDE_DEATH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
   PHONE_NUMBER_PATTERN: Joi.string(),
-  BIRTH_REGISTRATION_TARGET: Joi.number(),
-  DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2]),
   INFORMANT_SIGNATURE: Joi.boolean(),
