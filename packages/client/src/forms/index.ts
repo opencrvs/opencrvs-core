@@ -68,6 +68,7 @@ export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
+export const HEADING3 = 'HEADING3'
 
 export enum Sort {
   ASC = 'asc',
@@ -1161,6 +1162,10 @@ export interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
 }
 
+export interface I18nHeadin3Field extends Ii18nFormFieldBase {
+  type: typeof HEADING3
+}
+
 export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
@@ -1194,6 +1199,7 @@ export type Ii18nFormField =
   | Ii18nTimeFormField
   | Ii18nNidVerificationButtonField
   | I18nDividerField
+  | I18nHeadin3Field
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

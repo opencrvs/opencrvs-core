@@ -86,7 +86,8 @@ import {
   TIME,
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
-  DIVIDER
+  DIVIDER,
+  HEADING3
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -478,6 +479,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === DIVIDER) {
       return <Divider />
+    }
+    if (fieldDefinition.type === HEADING3) {
+      return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === SUBSECTION) {
       return (
