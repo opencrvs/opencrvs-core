@@ -11,8 +11,12 @@
  */
 import * as React from 'react'
 import { FormikTouched, FormikValues } from 'formik'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  useIntl
+} from 'react-intl'
+import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
@@ -21,9 +25,8 @@ import {
   TertiaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { Duplicate } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import {
-  FixedEventTopBar,
   IEventTopBarProps,
   IEventTopBarMenuAction
 } from '@opencrvs/components/lib/EventTopBar'
@@ -74,7 +77,7 @@ import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
@@ -107,6 +110,7 @@ import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
+import { ToggleMenu } from '@client/../../components/lib'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -203,6 +207,137 @@ function getDeclarationIconColor(declaration: IDeclaration): string {
     : declaration.registrationStatus
     ? STATUSTOCOLOR[declaration.registrationStatus]
     : 'orange'
+}
+
+function FormAppBar({
+  section,
+  declaration,
+  duplicate
+}: {
+  duplicate: boolean | undefined
+  section: IFormSection
+  declaration: IDeclaration
+}) {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  // we can compare the values from formik with declaration to
+  // see if the data has been altered or not
+  // section.id === 'preview' | 'review' should be treated as a
+  // special case where isDataAltered should always be false
+  // isDataAltered = !equal(values, declaration.data[section.id])
+  const getRedirectionTabOnSaveOrExit = () => {
+    const status =
+      declaration.submissionStatus || declaration.registrationStatus
+    switch (status) {
+      case 'DECLARED':
+        return WORKQUEUE_TABS.readyForReview
+      case 'DRAFT':
+        return WORKQUEUE_TABS.inProgress
+      case 'IN_PROGRESS':
+        return WORKQUEUE_TABS.inProgressFieldAgent
+      case 'REJECTED':
+        return WORKQUEUE_TABS.requiresUpdate
+      case 'VALIDATED':
+        return WORKQUEUE_TABS.readyForReview
+      default:
+        return WORKQUEUE_TABS.inProgress
+    }
+  }
+  const handleSaveAndExit = () => {
+    /*
+     * TODO: add modal logic here using useModal
+     * onSuccess: the declaration needs to be updated
+     * using values from formik. currently we change
+     * the declaration data on every change. what we
+     * can do is instead save the values from formik
+     * in an internal state which can be passed to this
+     * component to be used here
+     */
+    dispatch(writeDeclaration(declaration))
+    dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+  }
+
+  switch (section.viewType) {
+    case 'review':
+      return (
+        <AppBar
+          desktopLeft={
+            duplicate ? (
+              <Duplicate />
+            ) : (
+              <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+            )
+          }
+          desktopTitle={
+            duplicate
+              ? intl.formatMessage(duplicateMessages.duplicateReviewHeader, {
+                  event: declaration.event
+                })
+              : intl.formatMessage(messages.newVitalEventRegistration, {
+                  event: declaration.event
+                })
+          }
+          desktopRight={
+            <>
+              <Button type="primary" size="small" onClick={handleSaveAndExit}>
+                <Icon name="DownloadSimple" />
+                {intl.formatMessage(buttonMessages.saveExitButton)}
+              </Button>
+              <Button type="secondary" size="small">
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.exitButton)}
+              </Button>
+            </>
+          }
+        />
+      )
+    case 'preview':
+    case 'form':
+      return (
+        <AppBar
+          desktopLeft={
+            <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+          }
+          desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+            event: declaration.event
+          })}
+          desktopRight={
+            <>
+              <Button type="primary" size="small" onClick={handleSaveAndExit}>
+                <Icon name="DownloadSimple" />
+                {intl.formatMessage(buttonMessages.saveExitButton)}
+              </Button>
+              <Button type="secondary" size="small">
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.exitButton)}
+              </Button>
+              {declaration.submissionStatus === SUBMISSION_STATUS.DRAFT && (
+                <ToggleMenu
+                  id="eventToggleMenu"
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
+                  menuItems={[
+                    {
+                      label: intl.formatMessage(
+                        buttonMessages.deleteDeclaration
+                      ),
+                      // TODO: show delete confirmation modal
+                      handler: () => {}
+                    }
+                  ]}
+                />
+              )}
+            </>
+          }
+        />
+      )
+  }
+  return null
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
@@ -592,16 +727,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-    const menuItemDeleteOrClose =
-      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-        ? {
-            label: intl.formatMessage(buttonMessages.deleteDeclaration),
-            handler: () => this.toggleConfirmDeleteModalOpen()
-          }
-        : {
-            label: intl.formatMessage(buttonMessages.closeDeclaration),
-            handler: () => this.onCloseDeclaration()
-          }
     const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
     return (
       <>
@@ -611,7 +736,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         ></TimeMounted>
         <Frame
-          header={<AppBar title="OpenCRVS" />}
+          header={
+            <FormAppBar
+              declaration={declaration}
+              section={activeSection}
+              duplicate={duplicate}
+            />
+          }
           key={activeSection.id}
           skipToContentText={intl.formatMessage(
             constantsMessages.skipToMainContent
@@ -625,63 +756,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
           {!isErrorOccured && (
             <>
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                <>
-                  <FixedEventTopBar
-                    title={intl.formatMessage(
-                      messages.newVitalEventRegistration,
-                      {
-                        event: declaration.event
-                      }
-                    )}
-                    iconColor={getDeclarationIconColor(declaration)}
-                    saveAction={{
-                      handler: this.onSaveAsDraftClicked,
-                      label: intl.formatMessage(buttonMessages.save)
-                    }}
-                    menuItems={[menuItemDeleteOrClose]}
-                  />
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={declaration}
-                    submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyDeclaration}
-                  />
-                </>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={declaration}
+                  submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyDeclaration}
+                />
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
-                  {isCorrection(declaration) ? (
-                    <FixedEventTopBar
-                      {...this.getEventTopBarPropsForCorrection()}
-                    />
-                  ) : (
-                    <FixedEventTopBar
-                      title={
-                        duplicate
-                          ? intl.formatMessage(
-                              duplicateMessages.duplicateReviewHeader,
-                              {
-                                event: declaration.event
-                              }
-                            )
-                          : intl.formatMessage(
-                              messages.newVitalEventRegistration,
-                              {
-                                event: declaration.event
-                              }
-                            )
-                      }
-                      pageIcon={duplicate ? <Duplicate /> : undefined}
-                      iconColor={getDeclarationIconColor(declaration)}
-                      saveAction={{
-                        handler: () =>
-                          this.props.goToHomeTab(
-                            this.getRedirectionTabOnSaveOrExit()
-                          ),
-                        label: intl.formatMessage(buttonMessages.exitButton)
-                      }}
-                    />
-                  )}
                   {duplicate && (
                     <DuplicateFormTabs
                       declaration={declaration}
@@ -710,9 +793,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
-                  <FixedEventTopBar
-                    {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
-                  />
                   <Frame.LayoutForm>
                     <Frame.SectionFormBackAction>
                       <BackButtonContainer>
@@ -730,9 +810,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       <Content
                         size={ContentSize.NORMAL}
                         id="register_form"
-                        title={intl.formatMessage(
-                          activeSectionGroup.title || activeSection.title
-                        )}
+                        title={
+                          (activeSectionGroup.title &&
+                            intl.formatMessage(activeSectionGroup.title)) ??
+                          (activeSection.title &&
+                            intl.formatMessage(activeSection.title))
+                        }
                         showTitleOnMobile={true}
                         bottomActionButtons={
                           [
@@ -826,6 +909,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
                                 key={`${activeSection.id}-${activeSectionGroup.id}`}
                                 onChange={(values) => {
+                                  // TODO: instead of updating redux on every change
+                                  // we can save the changed values in a state
+                                  // which can then be used by FormAppBar
                                   debouncedModifyDeclaration(
                                     values,
                                     activeSection,
@@ -950,7 +1036,10 @@ function getValidSectionGroup(
   declaration: IDeclaration,
   sectionId: string,
   groupId?: string
-) {
+): {
+  activeSection: IFormSection
+  activeSectionGroup: IFormSectionGroup
+} {
   const currentSection = sectionId
     ? sections.find((sec) => sec.id === sectionId)
     : firstVisibleSection(sections)
