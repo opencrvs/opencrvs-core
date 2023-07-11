@@ -815,6 +815,16 @@ function createInformantShareContactNumber(
   })
 }
 
+function createInformantShareEmail(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+    valueString: fieldValue
+  })
+}
+
 function createInCompleteFieldListExt(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -2078,15 +2088,17 @@ export const builders: IFieldBuilders = {
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {
-          await setInformantReference(
+          setInformantReference(
             MOTHER_CODE,
+            MOTHER_TITLE,
             relatedPersonResource,
             fhirBundle,
             context
           )
         } else if (fieldValue === 'FATHER') {
-          await setInformantReference(
+          setInformantReference(
             FATHER_CODE,
+            FATHER_TITLE,
             relatedPersonResource,
             fhirBundle,
             context
@@ -2578,6 +2590,10 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
     },
+    email: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantShareEmail(taskResource, fieldValue)
+    },
     informantType: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2602,15 +2618,17 @@ export const builders: IFieldBuilders = {
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {
-          await setInformantReference(
+          setInformantReference(
             MOTHER_CODE,
+            MOTHER_TITLE,
             relatedPersonResource,
             fhirBundle,
             context
           )
         } else if (fieldValue === 'FATHER') {
-          await setInformantReference(
+          setInformantReference(
             FATHER_CODE,
+            FATHER_TITLE,
             relatedPersonResource,
             fhirBundle,
             context

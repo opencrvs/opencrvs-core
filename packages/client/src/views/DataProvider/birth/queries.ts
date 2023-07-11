@@ -140,6 +140,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        email
         duplicates {
           compositionId
           trackingId
@@ -421,6 +422,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        email
         informantsSignature
         informantsSignatureURI
         status {

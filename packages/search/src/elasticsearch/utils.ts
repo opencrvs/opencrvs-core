@@ -84,6 +84,7 @@ export interface ICompositionBody {
   type?: string
   contactRelationship?: string
   contactNumber?: string
+  email?: string
   dateOfDeclaration?: string
   trackingId?: string
   registrationNumber?: string

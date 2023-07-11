@@ -788,6 +788,13 @@ export const typeResolvers: GQLResolver = {
       )
       return (contactNumber && contactNumber.valueString) || null
     },
+    email: (task) => {
+      const email = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+        task.extension
+      )
+      return (email && email.valueString) || null
+    },
     paperFormID: (task) => {
       const foundIdentifier =
         task.identifier &&
