@@ -604,9 +604,8 @@ export const plainInputTransformerSection =
     targetSectionId?: string,
     targetFieldName?: string
   ) => {
-    if (fieldName) {
-      transformedData[targetSectionId || sectionId][
-        targetFieldName || 'informantType'
-      ] = queryData[sectionId][fieldName]
+    if (fieldName && targetFieldName) {
+      transformedData[targetSectionId || sectionId][targetFieldName] =
+        queryData[sectionId][fieldName]
     }
   }
