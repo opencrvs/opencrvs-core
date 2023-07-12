@@ -250,11 +250,20 @@ export const sectionFieldToBundleFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (transformedFieldName) {
-      transformedData[transformedFieldName] = draftData[sectionId][field.name]
-    } else {
-      transformedData[field.name] = draftData[sectionId][field.name]
+    const nestedFieldNames = transformedFieldName?.split('.') || []
+
+    let currentData = transformedData
+    for (let i = 0; i < nestedFieldNames.length - 1; i++) {
+      const nestedFieldName = nestedFieldNames[i]
+      if (!currentData[nestedFieldName]) {
+        currentData[nestedFieldName] = {}
+      }
+      currentData = currentData[nestedFieldName]
     }
+
+    const finalFieldName =
+      nestedFieldNames?.[nestedFieldNames.length - 1] || field.name
+    currentData[finalFieldName] = draftData[sectionId][field.name]
 
     return transformedData
   }

@@ -314,15 +314,13 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {

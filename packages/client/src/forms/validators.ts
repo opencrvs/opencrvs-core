@@ -15,7 +15,10 @@ import { AnyFn } from '@client/forms/mappings/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 
 export type Validator = Validation | AnyFn<Validation>
-export let validators: Record<string, Validator>
+export let validators: Record<string, Validator> = builtInValidators as Record<
+  string,
+  any
+>
 
 export async function initValidators() {
   const countryConfigValidators = await referenceApi.importValidators()

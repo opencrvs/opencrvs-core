@@ -815,6 +815,16 @@ function createInformantShareContactNumber(
   })
 }
 
+function createInformantShareEmail(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+    valueString: fieldValue
+  })
+}
+
 function createInCompleteFieldListExt(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -2054,68 +2064,6 @@ export const builders: IFieldBuilders = {
     ) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createEducationalAttainmentBuilder(person, fieldValue)
-    },
-    relationship: async (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-      if (fieldValue !== 'OTHER') {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: fieldValue
-            }
-          ]
-        }
-      }
-      if (context.event === EVENT_TYPE.BIRTH) {
-        if (fieldValue === 'MOTHER') {
-          await setInformantReference(
-            MOTHER_CODE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        } else if (fieldValue === 'FATHER') {
-          await setInformantReference(
-            FATHER_CODE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        }
-      }
-    },
-    otherRelationship: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-      if (!relatedPersonResource.relationship) {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: 'OTHER'
-            }
-          ]
-        }
-      }
-      relatedPersonResource.relationship.text = fieldValue
     }
   },
   bride: {
@@ -2578,6 +2526,14 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
     },
+    contactEmail: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantShareEmail(taskResource, fieldValue)
+    },
     informantType: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2602,15 +2558,33 @@ export const builders: IFieldBuilders = {
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {
-          await setInformantReference(
+          setInformantReference(
             MOTHER_CODE,
+            MOTHER_TITLE,
             relatedPersonResource,
             fhirBundle,
             context
           )
         } else if (fieldValue === 'FATHER') {
-          await setInformantReference(
+          setInformantReference(
             FATHER_CODE,
+            FATHER_TITLE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'BRIDE') {
+          setInformantReference(
+            BRIDE_CODE,
+            BRIDE_TITLE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'GROOM') {
+          setInformantReference(
+            GROOM_CODE,
+            GROOM_TITLE,
             relatedPersonResource,
             fhirBundle,
             context

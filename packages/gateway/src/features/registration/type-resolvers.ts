@@ -305,7 +305,7 @@ export const typeResolvers: GQLResolver = {
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-        person.extension
+        person?.extension
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
@@ -317,7 +317,7 @@ export const typeResolvers: GQLResolver = {
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
-        person.extension
+        person?.extension
       )
       return (marriageExtension && marriageExtension.valueString) || null
     },
@@ -345,7 +345,7 @@ export const typeResolvers: GQLResolver = {
       )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-        person.extension
+        person?.extension
       )
       return (occupationExtension && occupationExtension.valueString) || null
     },
@@ -361,7 +361,7 @@ export const typeResolvers: GQLResolver = {
       )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-        person.extension
+        person?.extension
       )
       return (
         (reasonNotApplyingExtension &&
@@ -381,7 +381,7 @@ export const typeResolvers: GQLResolver = {
       )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person.extension
+        person?.extension
       )
       return (
         (ageOfIndividualInYearsExtension &&
@@ -401,7 +401,7 @@ export const typeResolvers: GQLResolver = {
       )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person.extension
+        person?.extension
       )
       return (
         (exactDateOfBirthUnknownExtension &&
@@ -419,7 +419,7 @@ export const typeResolvers: GQLResolver = {
         authHeader,
         dataSources
       )
-      return person.active
+      return person?.active
     },
     multipleBirth: async (
       relatedPerson,
@@ -431,7 +431,7 @@ export const typeResolvers: GQLResolver = {
         authHeader,
         dataSources
       )
-      return person.multipleBirthInteger
+      return person?.multipleBirthInteger
     },
     deceased: async (
       relatedPerson,
@@ -457,7 +457,7 @@ export const typeResolvers: GQLResolver = {
       )
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
-        person.extension
+        person?.extension
       )
       if (!nationalityExtension || !nationalityExtension.extension) {
         return null
@@ -493,13 +493,21 @@ export const typeResolvers: GQLResolver = {
       )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
-        person.extension
+        person?.extension
       )
       return (
         (educationalAttainmentExtension &&
           educationalAttainmentExtension.valueString) ||
         null
       )
+    },
+    address: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person?.address
     }
   },
   Deceased: {
@@ -779,6 +787,13 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       return (contactNumber && contactNumber.valueString) || null
+    },
+    contactEmail: (task) => {
+      const email = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+        task.extension
+      )
+      return (email && email.valueString) || null
     },
     paperFormID: (task) => {
       const foundIdentifier =
