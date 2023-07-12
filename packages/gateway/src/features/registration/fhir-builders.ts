@@ -2064,70 +2064,6 @@ export const builders: IFieldBuilders = {
     ) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createEducationalAttainmentBuilder(person, fieldValue)
-    },
-    relationship: async (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-      if (fieldValue !== 'OTHER') {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: fieldValue
-            }
-          ]
-        }
-      }
-      if (context.event === EVENT_TYPE.BIRTH) {
-        if (fieldValue === 'MOTHER') {
-          setInformantReference(
-            MOTHER_CODE,
-            MOTHER_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        } else if (fieldValue === 'FATHER') {
-          setInformantReference(
-            FATHER_CODE,
-            FATHER_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        }
-      }
-    },
-    otherRelationship: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-      if (!relatedPersonResource.relationship) {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: 'OTHER'
-            }
-          ]
-        }
-      }
-      relatedPersonResource.relationship.text = fieldValue
     }
   },
   bride: {
@@ -2590,7 +2526,11 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
     },
-    email: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+    contactEmail: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareEmail(taskResource, fieldValue)
     },
@@ -2629,6 +2569,22 @@ export const builders: IFieldBuilders = {
           setInformantReference(
             FATHER_CODE,
             FATHER_TITLE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'BRIDE') {
+          setInformantReference(
+            BRIDE_CODE,
+            BRIDE_TITLE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'GROOM') {
+          setInformantReference(
+            GROOM_CODE,
+            GROOM_TITLE,
             relatedPersonResource,
             fhirBundle,
             context

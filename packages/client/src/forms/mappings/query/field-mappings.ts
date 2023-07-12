@@ -141,11 +141,7 @@ export const fieldValueSectionExchangeTransformer =
     sectionId: SectionId,
     field: IFormField
   ) => {
-    if (
-      queryData[sectionId] !== null &&
-      queryData[sectionId] !== undefined &&
-      queryData[sectionId] !== ''
-    ) {
+    if (Boolean(queryData[sectionId])) {
       transformedData[sectionId][field.name] =
         queryData[fromSectionId][fromSectionField]
     }

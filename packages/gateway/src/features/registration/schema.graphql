@@ -327,7 +327,7 @@ input RegistrationInput {
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
-  email: String
+  contactEmail: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
@@ -366,7 +366,7 @@ type Registration { # -> Task
   witnessOneSignatureURI: String # actual minio object uri for witnessOneSignatureURI
   witnessTwoSignatureURI: String # actual minio object uri for witnessTwoSignatureURI
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
-  email: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
+  contactEmail: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString

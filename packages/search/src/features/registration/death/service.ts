@@ -429,7 +429,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
-  body.email = emailExtension && emailExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

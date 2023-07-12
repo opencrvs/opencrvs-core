@@ -917,7 +917,7 @@ type Registration {
   witnessOneSignatureURI: String
   witnessTwoSignatureURI: String
   contactPhoneNumber: String
-  email: String
+  contactEmail: String
   status: [RegWorkflow]
   type: RegistrationType
   inCompleteFields: String
@@ -1279,7 +1279,7 @@ input RegistrationInput {
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
-  email: String
+  contactEmail: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String

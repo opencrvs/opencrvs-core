@@ -785,7 +785,7 @@ export interface GQLRegistration {
   witnessOneSignatureURI?: string
   witnessTwoSignatureURI?: string
   contactPhoneNumber?: string
-  email?: string
+  contactEmail?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
@@ -1171,7 +1171,7 @@ export interface GQLRegistrationInput {
   contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
-  email?: string
+  contactEmail?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
@@ -6347,7 +6347,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>
   witnessTwoSignatureURI?: RegistrationToWitnessTwoSignatureURIResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
-  email?: RegistrationToEmailResolver<TParent>
+  contactEmail?: RegistrationToContactEmailResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   inCompleteFields?: RegistrationToInCompleteFieldsResolver<TParent>
@@ -6635,7 +6635,10 @@ export interface RegistrationToContactPhoneNumberResolver<
   ): TResult
 }
 
-export interface RegistrationToEmailResolver<TParent = any, TResult = any> {
+export interface RegistrationToContactEmailResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

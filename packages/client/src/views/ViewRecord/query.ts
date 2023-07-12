@@ -25,7 +25,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        email
+        contactEmail
         duplicates {
           compositionId
           trackingId
