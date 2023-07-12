@@ -1210,7 +1210,7 @@ export const birthRegisterForms: ISerializedForm = {
               ],
               conditionals: [
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 },
                 {
@@ -1639,7 +1639,7 @@ export const birthRegisterForms: ISerializedForm = {
                     '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                 },
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 },
                 {
@@ -2281,7 +2281,7 @@ export const birthRegisterForms: ISerializedForm = {
                     '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                 },
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 },
                 {
