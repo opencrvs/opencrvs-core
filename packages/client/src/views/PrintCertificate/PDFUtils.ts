@@ -352,6 +352,11 @@ export function executeHandlebarsTemplate(
     return ''
   })
 
+  Handlebars.registerHelper('concat', function () {
+    // eslint-disable-next-line prefer-rest-params
+    return Array.prototype.slice.call(arguments, 0, -1).join('')
+  })
+
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
   const output = template(formattedTemplateData)

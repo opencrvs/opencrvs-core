@@ -1065,7 +1065,16 @@ export const deathRegisterForms: ISerializedForm = {
             }
           ]
         }
-      ]
+      ],
+      mapping: {
+        template: [
+          {
+            fieldName: 'deceasedGenderKey',
+            operation: 'plainInputTransformerSection',
+            parameters: ['gender']
+          }
+        ]
+      }
     },
     {
       id: DeathSection.Event,
