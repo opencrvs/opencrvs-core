@@ -63,13 +63,16 @@ async function getConfigFromCountry() {
 }
 
 export async function getApplicationConfig(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  request?: Hapi.Request,
+  h?: Hapi.ResponseToolkit
 ) {
   const configFromCountryConfig = await getConfigFromCountry()
   try {
     const confingFromDB = await ApplicationConfig.findOne({})
-    const finalConfig = merge(configFromCountryConfig, confingFromDB)
+    const finalConfig = merge(
+      configFromCountryConfig,
+      confingFromDB?.toObject()
+    )
     return finalConfig
   } catch (error) {
     throw internal(error.message)
@@ -80,7 +83,7 @@ export async function getLoginConfigHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const refineConfigResponse = pick(await getApplicationConfig(request, h), [
+  const refineConfigResponse = pick(await getApplicationConfig(), [
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
     'PHONE_NUMBER_PATTERN',
@@ -94,13 +97,15 @@ export async function updateApplicationConfigHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const applicationConfig = request.payload as IApplicationConfigurationModel
-    const res = await ApplicationConfig.updateOne(
+    const currentConfig = await getApplicationConfig()
+    const changeConfig = request.payload as IApplicationConfigurationModel
+    const applicationConfig = merge(currentConfig, changeConfig)
+    await ApplicationConfig.findOneAndUpdate(
       {},
       { $set: applicationConfig },
       { upsert: true }
     )
-    return h.response(res).code(201)
+    return h.response(applicationConfig).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
