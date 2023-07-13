@@ -81,7 +81,7 @@ export interface IUserReviewFormProps {
   section: IFormSection
   formData: IFormSectionData
   client: ApolloClient<unknown>
-  updateToBeConfirmed: boolean
+  updateToBeConfirmed?: boolean
 }
 
 interface IDispatchProps {
