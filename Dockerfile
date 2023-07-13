@@ -15,9 +15,9 @@ ENV NPM_CONFIG_LOGLEVEL warn
 COPY package.json .
 COPY yarn.lock .
 COPY lerna.json .
-#COPY packages/auth/package.json packages/auth/package.json
 COPY packages/commons packages/commons
 COPY packages/components packages/components
+#COPY packages/auth/package.json packages/auth/package.json
 #OPY packages/gateway/package.json packages/gateway/package.json
 #OPY packages/login/package.json packages/login/package.json
 #OPY packages/metrics/package.json packages/metrics/package.json
