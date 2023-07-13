@@ -16,7 +16,13 @@ import { Heading3 } from './Heading3'
 
 export default {
   title: 'Components/Heading3',
-  component: Heading3
+  component: Heading3,
+  argTypes: {
+    ref: { table: { disable: true } },
+    as: { table: { disable: true } },
+    forwardedAs: { table: { disable: true } },
+    theme: { table: { disable: true } } // Exclude theme prop
+  }
 }
 
 const Template: Story = (args) => <Heading3 {...args} />
