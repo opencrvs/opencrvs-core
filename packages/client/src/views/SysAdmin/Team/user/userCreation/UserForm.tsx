@@ -148,7 +148,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
       let updateToBeConfirmed = false
 
-      if (formData.username) {
+      if (formData?.username) {
         const oldFormData = { ...values, ...formData, systemRole: '' }
         const newFormData = { ...formData, ...values, systemRole: '' }
         if (

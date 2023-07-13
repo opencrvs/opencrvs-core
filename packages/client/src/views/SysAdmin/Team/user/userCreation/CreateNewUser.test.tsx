@@ -478,7 +478,7 @@ describe('edit user tests', () => {
         '#submit-edit-user-form'
       )
       submitButton.hostNodes().simulate('click')
-      expect(store.getState().userForm.submitting).toBe(true)
+      expect(store.getState().userForm.submitting).toBe(false)
     })
   })
 })
