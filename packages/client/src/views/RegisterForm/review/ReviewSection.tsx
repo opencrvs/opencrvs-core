@@ -1832,6 +1832,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     <DeclarationDataContainer key={index}>
                       <Accordion
                         name="accordion-component"
+                        // here
                         label={sec.title}
                         action={
                           sec.action && (

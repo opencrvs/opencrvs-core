@@ -91,7 +91,7 @@ import {
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
-import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
+import { SubSectionHeader } from '@client/components/form/SubSectionHeader'
 
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
@@ -485,10 +485,10 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === SUBSECTION) {
       return (
-        <SubSectionDivider
-          label={fieldDefinition.label}
-          required={inputFieldProps.required}
-        />
+        <>
+          <Divider />
+          <SubSectionHeader label={fieldDefinition.label} />
+        </>
       )
     }
     if (fieldDefinition.type === FIELD_GROUP_TITLE) {
