@@ -1870,7 +1870,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           SignatureSectionType.INFORMANT_SIGNATURE,
           'informants_signature',
           declaration.data.registration?.informantsSignature as string,
-          intl.formatMessage(messages.informantsSignature),
+          intl.formatMessage(messages.informantsSignature, {
+            event: eventType
+          }),
           window.config.INFORMANT_SIGNATURE_REQUIRED
         )
         return (
