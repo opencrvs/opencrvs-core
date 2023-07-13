@@ -19,6 +19,7 @@ import {
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
+import { logger } from '@metrics/logger'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -359,26 +360,30 @@ export async function getEncounterLocationType(
   )
 
   if (!encounter) {
-    throw new Error('Encounter not found!')
+    logger.warn('Encounter not found!')
+    return 'UNKNOWN'
   }
 
   const locationId = encounter.location?.[0].location.reference
   if (!locationId) {
-    throw new Error('Encounter location not found!')
+    logger.warn('Encounter location not found!')
+    return 'UNKNOWN'
   }
 
   const location = await fetchLocation(locationId, authHeader)
   if (!location || !location.type) {
-    throw new Error(
+    logger.warn(
       `Encounter location not found from Hearth with id ${locationId}!`
     )
+    return 'UNKNOWN'
   }
   const type = location.type.coding?.[0]?.code
 
   if (!type) {
-    throw new Error(
+    logger.warn(
       `Encounter location was found from Hearth with id ${locationId}, but the location did not have a proper type code`
     )
+    return 'UNKNOWN'
   }
   return type
 }
