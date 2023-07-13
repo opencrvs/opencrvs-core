@@ -67,7 +67,8 @@ const initialState: IUserFormState = {
   loadingRoles: false,
   submissionError: false,
   userAuditForm,
-  systemRoleMap: {}
+  systemRoleMap: {},
+  updateToBeConfirmed: false
 }
 
 export interface IRoleMessagesLoadedAction {
@@ -84,16 +85,19 @@ interface IUserFormDataModifyAction {
   type: typeof MODIFY_USER_FORM_DATA
   payload: {
     data: IFormSectionData
+    updateToBeConfirmed?: boolean
   }
 }
 
 export function modifyUserFormData(
-  data: IFormSectionData
+  data: IFormSectionData,
+  updateToBeConfirmed?: boolean
 ): IUserFormDataModifyAction {
   return {
     type: MODIFY_USER_FORM_DATA,
     payload: {
-      data
+      data,
+      updateToBeConfirmed
     }
   }
 }
@@ -257,6 +261,7 @@ export interface IUserFormState {
   submissionError: boolean
   userAuditForm: IUserAuditForm
   systemRoleMap: ISystemRolesMap
+  updateToBeConfirmed: boolean
 }
 
 export const fetchRoles = async () => {
@@ -332,7 +337,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case MODIFY_USER_FORM_DATA:
       return {
         ...state,
-        userFormData: (action as IUserFormDataModifyAction).payload.data
+        userFormData: (action as IUserFormDataModifyAction).payload.data,
+        updateToBeConfirmed:
+          (action as IUserFormDataModifyAction).payload?.updateToBeConfirmed ||
+          false
       }
 
     case CLEAR_USER_FORM_DATA:

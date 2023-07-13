@@ -49,6 +49,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
+import { isEqual } from 'lodash'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -144,7 +145,24 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
         const getSystemRoles = this.props.systemRoleMap
         values.systemRole = getSystemRoles[values.role]
       }
-      this.props.modifyUserFormData({ ...formData, ...values })
+
+      let updateToBeConfirmed = false
+
+      if (formData.username) {
+        const oldFormData = { ...values, ...formData, systemRole: '' }
+        const newFormData = { ...formData, ...values, systemRole: '' }
+        if (
+          !isEqual(oldFormData, newFormData) ||
+          (!formData.signature && values.signature?.name)
+        ) {
+          updateToBeConfirmed = true
+        }
+      }
+
+      this.props.modifyUserFormData(
+        { ...formData, ...values },
+        updateToBeConfirmed
+      )
       this.setState({
         disableContinueOnLocation: false
       })

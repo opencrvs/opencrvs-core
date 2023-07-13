@@ -81,6 +81,7 @@ export interface IUserReviewFormProps {
   section: IFormSection
   formData: IFormSectionData
   client: ApolloClient<unknown>
+  updateToBeConfirmed: boolean
 }
 
 interface IDispatchProps {
@@ -287,7 +288,8 @@ class UserReviewFormComponent extends React.Component<
       formData,
       goToTeamUserList,
       userDetails,
-      offlineCountryConfiguration
+      offlineCountryConfiguration,
+      updateToBeConfirmed
     } = this.props
     let title: string
     let actionComponent: JSX.Element
@@ -302,10 +304,11 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+            ((this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
               this.props.formData.systemRole === 'NATIONAL_REGISTRAR' ||
               this.props.formData.systemRole === 'REGISTRATION_AGENT') &&
-            !this.props.formData.signature
+              !this.props.formData.signature) ||
+            !updateToBeConfirmed
           }
           onClick={() => this.props.submitForm(userFormSection)}
           icon={() => <Check />}
