@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "rootDir": ".",
+    "outDir": "build/dist",
+    "strict": true,
+    "lib": ["esnext.asynciterable", "es6", "es2017", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "types": ["fhir"],
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": ["**/node_modules/**"]
+}

@@ -130,7 +130,7 @@ export function updateRegistrarWorkqueue(
   }
 }
 
-export async function getWorkqueueOfCurrentUser(): Promise<string> {
+async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
 
@@ -291,7 +291,7 @@ async function getWorkqueueData(
   )
 }
 
-export async function writeRegistrarWorkqueueByUser(
+async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {

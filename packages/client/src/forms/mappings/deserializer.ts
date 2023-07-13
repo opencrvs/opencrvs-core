@@ -251,6 +251,10 @@ function deserializeDynamicDefinitions(
       dependency: descriptor.tooltip.dependency,
       tooltipMapper: labels[descriptor.tooltip.tooltipMapper.operation]
     },
+    unit: descriptor.unit && {
+      dependency: descriptor.unit.dependency,
+      unitMapper: labels[descriptor.unit.unitMapper.operation]
+    },
     type:
       descriptor.type &&
       (descriptor.type.kind === 'static'
@@ -260,9 +264,9 @@ function deserializeDynamicDefinitions(
             dependency: descriptor.type.dependency,
             typeMapper: types[descriptor.type.typeMapper.operation]
           }),
-    validate:
-      descriptor.validate &&
-      descriptor.validate.map((validatorDescriptor) => ({
+    validator:
+      descriptor.validator &&
+      descriptor.validator.map((validatorDescriptor) => ({
         dependencies: validatorDescriptor.dependencies,
         validator: validators[
           validatorDescriptor.validator.operation
@@ -288,7 +292,9 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
 export function deserializeFormField(field: SerializedFormField): IFormField {
   const baseFields = {
     ...field,
-    validate: field.validate.map(fieldValidationDescriptorToValidationFunction),
+    validator:
+      field.validator &&
+      field.validator.map(fieldValidationDescriptorToValidationFunction),
     mapping: field.mapping && {
       query:
         field.mapping.query &&

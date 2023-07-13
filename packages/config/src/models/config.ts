@@ -59,6 +59,7 @@ export interface IApplicationConfigurationModel extends Document {
   CURRENCY: ICurrency
   DEATH: IDeath
   MARRIAGE: IMarriage
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
   HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -137,6 +138,7 @@ const configSchema = new Schema({
   CURRENCY: { type: currencySchema, required: false },
   DEATH: { type: deathSchema, required: false },
   MARRIAGE: { type: marriageSchema, required: false },
+  MARRIAGE_REGISTRATION: { type: Boolean, required: false },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,

@@ -508,6 +508,11 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Date input',
     description: 'Success notification label for number of addresses settings'
   },
+  time: {
+    id: 'config.form.settings.time',
+    defaultMessage: 'Time input',
+    description: 'Time input label'
+  },
   dateRangePickerForFormField: {
     id: 'config.form.settings.dateRangePickerForFormField',
     defaultMessage: 'Date Rangee Picker input',
@@ -568,6 +573,10 @@ const messagesToDefine: IFormConfigMessages = {
   customSelect: {
     id: 'config.form.tools.input.customSelect',
     defaultMessage: 'Custom Select'
+  },
+  customSelectWithDynamicOptions: {
+    id: 'config.form.tools.input.customSelectWithDynamicOptions',
+    defaultMessage: 'Custom select with dynamic options'
   }
 }
 

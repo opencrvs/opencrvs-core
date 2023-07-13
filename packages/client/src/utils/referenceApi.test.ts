@@ -18,7 +18,7 @@ vi.unmock('@client/utils/referenceApi')
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
-export const mockFetchLocations = {
+const mockFetchLocations = {
   resourceType: 'Bundle',
   id: 'ed2915f5-7257-4ae6-8499-4121a42c1a88',
   meta: {
@@ -198,13 +198,15 @@ export const mockFetchLocations = {
   ]
 }
 
-export const parsedLocations = {
+const parsedLocations = {
   '7dbf10a9-23d9-4038-8b1c-9f6547ab4877': {
     id: '7dbf10a9-23d9-4038-8b1c-9f6547ab4877',
     name: 'Central',
     alias: 'Central',
     status: 'active',
     physicalType: 'Jurisdiction',
+    statisticalId: 'AWn3s2RqgAN',
+    jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
   },
@@ -214,12 +216,14 @@ export const parsedLocations = {
     alias: 'Sulaka',
     status: 'active',
     physicalType: 'Jurisdiction',
+    statisticalId: 'KozcEjeTyuD',
+    jurisdictionType: 'STATE',
     type: 'ADMIN_STRUCTURE',
     partOf: 'Location/0'
   }
 }
 
-export const mockFetchOffices = {
+const mockFetchOffices = {
   resourceType: 'Bundle',
   id: '2ff926ac-e873-4f8b-b78d-b5a6d6537b07',
   meta: {
@@ -343,7 +347,7 @@ export const mockFetchOffices = {
   ]
 }
 
-export const mockFetchFacilities = {
+const mockFetchFacilities = {
   resourceType: 'Bundle',
   id: '946900ea-0aa7-487d-9059-2942d2f54743',
   meta: {
@@ -463,14 +467,16 @@ export const mockFetchFacilities = {
   ]
 }
 
-export const parsedFacilities = {
+const parsedFacilities = {
   'b3de59a0-835d-4c62-b91b-bc86e312d08e': {
     id: 'b3de59a0-835d-4c62-b91b-bc86e312d08e',
     name: 'HQ Office',
     alias: 'HQ Office',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'CRVS_OFFICE',
+    statisticalId: '',
     partOf: 'Location/56eafead-7264-4c22-aa38-3dc75ad061b4'
   },
   '964d9765-dc96-4c7e-81ec-0a5572d4ea68': {
@@ -479,7 +485,9 @@ export const parsedFacilities = {
     alias: 'Isamba District Office',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'CRVS_OFFICE',
+    statisticalId: '',
     partOf: 'Location/6f0ae45f-eefa-4b9e-9224-159e66bbee26'
   },
   '3ab39ce5-6d03-4149-8ae2-9f4f0baeadf8': {
@@ -488,7 +496,9 @@ export const parsedFacilities = {
     alias: 'Ibombo Rural Health Centre',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'HEALTH_FACILITY',
+    statisticalId: '',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
   },
   '7599ea22-0df3-4cd9-9d15-8868487deb4d': {
@@ -497,67 +507,10 @@ export const parsedFacilities = {
     alias: 'Chikobo Rural Health Centre',
     status: 'active',
     physicalType: 'Building',
+    jurisdictionType: '',
     type: 'HEALTH_FACILITY',
+    statisticalId: '',
     partOf: 'Location/b09122df-81f8-41a0-b5c6-68cba4145cab'
-  }
-}
-
-export const mockCertificatesTemplatesDefinitionData = {
-  birth: {
-    svgCode: '<svg></svg>'
-  },
-  death: {
-    svgCode: '<svg></svg/>'
-  }
-}
-
-export const mockFetchCertificatesTemplatesDefinition = [
-  {
-    event: 'birth',
-    status: 'ACTIVE',
-    svgCode: '<svg></svg>',
-    svgDateCreated: 1640696680593,
-    svgDateUpdated: 1644326332088,
-    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
-  },
-  {
-    event: 'death',
-    status: 'ACTIVE',
-    svgCode: '<svg></svg>',
-    svgDateCreated: 1640696804785,
-    svgDateUpdated: 1643885502999,
-    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
-  }
-]
-
-export const mockCertificateTemplate = {
-  data: {
-    getActiveCertificatesSVG: [
-      {
-        event: 'birth',
-        status: 'ACTIVE',
-        svgCode: '<svg><svg/>',
-        svgDateCreated: '1640696680593',
-        svgDateUpdated: '1643292458812',
-        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-        user: 'jonathan.campbell',
-        __typename: 'CertificateSVG',
-        id: '61cb0b68ab0cc2e187089786'
-      },
-      {
-        event: 'death',
-        status: 'ACTIVE',
-        svgCode: '<svg><svg/>',
-        svgDateCreated: '1640696804785',
-        svgDateUpdated: '1643292520393',
-        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
-        user: 'jonathan.campbell',
-        __typename: 'CertificateSVG',
-        id: '61cb0be4ab0cc2e187089787'
-      }
-    ]
   }
 }
 
@@ -568,7 +521,7 @@ const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-export const mockFetchConfig = {
+const mockFetchConfig = {
   config: {
     API_GATEWAY_URL: 'http://localhost:7070/',
     CONFIG_API_URL: 'http://localhost:2021',

@@ -45,6 +45,7 @@ describe('reports utils tests', () => {
         name: 'Barisal',
         alias: 'বরিশাল',
         physicalType: 'Jurisdiction',
+        statisticalId: '123',
         jurisdictionType: 'DIVISION',
         type: 'ADMIN_STRUCTURE',
         status: 'active',
@@ -62,6 +63,7 @@ describe('reports utils tests', () => {
         name: 'Moktarpur Union Parishad',
         alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
         physicalType: 'Building',
+        statisticalId: '123',
         type: 'CRVS_OFFICE',
         status: 'active',
         partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'

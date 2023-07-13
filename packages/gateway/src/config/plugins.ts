@@ -23,7 +23,7 @@ export const getPlugins = () => {
   const plugins: any[] = []
 
   if (SENTRY_DSN) {
-    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.NODE_ENV })
+    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.HOSTNAME })
   }
 
   const swaggerOptions: HapiSwagger.RegisterOptions = {

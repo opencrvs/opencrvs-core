@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { messages } from '@client/i18n/messages/views/correction'
+import { Event } from '@client/utils/gateway'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death
@@ -108,7 +108,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         { value: CorrectorRelationship.MOTHER, label: messages.mother },
         { value: CorrectorRelationship.FATHER, label: messages.father },
@@ -157,7 +157,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]
@@ -185,7 +185,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
       hideHeader: true,
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       options: [
         { value: 'INFORMANT', label: messages.informant },
         { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
@@ -222,7 +222,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-            validate: [],
+            validator: [],
             mapping: {}
           }
         ]

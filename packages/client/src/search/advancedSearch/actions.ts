@@ -14,7 +14,7 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 export const SET_ADVANCED_SEARCH_PARAM =
   'ADVANCED_SEARCH/SET_ADVANCED_SEARCH_PARAM'
 
-export type ModifyAdvancedSearchParamAction = {
+type ModifyAdvancedSearchParamAction = {
   type: typeof SET_ADVANCED_SEARCH_PARAM
   payload: Partial<IAdvancedSearchParamState>
 }

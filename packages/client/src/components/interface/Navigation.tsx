@@ -44,7 +44,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
@@ -295,7 +295,7 @@ const getSettingsAndLogout = (props: IFullProps) => {
   )
 }
 
-export const NavigationView = (props: IFullProps) => {
+const NavigationView = (props: IFullProps) => {
   const {
     intl,
     match,
