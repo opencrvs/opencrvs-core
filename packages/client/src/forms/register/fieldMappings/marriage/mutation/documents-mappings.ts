@@ -21,16 +21,20 @@ export const marriageDocumentForWhomFhirMapping = {
   GROOM: 'GROOM',
   BRIDE: 'BRIDE',
   MARRIAGE_NOTICE_PROOF: 'MARRIAGE_NOTICE_PROOF',
-  FAMILY_HEADS: 'FAMILY_HEADS',
-  WITNESSES: 'WITNESSES',
+  HUSBAND_FAMILY_HEADS: 'HUSBAND_FAMILY_HEADS',
+  WIFE_FAMILY_HEADS: 'WIFE_FAMILY_HEADS',
+  HUSBAND_WITNESS: 'HUSBAND_WITNESS',
+  WIFE_WITNESS: 'WIFE_WITNESS',
   MARRIAGE_DETAILS: 'MARRIAGE_DETAILS'
 }
 
 export const marriageSectionMapping = {
   [MarriageSection.Registration]: [
     marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF,
-    marriageDocumentForWhomFhirMapping.FAMILY_HEADS,
-    marriageDocumentForWhomFhirMapping.WITNESSES,
+    marriageDocumentForWhomFhirMapping.HUSBAND_FAMILY_HEADS,
+    marriageDocumentForWhomFhirMapping.WIFE_FAMILY_HEADS,
+    marriageDocumentForWhomFhirMapping.HUSBAND_WITNESS,
+    marriageDocumentForWhomFhirMapping.WIFE_WITNESS,
     marriageDocumentForWhomFhirMapping.MARRIAGE_DETAILS
   ],
   [MarriageSection.Groom]: [marriageDocumentForWhomFhirMapping.GROOM],
