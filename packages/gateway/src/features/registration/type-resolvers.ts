@@ -293,6 +293,14 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.text
       )
     },
+    name: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.name) || null
+    },
     dateOfMarriage: async (
       relatedPerson,
       _,
@@ -320,6 +328,30 @@ export const typeResolvers: GQLResolver = {
         person?.extension
       )
       return (marriageExtension && marriageExtension.valueString) || null
+    },
+    birthDate: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.birthDate) || null
+    },
+    identifier: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.identifier) || null
     },
     maritalStatus: async (
       relatedPerson,
