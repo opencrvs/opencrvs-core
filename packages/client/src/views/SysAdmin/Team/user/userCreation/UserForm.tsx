@@ -146,7 +146,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
         values.systemRole = getSystemRoles[values.role]
       }
 
-      let updateToBeConfirmed = false
+      let userDetailsChanged = false
 
       if (formData?.username) {
         const oldFormData = { ...values, ...formData, systemRole: '' }
@@ -155,13 +155,13 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           !isEqual(oldFormData, newFormData) ||
           (!formData.signature && values.signature?.name)
         ) {
-          updateToBeConfirmed = true
+          userDetailsChanged = true
         }
       }
 
       this.props.modifyUserFormData(
         { ...formData, ...values },
-        updateToBeConfirmed
+        userDetailsChanged
       )
       this.setState({
         disableContinueOnLocation: false
