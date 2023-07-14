@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
-import endOfToday from 'date-fns/endOfToday'
+import endOfDay from 'date-fns/endOfDay'
 import endOfYear from 'date-fns/endOfYear'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
@@ -637,13 +637,12 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           id="end-date-small"
           date={endDateNav}
           onNavigateDate={setEndDateNav}
-          // eslint-disable-next-line react/prop-types
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: endOfToday()
+              endDate: endOfDay(date)
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
@@ -733,7 +732,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate,
-                    endDate: endOfToday()
+                    endDate: endOfDay(endDate)
                   })
                   setModalVisible(false)
                   props.closeModalFromHOC && props.closeModalFromHOC()
