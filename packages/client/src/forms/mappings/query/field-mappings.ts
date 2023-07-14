@@ -474,15 +474,6 @@ export function attachmentToFieldTransformer(
           description: type
         } as IAttachment)
       }
-      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-        attachments.push({
-          data: attachment.data,
-          type: attachment.contentType,
-          optionValues: [subject, type],
-          title: subject,
-          description: type
-        } as IAttachment)
-      }
     })
   }
   if (attachments) {
