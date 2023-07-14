@@ -80,8 +80,10 @@ const activeCertificates = async (token: string) => {
 export async function seedCertificate(token: string) {
   if ((await activeCertificates(token)).length === 0) {
     const certificates = await getCertificate()
-    certificates.map(async (certificate: CertificateMeta) => {
-      await uploadCertificate(token, certificate)
-    })
+    await Promise.all(
+      certificates.map(async (certificate: CertificateMeta) => {
+        await uploadCertificate(token, certificate)
+      })
+    )
   }
 }
