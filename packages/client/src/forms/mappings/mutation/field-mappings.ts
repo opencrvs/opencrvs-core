@@ -354,19 +354,13 @@ export const copyAddressTransformer =
     if (nodeName) {
       fromSectionData = transformedData[fromSection][nodeName]
     }
-    if (
-      (fromSection !== 'informant' && !fromSectionData.address) ||
-      (fromSection === 'informant' && !fromSectionData.individual.address)
-    ) {
+    if (!fromSectionData.address) {
       throw new Error(
         `Address data not found on section copying from ${fromSection}`
       )
     }
 
-    const fromAddress =
-      fromSection === 'informant'
-        ? fromSectionData.individual.address
-        : fromSectionData.address
+    const fromAddress = fromSectionData.address
     const address = (fromAddress as [{ type: string }]).find(
       (addr) => addr.type === fromAddressType
     )
@@ -376,41 +370,22 @@ export const copyAddressTransformer =
       )
     }
     const toSectionData = transformedData[toSection]
-    if (sectionId !== 'informant') {
-      if (!toSectionData.address) {
-        toSectionData.address = []
-      }
-      let toAddress = (toSectionData.address as [{ type: string }]).find(
-        (addr) => addr.type === toAddressType
-      )
-      if (toAddress) {
-        toAddress = { ...address, type: toAddressType }
-      } else {
-        toAddress = {
-          ...address,
-          type: toAddressType
-        }
-        toSectionData.address.push(toAddress)
-      }
-      return transformedData
-    } else {
-      if (!toSectionData.individual.address) {
-        toSectionData.individual.address = []
-      }
-      let toAddress = (
-        toSectionData.individual.address as [{ type: string }]
-      ).find((addr) => addr.type === toAddressType)
-      if (toAddress) {
-        toAddress = { ...address, type: toAddressType }
-      } else {
-        toAddress = {
-          ...address,
-          type: toAddressType
-        }
-        toSectionData.individual.address.push(toAddress)
-      }
-      return transformedData
+    if (!toSectionData.address) {
+      toSectionData.address = []
     }
+    let toAddress = (toSectionData.address as [{ type: string }]).find(
+      (addr) => addr.type === toAddressType
+    )
+    if (toAddress) {
+      toAddress = { ...address, type: toAddressType }
+    } else {
+      toAddress = {
+        ...address,
+        type: toAddressType
+      }
+      toSectionData.address.push(toAddress)
+    }
+    return transformedData
   }
 
 export const sectionRemoveTransformer =
