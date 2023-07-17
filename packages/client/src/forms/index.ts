@@ -49,7 +49,7 @@ export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
-export const SUBSECTION = 'SUBSECTION'
+export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
@@ -591,7 +591,7 @@ export interface ITextareaFormField extends IFormFieldBase {
   maxLength?: number
 }
 export interface ISubsectionFormField extends IFormFieldBase {
-  type: typeof SUBSECTION
+  type: typeof SUBSECTION_HEADER
 }
 export interface IFieldGroupTitleField extends IFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
@@ -1085,7 +1085,7 @@ export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   maxLength?: number
 }
 export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
-  type: typeof SUBSECTION
+  type: typeof SUBSECTION_HEADER
 }
 export interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
   type: typeof FIELD_GROUP_TITLE

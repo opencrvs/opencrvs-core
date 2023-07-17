@@ -70,8 +70,8 @@ import {
   SELECT_WITH_OPTIONS,
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
-  SUBSECTION,
-  WARNING
+  WARNING,
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -871,9 +871,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [BULLET_LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
-      (type) => type === field.type
-    )
+    return [
+      BULLET_LIST,
+      PARAGRAPH,
+      WARNING,
+      SUBSECTION_HEADER,
+      FETCH_BUTTON
+    ].find((type) => type === field.type)
   }
 
   isDraft() {
@@ -1832,7 +1836,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     <DeclarationDataContainer key={index}>
                       <Accordion
                         name="accordion-component"
-                        // here
                         label={sec.title}
                         action={
                           sec.action && (

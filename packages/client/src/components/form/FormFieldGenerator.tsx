@@ -46,7 +46,6 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
   TEL,
-  SUBSECTION,
   WARNING,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField,
@@ -87,7 +86,8 @@ import {
   NID_VERIFICATION_BUTTON,
   INidVerificationButton,
   DIVIDER,
-  HEADING3
+  HEADING3,
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -483,7 +483,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === HEADING3) {
       return <Heading3>{fieldDefinition.label}</Heading3>
     }
-    if (fieldDefinition.type === SUBSECTION) {
+    if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
         <>
           <Divider />
