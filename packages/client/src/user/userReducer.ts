@@ -67,7 +67,8 @@ const initialState: IUserFormState = {
   loadingRoles: false,
   submissionError: false,
   userAuditForm,
-  systemRoleMap: {}
+  systemRoleMap: {},
+  userDetailsChanged: false
 }
 
 export interface IRoleMessagesLoadedAction {
@@ -84,16 +85,19 @@ interface IUserFormDataModifyAction {
   type: typeof MODIFY_USER_FORM_DATA
   payload: {
     data: IFormSectionData
+    userDetailsChanged?: boolean
   }
 }
 
 export function modifyUserFormData(
-  data: IFormSectionData
+  data: IFormSectionData,
+  userDetailsChanged?: boolean
 ): IUserFormDataModifyAction {
   return {
     type: MODIFY_USER_FORM_DATA,
     payload: {
-      data
+      data,
+      userDetailsChanged
     }
   }
 }
@@ -257,6 +261,7 @@ export interface IUserFormState {
   submissionError: boolean
   userAuditForm: IUserAuditForm
   systemRoleMap: ISystemRolesMap
+  userDetailsChanged: boolean
 }
 
 export const fetchRoles = async () => {
@@ -332,7 +337,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case MODIFY_USER_FORM_DATA:
       return {
         ...state,
-        userFormData: (action as IUserFormDataModifyAction).payload.data
+        userFormData: (action as IUserFormDataModifyAction).payload.data,
+        userDetailsChanged:
+          (action as IUserFormDataModifyAction).payload?.userDetailsChanged ||
+          false
       }
 
     case CLEAR_USER_FORM_DATA:
