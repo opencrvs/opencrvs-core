@@ -354,7 +354,7 @@ export const copyAddressTransformer =
     if (nodeName) {
       fromSectionData = transformedData[fromSection][nodeName]
     }
-    if (fromSection !== 'informant' && !fromSectionData.address) {
+    if (!fromSectionData.address) {
       throw new Error(
         `Address data not found on section copying from ${fromSection}`
       )
