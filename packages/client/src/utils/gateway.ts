@@ -303,7 +303,8 @@ export enum AttachmentSubject {
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
-  FamilyHeads = 'FAMILY_HEADS',
+  HusbandFamilyHeads = 'HUSBAND_FAMILY_HEADS',
+  WifeFamilyHeads = 'WIFE_FAMILY_HEADS',
   Father = 'FATHER',
   Groom = 'GROOM',
   InformantIdProof = 'INFORMANT_ID_PROOF',
@@ -313,7 +314,8 @@ export enum AttachmentSubject {
   Mother = 'MOTHER',
   Other = 'OTHER',
   Parent = 'PARENT',
-  Witnesses = 'WITNESSES',
+  HusbandWitness = 'HUSBAND_WITNESS',
+  WifeWitness = 'WIFE_WITNESS',
   WitnessOne = 'WITNESS_ONE',
   WitnessTwo = 'WITNESS_TWO'
 }
