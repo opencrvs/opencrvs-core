@@ -20,12 +20,22 @@ const isAllOk = (services: Service[]) =>
   services.every((service) => service.status === 'ok')
 
 export async function getServerSideProps() {
-  const services = await checkHealth()
+  try {
+    const services = await checkHealth()
 
-  return {
-    props: {
-      services,
-      isAllOk: isAllOk(services)
+    return {
+      props: {
+        services,
+        isAllOk: isAllOk(services)
+      }
+    }
+  } catch (error) {
+    console.log(error)
+    return {
+      props: {
+        services: []
+        // isAllOk: isAllOk(services)
+      }
     }
   }
 }

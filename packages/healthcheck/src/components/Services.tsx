@@ -13,7 +13,30 @@
 import { Service, Status } from '@/lib/check-health'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import {
+  LeftNavigation,
+  NavigationGroup,
+  NavigationItem
+} from '@opencrvs/components/lib/SideNavigation'
+import { SearchTool } from '@opencrvs/components/lib/SearchTool'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Stack } from '@opencrvs/components/lib/Stack'
+// import { Table } from '@opencrvs/components/lib/Table'
+import {
+  BackArrow,
+  Hamburger,
+  SearchBlue,
+  TrackingID,
+  ForwardArrowDeepBlue,
+  BRN,
+  Phone
+} from '@opencrvs/components/lib/icons'
 import React from 'react'
+import Sidebar from './Sidebar'
 
 const Table = styled.table`
   td,
@@ -55,5 +78,7 @@ export const Services = ({ services }: { services: Service[] }) => {
         ))}
       </tbody>
     </Table>
+
+    // <Sidebar />
   )
 }

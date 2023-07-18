@@ -14,12 +14,15 @@ import { GlobalStyle } from '@/components/GlobalStyle'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import React from 'react'
+import Layout from '../components/Layout'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={getTheme()}>
-      <GlobalStyle />
-      <Component {...pageProps} />
+      <Layout>
+        <GlobalStyle />
+        <Component {...pageProps} />
+      </Layout>
     </ThemeProvider>
   )
 }
