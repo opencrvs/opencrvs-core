@@ -36,7 +36,9 @@ import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   FIELD_AGENT_ROLES,
-  ROLE_LOCAL_REGISTRAR
+  ROLE_LOCAL_REGISTRAR,
+  REGISTRAR_ROLES,
+  ONLY_REGISTRAR_ROLES
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -518,6 +520,9 @@ function mapStateToProps(
     userLocationId,
     tabId:
       (match && match.params && match.params.tabId) ||
+      (userDetails &&
+        ONLY_REGISTRAR_ROLES.includes(userDetails.systemRole) &&
+        WORKQUEUE_TABS.readyForReview) ||
       WORKQUEUE_TABS.inProgress,
     selectorId: (match && match.params && match.params.selectorId) || '',
     pageId,

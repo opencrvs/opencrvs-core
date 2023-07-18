@@ -73,6 +73,12 @@ export const REGISTRAR_ROLES = [
   ROLE_REGISTRATION_AGENT
 ]
 
+export const ONLY_REGISTRAR_ROLES = [
+  ROLE_LOCAL_REGISTRAR,
+  'DISTRICT_REGISTRAR',
+  'STATE_REGISTRAR'
+]
+
 export const MARRIAGE_SIGNATURE_KEYS = [
   'groomSignature',
   'brideSignature',
