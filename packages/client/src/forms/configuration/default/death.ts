@@ -770,7 +770,7 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               conditionals: [
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 },
                 {
