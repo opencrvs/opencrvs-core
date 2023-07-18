@@ -13,7 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const StyledH2 = styled.h2`
-  padding-bottom: 18px;
+  padding-bottom: 0px;
 `
 
 export const SubSectionHeader: React.FC<{ label: string }> = ({ label }) => {

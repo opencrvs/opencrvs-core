@@ -486,8 +486,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
         <>
-          <Divider />
           <SubSectionHeader label={fieldDefinition.label} />
+          <Divider />
         </>
       )
     }

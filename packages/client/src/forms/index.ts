@@ -1162,7 +1162,7 @@ export interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
 }
 
-export interface I18nHeadin3Field extends Ii18nFormFieldBase {
+export interface I18nHeading3Field extends Ii18nFormFieldBase {
   type: typeof HEADING3
 }
 
@@ -1199,7 +1199,7 @@ export type Ii18nFormField =
   | Ii18nTimeFormField
   | Ii18nNidVerificationButtonField
   | I18nDividerField
-  | I18nHeadin3Field
+  | I18nHeading3Field
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

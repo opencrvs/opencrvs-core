@@ -71,7 +71,8 @@ import {
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
   WARNING,
-  SUBSECTION_HEADER
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -874,7 +875,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [BULLET_LIST, PARAGRAPH, WARNING, FETCH_BUTTON].find(
+    return [BULLET_LIST, PARAGRAPH, WARNING, DIVIDER, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -911,17 +912,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     const { draft: declaration, intl } = this.props
 
-    group.fields.map((field) => {
-      if (field.name === fieldName) return field.type
-    })
-
     return {
       label: intl.formatMessage(fieldLabel),
-      type: group.fields
-        .map((field) => {
-          if (field.name === fieldName) return field.type
-        })
-        .filter((type) => type !== undefined),
+      type: group.fields.find((field) => field.name === fieldName)?.type,
       value,
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
@@ -1862,7 +1855,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               <ListViewItemSimplified
                                 key={index}
                                 label={
-                                  item.type[0] === SUBSECTION_HEADER ? (
+                                  item.type === SUBSECTION_HEADER ? (
                                     <StyledLabel>{item.label}</StyledLabel>
                                   ) : (
                                     <Label>{item.label}</Label>
