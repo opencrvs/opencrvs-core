@@ -243,6 +243,9 @@ const DeclarationDataContainer = styled.div``
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
+const StyledLabel = styled.span`
+  ${({ theme }) => theme.fonts.h3}
+`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
@@ -871,13 +874,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [
-      BULLET_LIST,
-      PARAGRAPH,
-      WARNING,
-      SUBSECTION_HEADER,
-      FETCH_BUTTON
-    ].find((type) => type === field.type)
+    return [BULLET_LIST, PARAGRAPH, WARNING, FETCH_BUTTON].find(
+      (type) => type === field.type
+    )
   }
 
   isDraft() {
@@ -912,8 +911,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     const { draft: declaration, intl } = this.props
 
+    group.fields.map((field) => {
+      if (field.name === fieldName) return field.type
+    })
+
     return {
       label: intl.formatMessage(fieldLabel),
+      type: group.fields
+        .map((field) => {
+          if (field.name === fieldName) return field.type
+        })
+        .filter((type) => type !== undefined),
       value,
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
@@ -1853,7 +1861,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             return (
                               <ListViewItemSimplified
                                 key={index}
-                                label={<Label>{item.label}</Label>}
+                                label={
+                                  item.type[0] === SUBSECTION_HEADER ? (
+                                    <StyledLabel>{item.label}</StyledLabel>
+                                  ) : (
+                                    <Label>{item.label}</Label>
+                                  )
+                                }
                                 value={
                                   <Value id={item.label.split(' ')[0]}>
                                     {item.value}
