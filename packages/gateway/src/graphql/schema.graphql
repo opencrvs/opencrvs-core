@@ -390,6 +390,7 @@ type MarriageRegistration implements EventRegistration {
   id: ID!
   _fhirIDMap: Map
   registration: Registration
+  informant: RelatedPerson
   bride: Person
   groom: Person
   witnessOne: RelatedPerson
@@ -743,6 +744,7 @@ input DeathRegistrationInput {
 input MarriageRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
+  informant: RelatedPersonInput
   bride: PersonInput
   groom: PersonInput
   witnessOne: RelatedPersonInput

@@ -2336,6 +2336,23 @@ export const typeResolvers: GQLResolver = {
     createdAt(composition: ITemplatedComposition) {
       return composition.date
     },
+    async informant(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
+      const relatedPersonSection = findCompositionSection(
+        INFORMANT_CODE,
+        composition
+      )
+      if (!relatedPersonSection || !relatedPersonSection.entry) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${relatedPersonSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
+    },
     async bride(
       composition: ITemplatedComposition,
       _,
