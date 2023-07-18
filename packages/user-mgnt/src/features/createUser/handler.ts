@@ -15,8 +15,8 @@ import {
   generateUsername,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification,
-  getCatchmentAreaIdsByPrimaryOfficeId
+  sendCredentialsNotification
+  // getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -42,6 +42,9 @@ export default async function createUser(
   const user = request.payload as IUser & { password: string }
   const token = request.headers.authorization
 
+  console.log(' _____________ default users _____________ ')
+  console.log(user)
+
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
@@ -55,10 +58,12 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-      user.primaryOfficeId,
-      token
-    )
+    console.log(' entering getCatchmentAreaIdsByPrimaryOfficeId ')
+    // user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
+    //   user.primaryOfficeId,
+    //   token
+    // )
+    console.log(' exited getCatchmentAreaIdsByPrimaryOfficeId ')
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)
@@ -96,6 +101,7 @@ export default async function createUser(
     user.practitionerId = practitionerId
 
     user.username = await generateUsername(user.name)
+    console.log(' ####### ')
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)

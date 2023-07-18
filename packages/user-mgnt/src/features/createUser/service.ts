@@ -139,6 +139,7 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
   let locationRef = `Location/${primaryOfficeId}`
   let parentLocation: fhir.Location = {}
   while (locationRef !== 'Location/0') {
+    console.log(locationRef)
     parentLocation = await getFromFhir(token, `/${locationRef}`)
     if (parentLocation.id && parentLocation.partOf) {
       catchmentAreaIds.push(parentLocation.id)

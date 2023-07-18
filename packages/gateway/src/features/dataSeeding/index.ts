@@ -21,8 +21,9 @@ import {
   GQLSystemRole,
   GQLSystemRoleInput
 } from '@gateway/graphql/schema'
+import { Types } from 'mongoose'
 import fetch from 'node-fetch'
-import { seedCertificate } from './certificateSeeding'
+// import { seedCertificate } from './certificateSeeding'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -92,6 +93,17 @@ async function getCountryRoles() {
   return res.json() as Promise<RoleResponse>
 }
 
+async function getUseres() {
+  const url = new URL('users', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the users from ${url}`)
+  }
+  const users = await res.json()
+  return users
+}
+
+let roleToId: { [role: string]: Types.ObjectId } = {}
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
   const url = new URL('updateRole', USER_MANAGEMENT_URL).toString()
   return Promise.all(
@@ -103,9 +115,107 @@ async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
           'Content-Type': 'application/json',
           Authorization: token
         }
-      }).then((res) => res.json() as Promise<{ msg: string }>)
+      }).then(async (res) => {
+        const { msg, updRoleId } = await res.json()
+        roleToId = { ...roleToId, ...updRoleId }
+        return msg
+      })
     )
   )
+}
+export interface IUserName {
+  use: string
+  family: string
+  given: string[]
+}
+
+interface IIdentifier {
+  system: string
+  value: string
+}
+export interface ISecurityQuestionAnswer {
+  questionKey: string
+  answerHash: string
+}
+interface ISignature {
+  type: string
+  data: string
+}
+export interface IAuditHistory {
+  auditedBy: string
+  auditedOn: number
+  action: string
+  reason: string
+  comment?: string
+}
+export interface IUser {
+  name: IUserName[]
+  username: string
+  identifiers: IIdentifier[]
+  email: string
+  mobile?: string
+  passwordHash: string
+  salt: string
+  systemRole: string
+  role: Types.ObjectId
+  practitionerId: string
+  primaryOfficeId: string
+  catchmentAreaIds: string[]
+  scope: string[]
+  signature: ISignature
+  status: string
+  securityQuestionAnswers: ISecurityQuestionAnswer[]
+  creationDate: number
+}
+
+const seedUsers = async (token: string) => {
+  const rawUsers = await getUseres()
+
+  const users: IUser[] = []
+
+  for (const i in rawUsers) {
+    const { givenNames, familyName, role, type, ...user } = rawUsers[i]
+    users.push({
+      ...user,
+      role: roleToId[type],
+      systemRole: role,
+      name: [
+        {
+          use: user.username,
+          family: familyName,
+          given: [givenNames]
+        }
+      ],
+      identifiers: [],
+      passwordHash: 'dfgdfgdfgdfgdfgdfg',
+      salt: 'sadfgte4wrtdg',
+      practitionerId: 'asddsger4',
+      catchmentAreaIds: [],
+      scope: [],
+      signature: {
+        type: 'sadsa',
+        data: 'asdasd'
+      },
+      status: 'sadasd',
+      securityQuestionAnswers: [],
+      creationDate: 654051
+    })
+  }
+
+  console.log(users)
+
+  const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
+
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(users[0]),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  console.log(await res.json())
 }
 
 export async function seedData() {
@@ -115,6 +225,7 @@ export async function seedData() {
   const usedSystemRoles = Object.keys(
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
+
   const res = await updateRoles(
     token,
     systemRoles
@@ -127,5 +238,7 @@ export async function seedData() {
       }))
   )
   console.log(res)
-  seedCertificate(token)
+  seedUsers(token)
+
+  // seedCertificate(token)
 }

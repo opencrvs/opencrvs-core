@@ -398,10 +398,10 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       handler: createUser,
       config: {
         tags: ['api'],
-        description: 'Creates a new user',
-        auth: {
-          scope: [RouteScope.SYSADMIN]
-        }
+        description: 'Creates a new user'
+        // auth: {
+        //   scope: [RouteScope.SYSADMIN]
+        // }
       }
     },
     {
