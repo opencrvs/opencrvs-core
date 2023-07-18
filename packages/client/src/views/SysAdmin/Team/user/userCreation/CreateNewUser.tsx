@@ -261,6 +261,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     sectionId,
     section,
     formData,
+    userDetailsChanged: state.userForm.userDetailsChanged,
     submitting: state.userForm.submitting,
     userDetailsStored: state.userForm.userDetailsStored,
     loadingRoles: state.userForm.loadingRoles,

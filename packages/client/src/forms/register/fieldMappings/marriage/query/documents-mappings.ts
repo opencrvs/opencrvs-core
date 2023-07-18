@@ -21,10 +21,14 @@ const fieldNameMapping = {
   [marriageDocumentForWhomFhirMapping.BRIDE]: 'uploadDocForBride',
   [marriageDocumentForWhomFhirMapping.MARRIAGE_NOTICE_PROOF]:
     'uploadDocForMarriageProof',
-  [marriageDocumentForWhomFhirMapping.WITNESSES]:
-    'uploadDocForIdentityWitnesses',
-  [marriageDocumentForWhomFhirMapping.FAMILY_HEADS]:
-    'uploadDocForIdentityHeadsOfFamily',
+  [marriageDocumentForWhomFhirMapping.HUSBAND_WITNESS]:
+    'uploadDocForIdentityHusbandWitness',
+  [marriageDocumentForWhomFhirMapping.WIFE_WITNESS]:
+    'uploadDocForIdentityWifeWitness',
+  [marriageDocumentForWhomFhirMapping.HUSBAND_FAMILY_HEADS]:
+    'uploadDocForIdentityHusbandHeadsOfFamily',
+  [marriageDocumentForWhomFhirMapping.WIFE_FAMILY_HEADS]:
+    'uploadDocForIdentityWifeHeadsOfFamily',
   [marriageDocumentForWhomFhirMapping.MARRIAGE_DETAILS]: 'uploadDocCouplePhoto'
 }
 
