@@ -113,6 +113,7 @@ describe('date picker tests', () => {
         component.find('#start-date-small-year-label').hostNodes().text()
       ).toBe('2019')
 
+      // select start month to be February
       component.find('#start-date-small-feb').hostNodes().simulate('click')
 
       component.update()
@@ -122,13 +123,16 @@ describe('date picker tests', () => {
       ).toBe('2020')
       component.update()
 
+      // select end month to be March
       component.find('#end-date-small-mar').hostNodes().simulate('click')
 
       const [onDatesChangeHandlerArgs] = onDatesChangeMock.mock.calls
 
       const { startDate, endDate } = onDatesChangeHandlerArgs[0]
+      // expect start month to be February
       expect((startDate as Date).getMonth()).toBe(1)
-      expect((endDate as Date).getMonth()).toBe(5)
+      // expect end month to be March
+      expect((endDate as Date).getMonth()).toBe(2)
     })
   })
 })
