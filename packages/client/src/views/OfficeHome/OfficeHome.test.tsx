@@ -129,7 +129,6 @@ describe('OfficeHome related tests', () => {
         { store, history, apolloClient: client }
       )
 
-      await waitForElement(testComponent, '#navigation_progress')
       await waitForElement(testComponent, '#navigation_readyForReview')
       await waitForElement(testComponent, '#navigation_requiresUpdate')
       await waitForElement(testComponent, '#navigation_print')
