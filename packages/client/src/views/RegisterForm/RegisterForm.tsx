@@ -730,9 +730,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       <Content
                         size={ContentSize.NORMAL}
                         id="register_form"
-                        title={intl.formatMessage(
-                          activeSectionGroup.title || activeSection.title
-                        )}
+                        title={
+                          activeSectionGroup.title
+                            ? intl.formatMessage(activeSectionGroup.title)
+                            : activeSection.title &&
+                              intl.formatMessage(activeSection.title)
+                        }
                         showTitleOnMobile={true}
                         bottomActionButtons={
                           [
@@ -950,7 +953,7 @@ function getValidSectionGroup(
   declaration: IDeclaration,
   sectionId: string,
   groupId?: string
-) {
+): { activeSection: IFormSection; activeSectionGroup: IFormSectionGroup } {
   const currentSection = sectionId
     ? sections.find((sec) => sec.id === sectionId)
     : firstVisibleSection(sections)

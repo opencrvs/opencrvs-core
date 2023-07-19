@@ -16,7 +16,6 @@
     "test": "NODE_OPTIONS=--max_old_space_size=8000 vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors && yarn test:compilation",
     "test:watch": "vitest",
     "open:cov": "yarn test && opener coverage/index.html",
-    "generate:test:forms": "bash generate-form.sh",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",

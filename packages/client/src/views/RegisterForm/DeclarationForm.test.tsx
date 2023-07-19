@@ -22,7 +22,6 @@ import {
   selectOption,
   goToSection
 } from '@client/tests/util'
-import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
 import {
   storeDeclaration,
   createDeclaration,
@@ -72,9 +71,10 @@ describe('when user has starts a new declaration', () => {
     })
 
     it('renders unlock screen', async () => {
-      history.replace(
-        SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
-      )
+      // TODO: SELECT_BIRTH_INFORMANT has been removed
+      // history.replace(
+      //   SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
+      // )
       await waitForElement(app, '#unlockPage')
     })
   })
@@ -104,9 +104,10 @@ describe('when user has starts a new declaration', () => {
         }
         draft = createDeclaration(Event.Birth, data)
         store.dispatch(storeDeclaration(draft))
-        history.replace(
-          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
-        )
+        // TODO: SELECT_BIRTH_INFORMANT has been removed
+        // history.replace(
+        //   SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
+        // )
         await waitForElement(app, '#register_form')
       })
       describe('when user clicks continue without choosing informantType', () => {
@@ -180,9 +181,10 @@ describe('when user has starts a new declaration', () => {
          * so offline declarations wouldn't override the dispatched ones
          */
         store.dispatch(storeDeclaration(draft))
-        history.replace(
-          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
-        )
+        // TODO: SELECT_BIRTH_INFORMANT has been removed
+        // history.replace(
+        //   SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
+        // )
         await waitForElement(app, '#register_form')
 
         app

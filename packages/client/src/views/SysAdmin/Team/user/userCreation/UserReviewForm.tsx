@@ -279,7 +279,7 @@ class UserReviewFormComponent extends React.Component<
       userDetails,
       offlineCountryConfiguration
     } = this.props
-    let title: string
+    let title: string | undefined
     let actionComponent: JSX.Element
     const locationId = formData['registrationOffice']
     const locationDetails =
@@ -304,7 +304,7 @@ class UserReviewFormComponent extends React.Component<
         </SuccessButton>
       )
     } else {
-      title = intl.formatMessage(section.title)
+      title = section.title && intl.formatMessage(section.title)
       actionComponent = (
         <PrimaryButton
           id="submit_user_form"

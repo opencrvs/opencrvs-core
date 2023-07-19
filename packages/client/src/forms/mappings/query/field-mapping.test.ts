@@ -16,7 +16,6 @@ import {
 } from '@client/forms/mappings/query/field-mappings'
 import { IFormField } from '@client/forms'
 import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
-import { LocationType, IdentityIdType } from '@client/utils/gateway'
 
 describe('Query FieldMapping', () => {
   it('Should return valid data', () => {
@@ -47,7 +46,7 @@ describe('Query FieldMapping', () => {
       mother: {
         identifier: [
           {
-            type: 'nationalId' as IdentityIdType,
+            type: 'nationalId',
             id: '151515'
           }
         ]
@@ -100,7 +99,7 @@ describe('Query FieldMapping', () => {
       id: '12356',
       eventLocation: {
         id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
-        type: 'HEALTH_FACILITY' as LocationType,
+        type: 'HEALTH_FACILITY',
         address: {
           line: [],
           district: null,
