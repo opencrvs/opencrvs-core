@@ -15,8 +15,8 @@ import {
   generateUsername,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification
-  // getCatchmentAreaIdsByPrimaryOfficeId
+  sendCredentialsNotification,
+  getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -42,13 +42,10 @@ export default async function createUser(
   const user = request.payload as IUser & { password: string }
   const token = request.headers.authorization
 
-  console.log(' _____________ default users _____________ ')
-  console.log(user)
-
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
-  let autoGenPassword = null
+  let password = null
 
   try {
     const practitioner = createFhirPractitioner(user, false)
@@ -58,12 +55,10 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    console.log(' entering getCatchmentAreaIdsByPrimaryOfficeId ')
-    // user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-    //   user.primaryOfficeId,
-    //   token
-    // )
-    console.log(' exited getCatchmentAreaIdsByPrimaryOfficeId ')
+    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
+      user.primaryOfficeId,
+      token
+    )
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
     const role = await createFhirPractitionerRole(user, practitionerId, false)
@@ -92,16 +87,15 @@ export default async function createUser(
       user.status = statuses.ACTIVE
     }
 
-    autoGenPassword = generateRandomPassword(hasDemoScope(request))
+    password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
 
     user.username = await generateUsername(user.name)
-    console.log(' ####### ')
   } catch (err) {
     await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
@@ -129,7 +123,7 @@ export default async function createUser(
   sendCredentialsNotification(
     user.name,
     user.username,
-    autoGenPassword,
+    password,
     {
       Authorization: request.headers.authorization
     },

@@ -24,6 +24,14 @@ import {
 import { Types } from 'mongoose'
 import fetch from 'node-fetch'
 // import { seedCertificate } from './certificateSeeding'
+import { v4 as uuid } from 'uuid'
+import {
+  composeFhirLocation,
+  generateStatisticalExtensions,
+  getLocationsByIdentifier
+} from '@gateway/features/restLocation/utils'
+import { fetchFromHearth } from '@gateway/features/fhir/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -84,6 +92,28 @@ type RoleResponse = {
   [K in typeof SYSTEM_ROLES[number]]?: GQLRoleInput[]
 }
 
+type LocationResponse = {
+  id: string
+  name: string
+  alias: string
+  partOf: string
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+  jurisdictionType?:
+    | 'STATE'
+    | 'DISTRICT'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_4'
+    | 'LOCATION_LEVEL_5'
+  statistics?: Array<{
+    year: number
+    male_population: number
+    female_population: number
+    population: number
+    crude_birth_rate: number
+  }>
+}
+
 async function getCountryRoles() {
   const url = new URL('roles', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -104,6 +134,15 @@ async function getUseres() {
 }
 
 let roleToId: { [role: string]: Types.ObjectId } = {}
+async function getLocations() {
+  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the locations from ${url}`)
+  }
+  return res.json() as Promise<LocationResponse[]>
+}
+
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
   const url = new URL('updateRole', USER_MANAGEMENT_URL).toString()
   return Promise.all(
@@ -171,51 +210,95 @@ export interface IUser {
 const seedUsers = async (token: string) => {
   const rawUsers = await getUseres()
 
-  const users: IUser[] = []
-
-  for (const i in rawUsers) {
-    const { givenNames, familyName, role, type, ...user } = rawUsers[i]
-    users.push({
+  for (const rawUser of rawUsers) {
+    const { givenNames, familyName, role, type, primaryOfficeId, ...user } =
+      rawUser
+    const locations = await getLocationsByIdentifier(primaryOfficeId)
+    const officeId = locations[0].id
+    const parsedUser = {
       ...user,
       role: roleToId[type],
       systemRole: role,
       name: [
         {
-          use: user.username,
+          use: 'en',
           family: familyName,
           given: [givenNames]
         }
       ],
-      identifiers: [],
-      passwordHash: 'dfgdfgdfgdfgdfgdfg',
-      salt: 'sadfgte4wrtdg',
-      practitionerId: 'asddsger4',
-      catchmentAreaIds: [],
-      scope: [],
-      signature: {
-        type: 'sadsa',
-        data: 'asdasd'
-      },
-      status: 'sadasd',
-      securityQuestionAnswers: [],
-      creationDate: 654051
-    })
-  }
-
-  console.log(users)
-
-  const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(users[0]),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+      primaryOfficeId: officeId
     }
-  })
+    const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
+    const res = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(parsedUser),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    })
+    console.log(await res.json())
+  }
+}
 
-  console.log(await res.json())
+async function buildLocationBundle(
+  locations: LocationResponse[]
+): Promise<fhir.Bundle> {
+  const locationsMap = new Map(
+    locations.map((location) => [
+      location.id,
+      { ...location, uid: `urn:uuid:${uuid()}` }
+    ])
+  )
+  const savedLocations = await fetchFromHearth('/Location?_count=0').then(
+    (bundle: fhir.Bundle) => {
+      return (
+        bundle.entry
+          ?.map((bundleEntry) => bundleEntry.resource as fhir.Location)
+          .map((location) =>
+            location.identifier
+              ?.find(
+                ({ system }) =>
+                  system ===
+                    `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
+                  system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+              )
+              ?.value?.split('_')
+              .pop()
+          )
+          .filter((maybeId): maybeId is string => Boolean(maybeId)) ?? []
+      )
+    }
+  )
+  const savedLocationsSet = new Set(savedLocations)
+  return {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: locations
+      .filter((location) => !savedLocationsSet.has(location.id))
+      .map((location) => ({
+        ...location,
+        // statisticalID & code are legacy properties and need to be renamed
+        // to id & locationType
+        statisticalID: location.id,
+        code: location.locationType,
+        // partOf is either Location/{statisticalID} of another location or 'Location/0'
+        partOf:
+          locationsMap.get(location.partOf.split('/')[1])?.uid ??
+          location.partOf
+      }))
+      .map(
+        (location): fhir.BundleEntry => ({
+          fullUrl: locationsMap.get(location.id)!.uid,
+          resource: {
+            ...composeFhirLocation(location),
+            ...(location.statistics && {
+              extension: generateStatisticalExtensions(location.statistics)
+            })
+          }
+        })
+      )
+  }
 }
 
 export async function seedData() {
@@ -237,7 +320,16 @@ export async function seedData() {
         roles: countryRoles[value]!
       }))
   )
+
   console.log(res)
+  const locations = await getLocations()
+  const locationsBundle = await buildLocationBundle(locations)
+  const res2 = await fetchFromHearth(
+    '',
+    'POST',
+    JSON.stringify(locationsBundle)
+  )
+  console.log(res2)
   seedUsers(token)
 
   // seedCertificate(token)
