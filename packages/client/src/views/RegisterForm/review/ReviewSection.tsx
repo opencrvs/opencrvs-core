@@ -1644,12 +1644,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const disableSubmit = Boolean(
-      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
-        ?.length > 0 ||
-        errorsOnFields.registration?.contactPoint?.errors.length !== 0
-    )
-
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
         return false
@@ -1956,7 +1950,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         declaration={declaration}
                         submitDeclarationAction={submitClickEvent}
                         rejectDeclarationAction={rejectDeclarationClickEvent}
-                        disableSubmit={disableSubmit}
                       />
                     </>
                   ) : (
