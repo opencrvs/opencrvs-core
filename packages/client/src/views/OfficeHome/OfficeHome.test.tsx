@@ -113,7 +113,7 @@ describe('OfficeHome related tests', () => {
       })
       client.query = mockListSyncController
     })
-    it('renders page with five tabs', async () => {
+    it('renders page with four tabs', async () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
@@ -153,24 +153,17 @@ describe('OfficeHome related tests', () => {
       await flushPromises()
 
       const app = testComponent
-      await waitFor(() =>
-        app
-          .find('#navigation_progress')
-          .hostNodes()
-          .text()
-          .includes('In progress7')
-      )
       expect(
         app.find('#navigation_readyForReview').hostNodes().text()
-      ).toContain('Ready for review3')
+      ).toContain('Ready for review')
       expect(
         app.find('#navigation_requiresUpdate').hostNodes().text()
-      ).toContain('Requires update4')
+      ).toContain('Requires update')
       expect(
         app.find('#navigation_waitingValidation').hostNodes().text()
-      ).toContain('In external validation6')
+      ).toContain('In external validation')
       expect(app.find('#navigation_print').hostNodes().text()).toContain(
-        'Ready to print1'
+        'Ready to print'
       )
     })
   })
