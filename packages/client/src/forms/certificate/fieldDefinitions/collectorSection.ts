@@ -19,8 +19,7 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
-  TEXT,
-  ValidatorConditionalFactory
+  TEXT
 } from '@client/forms'
 import { builtInConditionals as conditionals } from '@client/forms/conditionals'
 import {
