@@ -224,7 +224,7 @@ async function getWorkqueueData(
   const scope = getScope(state)
   const reviewStatuses =
     scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      ? [EVENT_STATUS.VALIDATED]
       : [EVENT_STATUS.DECLARED]
 
   const {

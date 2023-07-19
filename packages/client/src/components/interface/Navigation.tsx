@@ -50,6 +50,7 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { ONLY_REGISTRAR_ROLES, REGISTRAR_ROLES } from '@client/utils/constants'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -147,7 +148,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.menuGroup
   ],
   LOCAL_REGISTRAR: [
-    WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
@@ -159,7 +159,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.menuGroup
   ],
   NATIONAL_REGISTRAR: [
-    WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
