@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,6 +22,13 @@ import {
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { seedCertificate } from './certificateSeeding'
+import { v4 as uuid } from 'uuid'
+import {
+  composeFhirLocation,
+  generateStatisticalExtensions
+} from '@gateway/features/restLocation/utils'
+import { fetchFromHearth } from '@gateway/features/fhir/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -83,6 +89,28 @@ type RoleResponse = {
   [K in typeof SYSTEM_ROLES[number]]?: GQLRoleInput[]
 }
 
+type LocationResponse = {
+  id: string
+  name: string
+  alias: string
+  partOf: string
+  locationType: 'ADMIN_STRUCTURE' | 'HEALTH_FACILITY' | 'CRVS_OFFICE'
+  jurisdictionType?:
+    | 'STATE'
+    | 'DISTRICT'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_3'
+    | 'LOCATION_LEVEL_4'
+    | 'LOCATION_LEVEL_5'
+  statistics?: Array<{
+    year: number
+    male_population: number
+    female_population: number
+    population: number
+    crude_birth_rate: number
+  }>
+}
+
 async function getCountryRoles() {
   const url = new URL('roles', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -90,6 +118,15 @@ async function getCountryRoles() {
     throw new Error(`Expected to get the roles from ${url}`)
   }
   return res.json() as Promise<RoleResponse>
+}
+
+async function getLocations() {
+  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the locations from ${url}`)
+  }
+  return res.json() as Promise<LocationResponse[]>
 }
 
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
@@ -108,6 +145,66 @@ async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
   )
 }
 
+async function buildLocationBundle(
+  locations: LocationResponse[]
+): Promise<fhir.Bundle> {
+  const locationsMap = new Map(
+    locations.map((location) => [
+      location.id,
+      { ...location, uid: `urn:uuid:${uuid()}` }
+    ])
+  )
+  const savedLocations = await fetchFromHearth('/Location?_count=0').then(
+    (bundle: fhir.Bundle) => {
+      return (
+        bundle.entry
+          ?.map((bundleEntry) => bundleEntry.resource as fhir.Location)
+          .map((location) =>
+            location.identifier
+              ?.find(
+                ({ system }) =>
+                  system ===
+                    `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
+                  system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+              )
+              ?.value?.split('_')
+              .pop()
+          )
+          .filter((maybeId): maybeId is string => Boolean(maybeId)) ?? []
+      )
+    }
+  )
+  const savedLocationsSet = new Set(savedLocations)
+  return {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: locations
+      .filter((location) => !savedLocationsSet.has(location.id))
+      .map((location) => ({
+        ...location,
+        // statisticalID & code are legacy properties and need to be renamed
+        // to id & locationType
+        statisticalID: location.id,
+        code: location.locationType,
+        // partOf is either Location/{statisticalID} of another location or 'Location/0'
+        partOf:
+          locationsMap.get(location.partOf.split('/')[1])?.uid ??
+          location.partOf
+      }))
+      .map(
+        (location): fhir.BundleEntry => ({
+          fullUrl: locationsMap.get(location.id)!.uid,
+          resource: {
+            ...composeFhirLocation(location),
+            ...(location.statistics && {
+              extension: generateStatisticalExtensions(location.statistics)
+            })
+          }
+        })
+      )
+  }
+}
+
 export async function seedData() {
   const token = await getToken()
   const systemRoles = await createSystemRoles(token)
@@ -115,7 +212,7 @@ export async function seedData() {
   const usedSystemRoles = Object.keys(
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
-  const res = await updateRoles(
+  await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
@@ -126,6 +223,9 @@ export async function seedData() {
         roles: countryRoles[value]!
       }))
   )
+  const locations = await getLocations()
+  const locationsBundle = await buildLocationBundle(locations)
+  const res = await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
   console.log(res)
   seedCertificate(token)
 }
