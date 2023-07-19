@@ -18,7 +18,7 @@ import {
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER,
-  SUBSECTION
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
@@ -138,7 +138,7 @@ class UserReviewFormComponent extends React.Component<
       group.fields.forEach((field: IFormField, idx) => {
         if (field.hideValueInPreview) {
           return
-        } else if (field.type === SUBSECTION) {
+        } else if (field.type === SUBSECTION_HEADER) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })

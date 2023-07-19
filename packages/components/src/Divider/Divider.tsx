@@ -18,6 +18,7 @@ export interface DividerProps {
 }
 
 export const Divider = styled.div<DividerProps>`
+  margin-bottom: 24px;
   padding: 8px 0px;
   border-bottom: ${({ border }) => border || '1px'} solid
     ${({ color, theme }) => color || theme.colors.grey200};

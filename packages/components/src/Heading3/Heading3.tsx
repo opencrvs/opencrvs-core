@@ -14,9 +14,6 @@ import styled from 'styled-components'
 
 export const Heading3 = styled.div`
   ${({ theme }) => theme.fonts.h2};
-  font-weight: 600;
-  font-size: 20px;
-  line-height: 28px;
   color: ${({ theme }) => theme.colors.grey600};
   margin-top: 24px;
 `

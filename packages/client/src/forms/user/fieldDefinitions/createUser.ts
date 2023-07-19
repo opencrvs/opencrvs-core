@@ -178,7 +178,7 @@ export const userSectionFormType: ISerializedFormSection = {
         },
         {
           name: 'seperator',
-          type: 'SUBSECTION',
+          type: 'DIVIDER',
           label: {
             defaultMessage: ' ',
             description: 'empty string',
