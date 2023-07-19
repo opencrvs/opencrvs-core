@@ -1229,13 +1229,3 @@ export interface ICertificate {
   data?: string
 }
 
-export type ValidatorConditionalFactory<T> = ({
-  validators,
-  conditionals
-}: {
-  validators: Record<
-    string,
-    validators.Validation | AnyFn<validators.Validation>
-  >
-  conditionals: Record<string, Conditional>
-}) => T

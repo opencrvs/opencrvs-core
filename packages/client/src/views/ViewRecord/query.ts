@@ -396,6 +396,37 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
       ... on MarriageRegistration {
         _fhirIDMap
         id
+        informant {
+          id
+          relationship
+          otherRelationship
+          _fhirIDPatient
+          identifier {
+            id
+            type
+            otherType
+            fieldsModifiedByIdentity
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          occupation
+          nationality
+          birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
         bride {
           id
           name {

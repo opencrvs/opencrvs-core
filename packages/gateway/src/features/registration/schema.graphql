@@ -257,6 +257,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
 input MarriageRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
+  informant: RelatedPersonInput
   bride: PersonInput
   groom: PersonInput
   witnessOne: RelatedPersonInput
@@ -272,6 +273,7 @@ type MarriageRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   _fhirIDMap: Map
   registration: Registration
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
   bride: Person # -> .section(code='bride-details').entry.reference
   groom: Person # -> .section(code='groom-details').entry.reference
   witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference

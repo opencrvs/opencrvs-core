@@ -234,6 +234,7 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   id: string
   _fhirIDMap?: GQLMap
   registration?: GQLRegistration
+  informant?: GQLRelatedPerson
   bride?: GQLPerson
   groom?: GQLPerson
   witnessOne?: GQLRelatedPerson
@@ -611,6 +612,7 @@ export interface GQLDeathRegistrationInput {
 export interface GQLMarriageRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
+  informant?: GQLRelatedPersonInput
   bride?: GQLPersonInput
   groom?: GQLPersonInput
   witnessOne?: GQLRelatedPersonInput
@@ -4415,6 +4417,7 @@ export interface GQLMarriageRegistrationTypeResolver<TParent = any> {
   id?: MarriageRegistrationToIdResolver<TParent>
   _fhirIDMap?: MarriageRegistrationTo_fhirIDMapResolver<TParent>
   registration?: MarriageRegistrationToRegistrationResolver<TParent>
+  informant?: MarriageRegistrationToInformantResolver<TParent>
   bride?: MarriageRegistrationToBrideResolver<TParent>
   groom?: MarriageRegistrationToGroomResolver<TParent>
   witnessOne?: MarriageRegistrationToWitnessOneResolver<TParent>
@@ -4452,6 +4455,18 @@ export interface MarriageRegistrationTo_fhirIDMapResolver<
 }
 
 export interface MarriageRegistrationToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToInformantResolver<
   TParent = any,
   TResult = any
 > {
