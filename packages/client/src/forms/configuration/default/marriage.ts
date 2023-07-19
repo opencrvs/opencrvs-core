@@ -478,7 +478,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.dateOfBirth,
               conditionals: [
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 }
               ],
@@ -775,7 +775,7 @@ export const marriageRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.dateOfBirth,
               conditionals: [
                 {
-                  action: 'disable',
+                  action: 'hide',
                   expression: 'values.exactDateOfBirthUnknown'
                 }
               ],
