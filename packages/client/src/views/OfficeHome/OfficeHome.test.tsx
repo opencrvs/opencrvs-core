@@ -153,6 +153,13 @@ describe('OfficeHome related tests', () => {
       await flushPromises()
 
       const app = testComponent
+      await waitFor(() =>
+        app
+          .find('#navigation_progress')
+          .hostNodes()
+          .text()
+          .includes('In progress7')
+      )
       expect(
         app.find('#navigation_readyForReview').hostNodes().text()
       ).toContain('Ready for review3')
