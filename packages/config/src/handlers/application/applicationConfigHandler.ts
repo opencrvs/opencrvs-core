@@ -68,10 +68,10 @@ export async function getApplicationConfig(
 ) {
   const configFromCountryConfig = await getConfigFromCountry()
   try {
-    const confingFromDB = await ApplicationConfig.findOne({})
+    const configFromDB = await ApplicationConfig.findOne({})
     const finalConfig = merge(
       configFromCountryConfig,
-      confingFromDB?.toObject()
+      configFromDB?.toObject()
     )
     return finalConfig
   } catch (error) {
