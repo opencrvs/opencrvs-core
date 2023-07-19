@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,7 +22,7 @@ import {
 } from '@gateway/graphql/schema'
 import { Types } from 'mongoose'
 import fetch from 'node-fetch'
-// import { seedCertificate } from './certificateSeeding'
+import { seedCertificate } from './certificateSeeding'
 import { v4 as uuid } from 'uuid'
 import {
   composeFhirLocation,
@@ -134,6 +133,7 @@ async function getUseres() {
 }
 
 let roleToId: { [role: string]: Types.ObjectId } = {}
+
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -309,7 +309,7 @@ export async function seedData() {
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
 
-  const res = await updateRoles(
+  await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
@@ -320,17 +320,11 @@ export async function seedData() {
         roles: countryRoles[value]!
       }))
   )
-
-  console.log(res)
   const locations = await getLocations()
   const locationsBundle = await buildLocationBundle(locations)
-  const res2 = await fetchFromHearth(
-    '',
-    'POST',
-    JSON.stringify(locationsBundle)
-  )
-  console.log(res2)
-  seedUsers(token)
+  const res = await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
+  console.log(res)
 
-  // seedCertificate(token)
+  seedUsers(token)
+  seedCertificate(token)
 }
