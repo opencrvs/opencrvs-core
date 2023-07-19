@@ -593,6 +593,9 @@ export interface ITextareaFormField extends IFormFieldBase {
 export interface ISubsectionFormField extends IFormFieldBase {
   type: typeof SUBSECTION_HEADER
 }
+export interface IDividerFormField extends IFormFieldBase {
+  type: typeof DIVIDER
+}
 export interface IFieldGroupTitleField extends IFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
 }
@@ -718,6 +721,7 @@ export type IFormField =
   | IDateRangePickerFormField
   | ITimeFormFIeld
   | INidVerificationButton
+  | IDividerFormField
 
 export interface IPreviewGroup {
   id: string
