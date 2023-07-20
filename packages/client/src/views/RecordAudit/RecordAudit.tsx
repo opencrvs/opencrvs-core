@@ -788,11 +788,11 @@ const BodyContent = ({
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
             assignment: workqueueDeclaration?.registration?.assignment
           }
-        : getWQDeclarationData(
+        : (getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
             language,
             trackingId
-          )
+          ) as IDeclarationData)
 
     const wqStatus = workqueueDeclaration?.registration?.status
     const draftStatus =

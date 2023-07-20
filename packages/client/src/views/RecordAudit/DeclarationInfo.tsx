@@ -58,7 +58,16 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
-  let informant = getCaptitalizedWord(declaration?.informant)
+  const informantPhone = declaration?.informant?.registrationPhone
+  const informantEmail = declaration?.informant?.registrationEmail
+  const mainContact =
+    informantPhone && informantEmail
+      ? [informantPhone, informantEmail]
+      : informantPhone
+      ? [informantPhone]
+      : informantEmail
+      ? [informantEmail]
+      : undefined
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
@@ -75,10 +84,6 @@ export const GetDeclarationInfo = ({
       : finalStatus === 'Draft'
       ? intl.formatMessage(dynamicConstantsMessages.draft)
       : finalStatus
-
-  if (declaration?.informantContact && informant) {
-    informant = informant + ' · ' + declaration.informantContact
-  }
 
   let info: ILabel = {
     status: declaration?.status && displayStatus,
@@ -102,8 +107,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.birth),
       dateOfBirth: declaration?.dateOfBirth,
-      placeOfBirth: declaration?.placeOfBirth,
-      informant: removeUnderscore(informant)
+      placeOfBirth: declaration?.placeOfBirth
     }
   } else if (info.type === 'Death') {
     if (
@@ -120,8 +124,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.death),
       dateOfDeath: declaration?.dateOfDeath,
-      placeOfDeath: declaration?.placeOfDeath,
-      informant: removeUnderscore(informant)
+      placeOfDeath: declaration?.placeOfDeath
     }
   } else if (info.type === 'Marriage') {
     if (
@@ -138,8 +141,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.marriage),
       dateOfMarriage: declaration?.dateOfMarriage,
-      placeOfMarriage: declaration?.placeOfMarriage,
-      informant: removeUnderscore(informant)
+      placeOfMarriage: declaration?.placeOfMarriage
     }
   }
 
@@ -173,6 +175,16 @@ export const GetDeclarationInfo = ({
             />
           )
         })}
+        <Summary.Row
+          key="contact-summary"
+          data-testid="contact"
+          label={intl.formatMessage(recordAuditMessages.contact)}
+          placeholder={intl.formatMessage(recordAuditMessages.noContact)}
+          value={mainContact?.map((contact) => (
+            <p>{contact}</p>
+          ))}
+          locked={!isDownloaded}
+        />
       </Summary>
 
       <ShowOnMobile>{mobileActions.map((action) => action)}</ShowOnMobile>

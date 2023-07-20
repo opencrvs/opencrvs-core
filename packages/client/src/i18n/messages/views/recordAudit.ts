@@ -48,6 +48,16 @@ interface IRecordAuditMessages
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  contact: {
+    id: 'recordAudit.contact',
+    defaultMessage: 'Contact',
+    description: 'Contact for record audit'
+  },
+  noContact: {
+    id: 'recordAudit.noContact',
+    defaultMessage: 'No contact details provided',
+    description: 'No contact for record audit'
+  },
   archived: {
     id: 'recordAudit.archive.status',
     defaultMessage: 'Archived',
