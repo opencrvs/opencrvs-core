@@ -211,14 +211,12 @@ const seedUsers = async (token: string) => {
   const rawUsers = await getUseres()
 
   for (const rawUser of rawUsers) {
-    const { givenNames, familyName, role, type, primaryOfficeId, ...user } =
-      rawUser
+    const { givenNames, familyName, role, primaryOfficeId, ...user } = rawUser
     const locations = await getLocationsByIdentifier(primaryOfficeId)
     const officeId = locations[0].id
     const parsedUser = {
       ...user,
-      role: roleToId[type],
-      systemRole: role,
+      role: roleToId[role],
       name: [
         {
           use: 'en',
@@ -229,7 +227,7 @@ const seedUsers = async (token: string) => {
       primaryOfficeId: officeId
     }
     const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
-    const res = await fetch(url, {
+    await fetch(url, {
       method: 'POST',
       body: JSON.stringify(parsedUser),
       headers: {
@@ -237,7 +235,6 @@ const seedUsers = async (token: string) => {
         Authorization: token
       }
     })
-    console.log(await res.json())
   }
 }
 
@@ -322,8 +319,7 @@ export async function seedData() {
   )
   const locations = await getLocations()
   const locationsBundle = await buildLocationBundle(locations)
-  const res = await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
-  console.log(res)
+  await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
 
   seedUsers(token)
   seedCertificate(token)
