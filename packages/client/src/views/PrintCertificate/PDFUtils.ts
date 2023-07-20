@@ -17,7 +17,7 @@ import {
 } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
@@ -35,6 +35,7 @@ import isValid from 'date-fns/isValid'
 import formatDate, { formatLongDate } from '@client/utils/date-formatting'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { constantsMessages } from '@client/i18n/messages'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -356,6 +357,17 @@ export function executeHandlebarsTemplate(
     // eslint-disable-next-line prefer-rest-params
     return Array.prototype.slice.call(arguments, 0, -1).join('')
   })
+
+  Handlebars.registerHelper(
+    'getLocalizedLocationName',
+    function (office: ILocation) {
+      if (intl.locale === getDefaultLanguage()) {
+        return office.name
+      } else {
+        return office.alias?.toString()
+      }
+    }
+  )
 
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)
