@@ -49,7 +49,7 @@ export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
-export const SUBSECTION = 'SUBSECTION'
+export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
@@ -67,6 +67,8 @@ export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
 export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
+export const DIVIDER = 'DIVIDER'
+export const HEADING3 = 'HEADING3'
 
 export enum Sort {
   ASC = 'asc',
@@ -589,7 +591,10 @@ export interface ITextareaFormField extends IFormFieldBase {
   maxLength?: number
 }
 export interface ISubsectionFormField extends IFormFieldBase {
-  type: typeof SUBSECTION
+  type: typeof SUBSECTION_HEADER
+}
+export interface IDividerFormField extends IFormFieldBase {
+  type: typeof DIVIDER
 }
 export interface IFieldGroupTitleField extends IFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
@@ -716,6 +721,7 @@ export type IFormField =
   | IDateRangePickerFormField
   | ITimeFormFIeld
   | INidVerificationButton
+  | IDividerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1083,7 +1089,7 @@ export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   maxLength?: number
 }
 export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
-  type: typeof SUBSECTION
+  type: typeof SUBSECTION_HEADER
 }
 export interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
@@ -1156,6 +1162,14 @@ export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
   labelForOffline: string
 }
 
+export interface I18nDividerField extends Ii18nFormFieldBase {
+  type: typeof DIVIDER
+}
+
+export interface I18nHeading3Field extends Ii18nFormFieldBase {
+  type: typeof HEADING3
+}
+
 export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
@@ -1188,6 +1202,8 @@ export type Ii18nFormField =
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
   | Ii18nNidVerificationButtonField
+  | I18nDividerField
+  | I18nHeading3Field
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1217,13 +1233,3 @@ export interface ICertificate {
   data?: string
 }
 
-export type ValidatorConditionalFactory<T> = ({
-  validators,
-  conditionals
-}: {
-  validators: Record<
-    string,
-    validators.Validation | AnyFn<validators.Validation>
-  >
-  conditionals: Record<string, Conditional>
-}) => T

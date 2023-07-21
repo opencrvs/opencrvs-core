@@ -23,8 +23,10 @@ export default defineConfig(({ mode }) => {
   const noTreeshakingForEvalPlugin = () => {
     return {
       name: 'no-treeshaking-for-eval',
+      // hotfix for #5679
       transform(code) {
-        if (code.match(/eval\(/)) return { moduleSideEffects: 'no-treeshake' }
+        if (code.match(/eval\( | getConditionalActionsForField/))
+          return { moduleSideEffects: 'no-treeshake' }
       }
     }
   }

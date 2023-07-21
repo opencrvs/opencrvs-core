@@ -234,6 +234,7 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   id: string
   _fhirIDMap?: GQLMap
   registration?: GQLRegistration
+  informant?: GQLRelatedPerson
   bride?: GQLPerson
   groom?: GQLPerson
   witnessOne?: GQLRelatedPerson
@@ -611,6 +612,7 @@ export interface GQLDeathRegistrationInput {
 export interface GQLMarriageRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
+  informant?: GQLRelatedPersonInput
   bride?: GQLPersonInput
   groom?: GQLPersonInput
   witnessOne?: GQLRelatedPersonInput
@@ -785,6 +787,7 @@ export interface GQLRegistration {
   witnessOneSignatureURI?: string
   witnessTwoSignatureURI?: string
   contactPhoneNumber?: string
+  contactEmail?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
@@ -1170,6 +1173,7 @@ export interface GQLRegistrationInput {
   contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
+  contactEmail?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
@@ -4413,6 +4417,7 @@ export interface GQLMarriageRegistrationTypeResolver<TParent = any> {
   id?: MarriageRegistrationToIdResolver<TParent>
   _fhirIDMap?: MarriageRegistrationTo_fhirIDMapResolver<TParent>
   registration?: MarriageRegistrationToRegistrationResolver<TParent>
+  informant?: MarriageRegistrationToInformantResolver<TParent>
   bride?: MarriageRegistrationToBrideResolver<TParent>
   groom?: MarriageRegistrationToGroomResolver<TParent>
   witnessOne?: MarriageRegistrationToWitnessOneResolver<TParent>
@@ -4450,6 +4455,18 @@ export interface MarriageRegistrationTo_fhirIDMapResolver<
 }
 
 export interface MarriageRegistrationToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MarriageRegistrationToInformantResolver<
   TParent = any,
   TResult = any
 > {
@@ -6345,6 +6362,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>
   witnessTwoSignatureURI?: RegistrationToWitnessTwoSignatureURIResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
+  contactEmail?: RegistrationToContactEmailResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
   inCompleteFields?: RegistrationToInCompleteFieldsResolver<TParent>
@@ -6621,6 +6639,18 @@ export interface RegistrationToWitnessTwoSignatureURIResolver<
 }
 
 export interface RegistrationToContactPhoneNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegistrationToContactEmailResolver<
   TParent = any,
   TResult = any
 > {

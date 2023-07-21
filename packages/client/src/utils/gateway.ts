@@ -215,7 +215,9 @@ export type ApplicationConfiguration = {
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
-  HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
@@ -236,7 +238,9 @@ export type ApplicationConfigurationInput = {
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
-  HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
@@ -977,6 +981,7 @@ export type MarriageRegistration = EventRegistration & {
   groom?: Maybe<Person>
   history?: Maybe<Array<Maybe<History>>>
   id: Scalars['ID']
+  informant?: Maybe<RelatedPerson>
   questionnaire?: Maybe<Array<Maybe<QuestionnaireQuestion>>>
   registration?: Maybe<Registration>
   typeOfMarriage?: Maybe<Scalars['String']>
@@ -991,6 +996,7 @@ export type MarriageRegistrationInput = {
   createdAt?: InputMaybe<Scalars['Date']>
   eventLocation?: InputMaybe<LocationInput>
   groom?: InputMaybe<PersonInput>
+  informant?: InputMaybe<RelatedPersonInput>
   questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
   registration?: InputMaybe<RegistrationInput>
   typeOfMarriage?: InputMaybe<Scalars['String']>
@@ -1851,6 +1857,7 @@ export type Registration = {
   brideSignatureURI?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   contact?: Maybe<Scalars['String']>
+  contactEmail?: Maybe<Scalars['String']>
   contactPhoneNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   draftId?: Maybe<Scalars['String']>
@@ -1889,6 +1896,7 @@ export type RegistrationInput = {
   brideSignature?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
   contact?: InputMaybe<Scalars['String']>
+  contactEmail?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
   contactRelationship?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
@@ -3461,6 +3469,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       informantsSignature?: string | null
       informantsSignatureURI?: string | null
       type?: RegistrationType | null
@@ -3546,6 +3555,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
         address?: {
           __typename?: 'Address'
           state?: string | null
@@ -3782,6 +3792,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       otherInformantType?: string | null
       contact?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       informantsSignature?: string | null
       informantsSignatureURI?: string | null
       trackingId?: string | null
@@ -3856,6 +3867,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
         address?: {
           __typename?: 'Address'
           state?: string | null
@@ -4254,6 +4266,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
         address?: {
           __typename?: 'Address'
           state?: string | null
@@ -4547,6 +4560,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
         address?: {
           __typename?: 'Address'
           state?: string | null
@@ -4736,6 +4750,41 @@ export type FetchMarriageRegistrationForReviewQuery = {
     _fhirIDMap?: any | null
     id: string
     typeOfMarriage?: string | null
+    informant?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      _fhirIDPatient?: string | null
+      occupation?: string | null
+      nationality?: Array<string | null> | null
+      birthDate?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
+      } | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: string | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+    } | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -4945,6 +4994,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -5032,6 +5082,41 @@ export type FetchMarriageRegistrationForCertificateQuery = {
     _fhirIDMap?: any | null
     id: string
     typeOfMarriage?: string | null
+    informant?: {
+      __typename?: 'RelatedPerson'
+      id?: string | null
+      relationship?: string | null
+      otherRelationship?: string | null
+      _fhirIDPatient?: string | null
+      occupation?: string | null
+      nationality?: Array<string | null> | null
+      birthDate?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+        fieldsModifiedByIdentity?: Array<string | null> | null
+      } | null> | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+      } | null> | null
+      address?: Array<{
+        __typename?: 'Address'
+        type?: string | null
+        line?: Array<string | null> | null
+        district?: string | null
+        state?: string | null
+        city?: string | null
+        postalCode?: string | null
+        country?: string | null
+      } | null> | null
+    } | null
     bride?: {
       __typename?: 'Person'
       id?: string | null
@@ -5241,6 +5326,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        alias?: Array<string> | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -7434,7 +7520,9 @@ export type UpdateApplicationConfigMutation = {
     APPLICATION_NAME?: string | null
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
-    HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
+    HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean | null
+    HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean | null
+    HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean | null
     DATE_OF_BIRTH_UNKNOWN?: boolean | null
     INFORMANT_SIGNATURE?: boolean | null
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
@@ -8347,6 +8435,7 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
+          contactEmail?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
@@ -8629,6 +8718,7 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
+          contactEmail?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
@@ -8905,6 +8995,7 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
+          contactEmail?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null

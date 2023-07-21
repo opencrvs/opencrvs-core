@@ -257,6 +257,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
 input MarriageRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
+  informant: RelatedPersonInput
   bride: PersonInput
   groom: PersonInput
   witnessOne: RelatedPersonInput
@@ -272,6 +273,7 @@ type MarriageRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   _fhirIDMap: Map
   registration: Registration
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
   bride: Person # -> .section(code='bride-details').entry.reference
   groom: Person # -> .section(code='groom-details').entry.reference
   witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
@@ -327,6 +329,7 @@ input RegistrationInput {
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
+  contactEmail: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
@@ -365,6 +368,7 @@ type Registration { # -> Task
   witnessOneSignatureURI: String # actual minio object uri for witnessOneSignatureURI
   witnessTwoSignatureURI: String # actual minio object uri for witnessTwoSignatureURI
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
+  contactEmail: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString

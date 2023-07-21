@@ -70,8 +70,9 @@ import {
   SELECT_WITH_OPTIONS,
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
-  SUBSECTION,
-  WARNING
+  WARNING,
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -242,6 +243,9 @@ const DeclarationDataContainer = styled.div``
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
+`
+const StyledLabel = styled.span`
+  ${({ theme }) => theme.fonts.h3}
 `
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
@@ -871,7 +875,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [BULLET_LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [BULLET_LIST, PARAGRAPH, WARNING, DIVIDER, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -910,6 +914,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     return {
       label: intl.formatMessage(fieldLabel),
+      type: group.fields.find((field) => field.name === fieldName)?.type,
       value,
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
@@ -1644,12 +1649,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const disableSubmit = Boolean(
-      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
-        ?.length > 0 ||
-        errorsOnFields.registration?.contactPoint?.errors.length !== 0
-    )
-
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
         return false
@@ -1849,7 +1848,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             return (
                               <ListViewItemSimplified
                                 key={index}
-                                label={<Label>{item.label}</Label>}
+                                label={
+                                  item.type === SUBSECTION_HEADER ? (
+                                    <StyledLabel>{item.label}</StyledLabel>
+                                  ) : (
+                                    <Label>{item.label}</Label>
+                                  )
+                                }
                                 value={
                                   <Value id={item.label.split(' ')[0]}>
                                     {item.value}
@@ -1956,7 +1961,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         declaration={declaration}
                         submitDeclarationAction={submitClickEvent}
                         rejectDeclarationAction={rejectDeclarationClickEvent}
-                        disableSubmit={disableSubmit}
                       />
                     </>
                   ) : (

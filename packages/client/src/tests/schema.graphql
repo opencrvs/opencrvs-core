@@ -1159,7 +1159,6 @@ enum InformantType {
   GRANDSON
   GRANDDAUGHTER
   OTHER
->>>>>>> 83cec2a1a (Cameroon core branch (#4847))
 }
 
 type AssignmentData {
@@ -1400,7 +1399,7 @@ enum CustomFieldType {
   TEL
   TEXTAREA
   NUMBER
-  SUBSECTION
+  SUBSECTION_HEADER
   PARAGRAPH
 }
 
