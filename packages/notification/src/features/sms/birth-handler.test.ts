@@ -40,7 +40,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -67,7 +70,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -99,7 +105,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -130,7 +139,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -157,7 +169,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -189,7 +204,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -220,7 +238,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456',
           registrationNumber: '20196816020000129'
@@ -248,7 +269,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRegistrationSMS',
         payload: {
-          msisdn: '447789778823'
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          }
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -278,7 +302,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456',
           registrationNumber: '20196816020000129'
@@ -310,7 +337,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -337,7 +367,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -369,7 +402,10 @@ describe('Verify birth handlers', () => {
         method: 'POST',
         url: '/birthRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },

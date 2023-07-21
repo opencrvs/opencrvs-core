@@ -33,8 +33,9 @@ export async function sendDeathInProgressConfirmation(
   const templateName = messageKeys.deathInProgressNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
@@ -56,8 +57,9 @@ export async function sendDeathDeclarationConfirmation(
   const templateName = messageKeys.deathDeclarationNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
       trackingId: payload.trackingId
@@ -79,8 +81,9 @@ export async function sendDeathRegistrationConfirmation(
   const templateName = messageKeys.deathRegistrationNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
       trackingId: payload.trackingId,
@@ -103,8 +106,9 @@ export async function sendDeathRejectionConfirmation(
   const templateName = messageKeys.deathRejectionNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
       trackingId: payload.trackingId
