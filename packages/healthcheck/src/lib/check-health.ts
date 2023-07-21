@@ -12,12 +12,13 @@
 
 export enum Status {
   OK = 'ok',
-  ERROR = 'error'
+  ERROR = 'error',
+  LOADING = 'loading'
 }
 
 export interface Service extends Record<string, unknown> {
   name: string
-  status: Status
+  status: string
   error?: string
   url?: string
   ping?: number

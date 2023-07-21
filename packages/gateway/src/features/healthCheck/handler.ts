@@ -17,7 +17,10 @@ import {
   METRICS_URL,
   NOTIFICATION_URL,
   COUNTRY_CONFIG_URL,
-  WORKFLOW_URL
+  WORKFLOW_URL,
+  DOCUMENTS_URL,
+  WEBHOOK_URL,
+  APPLICATION_CONFIG_URL
 } from '@gateway/constants'
 import { getServiceHealth, PingService } from './api'
 import { performance } from 'perf_hooks'
@@ -30,7 +33,10 @@ const SERVICES_TO_CHECK: readonly PingService[] = [
   { name: 'notification', url: new URL('ping', NOTIFICATION_URL) },
   { name: 'countryconfig', url: new URL('ping', COUNTRY_CONFIG_URL) },
   { name: 'search', url: new URL('ping', SEARCH_URL) },
-  { name: 'workflow', url: new URL('ping', WORKFLOW_URL) }
+  { name: 'workflow', url: new URL('ping', WORKFLOW_URL) },
+  { name: 'documents', url: new URL('ping', DOCUMENTS_URL) },
+  { name: 'webhooks', url: new URL('ping', WEBHOOK_URL) },
+  { name: 'applicationconfig', url: new URL('ping', APPLICATION_CONFIG_URL) }
 ]
 
 export async function checkServiceHealth(service: PingService) {
