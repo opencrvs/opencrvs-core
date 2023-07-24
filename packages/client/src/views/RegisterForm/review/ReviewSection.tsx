@@ -1826,59 +1826,61 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <ReviewContainter>
-                {transformedSectionData.map((sec, index) => {
-                  return (
-                    <DeclarationDataContainer key={index}>
-                      <Accordion
-                        name="accordion-component"
-                        label={sec.title}
-                        action={
-                          sec.action && (
-                            <Link font="reg16" onClick={sec.action.handler}>
-                              {sec.action.label}
-                            </Link>
-                          )
-                        }
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        expand={true}
-                      >
-                        <ListViewSimplified id={'Section_' + sec.id}>
-                          {sec.items.map((item, index) => {
-                            return (
-                              <ListViewItemSimplified
-                                key={index}
-                                label={
-                                  item.type === SUBSECTION_HEADER ? (
-                                    <StyledLabel>{item.label}</StyledLabel>
-                                  ) : (
-                                    <Label>{item.label}</Label>
-                                  )
-                                }
-                                value={
-                                  <Value id={item.label.split(' ')[0]}>
-                                    {item.value}
-                                  </Value>
-                                }
-                                actions={
-                                  !item?.action?.disabled && (
-                                    <LinkButton
-                                      id={item.action.id}
-                                      disabled={item.action.disabled}
-                                      onClick={item.action.handler}
-                                    >
-                                      {item.action.label}
-                                    </LinkButton>
-                                  )
-                                }
-                              />
+                {transformedSectionData
+                  .filter((sec) => sec.items.length > 0)
+                  .map((sec, index) => {
+                    return (
+                      <DeclarationDataContainer key={index}>
+                        <Accordion
+                          name="accordion-component"
+                          label={sec.title}
+                          action={
+                            sec.action && (
+                              <Link font="reg16" onClick={sec.action.handler}>
+                                {sec.action.label}
+                              </Link>
                             )
-                          })}
-                        </ListViewSimplified>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
+                          }
+                          labelForHideAction="Hide"
+                          labelForShowAction="Show"
+                          expand={true}
+                        >
+                          <ListViewSimplified id={'Section_' + sec.id}>
+                            {sec.items.map((item, index) => {
+                              return (
+                                <ListViewItemSimplified
+                                  key={index}
+                                  label={
+                                    item.type === SUBSECTION_HEADER ? (
+                                      <StyledLabel>{item.label}</StyledLabel>
+                                    ) : (
+                                      <Label>{item.label}</Label>
+                                    )
+                                  }
+                                  value={
+                                    <Value id={item.label.split(' ')[0]}>
+                                      {item.value}
+                                    </Value>
+                                  }
+                                  actions={
+                                    !item?.action?.disabled && (
+                                      <LinkButton
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                      >
+                                        {item.action.label}
+                                      </LinkButton>
+                                    )
+                                  }
+                                />
+                              )
+                            })}
+                          </ListViewSimplified>
+                        </Accordion>
+                      </DeclarationDataContainer>
+                    )
+                  })}
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}
