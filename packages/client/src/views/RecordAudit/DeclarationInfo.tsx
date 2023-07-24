@@ -42,6 +42,14 @@ const ShowOnMobile = styled.div`
     margin-top: 32px;
   }
 `
+const StyledSummaryRow = styled(Summary.Row)`
+  th {
+    vertical-align: baseline;
+  }
+`
+const StyledDiv = styled.div`
+  padding-bottom: 4px;
+`
 
 interface ILabel {
   [key: string]: string | undefined
@@ -61,12 +69,8 @@ export const GetDeclarationInfo = ({
   const informantPhone = declaration?.informant?.registrationPhone
   const informantEmail = declaration?.informant?.registrationEmail
   const mainContact =
-    informantPhone && informantEmail
-      ? [informantPhone, informantEmail]
-      : informantPhone
-      ? [informantPhone]
-      : informantEmail
-      ? [informantEmail]
+    [informantPhone, informantEmail].filter(Boolean).length > 0
+      ? [informantPhone, informantEmail].filter(Boolean)
       : undefined
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
@@ -175,13 +179,13 @@ export const GetDeclarationInfo = ({
             />
           )
         })}
-        <Summary.Row
+        <StyledSummaryRow
           key="contact-summary"
           data-testid="contact"
           label={intl.formatMessage(recordAuditMessages.contact)}
           placeholder={intl.formatMessage(recordAuditMessages.noContact)}
-          value={mainContact?.map((contact) => (
-            <p>{contact}</p>
+          value={mainContact?.map((contact, index) => (
+            <StyledDiv key={'contact_' + index}>{contact}</StyledDiv>
           ))}
           locked={!isDownloaded}
         />

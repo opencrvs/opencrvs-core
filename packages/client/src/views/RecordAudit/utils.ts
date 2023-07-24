@@ -426,8 +426,7 @@ export const getWQDeclarationData = (
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
-    placeOfBirth: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfBirth: EMPTY_STRING
   }
 }
 
