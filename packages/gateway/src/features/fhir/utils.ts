@@ -56,15 +56,12 @@ import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
-  BIRTH_REG_NO,
-  DEATH_REG_NO,
   DOWNLOADED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  MARRIAGE_REG_NO,
   MARKED_AS_DUPLICATE,
   MARKED_AS_NOT_DUPLICATE,
   VERIFIED_EXTENSION_URL,
@@ -927,7 +924,7 @@ export function setArrayPropInResourceObject(
 
 export function findExtension(
   url: string,
-  extensions: fhir.Extension[]
+  extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   const extension =
     extensions &&
@@ -957,13 +954,15 @@ export async function setCertificateCollector(
     familyName: nameItem.family,
     firstNames: nameItem.given.join(' ')
   }))
+  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
 
-  ;(details?.registration?.certificates || []).map((certificate: any) => {
-    if (!certificate?.collector) {
+  details?.registration?.certificates?.forEach((certificate) => {
+    if (!certificate) return
+    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
       certificate.collector = {
-        individual: { name },
+        name,
         relationship: 'PRINT_IN_ADVANCE',
-        otherRelationship: userDetails.role
+        otherRelationship: role
       }
     }
     return certificate
@@ -1379,63 +1378,12 @@ export async function getDeclarationIds(
   return { trackingId: compositionBundle.identifier.value, compositionId }
 }
 
-export async function getRegistrationIdsFromResponse(
+export async function getCompositionIdFromResponse(
   resBody: fhir.Bundle,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const compositionId = getIDFromResponse(resBody)
-  return getRegistrationIds(
-    compositionId,
-    eventType,
-    isTaskResponse(resBody),
-    authHeader
-  )
-}
-
-export async function getRegistrationIds(
-  compositionId: string,
-  eventType: EVENT_TYPE,
-  isTask: boolean,
-  authHeader: IAuthHeader
-) {
-  let registrationNumber: string
-  if (eventType === EVENT_TYPE.BIRTH) {
-    registrationNumber = BIRTH_REG_NO
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    registrationNumber = DEATH_REG_NO
-  } else if (eventType === EVENT_TYPE.MARRIAGE) {
-    registrationNumber = MARRIAGE_REG_NO
-  }
-
-  let path
-  if (isTask) {
-    path = `/Task/${compositionId}`
-  } else {
-    path = `/Task?focus=Composition/${compositionId}`
-  }
-  const taskBundle = await fetchFHIR(path, authHeader)
-  let taskResource
-  if (taskBundle && taskBundle.entry && taskBundle.entry[0].resource) {
-    taskResource = taskBundle.entry[0].resource
-  } else if (taskBundle.resourceType === 'Task') {
-    taskResource = taskBundle
-  } else {
-    throw new Error('getRegistrationIds: Invalid task found')
-  }
-  const regIdentifier =
-    taskResource.identifier &&
-    taskResource.identifier.find(
-      (identifier: fhir.Identifier) =>
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/${registrationNumber}`
-    )
-  if (!regIdentifier || !regIdentifier.value) {
-    throw new Error(
-      'getRegistrationIds: Task does not have any registration identifier'
-    )
-  }
-  return { registrationNumber: regIdentifier.value, compositionId }
+  return { compositionId: getIDFromResponse(resBody) }
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {
@@ -1465,37 +1413,28 @@ export function isTaskResponse(resBody: fhir.Bundle): boolean {
   return resBody.entry[0].response.location.indexOf('Task') > -1
 }
 
-export async function setInformantReference(
+export function setInformantReference(
   sectionCode: string,
+  sectionTitle: string,
   relatedPerson: fhir.RelatedPerson,
   fhirBundle: ITemplatedBundle,
   context: any
 ) {
+  selectOrCreatePersonResource(sectionCode, sectionTitle, fhirBundle)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      logger.error('Expected person entry not found on the bundle')
-      return
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = await fetchFHIR(
-      `/Composition/${fhirBundle.entry[0].resource.id}`,
-      context.authHeader
-    )
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
+  if (!section?.entry) {
+    throw new Error(`${sectionCode} not found in composition!`)
+  }
+  const personSectionEntry = section.entry[0]
+  const personEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === personSectionEntry.reference
+  )
+  if (!personEntry) {
+    logger.error('Expected person entry not found on the bundle')
+    return
+  }
+  relatedPerson.patient = {
+    reference: personEntry.fullUrl
   }
 }
 
@@ -1520,7 +1459,7 @@ export const fetchDocuments = async <T = any>(
     body
   })
   const res = await result.json()
-  return await res
+  return res
 }
 
 export async function uploadBase64ToMinio(

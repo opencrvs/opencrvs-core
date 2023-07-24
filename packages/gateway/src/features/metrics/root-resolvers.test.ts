@@ -26,7 +26,6 @@ describe('get total metrics', () => {
           maleEstimation: 127633,
           femaleEstimation: 136838,
           locationId: 'Location/0',
-          estimationYear: 2022,
           locationLevel: 'COUNTRY'
         },
         results: [

@@ -489,12 +489,6 @@ describe('validate', () => {
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
-    it('should error when an English number is given', () => {
-      const badValue = 'John1'
-      expect(englishOnlyNameFormat(badValue)).toEqual({
-        message: messages.englishOnlyNameFormat
-      })
-    })
     it('should error when a Bengali number is given', () => {
       const badValue = 'John১'
       expect(englishOnlyNameFormat(badValue)).toEqual({
@@ -547,6 +541,11 @@ describe('validate', () => {
 
       it('should pass when given a good name in English with number', () => {
         const goodValue = 'John 3rd'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when given a good name in English with number at first', () => {
+        const goodValue = "10th John The Alex'ander"
         expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
       })
 

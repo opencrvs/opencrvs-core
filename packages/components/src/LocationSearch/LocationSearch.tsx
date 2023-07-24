@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Location } from '../icons'
+import { Icon } from '../Icon'
 import { PrimaryButton } from '../buttons'
 import { InputError } from '../InputField/InputError'
 
@@ -30,6 +30,7 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   width: 344px;
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
@@ -45,7 +46,7 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   height: 40px;
   border-radius: 4px;
   ${({ theme }) => theme.fonts.reg18};
-  padding-left: 36px;
+  padding-left: 32px;
   border: 2px solid
     ${({ theme, error, touched }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -269,7 +270,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
       <>
         <LocationSearchContainer>
           <Wrapper className={this.props.className}>
-            <Location id="locationSearchIcon" />
+            <Icon name="MapPin" size="medium" />
             <SearchTextInput
               id={this.props.id ? this.props.id : 'locationSearchInput'}
               type="text"

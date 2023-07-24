@@ -202,10 +202,12 @@ async function createBrideIndex(
     brideNameLocal && brideNameLocal.given && brideNameLocal.given.join(' ')
   body.brideFamilyNameLocal =
     brideNameLocal && brideNameLocal.family && brideNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.brideIdentifier =
+    bride &&
     bride.identifier &&
     bride.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
@@ -240,10 +242,13 @@ async function createGroomIndex(
     groomNameLocal && groomNameLocal.given && groomNameLocal.given.join(' ')
   body.groomFamilyNameLocal =
     groomNameLocal && groomNameLocal.family && groomNameLocal.family[0]
-  body.marriageDate =
-    (marriageExtension && marriageExtension.valueDateTime) || ''
+
+  if (marriageExtension) {
+    body.marriageDate = marriageExtension.valueDateTime
+  }
 
   body.groomIdentifier =
+    groom &&
     groom.identifier &&
     groom.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
@@ -345,6 +350,10 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
   )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
+  )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
@@ -382,6 +391,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

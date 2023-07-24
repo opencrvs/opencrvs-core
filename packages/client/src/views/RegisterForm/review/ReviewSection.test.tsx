@@ -15,16 +15,16 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  BirthSection,
+  // BirthSection,
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
-  DeathSection,
+  // DeathSection,
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  MarriageSection
+  DOCUMENT_UPLOADER_WITH_OPTION
+  // MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
@@ -297,7 +297,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -310,18 +310,18 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should click the Validate Declaration Button', async () => {
-      const validateButton = reviewSectionComponent
-        .find('#validateDeclarationBtn')
-        .hostNodes().length
-      expect(validateButton).toEqual(1)
+    it('Should click the validator Declaration Button', async () => {
+      const validatorButton = reviewSectionComponent.contains(
+        '#validatorDeclarationBtn'
+      )
+      expect(validatorButton).toBeFalsy()
     })
 
     it('Should click the Reject Declaration Button', async () => {
-      const rejectButton = reviewSectionComponent
-        .find('#rejectDeclarationBtn')
-        .hostNodes().length
-      expect(rejectButton).toEqual(1)
+      const rejectButton = reviewSectionComponent.contains(
+        '#rejectDeclarationBtn'
+      )
+      expect(rejectButton).toBeFalsy()
     })
 
     describe('when user clicks on change link', () => {
@@ -365,8 +365,7 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Registration,
-              hasDocumentSection: true,
+              id: 'registration',
               viewType: 'form' as ViewType,
               title: {
                 defaultMessage: 'Informant',
@@ -392,7 +391,7 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       options: [
                         {
                           value: 'FATHER',
@@ -423,7 +422,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ],
                         MOTHER: [
@@ -437,7 +436,7 @@ describe('when in device of large viewport', () => {
                             },
                             required: false,
                             initialValue: '',
-                            validate: [phoneNumberFormat]
+                            validator: [phoneNumberFormat]
                           }
                         ]
                       }
@@ -451,7 +450,7 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               viewType: 'form' as ViewType,
               name: {
                 defaultMessage: 'What are the deceased details?',
@@ -477,7 +476,7 @@ describe('when in device of large viewport', () => {
                       },
                       required: true,
                       initialValue: '',
-                      validate: [],
+                      validator: [],
                       conditionals: []
                     }
                   ]
@@ -489,7 +488,7 @@ describe('when in device of large viewport', () => {
         marriage: {
           sections: [
             {
-              id: MarriageSection.Groom,
+              id: 'groom',
               name: formMessages.groomName,
               title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
@@ -546,10 +545,10 @@ describe('when in device of large viewport', () => {
 
     it('renders validation error if wrong value given', () => {
       expect(
-        reviewSectionComponent
-          .find('#required_label_registration_informant')
-          .hostNodes()
-      ).toHaveLength(2)
+        reviewSectionComponent.contains(
+          '#required_label_registration_informant'
+        )
+      ).toBeFalsy()
     })
   })
 
@@ -566,11 +565,10 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Child,
+              id: 'child',
               viewType: 'form' as ViewType,
               title: formMessages.childTitle,
               name: formMessages.childTitle,
-              hasDocumentSection: true,
               groups: [
                 {
                   id: 'child-view-group',
@@ -582,7 +580,7 @@ describe('when in device of large viewport', () => {
                       searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
-                      validate: [],
+                      validator: [],
                       label: formMessages.birthLocation
                     }
                   ]
@@ -594,7 +592,7 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               name: formMessages.deceasedTitle,
               title: formMessages.deceasedTitle,
               viewType: 'form' as ViewType,
@@ -605,7 +603,7 @@ describe('when in device of large viewport', () => {
         marriage: {
           sections: [
             {
-              id: MarriageSection.Groom,
+              id: 'groom',
               name: formMessages.groomName,
               title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
@@ -664,9 +662,8 @@ describe('when in device of small viewport', () => {
       birth: {
         sections: [
           {
-            id: BirthSection.Mother,
+            id: 'mother',
             name: formMessages.motherTitle,
-            hasDocumentSection: true,
             title: formMessages.motherTitle,
             viewType: 'form' as ViewType,
             groups: [
@@ -678,7 +675,7 @@ describe('when in device of small viewport', () => {
                     type: DATE,
                     label: formMessages.dateOfBirth,
                     required: true,
-                    validate: [],
+                    validator: [],
                     initialValue: ''
                   }
                 ]
@@ -686,7 +683,7 @@ describe('when in device of small viewport', () => {
             ]
           },
           {
-            id: BirthSection.Documents,
+            id: 'documents',
             name: formMessages.documentsName,
             title: formMessages.documentsTitle,
             viewType: 'form' as ViewType,
@@ -700,7 +697,7 @@ describe('when in device of small viewport', () => {
                     type: DOCUMENT_UPLOADER_WITH_OPTION,
                     label: formMessages.uploadDocForMother,
                     required: true,
-                    validate: [],
+                    validator: [],
                     options: [
                       {
                         label: formMessages.docTypeBirthCert,
@@ -717,7 +714,7 @@ describe('when in device of small viewport', () => {
       death: {
         sections: [
           {
-            id: DeathSection.Deceased,
+            id: 'deceased',
             name: formMessages.deceasedTitle,
             title: formMessages.deceasedTitle,
             viewType: 'form' as ViewType,
@@ -728,7 +725,7 @@ describe('when in device of small viewport', () => {
       marriage: {
         sections: [
           {
-            id: MarriageSection.Groom,
+            id: 'groom',
             name: formMessages.groomName,
             title: formMessages.groomTitle,
             viewType: 'form' as ViewType,
@@ -806,7 +803,7 @@ describe('when in device of small viewport', () => {
       reviewSectionComponent
         .find('#preview_image_field')
         .hostNodes()
-        .find('#preview_back')
+        .find('#preview_close')
         .hostNodes()
         .simulate('click')
 

@@ -168,6 +168,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -189,6 +190,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -210,6 +212,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -231,6 +234,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -252,6 +256,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -273,6 +278,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -294,6 +300,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -315,6 +322,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -336,6 +344,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -357,6 +366,7 @@ const dummyBirthRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -388,7 +398,7 @@ const dummyBirthRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:19:25.860+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -398,6 +408,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1102,6 +1116,10 @@ const dummyBirthRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1125,8 +1143,8 @@ const dummyBirthRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1266,6 +1284,7 @@ const dummyDeathRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1287,6 +1306,7 @@ const dummyDeathRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1310,6 +1330,7 @@ const dummyDeathRegistrationResponse = {
           },
           __typename: 'Location'
         },
+        partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         __typename: 'RegWorkflow'
       }
     ],
@@ -1344,7 +1365,7 @@ const dummyDeathRegistrationResponse = {
   history: [
     {
       date: '2022-03-25T12:30:51.727+00:00',
-      action: 'DOWNLOADED',
+      regStatus: 'REGISTERED',
       reinstated: false,
       location: {
         id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
@@ -1354,6 +1375,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1458,6 +1483,10 @@ const dummyDeathRegistrationResponse = {
       office: {
         id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
         name: 'Ibombo District Office',
+        address: {
+          state: 'Central',
+          district: 'Ibombo'
+        },
         __typename: 'Location'
       },
       user: {
@@ -1481,8 +1510,8 @@ const dummyDeathRegistrationResponse = {
         },
         name: [
           {
-            firstNames: 'Kennedy',
-            familyName: 'Mweene',
+            firstNames: 'Felix',
+            familyName: 'Katongo',
             use: 'en',
             __typename: 'HumanName'
           }
@@ -1653,6 +1682,7 @@ const dummyMarriageRegistrationResponse = {
             state: 'Central Province',
             __typename: 'Address'
           },
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           __typename: 'Location'
         },
         __typename: 'RegWorkflow'
@@ -1665,7 +1695,8 @@ const dummyMarriageRegistrationResponse = {
           name: 'Ibombo District Office',
           alias: ['Ibombo District Office'],
           address: null,
-          __typename: 'Location'
+          __typename: 'Location',
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
         },
         __typename: 'RegWorkflow'
       },
@@ -1677,7 +1708,8 @@ const dummyMarriageRegistrationResponse = {
           name: 'Ibombo District Office',
           alias: ['Ibombo District Office'],
           address: null,
-          __typename: 'Location'
+          __typename: 'Location',
+          partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
         },
         __typename: 'RegWorkflow'
       }
@@ -1876,6 +1908,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
@@ -1887,6 +1920,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Abwe',
       alias: 'Abwe',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -1897,6 +1931,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Ibombo',
       alias: 'Ibombo',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -1907,6 +1942,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Central',
       alias: 'Central',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',

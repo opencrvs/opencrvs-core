@@ -175,13 +175,6 @@ describe('Verify handler', () => {
         .spyOn(require('./utils'), 'sendEventNotification')
         .mockReturnValue('')
 
-      jest
-        .spyOn(
-          require('../../utils/formDraftUtils'),
-          'checkFormDraftStatusToAddTestExtension'
-        )
-        .mockReturnValue('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -1314,7 +1307,8 @@ describe('markEventAsWaitingValidationHandler', () => {
       // For triggering DECLARATION_UPDATED event
       [JSON.stringify({}), { status: 200 }],
       // This is needed only for the bundle with input output
-      ...getMarkBundleAndPostToHearthMockResponses
+      ...getMarkBundleAndPostToHearthMockResponses,
+      [hearthResponseMock, { status: 200 }]
     )
   })
 

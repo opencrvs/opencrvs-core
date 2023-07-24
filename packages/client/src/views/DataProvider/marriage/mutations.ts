@@ -13,7 +13,7 @@ import { gql } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
 import { REQUEST_MARRIAGE_REG_CORRECTION } from '@client/forms/correction/mutations'
 
-export const SUBMIT_MARRIAGE_DECLARATION = gql`
+const SUBMIT_MARRIAGE_DECLARATION = gql`
   mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
     createMarriageRegistration(details: $details) {
       trackingId
@@ -21,7 +21,7 @@ export const SUBMIT_MARRIAGE_DECLARATION = gql`
     }
   }
 `
-export const APPROVE_MARRIAGE_DECLARATION = gql`
+const APPROVE_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsValidated(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -29,7 +29,7 @@ export const APPROVE_MARRIAGE_DECLARATION = gql`
     markMarriageAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_MARRIAGE_DECLARATION = gql`
+const REGISTER_MARRIAGE_DECLARATION = gql`
   mutation markMarriageAsRegistered(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -72,7 +72,7 @@ export const REGISTER_MARRIAGE_DECLARATION = gql`
     }
   }
 `
-export const REJECT_MARRIAGE_DECLARATION = gql`
+const REJECT_MARRIAGE_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
     $reason: String!
@@ -82,7 +82,7 @@ export const REJECT_MARRIAGE_DECLARATION = gql`
   }
 `
 
-export const ARCHIVE_MARRIAGE_DECLARATION = gql`
+const ARCHIVE_MARRIAGE_DECLARATION = gql`
   mutation markEventAsArchived(
     $id: String!
     $reason: String
@@ -98,7 +98,7 @@ export const ARCHIVE_MARRIAGE_DECLARATION = gql`
   }
 `
 
-export const COLLECT_MARRIAGE_CERTIFICATE = gql`
+const COLLECT_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsCertified(
     $id: ID!
     $details: MarriageRegistrationInput!
@@ -107,13 +107,7 @@ export const COLLECT_MARRIAGE_CERTIFICATE = gql`
   }
 `
 
-export const MARK_EVENT_UNASSIGNED = gql`
-  mutation submitMutation($id: String!) {
-    markEventAsUnassigned(id: $id)
-  }
-`
-
-export const ISSUE_MARRIAGE_CERTIFICATE = gql`
+const ISSUE_MARRIAGE_CERTIFICATE = gql`
   mutation markMarriageAsIssued(
     $id: ID!
     $details: MarriageRegistrationInput!

@@ -11,7 +11,6 @@
  */
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { callingCountries } from 'country-data'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 
@@ -61,17 +60,6 @@ export async function getSystem(
   const body = await res.json()
 
   return body
-}
-
-export const convertToLocal = (
-  mobileWithCountryCode: string,
-  countryCode: string
-) => {
-  countryCode = countryCode.toUpperCase()
-  return mobileWithCountryCode.replace(
-    callingCountries[countryCode].countryCallingCodes[0],
-    '0'
-  )
 }
 
 // @todo remove this as it's not used anywhere (other than tests)

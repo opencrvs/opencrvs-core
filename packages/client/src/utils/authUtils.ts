@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as queryString from 'querystring'
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
@@ -17,10 +16,9 @@ import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from './userUtils'
-export interface IURLParams {
-  [key: string]: string | string[] | undefined
-}
+
 export type Scope = string[]
+
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -33,12 +31,8 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
 }
 
 export function getToken(): string {
-  return (
-    (queryString.parse(window.location.search.replace(/^\?/, ''))
-      .token as string) ||
-    localStorage.getItem('opencrvs') ||
-    ''
-  )
+  const params = new URLSearchParams(window.location.search)
+  return params.get('token') || localStorage.getItem('opencrvs') || ''
 }
 
 export function storeToken(token: string) {
@@ -84,10 +78,10 @@ export function isTokenAboutToExpire(token: string) {
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
 }
 
-export function refreshToken() {
+export async function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    const res = await fetch(`${window.config.AUTH_URL}/refreshToken`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -96,11 +90,10 @@ export function refreshToken() {
         token
       })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        removeToken()
-        storeToken(data.token)
-      })
+    const data = await res.json()
+
+    removeToken()
+    storeToken(data.token)
   }
 }
 

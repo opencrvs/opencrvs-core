@@ -31,7 +31,7 @@ import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
+import { Box, Stack, Text, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { BackgroundWrapper } from '@client/views/common/Common'
@@ -70,7 +70,7 @@ const Content = styled(Stack)`
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
-export const EnterPinLabel = () => {
+const EnterPinLabel = () => {
   const intl = useIntl()
   return (
     <Text element="h1" variant="h2" align="center">

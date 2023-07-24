@@ -56,7 +56,7 @@ import {
   recordAuditMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
@@ -82,6 +82,7 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const SupportingDocumentWrapper = styled(Stack)`
+  position: sticky;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column;
     align-items: flex-start;
@@ -122,7 +123,7 @@ export const getVisibleSections = (
   )
 }
 
-export const getViewableSection = (
+const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
 ): IFormSection[] => {
@@ -586,7 +587,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item)
       }
     })
@@ -676,11 +677,14 @@ export const DuplicateFormTabs = (props: IProps) => {
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
         registeredAt: (eventData.history as History[]).find(
-          (data) => data.action === null
+          (data) =>
+            data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (eventData.history as History[]).find((data) => data.action === null)
-            ?.user?.name as HumanName[],
+          (eventData.history as History[]).find(
+            (data) =>
+              data.action === null && data.regStatus === RegStatus.Registered
+          )?.user?.name as HumanName[],
           language
         )
       }

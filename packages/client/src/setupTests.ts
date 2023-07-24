@@ -35,7 +35,7 @@ const config = {
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
-  MINIO_URL: 'http://localhost:3535',
+  MINIO_BUCKET: 'ocrvs',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -47,7 +47,7 @@ const config = {
       DELAYED: 0
     }
   },
-  COUNTRY: 'bgd',
+  COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
@@ -61,6 +61,7 @@ const config = {
   },
   LANGUAGES: 'en,bn,fr',
   AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
+  USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
@@ -97,6 +98,16 @@ vi.doMock('@client/forms/configuration/default', async () => ({
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
+}))
+
+vi.mock('@client/forms/conditionals', async () => ({
+  ...((await vi.importActual('@client/forms/conditionals')) as any),
+  conditionals: ((await vi.importActual('@client/forms/conditionals')) as any)
+    .builtInConditionals
+}))
+
+vi.mock('@client/forms/validators', async () => ({
+  validators: await vi.importActual('@client/utils/validate')
 }))
 
 /*
@@ -166,7 +177,10 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
-      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse)
+      loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
+      loadForms: () => Promise.resolve(mockOfflineData.forms),
+      importConditionals: () => Promise.resolve({}),
+      importValidators: () => Promise.resolve({})
     }
   })
 )
@@ -232,7 +246,11 @@ beforeEach(() => {
 vi.mock('lodash/debounce', () => ({
   default: vi.fn().mockImplementation((arg) => arg)
 }))
-vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
+
+vi.mock('./utils', async () => ({
+  useOnlineStatus: () => true,
+  isNavigatorOnline: () => true
+}))
 
 vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
@@ -240,4 +258,13 @@ vi.mock('react-router', async () => ({
     event: 'birth',
     section: 'child'
   }))
+}))
+
+vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
+  ...((await vi.importActual(
+    '@client/views/OIDPVerificationCallback/utils'
+  )) as any),
+  useExtractCallBackState: vi.fn(),
+  useQueryParams: vi.fn(),
+  useCheckNonce: vi.fn()
 }))

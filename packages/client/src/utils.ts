@@ -12,8 +12,7 @@
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
-
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+import React from 'react'
 
 export async function validateApplicationVersion() {
   const runningVer = localStorage.getItem('running-version')
@@ -34,4 +33,18 @@ export async function validateApplicationVersion() {
 }
 export function isNavigatorOnline() {
   return navigator.onLine
+}
+
+export function useOnlineStatus() {
+  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
+  const ONLINE_CHECK_INTERVAL = 500
+  React.useEffect(() => {
+    const intervalID = setInterval(
+      () => setOnline(isNavigatorOnline()),
+      ONLINE_CHECK_INTERVAL
+    )
+
+    return () => clearInterval(intervalID)
+  }, [])
+  return isOnline
 }

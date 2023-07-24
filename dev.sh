@@ -51,7 +51,7 @@ do
 done
 
 if $dependencies; then
-  yarn run compose:deps
+  concurrently "yarn run compose:deps" "bash setup-elastic-index.sh"
   exit 0
 elif $services; then
   yarn dev:secrets:gen
@@ -91,7 +91,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -118,4 +118,4 @@ echo
 sleep 10
 
 yarn dev:secrets:gen
-concurrently "yarn run start" "yarn run compose:deps"
+concurrently "yarn run start" "yarn run compose:deps" "bash setup-elastic-index.sh"

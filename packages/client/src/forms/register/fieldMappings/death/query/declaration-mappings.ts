@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
+import { IFormData, IFormField } from '@client/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 
 export const phoneNumberToFieldTransformer = (
@@ -25,28 +25,6 @@ export const phoneNumberToFieldTransformer = (
       }
       return tel
     })
-  }
-  return transformedData
-}
-export function getInformantSectionTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string
-) {
-  if (
-    queryData[sectionId].id &&
-    queryData[sectionId].individual &&
-    queryData[sectionId].individual.id
-  ) {
-    transformedData[sectionId]._fhirIDMap = {
-      // @ts-ignore
-      relatedPerson: queryData[sectionId].id,
-      individual: queryData[sectionId].individual.id
-    }
-  }
-  // Getting Informant's relationship data
-  if (queryData[sectionId].relationship) {
-    transformedData[sectionId].relationship = queryData[sectionId].relationship
   }
   return transformedData
 }

@@ -33,109 +33,10 @@ enum RegAction {
   FLAGGED_AS_POTENTIAL_DUPLICATE
 }
 
-enum BirthRegType {
-  BOTH_PARENTS
-  SELF
-  INFORMANT_ONLY
-  MOTHER_ONLY
-  FATHER_ONLY
-}
-
-enum RegistrationContactType {
-  BOTH
-  MOTHER
-  FATHER
-  OTHER
-  INFORMANT
-}
-
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  BRIDE
-  GROOM
-  OTHER
-}
-
-enum BirthType {
-  SINGLE
-  TWIN
-  TRIPLET
-  QUADRUPLET
-  HIGHER_MULTIPLE_DELIVERY
-}
-
-enum AttendantType {
-  PHYSICIAN
-  NURSE
-  NURSE_MIDWIFE
-  MIDWIFE
-  TRADITIONAL_BIRTH_ATTENDANT
-  OTHER_PARAMEDICAL_PERSONNEL
-  LAYPERSON
-  NONE
-  OTHER
-}
-
-enum AttachmentType {
-  BIRTH_CERTIFICATE
-  NATIONAL_ID
-  PASSPORT
-  NOTIFICATION_OF_BIRTH
-  PROOF_OF_LEGAL_GUARDIANSHIP
-  PROOF_OF_ASSIGNED_RESPONSIBILITY
-  HOSPITAL_CERTIFICATE_OF_DEATH
-  ATTESTED_LETTER_OF_DEATH
-  BURIAL_RECEIPT
-  POLICE_CERTIFICATE_OF_DEATH
-  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
-  VERBAL_AUTOPSY_REPORT
-  CORONERS_REPORT
-  MARRIAGE_NOTICE
-  OTHER
-}
-
-enum AttachmentSubject {
-  MOTHER
-  FATHER
-  CHILD
-  OTHER
-  PARENT
-  CHILD_AGE
-  DECEASED_ID_PROOF
-  DECEASED_DEATH_PROOF
-  DECEASED_DEATH_CAUSE_PROOF
-  INFORMANT_ID_PROOF
-  LEGAL_GUARDIAN_PROOF
-  MARRIAGE_NOTICE_PROOF
-}
-
 enum RegistrationType {
   BIRTH
   DEATH
   MARRIAGE
-}
-
-enum MannerOfDeath {
-  NATURAL_CAUSES
-  ACCIDENT
-  SUICIDE
-  HOMICIDE
-  MANNER_UNDETERMINED
 }
 
 enum PaymentType {
@@ -146,18 +47,6 @@ enum PaymentOutcomeType {
   COMPLETED
   ERROR
   PARTIAL
-}
-
-enum CauseOfDeathMethodType {
-  PHYSICIAN
-  LAY_REPORTED
-  VERBAL_AUTOPSY
-  MEDICALLY_CERTIFIED
-}
-
-enum MarriageType {
-  POLYGAMY
-  MONOGAMY
 }
 
 input PaymentInput {
@@ -189,13 +78,6 @@ type MedicalPractitioner { # -> Encounter.participant
   name: String # -> Encounter.participant.individual(Practitioner).name
   qualification: String # -> Encounter.participant.individual(Practitioner).qualification
   lastVisitDate: Date # -> Encounter.participant.preriod.start
-}
-
-enum ParentDetailsType {
-  MOTHER_AND_FATHER
-  MOTHER_ONLY
-  FATHER_ONLY
-  NONE
 }
 
 input CommentInput {
@@ -289,15 +171,14 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
-  birthType: BirthType # Not in BDRIS2
+  birthType: String
   questionnaire: [QuestionnaireQuestionInput]
-  weightAtBirth: Float # Not in BDRIS2
-  attendantAtBirth: AttendantType # Not in BDRIS2
+  weightAtBirth: Float
+  attendantAtBirth: String
   otherAttendantAtBirth: String
-  birthRegistrationType: BirthRegType
-  childrenBornAliveToMother: Int # Not in BDRIS2
-  foetalDeathsToMother: Int # Not in BDRIS2
-  lastPreviousLiveBirth: Date # Not in BDRIS2
+  childrenBornAliveToMother: Int
+  foetalDeathsToMother: Int
+  lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -311,12 +192,11 @@ type BirthRegistration implements EventRegistration { # -> Composition
   father: Person # -> .section(code='father-details').entry.reference
   informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
-  birthType: BirthType # -> Observation.valueInteger
+  birthType: String # -> Observation.valueInteger
   questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
-  attendantAtBirth: AttendantType # -> Observation.valueString
+  attendantAtBirth: String # -> Observation.valueString
   otherAttendantAtBirth: String
-  birthRegistrationType: BirthRegType # -> Observation.valueString
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
@@ -336,9 +216,9 @@ input DeathRegistrationInput {
   spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
   questionnaire: [QuestionnaireQuestionInput]
-  mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  mannerOfDeath: String # -> Observation.valueCodeableConcept
   deathDescription: String
-  causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathMethod: String # -> Observation.valueCodeableConcept
   causeOfDeathEstablished: String
   causeOfDeath: String # need to store ICD-10? More types of cause of death
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -361,9 +241,9 @@ type DeathRegistration implements EventRegistration { # -> Composition
   spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
-  mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  mannerOfDeath: String # -> Observation.valueCodeableConcept
   deathDescription: String
-  causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathMethod: String # -> Observation.valueCodeableConcept
   causeOfDeathEstablished: String
   causeOfDeath: String # -> Observation.valueCodeableConcept
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -377,12 +257,13 @@ type DeathRegistration implements EventRegistration { # -> Composition
 input MarriageRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
+  informant: RelatedPersonInput
   bride: PersonInput
   groom: PersonInput
   witnessOne: RelatedPersonInput
   witnessTwo: RelatedPersonInput
   eventLocation: LocationInput
-  typeOfMarriage: MarriageType
+  typeOfMarriage: String
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
@@ -392,12 +273,13 @@ type MarriageRegistration implements EventRegistration { # -> Composition
   id: ID! # long uuid
   _fhirIDMap: Map
   registration: Registration
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
   bride: Person # -> .section(code='bride-details').entry.reference
   groom: Person # -> .section(code='groom-details').entry.reference
   witnessOne: RelatedPerson # -> .section(code='witnessOne-details').entry.reference
   witnessTwo: RelatedPerson # -> .section(code='witnessTwo-details').entry.reference
   eventLocation: Location
-  typeOfMarriage: MarriageType # -> Observation.valueInteger
+  typeOfMarriage: String # -> Observation.valueInteger
   questionnaire: [QuestionnaireQuestion]
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
@@ -442,11 +324,12 @@ input RegistrationInput {
   brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
   witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
   witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
-  informantType: InformantType # -> Observation.valueString
+  informantType: String # -> Observation.valueString
   otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
+  contactEmail: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
@@ -469,7 +352,7 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  informantType: InformantType # -> Observation.valueString
+  informantType: String # -> Observation.valueString
   otherInformantType: String
   assignment: AssignmentData # -> extension(url='http://opencrvs.org/specs/extension/regAssigned')
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
@@ -479,7 +362,13 @@ type Registration { # -> Task
   brideSignature: String # -> extension(url='http://opencrvs.org/specs/extension/bride-signature').valueString
   witnessOneSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-one-signature').valueString
   witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
+  informantsSignatureURI: String # actual minio object uri for informantsSignature
+  groomSignatureURI: String # actual minio object uri for groomSignatureURI
+  brideSignatureURI: String # actual minio object uri for brideSignatureURI
+  witnessOneSignatureURI: String # actual minio object uri for witnessOneSignatureURI
+  witnessTwoSignatureURI: String # actual minio object uri for witnessTwoSignatureURI
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
+  contactEmail: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-email').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
@@ -511,14 +400,15 @@ input AttachmentInput {
   _fhirID: ID
   contentType: String
   # base64
-  data: String!
+  data: String
+  uri: String
   # approved/validated/deleted
   status: String
   originalFileName: String
   systemFileName: String
-  type: AttachmentType
+  type: String
   description: String # -> use for other document type -> .description
-  subject: AttachmentSubject
+  subject: String
   createdAt: Date
 }
 
@@ -533,13 +423,14 @@ type Attachment { # -> DocumentReference
   contentType: String # -> .content.attachment.contentType
   # base64
   data: String # -> .content.attachment.data base64
+  uri: String
   # approved/validated/deleted
   status: String # -> .status
   originalFileName: String # -> .identifier
   systemFileName: String # -> .identifier
-  type: AttachmentType # -> .type
+  type: String # -> .type
   description: String # -> use for other document type -> .description
-  subject: AttachmentSubject # -> .subject (convert this to a reference to the person resoure in FHIR)
+  subject: String # -> .subject (convert this to a reference to the person resoure in FHIR)
   createdAt: Date # -> .created
 }
 
@@ -580,7 +471,6 @@ type RegistrationCountResult {
 type CreatedIds {
   compositionId: String
   trackingId: String
-  registrationNumber: String
   isPotentiallyDuplicate: Boolean
 }
 

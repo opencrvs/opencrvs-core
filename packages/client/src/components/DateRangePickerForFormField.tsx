@@ -9,15 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Checkbox, DateField, Link } from '@client/../../components/lib'
-import { DateRangePicker } from './DateRangePicker'
-import subYears from 'date-fns/subYears'
 import { IDateRangePickerValue } from '@client/forms'
-import styled from '@client/styledComponents'
-import format from '@client/utils/date-formatting'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import styled from 'styled-components'
+import format from '@client/utils/date-formatting'
+import startOfMonth from 'date-fns/startOfMonth'
+import subYears from 'date-fns/subYears'
+import * as React from 'react'
+import { WrappedComponentProps, injectIntl } from 'react-intl'
+import { DateRangePicker } from './DateRangePicker'
 const { useState } = React
 
 interface IDateRange {
@@ -135,7 +136,7 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
           <DateRangePicker
             startDate={
               (props.value.rangeStart && new Date(props.value.rangeStart)) ||
-              subYears(new Date(Date.now()), 1)
+              startOfMonth(subYears(new Date(Date.now()), 1))
             }
             endDate={
               (props.value.rangeEnd && new Date(props.value.rangeEnd)) ||

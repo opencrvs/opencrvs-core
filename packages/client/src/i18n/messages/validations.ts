@@ -9,50 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IValidationMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  bengaliOnlyNameFormat: MessageDescriptor
-  blockAlphaNumericDot: MessageDescriptor
-  dateFormat: MessageDescriptor
-  dobEarlierThanDom: MessageDescriptor
-  domLaterThanDob: MessageDescriptor
-  emailAddressFormat: MessageDescriptor
-  englishOnlyNameFormat: MessageDescriptor
-  facilityMustBeSelected: MessageDescriptor
-  officeMustBeSelected: MessageDescriptor
-  greaterThanZero: MessageDescriptor
-  isValidBirthDate: MessageDescriptor
-  isValidDateOfDeath: MessageDescriptor
-  isDateNotAfterDeath: MessageDescriptor
-  isDateNotBeforeBirth: MessageDescriptor
-  isInformantOfLegalAge: MessageDescriptor
-  illegalMarriageAge: MessageDescriptor
-  isMoVisitBeforeBirth: MessageDescriptor
-  isMoVisitAfterDeath: MessageDescriptor
-  maxLength: MessageDescriptor
-  minLength: MessageDescriptor
-  notGreaterThan: MessageDescriptor
-  numberRequired: MessageDescriptor
-  phoneNumberFormat: MessageDescriptor
-  range: MessageDescriptor
-  required: MessageDescriptor
-  requiredForNewUser: MessageDescriptor
-  requiredSymbol: MessageDescriptor
-  requiredBasic: MessageDescriptor
-  validBirthRegistrationNumber: MessageDescriptor
-  validDeathRegistrationNumber: MessageDescriptor
-  validNationalId: MessageDescriptor
-  validNationalIDLengths: MessageDescriptor
-  duplicateNationalID: MessageDescriptor
-  validPassportNumber: MessageDescriptor
-  phoneNumberNotValid: MessageDescriptor
-  validDrivingLicenseNumber: MessageDescriptor
-  nonDecimalPointNumber: MessageDescriptor
-}
-
-const messagesToDefine: IValidationMessages = {
+const messagesToDefine = {
   phoneNumberNotValid: {
     id: 'register.SelectContactPoint.phoneNoError',
     defaultMessage: 'Not a valid mobile number',
@@ -94,9 +53,10 @@ const messagesToDefine: IValidationMessages = {
     id: 'validations.emailAddressFormat'
   },
   englishOnlyNameFormat: {
-    defaultMessage: 'Must contain only English characters',
+    defaultMessage:
+      'Input contains invalid characters. Please use only letters (a-z), numbers (0-9), hyphens (-), and underscores (_)',
     description:
-      'The error message that appears when a non English character is used in an English name',
+      'The error message that appears when a non English character except numbers, hyphens and underscores is used in an English name',
     id: 'validations.englishOnlyNameFormat'
   },
   facilityMustBeSelected: {
@@ -283,5 +243,4 @@ const messagesToDefine: IValidationMessages = {
   }
 }
 
-export const validationMessages: IValidationMessages =
-  defineMessages(messagesToDefine)
+export const validationMessages = defineMessages(messagesToDefine)

@@ -11,31 +11,13 @@
  */
 import * as React from 'react'
 import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
-import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
 import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-
-export const Message = styled.div`
-  margin-bottom: 16px;
-`
-export const Field = styled.div`
-  width: 100%;
-  margin-bottom: 30px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-bottom: 0px;
-  }
-`
-export interface IBookmarkAdvancedSearch {
-  name: string
-  parameters: IAdvancedSearchParamState
-  userId: string
-}
 
 export function BookmarkAdvancedSearchResult() {
   const advancedSearchState = useSelector(getAdvancedSearchParamsState)
@@ -66,8 +48,8 @@ export function BookmarkAdvancedSearchResult() {
           }
         }}
         name={'Star'}
-        color={bookmark ? 'yellow' : 'blue'}
-        weight={bookmark ? 'fill' : 'regular'}
+        color={bookmark ? 'yellow' : 'primary'}
+        weight={bookmark ? 'fill' : 'bold'}
       />
 
       <BookmarkAdvancedSearchModal

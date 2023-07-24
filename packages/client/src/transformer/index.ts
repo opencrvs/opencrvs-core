@@ -62,7 +62,7 @@ const nestedFieldsMapping = (
   }
 }
 
-export const transformRegistrationCorrection = (
+const transformRegistrationCorrection = (
   section: IFormSection,
   fieldDef: IFormField,
   draftData: IFormData,
@@ -157,7 +157,8 @@ export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
   draftId?: string,
-  originalDraftData: IFormData = {}
+  originalDraftData: IFormData = {},
+  offlineCountryConfig?: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -180,7 +181,7 @@ export const draftToGqlTransformer = (
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
           draftData[section.id],
-          undefined,
+          offlineCountryConfig,
           draftData
         )
         if (
@@ -313,15 +314,13 @@ export const gqlToDraftTransformer = (
   }
   const transformedData: IFormData = {}
 
-  const visibleSections = formDefinition.sections.filter(
-    (section) =>
-      getVisibleSectionGroupsBasedOnConditions(
-        section,
-        queryData[section.id] || {},
-        queryData
-      ).length > 0
+  const visibleSections = formDefinition.sections.filter((section) =>
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData
+    )
   )
-
   visibleSections.forEach((section) => {
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {

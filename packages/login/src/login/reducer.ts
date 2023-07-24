@@ -20,9 +20,9 @@ import { IStoreState } from '@login/store'
 export type LoginState = {
   submitting: boolean
   token: string
-  authenticationDetails: { nonce: string; mobile: string }
+  authenticationDetails: { nonce: string; mobile?: string; email?: string }
   submissionError: boolean
-  resentSMS: boolean
+  resentAuthenticationCode: boolean
   stepOneDetails: { username: string }
   config: Partial<IApplicationConfig>
   redirectToURL?: string
@@ -35,10 +35,11 @@ export const initialState: LoginState = {
   config: {},
   authenticationDetails: {
     nonce: '',
-    mobile: ''
+    mobile: '',
+    email: ''
   },
   submissionError: false,
-  resentSMS: false,
+  resentAuthenticationCode: false,
   stepOneDetails: { username: '' },
   redirectToURL: ''
 }
@@ -78,7 +79,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state,
           submitting: true,
           submissionError: false,
-          resentSMS: false,
+          resentAuthenticationCode: false,
           stepOneDetails: action.payload
         },
         Cmd.run<
@@ -114,43 +115,54 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state,
           submitting: action.payload.token ? true : false,
           submissionError: false,
-          resentSMS: false,
+          resentAuthenticationCode: false,
           authenticationDetails: {
             ...state.authenticationDetails,
             nonce: action.payload.nonce,
-            mobile: action.payload.mobile
+            mobile: action.payload.mobile,
+            email: action.payload.email
           }
         },
         (action.payload.token &&
-          Cmd.run(() => {
-            window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
-            )
-          })) ||
+          Cmd.run(
+            (getState: () => IStoreState) => {
+              window.location.assign(
+                `${window.config.CLIENT_APP_URL}?token=${
+                  action.payload.token
+                }&lang=${getState().i18n.language}`
+              )
+            },
+            { args: [Cmd.getState] }
+          )) ||
           Cmd.action(push(routes.STEP_TWO))
       )
-    case actions.RESEND_SMS:
+    case actions.RESEND_AUTHENTICATION_CODE:
+      const notificationEvent = action.payload
       return loop(
         {
           ...state,
           submissionError: false,
-          resentSMS: false
+          resentAuthenticationCode: false
         },
-        Cmd.run<actions.ResendSMSFailedAction, actions.ResendSMSCompleteAction>(
-          authApi.resendSMS,
-          {
-            successActionCreator: actions.completeSMSResend,
-            failActionCreator: actions.failSMSResend,
-            args: [state.authenticationDetails.nonce]
-          }
-        )
+        Cmd.run<
+          actions.ResendAuthenticationCodeFailedAction,
+          actions.ResendAuthenticationCodeCompleteAction
+        >(authApi.resendAuthenticationCode, {
+          successActionCreator: actions.completeAuthenticationCodeResend,
+          failActionCreator: actions.failAuthenticationCodeResend,
+          args: [state.authenticationDetails.nonce, notificationEvent]
+        })
       )
-    case actions.RESEND_SMS_FAILED:
-      return { ...state, resentSMS: false, submissionError: true }
-    case actions.RESEND_SMS_COMPLETED:
+    case actions.RESEND_AUTHENTICATION_CODE_FAILED:
       return {
         ...state,
-        resentSMS: true,
+        resentAuthenticationCode: false,
+        submissionError: true
+      }
+    case actions.RESEND_AUTHENTICATION_CODE_COMPLETED:
+      return {
+        ...state,
+        resentAuthenticationCode: true,
         submissionError: false,
         authenticationDetails: {
           ...state.authenticationDetails,
@@ -170,7 +182,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state,
           submitting: true,
           submissionError: false,
-          resentSMS: false
+          resentAuthenticationCode: false
         },
         Cmd.run<
           actions.VerifyCodeFailedAction,
@@ -189,7 +201,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state,
           stepSubmitting: false,
           submissionError: false,
-          resentSMS: false,
+          resentAuthenticationCode: false,
           token: action.payload.token
         },
         Cmd.run(

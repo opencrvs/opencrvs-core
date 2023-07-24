@@ -17,15 +17,18 @@ import User, { IUserRole } from '@user-mgnt/model/user'
 interface IVerifyPayload {
   userId: string
   practitionerId: string
-  mobile: string
+  mobile?: string
+  email?: string
 }
 
 export default async function getUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { userId, practitionerId, mobile } = request.payload as IVerifyPayload
+  const { userId, practitionerId, mobile, email } =
+    request.payload as IVerifyPayload
   let criteria = {}
+
   if (userId) {
     criteria = { ...criteria, _id: userId }
   }
@@ -35,9 +38,13 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
+  if (email) {
+    criteria = { ...criteria, emailForNotification: email }
+  }
   const user = await User.findOne(criteria).populate<{
     role: IUserRole
   }>('role')
+
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
@@ -47,6 +54,7 @@ export default async function getUser(
 
 export const getUserRequestSchema = Joi.object({
   userId: Joi.string().optional(),
+  email: Joi.string().email().optional(),
   practitionerId: Joi.string().optional(),
   mobile: Joi.string().optional()
 })

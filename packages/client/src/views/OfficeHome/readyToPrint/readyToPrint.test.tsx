@@ -649,7 +649,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                       address: {
                         district: 'Narsingdi',
                         state: 'Dhaka'
-                      }
+                      },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
                     },
                     timestamp: null
                   },
@@ -666,7 +667,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                       address: {
                         district: 'Narsingdi',
                         state: 'Dhaka'
-                      }
+                      },
+                      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
                     },
                     timestamp: null
                   }

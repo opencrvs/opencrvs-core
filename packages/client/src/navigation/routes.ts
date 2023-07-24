@@ -14,13 +14,9 @@ import { Event } from '@client/utils/gateway'
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
-export const EVENT_INFO = '/events/:eventType/info'
-export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.Birth}/registration/informantType`
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Birth}/:pageId/group/:groupId`
-export const DRAFT_BIRTH_INFORMANT_FORM = `/events/${Event.Birth}/contact`
-export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:declarationId/events/${Event.Birth}/parent/:tabId`
 export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Death}/registration/informantType`
 export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
@@ -42,13 +38,8 @@ export const CERTIFICATE_CORRECTION_REVIEW =
 
 export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
 
-export const SAVED_REGISTRATION = '/saved'
-export const REJECTED_REGISTRATION = '/rejected'
 export const SEARCH = '/search'
 export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
-export const MY_RECORDS = '/my-records'
-export const MY_DRAFTS = '/my-drafts'
-export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
@@ -70,19 +61,13 @@ export const REGISTRAR_HOME_TAB_PAGE =
 
 export const SETTINGS = '/settings'
 export const CERTIFICATE_CONFIG = '/config/certificate'
-export const FORM_CONFIG_HOME = '/config/form'
 export const APPLICATION_CONFIG = '/config/application'
 export const SYSTEM_LIST = '/config/integration'
 export const USER_ROLES_CONFIG = '/config/userroles'
-export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'
 
-export const DECLARATION_DETAIL = '/details/:declarationId'
 export const DECLARATION_RECORD_AUDIT = '/record-audit/:tab/:declarationId'
-
-export const SYS_ADMIN_HOME = '/sys-admin-home'
-export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
 export const ADVANCED_SEARCH = '/search-result/advanced-search'
@@ -95,6 +80,10 @@ export const EVENT_COMPLETENESS_RATES =
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
 export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 export const PERFORMANCE_REGISTRATIONS_LIST = '/performance/registrations'
+
+export const PERFORMANCE_DASHBOARD = '/performance/dashboard'
+export const PERFORMANCE_LEADER_BOARDS = '/performance/leaderboards'
+export const PERFORMANCE_STATISTICS = '/performance/statistics'
 
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
@@ -111,3 +100,5 @@ export const VIEW_RECORD = '/:declarationId/viewRecord'
 
 export const VIEW_VERIFY_CERTIFICATE = '/verify-certificate/:declarationId'
 export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
+
+export const OIDP_VERIFICATION_CALLBACK = '/mosip-callback'

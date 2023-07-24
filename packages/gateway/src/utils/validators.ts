@@ -9,25 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MINIO_BUCKET } from '@gateway/constants'
+import {
+  MINIO_BUCKET,
+  USER_NOTIFICATION_DELIVERY_METHOD
+} from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
+  GQLMarriageRegistrationInput,
+  GQLUserInput
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
-  attachments: Array<{ data: string }>
+  attachments: Array<{ data?: string; uri?: string }>
 ) {
   for (const file of attachments) {
     const isMinioUrl =
-      file.data.split('/').length > 1 &&
-      file.data.split('/')[1] === MINIO_BUCKET
+      file.uri &&
+      file.uri.split('/').length > 1 &&
+      file.uri.split('/')[1] === MINIO_BUCKET
+
     if (isMinioUrl) {
       continue
     }
+
+    if (!file.data) {
+      throw new Error(`No attachment file found!`)
+    }
+
     const data = file.data.split('base64,')?.[1] || ''
     const mime = file.data.split(';')[0].replace('data:', '')
 
@@ -44,6 +55,18 @@ export async function validateAttachments(
     if (!type.mime.startsWith('image/')) {
       throw new Error(`File type doesn't match image/*`)
     }
+  }
+}
+
+export async function validateNotificationDeliveryMethod(user: GQLUserInput) {
+  const notificationMethodMap = {
+    sms: 'mobile',
+    email: 'email'
+  }
+  if (!user[notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]]) {
+    throw new Error(
+      `${notificationMethodMap[USER_NOTIFICATION_DELIVERY_METHOD]} is required`
+    )
   }
 }
 

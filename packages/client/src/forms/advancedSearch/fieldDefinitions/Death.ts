@@ -21,7 +21,6 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
     fields: [
       {
         name: 'placeOfRegistration',
-        customisable: false,
         type: 'LOCATION_SEARCH_INPUT',
         label: advancedSearchForm.placeOfRegistrationlabel,
         helperText: advancedSearchForm.placeOfRegistrationHelperText,
@@ -30,25 +29,23 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         initialValue: '',
         searchableResource: ['locations', 'offices'],
         searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
-        validate: []
+        validator: []
       },
       {
         name: 'dateOfRegistration',
-        customisable: false,
         type: 'DATE_RANGE_PICKER',
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validate: []
+        validator: []
       },
       {
         name: 'registrationStatuses',
-        customisable: false,
         type: 'SELECT_WITH_OPTIONS',
         label: advancedSearchForm.statusOfRecordLabel,
         required: false,
         initialValue: '',
-        validate: [],
+        validator: [],
         placeholder: formMessageDescriptors.formSelectPlaceholder,
         options: [
           {
@@ -90,41 +87,37 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'deceasedDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstName,
       maxLength: 32,
       required: false,
       initialValue: 'fasfasf',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'deceasedGender',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: formMessageDescriptors.sex,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -140,50 +133,6 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
           label: formMessageDescriptors.sexUnknown
         }
       ]
-    },
-    {
-      name: 'placeOfDeath',
-      customisable: false,
-      type: 'SELECT_WITH_OPTIONS',
-      ignoreFieldLabelOnErrorMessage: true,
-      label: formMessageDescriptors.placeOfDeath,
-      required: false,
-      initialValue: '',
-      validate: [],
-      placeholder: formMessageDescriptors.formSelectPlaceholder,
-      options: [
-        {
-          value: 'HEALTH_FACILITY',
-          label: formMessageDescriptors.healthInstitution
-        },
-        {
-          value: 'PRIVATE_HOME',
-          label: formMessageDescriptors.privateHome
-        },
-        {
-          value: 'OTHER',
-          label: formMessageDescriptors.otherInstitution
-        }
-      ]
-    },
-    {
-      name: 'eventCountry',
-      customisable: false,
-      type: 'SELECT_WITH_OPTIONS',
-      label: {
-        defaultMessage: 'Country',
-        description: 'Title for the country select',
-        id: 'form.field.label.country'
-      },
-      required: false,
-      initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
-      placeholder: {
-        defaultMessage: 'Select',
-        description: 'Placeholder text for a select',
-        id: 'form.field.select.placeholder'
-      },
-      options: countries
     }
   ]
 }
@@ -194,14 +143,13 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'eventLocationType',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       previewGroup: 'placeOfBirth',
       ignoreFieldLabelOnErrorMessage: true,
       label: formMessageDescriptors.placeOfBirth,
       required: false,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: formMessageDescriptors.formSelectPlaceholder,
       options: [
         {
@@ -216,7 +164,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationId',
-      customisable: false,
       type: 'LOCATION_SEARCH_INPUT',
       label: formMessageDescriptors.healthInstitution,
       required: false,
@@ -226,7 +173,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       dynamicOptions: {
         resource: 'facilities'
       },
-      validate: [],
+      validator: [],
       conditionals: [
         {
           action: 'hide',
@@ -236,7 +183,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventCountry',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: {
         defaultMessage: 'Country',
@@ -244,7 +190,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
         id: 'form.field.label.country'
       },
       required: false,
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -260,7 +206,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel1',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'Province',
@@ -269,7 +214,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -297,7 +242,6 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel2',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'District',
@@ -306,7 +250,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       required: true,
       initialValue: '',
-      validate: [],
+      validator: [],
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -345,34 +289,31 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'informantDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFirstNames',
 
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     },
     {
       name: 'informantFamilyName',
 
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
-      validate: []
+      validator: []
     }
   ]
 }

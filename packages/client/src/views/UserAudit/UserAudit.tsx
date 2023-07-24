@@ -33,7 +33,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
 import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { VerticalThreeDots } from '@client/../../components/lib/icons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
@@ -50,7 +50,6 @@ import {
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { getOfflineData } from '@client/offline/selectors'
 import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
@@ -62,11 +61,6 @@ const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
-`
-
-export const InformationTitle = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  width: 320px;
 `
 
 interface IRouteProps {
@@ -98,6 +92,7 @@ const transformUserQueryResult = (
     systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
+    email: userData.email,
     status: userData.status,
     underInvestigation: userData.underInvestigation,
     username: userData.username,
@@ -144,23 +139,23 @@ export const UserAudit = () => {
   const intl = useIntl()
   const { userId } = useParams<IRouteProps>()
   const dispatch = useDispatch()
-  const [showResendSMSSuccess, setShowResendSMSSuccess] =
+  const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
-  const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
+  const [showResendInviteError, setShowResendInviteError] =
+    useState<boolean>(false)
   const [modalVisible, setModalVisible] = useState(false)
   const scope = useSelector((store: IStoreState) => getScope(store))
   const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
-  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+  const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
-  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+  const [showUsernameReminderError, setShowUsernameReminderError] =
     useState(false)
-  const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
+  const [showResetPasswordSuccess, setShowResetPasswordSuccess] =
     useState(false)
-  const [showResetPasswordSMSError, setShowResetPasswordSMSError] =
-    useState(false)
+  const [showResetPasswordError, setShowResetPasswordError] = useState(false)
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
-  const offLineData = useSelector(getOfflineData)
+  const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
   const { data, loading, error } = useQuery<
     GetUserQuery,
     GetUserQueryVariables
@@ -181,9 +176,9 @@ export const UserAudit = () => {
     setToggleResetPassword((prevValue) => !prevValue)
   }
 
-  const resendSMS = async (userId: string) => {
+  const resendInvite = async (userId: string) => {
     try {
-      const res = await userMutations.resendSMSInvite(userId, [
+      const res = await userMutations.resendInvite(userId, [
         {
           query: GET_USER,
           variables: {
@@ -191,47 +186,43 @@ export const UserAudit = () => {
           }
         }
       ])
-      if (res && res.data && res.data.resendSMSInvite) {
-        setShowResendSMSSuccess(true)
+      if (res && res.data && res.data.resendInvite) {
+        setShowResendInviteSuccess(true)
       }
     } catch (err) {
-      setShowResendSMSError(true)
+      setShowResendInviteError(true)
     }
   }
 
-  const usernameSMSReminder = async (userId: string) => {
+  const usernameReminder = async (userId: string) => {
     try {
-      const res = await userMutations.usernameSMSReminderSend(userId, [
+      const res = await userMutations.usernameReminderSend(userId, [
         {
           query: GET_USER,
           variables: { userId: userId }
         }
       ])
-      if (res && res.data && res.data.usernameSMSReminder) {
-        setShowUsernameSMSReminderSuccess(true)
+      if (res && res.data && res.data.usernameReminder) {
+        setShowUsernameReminderSuccess(true)
       }
     } catch (err) {
-      setShowUsernameSMSReminderError(true)
+      setShowUsernameReminderError(true)
     }
   }
 
   const resetPassword = async (userId: string) => {
     try {
-      const res = await userMutations.sendResetPasswordSMS(
-        userId,
-        offLineData.config.APPLICATION_NAME,
-        [
-          {
-            query: GET_USER,
-            variables: { userId: userId }
-          }
-        ]
-      )
-      if (res && res.data && res.data.resetPasswordSMS) {
-        setShowResetPasswordSMSSuccess(true)
+      const res = await userMutations.sendResetPasswordInvite(userId, [
+        {
+          query: GET_USER,
+          variables: { userId: userId }
+        }
+      ])
+      if (res && res.data && res.data.resetPasswordInvite) {
+        setShowResetPasswordSuccess(true)
       }
     } catch (err) {
-      setShowResetPasswordSMSError(true)
+      setShowResetPasswordError(true)
     }
   }
 
@@ -246,7 +237,7 @@ export const UserAudit = () => {
     if (status === 'pending' || status === 'active') {
       menuItems.push(
         {
-          label: intl.formatMessage(sysMessages.sendUsernameReminderSMS),
+          label: intl.formatMessage(sysMessages.sendUsernameReminderInvite),
           handler: () => {
             toggleUsernameReminderModal()
           }
@@ -276,9 +267,9 @@ export const UserAudit = () => {
 
     if (status === 'pending') {
       menuItems.push({
-        label: intl.formatMessage(sysMessages.resendSMS),
+        label: intl.formatMessage(sysMessages.resendInvite),
         handler: () => {
-          resendSMS(userId)
+          resendInvite(userId)
         }
       })
     }
@@ -301,7 +292,13 @@ export const UserAudit = () => {
                 <Status status={user.status || 'pending'} />
                 <ToggleMenu
                   id={`sub-page-header-munu-button`}
-                  toggleButton={<VerticalThreeDots />}
+                  toggleButton={
+                    <Icon
+                      name="DotsThreeVertical"
+                      color="primary"
+                      size="large"
+                    />
+                  }
                   menuItems={getMenuItems(
                     user.id as string,
                     user.status as string
@@ -329,10 +326,20 @@ export const UserAudit = () => {
           topActionButtons={
             userDetails && scope
               ? [
-                  <Status status={user.status || 'pending'} />,
+                  <Status
+                    key="top-action-status"
+                    status={user.status || 'pending'}
+                  />,
                   <ToggleMenu
                     id={`sub-page-header-munu-button`}
-                    toggleButton={<VerticalThreeDots />}
+                    key="top-action-toggle-menu"
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
                     menuItems={getMenuItems(
                       user.id as string,
                       user.status as string
@@ -396,13 +403,13 @@ export const UserAudit = () => {
             show={toggleUsernameReminder}
             handleClose={() => toggleUsernameReminderModal()}
             title={intl.formatMessage(
-              sysMessages.sendUsernameReminderSMSModalTitle
+              sysMessages.sendUsernameReminderInviteModalTitle
             )}
             actions={[
               <Button
                 type="tertiary"
                 id="username-reminder-cancel"
-                key="username-reminusernameSMSReminderder-cancel"
+                key="username-reminusernameSMSReminder-cancel"
                 onClick={() => toggleUsernameReminderModal()}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
@@ -413,7 +420,7 @@ export const UserAudit = () => {
                 key="username-reminder-send"
                 onClick={() => {
                   if (toggleUsernameReminder) {
-                    usernameSMSReminder(userId)
+                    usernameReminder(userId)
                   }
                   toggleUsernameReminderModal()
                 }}
@@ -425,8 +432,11 @@ export const UserAudit = () => {
             autoHeight={true}
           >
             {intl.formatMessage(
-              sysMessages.sendUsernameReminderSMSModalMessage,
-              { phoneNumber: user.number }
+              sysMessages.sendUsernameReminderInviteModalMessage,
+              {
+                recipient: deliveryMethod === 'sms' ? user.number : user.email,
+                deliveryMethod
+              }
             )}
           </ResponsiveModal>
           <ResponsiveModal
@@ -461,68 +471,72 @@ export const UserAudit = () => {
             autoHeight={true}
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
-              phoneNumber: user.number ?? ''
+              deliveryMethod,
+              recipient: deliveryMethod === 'sms' ? user.number : user.email
             })}
           </ResponsiveModal>
-          {showResendSMSSuccess && (
+          {showResendInviteSuccess && (
             <Toast
               id="resend_invite_success"
               type="success"
-              onClose={() => setShowResendSMSSuccess(false)}
+              onClose={() => setShowResendInviteSuccess(false)}
             >
-              {intl.formatMessage(sysMessages.resendSMSSuccess)}
+              {intl.formatMessage(sysMessages.resendInviteSuccess)}
             </Toast>
           )}
-          {showResendSMSError && (
+          {showResendInviteError && (
             <Toast
               id="resend_invite_error"
               type="error"
-              onClose={() => setShowResendSMSError(false)}
+              onClose={() => setShowResendInviteError(false)}
             >
-              {intl.formatMessage(sysMessages.resendSMSError)}
+              {intl.formatMessage(sysMessages.resendInviteError)}
             </Toast>
           )}
-          {showUsernameSMSReminderSuccess && (
+          {showUsernameReminderSuccess && (
             <Toast
               id="username_reminder_success"
               type="success"
-              onClose={() => setShowUsernameSMSReminderSuccess(false)}
+              onClose={() => setShowUsernameReminderSuccess(false)}
             >
-              {intl.formatMessage(sysMessages.sendUsernameReminderSMSSuccess, {
-                name: user.name
-              })}
+              {intl.formatMessage(
+                sysMessages.sendUsernameReminderInviteSuccess,
+                {
+                  name: user.name
+                }
+              )}
             </Toast>
           )}
-          {showUsernameSMSReminderError && (
+          {showUsernameReminderError && (
             <Toast
               id="username_reminder_error"
               type="warning"
-              onClose={() => setShowUsernameSMSReminderError(false)}
+              onClose={() => setShowUsernameReminderError(false)}
             >
-              {intl.formatMessage(sysMessages.sendUsernameReminderSMSError)}
+              {intl.formatMessage(sysMessages.sendUsernameReminderInviteError)}
             </Toast>
           )}
 
-          {showResetPasswordSMSSuccess && (
+          {showResetPasswordSuccess && (
             <Toast
               id="reset_password_success"
               type="success"
               onClose={() => {
-                setShowResetPasswordSMSSuccess(false)
+                setShowResetPasswordSuccess(false)
               }}
             >
-              {intl.formatMessage(sysMessages.resetPasswordSMSSuccess, {
+              {intl.formatMessage(sysMessages.resetPasswordSuccess, {
                 username: user.name
               })}
             </Toast>
           )}
-          {showResetPasswordSMSError && (
+          {showResetPasswordError && (
             <Toast
               id="reset_password_error"
               type="warning"
-              onClose={() => setShowResetPasswordSMSError(false)}
+              onClose={() => setShowResetPasswordError(false)}
             >
-              {intl.formatMessage(sysMessages.resetPasswordSMSError)}
+              {intl.formatMessage(sysMessages.resetPasswordError)}
             </Toast>
           )}
         </Content>

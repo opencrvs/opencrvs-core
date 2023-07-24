@@ -19,53 +19,13 @@ import { userMessages } from '@client/i18n/messages'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { SystemRoleType } from '@client/utils/gateway'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 
 export enum UserStatus {
   ACTIVE,
   DEACTIVATED,
   PENDING,
   DISABLED
-}
-
-export const transformRoleDataToDefinitions = (
-  fields: IFormField[],
-  data: any,
-  userFormData: IFormSectionData
-): IFormField[] => {
-  const roles = data as Array<any>
-  const transformTypes = (types: string[]) =>
-    types.map((type) => ({
-      label: userMessages[type],
-      value: type
-    }))
-
-  return fields.map((field) => {
-    if (field.name === 'systemRole') {
-      if (userFormData && userFormData.systemRole) {
-        userFormData.systemRole = ''
-      }
-      ;(field as ISelectFormFieldWithOptions).options = roles.map(
-        ({ value }: { value: string }) => ({
-          label: userMessages[value],
-          value
-        })
-      )
-      return field
-    } else if (field.name === 'type') {
-      if (userFormData && userFormData.type) {
-        userFormData.type = ''
-      }
-      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options =
-        roles.reduce(
-          (options, { value, types }) => ({
-            ...options,
-            [value]: transformTypes(types)
-          }),
-          {}
-        )
-      return field
-    } else return field
-  })
 }
 
 const AuditDescriptionMapping: {
@@ -86,6 +46,7 @@ const AuditDescriptionMapping: {
   LOGGED_IN: messages.loggedInAuditAction,
   LOGGED_OUT: messages.loggedOutAuditAction,
   PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
+  EMAIL_ADDRESS_CHANGED: messages.emailAddressChangedAuditAction,
   PASSWORD_CHANGED: messages.passwordChangedAuditAction,
   DEACTIVATE: messages.deactivateAuditAction,
   REACTIVATE: messages.reactivateAuditAction,
@@ -100,7 +61,19 @@ const AuditDescriptionMapping: {
   REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction,
+  MARKED_AS_DUPLICATE: messages.markedAsDuplicate,
+  MARKED_AS_NOT_DUPLICATE: messages.markedAsNotDuplicate
+}
+
+export const getAddressName = (
+  offlineCountryConfig: IOfflineData,
+  { name, partOf }: ILocation
+): string => {
+  const parentLocationId = partOf.split('/')[1]
+  if (parentLocationId === '0') return name
+  const parentLocation = offlineCountryConfig?.locations[parentLocationId]
+  return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
 }
 
 export function getUserAuditDescription(
@@ -114,10 +87,6 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
     !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
   )
-}
-
-export function checkIfLocalLanguageProvided() {
-  return window.config.LANGUAGES.split(',').length > 1
 }
 
 export function getUserSystemRole(

@@ -15,7 +15,9 @@ import {
   fetchEstimateForTargetDaysByLocationId,
   getDistrictLocation,
   fillEmptyDataArrayByKey,
-  EVENT_TYPE
+  EVENT_TYPE,
+  getMonthRangeFilterListFromTimeRage,
+  getDaysPerYear
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 import { cloneDeep } from 'lodash'
@@ -163,12 +165,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns 0 as estimations for an office', async () => {
@@ -186,8 +187,7 @@ describe('verify metrics util', () => {
         femaleEstimation: 0,
         maleEstimation: 0,
         locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-        locationLevel: '',
-        estimationYear: 2017
+        locationLevel: ''
       })
     })
     it('Returns estimate properly for death', async () => {
@@ -214,12 +214,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 11873,
-        femaleEstimation: 5937,
-        maleEstimation: 5937,
+        totalEstimation: 12386,
+        femaleEstimation: 4653,
+        maleEstimation: 4642,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
     it('Returns the estimatedFigures for right location', async () => {
@@ -233,12 +232,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
 
@@ -325,12 +323,11 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        totalEstimation: 51916,
-        femaleEstimation: 26068,
-        maleEstimation: 25847,
+        totalEstimation: 48325,
+        femaleEstimation: 24212,
+        maleEstimation: 24113,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
+        locationLevel: 'DISTRICT'
       })
     })
   })
@@ -384,6 +381,62 @@ describe('verify metrics util', () => {
       )
 
       expect(output).toEqual(expectedOutput)
+    })
+  })
+  describe('check for the list of months in a range', () => {
+    it('Returns set of months from a range when start date is 29th of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-04-29T18:00:00.000Z',
+        '2023-04-05T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3])
+    })
+    it('Returns set of months from a range when start date is 1st of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-01-29T18:00:00.000Z',
+        '2023-04-05T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
+      ])
+    })
+    it('Returns set of months from a range when start date is middle of the month', async () => {
+      const monthFilterList = getMonthRangeFilterListFromTimeRage(
+        '2022-01-14T18:00:00.000Z',
+        '2023-04-15T17:59:59.999Z'
+      )
+      const monthIndexes = monthFilterList.map((obj) => obj.monthIndex)
+      expect(monthIndexes).toEqual([
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3
+      ])
+    })
+  })
+
+  describe('check for the list of days in year for a range', () => {
+    it('Returns set of days from a range when start date is 29th of the month', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-04-29T10:00:00.000Z'),
+        new Date('2023-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([247, 95])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in same year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2022-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T12:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([67])
+    })
+
+    it('Returns set of days from a range when start date is 1st of the month in different year', async () => {
+      const daysInYearList = getDaysPerYear(
+        new Date('2018-01-29T10:00:00.000Z'),
+        new Date('2022-04-05T11:59:59.999Z')
+      )
+      expect(daysInYearList).toEqual([337, 365, 366, 365, 95])
     })
   })
 })

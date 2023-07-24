@@ -10,9 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { withTheme } from 'styled-components'
-
-import { IGrid } from '../grid'
+import styled from 'styled-components'
 
 export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -23,21 +21,13 @@ const Wrapper = styled.div<IBox>`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 100%;
     border: 0;
     padding: 16px;
   }
 `
 
-class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {
-  render() {
-    const { id, children, className } = this.props
-    return (
-      <Wrapper id={id} className={className}>
-        {children}
-      </Wrapper>
-    )
-  }
-}
-
-export const Box = withTheme(Component)
+export const Box = ({ id, className, children }: IBox) => (
+  <Wrapper id={id} className={className}>
+    {children}
+  </Wrapper>
+)

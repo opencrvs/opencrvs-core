@@ -11,9 +11,11 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { TertiaryButton, CircleButton } from '../buttons'
-import { DeclarationIcon, Cross, VerticalThreeDots } from '../icons'
+import { CircleButton } from '../buttons'
+import { DeclarationIcon, Cross } from '../icons'
 import { ToggleMenu } from '../ToggleMenu'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -34,7 +36,13 @@ const TopBarTitle = styled.h4`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-const Item = styled.span`
+const ActionContainer = styled.span`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
+const TitleContainer = styled.span`
   display: flex;
   align-items: center;
 `
@@ -81,11 +89,11 @@ export const EventTopBar = (props: IEventTopBarProps) => {
   } = props
   return (
     <TopBar className={className}>
-      <Item>
+      <TitleContainer>
         {pageIcon || <DeclarationIcon color={iconColor} />}
         <TopBarTitle>{title}</TopBarTitle>
-      </Item>
-      <Item>
+      </TitleContainer>
+      <ActionContainer>
         {topBarActions && (
           <TopBarActionsContainer>{topBarActions}</TopBarActionsContainer>
         )}
@@ -95,9 +103,15 @@ export const EventTopBar = (props: IEventTopBarProps) => {
           </CircleButton>
         )}
         {saveAction && (
-          <TertiaryButton onClick={saveAction.handler} id="save_draft">
+          <Button
+            type="primary"
+            size="small"
+            onClick={saveAction.handler}
+            id="save_draft"
+          >
+            <Icon name="DownloadSimple" />
             {saveAction.label}
-          </TertiaryButton>
+          </Button>
         )}
 
         {exitAction && (
@@ -108,11 +122,13 @@ export const EventTopBar = (props: IEventTopBarProps) => {
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"
-            toggleButton={<VerticalThreeDots />}
+            toggleButton={
+              <Icon name="DotsThreeVertical" color="primary" size="large" />
+            }
             menuItems={menuItems}
           />
         )}
-      </Item>
+      </ActionContainer>
     </TopBar>
   )
 }

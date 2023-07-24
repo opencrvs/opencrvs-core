@@ -29,12 +29,12 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { omitBy } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -155,6 +155,7 @@ export function BookmarkAdvancedSearchModal({
           </Button>,
           <Button
             type="primary"
+            key="bookmark-advanced-search-result"
             id="bookmark_advanced_search_result"
             onClick={async () => {
               setNotificationMessages(

@@ -33,6 +33,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -42,6 +43,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
@@ -51,6 +53,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -76,6 +79,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -85,6 +89,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/321'
@@ -94,6 +99,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            statisticalId: '123',
             status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
@@ -165,7 +171,11 @@ describe('locationUtil tests', () => {
       expect(map).toEqual({
         DISTRICT: 'Abwe',
         STATE: 'Central',
-        country: undefined,
+        country: {
+          defaultMessage: 'Bangladesh',
+          description: 'ISO Country: BGD',
+          id: 'countries.BGD'
+        },
         facility: 'ARK Private Clinic'
       })
     })

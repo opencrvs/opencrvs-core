@@ -11,12 +11,14 @@
  */
 import { Document, model, Schema } from 'mongoose'
 
+// keeping these models to migrate from v1.2 to v1.3
+
 export enum FieldType {
   TEXT = 'TEXT',
   TEL = 'TEL',
   NUMBER = 'NUMBER',
   TEXTAREA = 'TEXTAREA',
-  SUBSECTION = 'SUBSECTION',
+  SUBSECTION_HEADER = 'SUBSECTION_HEADER',
   PARAGRAPH = 'PARAGRAPH',
   SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 }
@@ -39,6 +41,12 @@ export interface ISelectOption {
   value: string
   label: IMessage[]
 }
+
+export interface IValidate {
+  operation: string
+  parameters: number[]
+}
+
 export interface IQuestion {
   // fieldId is in the format:
   // event.sectionId.groupId.fieldName
@@ -47,8 +55,10 @@ export interface IQuestion {
   placeholder?: IMessage[]
   description?: IMessage[]
   tooltip?: IMessage[]
+  unit?: IMessage[]
   errorMessage?: IMessage[]
   maxLength?: number
+  inputWidth?: number
   fieldName?: string
   fieldType?: FieldType
   // must be the fieldId for the field vertically above this one in the form or the string "TOP"
@@ -61,6 +71,7 @@ export interface IQuestion {
   conditionals?: ICondition[]
   datasetId?: string
   options?: ISelectOption[]
+  validator?: IValidate[]
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -78,6 +89,17 @@ export const message = new Schema(
   {
     lang: { type: String, required: true },
     descriptor: { type: messageDescriptor, required: true }
+  },
+  { _id: false }
+)
+
+export const validator = new Schema(
+  {
+    operation: { type: String, required: true },
+    parameters: {
+      type: [{ type: Schema.Types.Mixed, required: false }],
+      default: undefined
+    }
   },
   { _id: false }
 )
@@ -107,6 +129,11 @@ const questionSchema = new Schema({
       type: message
     }
   ],
+  unit: [
+    {
+      type: message
+    }
+  ],
   tooltip: [
     {
       type: message
@@ -118,6 +145,7 @@ const questionSchema = new Schema({
     }
   ],
   maxLength: { type: Number, default: 280 },
+  inputWidth: { type: Number, default: 0 },
   fieldName: { type: String },
   fieldType: {
     type: String,
@@ -132,6 +160,11 @@ const questionSchema = new Schema({
     type: [conditionals],
     default: undefined
   },
+  validator: [
+    {
+      type: validator
+    }
+  ],
   datasetId: { type: Schema.Types.ObjectId, ref: 'FormDataset' }
 })
 

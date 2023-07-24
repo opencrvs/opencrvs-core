@@ -12,7 +12,8 @@
 import React, { useEffect, useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   goToAdvancedSearch,
@@ -79,7 +80,6 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
-import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,
@@ -88,7 +88,7 @@ import {
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 
-const SearchParamPillsContainer = styled.div`
+const SearchParamContainer = styled.div`
   margin: 16px 0px;
   display: flex;
   gap: 10px;
@@ -327,7 +327,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                           searchType === BRN_DRN_TEXT ? searchText : '',
                         contactNumber:
                           searchType === PHONE_TEXT
-                            ? convertToMSISDN(searchText)
+                            ? convertToMSISDN(searchText, window.config.COUNTRY)
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
                         declarationLocationId: userDetails
@@ -444,7 +444,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
                 onPageChange={(page: any) => setCurrentPageNumber(page)}
-                topActionButtons={[<BookmarkAdvancedSearchResult />]}
+                topActionButtons={[
+                  <BookmarkAdvancedSearchResult key="bookmark-advanced-search-result" />
+                ]}
                 showTitleOnMobile={true}
               >
                 {loading ? (
@@ -494,26 +496,28 @@ const SearchModifierComponent = () => {
 
   return (
     <>
-      <SearchParamPillsContainer>
+      <SearchParamContainer>
         {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
+              key={pillKey}
               label={`${intl.formatMessage(
                 advancedSearchResultMessages[pillKey as advancedSearchPillKey]
               )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
               type="default"
-              size="medium"
+              size="small"
             ></Pill>
           )
         })}
         <Link
+          font="bold14"
           onClick={() => {
             dispatch(goToAdvancedSearch())
           }}
         >
           {intl.formatMessage(buttonMessages.edit)}
         </Link>
-      </SearchParamPillsContainer>
+      </SearchParamContainer>
     </>
   )
 }

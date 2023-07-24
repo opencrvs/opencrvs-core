@@ -11,27 +11,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { SecondaryButton } from '../buttons'
-
-const ImageBase = styled(SecondaryButton)`
-  width: auto;
-  ${({ theme }) => theme.fonts.bold16};
-  align-items: center;
-  display: inline-flex;
-  border: 0;
-  justify-content: space-between;
-  cursor: pointer;
-`
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 const HiddenInput = styled.input`
   display: none;
 `
-const Icon = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-left: 2em;
-`
-interface IImagePickerProps {
+
+type IImagePickerProps = {
   id: string
   title: string
   icon?: () => React.ReactNode
@@ -54,7 +41,9 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
   render() {
     const { icon, title, disabled = false, ...otherProps } = this.props
     return (
-      <ImageBase
+      <Button
+        type="secondary"
+        size="medium"
         {...otherProps}
         onClick={(event) => {
           if (this.props.onClick) {
@@ -64,8 +53,8 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
         }}
         disabled={disabled}
       >
+        <Icon name="UploadSimple" />
         {title}
-        {icon && <Icon>{icon()}</Icon>}
         <HiddenInput
           ref={this.fileUploader}
           id="image_file_uploader_field"
@@ -73,7 +62,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
           accept="image/*"
           onChange={this.handleFileChange}
         />
-      </ImageBase>
+      </Button>
     )
   }
 }

@@ -100,7 +100,11 @@ export const REGISTRATION_HOME_QUERY = gql`
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
-        compositionType: ["birth-declaration", "death-declaration"]
+        compositionType: [
+          "birth-declaration"
+          "death-declaration"
+          "marriage-declaration"
+        ]
       }
       count: $pageSize
       skip: $inProgressSkip
@@ -114,7 +118,11 @@ export const REGISTRATION_HOME_QUERY = gql`
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
-        compositionType: ["birth-notification", "death-notification"]
+        compositionType: [
+          "birth-notification"
+          "death-notification"
+          "marriage-notification"
+        ]
       }
       count: $pageSize
       skip: $healthSystemSkip

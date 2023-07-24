@@ -26,7 +26,7 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-export const validImageB64String =
+const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
@@ -234,6 +234,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
 
     it('should render preview certificate template when clicked on preview', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+
       await waitForElement(testComponent, '#preview_image_field')
 
       expect(
@@ -244,7 +245,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
     it('should go back from preview page if click on back arrow', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
       await waitForElement(testComponent, '#preview_image_field')
-      testComponent.find('#preview_back').hostNodes().simulate('click')
+      testComponent.find('#preview_close').hostNodes().simulate('click')
       testComponent.update()
 
       expect(
@@ -258,6 +259,7 @@ describe('ConfigHome page when already has uploaded certificate template', async
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
+
       expect(printCertificateSpy).toBeCalledTimes(1)
     })
 

@@ -1,0 +1,5 @@
+0 0 * * * /usr/scheduler/jobs/runVSExport.sh
+
+0 0 * * * /usr/scheduler/jobs/refreshPerformanceData.sh
+
+0 0 * * * /usr/scheduler/jobs/clearOpenHIMTransactions.sh

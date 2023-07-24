@@ -90,7 +90,10 @@ describe('profileReducer tests', () => {
 
   it('removes details, tike and logs out a user', async () => {
     const action = {
-      type: actions.REDIRECT_TO_AUTHENTICATION
+      type: actions.REDIRECT_TO_AUTHENTICATION,
+      payload: {
+        redirectBack: false
+      }
     }
     store.dispatch(action)
     expect(store.getState().profile.authenticated).toEqual(false)

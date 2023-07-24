@@ -21,7 +21,7 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
-  mobile: string
+  mobile?: string
   scope: string[]
   status: string
   username: string
@@ -52,7 +52,6 @@ export default async function verifyPassByIdHandler(
     username: user.username,
     id: user.id
   }
-
   return response
 }
 

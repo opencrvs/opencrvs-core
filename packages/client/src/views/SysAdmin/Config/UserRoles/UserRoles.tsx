@@ -117,6 +117,7 @@ const UserRoles = () => {
             desktopLeft={<HistoryNavigator />}
             desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
+            mobileTitle={intl.formatMessage(messages.userRoles)}
           />
         }
         navigation={<Navigation />}
@@ -172,7 +173,9 @@ const UserRoles = () => {
                       <Value id={`${systemRole.value}_value`}>
                         <Stack direction="column" alignItems="stretch" gap={2}>
                           {systemRole.roles.map((role) => (
-                            <span>{getUserRole(language, role)}</span>
+                            <span key={role._id}>
+                              {getUserRole(language, role)}
+                            </span>
                           ))}
                         </Stack>
                       </Value>
@@ -180,7 +183,7 @@ const UserRoles = () => {
                     actions={
                       <Link
                         id="changeButton"
-                        key={systemRole.id}
+                        key={'change-button-' + systemRole.id}
                         font="reg16"
                         onClick={() => {
                           roleChangeHandler(systemRole)

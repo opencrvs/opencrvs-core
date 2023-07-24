@@ -13,7 +13,7 @@ import * as React from 'react'
 import { AvatarSmall as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
 import { Avatar } from '@client/utils/gateway'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
@@ -22,15 +22,13 @@ interface IProps extends React.HTMLAttributes<Element> {
 
 const AvatarImage = styled.img`
   border-radius: 50%;
-  border: solid 2px transparent;
+  cursor: pointer;
   &:hover {
-    border: 2px solid ${({ theme }) => theme.colors.grey100};
+    opacity: 0.8;
   }
   &:focus {
-    border: 2px solid ${({ theme }) => theme.colors.yellow};
-  }
-  &:active {
-    border: 2px solid ${({ theme }) => theme.colors.grey100};
+    outline: none;
+    box-shadow: 0 0px 0px 2px ${({ theme }) => theme.colors.yellow};
   }
 `
 
@@ -40,8 +38,8 @@ export function AvatarSmall({ name, avatar, ...props }: IProps) {
   if (!error && (name || avatar)) {
     return (
       <AvatarImage
-        width={40}
-        height={40}
+        width={36}
+        height={36}
         src={
           avatar
             ? avatar.data

@@ -10,19 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { set, get, del } from '@auth/database'
+import { del, get, set } from '@auth/database'
 import {
-  NOTIFICATION_SERVICE_URL,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  JWT_ISSUER
+  JWT_ISSUER,
+  NOTIFICATION_SERVICE_URL
 } from '@auth/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { createToken } from '@auth/features/authenticate/service'
+import { IUserName, createToken } from '@auth/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
   createdAt: number
+}
+
+export enum NotificationEvent {
+  TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
+  PASSWORD_RESET = 'PASSWORD_RESET'
 }
 
 type SixDigitVerificationCode = string
@@ -37,11 +42,9 @@ export async function storeVerificationCode(nonce: string, code: string) {
 }
 
 export async function generateVerificationCode(
-  nonce: string,
-  mobile: string
+  nonce: string
 ): Promise<SixDigitVerificationCode> {
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
-
+  const code = crypto.randomInt(100000, 999999).toString()
   await storeVerificationCode(nonce, code)
   return code
 }
@@ -58,14 +61,19 @@ export function generateNonce() {
 }
 
 export async function sendVerificationCode(
-  mobile: string,
-  verificationCode: string
+  verificationCode: string,
+  notificationEvent: NotificationEvent,
+  userFullName: IUserName[],
+  mobile?: string,
+  email?: string
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    code: verificationCode
+    email,
+    code: verificationCode,
+    notificationEvent,
+    userFullName
   }
-
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),
@@ -91,7 +99,7 @@ export async function checkVerificationCode(
   const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
 
   if (!codeDetails) {
-    throw new Error('sms code not found')
+    throw new Error('Auth code not found')
   }
 
   const codeExpired =
@@ -99,11 +107,11 @@ export async function checkVerificationCode(
     CONFIG_SMS_CODE_EXPIRY_SECONDS
 
   if (code !== codeDetails.code) {
-    throw new Error('sms code invalid')
+    throw new Error('Auth code invalid')
   }
 
   if (codeExpired) {
-    throw new Error('sms code expired')
+    throw new Error('Auth code expired')
   }
 }
 

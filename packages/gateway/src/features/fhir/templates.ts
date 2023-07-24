@@ -36,7 +36,6 @@ export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
 export const MARRIAGE_TYPE_CODE = 'partnership'
 export const BIRTH_ATTENDANT_CODE = '73764-3'
-export const BIRTH_REG_TYPE_CODE = 'birth-reg-type'
 export const INFORMANT_TYPE = 'informant-type'
 export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
 export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
@@ -241,19 +240,16 @@ export function updateTaskTemplate(
     throw new Error('Task has no businessStatus code')
   }
   task.businessStatus.coding[0].code = status
-  if (comment || reason) {
-    if (!task.reason) {
-      task.reason = {
-        text: ''
-      }
+  if (!task.reason) {
+    task.reason = {
+      text: ''
     }
-
-    task.reason.text = reason || ''
-    const statusReason: fhir.CodeableConcept = {
-      text: comment
-    }
-    task.statusReason = statusReason
   }
+  task.reason.text = reason || ''
+  const statusReason: fhir.CodeableConcept = {
+    text: comment || ''
+  }
+  task.statusReason = statusReason
   if (duplicateTrackingId) {
     task.extension = task.extension || []
     task.extension.push({
