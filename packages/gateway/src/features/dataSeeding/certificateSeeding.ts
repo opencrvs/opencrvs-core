@@ -66,9 +66,24 @@ async function uploadCertificate(token: string, certificate: CertificateMeta) {
   return await res.json()
 }
 
-export async function seedCertificate(token: string) {
-  const certificates = await getCertificate()
-  certificates.map(async (certificate: CertificateMeta) => {
-    await uploadCertificate(token, certificate)
+const activeCertificates = async (token: string) => {
+  const res = await fetch(`${APPLICATION_CONFIG_URL}getActiveCertificates`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
   })
+  return await res.json()
+}
+
+export async function seedCertificate(token: string) {
+  if ((await activeCertificates(token)).length === 0) {
+    const certificates = await getCertificate()
+    await Promise.all(
+      certificates.map(async (certificate: CertificateMeta) => {
+        await uploadCertificate(token, certificate)
+      })
+    )
+  }
 }
