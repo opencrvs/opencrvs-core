@@ -12,12 +12,12 @@ get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-WRITE=false
+write=false
 
 for i in "$@"; do
   case $i in
-    --write=*)
-      WRITE=true
+    --write)
+      write=true
       shift
       ;;
     -*|--*)
@@ -41,7 +41,7 @@ elif [[ ! -d "${COUNTRY_CONFIG_PATH}" ]]; then
   exit 1
 fi
 
-if [ -z $WRITE ]; then
+if $write; then
   $(yarn bin)/ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --write
   exit 0
 fi

@@ -146,6 +146,7 @@
     "eslint-plugin-react-hooks": "^4.0.8",
     "express": "^4.17.1",
     "fetch-mock": "^7.3.3",
+    "glob": "^7.1.2",
     "json2csv": "^4.3.2",
     "opener": "^1.5.1",
     "prettier": "^2.5.1",

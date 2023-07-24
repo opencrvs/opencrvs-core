@@ -20,15 +20,9 @@ interface IReactIntlDescriptions {
   [key: string]: string
 }
 
-// unit tests use some content keys that do not need to be content managed
+/** Keys used by unit tests that do not need to be content managed */
 const testKeys = ['form.field.label.UNION', 'form.field.label.DIVISION']
 
-function existsInContentful(obj: any, value: string): boolean {
-  if (Object.values(obj).indexOf(value) > -1) {
-    return true
-  }
-  return false
-}
 const write = process.argv.includes('--write')
 const COUNTRY_CONFIG_PATH = process.argv[2]
 type LocalisationFile = {
@@ -55,25 +49,15 @@ function readTranslations() {
       .toString()
   )
 }
-function readContentfulIds() {
-  return JSON.parse(
-    fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/contentful-ids.json`
-      )
-      .toString()
-  )
-}
+
 function isEnglish(obj: ILanguage) {
   return obj.lang === 'en-US' || obj.lang === 'en'
 }
 
 async function extractMessages() {
-  let client: LocalisationFile
-  let contentfulIds: Record<string, string>
+  let translations: LocalisationFile
   try {
-    client = readTranslations()
-    contentfulIds = readContentfulIds()
+    translations = readTranslations()
   } catch (error: unknown) {
     const err = error as Error & { code: string }
     if (err.code === 'ENOENT') {
@@ -82,8 +66,7 @@ async function extractMessages() {
         `Your environment variables may not be set.
         Please add valid COUNTRY_CONFIG_PATH, as an environment variable.
         If they are set correctly, then something is wrong with
-        this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json or
-        this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/contentful-ids.json`
+        this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json`
       )
     } else {
       console.error(err)
@@ -111,22 +94,11 @@ async function extractMessages() {
       results.forEach((r) => {
         reactIntlDescriptions[r.id] = r.description!
       })
-      const contentfulKeysToMigrate: string[] = []
-      const englishTranslations = client.data.find(isEnglish)?.messages
-      const missingKeys: string[] = []
-
-      Object.keys(reactIntlDescriptions).forEach((key) => {
-        if (
-          !englishTranslations?.hasOwnProperty(key) &&
-          !(testKeys.indexOf(key) > -1)
-        ) {
-          missingKeys.push(key)
-        }
-
-        if (contentfulIds && !existsInContentful(contentfulIds, key)) {
-          contentfulKeysToMigrate.push(key)
-        }
-      })
+      const englishTranslations = translations.data.find(isEnglish)?.messages
+      const missingKeys = Object.keys(reactIntlDescriptions).filter(
+        (key) =>
+          !englishTranslations?.hasOwnProperty(key) && !testKeys.includes(key)
+      )
 
       if (missingKeys.length > 0) {
         // eslint-disable-line no-console
@@ -139,6 +111,12 @@ ${chalk.white(
 )}`)
 
         if (write) {
+          console.log(
+            `${chalk.yellow('Warning ⚠️:')} ${chalk.white(
+              'The --write command is experimental and only adds new translations for English.'
+            )}`
+          )
+
           const defaultsToBeAdded = missingKeys.map((key) => [
             key,
             results.find(({ id }) => id === key)?.defaultMessage
@@ -148,59 +126,24 @@ ${chalk.white(
             ...Object.fromEntries(defaultsToBeAdded)
           }
 
-          const english = client.data.find(isEnglish)!
+          const english = translations.data.find(isEnglish)!
           english.messages = newEnglishTranslations
-          writeTranslations(client)
+          writeTranslations(translations)
         } else {
           console.log(`
-${chalk.green('Tip 🪄:')}
-${chalk.white(
-  `If you want this command do add the missing keys for you, run it with the ${chalk.bold(
-    '--write'
-  )} flag`
-)}`)
+${chalk.green('Tip 🪄')}: ${chalk.white(
+            `If you want this command do add the missing English keys for you, run it with the ${chalk.bold(
+              '--write'
+            )} flag. Note that you still need to add non-English translations to the file.`
+          )}`)
         }
 
         process.exit(1)
       }
 
-      if (contentfulKeysToMigrate.length > 0) {
-        console.log(chalk.bold.yellow('Contentful'))
-        console.log(
-          `${chalk.white(
-            `This country configuration is setup to optionally use the Contentful Content Management System.
-${chalk.bold(
-  'If your team is not using Contentful, you can safely ignore this message'
-)}.
-
-The following keys do not currently exist in Contentful:
-
-${chalk.white(contentfulKeysToMigrate.join('\n'))}`
-          )}`
-        )
-        console.log()
-        console.log(
-          `${chalk.yellow(
-            'When this script passes, OpenCRVS will save the new keys here:'
-          )}
-${chalk.bold(
-  chalk.white(
-    `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/contentful-keys-to-migrate.json`
-  )
-)}
-and save the description into descriptions.json so that later you can import it into an existing or new Contentful installation.`
-        )
-        console.log()
-        console.log()
-      }
-
       fs.writeFileSync(
         `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
-      )
-      fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/contentful-keys-to-migrate.json`,
-        JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })
   } catch (err) {

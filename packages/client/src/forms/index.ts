@@ -1232,4 +1232,3 @@ export interface ICertificate {
   payments?: Payment[]
   data?: string
 }
-
