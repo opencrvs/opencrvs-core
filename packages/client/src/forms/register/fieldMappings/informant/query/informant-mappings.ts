@@ -17,7 +17,7 @@ export function getInformantSectionTransformer(
   queryData: any,
   sectionId: string
 ) {
-  if (queryData[sectionId]._fhirIDPatient) {
+  if (queryData[sectionId]?._fhirIDPatient) {
     transformedData[sectionId]._fhirIDPatient =
       queryData[sectionId]._fhirIDPatient
   }
