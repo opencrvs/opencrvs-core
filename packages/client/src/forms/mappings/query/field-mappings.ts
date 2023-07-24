@@ -134,14 +134,20 @@ export const bundleFieldToSectionFieldTransformer =
   }
 
 export const fieldValueSectionExchangeTransformer =
-  (fromSectionId: SectionId, fromSectionField: string) =>
+  (
+    fromSectionId: SectionId,
+    fromSectionField: string,
+    transformerMethod?: IFormFieldQueryMapFunction
+  ) =>
   (
     transformedData: TransformedData,
     queryData: QueryData,
     sectionId: SectionId,
     field: IFormField
   ) => {
-    if (Boolean(queryData[sectionId])) {
+    if (transformerMethod) {
+      transformerMethod(transformedData, queryData, sectionId, field)
+    } else if (Boolean(queryData[sectionId])) {
       transformedData[sectionId][field.name] =
         queryData[fromSectionId][fromSectionField]
     }

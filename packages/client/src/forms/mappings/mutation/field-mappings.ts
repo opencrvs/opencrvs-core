@@ -243,7 +243,10 @@ export const fieldValueSectionExchangeTransformer =
   }
 
 export const sectionFieldToBundleFieldTransformer =
-  (transformedFieldName?: string) =>
+  (
+    transformedFieldName?: string,
+    transformerMethod?: IFormFieldMutationMapFunction
+  ) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -263,7 +266,12 @@ export const sectionFieldToBundleFieldTransformer =
 
     const finalFieldName =
       nestedFieldNames?.[nestedFieldNames.length - 1] || field.name
-    currentData[finalFieldName] = draftData[sectionId][field.name]
+
+    if (transformerMethod) {
+      transformerMethod(transformedData, draftData, sectionId, field)
+    } else {
+      currentData[finalFieldName] = draftData[sectionId][field.name]
+    }
 
     return transformedData
   }
