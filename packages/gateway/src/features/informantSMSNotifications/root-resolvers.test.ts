@@ -20,47 +20,16 @@ const informantSMSNotificationMock = [
   {
     id: '639ae12df387b6b3efbd9a17',
     name: 'deathInProgressSMS',
-    enabled: true,
-    message:
-      'Death registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration'
+    enabled: true
   },
   {
     id: '639ae12df387b6b3efbd9a18',
     name: 'deathDeclarationSMS',
     enabled: true,
-    message:
-      'Death registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
     updatedAt: '1671094573239',
     createdAt: '1671094573239'
   }
 ]
-
-const messageContentMock = {
-  languages: [
-    {
-      lang: 'en',
-      displayName: 'English',
-      messages: {
-        birthInProgressNotification:
-          'Birth registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
-        birthDeclarationNotification:
-          'Birth registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
-        birthRegistrationNotification:
-          'Congratulations, the birth of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
-        birthRejectionNotification:
-          'Birth registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
-        deathInProgressNotification:
-          'Death registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
-        deathDeclarationNotification:
-          'Death registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
-        deathRegistrationNotification:
-          'The death of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
-        deathRejectionNotification:
-          'Death registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.'
-      }
-    }
-  ]
-}
 
 const natlSYSAdminToken = jwt.sign(
   { scope: ['natlsysadmin'] },
@@ -99,7 +68,6 @@ describe('InformantSMSNotifications root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(informantSMSNotificationMock), {
         status: 200
       })
-      fetch.mockResponseOnce(JSON.stringify(messageContentMock))
 
       const res = await resolvers.Query.informantSMSNotifications(
         {},
@@ -120,7 +88,6 @@ describe('InformantSMSNotifications root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(informantSMSNotificationMock), {
         status: 200
       })
-      fetch.mockResponseOnce(JSON.stringify(messageContentMock))
 
       await expect(
         resolvers.Query.informantSMSNotifications(
@@ -141,7 +108,6 @@ describe('InformantSMSNotifications root resolvers', () => {
 
     it('throws error when the service response is not 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
-      fetch.mockResponseOnce(JSON.stringify(messageContentMock))
 
       await expect(
         resolvers.Query.informantSMSNotifications(
@@ -171,7 +137,6 @@ describe('toggleInformantSMSNotification mutation', () => {
     fetch.mockResponseOnce(JSON.stringify(informantSMSNotificationMock), {
       status: 201
     })
-    fetch.mockResponseOnce(JSON.stringify(messageContentMock))
 
     const response = await resolvers.Mutation.toggleInformantSMSNotification(
       {},
@@ -192,7 +157,6 @@ describe('toggleInformantSMSNotification mutation', () => {
     fetch.mockResponseOnce(JSON.stringify(informantSMSNotificationMock), {
       status: 201
     })
-    fetch.mockResponseOnce(JSON.stringify(messageContentMock))
 
     return expect(
       resolvers.Mutation.toggleInformantSMSNotification(

@@ -20,7 +20,6 @@ export const TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION = gql`
       id
       name
       enabled
-      message
       updatedAt
       createdAt
     }

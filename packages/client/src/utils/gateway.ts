@@ -2037,7 +2037,6 @@ export type SmsNotification = {
   createdAt: Scalars['String']
   enabled: Scalars['Boolean']
   id?: Maybe<Scalars['String']>
-  message: Scalars['String']
   name: Scalars['String']
   updatedAt: Scalars['String']
 }
@@ -7735,7 +7734,6 @@ export type ToggleInformantSmsNotificationMutation = {
     id?: string | null
     name: string
     enabled: boolean
-    message: string
     updatedAt: string
     createdAt: string
   }> | null
@@ -7752,7 +7750,6 @@ export type GetInformantSmsNotificationsQuery = {
     id?: string | null
     name: string
     enabled: boolean
-    message: string
     updatedAt: string
     createdAt: string
   }> | null
@@ -8855,6 +8852,41 @@ export type FetchViewRecordByCompositionQuery = {
         _fhirIDMap?: any | null
         id: string
         typeOfMarriage?: string | null
+        informant?: {
+          __typename?: 'RelatedPerson'
+          id?: string | null
+          relationship?: string | null
+          otherRelationship?: string | null
+          _fhirIDPatient?: string | null
+          occupation?: string | null
+          nationality?: Array<string | null> | null
+          birthDate?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: string | null
+            otherType?: string | null
+            fieldsModifiedByIdentity?: Array<string | null> | null
+          } | null> | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          address?: Array<{
+            __typename?: 'Address'
+            type?: string | null
+            line?: Array<string | null> | null
+            district?: string | null
+            state?: string | null
+            city?: string | null
+            postalCode?: string | null
+            country?: string | null
+          } | null> | null
+        } | null
         bride?: {
           __typename?: 'Person'
           id?: string | null

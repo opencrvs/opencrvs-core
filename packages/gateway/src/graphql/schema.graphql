@@ -665,7 +665,6 @@ type System {
 type SMSNotification {
   id: String
   name: String!
-  message: String!
   enabled: Boolean!
   updatedAt: String!
   createdAt: String!
