@@ -132,8 +132,6 @@ async function getUseres() {
   return users
 }
 
-let roleToId: { [role: string]: Types.ObjectId } = {}
-
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -144,8 +142,9 @@ async function getLocations() {
 }
 
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
+  let roleIdMap: IRoleIdMap = {}
   const url = new URL('updateRole', USER_MANAGEMENT_URL).toString()
-  return Promise.all(
+  await Promise.all(
     systemRoles.map((systemRole) =>
       fetch(url, {
         method: 'POST',
@@ -155,87 +154,80 @@ async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
           Authorization: token
         }
       }).then(async (res) => {
-        const { msg, updRoleId } = await res.json()
-        roleToId = { ...roleToId, ...updRoleId }
-        return msg
+        const { updRoleId } = await res.json()
+        roleIdMap = { ...roleIdMap, ...updRoleId }
       })
     )
   )
+  return roleIdMap
 }
-export interface IUserName {
-  use: string
-  family: string
-  given: string[]
+interface IRoleIdMap {
+  [role: string]: Types.ObjectId
 }
 
-interface IIdentifier {
-  system: string
-  value: string
-}
-export interface ISecurityQuestionAnswer {
-  questionKey: string
-  answerHash: string
-}
-interface ISignature {
-  type: string
-  data: string
-}
-export interface IAuditHistory {
-  auditedBy: string
-  auditedOn: number
-  action: string
-  reason: string
-  comment?: string
-}
-export interface IUser {
-  name: IUserName[]
-  username: string
-  identifiers: IIdentifier[]
-  email: string
-  mobile?: string
-  passwordHash: string
-  salt: string
-  systemRole: string
-  role: Types.ObjectId
-  practitionerId: string
+interface IUser {
   primaryOfficeId: string
-  catchmentAreaIds: string[]
-  scope: string[]
-  signature: ISignature
-  status: string
-  securityQuestionAnswers: ISecurityQuestionAnswer[]
-  creationDate: number
+  givenNames: string
+  familyName: string
+  systemRole:
+    | 'FIELD_AGENT'
+    | 'REGISTRATION_AGENT'
+    | 'LOCAL_REGISTRAR'
+    | 'LOCAL_SYSTEM_ADMIN'
+    | 'NATIONAL_SYSTEM_ADMIN'
+    | 'PERFORMANCE_MANAGEMENT'
+    | 'NATIONAL_REGISTRAR'
+  role:
+    | 'Field Agent'
+    | 'Police Officer'
+    | 'Social Worker'
+    | 'Healthcare Worker'
+    | 'Registration Agent'
+    | 'Local Registrar'
+    | 'Local System Admin'
+    | 'National System Admin'
+    | 'Performance Manager'
+    | 'National Registrar'
+  mobile: string
+  email: string
+  password: string
 }
 
-const seedUsers = async (token: string) => {
+const seedUsers = async (token: string, roleIdMap: IRoleIdMap) => {
   const rawUsers = await getUseres()
-
-  for (const rawUser of rawUsers) {
-    const { givenNames, familyName, role, primaryOfficeId, ...user } = rawUser
-    const locations = await getLocationsByIdentifier(primaryOfficeId)
-    const officeId = locations[0].id
-    const parsedUser = {
-      ...user,
-      role: roleToId[role],
-      name: [
-        {
-          use: 'en',
-          family: familyName,
-          given: [givenNames]
-        }
-      ],
-      primaryOfficeId: officeId
-    }
-    const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(parsedUser),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
+  let createdUsers = 0,
+    failed = 0
+  await Promise.all(
+    rawUsers.map(async (rawUser: IUser) => {
+      const { givenNames, familyName, role, primaryOfficeId, ...user } = rawUser
+      const locations = await getLocationsByIdentifier(primaryOfficeId)
+      const officeId = locations[0].id
+      const parsedUser = {
+        ...user,
+        role: roleIdMap[role],
+        name: [
+          {
+            use: 'en',
+            family: familyName,
+            given: [givenNames]
+          }
+        ],
+        primaryOfficeId: officeId
       }
+      const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
+      const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(parsedUser),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token
+        }
+      })
+      if (res.ok) createdUsers++
+      else failed++
     })
-  }
+  )
+  console.log(`${createdUsers} user(s) created, ${failed} falied`)
 }
 
 async function buildLocationBundle(
@@ -306,7 +298,7 @@ export async function seedData() {
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
 
-  await updateRoles(
+  const roleIdMap: IRoleIdMap = await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
@@ -321,6 +313,6 @@ export async function seedData() {
   const locationsBundle = await buildLocationBundle(locations)
   await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
 
-  seedUsers(token)
+  seedUsers(token, roleIdMap)
   seedCertificate(token)
 }
