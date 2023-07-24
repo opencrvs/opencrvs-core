@@ -51,7 +51,8 @@ const config = {
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
-  backgroundPrimary: '#36304E'
+  backgroundPrimary: '#36304E',
+  subheaderCopy: '#007A5E'
 }
 
 export const gradients = {

@@ -60,7 +60,8 @@ import {
   INFORMANT_NOTIFICATION,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT
+  ISSUE_CERTIFICATE_PAYMENT,
+  PRINT_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -689,6 +690,9 @@ export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 
+export function goToPrintRecordView(declarationId: string) {
+  return push(formatUrl(PRINT_RECORD, { declarationId }))
+}
 export type INavigationState = undefined
 
 export function navigationReducer(state: INavigationState, action: any) {

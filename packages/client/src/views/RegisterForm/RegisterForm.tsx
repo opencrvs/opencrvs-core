@@ -66,7 +66,8 @@ import {
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  goToPageGroup as goToPageGroupAction
+  goToPageGroup as goToPageGroupAction,
+  goToPrintRecordView
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
@@ -195,6 +196,7 @@ type DispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
+  goToPrintRecord: typeof goToPrintRecordView
 }
 
 type Props = {
@@ -599,7 +601,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
           handler: this.onSaveAsDraftClicked,
           label: intl.formatMessage(buttonMessages.saveExitButton)
         },
-        menuItems: [menuOption]
+        menuItems: [
+          menuOption,
+          {
+            label: 'Print declaration',
+            handler: () => this.props.goToPrintRecord(declaration.id)
+          }
+        ]
       }
     }
     return eventTopBarProps
@@ -1112,5 +1120,6 @@ export const RegisterForm = connect<
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  toggleDraftSavedNotification
+  toggleDraftSavedNotification,
+  goToPrintRecord: goToPrintRecordView
 })(injectIntl<'intl', FullProps>(RegisterFormView))
