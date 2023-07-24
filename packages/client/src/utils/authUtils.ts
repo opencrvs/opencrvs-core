@@ -16,8 +16,6 @@ import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { SystemRoleType } from '@client/utils/gateway'
 import { UserDetails } from './userUtils'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { createStore } from '@client/store'
 
 export type Scope = string[]
 
@@ -94,14 +92,14 @@ export async function refreshToken() {
     })
 
     if (!res.ok) {
-      const { store } = createStore()
-      store.dispatch(redirectToAuthentication())
+      return false
     } else {
       const data = await res.json()
       removeToken()
       storeToken(data.token)
     }
   }
+  return true
 }
 
 export const enum AuthScope {
