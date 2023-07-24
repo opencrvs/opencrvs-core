@@ -17,12 +17,12 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const existingCollections = await db
+      const existingCertificates = await db
         .collection('certificates')
         .find({})
         .toArray()
 
-      if (existingCollections.length) {
+      if (existingCertificates.length) {
         await db.collection('certificates').insertOne({
           event: 'marriage',
           status: 'ACTIVE',
