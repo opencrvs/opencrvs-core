@@ -164,31 +164,19 @@ export async function createLocationHandler(
   const newLocation: fhir.Location = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
-  let locations = []
-
-  locations.push(
-    ...(await getLocationsByIdentifier(
-      `${Code.ADMIN_STRUCTURE}_${String(payload.statisticalID)}`
-    ).catch((err) => {
-      throw err
-    }))
-  )
-
-  locations.push(
-    ...(await getLocationsByIdentifier(
-      `${Code.CRVS_OFFICE}_${String(payload.statisticalID)}`
-    ).catch((err) => {
-      throw err
-    }))
-  )
-
-  locations.push(
-    ...(await getLocationsByIdentifier(
-      `${Code.HEALTH_FACILITY}_${String(payload.statisticalID)}`
-    ).catch((err) => {
-      throw err
-    }))
-  )
+  const locations = [
+    ...(await Promise.all([
+      getLocationsByIdentifier(
+        `${Code.ADMIN_STRUCTURE}_${String(payload.statisticalID)}`
+      ),
+      getLocationsByIdentifier(
+        `${Code.CRVS_OFFICE}_${String(payload.statisticalID)}`
+      ),
+      getLocationsByIdentifier(
+        `${Code.HEALTH_FACILITY}_${String(payload.statisticalID)}`
+      )
+    ]).then((results) => results.flat()))
+  ]
 
   if (locations.length !== 0) {
     throw conflict(`statisticalID ${payload.statisticalID} already exists`)
