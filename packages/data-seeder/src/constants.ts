@@ -14,7 +14,11 @@ export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const APPLICATION_CONFIG_URL =
   process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
+export const DOCUMENTS_URL =
+  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 
 export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'

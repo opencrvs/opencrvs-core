@@ -14,6 +14,10 @@ module.exports = {
   env: {
     es6: true
   },
+  rules: {
+    'no-console': 'off',
+    'no-unused-vars': 'warn'
+  },
   overrides: [
     {
       files: ['*.ts'],

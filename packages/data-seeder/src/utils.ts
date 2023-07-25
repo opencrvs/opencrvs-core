@@ -9,19 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-// eslint-disable-next-line import/no-unassigned-import
-import '@opencrvs/commons/monitoring'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
-import * as DotEnv from 'dotenv'
-import { createServer } from '@gateway/server'
-
-DotEnv.config({
-  path: `${process.cwd()}/.env`
-})
-
-createServer().then((app) => {
-  app.start()
-})
+export function raise(msg: string): never {
+  console.log(new Error().stack)
+  console.log(msg)
+  process.exit(1)
+}

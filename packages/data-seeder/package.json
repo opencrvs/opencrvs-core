@@ -5,6 +5,7 @@
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "license": "MPL-2.0",
   "scripts": {
+    "seed": "ts-node -r tsconfig-paths/register src/index.ts",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit"
   },
@@ -17,6 +18,7 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
+    "@types/fhir": "^0.0.37",
     "@types/node": "^16.18.39",
     "@types/node-fetch": "^2.5.12",
     "node-fetch": "^2.6.1",

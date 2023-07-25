@@ -28,7 +28,8 @@
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "types": [
-      "node"
+      "node",
+      "fhir"
     ]
   },
   "include": [
