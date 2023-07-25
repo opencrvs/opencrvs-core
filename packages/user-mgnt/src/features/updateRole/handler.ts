@@ -40,7 +40,8 @@ export const systemRolesRequestSchema = Joi.object({
 })
 
 export const systemRoleResponseSchema = Joi.object({
-  msg: Joi.string().required()
+  msg: Joi.string().required(),
+  updRoleId: Joi.object()
 })
 
 export interface IRoleLabel {
@@ -66,6 +67,7 @@ export default async function updateRole(
 ) {
   const systemRolesRequest = request.payload as ISystemRolesRequest
   let updatedRoleIds: Types.ObjectId[] = []
+  let roleIdMap: { [role: string]: Types.ObjectId } = {}
 
   const systemRole: ISystemRoleModel | null = await SystemRole.findOne({
     _id: systemRolesRequest.id
@@ -77,7 +79,9 @@ export default async function updateRole(
 
   if (systemRolesRequest.roles) {
     try {
-      updatedRoleIds = await updateParticularRoles(systemRolesRequest.roles)
+      ;({ updatedRoleIds, roleIdMap } = await updateParticularRoles(
+        systemRolesRequest.roles
+      ))
       systemRole.roles = updatedRoleIds
     } catch (err) {
       logger.error(err)
@@ -99,15 +103,24 @@ export default async function updateRole(
   }
 
   logger.info(systemRole)
-  return h.response({ msg: 'System role updated' }).code(200)
+  return h
+    .response({
+      updRoleId: roleIdMap
+    })
+    .code(200)
 }
 
 async function updateParticularRoles(roles: IRoleRequest[]) {
-  return Promise.all(
+  const roleIdMap: { [role: string]: Types.ObjectId } = {}
+  const updatedRoleIds = await Promise.all(
     roles.map(async (role) => {
       const id = new Types.ObjectId(role._id)
       await UserRole.updateOne({ _id: id.toString() }, role, { upsert: true })
+      for (const labelObj of role.labels) {
+        roleIdMap[labelObj.label] = id
+      }
       return id
     })
   )
+  return { updatedRoleIds, roleIdMap }
 }

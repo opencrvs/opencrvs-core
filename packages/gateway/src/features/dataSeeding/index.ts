@@ -20,12 +20,14 @@ import {
   GQLSystemRole,
   GQLSystemRoleInput
 } from '@gateway/graphql/schema'
+import { Types } from 'mongoose'
 import fetch from 'node-fetch'
 import { seedCertificate } from './certificateSeeding'
 import { v4 as uuid } from 'uuid'
 import {
   composeFhirLocation,
-  generateStatisticalExtensions
+  generateStatisticalExtensions,
+  getLocationsByIdentifier
 } from '@gateway/features/restLocation/utils'
 import { fetchFromHearth } from '@gateway/features/fhir/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
@@ -120,6 +122,16 @@ async function getCountryRoles() {
   return res.json() as Promise<RoleResponse>
 }
 
+async function getUseres() {
+  const url = new URL('users', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the users from ${url}`)
+  }
+  const users = await res.json()
+  return users
+}
+
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
@@ -130,8 +142,9 @@ async function getLocations() {
 }
 
 async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
+  let roleIdMap: IRoleIdMap = {}
   const url = new URL('updateRole', USER_MANAGEMENT_URL).toString()
-  return Promise.all(
+  await Promise.all(
     systemRoles.map((systemRole) =>
       fetch(url, {
         method: 'POST',
@@ -140,9 +153,81 @@ async function updateRoles(token: string, systemRoles: GQLSystemRoleInput[]) {
           'Content-Type': 'application/json',
           Authorization: token
         }
-      }).then((res) => res.json() as Promise<{ msg: string }>)
+      }).then(async (res) => {
+        const { updRoleId } = await res.json()
+        roleIdMap = { ...roleIdMap, ...updRoleId }
+      })
     )
   )
+  return roleIdMap
+}
+interface IRoleIdMap {
+  [role: string]: Types.ObjectId
+}
+
+interface IUser {
+  primaryOfficeId: string
+  givenNames: string
+  familyName: string
+  systemRole:
+    | 'FIELD_AGENT'
+    | 'REGISTRATION_AGENT'
+    | 'LOCAL_REGISTRAR'
+    | 'LOCAL_SYSTEM_ADMIN'
+    | 'NATIONAL_SYSTEM_ADMIN'
+    | 'PERFORMANCE_MANAGEMENT'
+    | 'NATIONAL_REGISTRAR'
+  role:
+    | 'Field Agent'
+    | 'Police Officer'
+    | 'Social Worker'
+    | 'Healthcare Worker'
+    | 'Registration Agent'
+    | 'Local Registrar'
+    | 'Local System Admin'
+    | 'National System Admin'
+    | 'Performance Manager'
+    | 'National Registrar'
+  mobile: string
+  email: string
+  password: string
+}
+
+const seedUsers = async (token: string, roleIdMap: IRoleIdMap) => {
+  const rawUsers = await getUseres()
+  let createdUsers = 0,
+    failed = 0
+  await Promise.all(
+    rawUsers.map(async (rawUser: IUser) => {
+      const { givenNames, familyName, role, primaryOfficeId, ...user } = rawUser
+      const locations = await getLocationsByIdentifier(primaryOfficeId)
+      const officeId = locations[0].id
+      const parsedUser = {
+        ...user,
+        role: roleIdMap[role],
+        name: [
+          {
+            use: 'en',
+            family: familyName,
+            given: [givenNames]
+          }
+        ],
+        primaryOfficeId: officeId
+      }
+      const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
+      const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(parsedUser),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token
+        }
+      })
+      if (res.ok) createdUsers++
+      else failed++
+    })
+  )
+  console.log(`${createdUsers} user(s) created, ${failed} falied`)
 }
 
 async function buildLocationBundle(
@@ -212,7 +297,8 @@ export async function seedData() {
   const usedSystemRoles = Object.keys(
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
-  await updateRoles(
+
+  const roleIdMap: IRoleIdMap = await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
@@ -225,7 +311,8 @@ export async function seedData() {
   )
   const locations = await getLocations()
   const locationsBundle = await buildLocationBundle(locations)
-  const res = await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
-  console.log(res)
+  await fetchFromHearth('', 'POST', JSON.stringify(locationsBundle))
+
+  seedUsers(token, roleIdMap)
   seedCertificate(token)
 }
