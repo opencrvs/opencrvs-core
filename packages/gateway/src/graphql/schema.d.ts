@@ -533,7 +533,6 @@ export interface GQLSystem {
 export interface GQLSMSNotification {
   id?: string
   name: string
-  message: string
   enabled: boolean
   updatedAt: string
   createdAt: string
@@ -5806,7 +5805,6 @@ export interface SystemToSettingsResolver<TParent = any, TResult = any> {
 export interface GQLSMSNotificationTypeResolver<TParent = any> {
   id?: SMSNotificationToIdResolver<TParent>
   name?: SMSNotificationToNameResolver<TParent>
-  message?: SMSNotificationToMessageResolver<TParent>
   enabled?: SMSNotificationToEnabledResolver<TParent>
   updatedAt?: SMSNotificationToUpdatedAtResolver<TParent>
   createdAt?: SMSNotificationToCreatedAtResolver<TParent>
@@ -5822,18 +5820,6 @@ export interface SMSNotificationToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface SMSNotificationToNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SMSNotificationToMessageResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},

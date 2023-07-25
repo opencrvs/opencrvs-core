@@ -29,6 +29,7 @@ describe('.sendSMS()', () => {
           email: 'email@mail.com',
           sms: '27845555555'
         },
+        'informant',
         { test: 'test' },
         'Bearer token...',
         'en'
@@ -50,6 +51,7 @@ describe('.sendSMS()', () => {
           email: 'email@mail.com',
           sms: '27845555555'
         },
+        'informant',
         { test: 'test' },
         'Bearer token...',
         'en'

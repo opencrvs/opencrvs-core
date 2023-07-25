@@ -617,8 +617,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d0',
     name: 'birthInProgressSMS',
     enabled: true,
-    message:
-      'Birth registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
     updatedAt: '1671688043153',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -627,8 +625,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d1',
     name: 'birthDeclarationSMS',
     enabled: false,
-    message:
-      'Birth registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
     updatedAt: '1671688046478',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -637,8 +633,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d2',
     name: 'birthRegistrationSMS',
     enabled: true,
-    message:
-      'Congratulations, the birth of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -647,8 +641,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d3',
     name: 'birthRejectionSMS',
     enabled: true,
-    message:
-      'Birth registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -657,8 +649,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d4',
     name: 'deathInProgressSMS',
     enabled: true,
-    message:
-      'Death registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -667,8 +657,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d5',
     name: 'deathDeclarationSMS',
     enabled: true,
-    message:
-      'Death registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -677,8 +665,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d6',
     name: 'deathRegistrationSMS',
     enabled: true,
-    message:
-      'The death of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
@@ -687,8 +673,6 @@ export const informantSMSNotificationMock = [
     id: '63a30240ee4b270dc91f53d7',
     name: 'deathRejectionSMS',
     enabled: true,
-    message:
-      'Death registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
     updatedAt: '1671627328205',
     createdAt: '1671627328205',
     __typename: 'SMSNotification'
