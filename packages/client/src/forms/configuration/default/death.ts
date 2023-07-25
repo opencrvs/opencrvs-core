@@ -17,6 +17,32 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { IntegratingSystemType } from '@client/utils/gateway'
+
+const nidIntegrationConditionals = {
+  hideIfNidIntegrationEnabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
+        nationalIdSystem &&
+        nationalIdSystem.settings.openIdProviderBaseUrl &&
+        nationalIdSystem.settings.openIdProviderClientId &&
+        nationalIdSystem.settings.openIdProviderClaims;
+    `
+  },
+  hideIfNidIntegrationDisabled: {
+    action: 'hide',
+    expression: `const nationalIdSystem =
+    offlineCountryConfig &&
+    offlineCountryConfig.systems.find(s => s.integratingSystemType === '${IntegratingSystemType.Mosip}');
+      !nationalIdSystem ||
+      !nationalIdSystem.settings.openIdProviderBaseUrl ||
+      !nationalIdSystem.settings.openIdProviderClientId ||
+      !nationalIdSystem.settings.openIdProviderClaims;
+    `
+  }
+}
 
 export const deathRegisterForms: ISerializedForm = {
   sections: [
@@ -41,48 +67,48 @@ export const deathRegisterForms: ISerializedForm = {
               required: true,
               hideInPreview: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               options: [
                 {
                   value: 'SPOUSE',
-                  label: informantMessageDescriptors.spouse
+                  label: informantMessageDescriptors.SPOUSE
                 },
                 {
                   value: 'SON',
-                  label: informantMessageDescriptors.son
+                  label: informantMessageDescriptors.SON
                 },
                 {
                   value: 'DAUGHTER',
-                  label: informantMessageDescriptors.daughter
+                  label: informantMessageDescriptors.DAUGHTER
                 },
                 {
                   value: 'SON_IN_LAW',
-                  label: informantMessageDescriptors.sonInLaw
+                  label: informantMessageDescriptors.SON_IN_LAW
                 },
                 {
                   value: 'DAUGHTER_IN_LAW',
-                  label: informantMessageDescriptors.daughterInLaw
+                  label: informantMessageDescriptors.DAUGHTER_IN_LAW
                 },
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDSON',
-                  label: informantMessageDescriptors.grandson
+                  label: informantMessageDescriptors.GRANDSON
                 },
                 {
                   value: 'GRANDDAUGHTER',
-                  label: informantMessageDescriptors.granddaughter
+                  label: informantMessageDescriptors.GRANDDAUGHTER
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -105,7 +131,7 @@ export const deathRegisterForms: ISerializedForm = {
                     placeholder: formMessageDescriptors.relationshipPlaceHolder,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'englishOnlyNameFormat'
                       }
@@ -161,49 +187,49 @@ export const deathRegisterForms: ISerializedForm = {
               required: true,
               hideHeader: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               size: RadioSize.LARGE,
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
                   value: 'SPOUSE',
-                  label: informantMessageDescriptors.spouse
+                  label: informantMessageDescriptors.SPOUSE
                 },
                 {
                   value: 'SON',
-                  label: informantMessageDescriptors.son
+                  label: informantMessageDescriptors.SON
                 },
                 {
                   value: 'DAUGHTER',
-                  label: informantMessageDescriptors.daughter
+                  label: informantMessageDescriptors.DAUGHTER
                 },
                 {
                   value: 'SON_IN_LAW',
-                  label: informantMessageDescriptors.sonInLaw
+                  label: informantMessageDescriptors.SON_IN_LAW
                 },
                 {
                   value: 'DAUGHTER_IN_LAW',
-                  label: informantMessageDescriptors.daughterInLaw
+                  label: informantMessageDescriptors.DAUGHTER_IN_LAW
                 },
                 {
                   value: 'MOTHER',
-                  label: informantMessageDescriptors.mother
+                  label: informantMessageDescriptors.MOTHER
                 },
                 {
                   value: 'FATHER',
-                  label: informantMessageDescriptors.father
+                  label: informantMessageDescriptors.FATHER
                 },
                 {
                   value: 'GRANDSON',
-                  label: informantMessageDescriptors.grandson
+                  label: informantMessageDescriptors.GRANDSON
                 },
                 {
                   value: 'GRANDDAUGHTER',
-                  label: informantMessageDescriptors.granddaughter
+                  label: informantMessageDescriptors.GRANDDAUGHTER
                 },
                 {
                   value: 'OTHER',
-                  label: formMessageDescriptors.someoneElse
+                  label: informantMessageDescriptors.OTHER
                 }
               ],
               nestedFields: {
@@ -214,7 +240,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -250,7 +276,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -286,7 +312,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -322,7 +348,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -358,7 +384,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -394,7 +420,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -430,7 +456,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -466,7 +492,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -502,7 +528,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -538,7 +564,7 @@ export const deathRegisterForms: ISerializedForm = {
                     label: formMessageDescriptors.phoneNumber,
                     required: true,
                     initialValue: '',
-                    validate: [
+                    validator: [
                       {
                         operation: 'phoneNumberFormat'
                       }
@@ -589,6 +615,10 @@ export const deathRegisterForms: ISerializedForm = {
             operation: 'registrationNumberTransformer'
           },
           {
+            fieldName: 'informantType',
+            operation: 'informantTypeTransformer'
+          },
+          {
             fieldName: 'qrCode',
             operation: 'QRCodeTransformerTransformer'
           },
@@ -597,6 +627,17 @@ export const deathRegisterForms: ISerializedForm = {
             operation: 'certificateDateTransformer',
             parameters: ['en', 'dd MMMM yyyy']
           },
+          {
+            fieldName: 'registrar',
+            operation: 'userTransformer',
+            parameters: ['REGISTERED']
+          },
+          {
+            fieldName: 'registrationAgent',
+            operation: 'userTransformer',
+            parameters: ['VALIDATED']
+          },
+          // backward compatibility
           {
             fieldName: 'registrarName',
             operation: 'registrarNameUserTransformer'
@@ -646,7 +687,7 @@ export const deathRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -671,7 +712,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -681,7 +722,6 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['informant.informantID']
                 }
               ],
-              conditionals: [],
               mapping: {
                 template: {
                   fieldName: 'deceasedNID',
@@ -708,9 +748,13 @@ export const deathRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('birthDate')`
                 }
               ],
-              validate: [
+              validator: [
                 {
                   operation: 'isValidBirthDate'
                 }
@@ -739,7 +783,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: false,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -761,7 +805,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.ageOfDeceased,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [1, 120]
@@ -788,7 +832,7 @@ export const deathRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -807,7 +851,13 @@ export const deathRegisterForms: ISerializedForm = {
                   operation: 'nameToFieldTransformer',
                   parameters: ['en', 'firstNames']
                 }
-              }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
+                }
+              ]
             },
             {
               name: 'familyNameEng',
@@ -817,7 +867,7 @@ export const deathRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
                 }
@@ -836,7 +886,13 @@ export const deathRegisterForms: ISerializedForm = {
                   operation: 'nameToFieldTransformer',
                   parameters: ['en', 'familyName']
                 }
-              }
+              },
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.deceased?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
+                }
+              ]
             },
             {
               name: 'gender',
@@ -844,7 +900,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.sex,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               mapping: {
                 template: {
@@ -877,7 +933,7 @@ export const deathRegisterForms: ISerializedForm = {
               },
               initialValue: '',
               ignoreBottomMargin: true,
-              validate: [],
+              validator: [],
               conditionals: []
             },
             {
@@ -887,7 +943,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               mapping: {
                 template: {
@@ -978,7 +1034,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.deathEventDate,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'isValidDeathOccurrenceDate'
                 }
@@ -1011,7 +1067,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.manner,
               required: false,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -1060,7 +1116,7 @@ export const deathRegisterForms: ISerializedForm = {
               customisable: true,
               hideHeader: true,
               initialValue: 'false',
-              validate: [],
+              validator: [],
               mapping: {
                 mutation: {
                   operation: 'sectionFieldToBundleFieldTransformer',
@@ -1083,7 +1139,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: true,
               customisable: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               conditionals: [
                 {
@@ -1136,7 +1192,7 @@ export const deathRegisterForms: ISerializedForm = {
                 }
               ],
               initialValue: '',
-              validate: [],
+              validator: [],
               required: true,
               customisable: true,
               maxLength: 500,
@@ -1164,7 +1220,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.placeOfDeath,
               required: true,
               initialValue: '',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: [
                 {
@@ -1183,7 +1239,7 @@ export const deathRegisterForms: ISerializedForm = {
               mapping: {
                 mutation: {
                   operation: 'deathEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationTypeQueryTransformer',
@@ -1191,6 +1247,7 @@ export const deathRegisterForms: ISerializedForm = {
                 }
               }
             },
+
             {
               name: 'deathLocation',
               customisable: false,
@@ -1208,7 +1265,7 @@ export const deathRegisterForms: ISerializedForm = {
               dynamicOptions: {
                 resource: 'facilities'
               },
-              validate: [
+              validator: [
                 {
                   operation: 'facilityMustBeSelected'
                 }
@@ -1227,7 +1284,7 @@ export const deathRegisterForms: ISerializedForm = {
                 },
                 mutation: {
                   operation: 'deathEventLocationMutationTransformer',
-                  parameters: []
+                  parameters: [{}]
                 },
                 query: {
                   operation: 'eventLocationIDQueryTransformer',
@@ -1243,7 +1300,7 @@ export const deathRegisterForms: ISerializedForm = {
       id: DeathSection.Informant,
       viewType: 'form',
       name: formMessageDescriptors.informantName,
-      title: formMessageDescriptors.informantTitle,
+      title: formMessageDescriptors.deathInformantTitle,
       hasDocumentSection: true,
       groups: [
         {
@@ -1258,7 +1315,7 @@ export const deathRegisterForms: ISerializedForm = {
                 typeof window !== 'undefined'
                   ? (window as any).config.COUNTRY.toUpperCase()
                   : 'FAR',
-              validate: [],
+              validator: [],
               placeholder: formMessageDescriptors.formSelectPlaceholder,
               options: {
                 resource: 'countries'
@@ -1295,7 +1352,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: false,
               customisable: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'validIDNumber',
                   parameters: ['NATIONAL_ID']
@@ -1305,7 +1362,9 @@ export const deathRegisterForms: ISerializedForm = {
                   parameters: ['deceased.iD']
                 }
               ],
-              conditionals: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationEnabled
+              ],
               mapping: {
                 mutation: {
                   operation: 'fieldValueNestingTransformer',
@@ -1335,6 +1394,40 @@ export const deathRegisterForms: ISerializedForm = {
               }
             },
             {
+              name: 'informantNidVerification',
+              type: 'NID_VERIFICATION_BUTTON',
+              label: formMessageDescriptors.iDTypeNationalID,
+              required: true,
+              customisable: true,
+              initialValue: '',
+              validator: [],
+              conditionals: [
+                nidIntegrationConditionals.hideIfNidIntegrationDisabled,
+                {
+                  action: 'disable',
+                  expression: `values.informantNidVerification`
+                }
+              ],
+              mapping: {
+                mutation: {
+                  operation: 'fieldValueNestingTransformer',
+                  parameters: [
+                    'individual',
+                    {
+                      operation: 'nidVerificationFieldToIdentityTransformer'
+                    }
+                  ]
+                },
+                query: {
+                  operation: 'nestedIdentityValueToFieldTransformer',
+                  parameters: ['individual']
+                }
+              },
+              labelForVerified: formMessageDescriptors.nidVerified,
+              labelForUnverified: formMessageDescriptors.nidNotVerified,
+              labelForOffline: formMessageDescriptors.nidOffline
+            },
+            {
               name: 'informantBirthDate',
               type: 'DATE',
               label: formMessageDescriptors.dateOfBirth,
@@ -1345,9 +1438,13 @@ export const deathRegisterForms: ISerializedForm = {
                 {
                   action: 'disable',
                   expression: 'values.exactDateOfBirthUnknown'
+                },
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('informantBirthDate')`
                 }
               ],
-              validate: [
+              validator: [
                 {
                   operation: 'dateFormatIsCorrect',
                   parameters: []
@@ -1398,7 +1495,7 @@ export const deathRegisterForms: ISerializedForm = {
               required: false,
               hideHeader: true,
               initialValue: false,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',
@@ -1426,7 +1523,7 @@ export const deathRegisterForms: ISerializedForm = {
               label: formMessageDescriptors.ageOfInformant,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'range',
                   parameters: [12, 120]
@@ -1463,9 +1560,15 @@ export const deathRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('firstNamesEng')`
                 }
               ],
               mapping: {
@@ -1505,9 +1608,15 @@ export const deathRegisterForms: ISerializedForm = {
               maxLength: 32,
               required: true,
               initialValue: '',
-              validate: [
+              validator: [
                 {
                   operation: 'englishOnlyNameFormat'
+                }
+              ],
+              conditionals: [
+                {
+                  action: 'disable',
+                  expression: `draftData?.informant?.fieldsModifiedByNidUserInfo?.includes('familyNameEng')`
                 }
               ],
               mapping: {
@@ -1549,7 +1658,7 @@ export const deathRegisterForms: ISerializedForm = {
             {
               id: 'informantNameInEnglish',
               label: {
-                defaultMessage: "Informant's English name",
+                defaultMessage: 'Full name',
                 description: "Label for informant's name in english",
                 id: 'form.preview.group.label.informant.english.name'
               },
@@ -1582,7 +1691,7 @@ export const deathRegisterForms: ISerializedForm = {
               type: 'PARAGRAPH',
               label: formMessageDescriptors.deceasedParagraph,
               initialValue: '',
-              validate: []
+              validator: []
             },
             {
               name: 'uploadDocForDeceased',
@@ -1591,7 +1700,7 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: deathDocumentTypeFhirMapping.NATIONAL_ID,
@@ -1626,7 +1735,7 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: deathDocumentTypeFhirMapping.NATIONAL_ID,
@@ -1661,7 +1770,7 @@ export const deathRegisterForms: ISerializedForm = {
               initialValue: '',
               extraValue: deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               options: [
                 {
                   value: deathDocumentTypeFhirMapping.ATTESTED_LETTER_OF_DEATH,
@@ -1707,7 +1816,7 @@ export const deathRegisterForms: ISerializedForm = {
               extraValue:
                 deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
               hideAsterisk: true,
-              validate: [],
+              validator: [],
               conditionals: [
                 {
                   action: 'hide',

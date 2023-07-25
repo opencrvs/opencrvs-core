@@ -45,7 +45,7 @@ const formDrafts: IFormDraft[] = [
   }
 ]
 
-export const formConfig: IFormConfig = {
+const formConfig: IFormConfig = {
   formDrafts,
   questionConfig: [
     {
@@ -117,7 +117,7 @@ export const formConfig: IFormConfig = {
   ]
 }
 
-export const systems: System[] = [
+const systems: System[] = [
   {
     name: 'WebHook 1',
     status: SystemStatus.Active,
@@ -125,16 +125,29 @@ export const systems: System[] = [
     _id: '63998b6efbd0f8bad7708033',
     shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
     clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-    settings: [
-      {
-        event: 'birth',
-        permissions: ['informant-details', 'supporting-documents']
-      },
-      {
-        event: 'death',
-        permissions: ['deceased-details', 'death-encounter']
-      }
-    ]
+    settings: {
+      webhook: [
+        {
+          event: 'birth',
+          permissions: ['informant-details', 'supporting-documents']
+        },
+        {
+          event: 'death',
+          permissions: ['deceased-details', 'death-encounter']
+        }
+      ]
+    }
+  },
+  {
+    name: 'National Id',
+    status: SystemStatus.Active,
+    type: SystemType.NationalId,
+    _id: '613ddbbe4c0b86e9b9f114e8',
+    shaSecret: '22ea09c2-f964-4562-bdac-8e9ca9b9a81a',
+    clientId: '2f1047bb-af48-4f27-8ab8-993d7b960f92',
+    settings: {
+      openIdProviderClientId: '7b621732-6c1d-4808-81b2-fd67f05f3af3'
+    }
   },
   {
     _id: '63a01ffe607915acacc2f553',
@@ -143,240 +156,10 @@ export const systems: System[] = [
     shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
     status: SystemStatus.Deactivated,
     type: SystemType.Health,
-    settings: [],
+    settings: {},
     __typename: 'System'
   }
 ]
-
-export const mockConditionals = {
-  presentAtBirthRegistration: {
-    action: 'hide',
-    expression:
-      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
-  },
-  isOfficePreSelected: {
-    action: 'hide',
-    expression: 'values.skippedOfficeSelction && values.registrationOffice'
-  },
-  iDType: {
-    action: 'hide',
-    expression: "!values.iDType || (values.iDType !== 'OTHER')"
-  },
-  fathersDetailsExist: {
-    action: 'hide',
-    expression: '!values.fathersDetailsExist'
-  },
-  primaryAddressSameAsOtherPrimary: {
-    action: 'hide',
-    expression: 'values.primaryAddressSameAsOtherPrimary'
-  },
-  secondaryAddressSameAsOtherSecondary: {
-    action: 'hide',
-    expression: 'values.secondaryAddressSameAsOtherSecondary'
-  },
-  secondaryAddressSameAsPrimary: {
-    action: 'hide',
-    expression: 'values.secondaryAddressSameAsPrimary'
-  },
-  countryPrimary: {
-    action: 'hide',
-    expression: '!values.countryPrimary'
-  },
-  isDefaultCountryPrimary: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.countryPrimary)'
-  },
-  statePrimary: {
-    action: 'hide',
-    expression: '!values.statePrimary'
-  },
-  districtPrimary: {
-    action: 'hide',
-    expression: '!values.districtPrimary'
-  },
-  addressLine4Primary: {
-    action: 'hide',
-    expression: '!values.addressLine4Primary'
-  },
-  addressLine3Primary: {
-    action: 'hide',
-    expression: '!values.addressLine3Primary'
-  },
-  country: {
-    action: 'hide',
-    expression: '!values.country'
-  },
-  isDefaultCountry: {
-    action: 'hide',
-    expression: 'isDefaultCountry(values.country)'
-  },
-  state: {
-    action: 'hide',
-    expression: '!values.state'
-  },
-  district: {
-    action: 'hide',
-    expression: '!values.district'
-  },
-  addressLine4: {
-    action: 'hide',
-    expression: '!values.addressLine4'
-  },
-  addressLine3: {
-    action: 'hide',
-    expression: '!values.addressLine3'
-  },
-  uploadDocForWhom: {
-    action: 'hide',
-    expression: '!values.uploadDocForWhom'
-  },
-  motherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="MOTHER"'
-  },
-  fatherCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="FATHER"'
-  },
-  informantCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="INFORMANT"'
-  },
-  otherPersonCollectsCertificate: {
-    action: 'hide',
-    expression: 'values.personCollectingCertificate!="OTHER"'
-  },
-  birthCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  deathCertificateCollectorNotVerified: {
-    action: 'hide',
-    expression:
-      '!(values.personCollectingCertificate=="INFORMANT" && values.informantDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
-  },
-  placeOfBirthHospital: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
-  },
-  placeOfDeathTypeHeathInstitue: {
-    action: 'hide',
-    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
-  },
-  otherBirthEventLocation: {
-    action: 'hide',
-    expression:
-      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
-  },
-  isNotCityLocation: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isCityLocation: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
-  },
-  isNotCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  isCityLocationPrimary: {
-    action: 'hide',
-    expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
-  },
-  iDAvailable: {
-    action: 'hide',
-    expression: '!values.iDType || values.iDType === "NO_ID"'
-  },
-  informantPrimaryAddressSameAsCurrent: {
-    action: 'hide',
-    expression: 'values.informantPrimaryAddressSameAsCurrent'
-  },
-  deathPlaceOther: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  deathPlaceAtPrivateHome: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
-  },
-  deathPlaceAtOtherLocation: {
-    action: 'hide',
-    expression: 'values.placeOfDeath !== "OTHER"'
-  },
-  causeOfDeathEstablished: {
-    action: 'hide',
-    expression: '!values.causeOfDeathEstablished'
-  },
-  isMarried: {
-    action: 'hide',
-    expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
-  },
-  identifierIDSelected: {
-    action: 'hide',
-    expression:
-      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
-  },
-  otherRelationship: {
-    action: 'hide',
-    expression: 'values.informantsRelationToDeceased !== "OTHER"'
-  },
-  fatherContactDetailsRequired: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
-  },
-  withInTargetDays: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  between46daysTo5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs") || !draftData.child || !draftData.child.childBirthDate'
-  },
-  after5yrs: {
-    action: 'hide',
-    expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")  || !draftData.child || !draftData.child.childBirthDate'
-  },
-  deceasedNationIdSelected: {
-    action: 'hide',
-    expression:
-      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  certCollectorOther: {
-    action: 'hide',
-    expression: 'values.type !== "OTHER"'
-  },
-  userAuditReasonSpecified: {
-    action: 'hide',
-    expression: 'values.reason === "OTHER"'
-  },
-  userAuditReasonOther: {
-    action: 'hide',
-    expression: 'values.reason !== "OTHER"'
-  },
-  isAuditActionDeactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "DEACTIVATE"'
-  },
-  isAuditActionReactivate: {
-    action: 'hide',
-    expression: 'draftData.formValues.action !== "REACTIVATE"'
-  }
-}
 
 export const mockOfflineData = {
   forms: JSON.parse(readFileSync(join(__dirname, './default.json')).toString()),
@@ -386,6 +169,7 @@ export const mockOfflineData = {
       name: 'Shaheed Taj Uddin Ahmad Medical College',
       alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
@@ -395,6 +179,7 @@ export const mockOfflineData = {
       name: 'Kaliganj Union Sub Center',
       alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -404,6 +189,7 @@ export const mockOfflineData = {
       name: 'Kaliganj Upazila Health Complex',
       alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -413,6 +199,7 @@ export const mockOfflineData = {
       name: 'Dholashadhukhan Cc',
       alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -424,6 +211,7 @@ export const mockOfflineData = {
       name: 'Moktarpur Union Parishad',
       alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
@@ -435,6 +223,7 @@ export const mockOfflineData = {
       name: 'Barisal',
       alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -445,6 +234,7 @@ export const mockOfflineData = {
       name: 'Chittagong',
       alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -455,6 +245,7 @@ export const mockOfflineData = {
       name: 'Dhaka',
       alias: 'ঢাকা',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -465,6 +256,7 @@ export const mockOfflineData = {
       name: 'Khulna',
       alias: 'খুলনা',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -475,6 +267,7 @@ export const mockOfflineData = {
       name: 'Rajshahi',
       alias: 'রাজশাহী',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -485,6 +278,7 @@ export const mockOfflineData = {
       name: 'Rangpur',
       alias: 'রংপুর',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -495,6 +289,7 @@ export const mockOfflineData = {
       name: 'Sylhet',
       alias: 'সিলেট',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -505,6 +300,7 @@ export const mockOfflineData = {
       name: 'Mymensingh',
       alias: 'ময়মনসিংহ',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -515,6 +311,7 @@ export const mockOfflineData = {
       name: 'Chandpur',
       alias: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -525,6 +322,7 @@ export const mockOfflineData = {
       name: 'BARGUNA',
       alias: 'বরগুনা',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -535,6 +333,7 @@ export const mockOfflineData = {
       name: 'BARISAL',
       alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -545,6 +344,7 @@ export const mockOfflineData = {
       name: 'BHOLA',
       alias: 'ভোলা',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -555,6 +355,7 @@ export const mockOfflineData = {
       name: 'JHALOKATI',
       alias: 'ঝালকাঠি',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -565,6 +366,7 @@ export const mockOfflineData = {
       name: 'PATUAKHALI',
       alias: 'পটুয়াখালী ',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -575,6 +377,7 @@ export const mockOfflineData = {
       name: 'PIROJPUR',
       alias: 'পিরোজপুর ',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -585,6 +388,7 @@ export const mockOfflineData = {
       name: 'BANDARBAN',
       alias: 'বান্দরবান',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -595,6 +399,7 @@ export const mockOfflineData = {
       name: 'BRAHMANBARIA',
       alias: 'ব্রাহ্মণবাড়িয়া',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -605,6 +410,7 @@ export const mockOfflineData = {
       name: 'CHANDPUR',
       alias: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -615,6 +421,7 @@ export const mockOfflineData = {
       name: 'CHITTAGONG',
       alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -625,6 +432,7 @@ export const mockOfflineData = {
       name: 'COMILLA',
       alias: 'কুমিল্লা',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -635,6 +443,7 @@ export const mockOfflineData = {
       name: "COX'S BAZAR",
       alias: 'কক্সবাজার ',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -645,6 +454,7 @@ export const mockOfflineData = {
       name: 'FENI',
       alias: 'ফেনী',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -658,6 +468,7 @@ export const mockOfflineData = {
       name: 'Baniajan',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     },
     'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
@@ -668,6 +479,7 @@ export const mockOfflineData = {
       name: 'Duaz',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     },
     '473ed705-13e8-4ec1-9836-69bc269f7fad': {
@@ -678,6 +490,7 @@ export const mockOfflineData = {
       name: 'Lusaka',
       partOf: 'Location/0',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     },
     '81317429-1d89-42ac-8abc-7a92f268273c': {
@@ -688,6 +501,7 @@ export const mockOfflineData = {
       name: 'Lusaka',
       partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       type: 'ADMIN_STRUCTURE'
     }
   },
@@ -729,6 +543,7 @@ export const mockOfflineData = {
       },
       PRINT_IN_ADVANCE: true
     },
+    MARRIAGE_REGISTRATION: true,
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
     FIELD_AGENT_AUDIT_LOCATIONS:
@@ -790,6 +605,7 @@ export const mockOfflineLocationsWithHierarchy: Record<
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
@@ -801,6 +617,7 @@ export const mockOfflineLocationsWithHierarchy: Record<
       name: 'Ibombo District Office',
       alias: 'Ibombo District Office',
       physicalType: 'Building',
+      statisticalId: '123',
       status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
@@ -812,6 +629,7 @@ export const mockOfflineLocationsWithHierarchy: Record<
       name: 'Abwe',
       alias: 'Abwe',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -822,6 +640,7 @@ export const mockOfflineLocationsWithHierarchy: Record<
       name: 'Ibombo',
       alias: 'Ibombo',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -832,6 +651,7 @@ export const mockOfflineLocationsWithHierarchy: Record<
       name: 'Central',
       alias: 'Central',
       physicalType: 'Jurisdiction',
+      statisticalId: '123',
       status: 'active',
       jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',

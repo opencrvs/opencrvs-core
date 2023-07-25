@@ -83,6 +83,7 @@ interface IFormConfigMessages
   warning: MessageDescriptor
   link: MessageDescriptor
   fetchButton: MessageDescriptor
+  nidVerificationButton: MessageDescriptor
   tel: MessageDescriptor
   selectWithOption: MessageDescriptor
   selectWithDynamicOption: MessageDescriptor
@@ -452,6 +453,11 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Fetch Button',
     description: 'Success notification label for number of addresses settings'
   },
+  nidVerificationButton: {
+    id: 'config.form.settings.nidVerificationButton',
+    defaultMessage: 'NID Verification Button',
+    description: 'Success notification label for number of addresses settings'
+  },
   tel: {
     id: 'config.form.settings.tel',
     defaultMessage: 'Phone Input',
@@ -501,6 +507,11 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.date',
     defaultMessage: 'Date input',
     description: 'Success notification label for number of addresses settings'
+  },
+  time: {
+    id: 'config.form.settings.time',
+    defaultMessage: 'Time input',
+    description: 'Time input label'
   },
   dateRangePickerForFormField: {
     id: 'config.form.settings.dateRangePickerForFormField',
@@ -562,6 +573,10 @@ const messagesToDefine: IFormConfigMessages = {
   customSelect: {
     id: 'config.form.tools.input.customSelect',
     defaultMessage: 'Custom Select'
+  },
+  customSelectWithDynamicOptions: {
+    id: 'config.form.tools.input.customSelectWithDynamicOptions',
+    defaultMessage: 'Custom select with dynamic options'
   }
 }
 

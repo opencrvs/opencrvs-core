@@ -10,21 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-export interface IGetCertificatePayload {
-  status?: string
-  event?: string
-}
-
-export interface ICertificateSVGPayload {
-  id: string
-  svgCode: string
-  svgFilename: string
-  svgDateUpdated: number
-  svgDateCreated: number
-  user: string
-  event: string
-  status: string
-}
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export interface ICertificateSVG {
   _id: string
@@ -41,6 +27,9 @@ export const certificateTypeResolvers: GQLResolver = {
   CertificateSVG: {
     id(certificate: ICertificateSVG) {
       return certificate._id
+    },
+    svgCode: (certificate: ICertificateSVG, _, { headers: authHeader }) => {
+      return getPresignedUrlFromUri(certificate.svgCode, authHeader)
     }
   }
 }

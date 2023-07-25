@@ -19,7 +19,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { Content, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -45,7 +45,7 @@ import {
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
-export enum TabId {
+enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
@@ -111,7 +111,7 @@ const BirthSection = () => {
     )
   })
 
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 
@@ -314,7 +314,7 @@ const DeathSection = () => {
       'death'
     )
   })
-  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+  const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
 

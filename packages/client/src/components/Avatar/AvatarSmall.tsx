@@ -13,7 +13,7 @@ import * as React from 'react'
 import { AvatarSmall as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
 import { Avatar } from '@client/utils/gateway'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string

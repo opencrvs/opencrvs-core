@@ -34,7 +34,6 @@ import { Link } from '@client/../../components/lib'
 import { chunk, sortBy } from 'lodash'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { getToken } from '@client/utils/authUtils'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 
 const DEFAULT_LIST_SIZE = 12
@@ -51,9 +50,6 @@ type VSExportProps = {
 }
 
 async function getPreSignedURL(fileName: string) {
-  if (fileName.startsWith(`/${window.config.MINIO_BUCKET}/`)) {
-    fileName = fileName.replace(`/${window.config.MINIO_BUCKET}/`, EMPTY_STRING)
-  }
   const url = new URL(
     `document/${fileName}`,
     window.config.API_GATEWAY_URL
@@ -180,6 +176,7 @@ const VSExport = () => {
         id="vsexport-wrapper"
         hideBackground={true}
         isCertificatesConfigPage={true}
+        headerTitle={intl.formatMessage(messages.vsexport)}
       >
         <UserTable id="vsexport_list">
           <Content

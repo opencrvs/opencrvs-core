@@ -60,7 +60,7 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-export function getGroupWithVisibleFields(
+function getGroupWithVisibleFields(
   section: IFormSection,
   declaration: IDeclaration
 ) {

@@ -208,9 +208,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                     cond: {
                       $eq: [
                         {
-                          $min: '$allTasks.meta.lastUpdated'
+                          $min: '$allTasks.lastModified'
                         },
-                        '$$this.meta.lastUpdated'
+                        '$$this.lastModified'
                       ]
                     }
                   }
@@ -525,6 +525,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
             },
+            registeredAt: {
+              $dateFromString: { dateString: '$registerTask.lastModified' }
+            },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
             mothersAgeAtBirthOfChildInYears: '$mothersAgeAtBirthOfChild',
@@ -694,7 +697,6 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
         { $unwind: '$state' },
         {
           $project: {
-            _id: '$id',
             gender: '$child.gender',
             reason: '$reason.text',
             extensions: '$extensions',
@@ -809,7 +811,7 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                       : 365
                   }
                   const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
+                  const date = new Date(row.cbr.year, 0, 1)
                   const population = row.populations.find(
                     (p) => p.year === year
                   )
@@ -818,7 +820,9 @@ async function refreshPerformanceMaterialisedViews(client: MongoClient) {
                   }
                   const totalDays = daysInYear(year)
                   return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
+                    if(index !== 0){
+                      date.setDate(date.getDate() + 1)
+                    }
                     return {
                       date: date.toISOString(),
                       estimatedNumberOfBirths:

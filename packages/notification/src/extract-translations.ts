@@ -35,21 +35,21 @@ async function extractMessages() {
   const notification = JSON.parse(
     fs
       .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/notification.json`
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/notification.json`
       )
       .toString()
   )
   const contentfulIds = JSON.parse(
     fs
       .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/contentful-ids.json`
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/contentful-ids.json`
       )
       .toString()
   )
   const descriptions: IMessageDescriptions = JSON.parse(
     fs
       .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/descriptions.json`
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/descriptions.json`
       )
       .toString()
   )
@@ -73,7 +73,7 @@ async function extractMessages() {
             `No English translation key exists for messageKey.  Remeber to translate and add for all locales!!!: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/notification.json`
+              `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/notification.json`
             )}`
           )}`
         )
@@ -90,7 +90,7 @@ async function extractMessages() {
           `${chalk.yellow(
             'This key must be migrated into your Contentful CMS.  Saving to ...'
           )} in ${chalk.white(
-            `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/contentful-keys-to-migrate.json`
+            `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/contentful-keys-to-migrate.json`
           )}`
         )
         contentfulKeysToMigrate.push(messageKey)
@@ -102,7 +102,7 @@ async function extractMessages() {
             `No description exists for messageKey: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/descriptions.json`
+              `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/descriptions.json`
             )}`
           )}`
         )
@@ -119,7 +119,7 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/notification/contentful-keys-to-migrate.json`,
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/notification/contentful-keys-to-migrate.json`,
         JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })

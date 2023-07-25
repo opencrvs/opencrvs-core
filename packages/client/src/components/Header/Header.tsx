@@ -32,7 +32,7 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import { withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
 import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
@@ -61,7 +61,6 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -132,19 +131,20 @@ enum ACTIVE_MENU_ITEM {
   CERTIFICATE,
   APPLICATION,
   FORM,
-  INTEGRATION
+  INTEGRATION,
+  VSEXPORTS
 }
 
 const Search = styled(SearchTool)`
-  position: static;
-  left: calc(50% - 624px / 2 + 24px);
-  top: calc(50% - 40px / 2);
-  margin: 0px 80px 0px 12px;
+  margin-right: 45px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+  }
 `
 
 const HeaderCenter = styled.div`
-  padding: 8px 16px;
   height: 40px;
+  gap: 12px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -445,6 +445,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.formDeclarationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
           ? constantsMessages.integrationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+          ? constantsMessages.vsExportTitle
           : constantsMessages.declarationTitle
       )
 
@@ -540,6 +542,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.FORM
       : window.location.href.includes('config/integration')
       ? ACTIVE_MENU_ITEM.INTEGRATION
+      : window.location.href.includes('vsexports')
+      ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)

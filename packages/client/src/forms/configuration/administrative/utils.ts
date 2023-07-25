@@ -228,7 +228,7 @@ export function getConditionals(location: string, useCase: string) {
   }
 }
 
-export function getLocationSelect(
+export function getAddressLineLocationSelect(
   location: string,
   useCase: string,
   locationIndex: number,
@@ -246,7 +246,7 @@ export function getLocationSelect(
     previewGroup: `${useCase}Address`,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     placeholder: {
       defaultMessage: 'Select',
       description: 'Placeholder text for a select',
@@ -265,26 +265,24 @@ export function getLocationSelect(
             parameters: [
               'individual',
               {
-                operation: 'fieldToAddressTransformer',
+                operation: 'fieldToAddressLineTransformer',
                 parameters: [
                   useCase.toUpperCase() === 'PRIMARY'
                     ? AddressCases.PRIMARY_ADDRESS
                     : AddressCases.SECONDARY_ADDRESS,
-                  locationIndex,
-                  location
+                  locationIndex
                 ]
               },
               'address'
             ]
           }
         : {
-            operation: 'fieldToAddressTransformer',
+            operation: 'fieldToAddressLineTransformer',
             parameters: [
               useCase.toUpperCase() === 'PRIMARY'
                 ? AddressCases.PRIMARY_ADDRESS
                 : AddressCases.SECONDARY_ADDRESS,
-              locationIndex,
-              location
+              locationIndex
             ]
           },
       query: informant
@@ -293,7 +291,7 @@ export function getLocationSelect(
             parameters: [
               'individual',
               {
-                operation: 'addressToFieldTransformer',
+                operation: 'addressLineToFieldTransformer',
                 parameters: [
                   useCase.toUpperCase() === 'PRIMARY'
                     ? AddressCases.PRIMARY_ADDRESS
@@ -305,12 +303,97 @@ export function getLocationSelect(
             ]
           }
         : {
-            operation: 'addressToFieldTransformer',
+            operation: 'addressLineToFieldTransformer',
             parameters: [
               useCase.toUpperCase() === 'PRIMARY'
                 ? AddressCases.PRIMARY_ADDRESS
                 : AddressCases.SECONDARY_ADDRESS,
               locationIndex,
+              location
+            ]
+          }
+    }
+  }
+}
+
+export function getAddrressFhirPropertyLocationSelect(
+  location: string,
+  useCase: string,
+  informant: boolean
+): SerializedFormField {
+  return {
+    name: `${location}${sentenceCase(useCase)}`,
+    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+    label: {
+      defaultMessage: '',
+      description: `Title for the ${location} select`,
+      id: `form.field.label.${location}`
+    },
+    customisable: false,
+    previewGroup: `${useCase}Address`,
+    required: true,
+    initialValue: '',
+    validator: [],
+    placeholder: {
+      defaultMessage: 'Select',
+      description: 'Placeholder text for a select',
+      id: 'form.field.select.placeholder'
+    },
+    dynamicOptions: {
+      resource: 'locations',
+      dependency: getDependency(location, useCase),
+      initialValue: 'agentDefault'
+    },
+    conditionals: getConditionals(location, useCase),
+    mapping: {
+      mutation: informant
+        ? {
+            operation: 'fieldValueNestingTransformer',
+            parameters: [
+              'individual',
+              {
+                operation: 'fieldToAddressFhirPropertyTransformer',
+                parameters: [
+                  useCase.toUpperCase() === 'PRIMARY'
+                    ? AddressCases.PRIMARY_ADDRESS
+                    : AddressCases.SECONDARY_ADDRESS,
+                  location
+                ]
+              },
+              'address'
+            ]
+          }
+        : {
+            operation: 'fieldToAddressFhirPropertyTransformer',
+            parameters: [
+              useCase.toUpperCase() === 'PRIMARY'
+                ? AddressCases.PRIMARY_ADDRESS
+                : AddressCases.SECONDARY_ADDRESS,
+              location
+            ]
+          },
+      query: informant
+        ? {
+            operation: 'nestedValueToFieldTransformer',
+            parameters: [
+              'individual',
+              {
+                operation: 'addressFhirPropertyToFieldTransformer',
+                parameters: [
+                  useCase.toUpperCase() === 'PRIMARY'
+                    ? AddressCases.PRIMARY_ADDRESS
+                    : AddressCases.SECONDARY_ADDRESS,
+                  location
+                ]
+              }
+            ]
+          }
+        : {
+            operation: 'addressFhirPropertyToFieldTransformer',
+            parameters: [
+              useCase.toUpperCase() === 'PRIMARY'
+                ? AddressCases.PRIMARY_ADDRESS
+                : AddressCases.SECONDARY_ADDRESS,
               location
             ]
           }
@@ -459,7 +542,7 @@ export function getPlaceOfEventConditionals(
 export function getPlaceOfEventLocationSelect(
   location: string,
   configCase: EventLocationAddressCases,
-  locationIndex: number
+  locationIndex?: number
 ): SerializedFormField {
   return {
     name: location,
@@ -473,7 +556,7 @@ export function getPlaceOfEventLocationSelect(
     previewGroup: configCase,
     required: true,
     initialValue: '',
-    validate: [],
+    validator: [],
     placeholder: {
       defaultMessage: 'Select',
       description: 'Placeholder text for a select',
@@ -498,13 +581,14 @@ export function getPlaceOfEventLocationSelect(
             : configCase === EventLocationAddressCases.PLACE_OF_DEATH
             ? 'deathEventLocationMutationTransformer'
             : 'marriageEventLocationMutationTransformer',
-        parameters: [locationIndex]
+        parameters: [
+          { transformedFieldName: location, lineNumber: locationIndex }
+        ]
       },
       query: {
         operation: 'eventLocationQueryTransformer',
         parameters: [
-          locationIndex,
-          location,
+          { transformedFieldName: location, lineNumber: locationIndex },
           {
             fieldsToIgnoreForLocalAddress: [
               'internationalDistrict',

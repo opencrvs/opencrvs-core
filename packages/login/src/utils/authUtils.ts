@@ -41,3 +41,29 @@ export const getTokenPayload = (token: string) => {
 
   return decoded
 }
+
+export function maskEmail(email: string) {
+  const parts = email.split('@')
+  const username = parts[0]
+  const domain = parts[1]
+
+  const maskedUsername = maskString(username)
+  const maskedDomain =
+    maskString(domain.split('.')[0]) + '.' + maskString(domain.split('.')[1])
+
+  return maskedUsername + '@' + maskedDomain
+}
+
+export function maskString(s: string) {
+  const maskPercentage = 0.6
+  const emailLength = s.length || 0
+  const unmaskedEmailLength =
+    emailLength - Math.ceil(maskPercentage * emailLength)
+  const startFrom = Math.ceil(unmaskedEmailLength / 2)
+  const endBefore = unmaskedEmailLength - startFrom
+  const maskedEmail = s.replace(
+    s.slice(startFrom, emailLength - endBefore),
+    '*'.repeat(emailLength - startFrom - endBefore)
+  )
+  return maskedEmail
+}

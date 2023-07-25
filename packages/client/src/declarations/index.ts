@@ -72,9 +72,14 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import {
+  EMPTY_STRING,
+  FIELD_AGENT_ROLES,
+  SIGNATURE_KEYS
+} from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
+import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -170,7 +175,7 @@ const ACTION_LIST: IActionList = {
   [DownloadAction.LOAD_REVIEW_DECLARATION]:
     DownloadAction.LOAD_REVIEW_DECLARATION,
   [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
-    DownloadAction.LOAD_CERTIFICATE_DECLARATION,
+    DownloadAction.LOAD_REVIEW_DECLARATION,
   [DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
     DownloadAction.LOAD_REVIEW_DECLARATION
 }
@@ -354,6 +359,7 @@ interface IDeleteDeclarationAction {
   type: typeof DELETE_DECLARATION
   payload: {
     declarationId: string
+    client: ApolloClient<{}>
   }
 }
 
@@ -368,7 +374,7 @@ interface IGetStorageDeclarationsFailedAction {
 
 interface IDeleteDeclarationSuccessAction {
   type: typeof DELETE_DECLARATION_SUCCESS
-  payload: string
+  payload: { declarationId: string; client: ApolloClient<{}> }
 }
 
 interface IDeleteDeclarationFailedAction {
@@ -580,15 +586,20 @@ export function archiveDeclaration(
 }
 
 export function deleteDeclaration(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declarationId } }
+  return { type: DELETE_DECLARATION, payload: { declarationId, client } }
 }
 
 function deleteDeclarationSuccess(
-  declarationId: string
+  declarationId: string,
+  client: ApolloClient<{}>
 ): IDeleteDeclarationSuccessAction {
-  return { type: DELETE_DECLARATION_SUCCESS, payload: declarationId }
+  return {
+    type: DELETE_DECLARATION_SUCCESS,
+    payload: { declarationId, client }
+  }
 }
 
 function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
@@ -1062,17 +1073,9 @@ function getSignatureUrls(queryResultData: Query) {
     queryResultData.fetchDeathRegistration?.registration ||
     queryResultData.fetchMarriageRegistration?.registration
 
-  return (
-    [
-      'informantsSignature',
-      'brideSignature',
-      'groomSignature',
-      'witnessOneSignature',
-      'witnessTwoSignature'
-    ] as const
-  )
-    .map((propertyKey) => registration?.[propertyKey])
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+  return SIGNATURE_KEYS.map(
+    (propertyKey) => registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {
@@ -1214,7 +1217,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         declarations: state.declarations.concat(action.payload.declaration)
       }
     case DELETE_DECLARATION: {
-      const { declarationId } = action.payload
+      const { declarationId, client: clientFromDeleteDeclaration } =
+        action.payload
       return loop(
         {
           ...state,
@@ -1225,7 +1229,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           )
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: deleteDeclarationSuccess,
+          successActionCreator: (id: string) =>
+            deleteDeclarationSuccess(id, clientFromDeleteDeclaration),
           failActionCreator: deleteDeclarationFailed,
           args: [state.userID, action.payload.declarationId, state]
         })
@@ -1233,17 +1238,25 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
     }
     case DELETE_DECLARATION_SUCCESS:
       const declarationToDelete = state.declarations.find(
-        (declaration) => declaration.id === action.payload
+        (declaration) => declaration.id === action.payload.declarationId
       )
       const declarationMinioUrls =
         getMinioUrlsFromDeclaration(declarationToDelete)
 
       postMinioUrlsToServiceWorker(declarationMinioUrls)
+
+      const declarationsWithoutDeleted = state.declarations.filter(
+        ({ id }) => id !== action.payload.declarationId
+      )
+
+      clearUnusedViewRecordCacheEntries(
+        action.payload.client.cache,
+        declarationsWithoutDeleted
+      )
+
       return {
         ...state,
-        declarations: state.declarations.filter(
-          ({ id }) => id !== action.payload
-        )
+        declarations: declarationsWithoutDeleted
       }
     case MODIFY_DECLARATION:
       const newDeclarations = [...state.declarations]
@@ -1786,7 +1799,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           | IUnassignDeclaration
         >(
           [
-            Cmd.action(deleteDeclaration(action.payload.id)),
+            Cmd.action(
+              deleteDeclaration(action.payload.id, action.payload.client)
+            ),
             Cmd.action(updateRegistrarWorkqueue()),
             declarationNextToUnassign
               ? Cmd.action(
@@ -1832,10 +1847,13 @@ export function filterProcessingDeclarations(
 export function getMinioUrlsFromDeclaration(
   declaration: IDeclaration | undefined
 ) {
-  const minioUrls: string[] = []
   if (!declaration) {
-    return minioUrls
+    return []
   }
+  const minioUrls: string[] = SIGNATURE_KEYS.map(
+    (propertyKey) => declaration.originalData?.registration?.[propertyKey]
+  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
   const documentsData = declaration.originalData?.documents as Record<
     string,
     IAttachmentValue[]

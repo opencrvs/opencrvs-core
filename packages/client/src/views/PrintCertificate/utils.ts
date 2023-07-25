@@ -138,7 +138,7 @@ export function calculateDaysFromToday(doE: string) {
   return diffInDays
 }
 
-export function calculateDays(doE: string, regDate: string) {
+function calculateDays(doE: string, regDate: string) {
   const registeredDate = new Date(regDate)
   const eventDate = new Date(doE)
   const diffInDays = differenceInDays(registeredDate, eventDate)

@@ -51,7 +51,7 @@ const addressObjectProcessor = (
     if (index < 0) {
       objValues.push({
         type: srcValue.type,
-        line: ['', '', '', '', '', '']
+        line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
       })
       index = findIndex(objValues, { type: srcValue.type })
     }

@@ -84,6 +84,9 @@ export async function birthRegisteredHandler(
               context: [transformedBundle]
             }
           }
+          logger.info(
+            `DISPATCHING BIRTH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+          )
           const hmac = createRequestSignature(
             'sha256',
             webhookToNotify.sha_secret,
@@ -172,6 +175,9 @@ export async function deathRegisteredHandler(
               context: [transformedBundle]
             }
           }
+          logger.info(
+            `DISPATCHING DEATH_REGISTERED WEBHOOK: ${JSON.stringify(payload)}`
+          )
           const hmac = createRequestSignature(
             'sha256',
             webhookToNotify.sha_secret,

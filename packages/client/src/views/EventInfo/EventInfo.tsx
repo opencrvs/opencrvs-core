@@ -21,7 +21,7 @@ import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { messages } from '@client/i18n/messages/views/eventInfo'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   TertiaryButton,
   ICON_ALIGNMENT,
@@ -134,7 +134,11 @@ function EventInfoComponet(props: IFullProps) {
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
         <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
-        <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
+        <BulletList
+          id={`${eventType}-info-bullet-list`}
+          items={listItems}
+          font="reg18"
+        />
         <PrimaryButton id="continue" onClick={handleContinue}>
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>

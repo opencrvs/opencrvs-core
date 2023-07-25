@@ -15,6 +15,7 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { EventRegistration } from '@client/utils/gateway'
 
 export const REGISTRATION_SECTION = 'registration'
 
@@ -29,8 +30,8 @@ const fieldNameMapping = {
 
 export function deathAttachmentToFieldTransformer(
   transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
   field: IFormField
 ) {
   return attachmentToFieldTransformer(

@@ -272,16 +272,16 @@ export function sectionHasError(
   return false
 }
 
-export function renderSelectOrRadioLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
-  return option ? intl.formatMessage(option.label) : value
+  return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
@@ -304,8 +304,12 @@ export function renderSelectDynamicLabel(
     if (options.resource) {
       let selectedLocation: ILocation
       const locationId = value as string
+      // HOTFIX for handling international address
       if (options.resource === 'locations') {
-        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId] || {
+          name: locationId,
+          alias: locationId
+        }
       } else {
         selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
       }
@@ -338,7 +342,7 @@ const getCheckboxFieldValue = (
   )
 }
 
-export const getCheckBoxGroupFieldValue = (
+const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
   intl: IntlShape
@@ -352,7 +356,7 @@ export const getCheckBoxGroupFieldValue = (
   return ''
 }
 
-export const getFormFieldValue = (
+const getFormFieldValue = (
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -386,11 +390,15 @@ export const renderValue = (
     [
       'statePrimary',
       'districtPrimary',
+      'cityUrbanOptionPrimary',
       'internationalStatePrimary',
       'internationalDistrictPrimary',
+      'internationalCityPrimary',
       'stateSecondary',
       'districtSecondary',
+      'cityUrbanOptionSecondary',
       'internationalStateSecondary',
+      'internationalCitySecondary',
       'internationalDistrictSecondary'
     ].includes(field.name)
   ) {
@@ -546,7 +554,7 @@ export function hasFieldChanged(
   return data[field.name] !== originalData[field.name]
 }
 
-export function hasNestedDataChanged(
+function hasNestedDataChanged(
   nestedFieldData: IFormData,
   previousNestedFieldData: IFormData
 ) {

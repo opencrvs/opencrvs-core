@@ -78,10 +78,10 @@ export function isTokenAboutToExpire(token: string) {
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
 }
 
-export function refreshToken() {
+export async function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    const res = await fetch(`${window.config.AUTH_URL}/refreshToken`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -90,11 +90,10 @@ export function refreshToken() {
         token
       })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        removeToken()
-        storeToken(data.token)
-      })
+    const data = await res.json()
+
+    removeToken()
+    storeToken(data.token)
   }
 }
 
