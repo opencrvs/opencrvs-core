@@ -13,15 +13,21 @@
 import { Db, MongoClient } from 'mongodb'
 
 // Set users status to pending, as the password hashing method has changed to more secure, so we need to invalidate the old hashes.
+// also rename the passwordHash field to oldPasswordHash, so that the users can re-apply their passwords.
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
-
   try {
     await db.collection('users').updateMany(
       {
-        $and: [{ scope: { $exists: true } }, { scope: { $nin: ['demo'] } }]
+        $and: [
+          { scope: { $exists: true } },
+          { passwordHash: { $exists: true } }
+        ]
       },
-      { $set: { status: 'pending' } }
+      {
+        $set: { status: 'pending' },
+        $rename: { passwordHash: 'oldPasswordHash' }
+      }
     )
   } finally {
     await session.endSession()

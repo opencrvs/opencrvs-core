@@ -43,7 +43,11 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (generateHash(password, user.salt) !== user.passwordHash) {
+  if (!user.passwordHash) {
+    if (generateHash(password, user.salt) !== user.oldPasswordHash) {
+      throw unauthorized()
+    }
+  } else if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
   const response: IVerifyResponse = {
