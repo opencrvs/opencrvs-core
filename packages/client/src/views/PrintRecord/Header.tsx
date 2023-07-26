@@ -5,20 +5,14 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
-import { getLanguages } from '@client/i18n/selectors'
-import { ILanguageState } from '@client/i18n/reducer'
-import {
-  createIntl,
-  createIntlCache,
-  IntlCache,
-  IntlShape,
-  MessageDescriptor
-} from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { constantsMessages } from '@client/i18n/messages'
+import { formatMessage } from './utils'
 
 interface PrintRecordHeaderProps {
   declaration: IDeclaration
+  intls: IntlShape[]
 }
 
 const Container = styled.div`
@@ -49,31 +43,10 @@ const Box = styled.div`
   border-radius: 4px;
   padding: 8px;
 `
-function formatMessage(
-  intls: IntlShape[],
-  descriptor: MessageDescriptor,
-  options?: Record<string, string>
-) {
-  return intls
-    .map((intl) => intl.formatMessage(descriptor, options))
-    .join(' / ')
-}
-
-function createSeparateIntls(languages: ILanguageState, cache: IntlCache) {
-  return (window.config.LANGUAGES.split(',') || [])
-    .slice(0, 2)
-    .reverse()
-    .map((locale) =>
-      createIntl({ locale, messages: languages[locale].messages }, cache)
-    )
-}
 
 export function PrintRecordHeader(props: PrintRecordHeaderProps) {
   const offlineData = useSelector(getOfflineData)
-  const languages = useSelector(getLanguages)
-  const cache = createIntlCache()
-  const intls = createSeparateIntls(languages, cache)
-  const { declaration } = props
+  const { declaration, intls } = props
 
   return (
     <Container>

@@ -114,7 +114,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
-import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -334,7 +334,7 @@ function renderSelectOrRadioLabel(
   return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
