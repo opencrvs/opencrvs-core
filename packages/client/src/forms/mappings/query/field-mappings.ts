@@ -147,7 +147,7 @@ export const fieldValueSectionExchangeTransformer =
   ) => {
     if (transformerMethod) {
       transformerMethod(transformedData, queryData, sectionId, field)
-    } else if (Boolean(queryData[sectionId])) {
+    } else if (Boolean(queryData[fromSectionId])) {
       transformedData[sectionId][field.name] =
         queryData[fromSectionId][fromSectionField]
     }
