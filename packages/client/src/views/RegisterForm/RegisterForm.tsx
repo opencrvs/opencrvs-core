@@ -221,9 +221,7 @@ function FormAppBar({
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const [exitWithoutSaveModal, openExitWithoutSavingModal] = useModal()
-  const [saveAndExitModal, openSaveAndExitModal] = useModal()
-  const [deleteModal, openDeleteModal] = useModal()
+  const [modal, openModal] = useModal()
 
   const isFormDataAltered = () => {
     if (!declaration.originalData) {
@@ -257,47 +255,45 @@ function FormAppBar({
     }
   }
   const handleSaveAndExit = async () => {
-    const saveAndExitConfirm = await openSaveAndExitModal<boolean | null>(
-      (close) => (
-        <ResponsiveModal
-          autoHeight
-          responsive={false}
-          title={intl.formatMessage(messages.saveDeclarationConfirmModalTitle)}
-          actions={[
-            <Button
-              type="tertiary"
-              id="cancel_save_exit"
-              key="cancel_save_exit"
-              onClick={() => {
-                close(null)
-              }}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </Button>,
-            <Button
-              type="positive"
-              key="confirm_save_exit"
-              id="confirm_save_exit"
-              onClick={() => {
-                close(true)
-              }}
-            >
-              {intl.formatMessage(buttonMessages.confirm)}
-            </Button>
-          ]}
-          show={true}
-          handleClose={() => close(null)}
-        >
-          <Stack>
-            <Text variant="reg16" element="p" color="grey500">
-              {intl.formatMessage(
-                messages.saveDeclarationConfirmModalDescription
-              )}
-            </Text>
-          </Stack>
-        </ResponsiveModal>
-      )
-    )
+    const saveAndExitConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(messages.saveDeclarationConfirmModalTitle)}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel_save_exit"
+            key="cancel_save_exit"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="positive"
+            key="confirm_save_exit"
+            id="confirm_save_exit"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        <Stack>
+          <Text variant="reg16" element="p" color="grey500">
+            {intl.formatMessage(
+              messages.saveDeclarationConfirmModalDescription
+            )}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
 
     if (saveAndExitConfirm) {
       //saving current changes to original data
@@ -315,49 +311,47 @@ function FormAppBar({
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
       return
     }
-    const exitConfirm = await openExitWithoutSavingModal<boolean | null>(
-      (close) => (
-        <ResponsiveModal
-          autoHeight
-          responsive={false}
-          title={intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalTitle
-          )}
-          actions={[
-            <Button
-              type="tertiary"
-              id="cancel_save_without_exit"
-              key="cancel_save_without_exit"
-              onClick={() => {
-                close(null)
-              }}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </Button>,
-            <Button
-              type="primary"
-              key="confirm_save_without_exit"
-              id="confirm_save_without_exit"
-              onClick={() => {
-                close(true)
-              }}
-            >
-              {intl.formatMessage(buttonMessages.confirm)}
-            </Button>
-          ]}
-          show={true}
-          handleClose={() => close(null)}
-        >
-          <Stack>
-            <Text variant="reg16" element="p" color="grey500">
-              {intl.formatMessage(
-                messages.exitWithoutSavingDeclarationConfirmModalDescription
-              )}
-            </Text>
-          </Stack>
-        </ResponsiveModal>
-      )
-    )
+    const exitConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(
+          messages.exitWithoutSavingDeclarationConfirmModalTitle
+        )}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel_save_without_exit"
+            key="cancel_save_without_exit"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            key="confirm_save_without_exit"
+            id="confirm_save_without_exit"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        <Stack>
+          <Text variant="reg16" element="p" color="grey500">
+            {intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalDescription
+            )}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
 
     if (exitConfirm) {
       if (!declaration.originalData) {
@@ -375,7 +369,7 @@ function FormAppBar({
   }
 
   const handleDelete = async () => {
-    const deleteConfirm = await openDeleteModal<boolean | null>((close) => (
+    const deleteConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
         responsive={false}
@@ -484,9 +478,7 @@ function FormAppBar({
               </>
             }
           />
-          {exitWithoutSaveModal}
-          {saveAndExitModal}
-          {deleteModal}
+          {modal}
         </>
       )
     case 'preview':
@@ -583,9 +575,7 @@ function FormAppBar({
               </>
             }
           />
-          {exitWithoutSaveModal}
-          {saveAndExitModal}
-          {deleteModal}
+          {modal}
         </>
       )
   }
