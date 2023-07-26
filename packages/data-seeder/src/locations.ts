@@ -250,7 +250,14 @@ async function buildLocationBundle(
     resourceType: 'Bundle',
     type: 'document',
     entry: locations
-      .filter((location) => !savedLocationsSet.has(location.id))
+      .filter((location) => {
+        if (savedLocationsSet.has(location.id)) {
+          console.log(
+            `Location with id "${location.id}" already exists. Skipping`
+          )
+        }
+        return !savedLocationsSet.has(location.id)
+      })
       .map((location) => ({
         ...location,
         // partOf is either Location/{statisticalID} of another location or 'Location/0'
@@ -298,4 +305,12 @@ export async function seedLocations() {
   if (!res.ok) {
     raise(await res.json())
   }
+  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
+  response.entry?.forEach((res, index) => {
+    if (res.resource?.status !== '201') {
+      console.log(
+        `Failed to create location resource for: "${locationsBundle.entry?.[index].resource?.name}"`
+      )
+    }
+  })
 }
