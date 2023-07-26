@@ -93,8 +93,13 @@ class SelectVitalEventView extends React.Component<
             desktopLeft={<Icon name="Draft" size="large" />}
             desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
             desktopRight={
-              <Button type="icon" size="medium" onClick={this.props.goToHome}>
+              <Button
+                type="secondary"
+                size="medium"
+                onClick={this.props.goToHome}
+              >
                 <Icon name="X" />
+                {intl.formatMessage(buttonMessages.exitButton)}
               </Button>
             }
             mobileLeft={<Icon name="Draft" size="large" />}
