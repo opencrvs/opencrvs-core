@@ -78,7 +78,11 @@ const ErrorField = styled.p`
 const StyledTable = styled.table`
   margin-top: 8px;
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
+  border-collapse: separate;
+  border-radius: 4px;
+  border: 0.5px solid ${({ theme }) => theme.colors.grey500};
+  overflow: hidden;
   table-layout: fixed;
   ${({ theme }) => theme.fonts.bold14}
 `
@@ -89,12 +93,20 @@ const StyledTH = styled.th`
   text-transform: uppercase;
   text-align: left;
   padding: 4px 8px;
-  border: 0.5px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 0.5px solid ${({ theme }) => theme.colors.grey500};
 `
 
+const StyledTR = styled.tr`
+  :not(:last-child) > td {
+    border-bottom: 0.5px solid ${({ theme }) => theme.colors.grey500};
+  }
+`
 const StyledTD = styled.td`
-  border: 0.5px solid ${({ theme }) => theme.colors.grey500};
+  /* border: 0.5px solid ${({ theme }) => theme.colors.grey500}; */
   padding: 4px 8px;
+  :not(:last-child) {
+    border-right: 0.5px solid ${({ theme }) => theme.colors.grey500};
+  }
 `
 
 export function renderSelectOrRadioLabel(
@@ -949,10 +961,10 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           </StyledTHead>
           <tbody>
             {section.items.map((item, itemIdx) => (
-              <tr key={`${item.label}_${itemIdx}`}>
+              <StyledTR key={`${item.label}_${itemIdx}`}>
                 <StyledTD>{item.label}</StyledTD>
                 <StyledTD>{item.value}</StyledTD>
-              </tr>
+              </StyledTR>
             ))}
           </tbody>
         </StyledTable>
