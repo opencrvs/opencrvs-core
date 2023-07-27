@@ -1744,8 +1744,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <Accordion
               name="signatures"
               label="Signatures"
-              labelForHideAction="Hide"
-              labelForShowAction="Show"
+              labelForHideAction={intl.formatMessage(messages.hideLabel)}
+              labelForShowAction={intl.formatMessage(messages.showLabel)}
               expand={true}
             >
               <SignatureGenerator
@@ -1841,8 +1841,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               </Link>
                             )
                           }
-                          labelForHideAction="Hide"
-                          labelForShowAction="Show"
+                          labelForHideAction={intl.formatMessage(
+                            messages.hideLabel
+                          )}
+                          labelForShowAction={intl.formatMessage(
+                            messages.showLabel
+                          )}
                           expand={true}
                         >
                           <ListViewSimplified id={'Section_' + sec.id}>
@@ -1884,8 +1888,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}
-                  labelForHideAction="Hide"
-                  labelForShowAction="Show"
+                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                  labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
                     <Link
                       font="reg16"
@@ -1909,8 +1913,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <Accordion
                     name="additional_comments"
                     label={intl.formatMessage(messages.additionalComments)}
-                    labelForHideAction="Hide"
-                    labelForShowAction="Show"
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
                     expand={true}
                   >
                     <InputField
