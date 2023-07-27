@@ -12,12 +12,11 @@
 import fetch from 'node-fetch'
 import {
   COUNTRY_CONFIG_URL,
-  HEARTH_URL,
+  GATEWAY_URL,
   OPENCRVS_SPECIFICATION_URL
 } from './constants'
-import { TypeOf, z } from 'zod'
+import { z } from 'zod'
 import { raise } from './utils'
-import { v4 as uuid } from 'uuid'
 
 const LocationSchema = z.array(
   z.object({
@@ -49,85 +48,6 @@ const LocationSchema = z.array(
       .optional()
   })
 )
-
-type LocationResponse = TypeOf<typeof LocationSchema>[number]
-
-export const composeFhirLocation = (
-  location: LocationResponse
-): fhir3.Location => {
-  if (location.locationType === 'ADMIN_STRUCTURE') {
-    return {
-      resourceType: 'Location',
-      identifier: [
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
-          value: `ADMIN_STRUCTURE_${String(location.id)}`
-        },
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`,
-          value: location.jurisdictionType
-        }
-      ],
-      name: location.name,
-      alias: location.alias ? [location.alias] : [],
-      description: location.id,
-      status: 'active',
-      mode: 'instance',
-      partOf: {
-        reference: location.partOf
-      },
-      type: {
-        coding: [
-          {
-            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
-            code: 'ADMIN_STRUCTURE'
-          }
-        ]
-      },
-      physicalType: {
-        coding: [
-          {
-            code: 'jdn',
-            display: 'Jurisdiction'
-          }
-        ]
-      }
-    }
-  } else {
-    return {
-      resourceType: 'Location',
-      identifier: [
-        {
-          system: `${OPENCRVS_SPECIFICATION_URL}id/internal-id`,
-          value: `${location.locationType}_${String(location.id)}`
-        }
-      ],
-      name: location.name,
-      alias: location.alias ? [location.alias] : [],
-      status: 'active',
-      mode: 'instance',
-      partOf: {
-        reference: location.partOf
-      },
-      type: {
-        coding: [
-          {
-            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
-            code: location.locationType
-          }
-        ]
-      },
-      physicalType: {
-        coding: [
-          {
-            code: 'bu',
-            display: 'Building'
-          }
-        ]
-      }
-    }
-  }
-}
 
 type LocationStatistic = {
   year: number
@@ -204,21 +124,21 @@ export function generateStatisticalExtensions(
   )
 }
 
-async function buildLocationBundle(
-  locations: LocationResponse[]
-): Promise<fhir3.Bundle<fhir3.Location>> {
-  const locationsMap = new Map(
-    locations.map((location) => [
-      location.id,
-      { ...location, uid: `urn:uuid:${uuid()}` }
-    ])
-  )
-  fetch(`${HEARTH_URL}/Location?_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-  const savedLocations = await fetch(`${HEARTH_URL}/Location?_count=0`, {
+async function getLocations() {
+  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    raise(`Expected to get the locations from ${url}`)
+  }
+  const parsedLocations = LocationSchema.safeParse(await res.json())
+  if (!parsedLocations.success) {
+    raise(parsedLocations.error.issues.toString())
+  }
+  return parsedLocations.data
+}
+
+export async function seedLocations(token: string) {
+  const savedLocations = await fetch(`${GATEWAY_URL}/location?_count=0`, {
     headers: {
       'Content-Type': 'application/fhir+json'
     }
@@ -246,61 +166,27 @@ async function buildLocationBundle(
       )
     })
   const savedLocationsSet = new Set(savedLocations)
-  return {
-    resourceType: 'Bundle',
-    type: 'document',
-    entry: locations
-      .filter((location) => {
-        if (savedLocationsSet.has(location.id)) {
-          console.log(
-            `Location with id "${location.id}" already exists. Skipping`
-          )
-        }
-        return !savedLocationsSet.has(location.id)
-      })
-      .map((location) => ({
-        ...location,
-        // partOf is either Location/{statisticalID} of another location or 'Location/0'
-        partOf:
-          locationsMap.get(location.partOf.split('/')[1])?.uid ??
-          location.partOf
-      }))
-      .map(
-        (location): fhir3.BundleEntry<fhir3.Location> => ({
-          fullUrl: locationsMap.get(location.id)!.uid,
-          resource: {
-            ...composeFhirLocation(location),
-            ...(location.statistics && {
-              extension: generateStatisticalExtensions(location.statistics)
-            })
-          }
-        })
-      )
-  }
-}
-
-async function getLocations() {
-  const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
-  const res = await fetch(url)
-  if (!res.ok) {
-    raise(`Expected to get the locations from ${url}`)
-  }
-  const parsedLocations = LocationSchema.safeParse(await res.json())
-  if (!parsedLocations.success) {
-    raise(parsedLocations.error.issues.toString())
-  }
-  return parsedLocations.data
-}
-
-export async function seedLocations() {
-  const locations = await getLocations()
-  const locationsBundle = await buildLocationBundle(locations)
-  const res = await fetch(HEARTH_URL, {
+  const locations = (await getLocations()).filter((location) => {
+    if (savedLocationsSet.has(location.id)) {
+      console.log(`Location with id "${location.id}" already exists. Skipping`)
+    }
+    return !savedLocationsSet.has(location.id)
+  })
+  const res = await fetch(`${GATEWAY_URL}/location?`, {
     method: 'POST',
     headers: {
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/fhir+json'
     },
-    body: JSON.stringify(locationsBundle)
+    body: JSON.stringify(
+      locations
+        // statisticalID & code are legacy properties
+        .map(({ id, locationType, ...loc }) => ({
+          statisticalID: id,
+          code: locationType,
+          ...loc
+        }))
+    )
   })
   if (!res.ok) {
     raise(await res.json())
@@ -309,7 +195,7 @@ export async function seedLocations() {
   response.entry?.forEach((res, index) => {
     if (res.resource?.status !== '201') {
       console.log(
-        `Failed to create location resource for: "${locationsBundle.entry?.[index].resource?.name}"`
+        `Failed to create location resource for: "${locations[index].name}"`
       )
     }
   })

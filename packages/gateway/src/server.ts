@@ -32,6 +32,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
 import { logger } from '@gateway/logger'
+import { badRequest, Boom } from '@hapi/boom'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -46,6 +47,19 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: whitelist },
+      validate: {
+        failAction: async (_, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`ValidationError: ${err.message}`)
+            throw badRequest(`Invalid request payload input`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(err.message)
+            throw err
+          }
+        }
+      },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })

@@ -18,6 +18,7 @@ export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070'
 export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 
