@@ -171,10 +171,6 @@ export const up = async (db: Db, client: MongoClient) => {
   let skip = 0
   let processedDocCount = 0
   try {
-    // do nothing for empty db
-    if ((await db.collection('roles').estimatedDocumentCount()) === 0) {
-      return
-    }
     /* ==============Create a new userroles collection============== */
 
     await db.createCollection('userroles')
