@@ -102,8 +102,8 @@ const StyledTR = styled.tr`
   }
 `
 const StyledTD = styled.td`
-  /* border: 0.5px solid ${({ theme }) => theme.colors.grey500}; */
   padding: 4px 8px;
+  vertical-align: top;
   :not(:last-child) {
     border-right: 0.5px solid ${({ theme }) => theme.colors.grey500};
   }

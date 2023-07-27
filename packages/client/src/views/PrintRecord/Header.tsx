@@ -8,7 +8,7 @@ import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { constantsMessages } from '@client/i18n/messages'
-import { formatMessage } from './utils'
+import { formatMessage } from '@client/views/PrintRecord/utils'
 
 interface PrintRecordHeaderProps {
   declaration: IDeclaration
@@ -35,13 +35,13 @@ const SubheaderText = styled(CapitalText)`
 const StyledCountryLogo = styled(CountryLogo)`
   height: 48px;
   width: 48px;
-  margin-right: 8px;
+  margin-right: 16px;
 `
 
 const Box = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.copy};
   border-radius: 4px;
-  padding: 8px;
+  padding: 4px 8px;
 `
 
 export function PrintRecordHeader(props: PrintRecordHeaderProps) {
@@ -55,7 +55,7 @@ export function PrintRecordHeader(props: PrintRecordHeaderProps) {
         <CapitalText variant="bold12" element="span">
           {formatMessage(intls, reviewMessages.govtName)}
         </CapitalText>
-        <Text variant="h2" element="span">
+        <Text variant="bold18" element="span">
           {formatMessage(intls, reviewMessages.civilRegistrationCentre)}
         </Text>
         <SubheaderText variant="bold12" element="span">
@@ -64,12 +64,14 @@ export function PrintRecordHeader(props: PrintRecordHeaderProps) {
           })}
         </SubheaderText>
       </TextContainer>
-      {declaration.trackingId && (
+      {declaration.data?.registration?.trackingId && (
         <Box>
           <Text variant="bold12" element="span">
-            {formatMessage(intls, constantsMessages.trackingId)}
-            <br />
-            {declaration.trackingId}
+            <>
+              {formatMessage(intls, constantsMessages.trackingId)}
+              <br />
+              {declaration.data.registration.trackingId}
+            </>
           </Text>
         </Box>
       )}

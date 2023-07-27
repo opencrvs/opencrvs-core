@@ -604,7 +604,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         menuItems: [
           menuOption,
           {
-            label: 'Print declaration',
+            label: intl.formatMessage(buttonMessages.printDeclaration),
             handler: () => this.props.goToPrintRecord(declaration.id)
           }
         ]
