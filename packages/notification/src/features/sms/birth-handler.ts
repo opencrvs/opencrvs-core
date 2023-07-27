@@ -30,6 +30,7 @@ export interface IDeclarationPayload extends IEventMessageRecipient {
 
 export interface IRegistrationPayload extends IEventMessageRecipient {
   name: string
+  informantName: string
   registrationNumber: string
   trackingId: string
 }
@@ -37,6 +38,7 @@ export interface IRegistrationPayload extends IEventMessageRecipient {
 export interface IRejectionPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
+  informantName: string
 }
 
 export async function sendBirthInProgressConfirmation(
@@ -111,6 +113,7 @@ export async function sendBirthRegistrationConfirmation(
     'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
     }
@@ -137,6 +140,7 @@ export async function sendBirthRejectionConfirmation(
     'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId
     }
   )
@@ -167,6 +171,7 @@ export const registrationNotificationSchema = Joi.object({
     sms: Joi.string().allow(null)
   }),
   name: Joi.string().required(),
+  informantName: Joi.string(),
   trackingId: Joi.string().length(7).required(),
   registrationNumber: Joi.string().required()
 })
