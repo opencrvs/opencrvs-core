@@ -127,7 +127,7 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry.push(personEntry)
   } else {
     if (!section.entry || !section.entry[0]) {
-      throw new Error('Expected person section ot have an entry')
+      throw new Error('Expected person section to have an entry')
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(

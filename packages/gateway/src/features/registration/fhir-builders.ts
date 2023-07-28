@@ -2415,14 +2415,6 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       taskResource.id = fieldValue as string
     },
-    contact: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createInformantShareContact(taskResource, fieldValue)
-    },
     informantsSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2518,14 +2510,6 @@ export const builders: IFieldBuilders = {
         SignatureExtensionPostfix.WITNESS_TWO
       )
     },
-    contactRelationship: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createInformantRelationship(taskResource, fieldValue)
-    },
     contactPhoneNumber: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2547,6 +2531,9 @@ export const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      createInformantShareContact(taskResource, fieldValue)
+
       const relatedPersonResource = selectOrCreateInformantSection(
         INFORMANT_CODE,
         INFORMANT_TITLE,
@@ -2605,6 +2592,8 @@ export const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      createInformantRelationship(taskResource, fieldValue)
       const relatedPersonResource = selectOrCreateInformantSection(
         INFORMANT_CODE,
         INFORMANT_TITLE,
