@@ -16,10 +16,70 @@ import { Db, MongoClient } from 'mongodb'
 
 const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
 
+const DEFAULT_SYSTEM_ROLES = [
+  {
+    title: 'Field Agent',
+    value: 'FIELD_AGENT',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'Registration Agent',
+    value: 'REGISTRATION_AGENT',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'Registrar',
+    value: 'LOCAL_REGISTRAR',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'System admin (local)',
+    value: 'LOCAL_SYSTEM_ADMIN',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'System admin (national)',
+    value: 'NATIONAL_SYSTEM_ADMIN',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'Performance Management',
+    value: 'PERFORMANCE_MANAGEMENT',
+    roles: [],
+    active: true
+  },
+
+  {
+    title: 'National Registrar',
+    value: 'NATIONAL_REGISTRAR',
+    roles: [],
+    active: true
+  }
+] as const
+
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
 
   try {
+    if ((await db.collection('systemroles').estimatedDocumentCount()) === 0) {
+      await db.collection('systemroles').insertMany(
+        DEFAULT_SYSTEM_ROLES.map((systemRole) => ({
+          ...systemRole,
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString()
+        }))
+      )
+    }
     const salt = genSaltSync(10)
     const passwordHash = hashSync(SUPER_USER_PASSWORD, salt)
 
