@@ -257,11 +257,12 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
-  birthType: BirthTypeUnion
+  birthType: String
   questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
-  attendantAtBirth: AttendantAtBirthUnion
+  attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
+  birthRegistrationType: BirthRegType
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -281,9 +282,9 @@ type DeathRegistration implements EventRegistration {
   spouse: Person
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
-  mannerOfDeath: MannerOfDeathUnion
+  mannerOfDeath: MannerOfDeath
   deathDescription: String
-  causeOfDeathMethod: CauseOfDeathMethodUnion
+  causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
@@ -303,7 +304,7 @@ type Person {
   gender: String
   birthDate: String
   age: Float
-  maritalStatus: String
+  maritalStatus: MaritalStatusType
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
@@ -314,7 +315,7 @@ type Person {
   photo: [Attachment]
   deceased: Deceased
   nationality: [String]
-  educationalAttainment: String
+  educationalAttainment: EducationType
 }
 
 type BirthRegResultSet {
@@ -343,7 +344,7 @@ type Location {
   alias: [String]
   description: String
   partOf: String
-  type: String
+  type: LocationType
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -526,8 +527,9 @@ input BirthRegistrationInput {
   birthType: String
   questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
-  attendantAtBirth: String
+  attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
+  birthRegistrationType: BirthRegType
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -550,9 +552,9 @@ input DeathRegistrationInput {
   spouse: PersonInput
   eventLocation: LocationInput
   questionnaire: [QuestionnaireQuestionInput]
-  mannerOfDeath: String
+  mannerOfDeath: MannerOfDeath
   deathDescription: String
-  causeOfDeathMethod: String
+  causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
@@ -611,9 +613,7 @@ type ApplicationConfiguration {
   DEATH: Death
   MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Boolean
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
@@ -629,9 +629,7 @@ input ApplicationConfigurationInput {
   DEATH: DeathInput
   MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Boolean
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
@@ -693,6 +691,26 @@ type QuestionnaireQuestion {
   value: String
 }
 
+enum AttendantType {
+  PHYSICIAN
+  NURSE
+  NURSE_MIDWIFE
+  MIDWIFE
+  TRADITIONAL_BIRTH_ATTENDANT
+  OTHER_PARAMEDICAL_PERSONNEL
+  LAYPERSON
+  NONE
+  OTHER
+}
+
+enum BirthRegType {
+  BOTH_PARENTS
+  SELF
+  INFORMANT_ONLY
+  MOTHER_ONLY
+  FATHER_ONLY
+}
+
 type History {
   user: User
   date: Date
@@ -710,6 +728,21 @@ type History {
   signature: Signature
 }
 
+enum MannerOfDeath {
+  NATURAL_CAUSES
+  ACCIDENT
+  SUICIDE
+  HOMICIDE
+  MANNER_UNDETERMINED
+}
+
+enum CauseOfDeathMethodType {
+  PHYSICIAN
+  LAY_REPORTED
+  VERBAL_AUTOPSY
+  MEDICALLY_CERTIFIED
+}
+
 type MedicalPractitioner {
   name: String
   qualification: String
@@ -718,7 +751,7 @@ type MedicalPractitioner {
 
 type IdentityType {
   id: ID
-  type: String
+  type: IdentityIDType
   otherType: String
 }
 
@@ -734,9 +767,18 @@ type ContactPoint {
   use: String
 }
 
+enum MaritalStatusType {
+  SINGLE
+  MARRIED
+  WIDOWED
+  DIVORCED
+  NOT_STATED
+  SEPARATED
+}
+
 type Address {
   use: String
-  type: String
+  type: AddressType
   text: String
   line: [String]
   lineName: [String]
@@ -759,15 +801,26 @@ type Attachment {
   status: String
   originalFileName: String
   systemFileName: String
-  type: String
+  type: AttachmentType
   description: String
-  subject: String
+  subject: AttachmentSubject
   createdAt: Date
 }
 
 type Deceased {
   deceased: Boolean
   deathDate: String
+}
+
+enum EducationType {
+  NO_SCHOOLING
+  PRIMARY_ISCED_1
+  LOWER_SECONDARY_ISCED_2
+  UPPER_SECONDARY_ISCED_3
+  POST_SECONDARY_ISCED_4
+  FIRST_STAGE_TERTIARY_ISCED_5
+  SECOND_STAGE_TERTIARY_ISCED_6
+  NOT_STATED
 }
 
 type StatusWiseRegistrationCount {
@@ -780,52 +833,20 @@ type Identifier {
   value: String
 }
 
-input ConditionalInput {
-  fieldId: String!
-  regexp: String!
-}
-
-input CustomSelectOption {
-  value: String!
-  label: MesssageDescriptorInput!
-}
-
-input Operation {
-  operation: String!
-}
-
-input ValidatorInput {
-  operation: String!
-  parameters: [Int!]
-}
-
-input MappingInput {
-  mutation: Operation!
-  query: Operation!
-}
-
-input ConditionalInput {
-  fieldId: String!
-  regexp: String!
-}
-
-input CustomSelectOption {
-  value: String!
-  label: MesssageDescriptorInput!
-}
-
-input Operation {
-  operation: String!
-}
-
-input ValidatorInput {
-  operation: String!
-  parameters: [Int!]
-}
-
-input MappingInput {
-  mutation: Operation!
-  query: Operation!
+enum LocationType {
+  HEALTH_FACILITY
+  HOSPITAL
+  OTHER_HEALTH_INSTITUTION
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
+  SECONDARY_ADDRESS
+  PRIMARY_ADDRESS
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP
+  UNHCR_CAMP
+  OTHER
 }
 
 input ConditionalInput {
@@ -943,7 +964,7 @@ input PersonInput {
   gender: String
   birthDate: String
   age: Float
-  maritalStatus: String
+  maritalStatus: MaritalStatusType
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
@@ -954,7 +975,7 @@ input PersonInput {
   photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String]
-  educationalAttainment: String
+  educationalAttainment: EducationType
 }
 
 input LocationInput {
@@ -965,7 +986,7 @@ input LocationInput {
   alias: [String]
   description: String
   partOf: String
-  type: String
+  type: LocationType
   telecom: [ContactPointInput]
   address: AddressInput
   longitude: Float
@@ -1141,26 +1162,6 @@ input QuestionInput {
   mapping: MappingInput
 }
 
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
-}
-
 type AssignmentData {
   userId: String
   firstName: String
@@ -1207,6 +1208,67 @@ type InputOutput {
   valueCode: String
   valueId: String
   valueString: String
+}
+
+enum IdentityIDType {
+  PASSPORT
+  NATIONAL_ID
+  MOSIP_PSUT_TOKEN_ID
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
+  DRIVING_LICENSE
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
+  OTHER
+  NO_ID
+  SOCIAL_SECURITY_NO
+}
+
+enum AddressType {
+  HEALTH_FACILITY
+  ADMIN_STRUCTURE
+  CRVS_OFFICE
+  PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
+  SECONDARY_ADDRESS
+  PRIMARY_ADDRESS
+  MILITARY_BASE_OR_CANTONMENT
+  IDP_CAMP
+  UNHCR_CAMP
+  OTHER
+}
+
+enum AttachmentType {
+  BIRTH_CERTIFICATE
+  NATIONAL_ID
+  PASSPORT
+  NOTIFICATION_OF_BIRTH
+  PROOF_OF_LEGAL_GUARDIANSHIP
+  PROOF_OF_ASSIGNED_RESPONSIBILITY
+  HOSPITAL_CERTIFICATE_OF_DEATH
+  ATTESTED_LETTER_OF_DEATH
+  BURIAL_RECEIPT
+  POLICE_CERTIFICATE_OF_DEATH
+  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
+  VERBAL_AUTOPSY_REPORT
+  CORONERS_REPORT
+  OTHER
+}
+
+enum AttachmentSubject {
+  MOTHER
+  FATHER
+  CHILD
+  OTHER
+  PARENT
+  CHILD_AGE
+  DECEASED_ID_PROOF
+  DECEASED_DEATH_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
+  INFORMANT_ID_PROOF
+  LEGAL_GUARDIAN_PROOF
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {
@@ -1285,7 +1347,7 @@ type EventProgressData {
 
 input IdentityInput {
   id: ID
-  type: String
+  type: IdentityIDType
   otherType: String
 }
 
@@ -1297,7 +1359,7 @@ input ContactPointInput {
 
 input AddressInput {
   use: String
-  type: String
+  type: AddressType
   text: String
   line: [String]
   city: String
@@ -1316,9 +1378,9 @@ input AttachmentInput {
   status: String
   originalFileName: String
   systemFileName: String
-  type: String
+  type: AttachmentType
   description: String
-  subject: String
+  subject: AttachmentSubject
   createdAt: Date
 }
 
@@ -1399,7 +1461,7 @@ enum CustomFieldType {
   TEL
   TEXTAREA
   NUMBER
-  SUBSECTION_HEADER
+  SUBSECTION
   PARAGRAPH
 }
 

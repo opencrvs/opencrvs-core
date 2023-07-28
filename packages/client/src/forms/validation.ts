@@ -47,7 +47,6 @@ const getValidationErrors = {
       field.nestedFields && values[field.name]
         ? (values[field.name] as IFormSectionData).value
         : values[field.name]
-
     const conditionalActions = getConditionalActionsForField(
       field,
       values,

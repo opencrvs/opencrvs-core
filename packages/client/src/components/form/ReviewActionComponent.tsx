@@ -306,6 +306,7 @@ class ReviewActionComponent extends React.Component<
       intl
     } = this.props
 
+
     const background = !completeDeclaration
       ? 'error'
       : draftDeclaration

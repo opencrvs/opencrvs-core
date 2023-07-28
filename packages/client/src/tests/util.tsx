@@ -696,6 +696,7 @@ export const mockDeclarationData = {
     birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {
+    detailsExist: true,
     firstNames: 'স্পিভক',
     familyName: 'গায়ত্রী',
     firstNamesEng: 'Liz',
@@ -838,12 +839,7 @@ export const mockDeathDeclarationData = {
     ]
   },
   registration: {
-    contactPoint: {
-      nestedFields: {
-        registrationPhone: '01557394982'
-      },
-      value: 'SPOUSE'
-    },
+    informantType: 'SPOUSE',
     registrationPhone: '01557394986',
     registrationNumber: '201908122365DDSS0SE1',
     contact: 'OTHER',
@@ -1126,7 +1122,8 @@ export const mockOfflineDataDispatch = {
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
-  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString()),
+  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
+    .forms,
   systems: mockOfflineData.systems
 }
 
