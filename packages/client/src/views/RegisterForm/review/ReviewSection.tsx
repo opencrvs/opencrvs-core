@@ -1891,18 +1891,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   labelForHideAction={intl.formatMessage(messages.hideLabel)}
                   labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    <Link
-                      font="reg16"
-                      element="button"
-                      onClick={() =>
-                        this.editLinkClickHandlerForDraft(
-                          documentsSection.id,
-                          documentsSection.groups[0].id!
-                        )
-                      }
-                    >
-                      {intl.formatMessage(messages.editDocuments)}
-                    </Link>
+                    viewRecord ? null : (
+                      <Link
+                        font="reg16"
+                        element="button"
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </Link>
+                    )
                   }
                   expand={true}
                 >
