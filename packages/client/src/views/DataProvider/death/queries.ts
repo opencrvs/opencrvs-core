@@ -120,6 +120,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        contactEmail
         duplicates {
           compositionId
           trackingId
@@ -382,6 +383,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         informantType
         otherInformantType
         contactRelationship
+        contactEmail
         contactPhoneNumber
         informantsSignature
         informantsSignatureURI

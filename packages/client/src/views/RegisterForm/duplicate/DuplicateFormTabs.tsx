@@ -76,7 +76,7 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  top: 56px;
+  top: 0;
   width: 100%;
   position: sticky;
   z-index: 1;

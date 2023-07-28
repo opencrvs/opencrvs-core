@@ -12,6 +12,16 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Button to hide section',
+    id: 'form.field.hideLabel'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Button to show section',
+    id: 'form.field.showLabel'
+  },
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
