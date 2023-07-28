@@ -10,13 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import {
-  COUNTRY_CONFIG_URL,
-  HEARTH_URL,
-  USER_MANAGEMENT_URL
-} from './constants'
+import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST, GATEWAY_URL } from './constants'
 import { z } from 'zod'
-import { raise } from './utils'
+import { parseGQLResponse, raise } from './utils'
+import { print } from 'graphql'
+import gql from 'graphql-tag'
 
 const UserSchema = z.array(
   z.object({
@@ -35,6 +33,7 @@ const UserSchema = z.array(
     role: z.enum([
       'Field Agent',
       'Police Officer',
+      'Local Leader',
       'Social Worker',
       'Healthcare Worker',
       'Registration Agent',
@@ -44,11 +43,28 @@ const UserSchema = z.array(
       'Performance Manager',
       'National Registrar'
     ]),
+    username: z.string(),
     mobile: z.string(),
     email: z.string().email(),
     password: z.string()
   })
 )
+
+const searchUserQuery = print(gql`
+  query searchUsers($username: String) {
+    searchUsers(username: $username) {
+      totalItems
+    }
+  }
+`)
+
+const createUserMutation = print(gql`
+  mutation createOrUpdateUser($user: UserInput!) {
+    createOrUpdateUser(user: $user) {
+      username
+    }
+  }
+`)
 
 async function getUseres() {
   const url = new URL('users', COUNTRY_CONFIG_URL).toString()
@@ -58,63 +74,111 @@ async function getUseres() {
   }
   const parsedUsers = UserSchema.safeParse(await res.json())
   if (!parsedUsers.success) {
-    raise(parsedUsers.error.issues.toString())
+    raise(
+      `Error when getting users metadata from country-config: ${JSON.stringify(
+        parsedUsers.error.issues
+      )}`
+    )
   }
   return parsedUsers.data
 }
 
+async function userAlreadyExists(
+  token: string,
+  username: string
+): Promise<boolean> {
+  const searchResponse = await fetch(GATEWAY_GQL_HOST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: searchUserQuery,
+      variables: {
+        username
+      }
+    })
+  })
+  const parsedSearchResponse = parseGQLResponse<{
+    searchUsers: { totalItems?: number }
+  }>(await searchResponse.json())
+  return Boolean(parsedSearchResponse.searchUsers.totalItems)
+}
+
+async function getOfficeIdFromIdentifier(identifier: string) {
+  const response = await fetch(
+    `${GATEWAY_URL}/location?identifier=${identifier}`,
+    {
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  const locationBundle: fhir3.Bundle<fhir3.Location> = await response.json()
+  return locationBundle.entry?.[0]?.resource?.id
+}
+
 export async function seedUsers(
   token: string,
-  roleIdMap: Record<string, string>
+  roleIdMap: Record<string, string | undefined>
 ) {
   const rawUsers = await getUseres()
-  let createdUsers = 0,
-    failed = 0
   await Promise.all(
-    rawUsers.map(async (rawUser) => {
-      const { givenNames, familyName, role, primaryOfficeId, ...user } = rawUser
-      const response = await fetch(
-        `${HEARTH_URL}/Location?identifier=${primaryOfficeId}`,
-        {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        }
-      )
-      const locationBundle: fhir3.Bundle<fhir3.Location> = await response.json()
-      const officeId = locationBundle.entry?.[0].id
-      if (!officeId) {
-        console.log(`No office found with id ${primaryOfficeId}`)
+    rawUsers.map(async (userMetadata) => {
+      const {
+        givenNames,
+        familyName,
+        role,
+        primaryOfficeId: officeIdentifier,
+        username,
+        ...user
+      } = userMetadata
+      if (await userAlreadyExists(token, username)) {
+        console.log(
+          `User with the username "${username}" already exists. Skipping user "${username}"`
+        )
+        return
+      }
+      const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
+      if (!primaryOffice) {
+        console.log(
+          `No office found with id ${officeIdentifier}. Skipping user "${username}"`
+        )
         return
       }
       if (!roleIdMap[role]) {
-        console.log(`Role "${role}" is not recognized by system`)
+        console.log(
+          `Role "${role}" is not recognized by system. Skipping user "${username}"`
+        )
         return
       }
-      const parsedUser = {
+      const userPayload = {
         ...user,
         role: roleIdMap[role],
         name: [
           {
             use: 'en',
-            family: familyName,
-            given: [givenNames]
+            familyName,
+            firstNames: givenNames
           }
         ],
-        primaryOfficeId: officeId
+        primaryOffice
       }
-      const url = new URL('createUser', USER_MANAGEMENT_URL).toString()
-      const res = await fetch(url, {
+      const res = await fetch(GATEWAY_GQL_HOST, {
         method: 'POST',
-        body: JSON.stringify(parsedUser),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: token
-        }
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: createUserMutation,
+          variables: {
+            user: userPayload
+          }
+        })
       })
-      if (res.ok) createdUsers++
-      else failed++
+      parseGQLResponse(await res.json())
     })
   )
-  console.log(`${createdUsers} user(s) created, ${failed} falied`)
 }

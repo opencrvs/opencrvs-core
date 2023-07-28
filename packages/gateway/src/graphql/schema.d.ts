@@ -628,6 +628,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
+  password?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string

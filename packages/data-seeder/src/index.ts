@@ -12,11 +12,10 @@
 import { AUTH_URL, SUPER_USER_PASSWORD } from './constants'
 import fetch from 'node-fetch'
 // import { seedCertificate } from './certificates'
-// import { seedLocations } from './locations'
-// import { seedRoles } from './roles'
-// import { seedUsers } from './users'
-import { raise } from './utils'
+import { seedLocations } from './locations'
 import { seedRoles } from './roles'
+import { seedUsers } from './users'
+import { raise } from './utils'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -40,9 +39,8 @@ async function getToken(): Promise<string> {
 async function main() {
   const token = await getToken()
   const roleIdMap = await seedRoles(token)
-  console.log(roleIdMap)
-  // await seedLocations(token)
-  // await seedUsers(token, roleIdMap)
+  await seedLocations(token)
+  await seedUsers(token, roleIdMap)
   // await seedCertificate(token)
 }
 

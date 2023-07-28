@@ -193,7 +193,7 @@ export async function seedLocations(token: string) {
   }
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
   response.entry?.forEach((res, index) => {
-    if (res.resource?.status !== '201') {
+    if (res.response?.status !== '201') {
       console.log(
         `Failed to create location resource for: "${locations[index].name}"`
       )

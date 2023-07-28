@@ -760,6 +760,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
+  password: String
   systemRole: SystemRoleType!
   role: String
   email: String

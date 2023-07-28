@@ -612,6 +612,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
+    ...(user.password && { password: user.password }),
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
