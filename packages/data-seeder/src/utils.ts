@@ -14,3 +14,12 @@ export function raise(msg: string): never {
   console.log(msg)
   process.exit(1)
 }
+
+export function parseGQLResponse<T>(
+  response: { data: T } | { errors: Array<{ message: string }> }
+) {
+  if ('errors' in response) {
+    raise(JSON.stringify(response.errors))
+  }
+  return response.data
+}

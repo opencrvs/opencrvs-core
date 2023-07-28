@@ -785,7 +785,7 @@ input AvatarInput {
 }
 
 type Response {
-  msg: String!
+  roleIdMap: Map!
 }
 
 input SystemRoleInput {

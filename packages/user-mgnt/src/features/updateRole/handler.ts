@@ -40,8 +40,7 @@ export const systemRolesRequestSchema = Joi.object({
 })
 
 export const systemRoleResponseSchema = Joi.object({
-  msg: Joi.string().required(),
-  updRoleId: Joi.object()
+  roleIdMap: Joi.object().required()
 })
 
 export interface IRoleLabel {
@@ -102,10 +101,9 @@ export default async function updateRole(
       .code(401)
   }
 
-  logger.info(systemRole)
   return h
     .response({
-      updRoleId: roleIdMap
+      roleIdMap
     })
     .code(200)
 }

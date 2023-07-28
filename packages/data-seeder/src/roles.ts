@@ -9,26 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from './constants'
-import { raise } from './utils'
+import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST } from './constants'
+import { raise, parseGQLResponse } from './utils'
 import fetch from 'node-fetch'
 import { z } from 'zod'
+import { print } from 'graphql'
+import gql from 'graphql-tag'
 
-export const RoleSchema = z.array(
+const LabelSchema = z.array(
   z.object({
-    systemRole: z.enum([
-      'FIELD_AGENT',
-      'REGISTRATION_AGENT',
-      'LOCAL_REGISTRAR',
-      'LOCAL_SYSTEM_ADMIN',
-      'NATIONAL_SYSTEM_ADMIN',
-      'PERFORMANCE_MANAGEMENT',
-      'NATIONAL_REGISTRAR'
-    ]),
-    label_en: z.string(),
-    label_fr: z.string()
+    labels: z.array(z.object({ lang: z.string(), label: z.string() }))
   })
 )
+
+const CountryRoleSchema = z
+  .object({
+    FIELD_AGENT: LabelSchema,
+    LOCAL_REGISTRAR: LabelSchema,
+    LOCAL_SYSTEM_ADMIN: LabelSchema,
+    NATIONAL_REGISTRAR: LabelSchema,
+    NATIONAL_SYSTEM_ADMIN: LabelSchema,
+    PERFORMANCE_MANAGEMENT: LabelSchema,
+    REGISTRATION_AGENT: LabelSchema
+  })
+  .partial()
 
 const SYSTEM_ROLES = [
   'FIELD_AGENT',
@@ -44,34 +48,10 @@ export interface Label {
   lang: string
   label: string
 }
+
 export interface Role {
   _id?: string
   labels: Array<Label>
-}
-type SystemRole = {
-  _id: string
-  value: typeof SYSTEM_ROLES[number]
-  roles: Role[]
-  active: boolean
-}
-
-async function createSystemRoles(token: string): Promise<SystemRole[]> {
-  const url = new URL('systemRole', USER_MANAGEMENT_URL).toString()
-  return Promise.all(
-    SYSTEM_ROLES.map((systemRole) =>
-      fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
-          value: systemRole,
-          roles: []
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token
-        }
-      }).then((res) => res.json())
-    )
-  )
 }
 
 interface GQLSystemRoleInput {
@@ -81,39 +61,96 @@ interface GQLSystemRoleInput {
   roles?: Array<Role>
 }
 
+type SystemRole = {
+  id: string
+  value: typeof SYSTEM_ROLES[number]
+  roles: Array<Role>
+  active: boolean
+}
+
+const updateRoleMutation = print(gql`
+  mutation updateRole($systemRole: SystemRoleInput) {
+    updateRole(systemRole: $systemRole) {
+      roleIdMap
+    }
+  }
+`)
+
+const getSystemRolesQuery = print(gql`
+  query getSystemRoles {
+    getSystemRoles(active: true) {
+      id
+      value
+      roles {
+        _id
+        labels {
+          label
+        }
+      }
+    }
+  }
+`)
+
+async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
+  const res = await fetch(GATEWAY_GQL_HOST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: getSystemRolesQuery,
+      variables: {
+        active: true
+      }
+    })
+  })
+  if (!res.ok) {
+    raise(`Failed to fetch roles from gateway`)
+  }
+  return res.json().then((res) => res.data.getSystemRoles)
+}
+
 async function updateRoles(
   token: string,
   systemRoles: GQLSystemRoleInput[]
 ): Promise<RoleIdMap> {
   let roleIdMap: RoleIdMap = {}
-  const url = new URL('updateRole', USER_MANAGEMENT_URL).toString()
   await Promise.all(
     systemRoles.map((systemRole) =>
-      fetch(url, {
+      fetch(GATEWAY_GQL_HOST, {
         method: 'POST',
-        body: JSON.stringify(systemRole),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: token
-        }
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          query: updateRoleMutation,
+          variables: {
+            systemRole
+          }
+        })
       }).then(async (res) => {
-        const { updRoleId } = await res.json()
-        roleIdMap = { ...roleIdMap, ...updRoleId }
+        const parsedResponse = parseGQLResponse<{
+          updateRole: { roleIdMap: RoleIdMap }
+        }>(await res.json())
+        roleIdMap = {
+          ...roleIdMap,
+          ...parsedResponse.updateRole.roleIdMap
+        }
       })
     )
   )
   return roleIdMap
 }
 
-async function getCountryRoles() {
+async function fetchCountryRoles() {
   const url = new URL('roles', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the roles from ${url}`)
   }
-  const rawRoles = await res.json()
-  console.log(rawRoles)
-  const parsedRoles = RoleSchema.safeParse(rawRoles)
+  const parsedRoles = CountryRoleSchema.safeParse(await res.json())
   if (!parsedRoles.success) {
     raise(
       `Error when getting roles from country-config: ${JSON.stringify(
@@ -124,25 +161,52 @@ async function getCountryRoles() {
   return parsedRoles.data
 }
 
-interface RoleIdMap {
-  [role: string]: string
-}
+type RoleIdMap = Record<string, string | undefined>
 
 export async function seedRoles(token: string) {
-  const systemRoles = await createSystemRoles(token)
-  const countryRoles = await getCountryRoles()
+  const systemRoles = await fetchSystemRoles(token)
+  const roleIdMap = systemRoles.reduce<RoleIdMap>(
+    (systemRoleMap, systemRole) => ({
+      ...systemRoleMap,
+      ...systemRole.roles.reduce(
+        (roleMap, role) => ({
+          ...roleMap,
+          ...role.labels.reduce(
+            (labelMap, label) => ({
+              ...labelMap,
+              [label.label]: role._id
+            }),
+            {}
+          )
+        }),
+        {}
+      )
+    }),
+    {}
+  )
+  const countryRoles = await fetchCountryRoles()
   const usedSystemRoles = Object.keys(
     countryRoles
   ) as typeof SYSTEM_ROLES[number][]
-  return updateRoles(
+  const updatedRoleIdMap = await updateRoles(
     token,
     systemRoles
       .filter(({ value }) => usedSystemRoles.includes(value))
-      .map(({ _id, value, active }) => ({
-        id: _id,
-        value,
-        active,
-        roles: countryRoles[value]!
+      .filter((systemRole) => {
+        if (Boolean(systemRole.roles?.length)) {
+          console.log(
+            `Roles for the systemRole "${systemRole.value}" already exists. Skipping`
+          )
+        }
+        return !Boolean(systemRole.roles?.length)
+      })
+      .map((systemRole) => ({
+        ...systemRole,
+        roles: countryRoles[systemRole.value]!
       }))
   )
+  return {
+    ...roleIdMap,
+    ...updatedRoleIdMap
+  }
 }
