@@ -9,44 +9,54 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { precacheAndRoute } from 'workbox-precaching'
+import { PrecacheEntry, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
+import { RouteHandler, skipWaiting } from 'workbox-core'
+
+interface OnSyncCallbackOptions {
+  queue: Queue
+}
+interface OnSyncCallback {
+  (options: OnSyncCallbackOptions): void | Promise<void>
+}
+
+const callback = (requestArray: any[]) => {
+  let requestSynced = 0
+  requestArray.forEach((item) => {
+    if (!item.error) {
+      requestSynced++
+    }
+  })
+
+  if (requestSynced > 0) {
+    new BroadcastChannel('backgroundSynBroadCastChannel').postMessage(
+      requestSynced
+    )
+  }
+}
 
 const queue = new Queue('registerQueue', {
-  callbacks: {
-    queueDidReplay: function (requestArray) {
-      let requestSynced = 0
-      requestArray.forEach((item) => {
-        if (!item.error) {
-          requestSynced++
-        }
-      })
-
-      if (requestSynced > 0) {
-        new BroadcastChannel('backgroundSynBroadCastChannel').postMessage(
-          requestSynced
-        )
-      }
-    }
-  }
+  onSync: callback as unknown as OnSyncCallback
 })
 const GraphQLMatch = /graphql(\S+)?/
 
-self.addEventListener('fetch', (event) => {
+/* eslint-disable-next-line no-restricted-globals */
+self.addEventListener('fetch', (event: any) => {
   if (
     null !== event.request.url.match(GraphQLMatch) &&
     navigator.onLine === false
   ) {
     const promiseChain = fetch(event.request.clone()).catch((err) => {
-      return queue.addRequest(event.request)
+      return queue.pushRequest(event.request)
     })
 
     event.waitUntil(promiseChain)
   }
 })
 
+/* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', async (event) => {
   if (!event.data) {
     return
@@ -66,14 +76,15 @@ self.addEventListener('message', async (event) => {
       caches
         .keys()
         .then((cs) => cs.forEach((c) => caches.delete(c)))
-        .then(() => self.skipWaiting())
+        .then(() => skipWaiting())
       break
     default:
       break
   }
 })
 
-precacheAndRoute(self.__WB_MANIFEST)
+/* eslint-disable-next-line no-restricted-globals */
+precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
 
 /*
  * As the config file can change after the app is built, we cannot precache it
@@ -95,12 +106,12 @@ registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
-  new NavigationRoute('/index.html', {
+  new NavigationRoute('/index.html' as unknown as RouteHandler, {
     denylist: [/^\/__.*$/]
   })
 )
 
-const removeCache = async (minioUrls) => {
+const removeCache = async (minioUrls: string) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>
     e.includes('workbox-runtime')
   )
@@ -108,7 +119,7 @@ const removeCache = async (minioUrls) => {
     return
   }
   const runtimecache = await caches.open(runTimeCacheKey)
-  for (let minioUrl of minioUrls) {
+  for (const minioUrl of minioUrls) {
     const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
     console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
   }

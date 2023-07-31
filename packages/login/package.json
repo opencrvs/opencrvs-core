@@ -51,7 +51,7 @@
     "precommit": "lint-staged",
     "start": "vite --port=3020",
     "preview": "vite preview",
-    "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build && yarn gen:sw",
+    "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-login ocrvs-login",
@@ -105,10 +105,10 @@
     "ts-node": "^6.1.1",
     "typescript": "^4.7.4",
     "vite": "^3.0.0",
+    "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-svgr": "^0.3.0",
     "vite-tsconfig-paths": "^3.5.0",
-    "vitest": "^0.25.5",
-    "workbox-cli": "^4.0.0-alpha.0"
+    "vitest": "^0.25.5"
   },
   "browserslist": {
     "production": [
