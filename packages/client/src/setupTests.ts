@@ -92,24 +92,27 @@ import {
   setItem
 } from './tests/util'
 
-vi.doMock('@client/forms/configuration/default', async () => ({
-  ...((await vi.importActual('@client/forms/configuration/default')) as any),
-  registerForms: mockOfflineData.forms.registerForm
-}))
-
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.forms.userForm
 }))
 
-vi.mock('@client/forms/conditionals', async () => ({
-  ...((await vi.importActual('@client/forms/conditionals')) as any),
-  conditionals: ((await vi.importActual('@client/forms/conditionals')) as any)
-    .builtInConditionals
-}))
+vi.mock('@client/forms/conditionals', async () => {
+  const actual = (await vi.importActual('@client/forms/conditionals')) as any
+  return {
+    ...actual,
+    conditionals: actual.builtInConditionals,
+    initConditionals: () => Promise.resolve()
+  }
+})
 
-vi.mock('@client/forms/validators', async () => ({
-  validators: await vi.importActual('@client/utils/validate')
-}))
+vi.mock('@client/forms/validators', async () => {
+  const actual = (await vi.importActual('@client/forms/validators')) as any
+  return {
+    ...actual,
+    validators: await vi.importActual('@client/utils/validate'),
+    initValidators: () => Promise.resolve()
+  }
+})
 
 /*
  * Initialize mocks
@@ -179,7 +182,7 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve(mockOfflineData.forms),
+      loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),
       importValidators: () => Promise.resolve({})
     }

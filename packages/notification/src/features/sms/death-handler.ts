@@ -86,6 +86,7 @@ export async function sendDeathRegistrationConfirmation(
     'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
     }
@@ -111,6 +112,7 @@ export async function sendDeathRejectionConfirmation(
     'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId
     }
   )

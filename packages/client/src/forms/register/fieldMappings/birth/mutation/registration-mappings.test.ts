@@ -37,23 +37,19 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.certificates).toEqual([
       {
         collector: {
-          relationship: 'OTHER',
-          otherRelationship: 'Uncle',
-          individual: {
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Mushraful',
-                familyName: 'Hoque'
-              }
-            ],
-            identifier: [
-              {
-                id: '123456789',
-                type: 'PASSPORT'
-              }
-            ]
-          },
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Mushraful',
+              familyName: 'Hoque'
+            }
+          ],
+          identifier: [
+            {
+              id: '123456789',
+              type: 'PASSPORT'
+            }
+          ],
           affidavit: [
             {
               id: '123456789',
