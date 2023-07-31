@@ -20,7 +20,8 @@ import {
   BirthRegistration,
   DeathRegistration,
   MarriageRegistration,
-  Address
+  Address,
+  IdentityType
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -226,7 +227,7 @@ export const identityToFieldTransformer =
         const existingIdentity = queryData[sectionId][
           nestedField
         ].identifier.find(
-          (identity: fhir.Identifier) => identity.type === identityType
+          (identity: IdentityType) => identity.type === identityType
         )
         if (!transformedData[sectionId]) {
           transformedData[sectionId] = {}
@@ -239,7 +240,7 @@ export const identityToFieldTransformer =
     } else {
       if (queryData[sectionId] && queryData[sectionId].identifier) {
         const existingIdentity = queryData[sectionId].identifier.find(
-          (identity: fhir.Identifier) => identity.type === identityType
+          (identity: IdentityType) => identity.type === identityType
         )
         if (!transformedData[sectionId]) {
           transformedData[sectionId] = {}
@@ -266,7 +267,7 @@ export const identityToNidVerificationFieldTransformer = (
     field
   )
   const existingIdentity = queryData[sectionId]?.identifier?.find(
-    (identity: fhir.Identifier) =>
+    (identity: IdentityType) =>
       (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (!transformedData[sectionId]) {
@@ -710,7 +711,7 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) =>
+      (identity: IdentityType) =>
         (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
     )
     if (!transformedData[sectionId]) {
