@@ -15,16 +15,16 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  BirthSection,
+  // BirthSection,
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
-  DeathSection,
+  // DeathSection,
   TEXT,
   LOCATION_SEARCH_INPUT,
   DATE,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  MarriageSection
+  DOCUMENT_UPLOADER_WITH_OPTION
+  // MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
@@ -129,12 +129,12 @@ describe('when in device of large viewport', () => {
 
     it('Goes to child document while scroll to child section', async () => {
       window.dispatchEvent(new Event('scroll'))
-      await waitForElement(reviewSectionComponent, '#document_section_child')
+      await waitForElement(reviewSectionComponent, '#child-accordion')
     })
 
     it('shows zero document error if no document is uploaded', async () => {
       window.dispatchEvent(new Event('scroll'))
-      await waitForElement(reviewSectionComponent, '#zero_document_child')
+      await waitForElement(reviewSectionComponent, '#zero_document')
     })
 
     describe('when user clicks on change link', () => {
@@ -365,7 +365,7 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Registration,
+              id: 'registration',
               viewType: 'form' as ViewType,
               title: {
                 defaultMessage: 'Informant',
@@ -450,7 +450,7 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               viewType: 'form' as ViewType,
               name: {
                 defaultMessage: 'What are the deceased details?',
@@ -488,7 +488,7 @@ describe('when in device of large viewport', () => {
         marriage: {
           sections: [
             {
-              id: MarriageSection.Groom,
+              id: 'groom',
               name: formMessages.groomName,
               title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
@@ -565,7 +565,7 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Child,
+              id: 'child',
               viewType: 'form' as ViewType,
               title: formMessages.childTitle,
               name: formMessages.childTitle,
@@ -592,7 +592,7 @@ describe('when in device of large viewport', () => {
         death: {
           sections: [
             {
-              id: DeathSection.Deceased,
+              id: 'deceased',
               name: formMessages.deceasedTitle,
               title: formMessages.deceasedTitle,
               viewType: 'form' as ViewType,
@@ -603,7 +603,7 @@ describe('when in device of large viewport', () => {
         marriage: {
           sections: [
             {
-              id: MarriageSection.Groom,
+              id: 'groom',
               name: formMessages.groomName,
               title: formMessages.groomTitle,
               viewType: 'form' as ViewType,
@@ -662,7 +662,7 @@ describe('when in device of small viewport', () => {
       birth: {
         sections: [
           {
-            id: BirthSection.Mother,
+            id: 'mother',
             name: formMessages.motherTitle,
             title: formMessages.motherTitle,
             viewType: 'form' as ViewType,
@@ -683,7 +683,7 @@ describe('when in device of small viewport', () => {
             ]
           },
           {
-            id: BirthSection.Documents,
+            id: 'documents',
             name: formMessages.documentsName,
             title: formMessages.documentsTitle,
             viewType: 'form' as ViewType,
@@ -714,7 +714,7 @@ describe('when in device of small viewport', () => {
       death: {
         sections: [
           {
-            id: DeathSection.Deceased,
+            id: 'deceased',
             name: formMessages.deceasedTitle,
             title: formMessages.deceasedTitle,
             viewType: 'form' as ViewType,
@@ -725,7 +725,7 @@ describe('when in device of small viewport', () => {
       marriage: {
         sections: [
           {
-            id: MarriageSection.Groom,
+            id: 'groom',
             name: formMessages.groomName,
             title: formMessages.groomTitle,
             viewType: 'form' as ViewType,
@@ -740,14 +740,14 @@ describe('when in device of small viewport', () => {
       documents: {
         uploadDocForMother: [
           {
-            optionValues: ['MOTHER', 'Birth Registration'],
+            optionValues: ['MOTHER', 'NATIONAL_ID'],
             type: 'image/png',
             data: 'data:image/png;base64,abcd'
           }
         ],
         uploadDocForChildDOB: [
           {
-            optionValues: ['CHILD', 'Birth Registration'],
+            optionValues: ['CHILD', 'NOTIFICATION_OF_BIRTH'],
             type: 'image/png',
             data: 'data:image/png;base64,abcd'
           }
@@ -775,18 +775,18 @@ describe('when in device of small viewport', () => {
     reviewSectionComponent = testComponent
   })
 
-  it('renders without preview list of documents', () => {
+  it('renders preview list of documents', () => {
     expect(
-      reviewSectionComponent.find('#preview-list-mother').hostNodes()
+      reviewSectionComponent
+        .find('#preview-list-all_attachment_list')
+        .hostNodes()
     ).toHaveLength(1)
   })
 
   describe('clicking on preview list item...', () => {
     beforeEach(() => {
       reviewSectionComponent
-        .find('#preview-list-mother')
-        .hostNodes()
-        .find('#document_BirthRegistration_link')
+        .find('#document_NOTIFICATION_OF_BIRTH_link')
         .hostNodes()
         .simulate('click')
 
@@ -801,8 +801,6 @@ describe('when in device of small viewport', () => {
 
     it('clicking on back button closes image preview', () => {
       reviewSectionComponent
-        .find('#preview_image_field')
-        .hostNodes()
         .find('#preview_close')
         .hostNodes()
         .simulate('click')

@@ -40,7 +40,7 @@ export const identityOptions = [
     label: messages.iDTypeRefugeeNumber
   },
   { value: ALIEN_NUMBER, label: messages.iDTypeAlienNumber },
-  { value: NO_ID, label: messages.iDTypeNoId },
+  { value: NO_ID, label: messages.iDTypeNoID },
   { value: OTHER, label: messages.iDTypeOther }
 ]
 

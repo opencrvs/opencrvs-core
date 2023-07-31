@@ -31,7 +31,7 @@ export async function getPatientResource(
   relatedPerson: fhir.RelatedPerson,
   authHeader: IAuthHeader,
   dataSources: Context['dataSources']
-) {
+): Promise<fhir.Patient | null> {
   if (
     !relatedPerson ||
     !relatedPerson.patient ||

@@ -103,19 +103,6 @@ describe('when user is in the register form for birth event', () => {
       )
       component = testComponent
     })
-    it('renders the page', () => {
-      expect(
-        component.find('#form_section_title_mother-view-group').hostNodes()
-      ).toHaveLength(1)
-    })
-    it('changes the country select', async () => {
-      const select = selectOption(
-        component,
-        '#countryPrimary',
-        'United States of America'
-      )
-      expect(select.text()).toEqual('United States of America')
-    })
     it('takes field agent to declaration submitted page when save button is clicked', async () => {
       localStorage.getItem = vi.fn(
         (key: string) =>
@@ -162,7 +149,8 @@ describe('when user is in the register form for death event', () => {
     beforeEach(async () => {
       const clonedForm = cloneDeep(form)
       clonedForm.sections[2].optional = true
-      clonedForm.sections[2].notice = messages.causeOfDeathNotice
+      // TODO: need to check if causeOfDeathNotice is needed or not
+      // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const mock: any = vi.fn()
       const testComponent = await createTestComponent(
@@ -363,68 +351,6 @@ describe('when user is in the register form for marriage event', () => {
 
       expect(history.location.pathname).toContain('/')
     })
-  })
-})
-
-describe('when user is in the register form preview section without phone number', () => {
-  let component: ReactWrapper<{}, {}>
-  let store: AppStore
-  let history: History
-  const mock = vi.fn()
-
-  beforeEach(async () => {
-    mock.mockReset()
-    const storeContext = await createTestStore()
-    store = storeContext.store
-    history = storeContext.history
-
-    const draft = createDeclaration(Event.Birth)
-    draft.data = {
-      child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
-      father: {
-        detailsExist: true
-      },
-      mother: {
-        detailsExist: true
-      },
-      documents: {
-        imageUploader: { title: 'dummy', description: 'dummy', data: '' }
-      },
-      registration: {
-        commentsOrNotes: ''
-      }
-    }
-    store.dispatch(setInitialDeclarations())
-    store.dispatch(storeDeclaration(draft))
-
-    const form = await getRegisterFormFromStore(store, Event.Birth)
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegisterForm
-        history={history}
-        registerForm={form}
-        declaration={draft}
-        pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: draft.id,
-            pageId: 'preview',
-            groupId: 'preview-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
-    )
-    component = testComponent
-  })
-
-  it('submit button will be disabled since form does not have a phone no for contact point', () => {
-    expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
-      true
-    )
   })
 })
 

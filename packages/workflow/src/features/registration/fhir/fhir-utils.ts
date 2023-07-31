@@ -20,7 +20,8 @@ import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
-  getSectionEntryBySectionCode
+  getSectionEntryBySectionCode,
+  findRelatedPersonEntry
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch, { RequestInit } from 'node-fetch'
@@ -42,11 +43,22 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
+export async function getSharedContactEmail(fhirBundle: fhir.Bundle) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error('Invalid FHIR bundle found for declaration')
+  }
+  return await getEmailAddress(
+    getTaskResource(fhirBundle),
+    getEventType(fhirBundle)
+  )
+}
+
 export function concatenateName(fhirNames: fhir.HumanName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: fhir.HumanName) => {
     return humanName.use === language
   })
+
   if (!name || !name.family) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
@@ -56,20 +68,32 @@ export function concatenateName(fhirNames: fhir.HumanName[]) {
     .concat(name.family)
 }
 
+export async function getSubjectName(
+  fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE
+) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
+  }
+  const person = await findPersonEntry(sectionCode, fhirBundle)
+  if (!person || !person.name) {
+    throw new Error("Didn't find subject's name information")
+  }
+
+  return concatenateName(person.name)
+}
+
 export async function getInformantName(
   fhirBundle: fhir.Bundle,
   sectionCode: string = CHILD_SECTION_CODE
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getInformantName: Invalid FHIR bundle found for declaration'
-    )
+    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
   }
-  const informant = await findPersonEntry(sectionCode, fhirBundle)
+  const informant = await findRelatedPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
-
   return concatenateName(informant.name)
 }
 
@@ -316,9 +340,33 @@ export async function getPhoneNo(
     phoneNumber = phoneExtension && phoneExtension.valueString
   }
   if (!phoneNumber) {
-    return false
+    return null
   }
   return phoneNumber
+}
+
+//TODO: need to modifty for marriage event
+export async function getEmailAddress(
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
+  let emailAddress
+  if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
+    const emailExtension =
+      taskResource &&
+      taskResource.extension &&
+      taskResource.extension.find((extension) => {
+        return (
+          extension.url ===
+          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
+        )
+      })
+    emailAddress = emailExtension && emailExtension.valueString
+  }
+  if (!emailAddress) {
+    return null
+  }
+  return emailAddress
 }
 
 //TODO: need to modifty for marriage event
@@ -326,29 +374,30 @@ export async function getEventInformantName(
   composition: fhir.Composition,
   eventType: EVENT_TYPE
 ) {
-  let informantSection
+  let subjectSection
   if (eventType === EVENT_TYPE.BIRTH) {
-    informantSection = getSectionEntryBySectionCode(
+    subjectSection = getSectionEntryBySectionCode(
       composition,
       CHILD_SECTION_CODE
     )
   } else if (eventType === EVENT_TYPE.DEATH) {
-    informantSection = getSectionEntryBySectionCode(
+    subjectSection = getSectionEntryBySectionCode(
       composition,
       DECEASED_SECTION_CODE
     )
   }
 
-  const informant =
-    informantSection && (await getFromFhir(`/${informantSection.reference}`))
+  const subject =
+    subjectSection && (await getFromFhir(`/${subjectSection.reference}`))
   const language = getDefaultLanguage()
-  if (!informant || !informant.name) {
+  if (!subject || !subject.name) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const name = informant.name.find((humanName: fhir.HumanName) => {
+  const name = subject.name.find((humanName: fhir.HumanName) => {
     return humanName.use === language
   })
+
   if (!name || !name.family) {
     throw new Error(`Didn't found informant's ${language} name`)
   }

@@ -34,13 +34,13 @@ describe('Create new user page tests', () => {
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(
-          mockOfflineData.forms.userForm.sections[0],
+          mockOfflineData.userForms.sections[0],
           // Needs to be casted as any as there are non-validator functions in the import
           builtInValidators as Record<string, any>
         )}
         activeGroup={
           deserializeFormSection(
-            mockOfflineData.forms.userForm.sections[0],
+            mockOfflineData.userForms.sections[0],
             // Needs to be casted as any as there are non-validator functions in the import
             builtInValidators as Record<string, any>
           ).groups[0]

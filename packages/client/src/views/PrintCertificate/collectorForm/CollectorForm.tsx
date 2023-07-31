@@ -362,7 +362,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         <ActionPageLight
           id="collector_form"
           hideBackground
-          title={intl.formatMessage(formSection.title)}
+          title={formSection.title && intl.formatMessage(formSection.title)}
           goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >

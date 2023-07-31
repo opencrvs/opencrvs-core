@@ -924,7 +924,7 @@ export function setArrayPropInResourceObject(
 
 export function findExtension(
   url: string,
-  extensions: fhir.Extension[]
+  extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   const extension =
     extensions &&
@@ -1413,37 +1413,28 @@ export function isTaskResponse(resBody: fhir.Bundle): boolean {
   return resBody.entry[0].response.location.indexOf('Task') > -1
 }
 
-export async function setInformantReference(
+export function setInformantReference(
   sectionCode: string,
+  sectionTitle: string,
   relatedPerson: fhir.RelatedPerson,
   fhirBundle: ITemplatedBundle,
   context: any
 ) {
+  selectOrCreatePersonResource(sectionCode, sectionTitle, fhirBundle)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      logger.error('Expected person entry not found on the bundle')
-      return
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = await fetchFHIR(
-      `/Composition/${fhirBundle.entry[0].resource.id}`,
-      context.authHeader
-    )
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
+  if (!section?.entry) {
+    throw new Error(`${sectionCode} not found in composition!`)
+  }
+  const personSectionEntry = section.entry[0]
+  const personEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === personSectionEntry.reference
+  )
+  if (!personEntry) {
+    logger.error('Expected person entry not found on the bundle')
+    return
+  }
+  relatedPerson.patient = {
+    reference: personEntry.fullUrl
   }
 }
 
