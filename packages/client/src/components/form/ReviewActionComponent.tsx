@@ -23,7 +23,7 @@ import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { SubmissionAction } from '@client/forms'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import * as React from 'react'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {

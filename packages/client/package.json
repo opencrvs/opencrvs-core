@@ -70,6 +70,7 @@
     "google-libphonenumber": "^3.2.32",
     "graphql": "^15.0.0",
     "graphql-tools": "^4.0.7",
+    "handlebars": "^4.7.6",
     "history": "^4.7.2",
     "http-proxy-middleware": "^0.20.0",
     "iframe-resizer-react": "^1.1.0",

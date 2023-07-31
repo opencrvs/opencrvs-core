@@ -44,8 +44,11 @@ import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
-import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  countryAlpha3toAlpha2,
+  getLocationNameMapOfFacility
+} from '@client/utils/locationUtils'
+
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
@@ -279,12 +282,9 @@ export const identityToNidVerificationFieldTransformer = (
 
   return transformedData
 }
-interface IAddress {
-  [key: string]: any
-}
 
-export const addressToFieldTransformer =
-  (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
+export const addressLineToFieldTransformer =
+  (addressType: string, lineNumber = 0) =>
   (
     transformedData: IFormData,
     queryData: QueryData,
@@ -301,13 +301,38 @@ export const addressToFieldTransformer =
     if (!address) {
       return transformedData
     }
-    if (lineNumber > 0) {
-      transformedData[sectionId][field.name] =
-        (address.line && address.line[lineNumber - 1]) || ''
-    } else {
-      transformedData[sectionId][field.name] =
-        address[transformedFieldName ? transformedFieldName : field.name]
+
+    transformedData[sectionId][field.name] =
+      (address.line && address.line[lineNumber]) || ''
+    return transformedData
+  }
+
+interface IAddress {
+  [key: string]: any
+}
+
+export const addressFhirPropertyToFieldTransformer =
+  (addressType: string, transformedFieldName: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const address =
+      queryData[sectionId] &&
+      queryData[sectionId].address &&
+      (queryData[sectionId].address as GQLAddress[]).find(
+        (addr) => addr.type === addressType
+      )
+
+    if (!address) {
+      return transformedData
     }
+
+    transformedData[sectionId][field.name] =
+      address[transformedFieldName ? transformedFieldName : field.name]
+
     return transformedData
   }
 
@@ -449,15 +474,6 @@ export function attachmentToFieldTransformer(
           description: type
         } as IAttachment)
       }
-      if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
-        attachments.push({
-          data: attachment.data,
-          type: attachment.contentType,
-          optionValues: [subject, type],
-          title: subject,
-          description: type
-        } as IAttachment)
-      }
     })
   }
   if (attachments) {
@@ -468,8 +484,10 @@ export function attachmentToFieldTransformer(
 
 export const eventLocationQueryTransformer =
   (
-    lineNumber = 0,
-    transformedFieldName?: string,
+    transformationParams: {
+      lineNumber?: number
+      transformedFieldName?: string
+    },
     ignoreAddressFields?: IIgnoreAddressFields
   ) =>
   (
@@ -481,16 +499,22 @@ export const eventLocationQueryTransformer =
     if (!queryData.eventLocation || !queryData.eventLocation.address) {
       return transformedData
     }
-    const eventLocation = queryData.eventLocation
-    const address = eventLocation.address
-    const line = address?.line
-    const country = address?.country
-    const addressKey = transformedFieldName ? transformedFieldName : field.name
-    const fieldValue = address && address[addressKey as keyof Address]
-
-    if (lineNumber > 0) {
+    const eventLocation = queryData.eventLocation as fhir.Location
+    const address = eventLocation.address as IAddress
+    const line = address.line as string[]
+    const country = address.country
+    const fieldValue =
+      address[
+        transformationParams.transformedFieldName
+          ? transformationParams.transformedFieldName
+          : field.name
+      ]
+    if (
+      transformationParams.lineNumber ||
+      transformationParams.lineNumber === 0
+    ) {
       transformedData[sectionId][field.name] =
-        (line && line[lineNumber - 1]) || []
+        line[transformationParams.lineNumber]
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
@@ -1018,7 +1042,7 @@ export const addressLineTemplateTransformer =
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const index = lineNumber
     const addCase =
       addressCase === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
     const newTransformedName = camelCase(
@@ -1039,14 +1063,14 @@ export const eventLocationAddressLineTemplateTransformer =
   ) => {
     if (
       queryData.eventLocation?.type &&
-      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+      queryData.eventLocation?.type === 'HEALTH_FACILITY'
     ) {
       return
     }
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const index = lineNumber
     transformedData[sectionId][transformedFieldName] =
       (queryData.eventLocation?.address &&
         queryData.eventLocation.address.line &&
@@ -1124,25 +1148,27 @@ export const nationalityTransformer = (
   transformedData: IFormData,
   queryData: QueryData,
   sectionId: SectionId,
-  field: IFormField
+  field: IFormField,
+  _?: IFormField,
+  __?: IOfflineData
 ) => {
   if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId][field.name] && queryData[sectionId][field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   } else if (queryData[sectionId]?.individual) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const countryName = getCountryName(
+    const nationalityName = countryAlpha3toAlpha2(
       queryData[sectionId].individual[field.name] &&
         queryData[sectionId].individual[field.name][0]
     )
-    transformedData[sectionId][field.name] = countryName || ''
+    transformedData[sectionId][field.name] = nationalityName || 'UNKNOWN'
   }
 }
 

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
@@ -46,7 +46,7 @@ export const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-export const StyledTooltip = styled(Tooltip)`
+const StyledTooltip = styled(Tooltip)`
   height: 16px;
   width: 16px;
 `

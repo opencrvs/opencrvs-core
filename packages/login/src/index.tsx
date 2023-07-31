@@ -34,7 +34,7 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      environment: process.env.NODE_ENV,
+      environment: process.env.HOSTNAME,
       dsn: window.config.SENTRY,
       integrations: [new BrowserTracing()],
       tracesSampleRate: 1.0

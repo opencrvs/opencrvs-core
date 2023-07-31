@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   NavigationSubItem,
   LabelContainer

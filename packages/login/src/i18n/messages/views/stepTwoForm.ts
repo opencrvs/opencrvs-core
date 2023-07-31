@@ -39,9 +39,9 @@ const messagesToDefine: IStepTwoFormMessages = {
       'The title that appears in step two of the form after resend button click'
   },
   resend: {
-    id: 'login.resendMobile',
+    id: 'login.resend',
     defaultMessage: 'Resend SMS',
-    description: 'Text for button that resends SMS verification code'
+    description: 'Text for button that resends SMS or email verification code'
   },
   stepTwoInstructionSMS: {
     id: 'login.stepTwoInstruction.sms',

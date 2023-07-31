@@ -43,7 +43,17 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (generateHash(password, user.salt) !== user.passwordHash) {
+  /*
+   * In OCRVS-4979 we needed to change the hashing algorithm to conform latest security standards.
+   * We still need to support users logging in with the old password hash to allow them to change their passwords to the new hash.
+   *
+   * TODO: In OpenCRVS 1.4, remove this check and force any users without new password hash to reset their password via sys admin.
+   */
+  if (!user.passwordHash) {
+    if (generateHash(password, user.salt) !== user.oldPasswordHash) {
+      throw unauthorized()
+    }
+  } else if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
   const response: IVerifyResponse = {
@@ -72,7 +82,7 @@ export const responseSchema = Joi.object({
     }).unknown(true)
   ),
   mobile: Joi.string().optional(),
-  email: Joi.string().optional(),
+  email: Joi.string().allow(null, '').optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

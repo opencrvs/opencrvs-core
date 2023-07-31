@@ -9,11 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISerializedForm } from '@client/forms'
+import {
+  IDynamicOptions,
+  IMapping,
+  ISerializedForm,
+  IValidatorDescriptor,
+  SerializedFormField
+} from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
+import {
+  transformUIConfiguredConditionalsToDefaultFormat,
+  getDefaultLanguageMessage
+} from '@client/forms/configuration/customUtils'
 import { getSection } from '@client/forms/configuration/defaultUtils'
 import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
-import { CustomFieldType, Event } from '@client/utils/gateway'
+import {
+  CustomFieldType,
+  CustomSelectOption,
+  Event
+} from '@client/utils/gateway'
+import { MessageDescriptor } from 'react-intl'
 import { Message } from 'typescript-react-intl'
 
 export * from './transformers'
@@ -46,23 +61,49 @@ export interface IFieldIdentifiers {
 export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   required?: boolean
   enabled: string
+  ignoreBottomMargin?: boolean
+  validateEmpty?: boolean
   identifiers: IFieldIdentifiers
+  conditionals?: IConditionalConfig[]
+  optionCondition?: string
+  validator?: IValidatorDescriptor[]
+  label?: Message
+  helperText?: Message
+  hideHeader?: boolean
+  hideInPreview?: boolean
+  options?: Array<
+    Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
+  >
 }
 
 export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   custom: boolean
   label: IMessage[]
-  required: boolean
+  required?: boolean
   placeholder?: IMessage[]
   description?: IMessage[]
+  helperText?: IMessage[]
+  unit?: IMessage[]
   tooltip?: IMessage[]
   errorMessage?: IMessage[]
+  validateEmpty?: boolean
   maxLength?: number
+  ignoreBottomMargin?: boolean
+  inputWidth?: number
+  initialValue?: string
   fieldName: string
+  extraValue?: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
   options?: ICustomSelectOption[]
   datasetId?: string
+  validator?: IValidatorDescriptor[]
+  mapping?: IMapping
+  hideInPreview?: boolean
+  optionCondition?: string
+  dynamicOptions?: IDynamicOptions
+  hideHeader?: boolean
+  previewGroup?: string
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
@@ -83,22 +124,45 @@ export function getIdentifiersFromFieldId(fieldId: string) {
   }
 }
 
+function hasQuestionAlteredOptions(question: IDefaultQuestionConfig) {
+  return question.options?.length
+}
 export function getCustomizedDefaultField(
   question: IDefaultQuestionConfig,
   defaultForm: ISerializedForm
-) {
+): SerializedFormField {
   const {
     identifiers: { sectionIndex, groupIndex, fieldIndex },
+    conditionals,
     ...rest
   } = question
 
   const serializedField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-
-  return {
+  const customizedDefaultField = {
     ...serializedField,
     ...rest
   }
+  if (conditionals) {
+    customizedDefaultField.conditionals =
+      transformUIConfiguredConditionalsToDefaultFormat(conditionals)
+  }
+
+  if (
+    serializedField.type === 'SELECT_WITH_OPTIONS' &&
+    hasQuestionAlteredOptions(question)
+  ) {
+    customizedDefaultField.options =
+      question.options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
+  }
+  return customizedDefaultField
 }
 
 export function getSectionIdentifiers(fieldId: string, form: ISerializedForm) {

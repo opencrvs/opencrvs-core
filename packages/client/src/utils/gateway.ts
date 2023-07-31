@@ -234,6 +234,7 @@ export type ApplicationConfiguration = {
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
   MARRIAGE?: Maybe<Marriage>
+  MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -531,7 +532,7 @@ export type CertificateSvg = {
 
 export type CertificateSvgInput = {
   event: Event
-  id: Scalars['ID']
+  id?: InputMaybe<Scalars['ID']>
   status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
@@ -653,11 +654,13 @@ export type CurrencyInput = {
 export enum CustomFieldType {
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
+  SelectWithDynamicOptions = 'SELECT_WITH_DYNAMIC_OPTIONS',
   SelectWithOptions = 'SELECT_WITH_OPTIONS',
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Time = 'TIME'
 }
 
 export type CustomSelectOption = {
@@ -793,6 +796,12 @@ export type DuplicatesInfo = {
   __typename?: 'DuplicatesInfo'
   compositionId?: Maybe<Scalars['ID']>
   trackingId?: Maybe<Scalars['String']>
+}
+
+export type DynamicOptionInput = {
+  dependency: Scalars['String']
+  jurisdictionType?: InputMaybe<Scalars['String']>
+  resource?: InputMaybe<Scalars['String']>
 }
 
 export enum EducationType {
@@ -1138,6 +1147,7 @@ export type LocationStatisticsResponse = {
 
 export enum LocationType {
   AdminStructure = 'ADMIN_STRUCTURE',
+  Community = 'COMMUNITY',
   CrvsOffice = 'CRVS_OFFICE',
   DeceasedUsualResidence = 'DECEASED_USUAL_RESIDENCE',
   HealthFacility = 'HEALTH_FACILITY',
@@ -1182,6 +1192,11 @@ export enum MannerOfDeath {
   MannerUndetermined = 'MANNER_UNDETERMINED',
   NaturalCauses = 'NATURAL_CAUSES',
   Suicide = 'SUICIDE'
+}
+
+export type MappingInput = {
+  mutation: Operation
+  query: Operation
 }
 
 export enum MaritalStatusType {
@@ -1695,6 +1710,10 @@ export type OidpUserInfo = {
   zoneinfo?: Maybe<Scalars['String']>
 }
 
+export type Operation = {
+  operation: Scalars['String']
+}
+
 export type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
   notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
@@ -2091,18 +2110,32 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  dynamicOptions?: InputMaybe<DynamicOptionInput>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
+  extraValue?: InputMaybe<Scalars['String']>
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  helperText?: InputMaybe<Array<MesssageInput>>
+  hideHeader?: InputMaybe<Scalars['Boolean']>
+  hideInPreview?: InputMaybe<Scalars['Boolean']>
+  ignoreBottomMargin?: InputMaybe<Scalars['Boolean']>
+  initialValue?: InputMaybe<Scalars['String']>
+  inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
+  mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
+  previewGroup?: InputMaybe<Scalars['String']>
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  unit?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
+  validator?: InputMaybe<Array<ValidatorInput>>
 }
 
 export type QuestionnaireQuestion = {
@@ -2593,6 +2626,11 @@ export type VsExport = {
   fileSize: Scalars['String']
   startDate: Scalars['Date']
   url: Scalars['String']
+}
+
+export type ValidatorInput = {
+  operation: Scalars['String']
+  parameters?: InputMaybe<Array<Scalars['Int']>>
 }
 
 export type VerifyPasswordResult = {
@@ -3858,6 +3896,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4168,6 +4211,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4567,6 +4615,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4860,6 +4913,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {

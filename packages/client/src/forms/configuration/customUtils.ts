@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SerializedFormField, BirthSection } from '@client/forms/index'
+import {
+  SerializedFormField,
+  BirthSection,
+  IConditional
+} from '@client/forms/index'
 import {
   IMessage,
   ICustomQuestionConfig,
@@ -27,7 +31,7 @@ import { CustomFieldType } from '@client/utils/gateway'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
-function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
+export function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   const language = getDefaultLanguage()
   const defaultMessage = find(messages, {
     lang: language
@@ -35,11 +39,20 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
-function getOtherConditionalsAction(
-  conditionals: IConditionalConfig[] | undefined
+export function transformUIConfiguredConditionalsToDefaultFormat(
+  conditionals: Array<IConditionalConfig | IConditional> | undefined
 ) {
+  const isConditional = (
+    condition: IConditionalConfig | IConditional
+  ): condition is IConditional => condition.hasOwnProperty('expression')
+
   if (!conditionals) return []
   return conditionals.map((condition) => {
+    // Allow country config to use normal way of defining conditionals
+    if (isConditional(condition)) {
+      return condition
+    }
+
     const escapeRegExpValue = escapeRegExp(condition.regexp)
     const { fieldName, sectionId } = getIdentifiersFromFieldId(
       condition.fieldId
@@ -59,11 +72,24 @@ export function createCustomField({
   label,
   description,
   tooltip,
+  unit,
+  initialValue,
   placeholder,
   required,
   maxLength,
+  inputWidth,
   conditionals,
-  options
+  options,
+  extraValue,
+  validator,
+  mapping,
+  helperText,
+  hideInPreview,
+  ignoreBottomMargin,
+  dynamicOptions,
+  optionCondition,
+  hideHeader,
+  previewGroup
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -71,12 +97,27 @@ export function createCustomField({
     custom,
     required,
     type: fieldType,
+    extraValue,
+    ignoreBottomMargin,
+    hideInPreview,
+    helperText: helperText && getDefaultLanguageMessage(helperText),
+    optionCondition,
+    previewGroup,
     label: getDefaultLanguageMessage(label) as MessageDescriptor,
-    initialValue: '',
-    validate: [],
+    initialValue: initialValue || '',
+    validator: validator || [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
-    options: [],
+    options: (options || []).map((option) => {
+      return {
+        ...option,
+        label: Array.isArray(option.label)
+          ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+          : option.label
+      }
+    }),
+    dynamicOptions: {},
+    hideHeader,
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -86,13 +127,16 @@ export function createCustomField({
       },
       template: {
         fieldName: createCustomFieldHandlebarName(fieldId),
-        operation: 'questionnaireToCustomFieldTransformer'
-      }
+        operation: 'questionnaireToTemplateFieldTransformer'
+      },
+      ...(mapping || {})
     }
   }
+
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
 
-  const othersConditionals = getOtherConditionalsAction(conditionals)
+  const othersConditionals =
+    transformUIConfiguredConditionalsToDefaultFormat(conditionals)
 
   if (sectionId === BirthSection.Father) {
     baseField.conditionals = [
@@ -119,8 +163,12 @@ export function createCustomField({
   ) {
     baseField.placeholder = getDefaultLanguageMessage(placeholder)
   }
+  if (baseField.type === 'NUMBER') {
+    baseField.unit = getDefaultLanguageMessage(unit)
+    baseField.inputWidth = inputWidth
+  }
   if (baseField.type === 'TEL') {
-    baseField.validate = [
+    baseField.validator = [
       {
         operation: 'phoneNumberFormat'
       }
@@ -128,6 +176,9 @@ export function createCustomField({
   }
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
+  }
+  if (baseField.type === CustomFieldType.SelectWithDynamicOptions) {
+    baseField.dynamicOptions = dynamicOptions || { dependency: undefined }
   }
   if (baseField.type === CustomFieldType.SelectWithOptions) {
     baseField.options =
@@ -140,6 +191,7 @@ export function createCustomField({
         }
       }) || []
   }
+
   return baseField
 }
 
