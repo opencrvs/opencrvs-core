@@ -48,8 +48,8 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[0].id,
-              groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
+              sectionId: mockOfflineData.userForms.sections[0].id,
+              groupId: mockOfflineData.userForms.sections[0].groups[2].id
             },
             isExact: true,
             path: '/createUser',
@@ -136,8 +136,8 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[1].id,
-              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+              sectionId: mockOfflineData.userForms.sections[1].id,
+              groupId: mockOfflineData.userForms.sections[1].groups[0].id
             },
             isExact: true,
             path: '/createUser',

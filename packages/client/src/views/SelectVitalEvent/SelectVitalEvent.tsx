@@ -94,6 +94,7 @@ class SelectVitalEventView extends React.Component<
             desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
             desktopRight={
               <Button
+                id="goBack"
                 type="secondary"
                 size="medium"
                 onClick={this.props.goToHome}

@@ -62,7 +62,11 @@ export const systems: System[] = [
 ]
 
 export const mockOfflineData = {
-  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString()),
+  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
+    .forms,
+  userForms: JSON.parse(
+    readFileSync(join(__dirname, './forms.json')).toString()
+  ).userForm,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
