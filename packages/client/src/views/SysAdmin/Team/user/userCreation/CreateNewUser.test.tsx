@@ -207,7 +207,7 @@ describe('create new user tests', () => {
             // @ts-ignore
             params: {
               locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.forms.userForm.sections[0].id
+              sectionId: mockOfflineData.userForms.sections[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -265,8 +265,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[1].id,
-              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+              sectionId: mockOfflineData.userForms.sections[1].id,
+              groupId: mockOfflineData.userForms.sections[1].groups[0].id
             },
             isExact: true,
             path: '/createUser',

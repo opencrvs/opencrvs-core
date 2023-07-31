@@ -1744,8 +1744,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <Accordion
               name="signatures"
               label="Signatures"
-              labelForHideAction="Hide"
-              labelForShowAction="Show"
+              labelForHideAction={intl.formatMessage(messages.hideLabel)}
+              labelForShowAction={intl.formatMessage(messages.showLabel)}
               expand={true}
             >
               <SignatureGenerator
@@ -1832,7 +1832,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     return (
                       <DeclarationDataContainer key={index}>
                         <Accordion
-                          name="accordion-component"
+                          name={sec.id}
                           label={sec.title}
                           action={
                             sec.action && (
@@ -1841,8 +1841,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               </Link>
                             )
                           }
-                          labelForHideAction="Hide"
-                          labelForShowAction="Show"
+                          labelForHideAction={intl.formatMessage(
+                            messages.hideLabel
+                          )}
+                          labelForShowAction={intl.formatMessage(
+                            messages.showLabel
+                          )}
                           expand={true}
                         >
                           <ListViewSimplified id={'Section_' + sec.id}>
@@ -1884,21 +1888,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}
-                  labelForHideAction="Hide"
-                  labelForShowAction="Show"
+                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                  labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    <Link
-                      font="reg16"
-                      element="button"
-                      onClick={() =>
-                        this.editLinkClickHandlerForDraft(
-                          documentsSection.id,
-                          documentsSection.groups[0].id!
-                        )
-                      }
-                    >
-                      {intl.formatMessage(messages.editDocuments)}
-                    </Link>
+                    viewRecord ? null : (
+                      <Link
+                        font="reg16"
+                        element="button"
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </Link>
+                    )
                   }
                   expand={true}
                 >
@@ -1909,8 +1915,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <Accordion
                     name="additional_comments"
                     label={intl.formatMessage(messages.additionalComments)}
-                    labelForHideAction="Hide"
-                    labelForShowAction="Show"
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
                     expand={true}
                   >
                     <InputField

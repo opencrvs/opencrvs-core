@@ -4180,6 +4180,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       informantsSignature?: string | null
       informantsSignatureURI?: string | null
       type?: RegistrationType | null
@@ -4478,6 +4479,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       informantType?: string | null
       otherInformantType?: string | null
       contactRelationship?: string | null
+      contactEmail?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
       informantsSignatureURI?: string | null

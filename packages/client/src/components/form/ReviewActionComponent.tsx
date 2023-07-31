@@ -115,7 +115,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.reviewActionDescriptionComplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -134,7 +138,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.reviewActionDescriptionIncomplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -306,6 +314,7 @@ class ReviewActionComponent extends React.Component<
       intl
     } = this.props
 
+
     const background = !completeDeclaration
       ? 'error'
       : draftDeclaration
@@ -334,6 +343,7 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {intl.formatMessage(actionContent.description.message, {
+              ...actionContent.description.payload,
               eventType: declaration.event
             })}
           </Description>
