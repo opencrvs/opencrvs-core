@@ -234,6 +234,7 @@ export type ApplicationConfiguration = {
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
   MARRIAGE?: Maybe<Marriage>
+  MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -531,7 +532,7 @@ export type CertificateSvg = {
 
 export type CertificateSvgInput = {
   event: Event
-  id: Scalars['ID']
+  id?: InputMaybe<Scalars['ID']>
   status: CertificateStatus
   svgCode: Scalars['String']
   svgDateCreated?: InputMaybe<Scalars['Int']>
@@ -636,7 +637,6 @@ export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
   isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
-  registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
 
@@ -654,11 +654,13 @@ export type CurrencyInput = {
 export enum CustomFieldType {
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
+  SelectWithDynamicOptions = 'SELECT_WITH_DYNAMIC_OPTIONS',
   SelectWithOptions = 'SELECT_WITH_OPTIONS',
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Time = 'TIME'
 }
 
 export type CustomSelectOption = {
@@ -796,6 +798,12 @@ export type DuplicatesInfo = {
   trackingId?: Maybe<Scalars['String']>
 }
 
+export type DynamicOptionInput = {
+  dependency: Scalars['String']
+  jurisdictionType?: InputMaybe<Scalars['String']>
+  resource?: InputMaybe<Scalars['String']>
+}
+
 export enum EducationType {
   FirstStageTertiaryIsced_5 = 'FIRST_STAGE_TERTIARY_ISCED_5',
   LowerSecondaryIsced_2 = 'LOWER_SECONDARY_ISCED_2',
@@ -809,7 +817,6 @@ export enum EducationType {
 
 export type Estimation = {
   __typename?: 'Estimation'
-  estimationYear: Scalars['Int']
   femaleEstimation: Scalars['Int']
   locationId: Scalars['String']
   locationLevel: Scalars['String']
@@ -1140,6 +1147,7 @@ export type LocationStatisticsResponse = {
 
 export enum LocationType {
   AdminStructure = 'ADMIN_STRUCTURE',
+  Community = 'COMMUNITY',
   CrvsOffice = 'CRVS_OFFICE',
   DeceasedUsualResidence = 'DECEASED_USUAL_RESIDENCE',
   HealthFacility = 'HEALTH_FACILITY',
@@ -1184,6 +1192,11 @@ export enum MannerOfDeath {
   MannerUndetermined = 'MANNER_UNDETERMINED',
   NaturalCauses = 'NATURAL_CAUSES',
   Suicide = 'SUICIDE'
+}
+
+export type MappingInput = {
+  mutation: Operation
+  query: Operation
 }
 
 export enum MaritalStatusType {
@@ -1321,6 +1334,7 @@ export type Mutation = {
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
+  changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
   createBirthRegistration: CreatedIds
@@ -1362,15 +1376,15 @@ export type Mutation = {
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   requestMarriageRegistrationCorrection: Scalars['ID']
-  resendSMSInvite?: Maybe<Scalars['String']>
-  resetPasswordSMS?: Maybe<Scalars['String']>
+  resendInvite?: Maybe<Scalars['String']>
+  resetPasswordInvite?: Maybe<Scalars['String']>
   toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
   updateRole: Response
-  usernameSMSReminder?: Maybe<Scalars['String']>
+  usernameReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
 
@@ -1394,6 +1408,13 @@ export type MutationBookmarkAdvancedSearchArgs = {
 export type MutationChangeAvatarArgs = {
   avatar: AvatarInput
   userId: Scalars['String']
+}
+
+export type MutationChangeEmailArgs = {
+  email: Scalars['String']
+  nonce: Scalars['String']
+  userId: Scalars['String']
+  verifyCode: Scalars['String']
 }
 
 export type MutationChangePasswordArgs = {
@@ -1590,12 +1611,11 @@ export type MutationRequestMarriageRegistrationCorrectionArgs = {
   id: Scalars['ID']
 }
 
-export type MutationResendSmsInviteArgs = {
+export type MutationResendInviteArgs = {
   userId: Scalars['String']
 }
 
-export type MutationResetPasswordSmsArgs = {
-  applicationName: Scalars['String']
+export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
 }
 
@@ -1625,7 +1645,7 @@ export type MutationUpdateRoleArgs = {
   systemRole?: InputMaybe<SystemRoleInput>
 }
 
-export type MutationUsernameSmsReminderArgs = {
+export type MutationUsernameReminderArgs = {
   userId: Scalars['String']
 }
 
@@ -1688,6 +1708,10 @@ export type OidpUserInfo = {
   updated_at?: Maybe<Scalars['Int']>
   website?: Maybe<Scalars['String']>
   zoneinfo?: Maybe<Scalars['String']>
+}
+
+export type Operation = {
+  operation: Scalars['String']
 }
 
 export type OperationHistorySearchSet = {
@@ -1816,6 +1840,7 @@ export type Query = {
   getTotalPayments?: Maybe<Array<PaymentMetric>>
   getUser?: Maybe<User>
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
+  getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
@@ -1977,6 +2002,10 @@ export type QueryGetUserAuditLogArgs = {
   timeStart?: InputMaybe<Scalars['String']>
 }
 
+export type QueryGetUserByEmailArgs = {
+  email?: InputMaybe<Scalars['String']>
+}
+
 export type QueryGetUserByMobileArgs = {
   mobile?: InputMaybe<Scalars['String']>
 }
@@ -2060,6 +2089,7 @@ export type QuerySearchFieldAgentsArgs = {
 
 export type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
+  email?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   mobile?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
@@ -2080,18 +2110,32 @@ export type QuestionInput = {
   custom?: InputMaybe<Scalars['Boolean']>
   datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
+  dynamicOptions?: InputMaybe<DynamicOptionInput>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
+  extraValue?: InputMaybe<Scalars['String']>
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
   fieldType?: InputMaybe<CustomFieldType>
+  helperText?: InputMaybe<Array<MesssageInput>>
+  hideHeader?: InputMaybe<Scalars['Boolean']>
+  hideInPreview?: InputMaybe<Scalars['Boolean']>
+  ignoreBottomMargin?: InputMaybe<Scalars['Boolean']>
+  initialValue?: InputMaybe<Scalars['String']>
+  inputWidth?: InputMaybe<Scalars['Int']>
   label?: InputMaybe<Array<MesssageInput>>
+  mapping?: InputMaybe<MappingInput>
   maxLength?: InputMaybe<Scalars['Int']>
+  optionCondition?: InputMaybe<Scalars['String']>
   options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
+  previewGroup?: InputMaybe<Scalars['String']>
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  unit?: InputMaybe<Array<MesssageInput>>
+  validateEmpty?: InputMaybe<Scalars['Boolean']>
+  validator?: InputMaybe<Array<ValidatorInput>>
 }
 
 export type QuestionnaireQuestion = {
@@ -2502,7 +2546,7 @@ export type User = {
   id: Scalars['ID']
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
-  mobile: Scalars['String']
+  mobile?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
@@ -2565,7 +2609,7 @@ export type UserInput = {
   email?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
-  mobile: Scalars['String']
+  mobile?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
@@ -2582,6 +2626,11 @@ export type VsExport = {
   fileSize: Scalars['String']
   startDate: Scalars['Date']
   url: Scalars['String']
+}
+
+export type ValidatorInput = {
+  operation: Scalars['String']
+  parameters?: InputMaybe<Array<Scalars['Int']>>
 }
 
 export type VerifyPasswordResult = {
@@ -2997,7 +3046,8 @@ export type FetchUserQuery = {
     creationDate: string
     username?: string | null
     practitionerId: string
-    mobile: string
+    mobile?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     role: {
@@ -3279,32 +3329,31 @@ export type SearchEventsQuery = {
   } | null
 }
 
-export type ResendSmsInviteMutationVariables = Exact<{
+export type ResendInviteMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type ResendSmsInviteMutation = {
+export type ResendInviteMutation = {
   __typename?: 'Mutation'
-  resendSMSInvite?: string | null
+  resendInvite?: string | null
 }
 
-export type UsernameSmsReminderMutationVariables = Exact<{
+export type UsernameReminderMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type UsernameSmsReminderMutation = {
+export type UsernameReminderMutation = {
   __typename?: 'Mutation'
-  usernameSMSReminder?: string | null
+  usernameReminder?: string | null
 }
 
-export type ResetPasswordSmsMutationVariables = Exact<{
+export type ResetPasswordInviteMutationVariables = Exact<{
   userId: Scalars['String']
-  applicationName: Scalars['String']
 }>
 
-export type ResetPasswordSmsMutation = {
+export type ResetPasswordInviteMutation = {
   __typename?: 'Mutation'
-  resetPasswordSMS?: string | null
+  resetPasswordInvite?: string | null
 }
 
 export type SearchUsersQueryVariables = Exact<{
@@ -3323,7 +3372,8 @@ export type SearchUsersQuery = {
       id: string
       username?: string | null
       systemRole: SystemRoleType
-      mobile: string
+      mobile?: string | null
+      email?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -3387,7 +3437,8 @@ export type GetUserQuery = {
     __typename?: 'User'
     id: string
     username?: string | null
-    mobile: string
+    mobile?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
@@ -3845,6 +3896,11 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4155,6 +4211,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4554,6 +4615,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -4847,6 +4913,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'Location'
         id: string
         name?: string | null
+        address?: {
+          __typename?: 'Address'
+          state?: string | null
+          district?: string | null
+        } | null
       } | null
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
@@ -5654,6 +5725,7 @@ export type GetOidpUserInfoQuery = {
     __typename?: 'UserInfo'
     districtFhirId?: string | null
     stateFhirId?: string | null
+    locationLevel3FhirId?: string | null
     oidpUserInfo?: {
       __typename?: 'OIDPUserInfo'
       sub: string
@@ -7689,6 +7761,18 @@ export type ChangePhoneMutation = {
   changePhone?: string | null
 }
 
+export type ChangeEmailMutationVariables = Exact<{
+  userId: Scalars['String']
+  email: Scalars['String']
+  nonce: Scalars['String']
+  verifyCode: Scalars['String']
+}>
+
+export type ChangeEmailMutation = {
+  __typename?: 'Mutation'
+  changeEmail?: string | null
+}
+
 export type GetUserByMobileQueryVariables = Exact<{
   mobile?: InputMaybe<Scalars['String']>
 }>
@@ -7699,7 +7783,26 @@ export type GetUserByMobileQuery = {
     __typename?: 'User'
     id: string
     username?: string | null
-    mobile: string
+    mobile?: string | null
+    email?: string | null
+    systemRole: SystemRoleType
+    status: Status
+    role: { __typename?: 'Role'; _id: string }
+  } | null
+}
+
+export type GetUserByEmailQueryVariables = Exact<{
+  email?: InputMaybe<Scalars['String']>
+}>
+
+export type GetUserByEmailQuery = {
+  __typename?: 'Query'
+  getUserByEmail?: {
+    __typename?: 'User'
+    id: string
+    username?: string | null
+    mobile?: string | null
+    email?: string | null
     systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'Role'; _id: string }
@@ -8103,7 +8206,6 @@ export type GetTotalMetricsQuery = {
       maleEstimation: number
       femaleEstimation: number
       locationId: string
-      estimationYear: number
       locationLevel: string
     }
     results: Array<{

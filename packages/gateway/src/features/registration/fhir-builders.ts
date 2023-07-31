@@ -753,6 +753,14 @@ function createAgeOfIndividualInYearsBuilder(
       valueString: fieldValue
     })
   }
+
+  // for storing an assumed birthdate when exact DOB is not known
+  const birthYear =
+    new Date().getFullYear() - parseInt(fieldValue.toString(), 10)
+  const firstDayOfBirthYear = new Date(birthYear, 0, 1)
+  resource.birthDate = `${firstDayOfBirthYear.getFullYear()}-${String(
+    firstDayOfBirthYear.getMonth() + 1
+  ).padStart(2, '0')}-${String(firstDayOfBirthYear.getDate()).padStart(2, '0')}`
 }
 
 function createEducationalAttainmentBuilder(

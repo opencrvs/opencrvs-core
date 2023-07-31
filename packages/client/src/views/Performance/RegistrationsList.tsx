@@ -61,6 +61,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
 import { useAuthorization } from '@client/hooks/useAuthorization'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -122,7 +123,7 @@ type IProps = RouteComponentProps &
   IConnectProps &
   IDispatchProps
 
-export enum EVENT_OPTIONS {
+enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
@@ -500,6 +501,11 @@ function RegistrationListComponent(props: IProps) {
       finalContent = content.results.map(
         (result: IDynamicValues, index: number) => ({
           ...result,
+          month: formatLongDate(
+            new Date(result.month).toISOString(),
+            intl.locale,
+            'MMMM yyyy'
+          ),
           total: String(result.total),
           delayed: showWithTooltip(
             result.total,

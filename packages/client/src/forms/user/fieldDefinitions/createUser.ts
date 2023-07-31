@@ -47,7 +47,7 @@ export const userSectionFormType: ISerializedFormSection = {
           required: false,
           hidden: true,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'registrationOffice',
@@ -57,7 +57,7 @@ export const userSectionFormType: ISerializedFormSection = {
           initialValue: '',
           searchableResource: ['offices'],
           searchableType: ['CRVS_OFFICE'],
-          validate: [
+          validator: [
             {
               operation: 'officeMustBeSelected'
             }
@@ -86,7 +86,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.firstNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -104,7 +104,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validator: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -123,7 +123,7 @@ export const userSectionFormType: ISerializedFormSection = {
           previewGroup: 'userNameGroup',
           required: false,
           initialValue: '',
-          validate: [],
+          validator: [],
           readonly: true,
           hidden: true
         },
@@ -131,9 +131,9 @@ export const userSectionFormType: ISerializedFormSection = {
           name: 'phoneNumber',
           type: TEXT,
           label: userFormMessages.phoneNumber,
-          required: true,
+          required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms',
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat' }],
+          validator: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
               operation: 'msisdnTransformer',
@@ -146,12 +146,20 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
+          name: 'email',
+          type: TEXT,
+          label: userFormMessages.email,
+          required: window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
+          initialValue: '',
+          validator: [{ operation: 'emailAddressFormat' }]
+        },
+        {
           name: 'nid',
           type: TEXT,
           label: userFormMessages.NID,
           required: false,
           initialValue: '',
-          validate: [
+          validator: [
             {
               operation: 'validIDNumber',
               parameters: [NATIONAL_ID]
@@ -178,7 +186,7 @@ export const userSectionFormType: ISerializedFormSection = {
           },
           initialValue: '',
           ignoreBottomMargin: true,
-          validate: [],
+          validator: [],
           conditionals: []
         },
         {
@@ -187,7 +195,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.role,
           required: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           options: [],
           conditionals: []
         },
@@ -199,7 +207,7 @@ export const userSectionFormType: ISerializedFormSection = {
           hidden: true,
           hideValueInPreview: true,
           initialValue: '',
-          validate: [],
+          validator: [],
           conditionals: []
         },
 
@@ -209,20 +217,14 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userDevice,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         }
       ]
     },
     {
       id: 'signature-attachment',
       title: userFormMessages.userSignatureAttachmentTitle,
-      conditionals: [
-        {
-          action: 'hide',
-          expression:
-            'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
-        }
-      ],
+      conditionals: [],
       fields: [
         {
           name: 'attachmentTitle',
@@ -231,7 +233,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.userAttachmentSection,
           required: false,
           initialValue: '',
-          validate: []
+          validator: []
         },
         {
           name: 'signature',
@@ -240,8 +242,8 @@ export const userSectionFormType: ISerializedFormSection = {
           description: userFormMessages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
-          required: true,
-          validate: []
+          required: false,
+          validator: []
         }
       ]
     }

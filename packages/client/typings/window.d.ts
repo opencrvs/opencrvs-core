@@ -50,6 +50,7 @@ interface Window {
       }
       PRINT_IN_ADVANCE: boolean
     }
+    MARRIAGE_REGISTRATION: boolean
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
@@ -57,6 +58,7 @@ interface Window {
     MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
+    USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string

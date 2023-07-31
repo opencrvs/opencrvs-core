@@ -30,7 +30,7 @@ import {
   CancelButton
 } from '@client/views/SysAdmin/Config/Application/Components'
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import SignatureCanvas from 'react-signature-canvas'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { EMPTY_STRING } from '@client/utils/constants'
@@ -118,7 +118,7 @@ export function SignatureGenerator({
               </SecondaryButton>
               <CustomImageUpload
                 id="signature-file-upload"
-                title="Upload"
+                title={intl.formatMessage(buttonMessages.upload)}
                 handleFileChange={async (file) => {
                   const fileSizeMB = file.size / (1024 * 1024) // convert bytes to megabytes
                   if (fileSizeMB > 2) {

@@ -21,7 +21,7 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
-  mobile: string
+  mobile?: string
   scope: string[]
   status: string
   username: string

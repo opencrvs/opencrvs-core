@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
@@ -22,7 +22,9 @@ interface IVerifyPayload {
 }
 
 interface IVerifyResponse {
-  mobile: string
+  name: IUserName[]
+  mobile?: string
+  email?: string
   scope: string[]
   status: string
   id: string
@@ -41,11 +43,23 @@ export default async function verifyPassHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (generateHash(password, user.salt) !== user.passwordHash) {
+  /*
+   * In OCRVS-4979 we needed to change the hashing algorithm to conform latest security standards.
+   * We still need to support users logging in with the old password hash to allow them to change their passwords to the new hash.
+   *
+   * TODO: In OpenCRVS 1.4, remove this check and force any users without new password hash to reset their password via sys admin.
+   */
+  if (!user.passwordHash) {
+    if (generateHash(password, user.salt) !== user.oldPasswordHash) {
+      throw unauthorized()
+    }
+  } else if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
   const response: IVerifyResponse = {
+    name: user.name,
     mobile: user.mobile,
+    email: user.emailForNotification,
     scope: user.scope,
     status: user.status,
     id: user.id,
@@ -60,7 +74,15 @@ export const requestSchema = Joi.object({
 })
 
 export const responseSchema = Joi.object({
-  mobile: Joi.string(),
+  name: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()).required(),
+      use: Joi.string().required(),
+      family: Joi.string().required()
+    }).unknown(true)
+  ),
+  mobile: Joi.string().optional(),
+  email: Joi.string().allow(null, '').optional(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string(),

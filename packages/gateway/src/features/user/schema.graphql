@@ -47,7 +47,7 @@ input UserInput {
   name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String!
+  mobile: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -86,7 +86,7 @@ type User {
   practitionerId: String!
   name: [HumanName!]! # -> .name
   username: String
-  mobile: String!
+  mobile: String
   systemRole: SystemRoleType!
   role: Role!
   email: String
@@ -148,9 +148,11 @@ input AvatarInput {
 type Query {
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
+  getUserByEmail(email: String): User
   searchUsers(
     username: String
     mobile: String
+    email: String
     status: String
     systemRole: String
     primaryOfficeId: String
@@ -192,6 +194,12 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
+  changeEmail(
+    userId: String!
+    email: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
   changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
@@ -199,7 +207,7 @@ type Mutation {
     reason: String!
     comment: String
   ): String
-  resendSMSInvite(userId: String!): String
-  usernameSMSReminder(userId: String!): String
-  resetPasswordSMS(userId: String!, applicationName: String!): String
+  resendInvite(userId: String!): String
+  usernameReminder(userId: String!): String
+  resetPasswordInvite(userId: String!): String
 }

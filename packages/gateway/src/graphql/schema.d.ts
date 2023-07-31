@@ -33,6 +33,7 @@ export interface GQLQuery {
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
   getUserByMobile?: GQLUser
+  getUserByEmail?: GQLUser
   searchUsers?: GQLSearchUserResult
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
@@ -94,11 +95,12 @@ export interface GQLMutation {
   activateUser?: string
   changePassword?: string
   changePhone?: string
+  changeEmail?: string
   changeAvatar?: GQLAvatar
   auditUser?: string
-  resendSMSInvite?: string
-  usernameSMSReminder?: string
-  resetPasswordSMS?: string
+  resendInvite?: string
+  usernameReminder?: string
+  resetPasswordInvite?: string
   updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
@@ -288,7 +290,7 @@ export interface GQLUser {
   practitionerId: string
   name: Array<GQLHumanName>
   username?: string
-  mobile: string
+  mobile?: string
   systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
@@ -581,7 +583,6 @@ export interface GQLNotificationInput {
 export interface GQLCreatedIds {
   compositionId?: string
   trackingId?: string
-  registrationNumber?: string
   isPotentiallyDuplicate?: boolean
 }
 
@@ -652,7 +653,7 @@ export interface GQLUserInput {
   name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile: string
+  mobile?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -689,7 +690,7 @@ export interface GQLSystemRoleInput {
 }
 
 export interface GQLCertificateSVGInput {
-  id: string
+  id?: string
   svgCode: string
   svgFilename: string
   svgDateUpdated?: number
@@ -706,6 +707,7 @@ export interface GQLApplicationConfiguration {
   CURRENCY?: GQLCurrency
   DEATH?: GQLDeath
   MARRIAGE?: GQLMarriage
+  MARRIAGE_REGISTRATION?: boolean
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
@@ -1022,6 +1024,7 @@ export interface GQLIdentifier {
 
 export const enum GQLLocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
+  COMMUNITY = 'COMMUNITY',
   HOSPITAL = 'HOSPITAL',
   OTHER_HEALTH_INSTITUTION = 'OTHER_HEALTH_INSTITUTION',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
@@ -1094,7 +1097,6 @@ export interface GQLEstimation {
   maleEstimation: number
   femaleEstimation: number
   locationId: string
-  estimationYear: number
   locationLevel: string
 }
 
@@ -1445,18 +1447,32 @@ export interface GQLQuestionInput {
   label?: Array<GQLMesssageInput>
   placeholder?: Array<GQLMesssageInput>
   description?: Array<GQLMesssageInput>
+  helperText?: Array<GQLMesssageInput>
   tooltip?: Array<GQLMesssageInput>
+  unit?: Array<GQLMesssageInput>
   errorMessage?: Array<GQLMesssageInput>
+  initialValue?: string
   maxLength?: number
+  inputWidth?: number
   fieldName?: string
   fieldType?: GQLCustomFieldType
   precedingFieldId: string
+  validateEmpty?: boolean
   required?: boolean
   enabled?: string
   custom?: boolean
+  ignoreBottomMargin?: boolean
   conditionals?: Array<GQLConditionalInput>
   datasetId?: string
   options?: Array<GQLCustomSelectOption>
+  validator?: Array<GQLValidatorInput>
+  mapping?: GQLMappingInput
+  extraValue?: string
+  dynamicOptions?: GQLDynamicOptionInput
+  hideInPreview?: boolean
+  optionCondition?: string
+  hideHeader?: boolean
+  previewGroup?: string
 }
 
 export interface GQLSystemSettingsInput {
@@ -1961,7 +1977,9 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH',
-  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS',
+  TIME = 'TIME'
 }
 
 export interface GQLConditionalInput {
@@ -1972,6 +1990,22 @@ export interface GQLConditionalInput {
 export interface GQLCustomSelectOption {
   value: string
   label: GQLMesssageDescriptorInput
+}
+
+export interface GQLValidatorInput {
+  operation: string
+  parameters?: Array<number>
+}
+
+export interface GQLMappingInput {
+  mutation: GQLOperation
+  query: GQLOperation
+}
+
+export interface GQLDynamicOptionInput {
+  resource?: string
+  dependency: string
+  jurisdictionType?: string
 }
 
 export interface GQLPayment {
@@ -2040,6 +2074,10 @@ export interface GQLMesssageDescriptorInput {
   id: string
   description?: string
   defaultMessage: string
+}
+
+export interface GQLOperation {
+  operation: string
 }
 
 export const enum GQLPaymentType {
@@ -2217,6 +2255,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
+  getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
@@ -2548,9 +2587,22 @@ export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetUserByEmailArgs {
+  email?: string
+}
+export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetUserByEmailArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   systemRole?: string
   primaryOfficeId?: string
@@ -2962,11 +3014,12 @@ export interface GQLMutationTypeResolver<TParent = any> {
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
   changePhone?: MutationToChangePhoneResolver<TParent>
+  changeEmail?: MutationToChangeEmailResolver<TParent>
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
-  resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
-  usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
-  resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
+  resendInvite?: MutationToResendInviteResolver<TParent>
+  usernameReminder?: MutationToUsernameReminderResolver<TParent>
+  resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
@@ -3523,6 +3576,21 @@ export interface MutationToChangePhoneResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface MutationToChangeEmailArgs {
+  userId: string
+  email: string
+  nonce: string
+  verifyCode: string
+}
+export interface MutationToChangeEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangeEmailArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToChangeAvatarArgs {
   userId: string
   avatar: GQLAvatarInput
@@ -3551,47 +3619,43 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface MutationToResendSMSInviteArgs {
+export interface MutationToResendInviteArgs {
   userId: string
 }
-export interface MutationToResendSMSInviteResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface MutationToResendInviteResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: MutationToResendSMSInviteArgs,
+    args: MutationToResendInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToUsernameSMSReminderArgs {
+export interface MutationToUsernameReminderArgs {
   userId: string
 }
-export interface MutationToUsernameSMSReminderResolver<
+export interface MutationToUsernameReminderResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToUsernameSMSReminderArgs,
+    args: MutationToUsernameReminderArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToResetPasswordSMSArgs {
+export interface MutationToResetPasswordInviteArgs {
   userId: string
-  applicationName: string
 }
-export interface MutationToResetPasswordSMSResolver<
+export interface MutationToResetPasswordInviteResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToResetPasswordSMSArgs,
+    args: MutationToResetPasswordInviteArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -6382,7 +6446,6 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
-  registrationNumber?: CreatedIdsToRegistrationNumberResolver<TParent>
   isPotentiallyDuplicate?: CreatedIdsToIsPotentiallyDuplicateResolver<TParent>
 }
 
@@ -6399,18 +6462,6 @@ export interface CreatedIdsToCompositionIdResolver<
 }
 
 export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CreatedIdsToRegistrationNumberResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
@@ -6503,6 +6554,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
   MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
+  MARRIAGE_REGISTRATION?: ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
@@ -6577,6 +6629,18 @@ export interface ApplicationConfigurationToDEATHResolver<
 }
 
 export interface ApplicationConfigurationToMARRIAGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<
   TParent = any,
   TResult = any
 > {
@@ -8324,7 +8388,6 @@ export interface GQLEstimationTypeResolver<TParent = any> {
   maleEstimation?: EstimationToMaleEstimationResolver<TParent>
   femaleEstimation?: EstimationToFemaleEstimationResolver<TParent>
   locationId?: EstimationToLocationIdResolver<TParent>
-  estimationYear?: EstimationToEstimationYearResolver<TParent>
   locationLevel?: EstimationToLocationLevelResolver<TParent>
 }
 
@@ -8365,18 +8428,6 @@ export interface EstimationToFemaleEstimationResolver<
 }
 
 export interface EstimationToLocationIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EstimationToEstimationYearResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
