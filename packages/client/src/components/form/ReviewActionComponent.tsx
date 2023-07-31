@@ -37,7 +37,6 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
-  disableSubmit: boolean
 }
 
 const Container = styled.div`
@@ -116,7 +115,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.reviewActionDescriptionComplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -135,7 +138,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.reviewActionDescriptionIncomplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -304,9 +311,9 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl,
-      disableSubmit
+      intl
     } = this.props
+
 
     const background = !completeDeclaration
       ? 'error'
@@ -336,6 +343,7 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {intl.formatMessage(actionContent.description.message, {
+              ...actionContent.description.payload,
               eventType: declaration.event
             })}
           </Description>
@@ -368,7 +376,7 @@ class ReviewActionComponent extends React.Component<
                 size="large"
                 id="submit_form"
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded || disableSubmit}
+                disabled={totalFileSizeExceeded}
               >
                 <Upload />
                 {intl.formatMessage(

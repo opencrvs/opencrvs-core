@@ -390,6 +390,7 @@ type MarriageRegistration implements EventRegistration {
   id: ID!
   _fhirIDMap: Map
   registration: Registration
+  informant: RelatedPerson
   bride: Person
   groom: Person
   witnessOne: RelatedPerson
@@ -664,7 +665,6 @@ type System {
 type SMSNotification {
   id: String
   name: String!
-  message: String!
   enabled: Boolean!
   updatedAt: String!
   createdAt: String!
@@ -743,6 +743,7 @@ input DeathRegistrationInput {
 input MarriageRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
+  informant: RelatedPersonInput
   bride: PersonInput
   groom: PersonInput
   witnessOne: RelatedPersonInput
@@ -918,6 +919,7 @@ type Registration {
   witnessOneSignatureURI: String
   witnessTwoSignatureURI: String
   contactPhoneNumber: String
+  contactEmail: String
   status: [RegWorkflow]
   type: RegistrationType
   inCompleteFields: String
@@ -1279,6 +1281,7 @@ input RegistrationInput {
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
+  contactEmail: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String

@@ -11,29 +11,34 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { sendNotification, ISMSPayload } from '@notification/features/sms/utils'
+import {
+  sendNotification,
+  IEventMessageRecipient
+} from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
 import { messageKeys } from '@notification/i18n/messages'
 
-export interface IInProgressPayload extends ISMSPayload {
+export interface IInProgressPayload extends IEventMessageRecipient {
   trackingId: string
   crvsOffice: string
 }
 
-export interface IDeclarationPayload extends ISMSPayload {
+export interface IDeclarationPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
 }
 
-export interface IRegistrationPayload extends ISMSPayload {
+export interface IRegistrationPayload extends IEventMessageRecipient {
   name: string
+  informantName: string
   registrationNumber: string
   trackingId: string
 }
 
-export interface IRejectionPayload extends ISMSPayload {
+export interface IRejectionPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
+  informantName: string
 }
 
 export async function sendBirthInProgressConfirmation(
@@ -50,9 +55,14 @@ export async function sendBirthInProgressConfirmation(
   await sendNotification(
     request,
     {
-      sms: templateName
+      sms: templateName,
+      email: templateName
     },
-    { sms: payload.msisdn },
+    {
+      sms: payload.recipient.sms,
+      email: payload.recipient.email
+    },
+    'informant',
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
@@ -74,8 +84,9 @@ export async function sendBirthDeclarationConfirmation(
   const templateName = messageKeys.birthDeclarationNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
       trackingId: payload.trackingId
@@ -97,10 +108,12 @@ export async function sendBirthRegistrationConfirmation(
   const templateName = messageKeys.birthRegistrationNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
     }
@@ -122,10 +135,12 @@ export async function sendBirthRejectionConfirmation(
   const templateName = messageKeys.birthRejectionNotification
   await sendNotification(
     request,
-    { sms: templateName },
-    { sms: payload.msisdn },
+    { sms: templateName, email: templateName },
+    { sms: payload.recipient.sms, email: payload.recipient.email },
+    'informant',
     {
       name: payload.name,
+      informantName: payload.informantName,
       trackingId: payload.trackingId
     }
   )
@@ -133,26 +148,39 @@ export async function sendBirthRejectionConfirmation(
 }
 
 export const inProgressNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
+  recipient: Joi.object({
+    email: Joi.string().allow(null),
+    sms: Joi.string().allow(null)
+  }),
   trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required()
 })
 
 export const declarationNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
+  recipient: Joi.object({
+    email: Joi.string().allow(null),
+    sms: Joi.string().allow(null)
+  }),
   trackingId: Joi.string().length(7).required(),
   name: Joi.string().required()
 })
 
 export const registrationNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
+  recipient: Joi.object({
+    email: Joi.string().allow(null),
+    sms: Joi.string().allow(null)
+  }),
   name: Joi.string().required(),
+  informantName: Joi.string(),
   trackingId: Joi.string().length(7).required(),
   registrationNumber: Joi.string().required()
 })
 
 export const rejectionNotificationSchema = Joi.object({
-  msisdn: Joi.string().required(),
+  recipient: Joi.object({
+    email: Joi.string().allow(null),
+    sms: Joi.string().allow(null)
+  }),
   trackingId: Joi.string().length(7).required(),
   name: Joi.string().required()
 })

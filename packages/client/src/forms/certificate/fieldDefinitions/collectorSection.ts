@@ -19,9 +19,9 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
-  TEXT,
-  ValidatorConditionalFactory
+  TEXT
 } from '@client/forms'
+import { builtInConditionals as conditionals } from '@client/forms/conditionals'
 import {
   identityOptions,
   identityHelperTextMapper,
@@ -29,6 +29,7 @@ import {
   identityTypeMapper
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
+import { validators } from '@client/forms/validators'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
@@ -252,9 +253,7 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
     ]
   }
 
-export const collectBirthCertificateFormSection: ValidatorConditionalFactory<
-  IFormSection
-> = ({ conditionals, validators }) => ({
+export const collectBirthCertificateFormSection: IFormSection = {
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -436,11 +435,9 @@ export const collectBirthCertificateFormSection: ValidatorConditionalFactory<
       ]
     }
   ]
-})
+}
 
-export const collectDeathCertificateFormSection: ValidatorConditionalFactory<
-  IFormSection
-> = ({ conditionals, validators }) => ({
+export const collectDeathCertificateFormSection: IFormSection = {
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -651,11 +648,9 @@ export const collectDeathCertificateFormSection: ValidatorConditionalFactory<
       ]
     }
   ]
-})
+}
 
-export const collectMarriageCertificateFormSection: ValidatorConditionalFactory<
-  IFormSection
-> = ({ conditionals, validators }) => ({
+export const collectMarriageCertificateFormSection: IFormSection = {
   id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
@@ -867,4 +862,4 @@ export const collectMarriageCertificateFormSection: ValidatorConditionalFactory<
       ]
     }
   ]
-})
+}

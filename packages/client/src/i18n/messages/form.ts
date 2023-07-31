@@ -17,6 +17,92 @@ export const formMessageDescriptors = {
     description: 'text for add file button',
     id: 'form.field.label.addFile'
   },
+  uploadFile: {
+    defaultMessage: 'Upload',
+    description: 'text for upload file button',
+    id: 'form.field.label.uploadFile'
+  },
+  iDType: {
+    id: 'form.field.label.iDType',
+    defaultMessage: 'Type of ID'
+  },
+  iDTypeAlienNumber: {
+    id: 'form.field.label.iDTypeAlienNumber',
+    defaultMessage: 'Alien Number'
+  },
+  iDTypeBRN: {
+    id: 'form.field.label.iDTypeBRN',
+    defaultMessage: 'Birth Registration Number'
+  },
+  iDTypeDrivingLicense: {
+    id: 'form.field.label.iDTypeDrivingLicense',
+    defaultMessage: 'Drivers License'
+  },
+  iDTypeDRN: {
+    id: 'form.field.label.iDTypeDRN',
+    defaultMessage: 'Death Registration Number'
+  },
+  iDTypeNationalID: {
+    id: 'form.field.label.iDTypeNationalID',
+    defaultMessage: 'National ID'
+  },
+  iDTypeNoID: {
+    id: 'form.field.label.iDTypeNoID',
+    defaultMessage: 'No ID available'
+  },
+  iDTypeOther: {
+    id: 'form.field.label.iDTypeOther',
+    defaultMessage: 'Other'
+  },
+  iDTypePassport: {
+    id: 'form.field.label.iDTypePassport',
+    defaultMessage: 'Passport'
+  },
+  iDTypeRefugeeNumber: {
+    id: 'form.field.label.iDTypeRefugeeNumber',
+    defaultMessage: 'Refugee Number'
+  },
+  helperTextNID: {
+    defaultMessage:
+      'The National ID can only be numeric and must be 10 digits long',
+    description: 'Helper text for nid input field',
+    id: 'form.field.helpertext.nid'
+  },
+  tooltipNationalID: {
+    defaultMessage:
+      'The National ID can only be numeric and must be 10 digits long',
+    description: 'Tooltip for form field: iD number',
+    id: 'form.field.tooltip.tooltipNationalID'
+  },
+  securityQuestionLabel: {
+    id: 'user.form.securityquestion.securityQuestionLabel',
+    defaultMessage: 'Security question {count}'
+  },
+  selectSecurityQuestion: {
+    id: 'user.form.securityquestion.selectSecurityQuestion',
+    defaultMessage: 'Select a security question'
+  },
+  answer: {
+    id: 'user.form.securityquestion.answer',
+    defaultMessage: 'Answer'
+  },
+  userFormSecurityQuestionsDescription: {
+    id: 'user.form.securityquestion.description',
+    defaultMessage:
+      'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.'
+  },
+  enterResponse: {
+    id: 'user.form.securityquestion.enterResponse',
+    defaultMessage: 'Enter a response to your chosen security question'
+  },
+  userFormSecurityQuestionsHeading: {
+    id: 'user.form.securityquestion.heading',
+    defaultMessage: 'Set your security questions'
+  },
+  userFormSecurityQuestionsTitle: {
+    id: 'user.form.securityquestion.title',
+    defaultMessage: 'Security questions'
+  },
   country: {
     defaultMessage: 'Country',
     description: 'Title for the country select',

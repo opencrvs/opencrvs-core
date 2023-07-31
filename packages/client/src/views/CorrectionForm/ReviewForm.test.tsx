@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { mockDeclarationData, createTestApp } from '@client/tests/util'
+import {
+  mockDeclarationData,
+  createTestApp,
+  flushPromises
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -116,13 +120,15 @@ describe('Review form for an declaration', () => {
           ...declaration.data,
           mother: {
             ...declaration.data.mother,
-            iD: '122456789'
+            iD: '1231313222'
           }
         }
       })
     )
     wrapper.update()
     await waitForElement(wrapper, '#continue_button')
+    await flushPromises()
+
     expect(
       wrapper.find('#continue_button').hostNodes().props().disabled
     ).toBeFalsy()

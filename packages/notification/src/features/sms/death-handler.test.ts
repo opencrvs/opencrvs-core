@@ -40,7 +40,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -67,7 +70,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -99,7 +105,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathInProgressSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
           trackingId: 'B123456'
         },
@@ -130,7 +139,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -157,7 +169,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -189,7 +204,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathDeclarationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -220,7 +238,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'D123456',
           registrationNumber: '20196816020000129'
@@ -248,7 +269,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823'
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          }
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -278,7 +302,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRegistrationSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'D123456',
           registrationNumber: '20196816020000129'
@@ -310,7 +337,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },
@@ -337,7 +367,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'childName',
           trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
@@ -369,7 +402,10 @@ describe('Verify death handlers', () => {
         method: 'POST',
         url: '/deathRejectionSMS',
         payload: {
-          msisdn: '447789778823',
+          recipient: {
+            sms: '447789778823',
+            email: 'email@email.com'
+          },
           name: 'অনিক',
           trackingId: 'B123456'
         },

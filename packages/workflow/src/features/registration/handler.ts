@@ -32,7 +32,10 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  mergePatientIdentifier
+  mergePatientIdentifier,
+  getSharedContactEmail,
+  getEmailAddress,
+  getInformantName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -48,7 +51,10 @@ import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  INFORMANT_CODE,
+  getTaskResource
+} from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   Events,
@@ -202,15 +208,21 @@ export async function createRegistrationHandler(
     }
 
     /* sending notification to the contact */
-    const msisdn = await getSharedContactMsisdn(payload)
-    if (!msisdn) {
+    const sms = await getSharedContactMsisdn(payload)
+    const email = await getSharedContactEmail(payload)
+    if (!sms && !email) {
       logger.info('createRegistrationHandler could not send event notification')
       return { resBundle, payloadForInvokingValidation: payload }
     }
     logger.info('createRegistrationHandler sending event notification')
-    sendEventNotification(payload, event, msisdn, {
-      Authorization: request.headers.authorization
-    })
+    sendEventNotification(
+      payload,
+      event,
+      { sms, email },
+      {
+        Authorization: request.headers.authorization
+      }
+    )
     return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
     logger.error(
@@ -324,16 +336,19 @@ export async function markEventAsRegisteredCallbackHandler(
     await sendBundleToHearth(bundle)
     //TODO: We have to configure sms and identify informant for marriage event
     if (event !== EVENT_TYPE.MARRIAGE) {
-      const phoneNo = await getPhoneNo(task, event)
-      const informantName = await getEventInformantName(composition, event)
+      const sms = await getPhoneNo(task, event)
+      const email = await getEmailAddress(task, event)
+      const informantName = await getInformantName(bundle, INFORMANT_CODE)
+      const name = await getEventInformantName(composition, event)
       /* sending notification to the contact */
-      if (phoneNo && informantName) {
+      if ((sms || email) && informantName) {
         logger.info(
           'markEventAsRegisteredCallbackHandler sending event notification'
         )
         sendRegisteredNotification(
-          phoneNo,
+          { sms, email },
           informantName,
+          name,
           trackingId,
           registrationNumber,
           event,

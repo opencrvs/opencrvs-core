@@ -18,11 +18,12 @@ import {
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
-  getInformantName,
+  getSubjectName,
   getTrackingId,
   getCRVSOfficeName,
   getRegistrationNumber,
-  concatenateName
+  concatenateName,
+  getInformantName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
@@ -30,19 +31,23 @@ import {
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
   DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
+  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  INFORMANT_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import {
   getInformantSMSNotification,
-  InformantSMSNotificationName,
+  InformantNotificationName,
   isInformantSMSNotificationEnabled
 } from './smsNotificationUtils'
 
 interface INotificationPayload {
-  msisdn: string
+  recipient: {
+    sms?: string | null
+    email?: string | null
+  }
   name?: string
   trackingId?: string
   crvsOffice?: string
@@ -74,11 +79,14 @@ export function convertStringToASCII(str: string): string {
     .reduce((acc, v) => acc.concat(v))
 }
 
-// TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getInformantName() )
+// TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getSubjectName() )
 export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
   event: Events,
-  msisdn: string,
+  recipient: {
+    sms?: string | null
+    email?: string | null
+  },
   authHeader: { Authorization: string }
 ) {
   const informantSMSNotifications = await getInformantSMSNotification(
@@ -86,19 +94,18 @@ export async function sendEventNotification(
   )
 
   const eventType = getEventType(fhirBundle)
-
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.birthInProgressSMS
+          InformantNotificationName.birthInProgressSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.birthInProgressSMS,
-          msisdn,
+          InformantNotificationName.birthInProgressSMS,
+          recipient,
           authHeader,
           {
             trackingId: getTrackingId(fhirBundle),
@@ -106,24 +113,28 @@ export async function sendEventNotification(
           }
         )
       }
-
       break
     case Events.BIRTH_NEW_DEC:
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.birthDeclarationSMS
+          InformantNotificationName.birthDeclarationSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.birthDeclarationSMS,
-          msisdn,
+          InformantNotificationName.birthDeclarationSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-            trackingId: getTrackingId(fhirBundle)
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -132,17 +143,22 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.birthRegistrationSMS
+          InformantNotificationName.birthRegistrationSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.birthRegistrationSMS,
-          msisdn,
+          InformantNotificationName.birthRegistrationSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            ),
             registrationNumber: getRegistrationNumber(
               getTaskResource(fhirBundle),
               EVENT_TYPE[eventType]
@@ -155,17 +171,22 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.birthRejectionSMS
+          InformantNotificationName.birthRejectionSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.birthRejectionSMS,
-          msisdn,
+          InformantNotificationName.birthRejectionSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-            trackingId: getTrackingId(fhirBundle)
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, CHILD_SECTION_CODE),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -174,13 +195,13 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.deathInProgressSMS
+          InformantNotificationName.deathInProgressSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.deathInProgressSMS,
-          msisdn,
+          InformantNotificationName.deathInProgressSMS,
+          recipient,
           authHeader,
           {
             trackingId: getTrackingId(fhirBundle),
@@ -194,17 +215,22 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.deathDeclarationSMS
+          InformantNotificationName.deathDeclarationSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.deathDeclarationSMS,
-          msisdn,
+          InformantNotificationName.deathDeclarationSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-            trackingId: getTrackingId(fhirBundle)
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -213,20 +239,25 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.deathRegistrationSMS
+          InformantNotificationName.deathRegistrationSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.deathRegistrationSMS,
-          msisdn,
+          InformantNotificationName.deathRegistrationSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             registrationNumber: getRegistrationNumber(
               getTaskResource(fhirBundle),
               EVENT_TYPE[eventType]
+            ),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
             )
           }
         )
@@ -236,17 +267,22 @@ export async function sendEventNotification(
       if (
         isInformantSMSNotificationEnabled(
           informantSMSNotifications,
-          InformantSMSNotificationName.deathRejectionSMS
+          InformantNotificationName.deathRejectionSMS
         )
       ) {
         logger.info(`sendEventNotification method for event: ${event}`)
         await sendNotification(
-          InformantSMSNotificationName.deathRejectionSMS,
-          msisdn,
+          InformantNotificationName.deathRejectionSMS,
+          recipient,
           authHeader,
           {
-            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-            trackingId: getTrackingId(fhirBundle)
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -254,8 +290,12 @@ export async function sendEventNotification(
 }
 
 export async function sendRegisteredNotification(
-  msisdn: string,
+  recipient: {
+    sms?: string | null
+    email?: string | null
+  },
   informantName: string,
+  name: string,
   trackingId: string,
   registrationNumber: string,
   eventType: EVENT_TYPE,
@@ -268,11 +308,12 @@ export async function sendRegisteredNotification(
     eventType === EVENT_TYPE.BIRTH &&
     isInformantSMSNotificationEnabled(
       informantSMSNotifications,
-      InformantSMSNotificationName.birthRegistrationSMS
+      InformantNotificationName.birthRegistrationSMS
     )
   ) {
-    await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
-      name: informantName,
+    await sendNotification('birthRegistrationSMS', recipient, authHeader, {
+      informantName,
+      name,
       trackingId,
       registrationNumber
     })
@@ -280,11 +321,12 @@ export async function sendRegisteredNotification(
     eventType === EVENT_TYPE.DEATH &&
     isInformantSMSNotificationEnabled(
       informantSMSNotifications,
-      InformantSMSNotificationName.deathRegistrationSMS
+      InformantNotificationName.deathRegistrationSMS
     )
   ) {
-    await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
-      name: informantName,
+    await sendNotification('deathRegistrationSMS', recipient, authHeader, {
+      informantName,
+      name,
       trackingId,
       registrationNumber
     })
@@ -293,17 +335,21 @@ export async function sendRegisteredNotification(
 
 async function sendNotification(
   smsType: string,
-  msisdn: string,
+  recipient: {
+    sms?: string | null
+    email?: string | null
+  },
   authHeader: { Authorization: string },
   notificationPayload: {
     name?: string
+    informantName?: string
     trackingId?: string
     crvsOffice?: string
     registrationNumber?: string
   }
 ) {
   const payload: INotificationPayload = {
-    msisdn,
+    recipient,
     ...notificationPayload
   }
   logger.info(
