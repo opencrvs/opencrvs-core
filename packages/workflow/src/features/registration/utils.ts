@@ -295,6 +295,7 @@ export async function sendRegisteredNotification(
     email?: string | null
   },
   informantName: string,
+  name: string,
   trackingId: string,
   registrationNumber: string,
   eventType: EVENT_TYPE,
@@ -311,7 +312,8 @@ export async function sendRegisteredNotification(
     )
   ) {
     await sendNotification('birthRegistrationSMS', recipient, authHeader, {
-      name: informantName,
+      informantName,
+      name,
       trackingId,
       registrationNumber
     })
@@ -323,7 +325,8 @@ export async function sendRegisteredNotification(
     )
   ) {
     await sendNotification('deathRegistrationSMS', recipient, authHeader, {
-      name: informantName,
+      informantName,
+      name,
       trackingId,
       registrationNumber
     })

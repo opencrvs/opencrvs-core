@@ -34,7 +34,8 @@ import {
   generateEmptyBundle,
   mergePatientIdentifier,
   getSharedContactEmail,
-  getEmailAddress
+  getEmailAddress,
+  getInformantName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -50,7 +51,10 @@ import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  INFORMANT_CODE,
+  getTaskResource
+} from '@workflow/features/registration/fhir/fhir-template'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   Events,
@@ -334,7 +338,8 @@ export async function markEventAsRegisteredCallbackHandler(
     if (event !== EVENT_TYPE.MARRIAGE) {
       const sms = await getPhoneNo(task, event)
       const email = await getEmailAddress(task, event)
-      const informantName = await getEventInformantName(composition, event)
+      const informantName = await getInformantName(bundle, INFORMANT_CODE)
+      const name = await getEventInformantName(composition, event)
       /* sending notification to the contact */
       if ((sms || email) && informantName) {
         logger.info(
@@ -343,6 +348,7 @@ export async function markEventAsRegisteredCallbackHandler(
         sendRegisteredNotification(
           { sms, email },
           informantName,
+          name,
           trackingId,
           registrationNumber,
           event,
