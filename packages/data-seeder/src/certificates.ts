@@ -10,33 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  COUNTRY_CONFIG_URL,
-  APPLICATION_CONFIG_URL,
-  DOCUMENTS_URL
-} from './constants'
+import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST } from './constants'
 import fetch from 'node-fetch'
-import { raise } from './utils'
+import { parseGQLResponse, raise } from './utils'
 import { TypeOf, z } from 'zod'
-
-async function uploadSvg(
-  fileData: string,
-  authHeader: { Authorization: string }
-) {
-  const url = new URL('upload-svg', DOCUMENTS_URL).toString()
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      ...authHeader,
-      'Content-Type': 'image/svg+xml'
-    },
-    body: Buffer.from(fileData)
-  })
-  if (!res.ok) {
-    raise(await res.json())
-  }
-  return (await res.json()).refUrl
-}
+import { print } from 'graphql'
+import gql from 'graphql-tag'
 
 type CertificateMeta = TypeOf<typeof CertificateSchema>[number]
 
@@ -65,57 +44,89 @@ async function getCertificate() {
   return parsedCertificates.data
 }
 
-async function uploadCertificate(token: string, certificate: CertificateMeta) {
-  const authHeader = {
-    Authorization: `Bearer ${token}`
-  }
-  const certificateSVG = {
-    svgCode: certificate.svgCode as string,
-    svgFilename: certificate.fileName,
-    user: 'jonathan.campbell',
-    event: certificate.event,
-    status: 'ACTIVE'
-  }
-
-  certificateSVG.svgCode = await uploadSvg(certificateSVG.svgCode, authHeader)
-
-  const res = await fetch(`${APPLICATION_CONFIG_URL}createCertificate`, {
-    method: 'POST',
-    body: JSON.stringify(certificateSVG),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
+const createCertificateQuery = print(gql`
+  mutation createCertificate($certificate: CertificateSVGInput!) {
+    createOrUpdateCertificateSVG(certificateSVG: $certificate) {
+      id
     }
-  })
-
-  if (res.status !== 201) {
-    return await Promise.reject(
-      new Error(
-        `Something went wrong on config service. Couldn't create certificate SVG`
-      )
-    )
   }
-  return await res.json()
+`)
+
+type CertificateInput = {
+  svgCode: string
+  svgFilename: string
+  user: string
+  event: CertificateMeta['event']
+  status: 'ACTIVE' | 'INACTIVE'
 }
 
-const activeCertificates = async (token: string) => {
-  const res = await fetch(`${APPLICATION_CONFIG_URL}getActiveCertificates`, {
-    method: 'GET',
+const getCertificateQuery = print(gql`
+  query getCertificate($status: CertificateStatus!, $event: Event!) {
+    getCertificateSVG(status: $status, event: $event) {
+      id
+    }
+  }
+`)
+
+async function certificatesAlreadyExist(
+  status: 'ACTIVE' | 'INACTIVE',
+  event: CertificateMeta['event'],
+  token: string
+) {
+  const res = await fetch(GATEWAY_GQL_HOST, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
-    }
+    },
+    body: JSON.stringify({
+      query: getCertificateQuery,
+      variables: { status, event }
+    })
   })
-  return await res.json()
+  const certificate = parseGQLResponse<{
+    getCertificateSVG: [{ id: string }] | null
+  }>(await res.json())
+  return Boolean(certificate.getCertificateSVG)
+}
+
+async function uploadCertificate(token: string, certificate: CertificateInput) {
+  if (
+    await certificatesAlreadyExist(certificate.status, certificate.event, token)
+  ) {
+    console.log(
+      `Certificate for "${certificate.event}" event already exists. Skipping`
+    )
+    return
+  }
+  const res = await fetch(GATEWAY_GQL_HOST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: createCertificateQuery,
+      variables: {
+        certificate
+      }
+    })
+  })
+  parseGQLResponse<{
+    createOrUpdateCertificateSVG: [{ id: string }]
+  }>(await res.json())
 }
 
 export async function seedCertificate(token: string) {
-  if ((await activeCertificates(token)).length === 0) {
-    const certificates = await getCertificate()
-    await Promise.all(
-      certificates.map(async (certificate) => {
-        await uploadCertificate(token, certificate)
+  const certificates = await getCertificate()
+  await Promise.all(
+    certificates.map(async ({ fileName, ...certificate }) => {
+      await uploadCertificate(token, {
+        ...certificate,
+        svgFilename: fileName,
+        user: 'o.admin',
+        status: 'ACTIVE'
       })
-    )
-  }
+    })
+  )
 }
