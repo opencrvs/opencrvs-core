@@ -208,7 +208,7 @@ class InProgressComponent extends React.Component<
         } else if (isMarriageEvent(reg)) {
           const groomNames = reg.groomName as GQLHumanName[]
           const groomNamesMap = createNamesMap(groomNames)
-          const brideNames = reg.groomName as GQLHumanName[]
+          const brideNames = reg.brideName as GQLHumanName[]
           const brideNamesMap = createNamesMap(brideNames)
           const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
           const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]
