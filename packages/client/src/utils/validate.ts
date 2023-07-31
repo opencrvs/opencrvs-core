@@ -260,6 +260,17 @@ export const minAgeGapExist = (
   return diff >= minAgeGap
 }
 
+export const isValidDate: Validation = (value: IFormFieldValue, drafts?) => {
+  const cast = value as string
+  return !cast
+    ? { message: messages.required }
+    : cast && isAValidDateFormat(cast)
+    ? undefined
+    : {
+        message: messages.isValidDate
+      }
+}
+
 export const isValidBirthDate: Validation = (
   value: IFormFieldValue,
   drafts?
