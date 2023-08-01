@@ -35,6 +35,7 @@
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",
     "check:license": "license-check-and-add check -f license-config.json",
+    "seed": "lerna run seed --scope @opencrvs/data-seeder",
     "add:license": "license-check-and-add add -f license-config.json",
     "build:components": "lerna run build --scope @opencrvs/components"
   },
