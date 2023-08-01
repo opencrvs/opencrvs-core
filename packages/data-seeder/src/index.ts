@@ -40,7 +40,9 @@ async function main() {
   const token = await getToken()
   const roleIdMap = await seedRoles(token)
   await seedLocations(token)
+  console.log('Seeding users')
   await seedUsers(token, roleIdMap)
+  console.log('Seeding certificates')
   await seedCertificate(token)
 }
 

@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export function raise(msg: string): never {
-  console.log(new Error().stack)
   console.log(msg)
   process.exit(1)
 }
