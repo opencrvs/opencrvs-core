@@ -230,10 +230,7 @@ function FormAppBar({
       return true
     }
 
-    return !isEqual(
-      declaration.originalData[section.id],
-      declaration.data[section.id]
-    )
+    return !isEqual(declaration.originalData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
