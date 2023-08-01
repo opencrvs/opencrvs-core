@@ -375,7 +375,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       })
     }
-    if (fieldNames.includes('iD')) {
+    if (
+      fieldNames.includes('iD') ||
+      fieldNames.includes('deceasedID') ||
+      fieldNames.includes('informantID')
+    ) {
       searchTypeList.splice(2, 0, {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
