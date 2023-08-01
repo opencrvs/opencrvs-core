@@ -248,10 +248,6 @@ const messagesToDefine = {
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
   },
-  civilRegistrationCentre: {
-    id: 'review.header.title.civilRegistrationCentre',
-    defineMessage: 'Civil Registration Centre'
-  },
   clear: {
     defaultMessage: 'Clear',
     description: 'Label for button that clear signature input',

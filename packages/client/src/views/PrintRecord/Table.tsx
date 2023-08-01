@@ -72,7 +72,13 @@ import { IValidationResult } from '@client/utils/validate'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import styled from 'styled-components'
-import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors,
+  formMessages,
+  userMessages
+} from '@client/i18n/messages'
 import {
   getValidationErrorsForForm,
   IFieldErrors
@@ -84,6 +90,7 @@ import {
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { Checkbox } from '@opencrvs/components/lib'
+import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
@@ -144,7 +151,36 @@ const DocumentTypeBox = styled.div`
     margin-top: 8px;
   }
 `
-export function renderSelectOrRadioLabel(
+const SignatureBox = styled.div`
+  margin-top: 8px;
+  height: 66px;
+  display: flex;
+  border-radius: 4px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.bold14}
+  padding: 4px 8px;
+`
+
+const WarningText = styled.p`
+  width: 100%;
+  margin-top: 64px;
+  text-align: center;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.negative};
+  color: ${({ theme }) => theme.colors.negative};
+  ${({ theme }) => theme.fonts.bold14}
+  line-height: 0.1em;
+  text-transform: uppercase;
+
+  span {
+    background: ${({ theme }) => theme.colors.white};
+    padding: 0 16px;
+  }
+`
+const StyledEM = styled.em`
+  ${({ theme }) => theme.fonts.reg14}
+`
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
   intls: IntlShape[]
@@ -401,7 +437,7 @@ function renderValue(
   return value
 }
 
-export const getErrorsOnFieldsBySection = (
+const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration
@@ -1040,7 +1076,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
   ) || []) as IDocumentUploaderWithOptionsFormField[]
   const leftColumnSize = Math.ceil(documentSectionFields.length / 2)
   return (
-    <>
+    <div>
       {transformedSectionData.map((section, idx) => (
         <StyledTable key={`${section.id}_${idx}`}>
           <StyledTHead>
@@ -1087,6 +1123,74 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           </tbody>
         </StyledTable>
       )}
-    </>
+      <SignatureBox>
+        {formatMessage(props.intls, reviewMessages.informantsSignature)}
+      </SignatureBox>
+      <WarningText>
+        <span>
+          {formatMessage(
+            props.intls,
+            printRecordMessages.warningDeclarationDetails
+          )}
+        </span>
+      </WarningText>
+      <StyledTable>
+        <StyledTHead>
+          <tr>
+            <StyledTH colSpan={2}>
+              {formatMessage(props.intls, formMessages.registrationTitle)}
+            </StyledTH>
+          </tr>
+        </StyledTHead>
+        <tbody>
+          <StyledTR>
+            <StyledTD colSpan={2}>
+              <StyledEM>
+                {formatMessage(
+                  props.intls,
+                  printRecordMessages.informantAttestation
+                )}
+              </StyledEM>
+            </StyledTD>
+          </StyledTR>
+          <StyledTR>
+            <StyledTD>
+              {formatMessage(
+                props.intls,
+                printRecordMessages.placeOfDeclaration
+              )}
+            </StyledTD>
+            <StyledTD></StyledTD>
+          </StyledTR>
+          <StyledTR>
+            <StyledTD>
+              {formatMessage(
+                props.intls,
+                printRecordMessages.civilRegistrationOffice
+              )}
+            </StyledTD>
+            <StyledTD></StyledTD>
+          </StyledTR>
+          <StyledTR>
+            <StyledTD>
+              {formatMessage(props.intls, constantsMessages.dateOfDeclaration)}
+            </StyledTD>
+            <StyledTD></StyledTD>
+          </StyledTR>
+          <StyledTR>
+            <StyledTD>
+              {formatMessage(
+                [props.intls[0]],
+                userMessages['REGISTRATION_AGENT']
+              )}
+            </StyledTD>
+            <StyledTD></StyledTD>
+          </StyledTR>
+        </tbody>
+      </StyledTable>
+      <SignatureBox>
+        {formatMessage(props.intls, formMessages.userAttachmentSection)}
+      </SignatureBox>
+    </div>
   )
 }

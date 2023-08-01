@@ -25,7 +25,8 @@ import { getLanguages } from '@client/i18n/selectors'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 
 const PageContainer = styled.div`
-  padding: 16px 24px;
+  padding: 16px;
+  background: ${({ theme }) => theme.colors.white};
 `
 export function PrintRecord() {
   const languages = useSelector(getLanguages)

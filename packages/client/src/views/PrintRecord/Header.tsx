@@ -20,6 +20,7 @@ import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { constantsMessages } from '@client/i18n/messages'
 import { formatMessage } from '@client/views/PrintRecord/utils'
+import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 
 interface PrintRecordHeaderProps {
   declaration: IDeclaration
@@ -67,7 +68,7 @@ export function PrintRecordHeader(props: PrintRecordHeaderProps) {
           {formatMessage(intls, reviewMessages.govtName)}
         </CapitalText>
         <Text variant="bold18" element="span">
-          {formatMessage(intls, reviewMessages.civilRegistrationCentre)}
+          {formatMessage(intls, printRecordMessages.civilRegistrationCentre)}
         </Text>
         <SubheaderText variant="bold12" element="span">
           {formatMessage(intls, reviewMessages.headerSubjectWithoutName, {
