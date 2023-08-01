@@ -230,10 +230,7 @@ function FormAppBar({
       return true
     }
 
-    return !isEqual(
-      declaration.originalData[section.id],
-      declaration.data[section.id]
-    )
+    return !isEqual(declaration.originalData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
@@ -649,9 +646,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         hash: newHash + '-form-input'
       })
     }
-    const oldIsWritingDraft = prevProps.isWritingDraft
-    const newIsWritingDraft = this.props.isWritingDraft
-    if (oldIsWritingDraft && !newIsWritingDraft) {
+    if (prevProps.activeSection.id !== this.props.activeSection.id) {
       const sectionValues =
         this.props.declaration.data[this.props.activeSection.id] || {}
       this.props.activeSectionGroup.fields.forEach((field) => {

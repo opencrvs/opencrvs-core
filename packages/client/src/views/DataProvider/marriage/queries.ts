@@ -153,6 +153,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         groomSignature
         groomSignatureURI
         brideSignature
@@ -443,6 +444,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         groomSignature
         groomSignatureURI
         brideSignature

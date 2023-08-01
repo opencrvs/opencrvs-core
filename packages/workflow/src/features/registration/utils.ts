@@ -295,8 +295,10 @@ export async function sendRegisteredNotification(
     email?: string | null
   },
   informantName: string,
+  name: string,
   trackingId: string,
   registrationNumber: string,
+  crvsOffice: string,
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
@@ -311,9 +313,11 @@ export async function sendRegisteredNotification(
     )
   ) {
     await sendNotification('birthRegistrationSMS', recipient, authHeader, {
-      name: informantName,
+      informantName,
+      name,
       trackingId,
-      registrationNumber
+      registrationNumber,
+      crvsOffice
     })
   } else if (
     eventType === EVENT_TYPE.DEATH &&
@@ -323,9 +327,11 @@ export async function sendRegisteredNotification(
     )
   ) {
     await sendNotification('deathRegistrationSMS', recipient, authHeader, {
-      name: informantName,
+      informantName,
+      name,
       trackingId,
-      registrationNumber
+      registrationNumber,
+      crvsOffice
     })
   }
 }
