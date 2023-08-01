@@ -26,7 +26,14 @@ import {
   ICheckboxFormField,
   ICheckboxGroupFormField,
   IRadioOption,
-  ISelectOption
+  ISelectOption,
+  BirthSection,
+  DeathSection,
+  MarriageSection,
+  Section,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IAttachment,
+  IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -64,6 +71,8 @@ import {
   hasFieldChanged
 } from '@client/views/CorrectionForm/utils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { messages as reviewMessages } from '@client/i18n/messages/views/review'
+import { Checkbox } from '@opencrvs/components/lib'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
@@ -109,6 +118,21 @@ const StyledTD = styled.td`
   }
 `
 
+const DocumentsTD = styled.td`
+  vertical-align: top;
+  padding: 0 8px;
+`
+const DocumentTypeBox = styled.div`
+  border-radius: 2px;
+  border: 1px solid ${({ theme }) => theme.colors.grey500};
+  padding: 2px 4px;
+  margin-left: 39px;
+  ${({ theme }) => theme.fonts.reg14}
+
+  :not(:first-child) {
+    margin-top: 8px;
+  }
+`
 export function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
@@ -412,10 +436,31 @@ export const getErrorsOnFieldsBySection = (
   }, {})
 }
 
+const DOCUMENT_SECTION_CODES: Section[] = [
+  BirthSection.Documents,
+  DeathSection.DeathDocuments,
+  MarriageSection.Documents
+]
 export function PrintRecordTable(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
   const intl = useIntl()
   const registerForm = useSelector(getRegisterForm)
+  function getLabelForDoc(
+    docFieldsWithOptions: IDocumentUploaderWithOptionsFormField[],
+    docForWhom: string,
+    docType: string
+  ) {
+    const { intls } = props
+    const matchedField = docFieldsWithOptions?.find(
+      (field) => field.extraValue === docForWhom
+    )
+    const matchedOption = matchedField?.options.find(
+      (option) => option.value === docType
+    )
+    return (
+      matchedField && matchedOption && formatMessage(intls, matchedOption.label)
+    )
+  }
   function fieldHasErrors(
     section: IFormSection,
     field: IFormField,
@@ -950,13 +995,46 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     errorsOnFields,
     offlineCountryConfiguration
   )
+  function renderDocumentBox(field: IDocumentUploaderWithOptionsFormField) {
+    const documents = props.declaration.data?.documents?.[
+      field.name
+    ] as IAttachment[]
+    return (
+      <div>
+        <Checkbox
+          name={field.name}
+          value="true"
+          selected={Boolean(documents.length)}
+          disabled
+          label={formatMessage(props.intls, field.label)}
+        ></Checkbox>
+        {documents.length > 0 &&
+          documents.map((doc, i) => (
+            <DocumentTypeBox key={`${doc.title}_${i}`}>
+              {getLabelForDoc(
+                documentSectionFields,
+                doc.optionValues[0],
+                doc.optionValues[1]
+              )}
+            </DocumentTypeBox>
+          ))}
+      </div>
+    )
+  }
+  const documentSection = registerForm[props.declaration.event].sections.find(
+    ({ id }) => DOCUMENT_SECTION_CODES.includes(id)
+  )
+  const documentSectionFields = (documentSection?.groups[0].fields.filter(
+    (field) => field.type === DOCUMENT_UPLOADER_WITH_OPTION
+  ) || []) as IDocumentUploaderWithOptionsFormField[]
+  const leftColumnSize = Math.ceil(documentSectionFields.length / 2)
   return (
     <>
       {transformedSectionData.map((section, idx) => (
         <StyledTable key={`${section.id}_${idx}`}>
           <StyledTHead>
             <tr>
-              <StyledTH colSpan={2}> {section.title}</StyledTH>
+              <StyledTH colSpan={2}>{section.title}</StyledTH>
             </tr>
           </StyledTHead>
           <tbody>
@@ -969,6 +1047,35 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           </tbody>
         </StyledTable>
       ))}
+      {documentSection && (
+        <StyledTable>
+          <StyledTHead>
+            <tr>
+              <StyledTH colSpan={2}>
+                {formatMessage(props.intls, reviewMessages.documentViewerTitle)}
+              </StyledTH>
+            </tr>
+          </StyledTHead>
+          <tbody>
+            {documentSectionFields
+              .slice(0, leftColumnSize)
+              .map((leftColumnField, index) => {
+                const rightColumnField =
+                  documentSectionFields[index + leftColumnSize]
+                return (
+                  <tr key={leftColumnField.name}>
+                    <DocumentsTD>
+                      {renderDocumentBox(leftColumnField)}
+                    </DocumentsTD>
+                    <DocumentsTD>
+                      {rightColumnField && renderDocumentBox(rightColumnField)}
+                    </DocumentsTD>
+                  </tr>
+                )
+              })}
+          </tbody>
+        </StyledTable>
+      )}
     </>
   )
 }
