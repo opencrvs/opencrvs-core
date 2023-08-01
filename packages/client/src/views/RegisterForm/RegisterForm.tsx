@@ -442,7 +442,12 @@ function FormAppBar({
                     {intl.formatMessage(buttonMessages.saveExitButton)}
                   </Button>
                 )}
-                <Button type="secondary" size="medium" onClick={handleExit}>
+                <Button
+                  id="exit-btn"
+                  type="secondary"
+                  size="medium"
+                  onClick={handleExit}
+                >
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
                 </Button>

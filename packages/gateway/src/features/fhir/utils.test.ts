@@ -30,8 +30,6 @@ import {
 } from '@gateway/utils/testUtils'
 import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
 import { clone, cloneDeep } from 'lodash'
-import { logger } from '@gateway/logger'
-import * as fetchAny from 'jest-fetch-mock'
 import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
 
 describe('Fhir util function testing', () => {
@@ -132,7 +130,6 @@ describe('Fhir util function testing', () => {
       )
     })
     it('throws error if person entry is missing from the bundle', async () => {
-      const logSpy = jest.spyOn(logger, 'error')
       const mockFhirBundleCloned = cloneDeep(mockFhirBundle)
       mockFhirBundleCloned.entry[4].fullUrl = 'Invalid'
 
