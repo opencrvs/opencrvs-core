@@ -544,7 +544,6 @@ export function storeDeclaration(
 export function modifyDeclaration(
   declaration: IDeclaration | IPrintableDeclaration
 ): IModifyDeclarationAction {
-  declaration.modifiedOn = Date.now()
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
@@ -610,6 +609,7 @@ export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
+  declaration.modifiedOn = Date.now()
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
