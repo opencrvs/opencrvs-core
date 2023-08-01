@@ -254,6 +254,7 @@ function FormAppBar({
   const handleSaveAndExit = async () => {
     const saveAndExitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
+        id="save_declaration_confirmation"
         autoHeight
         responsive={false}
         title={intl.formatMessage(messages.saveDeclarationConfirmModalTitle)}
@@ -434,6 +435,7 @@ function FormAppBar({
               <>
                 {!isCorrection(declaration) && (
                   <Button
+                    id="save-exit-btn"
                     type="primary"
                     size="medium"
                     onClick={handleSaveAndExit}
@@ -500,6 +502,7 @@ function FormAppBar({
             desktopRight={
               <>
                 <Button
+                  id="save-exit-btn"
                   type="primary"
                   size="medium"
                   onClick={handleSaveAndExit}

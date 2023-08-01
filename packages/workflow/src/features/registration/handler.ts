@@ -337,12 +337,12 @@ export async function markEventAsRegisteredCallbackHandler(
     await sendBundleToHearth(bundle)
     //TODO: We have to configure sms and identify informant for marriage event
     if (event !== EVENT_TYPE.MARRIAGE) {
-      const sms = await getPhoneNo(task, event)
-      const email = await getEmailAddress(task, event)
+      const sms = getPhoneNo(task, event)
+      const email = getEmailAddress(task, event)
       const informantName = await getInformantName(bundle, INFORMANT_CODE)
       const name = await getEventInformantName(composition, event)
-
       const crvsOffice = await getCRVSOfficeName(bundle)
+
       /* sending notification to the contact */
       if ((sms || email) && informantName) {
         logger.info(

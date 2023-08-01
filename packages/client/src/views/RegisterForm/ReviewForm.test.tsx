@@ -409,11 +409,10 @@ describe('ReviewForm tests', () => {
   it('redirect to home when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'IN_PROGRESS'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -456,11 +455,10 @@ describe('ReviewForm tests', () => {
   it('redirect to review tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'DECLARED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -503,11 +501,10 @@ describe('ReviewForm tests', () => {
   it('redirect to review tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'VALIDATED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -550,11 +547,10 @@ describe('ReviewForm tests', () => {
   it('redirect to update tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'REJECTED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -595,8 +591,11 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
-    declaration.data = birthDraftData
+    const declaration = createReviewDeclaration(
+      uuid(),
+      birthDraftData,
+      Event.Birth
+    )
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -637,8 +636,11 @@ describe('ReviewForm tests', () => {
   })
 
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
-    declaration.data = birthDraftData
+    const declaration = createReviewDeclaration(
+      uuid(),
+      birthDraftData,
+      Event.Birth
+    )
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({

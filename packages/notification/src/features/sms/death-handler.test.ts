@@ -54,6 +54,7 @@ describe('Verify death handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
+
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -144,7 +145,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -153,6 +156,7 @@ describe('Verify death handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
+
     it('returns 400 if called with invalid trackingId', async () => {
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -174,7 +178,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'childName',
-          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -209,7 +215,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -244,7 +252,9 @@ describe('Verify death handlers', () => {
           },
           name: 'অনিক',
           trackingId: 'D123456',
-          registrationNumber: '20196816020000129'
+          registrationNumber: '20196816020000129',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -308,7 +318,9 @@ describe('Verify death handlers', () => {
           },
           name: 'অনিক',
           trackingId: 'D123456',
-          registrationNumber: '20196816020000129'
+          registrationNumber: '20196816020000129',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -342,7 +354,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -372,7 +386,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'childName',
-          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -407,7 +423,9 @@ describe('Verify death handlers', () => {
             email: 'email@email.com'
           },
           name: 'অনিক',
-          trackingId: 'B123456'
+          trackingId: 'B123456',
+          crvsOffice: 'ALASKA',
+          informantName: 'Sadman Anik'
         },
         headers: {
           Authorization: `Bearer ${token}`
