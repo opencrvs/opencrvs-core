@@ -17,15 +17,22 @@ export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db.collection('certificates').insertOne({
-        event: 'marriage',
-        status: 'ACTIVE',
-        svgCode: marriageCertificateTemplateDefault,
-        svgDateCreated: Number(new Date()),
-        svgDateUpdated: Number(new Date()),
-        svgFilename: 'farajaland-marriage-certificate-v1.svg',
-        user: 'j.campbell'
-      })
+      const existingCertificates = await db
+        .collection('certificates')
+        .find({})
+        .toArray()
+
+      if (existingCertificates.length) {
+        await db.collection('certificates').insertOne({
+          event: 'marriage',
+          status: 'ACTIVE',
+          svgCode: marriageCertificateTemplateDefault,
+          svgDateCreated: Number(new Date()),
+          svgDateUpdated: Number(new Date()),
+          svgFilename: 'farajaland-marriage-certificate-v1.svg',
+          user: 'j.campbell'
+        })
+      }
     })
   } finally {
     console.log(`Migration - Add Marriage Certificate Configuration: Done.`)

@@ -629,6 +629,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
+  password?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -654,7 +655,7 @@ export interface GQLAvatarInput {
 }
 
 export interface GQLResponse {
-  msg: string
+  roleIdMap: GQLMap
 }
 
 export interface GQLSystemRoleInput {
@@ -6006,10 +6007,10 @@ export interface AvatarToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLResponseTypeResolver<TParent = any> {
-  msg?: ResponseToMsgResolver<TParent>
+  roleIdMap?: ResponseToRoleIdMapResolver<TParent>
 }
 
-export interface ResponseToMsgResolver<TParent = any, TResult = any> {
+export interface ResponseToRoleIdMapResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
