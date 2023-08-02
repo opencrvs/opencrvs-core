@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { GIT_HASH } from '@workflow/constants'
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 
@@ -32,6 +33,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
+          git_hash: GIT_HASH,
           status: 'ok'
         }
       },

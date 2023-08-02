@@ -103,6 +103,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
+import { GIT_HASH } from '@user-mgnt/constants'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -125,6 +126,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
+          git_hash: GIT_HASH,
           status: 'ok'
         }
       },

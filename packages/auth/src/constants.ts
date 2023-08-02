@@ -13,6 +13,8 @@ export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const AUTH_HOST = process.env.AUTH_HOST || '0.0.0.0'
 export const AUTH_PORT = process.env.AUTH_PORT || 4040
 export const HOSTNAME = process.env.DOMAIN || '*'
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'

@@ -15,7 +15,8 @@ import {
   AUTH_HOST,
   AUTH_PORT,
   DEFAULT_TIMEOUT,
-  HOSTNAME
+  HOSTNAME,
+  GIT_HASH
 } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
@@ -97,6 +98,7 @@ export async function createServer() {
     handler: (request: any, h: any) =>
       // Perform any health checks and return true or false for success prop
       ({
+        git_hash: GIT_HASH,
         status: 'ok'
       }),
     options: {

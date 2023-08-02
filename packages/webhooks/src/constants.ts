@@ -12,6 +12,8 @@
 export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/webhooks'
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 2525
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const CERT_PRIVATE_KEY_PATH =

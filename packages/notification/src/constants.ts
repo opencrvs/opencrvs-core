@@ -12,7 +12,7 @@
 
 export const HOST = process.env.HOST || 'localhost'
 export const PORT = process.env.PORT || 2020
-
+export const GIT_HASH = process.env.GIT_HASH || ''
 /*
   For these locales sms content will not be sent as unicoded payload
   In future based on our experience on different countries we can add more locals here

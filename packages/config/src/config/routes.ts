@@ -58,6 +58,8 @@ import {
   getFormDatasetHandler
 } from '@config/handlers/formDataset/handler'
 
+import { GIT_HASH } from './constants'
+
 export const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
@@ -77,6 +79,7 @@ export default function getRoutes() {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
+          git_hash: GIT_HASH,
           status: 'ok'
         }
       },

@@ -13,6 +13,8 @@ export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const HOST = process.env.HOST || 'localhost'
 export const HOSTNAME = process.env.DOMAIN || '*'
 export const PORT = process.env.PORT || 2021
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 // Services
 export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070/'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'

@@ -79,7 +79,7 @@ import {
   performanceDataRefreshHandler,
   refresh
 } from '@metrics/features/performance/viewRefresher'
-import { PRODUCTION, QA_ENV } from '@metrics/constants'
+import { PRODUCTION, QA_ENV, GIT_HASH } from '@metrics/constants'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -734,6 +734,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
+          git_hash: GIT_HASH,
           status: 'ok'
         }
       },

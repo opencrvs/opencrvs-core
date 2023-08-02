@@ -11,6 +11,8 @@
  */
 export const HOST = process.env.HOST || 'localhost'
 export const PORT = process.env.PORT || 3030
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/user-mgnt'
 export const NOTIFICATION_SERVICE_URL =

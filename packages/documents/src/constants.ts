@@ -11,6 +11,8 @@
  */
 export const HOST = process.env.DOCUMENTS_HOST || '0.0.0.0'
 export const PORT = process.env.DOCUMENTS_PORT || 9050
+export const GIT_HASH = process.env.GIT_HASH || ''
+
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
