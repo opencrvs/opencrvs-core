@@ -9,13 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  DangerButton,
-  ICON_ALIGNMENT,
-  PrimaryButton,
-  SuccessButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
@@ -25,6 +19,8 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { SubmissionAction } from '@client/forms'
 import styled from 'styled-components'
 import * as React from 'react'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
@@ -41,55 +37,48 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
-  disableSubmit: boolean
 }
 
 const Container = styled.div`
   position: relative;
-  margin-top: 32px;
-
+  margin-top: 48px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100vw;
-    margin: 32px -32px -32px -24px;
   }
 `
 const Content = styled.div`
   z-index: 1;
-  padding: 24px 32px;
+  padding: 32px;
   position: relative;
   white-space: pre-wrap;
   color: ${({ theme }) => theme.colors.copy};
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px;
     padding-bottom: 32px;
   }
 `
 const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
-      ? theme.colors.positive
+      ? theme.colors.greenLighter
       : background === 'error'
-      ? theme.colors.negative
-      : theme.colors.primary};
+      ? theme.colors.redLighter
+      : theme.colors.greenLighter};
   position: absolute;
-  border-radius: 4px;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.1;
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4}
-  margin-bottom: 8px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bold16}
-  }
+  ${({ theme }) => theme.fonts.h2}
+  margin-bottom: 12px;
 `
 const Description = styled.div`
   ${({ theme }) => theme.fonts.reg18};
-  margin-bottom: 16px;
+  margin-bottom: 32px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.reg16}
   }
@@ -126,7 +115,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.reviewActionDescriptionComplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -145,7 +138,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.reviewActionDescriptionIncomplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -314,8 +311,7 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl,
-      disableSubmit
+      intl
     } = this.props
 
     const background = !completeDeclaration
@@ -349,55 +345,60 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {intl.formatMessage(actionContent.description.message, {
+              ...actionContent.description.payload,
               eventType: declaration.event
             })}
           </Description>
           <ActionContainer>
             {declarationToBeRegistered ? (
-              <SuccessButton
+              <Button
+                type="positive"
+                size="large"
                 id="registerDeclarationBtn"
-                icon={() => <Check />}
                 onClick={this.toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
-                align={ICON_ALIGNMENT.LEFT}
               >
+                <Icon name="Check" />
                 {intl.formatMessage(buttonMessages.register)}
-              </SuccessButton>
+              </Button>
             ) : declarationToBeValidated ? (
-              <SuccessButton
+              <Button
+                type="positive"
+                size="large"
                 id="validateDeclarationBtn"
-                icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
                 disabled={!completeDeclaration || totalFileSizeExceeded}
-                align={ICON_ALIGNMENT.LEFT}
               >
+                <Icon name="PaperPlaneTilt" />
                 {intl.formatMessage(buttonMessages.sendForApproval)}
-              </SuccessButton>
+              </Button>
             ) : (
-              <PrimaryButton
+              <Button
+                type="primary"
+                size="large"
                 id="submit_form"
-                icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded || disableSubmit}
-                align={ICON_ALIGNMENT.LEFT}
+                disabled={totalFileSizeExceeded}
               >
+                <Upload />
                 {intl.formatMessage(
                   completeDeclaration
                     ? buttonMessages.sendForReview
                     : buttonMessages.sendIncomplete
                 )}
-              </PrimaryButton>
+              </Button>
             )}
 
             {rejectDeclarationAction && !alreadyRejectedDeclaration && (
-              <DangerButton
+              <Button
+                type="negative"
+                size="large"
                 id="rejectDeclarationBtn"
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <Cross color="currentColor" />}
                 onClick={rejectDeclarationAction}
               >
+                <Icon name="X" />
                 {intl.formatMessage(buttonMessages.reject)}
-              </DangerButton>
+              </Button>
             )}
           </ActionContainer>
         </Content>

@@ -257,7 +257,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -524,7 +524,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
-  birthType: BirthType
+  birthType: String
   questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -663,7 +663,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   assignment: AssignmentData
   contact: String
@@ -684,14 +684,6 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
-}
-
-enum BirthType {
-  SINGLE
-  TWIN
-  TRIPLET
-  QUADRUPLET
-  HIGHER_MULTIPLE_DELIVERY
 }
 
 type QuestionnaireQuestion {
@@ -1011,7 +1003,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  informantType: InformantType
+  informantType: String
   otherInformantType: String
   contact: String
   contactRelationship: String
@@ -1168,26 +1160,6 @@ input QuestionInput {
   options: [CustomSelectOption!]
   validator: [ValidatorInput!]
   mapping: MappingInput
-}
-
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
 }
 
 type AssignmentData {

@@ -257,8 +257,8 @@ type RelationForCertificateCorrection =
   | 'CHILD'
 
 export type ICertificate = {
-  collector?: Partial<{ type: Relation }>
-  corrector?: Partial<{ type: RelationForCertificateCorrection }>
+  collector?: Partial<{ type: Relation | string }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -280,7 +280,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
     }
     registration: {
       _fhirID: string
-      informantType: Relation
+      informantType: Relation | string
       whoseContactDetails: string
       registrationPhone: string
       trackingId: string

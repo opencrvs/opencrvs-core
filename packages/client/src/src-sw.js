@@ -85,6 +85,9 @@ precacheAndRoute(self.__WB_MANIFEST)
 
 // This caches the config files fetched from country config
 registerRoute(/http(.+)config\.js$/, new NetworkFirst())
+
+// This caches validations fetched from country config
+registerRoute(/http(.+)validation\.js$/, new NetworkFirst())
 // This caches config fetched from the config microservice
 registerRoute(/http(.+)config$/, new NetworkFirst())
 

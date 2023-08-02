@@ -17,6 +17,37 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
       id
+      informant {
+        id
+        relationship
+        otherRelationship
+        _fhirIDPatient
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        occupation
+        nationality
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+      }
       bride {
         id
         name {
@@ -87,36 +118,32 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       witnessTwo {
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       registration {
@@ -126,6 +153,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         groomSignature
         groomSignatureURI
         brideSignature
@@ -258,17 +286,15 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -282,6 +308,37 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
     fetchMarriageRegistration(id: $id) {
       _fhirIDMap
       id
+      informant {
+        id
+        relationship
+        otherRelationship
+        _fhirIDPatient
+        identifier {
+          id
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        occupation
+        nationality
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+      }
       bride {
         id
         name {
@@ -352,36 +409,32 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       witnessTwo {
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       registration {
@@ -391,6 +444,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         groomSignature
         groomSignatureURI
         brideSignature
@@ -523,17 +577,16 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }

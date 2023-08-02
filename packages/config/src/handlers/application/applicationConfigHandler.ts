@@ -18,10 +18,7 @@ import { badRequest, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
-import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
-import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
 import { getDocumentUrl } from '@config/services/documents'
 
 export default async function configHandler(
@@ -29,14 +26,7 @@ export default async function configHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [
-      certificates,
-      questionConfig,
-      formDrafts,
-      config,
-      systems,
-      formDataset
-    ] = await Promise.all([
+    const [certificates, config, systems] = await Promise.all([
       getActiveCertificatesHandler(request, h).then((certs) =>
         Promise.all(
           certs.map(async (cert) => ({
@@ -47,21 +37,13 @@ export default async function configHandler(
           }))
         )
       ),
-      getQuestionsHandler(request, h),
-      getFormDrafts(request, h),
       getApplicationConfig(request, h),
-      getSystems(request, h),
-      getFormDatasetHandler(request, h)
+      getSystems(request, h)
     ])
     return {
       config,
       certificates,
-      systems,
-      formConfig: {
-        questionConfig,
-        formDrafts,
-        formDataset
-      }
+      systems
     }
   } catch (ex) {
     logger.error(ex)
@@ -164,7 +146,9 @@ export const updateApplicationConfig = Joi.object({
     PRINT_IN_ADVANCE: Joi.boolean()
   }),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
-  HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION: Joi.boolean(),
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
   PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),

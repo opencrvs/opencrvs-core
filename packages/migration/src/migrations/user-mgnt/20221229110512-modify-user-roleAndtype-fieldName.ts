@@ -112,7 +112,13 @@ const DEFAULT_SYSTEM_ROLES = [
   {
     title: 'Field Agent',
     value: 'FIELD_AGENT',
-    roles: ['FIELD_AGENT'],
+    roles: [
+      'HEALTHCARE_WORKER',
+      'POLICE_OFFICER',
+      'SOCIAL_WORKER',
+      'LOCAL_LEADER',
+      'FIELD_AGENT'
+    ],
     active: true
   },
 
@@ -260,7 +266,10 @@ export const up = async (db: Db, client: MongoClient) => {
         DEFAULT_SYSTEM_ROLES.map((systemRole) => ({
           ...systemRole,
           roles: systemRole.roles.map(
-            (role) => userRolesResult.insertedIds[UserRolesIndex[role]]
+            (role) =>
+              userRolesResult.insertedIds[
+                UserRolesIndex[role as keyof typeof UserRolesIndex]
+              ]
           ),
           createdAt: Date.now().toString(),
           updatedAt: Date.now().toString()

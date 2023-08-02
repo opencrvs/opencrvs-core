@@ -46,7 +46,6 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
   TEL,
-  SUBSECTION,
   WARNING,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField,
@@ -62,7 +61,7 @@ import {
   ITextFormField,
   Ii18nTextFormField,
   LINK,
-  LIST,
+  BULLET_LIST,
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
@@ -85,13 +84,15 @@ import {
   IDateRangePickerValue,
   TIME,
   NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  INidVerificationButton,
+  DIVIDER,
+  HEADING3,
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
-import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
+import { SubSectionHeader } from '@client/components/form/SubSectionHeader'
 
-import { FormList } from '@client/components/form/FormList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -142,6 +143,8 @@ import {
 } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
+import { BulletList, Divider } from '@opencrvs/components'
+import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -154,11 +157,6 @@ const FormItem = styled.div<{
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-top: 16px;
 `
 
 const LocationSearchFormField = styled(LocationSearch)`
@@ -479,16 +477,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
-    if (fieldDefinition.type === SUBSECTION) {
+    if (fieldDefinition.type === DIVIDER) {
+      return <Divider />
+    }
+    if (fieldDefinition.type === HEADING3) {
+      return <Heading3>{fieldDefinition.label}</Heading3>
+    }
+    if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
-        <SubSectionDivider
-          label={fieldDefinition.label}
-          required={inputFieldProps.required}
-        />
+        <>
+          <SubSectionHeader label={fieldDefinition.label} />
+          <Divider />
+        </>
       )
     }
     if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
+      return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor
@@ -504,8 +508,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </Text>
       )
     }
-    if (fieldDefinition.type === LIST) {
-      return <FormList {...inputProps} list={fieldDefinition.items} />
+    if (fieldDefinition.type === BULLET_LIST) {
+      return (
+        <BulletList
+          font={'reg16'}
+          {...inputProps}
+          items={fieldDefinition.items}
+        />
+      )
     }
     if (fieldDefinition.type === NUMBER) {
       let inputFieldWidth = fieldDefinition.inputFieldWidth
@@ -991,7 +1001,7 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === DYNAMIC_LIST
               ? ({
                   ...field,
-                  type: LIST,
+                  type: BULLET_LIST,
                   items: getFieldOptionsByValueMapper(
                     field as IDynamicListFormField,
                     draftData as IFormData,

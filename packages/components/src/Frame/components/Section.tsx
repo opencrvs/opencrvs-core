@@ -19,3 +19,16 @@ export const Section = styled.div`
     gap: 0;
   }
 `
+
+export const SectionFormBackAction = styled.div`
+  display: grid;
+  gap: 24px;
+  justify-items: end;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    gap: 0;
+    background: ${({ theme }) => theme.colors.white};
+    align-items: centre;
+    justify-items: start;
+  }
+`

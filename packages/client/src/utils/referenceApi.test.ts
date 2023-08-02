@@ -574,7 +574,6 @@ const mockFetchConfig = {
       svgDateCreated: 1640696804785
     }
   ],
-  formConfig: { questionConfig: [] },
   systems: [
     {
       name: 'MOSIP',

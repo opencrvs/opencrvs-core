@@ -26,19 +26,19 @@ import {
   IFormSectionGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
   CHECKBOX,
-  ICheckboxFormField
+  ICheckboxFormField,
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -654,9 +654,14 @@ export function getOverriddenFieldsListForPreview(
 }
 
 export function isViewOnly(field: IFormField) {
-  return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
-    (type) => type === field.type
-  )
+  return [
+    BULLET_LIST,
+    PARAGRAPH,
+    WARNING,
+    TEXTAREA,
+    SUBSECTION_HEADER,
+    FETCH_BUTTON
+  ].find((type) => type === field.type)
 }
 
 export const getNestedFieldValue = (

@@ -62,7 +62,9 @@ export interface IApplicationConfigurationModel extends Document {
   MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
@@ -149,7 +151,17 @@ const configSchema = new Schema({
     required: false,
     default: 'DISTRICT'
   },
-  HIDE_EVENT_REGISTER_INFORMATION: {
+  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  HIDE_DEATH_EVENT_REGISTER_INFORMATION: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: {
     type: Boolean,
     required: false,
     default: false

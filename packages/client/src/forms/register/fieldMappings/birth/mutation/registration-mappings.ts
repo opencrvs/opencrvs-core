@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLRelatedPerson,
-  GQLIdentityIDType
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRelatedPerson } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ICertificate,
   IFileValue,
@@ -37,14 +34,14 @@ export function transformCertificateData(
   ]
   // for collector mapping
   if (certificateData && certificateData.collector) {
-    const collector: GQLRelatedPerson = {}
+    let collector: GQLRelatedPerson = {}
     if (certificateData.collector.type) {
       collector.relationship = certificateData.collector.type as string
     }
     if (certificateData.collector.relationship) {
       collector.otherRelationship = certificateData.collector
         .relationship as string
-      collector.individual = {
+      collector = {
         name: [
           {
             use: 'en',
@@ -55,7 +52,7 @@ export function transformCertificateData(
         identifier: [
           {
             id: certificateData.collector.iD as string,
-            type: certificateData.collector.iDType as GQLIdentityIDType
+            type: certificateData.collector.iDType as string
           }
         ]
       }

@@ -352,6 +352,10 @@ async function createDeclarationIndex(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
   )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
+  )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
@@ -389,6 +393,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

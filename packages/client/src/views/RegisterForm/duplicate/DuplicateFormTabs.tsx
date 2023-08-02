@@ -76,7 +76,7 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  top: 56px;
+  top: 0;
   width: 100%;
   position: sticky;
   z-index: 1;
@@ -587,7 +587,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item)
       }
     })

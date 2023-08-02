@@ -10,7 +10,4 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export { transformRegistrationData } from '@client/forms/register/queries/registration'
-export {
-  transformPersonData,
-  transformInformantData
-} from '@client/forms/register/queries/person'
+export { transformPersonData } from '@client/forms/register/queries/person'

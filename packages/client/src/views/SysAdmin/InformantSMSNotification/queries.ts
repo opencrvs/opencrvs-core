@@ -18,7 +18,6 @@ export const GET_INFORMANT_SMS_NOTIFICATIONS = gql`
       id
       name
       enabled
-      message
       updatedAt
       createdAt
     }

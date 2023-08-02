@@ -21,7 +21,6 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
     fields: [
       {
         name: 'placeOfRegistration',
-        customisable: false,
         type: 'LOCATION_SEARCH_INPUT',
         label: advancedSearchForm.placeOfRegistrationlabel,
         helperText: advancedSearchForm.placeOfRegistrationHelperText,
@@ -34,7 +33,6 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
       },
       {
         name: 'dateOfRegistration',
-        customisable: false,
         type: 'DATE_RANGE_PICKER',
         label: advancedSearchForm.dateOfRegistration,
         required: false,
@@ -43,7 +41,6 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
       },
       {
         name: 'registrationStatuses',
-        customisable: false,
         type: 'SELECT_WITH_OPTIONS',
         label: advancedSearchForm.statusOfRecordLabel,
         required: false,
@@ -90,7 +87,6 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'childDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -100,7 +96,6 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
     {
       name: 'childFirstNames',
       previewGroup: 'childNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
@@ -111,7 +106,6 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
     {
       name: 'childLastName',
       previewGroup: 'childNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
@@ -121,7 +115,6 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
     },
     {
       name: 'childGender',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: formMessageDescriptors.sex,
       required: false,
@@ -152,7 +145,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'eventLocationType',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       previewGroup: 'placeOfBirth',
       ignoreFieldLabelOnErrorMessage: true,
@@ -174,7 +166,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationId',
-      customisable: false,
       type: 'LOCATION_SEARCH_INPUT',
       label: formMessageDescriptors.healthInstitution,
       required: false,
@@ -194,7 +185,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventCountry',
-      customisable: false,
       type: 'SELECT_WITH_OPTIONS',
       label: {
         defaultMessage: 'Country',
@@ -218,7 +208,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel1',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'Province',
@@ -255,7 +244,6 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
     },
     {
       name: 'eventLocationLevel2',
-      customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
         defaultMessage: 'District',
@@ -303,7 +291,6 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'motherDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -313,7 +300,6 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
     {
       name: 'motherFirstNames',
       previewGroup: 'motherFirstNamesEng',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
@@ -324,7 +310,6 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
     {
       name: 'motherFamilyName',
       previewGroup: 'motherNameInEnglish',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
@@ -341,7 +326,6 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'fatherDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -350,7 +334,6 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
     },
     {
       name: 'fatherFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
@@ -360,7 +343,6 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
     },
     {
       name: 'fatherFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,
@@ -377,7 +359,6 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
   fields: [
     {
       name: 'informantDoB',
-      customisable: false,
       type: 'DATE_RANGE_PICKER',
       label: formMessageDescriptors.dateOfBirth,
       required: false,
@@ -386,7 +367,6 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
     },
     {
       name: 'informantFirstNames',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.firstNames,
       maxLength: 32,
@@ -396,7 +376,6 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
     },
     {
       name: 'informantFamilyName',
-      customisable: false,
       type: 'TEXT',
       label: formMessageDescriptors.familyName,
       maxLength: 32,

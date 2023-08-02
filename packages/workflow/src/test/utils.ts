@@ -95,6 +95,23 @@ export const testFhirBundle = {
                 reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
               }
             ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'informant-details'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7'
+              }
+            ]
           }
         ]
       }
@@ -165,7 +182,8 @@ export const testFhirBundle = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -189,6 +207,16 @@ export const testFhirBundle = {
           }
         ],
         gender: 'male'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7',
+      resource: {
+        resourceType: 'RelatedPerson',
+        active: true,
+        patient: {
+          reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
+        }
       }
     }
   ]
@@ -573,7 +601,8 @@ export const testFhirBundleWithIdsForDeath = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -711,6 +740,10 @@ export const taskResouceMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: { reference: 'DUMMY' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   note: [
@@ -1957,6 +1990,10 @@ export const deathTaskMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
