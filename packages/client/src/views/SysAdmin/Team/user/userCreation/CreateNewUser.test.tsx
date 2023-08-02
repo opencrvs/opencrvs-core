@@ -22,7 +22,9 @@ import {
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  getFileFromBase64String,
+  validImageB64String
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -54,7 +56,7 @@ const mockUsers = {
             }
           ],
           username: 'api.user',
-          systemRole: 'API_USER',
+          systemRole: 'NATIONAL_REGISTRAR',
           role: {
             _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             labels: [
@@ -241,7 +243,9 @@ describe('create new user tests', () => {
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toContain('signature-attachment')
+      expect(history.location.pathname).toContain(
+        'preview/preview-registration-office'
+      )
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
@@ -340,7 +344,7 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
-            systemRole: 'API_USER',
+            systemRole: 'NATIONAL_REGISTRAR',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',
             underInvestigation: false,
@@ -472,11 +476,29 @@ describe('edit user tests', () => {
     })
 
     it('clicking confirm button starts submitting the form', async () => {
+      await waitForElement(component, '#image_file_uploader_field')
+      component.update()
+      const file = new File(['(⌐□_□)'], 'chucknorris.png', {
+        type: 'image/png'
+      })
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { files: [file] } })
+
+      await flushPromises()
+      component.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
       submitButton.hostNodes().simulate('click')
+      await flushPromises()
+      component.update()
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })
