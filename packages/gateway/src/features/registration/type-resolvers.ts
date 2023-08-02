@@ -122,8 +122,8 @@ export const typeResolvers: GQLResolver = {
     id: (identifier) => {
       return identifier.value
     },
-    type: (identifier) => {
-      return identifier.type
+    type: (identifier: fhir.Identifier) => {
+      return identifier.type?.coding?.[0].code
     },
     otherType: (identifier) => {
       return identifier.otherType

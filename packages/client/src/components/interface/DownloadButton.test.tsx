@@ -104,7 +104,8 @@ describe('download button tests', () => {
                 firstName: 'Kennedy',
                 lastName: 'Mweene',
                 officeName: 'Ibombo District Office',
-                userId: '456'
+                userId: '456',
+                avatarURL: '/ocrvs/4c3645fc-f3f9-4c89-b109-05daa8f49b3b.jpg'
               },
               declarationStatus: ''
             }}

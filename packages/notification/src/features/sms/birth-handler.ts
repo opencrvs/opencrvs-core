@@ -26,6 +26,7 @@ export interface IInProgressPayload extends IEventMessageRecipient {
 export interface IDeclarationPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
+  crvsOffice: string
 }
 
 export interface IRegistrationPayload extends IEventMessageRecipient {
@@ -33,12 +34,14 @@ export interface IRegistrationPayload extends IEventMessageRecipient {
   informantName: string
   registrationNumber: string
   trackingId: string
+  crvsOffice: string
 }
 
 export interface IRejectionPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
   informantName: string
+  crvsOffice: string
 }
 
 export async function sendBirthInProgressConfirmation(
@@ -89,6 +92,7 @@ export async function sendBirthDeclarationConfirmation(
     'informant',
     {
       name: payload.name,
+      crvsOffice: payload.crvsOffice,
       trackingId: payload.trackingId
     }
   )
@@ -115,6 +119,7 @@ export async function sendBirthRegistrationConfirmation(
       name: payload.name,
       informantName: payload.informantName,
       trackingId: payload.trackingId,
+      crvsOffice: payload.crvsOffice,
       registrationNumber: payload.registrationNumber
     }
   )
@@ -141,6 +146,7 @@ export async function sendBirthRejectionConfirmation(
     {
       name: payload.name,
       informantName: payload.informantName,
+      crvsOffice: payload.crvsOffice,
       trackingId: payload.trackingId
     }
   )
@@ -162,7 +168,9 @@ export const declarationNotificationSchema = Joi.object({
     sms: Joi.string().allow(null)
   }),
   trackingId: Joi.string().length(7).required(),
-  name: Joi.string().required()
+  crvsOffice: Joi.string().required(),
+  name: Joi.string().required(),
+  informantName: Joi.string()
 })
 
 export const registrationNotificationSchema = Joi.object({
@@ -172,6 +180,7 @@ export const registrationNotificationSchema = Joi.object({
   }),
   name: Joi.string().required(),
   informantName: Joi.string(),
+  crvsOffice: Joi.string().required(),
   trackingId: Joi.string().length(7).required(),
   registrationNumber: Joi.string().required()
 })
@@ -182,5 +191,7 @@ export const rejectionNotificationSchema = Joi.object({
     sms: Joi.string().allow(null)
   }),
   trackingId: Joi.string().length(7).required(),
-  name: Joi.string().required()
+  crvsOffice: Joi.string().required(),
+  name: Joi.string().required(),
+  informantName: Joi.string()
 })

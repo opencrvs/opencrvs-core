@@ -247,5 +247,17 @@ export const userTypeResolvers: GQLResolver = {
         }
       )
     }
+  },
+
+  Avatar: {
+    data(avatar: IAvatar, _, { dataSources }) {
+      if (avatar.data) {
+        const staticData = dataSources.minioAPI.getStaticData(avatar.data)
+        return staticData.then((data) => {
+          return data.presignedURL
+        })
+      }
+      return null
+    }
   }
 }

@@ -314,7 +314,6 @@ class ReviewActionComponent extends React.Component<
       intl
     } = this.props
 
-
     const background = !completeDeclaration
       ? 'error'
       : draftDeclaration
@@ -327,9 +326,12 @@ class ReviewActionComponent extends React.Component<
       : ACTION.DECLARATION_TO_BE_DECLARED
 
     const actionContent =
-      (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)] &&
-        ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
-          .completionStatus[String(completeDeclaration)]) ||
+      (ACTION_TO_CONTENT_MAP[action].draftStatus[
+        String(draftDeclaration || alreadyRejectedDeclaration)
+      ] &&
+        ACTION_TO_CONTENT_MAP[action].draftStatus[
+          String(draftDeclaration || alreadyRejectedDeclaration)
+        ].completionStatus[String(completeDeclaration)]) ||
       null
     return !actionContent ? null : (
       <Container id={id}>

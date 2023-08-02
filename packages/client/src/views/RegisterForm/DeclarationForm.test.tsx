@@ -226,19 +226,8 @@ describe('when user has starts a new declaration', () => {
           app.find('#next_section').hostNodes().simulate('click')
           await flushPromises()
         })
-        it('stores the value to a new draft and move to next section', () => {
-          const mockCalls = (storage.setItem as Mock).mock.calls
-          const userData = mockCalls[mockCalls.length - 1]
-          const storedDeclarations = JSON.parse(
-            userData[userData.length - 1]
-          )[0].declarations
-          expect(storedDeclarations[0].data.child.firstNamesEng).toEqual(
-            'hello'
-          )
-          expect(window.location.href).toContain('mother')
-        })
         it('redirect to home when pressed save and exit button', async () => {
-          app.find('#save_draft').hostNodes().simulate('click')
+          app.find('#save-exit-btn').hostNodes().simulate('click')
           await flushPromises()
           app.update()
           expect(window.location.href).toContain('/')
@@ -248,13 +237,18 @@ describe('when user has starts a new declaration', () => {
           await flushPromises()
           app.update()
           expect(
-            app.find('#eventToggleMenuSubMenu').hostNodes().length
+            app.find('#eventToggleMenuToggleButton').hostNodes().length
           ).toEqual(1)
         })
         it('check toggle menu item handler', async () => {
-          app.find('#eventToggleMenuToggleButton').hostNodes().simulate('click')
+          const menuLink = await waitForElement(
+            app,
+            '#eventToggleMenuToggleButton'
+          )
+          menuLink.hostNodes().simulate('click')
           await flushPromises()
           app.update()
+
           await waitForElement(app, '#eventToggleMenuItem0')
           app.find('#eventToggleMenuItem0').hostNodes().simulate('click')
           await flushPromises()

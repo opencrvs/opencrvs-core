@@ -97,12 +97,12 @@ describe('Review form for an declaration', () => {
   })
 
   it('should cancel the correction when the cross button is pressed', async () => {
-    await waitForElement(wrapper, '#crcl-btn')
+    await waitForElement(wrapper, '#exit-btn')
 
-    wrapper.find('#crcl-btn').hostNodes().simulate('click')
+    wrapper.find('#exit-btn').hostNodes().simulate('click')
     wrapper.update()
 
-    expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+    expect(history.location.pathname).toContain(WORKQUEUE_TABS.inProgress)
   })
 
   it('should disable the continue button if no changes have been made', async () => {

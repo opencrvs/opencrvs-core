@@ -298,6 +298,7 @@ export async function sendRegisteredNotification(
   name: string,
   trackingId: string,
   registrationNumber: string,
+  crvsOffice: string,
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
@@ -315,7 +316,8 @@ export async function sendRegisteredNotification(
       informantName,
       name,
       trackingId,
-      registrationNumber
+      registrationNumber,
+      crvsOffice
     })
   } else if (
     eventType === EVENT_TYPE.DEATH &&
@@ -328,7 +330,8 @@ export async function sendRegisteredNotification(
       informantName,
       name,
       trackingId,
-      registrationNumber
+      registrationNumber,
+      crvsOffice
     })
   }
 }
@@ -543,7 +546,7 @@ export async function getMosipUINToken(
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {
-      return identifier.type === 'NATIONAL_ID'
+      return identifier.type?.coding?.[0].code === 'NATIONAL_ID'
     }
   )
   if (identifiers) {
