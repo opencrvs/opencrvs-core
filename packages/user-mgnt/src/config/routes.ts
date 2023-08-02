@@ -103,10 +103,6 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
-import {
-  createSystemRole,
-  createSystemRoleReqSchema
-} from '@user-mgnt/features/systemRole/create'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -770,21 +766,6 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
         },
         response: {
           schema: systemRoleResponseSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/systemRole',
-      handler: createSystemRole,
-      options: {
-        tags: ['api', 'system-role'],
-        description: 'Create a new System Role',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: createSystemRoleReqSchema
         }
       }
     }

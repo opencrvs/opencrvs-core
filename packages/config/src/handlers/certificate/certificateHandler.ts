@@ -17,7 +17,7 @@ import Certificate, {
 } from '@config/models/certificate' //   IDeclarationConfigurationModel
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import { badRequest } from '@hapi/boom'
+import { badRequest, notFound } from '@hapi/boom'
 import { verifyToken } from '@config/utils/verifyToken'
 import { RouteScope } from '@config/config/routes'
 import { pipe } from 'fp-ts/lib/function'
@@ -37,6 +37,9 @@ export async function getCertificateHandler(
     event: event
   })
 
+  if (!certificate) {
+    throw notFound()
+  }
   return certificate
 }
 
