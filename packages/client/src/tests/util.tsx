@@ -1049,10 +1049,7 @@ export const mockDeathRegistrationSectionData = {
     value: 'MOTHER'
   },
   whoseContactDetails: 'MOTHER',
-  informantType: {
-    value: 'MOTHER',
-    nestedFields: { otherInformantType: '' }
-  },
+  informantType: 'MOTHER',
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
