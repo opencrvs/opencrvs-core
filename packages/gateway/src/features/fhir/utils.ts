@@ -882,7 +882,18 @@ export function setObjectPropInResourceArray(
     if (!resource[label][context._index[label]]) {
       resource[label][context._index[label]] = {}
     }
-    resource[label][context._index[label]][propName] = value
+    if (label === 'identifier' && propName === 'type') {
+      resource[label][context._index[label]][propName] = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+            code: value
+          }
+        ]
+      }
+    } else {
+      resource[label][context._index[label]][propName] = value
+    }
   }
 }
 

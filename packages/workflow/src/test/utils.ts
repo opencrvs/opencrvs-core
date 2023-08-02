@@ -1214,7 +1214,14 @@ export const motherMock = JSON.stringify({
   identifier: [
     {
       id: '12341234123412341',
-      type: 'NATIONAL_ID'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'NATIONAL_ID'
+          }
+        ]
+      }
     }
   ],
   name: [
@@ -2117,27 +2124,62 @@ export const mockFormDraft = [
   }
 ]
 const drnIdentifier = {
-  type: 'DEATH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'DEATH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022DSNEYUG'
 } as fhir.CodeableConcept
 
 const nidIdentifier = {
   value: '654654666',
-  type: 'NATIONAL_ID'
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'NATIONAL_ID'
+      }
+    ]
+  }
 } as fhir.CodeableConcept
 
 const brnIdentifier = {
-  type: 'BIRTH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022BSNEYUG'
 } as fhir.CodeableConcept
 
 const mosipPsutTokenIdentifier = {
-  type: 'MOSIP_PSUT_TOKEN_ID',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'MOSIP_PSUT_TOKEN_ID'
+      }
+    ]
+  },
   value: '257803821990055124230310596669133515'
 } as fhir.CodeableConcept
 
 const birthPatientIdentifier = {
-  type: 'BIRTH_PATIENT_ENTRY',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_PATIENT_ENTRY'
+      }
+    ]
+  },
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
 } as fhir.CodeableConcept
 

@@ -33,6 +33,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
+import { redirectToAuthentication } from '@client/profile/profileActions'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -42,6 +43,7 @@ type OwnProps = PropsWithChildren<{
 type DispatchProps = {
   onNumPadVisible: () => void
   showPINUpdateSuccessToast: typeof showPINUpdateSuccessToast
+  redirectToAuthentication: typeof redirectToAuthentication
 }
 interface IProtectPageState {
   loading: boolean
@@ -118,8 +120,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     newState.loading = false
     this.setState(newState)
 
-    setInterval(() => {
-      refreshToken()
+    setInterval(async () => {
+      if (!(await refreshToken())) this.props.redirectToAuthentication()
     }, REFRESH_TOKEN_CHECK_MILLIS)
   }
 
@@ -261,5 +263,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 }
 export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
   onNumPadVisible: refreshOfflineData,
-  showPINUpdateSuccessToast
+  showPINUpdateSuccessToast,
+  redirectToAuthentication
 })(withRouter(ProtectedPageComponent))

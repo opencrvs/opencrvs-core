@@ -1342,6 +1342,7 @@ export interface GQLAssignmentData {
   firstName?: string
   lastName?: string
   officeName?: string
+  avatarURL: string
 }
 
 export interface GQLRegWorkflow {
@@ -8962,6 +8963,7 @@ export interface GQLAssignmentDataTypeResolver<TParent = any> {
   firstName?: AssignmentDataToFirstNameResolver<TParent>
   lastName?: AssignmentDataToLastNameResolver<TParent>
   officeName?: AssignmentDataToOfficeNameResolver<TParent>
+  avatarURL?: AssignmentDataToAvatarURLResolver<TParent>
 }
 
 export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
@@ -8998,6 +9000,18 @@ export interface AssignmentDataToLastNameResolver<
 }
 
 export interface AssignmentDataToOfficeNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AssignmentDataToAvatarURLResolver<
   TParent = any,
   TResult = any
 > {
