@@ -322,7 +322,7 @@ interface IStoreDeclarationAction {
 interface IModifyDeclarationAction {
   type: typeof MODIFY_DECLARATION
   payload: {
-    declaration: IDeclaration | IPrintableDeclaration
+    declaration: IPrintableDeclaration | Partial<IDeclaration>
   }
 }
 
@@ -542,7 +542,7 @@ export function storeDeclaration(
 }
 
 export function modifyDeclaration(
-  declaration: IDeclaration | IPrintableDeclaration
+  declaration: IPrintableDeclaration | Partial<IDeclaration>
 ): IModifyDeclarationAction {
   declaration.modifiedOn = Date.now()
   return { type: MODIFY_DECLARATION, payload: { declaration } }
@@ -1271,7 +1271,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )?.value
       }
 
-      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
+      newDeclarations[currentDeclarationIndex] = {
+        ...newDeclarations[currentDeclarationIndex],
+        ...modifiedDeclaration
+      }
 
       return {
         ...state,
