@@ -629,13 +629,7 @@ export const longDateTransformer =
   }
 
 export const childFieldToIdentityTransformer =
-  (
-    idTypes: Array<
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_1'
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_2'
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_3'
-    >
-  ) =>
+  (idTypes: string[]) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,

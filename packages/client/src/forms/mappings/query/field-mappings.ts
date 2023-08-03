@@ -1125,13 +1125,7 @@ export const plainInputTransformer = (
 }
 
 export const childIdentityToFieldTransformer =
-  (
-    idTypes: Array<
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_1'
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_2'
-      | 'BIRTH_CONFIGURABLE_IDENTIFIER_3'
-    >
-  ) =>
+  (idTypes: string[]) =>
   (
     transformedData: IFormData,
     queryData: BirthRegistration,
