@@ -69,7 +69,7 @@ interface IEventRegistrationCallbackPayload {
   registrationNumber: string
   error: string
   childIdentifiers?: {
-    type: `BIRTH_CONFIGURABLE_IDENTIFIER_${1 | 2 | 3}`
+    type: string
     value: string
   }[]
 }
@@ -330,11 +330,15 @@ export async function markEventAsRegisteredCallbackHandler(
       // already be initialized with the RN identifier
       childIdentifiers.forEach((childIdentifier) => {
         const previousIdentifier = patients[0].identifier!.find(
-          ({ type }) => type === childIdentifier.type
+          ({ type }) => type?.coding?.[0].code === childIdentifier.type
         )
         if (!previousIdentifier) {
-          // @ts-ignore
-          patients[0].identifier!.push(childIdentifier)
+          patients[0].identifier!.push({
+            type: {
+              coding: [{ code: childIdentifier.type }]
+            },
+            value: childIdentifier.value
+          })
         } else {
           previousIdentifier.value = childIdentifier.value
         }
