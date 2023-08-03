@@ -761,6 +761,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
+  password: String
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -786,7 +787,7 @@ input AvatarInput {
 }
 
 type Response {
-  msg: String!
+  roleIdMap: Map!
 }
 
 input SystemRoleInput {
@@ -1450,6 +1451,7 @@ type AssignmentData {
   firstName: String
   lastName: String
   officeName: String
+  avatarURL: String!
 }
 
 type RegWorkflow {

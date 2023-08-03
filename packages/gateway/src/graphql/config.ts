@@ -52,6 +52,7 @@ import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import PractitionerRoleAPI from '@gateway/features/fhir/practitionerRoleAPI'
 import { Context } from '@gateway/graphql/context'
 import PatientAPI from '@gateway/features/fhir/patientAPI'
+import MinioAPI from '@gateway/features/fhir/minioAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -175,7 +176,8 @@ export const getApolloConfig = (): Config<Context> => {
     dataSources: (): Context['dataSources'] => ({
       locationsAPI: new LocationsAPI(),
       practitionerRoleAPI: new PractitionerRoleAPI(),
-      patientAPI: new PatientAPI()
+      patientAPI: new PatientAPI(),
+      minioAPI: new MinioAPI()
     }),
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {

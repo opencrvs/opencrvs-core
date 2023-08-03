@@ -546,7 +546,7 @@ export async function getMosipUINToken(
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {
-      return identifier.type === 'NATIONAL_ID'
+      return identifier.type?.coding?.[0].code === 'NATIONAL_ID'
     }
   )
   if (identifiers) {

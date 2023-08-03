@@ -247,8 +247,9 @@ function createMotherIndex(
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
     mother.identifier &&
-    mother.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    mother.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createFatherIndex(
@@ -280,8 +281,9 @@ function createFatherIndex(
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
     father.identifier &&
-    father.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    father.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 function createInformantIndex(
@@ -326,8 +328,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
