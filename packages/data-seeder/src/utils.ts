@@ -9,7 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-// @ts-ignore
-export const API_URL = __ENV.API_URL || 'http://172.17.0.1:5001/fhir'
-// @ts-ignore
-export const AUTH_URL = __ENV.AUTH_URL || 'http://172.17.0.1:4040'
+export function raise(msg: string): never {
+  console.log(msg)
+  process.exit(1)
+}
+
+export function parseGQLResponse<T>(
+  response: { data: T } | { errors: Array<{ message: string }> }
+) {
+  if ('errors' in response) {
+    raise(JSON.stringify(response.errors))
+  }
+  return response.data
+}

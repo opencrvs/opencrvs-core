@@ -409,11 +409,10 @@ describe('ReviewForm tests', () => {
   it('redirect to home when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'IN_PROGRESS'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -448,7 +447,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    testComponent.find('#save_draft').hostNodes().simulate('click')
+    testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
@@ -456,11 +455,10 @@ describe('ReviewForm tests', () => {
   it('redirect to review tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'DECLARED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -495,7 +493,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    testComponent.find('#save_draft').hostNodes().simulate('click')
+    testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
@@ -503,11 +501,10 @@ describe('ReviewForm tests', () => {
   it('redirect to review tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'VALIDATED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -542,7 +539,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    testComponent.find('#save_draft').hostNodes().simulate('click')
+    testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
@@ -550,11 +547,10 @@ describe('ReviewForm tests', () => {
   it('redirect to update tab when exit button is clicked', async () => {
     const declaration = createReviewDeclaration(
       uuid(),
-      {},
+      birthDraftData,
       Event.Birth,
       'REJECTED'
     )
-    declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -589,14 +585,17 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    testComponent.find('#save_draft').hostNodes().simulate('click')
+    testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.requiresUpdate)
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
-    declaration.data = birthDraftData
+    const declaration = createReviewDeclaration(
+      uuid(),
+      birthDraftData,
+      Event.Birth
+    )
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({
@@ -631,52 +630,17 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    testComponent.find('#save_draft').hostNodes().simulate('click')
+    testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
 
-  it('should redirect to progress tab when close declaration button is clicked', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
-    store.dispatch(storeDeclaration(declaration))
-    const testComponent = await createTestComponent(
-      <ReviewForm
-        location={mock}
-        history={history}
-        scope={scope}
-        staticContext={mock}
-        event={declaration.event}
-        registerForm={form}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'child',
-            event: declaration.event.toLowerCase()
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        declarationId={declaration.id}
-      />,
-      { store, history }
-    )
-
-    testComponent.update()
-    testComponent
-      .find('#eventToggleMenuToggleButton')
-      .hostNodes()
-      .simulate('click')
-    testComponent.update()
-    testComponent.find('#eventToggleMenuItem0').hostNodes().simulate('click')
-    testComponent.update()
-
-    expect(window.location.href).toContain('/progress')
-  })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
-    declaration.data = birthDraftData
+    const declaration = createReviewDeclaration(
+      uuid(),
+      birthDraftData,
+      Event.Birth
+    )
     store.dispatch(
       getStorageDeclarationsSuccess(
         JSON.stringify({

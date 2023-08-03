@@ -59,6 +59,7 @@ interface Window {
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
     HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
     HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
@@ -79,4 +80,5 @@ interface Window {
     LEADERBOARDS_DASHBOARD_URL: string
   }
   __localeId__: string
+  __WB_MANIFEST: Array<{ url: string; revision: string }>
 }

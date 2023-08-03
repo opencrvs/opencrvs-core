@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { AppBar, Frame, Icon, Spinner } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/review'
 import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -96,20 +96,17 @@ const LoadingState = () => {
         <AppBar
           desktopRight={
             <Button
-              size="large"
-              type="tertiary"
+              type="secondary"
+              size="small"
               onClick={() => dispatch(goBack())}
             >
+              <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
           }
           mobileRight={
-            <Button
-              size="large"
-              type="tertiary"
-              onClick={() => dispatch(goBack())}
-            >
-              {intl.formatMessage(buttonMessages.exitButton)}
+            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+              <Icon name="X" />
             </Button>
           }
         />
@@ -193,10 +190,11 @@ export const ViewRecord = () => {
           }
           desktopRight={
             <Button
-              size="large"
-              type="tertiary"
+              type="secondary"
+              size="small"
               onClick={() => dispatch(goBack())}
             >
+              <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
           }
@@ -205,12 +203,8 @@ export const ViewRecord = () => {
             isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
           }
           mobileRight={
-            <Button
-              size="large"
-              type="tertiary"
-              onClick={() => dispatch(goBack())}
-            >
-              {intl.formatMessage(buttonMessages.exitButton)}
+            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+              <Icon name="X" />
             </Button>
           }
         />

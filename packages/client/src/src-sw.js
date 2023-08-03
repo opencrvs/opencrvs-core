@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-importScripts(
-  'https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js'
-)
+import { precacheAndRoute } from 'workbox-precaching'
+import { registerRoute, NavigationRoute } from 'workbox-routing'
+import { Queue } from 'workbox-background-sync'
+import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 
-const queue = new workbox.backgroundSync.Queue('registerQueue', {
+const queue = new Queue('registerQueue', {
   callbacks: {
     queueDidReplay: function (requestArray) {
       let requestSynced = 0
@@ -72,7 +73,7 @@ self.addEventListener('message', async (event) => {
   }
 })
 
-workbox.precaching.precacheAndRoute([])
+precacheAndRoute(self.__WB_MANIFEST)
 
 /*
  * As the config file can change after the app is built, we cannot precache it
@@ -83,33 +84,24 @@ workbox.precaching.precacheAndRoute([])
  */
 
 // This caches the config files fetched from country config
-workbox.routing.registerRoute(
-  /http(.+)config\.js$/,
-  new workbox.strategies.NetworkFirst()
-)
+registerRoute(/http(.+)config\.js$/, new NetworkFirst())
+
 // This caches validations fetched from country config
-workbox.routing.registerRoute(
-  /http(.+)validation\.js$/,
-  new workbox.strategies.NetworkFirst()
-)
+registerRoute(/http(.+)validation\.js$/, new NetworkFirst())
 // This caches config fetched from the config microservice
-workbox.routing.registerRoute(
-  /http(.+)config$/,
-  new workbox.strategies.NetworkFirst()
-)
+registerRoute(/http(.+)config$/, new NetworkFirst())
 
 // This caches the minio urls
-workbox.routing.registerRoute(
-  /https(.+)minio\.(.+)\/ocrvs\/+/,
-  new workbox.strategies.CacheFirst()
-)
+registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
-workbox.routing.registerNavigationRoute('/index.html', {
-  blacklist: [/^\/__.*$/]
-})
+registerRoute(
+  new NavigationRoute('/index.html', {
+    denylist: [/^\/__.*$/]
+  })
+)
 
 const removeCache = async (minioUrls) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>

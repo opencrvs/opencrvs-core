@@ -70,8 +70,9 @@ import {
   SELECT_WITH_OPTIONS,
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
-  SUBSECTION,
-  WARNING
+  WARNING,
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -242,6 +243,9 @@ const DeclarationDataContainer = styled.div``
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
+`
+const StyledLabel = styled.span`
+  ${({ theme }) => theme.fonts.h3}
 `
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
@@ -871,7 +875,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [BULLET_LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [BULLET_LIST, PARAGRAPH, WARNING, DIVIDER, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -910,6 +914,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     return {
       label: intl.formatMessage(fieldLabel),
+      type: group.fields.find((field) => field.name === fieldName)?.type,
       value,
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
@@ -1644,12 +1649,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const disableSubmit = Boolean(
-      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
-        ?.length > 0 ||
-        errorsOnFields.registration?.contactPoint?.errors.length !== 0
-    )
-
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
         return false
@@ -1745,8 +1744,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <Accordion
               name="signatures"
               label="Signatures"
-              labelForHideAction="Hide"
-              labelForShowAction="Show"
+              labelForHideAction={intl.formatMessage(messages.hideLabel)}
+              labelForShowAction={intl.formatMessage(messages.showLabel)}
               expand={true}
             >
               <SignatureGenerator
@@ -1827,71 +1826,85 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <ReviewContainter>
-                {transformedSectionData.map((sec, index) => {
-                  return (
-                    <DeclarationDataContainer key={index}>
-                      <Accordion
-                        name="accordion-component"
-                        label={sec.title}
-                        action={
-                          sec.action && (
-                            <Link font="reg16" onClick={sec.action.handler}>
-                              {sec.action.label}
-                            </Link>
-                          )
-                        }
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        expand={true}
-                      >
-                        <ListViewSimplified id={'Section_' + sec.id}>
-                          {sec.items.map((item, index) => {
-                            return (
-                              <ListViewItemSimplified
-                                key={index}
-                                label={<Label>{item.label}</Label>}
-                                value={
-                                  <Value id={item.label.split(' ')[0]}>
-                                    {item.value}
-                                  </Value>
-                                }
-                                actions={
-                                  !item?.action?.disabled && (
-                                    <LinkButton
-                                      id={item.action.id}
-                                      disabled={item.action.disabled}
-                                      onClick={item.action.handler}
-                                    >
-                                      {item.action.label}
-                                    </LinkButton>
-                                  )
-                                }
-                              />
+                {transformedSectionData
+                  .filter((sec) => sec.items.length > 0)
+                  .map((sec, index) => {
+                    return (
+                      <DeclarationDataContainer key={index}>
+                        <Accordion
+                          name={sec.id}
+                          label={sec.title}
+                          action={
+                            sec.action && (
+                              <Link font="reg16" onClick={sec.action.handler}>
+                                {sec.action.label}
+                              </Link>
                             )
-                          })}
-                        </ListViewSimplified>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
+                          }
+                          labelForHideAction={intl.formatMessage(
+                            messages.hideLabel
+                          )}
+                          labelForShowAction={intl.formatMessage(
+                            messages.showLabel
+                          )}
+                          expand={true}
+                        >
+                          <ListViewSimplified id={'Section_' + sec.id}>
+                            {sec.items.map((item, index) => {
+                              return (
+                                <ListViewItemSimplified
+                                  key={index}
+                                  label={
+                                    item.type === SUBSECTION_HEADER ? (
+                                      <StyledLabel>{item.label}</StyledLabel>
+                                    ) : (
+                                      <Label>{item.label}</Label>
+                                    )
+                                  }
+                                  value={
+                                    <Value id={item.label.split(' ')[0]}>
+                                      {item.value}
+                                    </Value>
+                                  }
+                                  actions={
+                                    !item?.action?.disabled && (
+                                      <LinkButton
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                      >
+                                        {item.action.label}
+                                      </LinkButton>
+                                    )
+                                  }
+                                />
+                              )
+                            })}
+                          </ListViewSimplified>
+                        </Accordion>
+                      </DeclarationDataContainer>
+                    )
+                  })}
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}
-                  labelForHideAction="Hide"
-                  labelForShowAction="Show"
+                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                  labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    <Link
-                      font="reg16"
-                      element="button"
-                      onClick={() =>
-                        this.editLinkClickHandlerForDraft(
-                          documentsSection.id,
-                          documentsSection.groups[0].id!
-                        )
-                      }
-                    >
-                      {intl.formatMessage(messages.editDocuments)}
-                    </Link>
+                    viewRecord ? null : (
+                      <Link
+                        font="reg16"
+                        element="button"
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </Link>
+                    )
                   }
                   expand={true}
                 >
@@ -1902,8 +1915,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <Accordion
                     name="additional_comments"
                     label={intl.formatMessage(messages.additionalComments)}
-                    labelForHideAction="Hide"
-                    labelForShowAction="Show"
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
                     expand={true}
                   >
                     <InputField
@@ -1956,7 +1969,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         declaration={declaration}
                         submitDeclarationAction={submitClickEvent}
                         rejectDeclarationAction={rejectDeclarationClickEvent}
-                        disableSubmit={disableSubmit}
                       />
                     </>
                   ) : (

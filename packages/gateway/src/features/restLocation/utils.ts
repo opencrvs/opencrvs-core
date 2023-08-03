@@ -62,7 +62,7 @@ export const composeFhirLocation = (
         coding: [
           {
             code: 'jdn',
-            display: `'Jurisdiction'`
+            display: 'Jurisdiction'
           }
         ]
       }

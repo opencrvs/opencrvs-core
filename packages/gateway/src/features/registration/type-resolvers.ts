@@ -122,8 +122,8 @@ export const typeResolvers: GQLResolver = {
     id: (identifier) => {
       return identifier.value
     },
-    type: (identifier) => {
-      return identifier.type
+    type: (identifier: fhir.Identifier) => {
+      return identifier.type?.coding?.[0].code
     },
     otherType: (identifier) => {
       return identifier.otherType
@@ -293,6 +293,14 @@ export const typeResolvers: GQLResolver = {
         relatedPerson.relationship.text
       )
     },
+    name: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.name) || null
+    },
     dateOfMarriage: async (
       relatedPerson,
       _,
@@ -305,7 +313,7 @@ export const typeResolvers: GQLResolver = {
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
-        person.extension
+        person?.extension
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
@@ -317,9 +325,33 @@ export const typeResolvers: GQLResolver = {
       )
       const marriageExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age`,
-        person.extension
+        person?.extension
       )
       return (marriageExtension && marriageExtension.valueString) || null
+    },
+    birthDate: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.birthDate) || null
+    },
+    identifier: async (
+      relatedPerson,
+      _,
+      { headers: authHeader, dataSources }
+    ) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return (person && person.identifier) || null
     },
     maritalStatus: async (
       relatedPerson,
@@ -345,7 +377,7 @@ export const typeResolvers: GQLResolver = {
       )
       const occupationExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
-        person.extension
+        person?.extension
       )
       return (occupationExtension && occupationExtension.valueString) || null
     },
@@ -361,7 +393,7 @@ export const typeResolvers: GQLResolver = {
       )
       const reasonNotApplyingExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
-        person.extension
+        person?.extension
       )
       return (
         (reasonNotApplyingExtension &&
@@ -381,7 +413,7 @@ export const typeResolvers: GQLResolver = {
       )
       const ageOfIndividualInYearsExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person.extension
+        person?.extension
       )
       return (
         (ageOfIndividualInYearsExtension &&
@@ -401,7 +433,7 @@ export const typeResolvers: GQLResolver = {
       )
       const exactDateOfBirthUnknownExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
-        person.extension
+        person?.extension
       )
       return (
         (exactDateOfBirthUnknownExtension &&
@@ -419,7 +451,7 @@ export const typeResolvers: GQLResolver = {
         authHeader,
         dataSources
       )
-      return person.active
+      return person?.active
     },
     multipleBirth: async (
       relatedPerson,
@@ -431,7 +463,7 @@ export const typeResolvers: GQLResolver = {
         authHeader,
         dataSources
       )
-      return person.multipleBirthInteger
+      return person?.multipleBirthInteger
     },
     deceased: async (
       relatedPerson,
@@ -457,7 +489,7 @@ export const typeResolvers: GQLResolver = {
       )
       const nationalityExtension = findExtension(
         `${FHIR_SPECIFICATION_URL}patient-nationality`,
-        person.extension
+        person?.extension
       )
       if (!nationalityExtension || !nationalityExtension.extension) {
         return null
@@ -493,13 +525,21 @@ export const typeResolvers: GQLResolver = {
       )
       const educationalAttainmentExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`,
-        person.extension
+        person?.extension
       )
       return (
         (educationalAttainmentExtension &&
           educationalAttainmentExtension.valueString) ||
         null
       )
+    },
+    address: async (relatedPerson, _, { headers: authHeader, dataSources }) => {
+      const person = await getPatientResource(
+        relatedPerson,
+        authHeader,
+        dataSources
+      )
+      return person?.address
     }
   },
   Deceased: {
@@ -779,6 +819,13 @@ export const typeResolvers: GQLResolver = {
         task.extension
       )
       return (contactNumber && contactNumber.valueString) || null
+    },
+    contactEmail: (task) => {
+      const email = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`,
+        task.extension
+      )
+      return (email && email.valueString) || null
     },
     paperFormID: (task) => {
       const foundIdentifier =
@@ -2288,6 +2335,23 @@ export const typeResolvers: GQLResolver = {
     },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
+    },
+    async informant(
+      composition: ITemplatedComposition,
+      _,
+      { headers: authHeader }
+    ) {
+      const relatedPersonSection = findCompositionSection(
+        INFORMANT_CODE,
+        composition
+      )
+      if (!relatedPersonSection || !relatedPersonSection.entry) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${relatedPersonSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
     },
     async bride(
       composition: ITemplatedComposition,

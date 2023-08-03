@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-module.exports = {
-  globDirectory: 'build/',
-  globPatterns: ['**/*.{json,ico,ttf,html,js}'],
-  globIgnores: ['**/config.js'],
-  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-  swDest: 'build/service-worker.js',
-  swSrc: 'src/src-sw.js'
-}
+
+import styled from 'styled-components'
+
+export const Heading3 = styled.div`
+  ${({ theme }) => theme.fonts.h2};
+  color: ${({ theme }) => theme.colors.grey600};
+  margin-top: 24px;
+`

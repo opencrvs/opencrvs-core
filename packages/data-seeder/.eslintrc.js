@@ -9,21 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-/* eslint-disable */
-import { registerForms } from '@client/forms/configuration/default/index'
-import * as fs from 'fs'
-import { createUserForm } from './forms/user/fieldDefinitions/createUser'
-
-async function generateForm() {
-  const defaultFormsConfig = {
-    registerForm: registerForms,
-    userForm: createUserForm
-  }
-  fs.writeFileSync(
-    `${process.argv[2]}/src/tests/default.json`,
-    JSON.stringify(defaultFormsConfig, null, 2)
-  )
-  return true
+module.exports = {
+  extends: '../../.eslintrc.js',
+  env: {
+    es6: true
+  },
+  rules: {
+    'no-console': 'off',
+    'no-unused-vars': 'warn'
+  },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.json', './tsconfig.eslint.json']
+      }
+    }
+  ]
 }
-
-generateForm()

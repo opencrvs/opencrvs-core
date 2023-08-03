@@ -76,7 +76,7 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  top: 56px;
+  top: 0;
   width: 100%;
   position: sticky;
   z-index: 1;
@@ -677,11 +677,14 @@ export const DuplicateFormTabs = (props: IProps) => {
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
         registeredAt: (eventData.history as History[]).find(
-          (data) => data.action === null
+          (data) =>
+            data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (eventData.history as History[]).find((data) => data.action === null)
-            ?.user?.name as HumanName[],
+          (eventData.history as History[]).find(
+            (data) =>
+              data.action === null && data.regStatus === RegStatus.Registered
+          )?.user?.name as HumanName[],
           language
         )
       }

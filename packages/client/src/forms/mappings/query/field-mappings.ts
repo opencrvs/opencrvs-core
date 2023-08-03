@@ -18,7 +18,8 @@ import {
   BirthRegistration,
   DeathRegistration,
   MarriageRegistration,
-  Address
+  Address,
+  IdentityType
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -133,6 +134,27 @@ export const bundleFieldToSectionFieldTransformer =
     return transformedData
   }
 
+export const fieldValueSectionExchangeTransformer =
+  (
+    fromSectionId: SectionId,
+    fromSectionField: string,
+    transformerMethod?: IFormFieldQueryMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    queryData: QueryData,
+    sectionId: SectionId,
+    field: IFormField
+  ) => {
+    if (transformerMethod) {
+      transformerMethod(transformedData, queryData, sectionId, field)
+    } else if (Boolean(queryData[fromSectionId])) {
+      transformedData[sectionId][field.name] =
+        queryData[fromSectionId][fromSectionField]
+    }
+    return transformedData
+  }
+
 export function arrayToFieldTransformer(
   transformedData: IFormData,
   queryData: QueryData,
@@ -225,7 +247,7 @@ export const identityToNidVerificationFieldTransformer = (
     field
   )
   const existingIdentity = queryData[sectionId]?.identifier?.find(
-    (identity: fhir.Identifier) =>
+    (identity: IdentityType) =>
       (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (!transformedData[sectionId]) {
@@ -397,8 +419,9 @@ export function attachmentToFieldTransformer(
   const attachments: IAttachment[] = []
 
   if (queryData[selectedSectionId].attachments) {
-    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
-      (attachment) => {
+    ;(queryData[selectedSectionId].attachments as GQLAttachment[])
+      .filter((attachment) => attachment.subject === field.extraValue)
+      .forEach((attachment) => {
         attachments.push({
           data: attachment.data,
           uri: attachment.uri,
@@ -407,8 +430,7 @@ export function attachmentToFieldTransformer(
           title: attachment.subject,
           description: attachment.type
         } as IAttachment)
-      }
-    )
+      })
   }
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
@@ -644,7 +666,7 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) =>
+      (identity: IdentityType) =>
         (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
     )
     if (!transformedData[sectionId]) {

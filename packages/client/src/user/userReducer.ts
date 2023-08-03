@@ -43,7 +43,6 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { validators, Validator } from '@client/forms/validators'
-import { conditionals } from '@client/forms/conditionals'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -329,10 +328,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
-          userAuditForm: userAuditForm({
-            validators,
-            conditionals
-          })
+          userAuditForm
         },
         Cmd.run(fetchRoles, {
           successActionCreator: rolesLoaded

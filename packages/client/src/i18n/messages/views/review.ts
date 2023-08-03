@@ -12,6 +12,16 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Button to hide section',
+    id: 'form.field.hideLabel'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Button to show section',
+    id: 'form.field.showLabel'
+  },
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
@@ -176,14 +186,14 @@ const messagesToDefine = {
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
+      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an {deliveryMethod} with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
       'Description for review action component when complete declaration',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an SMS with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
+      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an {deliveryMethod} with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
     description:
       'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'

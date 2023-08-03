@@ -160,7 +160,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           title={
             userId
               ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-              : intl.formatMessage(section.title)
+              : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}

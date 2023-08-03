@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
+    "bcryptjs": "^2.4.3",
     "file-type": "^16.5.3",
     "influx": "^5.0.7",
     "is-svg": "^4.3.2",

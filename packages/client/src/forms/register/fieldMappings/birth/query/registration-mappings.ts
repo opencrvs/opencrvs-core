@@ -432,7 +432,7 @@ export const userTransformer =
     if (!_.history) {
       return
     }
-    const history: History = _.history
+    const history: History = [..._.history]
       .reverse()
       .find(
         ({ action, regStatus }: History) =>

@@ -9,16 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070'
+export const GATEWAY_GQL_HOST =
+  process.env.GATEWAY_GQL_HOST || 'http://localhost:7070/graphql'
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 
-import { getUserAvatarHandler } from '@gateway/routes/getUserAvatar/handler'
-
-export default {
-  method: 'GET',
-  path: '/files/avatar/{userId}.jpg',
-  handler: getUserAvatarHandler,
-  config: {
-    auth: false,
-    description: 'Get the user avatar as buffer',
-    notes: 'Pass the usreId as url param'
-  }
-}
+export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'

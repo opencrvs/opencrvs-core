@@ -371,9 +371,9 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.individual?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name,
+          certificate.collector.name,
           window.config.LANGUAGES
         )
       : {}

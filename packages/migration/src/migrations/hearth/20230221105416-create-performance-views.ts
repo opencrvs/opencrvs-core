@@ -138,9 +138,9 @@ export const up = async (db: Db, client: MongoClient) => {
                     cond: {
                       $eq: [
                         {
-                          $min: '$allTasks.meta.lastUpdated'
+                          $min: '$allTasks.lastModified'
                         },
-                        '$$this.meta.lastUpdated'
+                        '$$this.lastModified'
                       ]
                     }
                   }
@@ -454,6 +454,9 @@ export const up = async (db: Db, client: MongoClient) => {
             stateName: '$state.name',
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
+            },
+            registeredAt: {
+              $dateFromString: { dateString: '$registerTask.lastModified' }
             },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,

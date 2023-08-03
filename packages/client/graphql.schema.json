@@ -2013,7 +2013,31 @@
             "deprecationReason": null
           },
           {
-            "name": "HIDE_EVENT_REGISTER_INFORMATION",
+            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
             "description": null,
             "args": [],
             "type": {
@@ -2241,7 +2265,31 @@
             "deprecationReason": null
           },
           {
-            "name": "HIDE_EVENT_REGISTER_INFORMATION",
+            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -2334,6 +2382,22 @@
         "name": "AssignmentData",
         "description": null,
         "fields": [
+          {
+            "name": "avatarURL",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "firstName",
             "description": null,
@@ -9074,6 +9138,18 @@
             "deprecationReason": null
           },
           {
+            "name": "informant",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "RelatedPerson",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "questionnaire",
             "description": null,
             "args": [],
@@ -9221,6 +9297,18 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "PersonInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "informant",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "RelatedPersonInput",
               "ofType": null
             },
             "defaultValue": null,
@@ -16238,6 +16326,18 @@
             "deprecationReason": null
           },
           {
+            "name": "contactEmail",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "contactPhoneNumber",
             "description": null,
             "args": [],
@@ -16654,6 +16754,18 @@
           },
           {
             "name": "contact",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contactEmail",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -18094,22 +18206,6 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "message",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
             },
             "isDeprecated": false,
             "deprecationReason": null
