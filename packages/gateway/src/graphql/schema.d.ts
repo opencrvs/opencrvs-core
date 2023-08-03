@@ -629,6 +629,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
+  password?: string
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -654,7 +655,7 @@ export interface GQLAvatarInput {
 }
 
 export interface GQLResponse {
-  msg: string
+  roleIdMap: GQLMap
 }
 
 export interface GQLSystemRoleInput {
@@ -1342,6 +1343,7 @@ export interface GQLAssignmentData {
   firstName?: string
   lastName?: string
   officeName?: string
+  avatarURL: string
 }
 
 export interface GQLRegWorkflow {
@@ -6005,10 +6007,10 @@ export interface AvatarToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLResponseTypeResolver<TParent = any> {
-  msg?: ResponseToMsgResolver<TParent>
+  roleIdMap?: ResponseToRoleIdMapResolver<TParent>
 }
 
-export interface ResponseToMsgResolver<TParent = any, TResult = any> {
+export interface ResponseToRoleIdMapResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -8962,6 +8964,7 @@ export interface GQLAssignmentDataTypeResolver<TParent = any> {
   firstName?: AssignmentDataToFirstNameResolver<TParent>
   lastName?: AssignmentDataToLastNameResolver<TParent>
   officeName?: AssignmentDataToOfficeNameResolver<TParent>
+  avatarURL?: AssignmentDataToAvatarURLResolver<TParent>
 }
 
 export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
@@ -8998,6 +9001,18 @@ export interface AssignmentDataToLastNameResolver<
 }
 
 export interface AssignmentDataToOfficeNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AssignmentDataToAvatarURLResolver<
   TParent = any,
   TResult = any
 > {

@@ -52,7 +52,9 @@ describe('Route authorization', () => {
           email: 'email@email.com'
         },
         name: 'test',
-        trackingId: 'B123456'
+        trackingId: 'B123456',
+        crvsOffice: 'ALASKA',
+        informantName: 'SADMAN ANIK'
       },
       headers: {
         Authorization: `Bearer ${token}`

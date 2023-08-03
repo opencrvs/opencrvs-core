@@ -127,7 +127,7 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry.push(personEntry)
   } else {
     if (!section.entry || !section.entry[0]) {
-      throw new Error('Expected person section ot have an entry')
+      throw new Error('Expected person section to have an entry')
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
@@ -882,7 +882,18 @@ export function setObjectPropInResourceArray(
     if (!resource[label][context._index[label]]) {
       resource[label][context._index[label]] = {}
     }
-    resource[label][context._index[label]][propName] = value
+    if (label === 'identifier' && propName === 'type') {
+      resource[label][context._index[label]][propName] = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+            code: value
+          }
+        ]
+      }
+    } else {
+      resource[label][context._index[label]][propName] = value
+    }
   }
 }
 

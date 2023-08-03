@@ -1062,6 +1062,10 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     )
     fetch.resetMocks()
     server = await createServer()
+
+    jest
+      .spyOn(require('./fhir/fhir-utils'), 'getInformantName')
+      .mockReturnValue('informant name')
   })
 
   it('returns error', async () => {

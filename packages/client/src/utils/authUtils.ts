@@ -90,11 +90,16 @@ export async function refreshToken() {
         token
       })
     })
-    const data = await res.json()
 
-    removeToken()
-    storeToken(data.token)
+    if (!res.ok) {
+      return false
+    } else {
+      const data = await res.json()
+      removeToken()
+      storeToken(data.token)
+    }
   }
+  return true
 }
 
 export const enum AuthScope {

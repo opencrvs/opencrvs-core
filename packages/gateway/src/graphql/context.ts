@@ -14,6 +14,7 @@ import PatientAPI from '../features/fhir/patientAPI'
 import { IAuthHeader } from '../common-types'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PractitionerRoleAPI from '../features/fhir/practitionerRoleAPI'
+import MinioAPI from '../features/fhir/minioAPI'
 import { Request } from '@hapi/hapi'
 
 export interface Context {
@@ -22,6 +23,7 @@ export interface Context {
     locationsAPI: LocationsAPI
     practitionerRoleAPI: PractitionerRoleAPI
     patientAPI: PatientAPI
+    minioAPI: MinioAPI
   }
   headers: IAuthHeader
 }

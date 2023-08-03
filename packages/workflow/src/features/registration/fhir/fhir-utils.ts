@@ -40,17 +40,14 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export async function getSharedContactEmail(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return await getEmailAddress(
-    getTaskResource(fhirBundle),
-    getEventType(fhirBundle)
-  )
+  return getEmailAddress(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export function concatenateName(fhirNames: fhir.HumanName[]) {
@@ -322,10 +319,7 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
 }
 
 //TODO: need to modifty for marriage event
-export async function getPhoneNo(
-  taskResource: fhir.Task,
-  eventType: EVENT_TYPE
-) {
+export function getPhoneNo(taskResource: fhir.Task, eventType: EVENT_TYPE) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
     const phoneExtension =
@@ -346,7 +340,7 @@ export async function getPhoneNo(
 }
 
 //TODO: need to modifty for marriage event
-export async function getEmailAddress(
+export function getEmailAddress(
   taskResource: fhir.Task,
   eventType: EVENT_TYPE
 ) {
@@ -401,6 +395,7 @@ export async function getEventInformantName(
   if (!name || !name.family) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
+
   return ''
     .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')

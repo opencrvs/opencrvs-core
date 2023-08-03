@@ -1861,6 +1861,25 @@ export function getMinioUrlsFromDeclaration(
     string,
     IAttachmentValue[]
   >
+
+  const userAvatars: string[] = Object.values(
+    declaration.originalData?.history || []
+  )
+    .map((history) => {
+      if (
+        typeof history === 'object' &&
+        history !== null &&
+        'user' in history
+      ) {
+        const user = history.user as { avatar?: { data?: string } }
+        return user.avatar?.data
+      }
+      return null
+    })
+    .filter((avatarData): avatarData is string => Boolean(avatarData))
+
+  minioUrls.push(...userAvatars)
+
   if (!documentsData) {
     return minioUrls
   }
