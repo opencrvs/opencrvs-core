@@ -67,7 +67,11 @@ import {
 } from '@client/views/RegisterForm/review/ReviewSection'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { generateLocations } from '@client/utils/locationUtils'
-import { formatLocationName, formatMessage } from './utils'
+import {
+  formatLocationName,
+  formatMessage,
+  getLocationHierarchy
+} from './utils'
 import { IValidationResult } from '@client/utils/validate'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
@@ -89,8 +93,11 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
-import { Checkbox } from '@opencrvs/components/lib'
+import { Checkbox, Stack } from '@opencrvs/components/lib'
 import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
+import { Event, History } from '@client/utils/gateway'
+import { DECLARED, VALIDATED } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
@@ -155,6 +162,7 @@ const SignatureBox = styled.div`
   margin-top: 8px;
   height: 66px;
   display: flex;
+  width: 100%;
   border-radius: 4px;
   border-top: 1px solid ${({ theme }) => theme.colors.grey500};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
@@ -180,6 +188,10 @@ const WarningText = styled.p`
 const StyledEM = styled.em`
   ${({ theme }) => theme.fonts.reg14}
 `
+const StyledStack = styled(Stack)`
+  flex: 1;
+`
+
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,
   options: Array<ISelectOption | IRadioOption>,
@@ -1042,6 +1054,36 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     errorsOnFields,
     offlineCountryConfiguration
   )
+  function renderSignatureBox() {
+    if (props.declaration.event === Event.Marriage) {
+      return (
+        <StyledStack>
+          <StyledStack direction="column">
+            <SignatureBox>
+              {formatMessage(props.intls, reviewMessages.groomSignature)}
+            </SignatureBox>
+            <SignatureBox>
+              {formatMessage(props.intls, reviewMessages.witnessOneSignature)}
+            </SignatureBox>
+          </StyledStack>
+          <StyledStack direction="column">
+            <SignatureBox>
+              {formatMessage(props.intls, reviewMessages.brideSignature)}
+            </SignatureBox>
+            <SignatureBox>
+              {formatMessage(props.intls, reviewMessages.witnessTwoSignature)}
+            </SignatureBox>
+          </StyledStack>
+        </StyledStack>
+      )
+    } else {
+      return (
+        <SignatureBox>
+          {formatMessage(props.intls, reviewMessages.informantsSignature)}
+        </SignatureBox>
+      )
+    }
+  }
   function renderDocumentBox(field: IDocumentUploaderWithOptionsFormField) {
     const documents = props.declaration.data?.documents?.[
       field.name
@@ -1075,6 +1117,15 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     (field) => field.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) || []) as IDocumentUploaderWithOptionsFormField[]
   const leftColumnSize = Math.ceil(documentSectionFields.length / 2)
+  const declarationAciton = (
+    props.declaration.data.history as unknown as History[]
+  )
+    .reverse()
+    .find(
+      (history) =>
+        history.regStatus && [DECLARED, VALIDATED].includes(history.regStatus)
+    )
+
   return (
     <div>
       {transformedSectionData.map((section, idx) => (
@@ -1123,9 +1174,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           </tbody>
         </StyledTable>
       )}
-      <SignatureBox>
-        {formatMessage(props.intls, reviewMessages.informantsSignature)}
-      </SignatureBox>
+      {renderSignatureBox()}
       <WarningText>
         <span>
           {formatMessage(
@@ -1148,7 +1197,8 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
               <StyledEM>
                 {formatMessage(
                   props.intls,
-                  printRecordMessages.informantAttestation
+                  printRecordMessages.informantAttestation,
+                  { eventType: props.declaration.event }
                 )}
               </StyledEM>
             </StyledTD>
@@ -1160,7 +1210,18 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
                 printRecordMessages.placeOfDeclaration
               )}
             </StyledTD>
-            <StyledTD></StyledTD>
+            <StyledTD>
+              {declarationAciton?.location?.id &&
+                getLocationHierarchy(
+                  declarationAciton.location.id,
+                  offlineCountryConfiguration
+                ).map((loc) => (
+                  <span key={loc.id}>
+                    {formatLocationName(loc)}
+                    <br></br>
+                  </span>
+                ))}
+            </StyledTD>
           </StyledTR>
           <StyledTR>
             <StyledTD>
@@ -1169,13 +1230,18 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
                 printRecordMessages.civilRegistrationOffice
               )}
             </StyledTD>
-            <StyledTD></StyledTD>
+            <StyledTD>
+              {declarationAciton?.office &&
+                formatLocationName(
+                  declarationAciton?.office as unknown as ILocation
+                )}
+            </StyledTD>
           </StyledTR>
           <StyledTR>
             <StyledTD>
               {formatMessage(props.intls, constantsMessages.dateOfDeclaration)}
             </StyledTD>
-            <StyledTD></StyledTD>
+            <StyledTD>{formatLongDate(declarationAciton?.date)}</StyledTD>
           </StyledTR>
           <StyledTR>
             <StyledTD>
@@ -1184,7 +1250,10 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
                 userMessages['REGISTRATION_AGENT']
               )}
             </StyledTD>
-            <StyledTD></StyledTD>
+            <StyledTD>
+              {declarationAciton?.user?.name &&
+                createNamesMap(declarationAciton.user.name)[intl.locale]}
+            </StyledTD>
           </StyledTR>
         </tbody>
       </StyledTable>

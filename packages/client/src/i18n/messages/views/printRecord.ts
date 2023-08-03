@@ -24,7 +24,8 @@ const messagesToDefine = {
   },
   informantAttestation: {
     id: 'print.declaration.informantAttestation',
-    defaultMessage: 'I attest to having received this death declaration',
+    defaultMessage:
+      'I attest to having received this {eventType, select, birth{birth} death{death} marriage{marriage} other{}} declaration',
     description: 'Text for declaration details table entry'
   },
   placeOfDeclaration: {

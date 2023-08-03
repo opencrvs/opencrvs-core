@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ILanguageState } from '@client/i18n/reducer'
-import { ILocation } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { createIntl, MessageDescriptor, IntlShape, IntlCache } from 'react-intl'
 
 export function formatMessage(
@@ -40,4 +40,23 @@ export function formatLocationName(location: ILocation) {
   return locales.length > 1
     ? [location.alias, location.name].join(' / ')
     : location.name
+}
+
+export function getLocationHierarchy(
+  locationKey: string,
+  offlineCountryConfig: IOfflineData
+): ILocation[] {
+  const result: ILocation[] = []
+  const { locations } = offlineCountryConfig
+  let location = locations[locationKey]
+  if (!location) {
+    return result
+  } else {
+    do {
+      result.push(location)
+      const parent = location.partOf.split('/')[1]
+      location = locations[parent]
+    } while (location)
+    return result.reverse()
+  }
 }
