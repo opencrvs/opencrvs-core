@@ -504,7 +504,7 @@ export const eventLocationTypeQueryTransformer =
       return transformedData
     }
     if (!queryData.eventLocation.type) {
-      transformedData[sectionId][field.name] = 'HOSPITAL'
+      transformedData[sectionId][field.name] = 'HEALTH_FACILITY'
     } else {
       transformedData[sectionId][field.name] = queryData.eventLocation
         .type as string
