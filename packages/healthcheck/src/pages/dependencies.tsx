@@ -10,7 +10,6 @@ import { useRouter } from 'next/router'
 import DynamicModal from '@/components/DynamicModal'
 import { Service, Status } from '@/lib/check-health'
 import { LoadingGrey, Spinner } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 const Search = styled(SearchTool)`
   margin-right: 10px;
@@ -24,87 +23,37 @@ const ServiceContent = styled(Content)`
 `
 
 export default function dependencies() {
+  type ButtonType = 'primary' | 'secondary'
+
   const router = useRouter()
+  const pingUrl = 'http://localhost:7070/ping?service'
+  const columns = [
+    { label: 'Service', width: 25, key: 'service' },
+    { label: 'Port', width: 20, key: 'port' },
+    { label: 'Status', width: 20, key: 'status' },
+    { label: 'Timespan', width: 20, key: 'span' },
+    { label: 'Action', width: 15, key: 'action' }
+  ]
   const [modalState, setModalState] = useState(false)
-
-  function handleView() {
-    setModalState(true)
-  }
-  function handleClose() {
-    setModalState(false)
-  }
-
-  // function Check<T = any>({
-  //   check,
-  //   ok,
-  //   fail,
-  //   instructions
-  // }: {
-  //   check: () => Promise<T>
-  //   ok: (result: T) => React.ReactNode
-  //   fail: (result: Error) => React.ReactNode
-  //   instructions?: React.ReactNode
-  // }) {
-  //   const [status, setStatus] = useState<Status>(Status.LOADING)
-  //   const [result, setResult] = useState<T | null>(null)
-  //   const [icon, setIcon] = useState<JSX.Element | null>(null)
-  //   useEffect(() => {
-  //     check()
-  //       .then((result) => {
-  //         setResult(result as T)
-  //         setStatus('OK')
-  //         setIcon(<Success />)
-  //       })
-  //       .catch((err) => {
-  //         setResult(err)
-  //         setStatus('FAIL')
-  //         setIcon(<Offline />)
-  //       })
-  //   }, [])
-
-  //   if (status == Status.LOADING) {
-  //     return <Spinner size={20} id="spin" />
-  //   }
-  //   return (
-  //     <div className="check">
-  //       {status === Status.OK ? (
-  //         <>
-  //           <Pill label="Running" type="active" size="small" />
-  //           <Icon name={'Activity'} color="green" />
-  //         </>
-  //       ) : (
-  //         <Icon color="red" name={'Activity'} />
-  //       )}
-  //       <div>
-  //         {status === Status.OK ? ok(result as T) : fail(result as Error)}
-  //         {status === Status.ERROR && instructions && (
-  //           <div className="instructions">{instructions}</div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // const pingUrl = 'http://localhost:7070/ping?service='
-
+  const [Running, setRunning] = useState<ButtonType>('secondary')
   const [services, setServices] = useState({
-    countryconfig: {
-      name: 'countryconfig',
-      url: 'http://localhost:7070/ping?service=countryconfig',
+    CountryConfig: {
+      name: 'CountryConfig',
+      url: `${pingUrl}=countryconfig`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
-    openhim: {
-      name: 'openhim',
+    Openhim: {
+      name: 'Openhim',
       acceptedStatusCodes: [200, 404],
-      url: 'http://localhost:7070/ping?service=openhim',
+      url: `${pingUrl}=openhim`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     MongoDB: {
-      name: 'MOngoDB',
+      name: 'MongoDB',
       url: 'https://stackoverflow.com/questions/37839365/simple-http-tcp-health-check-for-mongodb/37852368#37852368',
       status: 'LOADING',
       type: 'dependency',
@@ -112,33 +61,40 @@ export default function dependencies() {
     },
     Influx: {
       name: 'Influx',
-      url: 'http://localhost:7070/ping?service=influx',
+      url: `${pingUrl}=influx`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Minio: {
       name: 'Minio',
-      url: 'https://docs.min.io/minio/baremetal/monitoring/healthcheck-probe.html',
+      url: 'http://localhost:3535/minio/health/cluster',
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Kibana: {
       name: 'Kibana',
-      url: 'https://docs.min.io/minio/baremetal/monitoring/healthcheck-probe.html',
+      url: 'https://kibana.farajaland.opencrvs.org/api/status',
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Elasticsearch: {
       name: 'Elasticsearch',
-      url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-health.html#cat-health-api-request',
+      url: 'http://localhost:9200/_cluster/health',
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     }
   })
+
+  const handleView = () => {
+    setModalState(true)
+  }
+  const handleClose = () => {
+    setModalState(false)
+  }
 
   useEffect(() => {
     function setHealthy(service: Service) {
@@ -173,15 +129,11 @@ export default function dependencies() {
         }
       }))
     }
-    console.log(services)
+
     Object.values(services).forEach((service) => {
       fetch(service.url)
         .then((res) => {
-          if (
-            (service.acceptedStatusCodes &&
-              service.acceptedStatusCodes.includes(res.status)) ||
-            res.status === 200
-          ) {
+          if (res.status === 200) {
             return setHealthy(service)
           }
 
@@ -192,135 +144,6 @@ export default function dependencies() {
         })
     })
   }, [])
-
-  // const [contents, setContents] = useState([
-  //   {
-  //     // service: 'Auth',
-  //     // port: '4030',
-  //     // status: <Pill label="Down" type="inactive" size="small" />,
-  //     // span: '3 min ago',
-  //     // action: (
-  //     //   <Button type="primary" size="small" onClick={handleView}>
-  //     //     view
-  //     //   </Button>
-  //     // )
-  //   }
-  // ])
-
-  // useEffect(() => {
-  //   function serviceStatus(service: string) {
-  //     return fetch(`http://localhost:7070/ping?service=${service}`)
-  //       .then((res) => {
-  //         if (res.status == 200) {
-  //           return true
-  //         } else {
-  //           return false
-  //         }
-  //       })
-  //       .catch(() => {
-  //         return false
-  //       })
-  //   }
-
-  //   serviceStatus('documents').then((result) => {
-  //     // Do something with the result
-  //     const updatedContents = [
-  //       {
-  //         service: 'Auth',
-  //         port: '4030',
-  //         status: result ? (
-  //           <Pill label="Running" type="active" size="small" />
-  //         ) : (
-  //           <Pill label="Down" type="inactive" size="small" />
-  //         ),
-  //         span: '3 min ago',
-  //         action: (
-  //           <Button type="primary" size="small" onClick={handleView}>
-  //             view
-  //           </Button>
-  //         )
-  //       }
-  //     ]
-
-  //     setContents(updatedContents)
-  //     // Update state or do something with the updated contents
-  //   })
-  // })
-
-  const columns = [
-    { label: 'Service', width: 25, key: 'service' },
-    { label: 'Port', width: 20, key: 'port' },
-    { label: 'Status', width: 20, key: 'status' },
-    { label: 'Timespan', width: 20, key: 'span' },
-    { label: 'Action', width: 15, key: 'action' }
-  ]
-
-  // const contents = [
-  //   {
-  //     service: 'Auth',
-  //     port: '4030',
-  //     status: serviceStatus() ? (
-  //       <Pill label="Running" type="active" size="small" />
-  //     ) : (
-  //       <Pill label="Down" type="inactive" size="small" />
-  //     ),
-  //     span: '3 min ago',
-  //     action: (
-  //       <Button type="primary" size="small" onClick={handleView}>
-  //         {' '}
-  //         view{' '}
-  //       </Button>
-  //     )
-  //   },
-  //   {
-  //     service: 'User',
-  //     port: '8090',
-  //     status: <Pill label="Running" type="active" size="small" />,
-  //     span: '3 min ago',
-  //     action: (
-  //       <Button type="primary" size="small" onClick={handleView}>
-  //         {' '}
-  //         view{' '}
-  //       </Button>
-  //     )
-  //   },
-  //   {
-  //     service: 'Notification',
-  //     port: '7070',
-  //     status: <Pill label="Running" type="active" size="small" />,
-  //     span: '3 min ago',
-  //     action: (
-  //       <Button type="primary" size="small" onClick={handleView}>
-  //         {' '}
-  //         view{' '}
-  //       </Button>
-  //     )
-  //   },
-  //   {
-  //     service: 'Webhooks',
-  //     port: '5060',
-  //     status: <Pill label="Running" type="active" size="small" />,
-  //     span: '3 min ago',
-  //     action: (
-  //       <Button type="primary" size="small" onClick={handleView}>
-  //         {' '}
-  //         view{' '}
-  //       </Button>
-  //     )
-  //   },
-  //   {
-  //     service: 'Gateway',
-  //     port: '8080',
-  //     status: <Pill label="Down" type="inactive" size="small" />,
-  //     span: '3 min ago',
-  //     action: (
-  //       <Button type="primary" size="small" onClick={handleView}>
-  //         {' '}
-  //         view{' '}
-  //       </Button>
-  //     )
-  //   }
-  // ]
 
   return (
     <ServiceContent size={ContentSize.LARGE} title="Dependencies">
@@ -341,7 +164,12 @@ export default function dependencies() {
             {' '}
             All{' '}
           </Button>
-          <Button type="secondary" size="small" style={{ marginRight: 5 }}>
+          <Button
+            type={Running}
+            size="small"
+            style={{ marginRight: 5 }}
+            onClick={() => setRunning('primary')}
+          >
             {' '}
             Running{' '}
           </Button>
@@ -371,13 +199,6 @@ export default function dependencies() {
                 placeHolderText: 'Search for a service',
                 value: 'Tracking ID'
               }
-              // {
-              //   icon: <BRN />,
-              //   invertIcon: <BRN />,
-              //   label: 'BRN/DRN',
-              //   placeHolderText: '',
-              //   value: ''
-              // }
             ]}
           />
 
@@ -385,14 +206,6 @@ export default function dependencies() {
             {' '}
             Search{' '}
           </Button>
-          {/* <ToggleMenu
-              key="toggleMenu"
-              id="toggleMenu"
-              menuItems={[
-                { handler: function noRefCheck() {}, label: 'Item 1' }
-              ]}
-              toggleButton={<VerticalThreeDots />}
-            /> */}
         </div>
       </div>
 
@@ -404,11 +217,16 @@ export default function dependencies() {
           port: '3002',
           status: service.icon,
           span: '3 min',
-          action: (
-            <Button type="primary" size="small" onClick={handleView}>
-              view
-            </Button>
-          )
+          action:
+            service.status === 'OK' ? (
+              <Button type="primary" size="small" onClick={handleView} disabled>
+                view
+              </Button>
+            ) : (
+              <Button type="primary" size="small" onClick={handleView}>
+                view
+              </Button>
+            )
         }))}
       />
 

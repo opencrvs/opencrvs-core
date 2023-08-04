@@ -10,8 +10,6 @@ import { useRouter } from 'next/router'
 import DynamicModal from '@/components/DynamicModal'
 import { Service, Status } from '@/lib/check-health'
 import { LoadingGrey, Spinner } from '@opencrvs/components'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { ok } from 'assert'
 
 const Search = styled(SearchTool)`
   margin-right: 10px;
@@ -25,23 +23,23 @@ const ServiceContent = styled(Content)`
 `
 
 export default function microservices() {
+  type ButtonType = 'primary' | 'secondary'
+
   const router = useRouter()
-  const [modalState, setModalState] = useState(false)
-
-  function handleView() {
-    setModalState(true)
-  }
-  function handleClose() {
-    setModalState(false)
-  }
-
-  const pingUrl = 'http://localhost:7070/ping?service='
+  const columns = [
+    { label: 'Service', width: 25, key: 'service' },
+    { label: 'Port', width: 20, key: 'port' },
+    { label: 'Status', width: 20, key: 'status' },
+    { label: 'Timespan', width: 20, key: 'span' },
+    { label: 'Action', width: 15, key: 'action' }
+  ]
+  const pingUrl = 'http://localhost:7070/ping?service'
   const [services, setServices] = useState({
     auth: {
       name: 'auth',
       port: 304,
       label: 'Auth',
-      url: `${pingUrl}auth`,
+      url: `${pingUrl}=auth`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -50,7 +48,7 @@ export default function microservices() {
       name: 'user',
       port: 304,
       label: 'User',
-      url: 'http://localhost:7070/ping?service=user-mgnt',
+      url: `${pingUrl}=user-mgnt`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -59,7 +57,7 @@ export default function microservices() {
       name: 'webhooks',
       port: 304,
       label: 'Webhooks',
-      url: 'http://localhost:7070/ping?service=webhooks',
+      url: `${pingUrl}=webhooks`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -68,7 +66,7 @@ export default function microservices() {
       name: 'documents',
       port: 304,
       label: 'Documents',
-      url: 'http://localhost:7070/ping?service=documents',
+      url: `${pingUrl}=documents`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -77,7 +75,7 @@ export default function microservices() {
       name: 'notification',
       port: 304,
       label: 'Notification',
-      url: 'http://localhost:7070/ping?service=notification',
+      url: `${pingUrl}=notification`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -86,7 +84,7 @@ export default function microservices() {
       name: 'gateway',
       port: 304,
       label: 'Gateway',
-      url: 'http://localhost:7070/ping?service=gateway',
+      url: `${pingUrl}=gateway`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -95,7 +93,7 @@ export default function microservices() {
       name: 'workflow',
       port: 304,
       label: 'Workflow',
-      url: 'http://localhost:7070/ping?service=workflow',
+      url: `${pingUrl}=workflow`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -104,7 +102,7 @@ export default function microservices() {
       name: 'search',
       port: 304,
       label: 'Search',
-      url: 'http://localhost:7070/ping?service=search',
+      url: `${pingUrl}=search`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -113,7 +111,7 @@ export default function microservices() {
       name: 'countryconfig',
       port: 304,
       label: 'Countryconfig',
-      url: 'http://localhost:7070/ping?service=countryconfig',
+      url: `${pingUrl}=countryconfig`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -122,7 +120,7 @@ export default function microservices() {
       name: 'metrics',
       port: 304,
       label: 'Webhooks',
-      url: 'http://localhost:7070/ping?service=metrics',
+      url: `${pingUrl}=metrics`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -131,7 +129,7 @@ export default function microservices() {
       name: 'client',
       port: 304,
       label: 'Client',
-      url: 'http://localhost:7070/ping?service=client',
+      url: `${pingUrl}=client`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -140,7 +138,7 @@ export default function microservices() {
       name: 'login',
       port: 304,
       label: 'Login',
-      url: 'http://localhost:7070/ping?service=login',
+      url: `${pingUrl}=login`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
@@ -149,55 +147,22 @@ export default function microservices() {
       name: 'config',
       port: 304,
       label: 'Config',
-      url: 'http://localhost:7070/ping?service=config',
+      url: `${pingUrl}=config`,
       status: 'LOADING',
       type: 'service',
       icon: <LoadingGrey />
     }
-    // openhim: {
-    //   name: 'openhim',
-    //   acceptedStatusCodes: [200, 404],
-    //   url: 'http://localhost:7070/ping?service=openhim',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // },
-    // MongoDB: {
-    //   name: 'MOngoDB',
-    //   url: 'https://stackoverflow.com/questions/37839365/simple-http-tcp-health-check-for-mongodb/37852368#37852368',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // },
-    // Influx: {
-    //   name: 'Influx',
-    //   url: 'http://localhost:7070/ping?service=influx',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // },
-    // Minio: {
-    //   name: 'Minio',
-    //   url: 'https://docs.min.io/minio/baremetal/monitoring/healthcheck-probe.html',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // },
-    // Kibana: {
-    //   name: 'Kibana',
-    //   url: 'https://docs.min.io/minio/baremetal/monitoring/healthcheck-probe.html',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // },
-    // Elasticsearch: {
-    //   name: 'Elasticsearch',
-    //   url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-health.html#cat-health-api-request',
-    //   status: 'LOADING',
-    //   type: 'dependency',
-    //   icon: <LoadingGrey />
-    // }
   })
+  const [modalState, setModalState] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [Running, setRunning] = useState<ButtonType>('secondary')
+
+  const handleView = () => {
+    setModalState(true)
+  }
+  const handleClose = () => {
+    setModalState(false)
+  }
 
   useEffect(() => {
     function setHealthy(service: Service) {
@@ -236,11 +201,7 @@ export default function microservices() {
     Object.values(services).forEach((service) => {
       fetch(service.url)
         .then((res) => {
-          if (
-            (service.acceptedStatusCodes &&
-              service.acceptedStatusCodes.includes(res.status)) ||
-            res.status === 200
-          ) {
+          if (res.status === 200) {
             return setHealthy(service)
           }
 
@@ -251,17 +212,6 @@ export default function microservices() {
         })
     })
   }, [])
-
-  const columns = [
-    { label: 'Service', width: 25, key: 'service' },
-    { label: 'Port', width: 20, key: 'port' },
-    { label: 'Status', width: 20, key: 'status' },
-    { label: 'Timespan', width: 20, key: 'span' },
-    { label: 'Action', width: 15, key: 'action' }
-  ]
-
-  const [currentPage, setCurrentPage] = useState(1)
-  const [Running, setRunning] = useState('secondary')
 
   return (
     <ServiceContent size={ContentSize.LARGE} title="Microservices">
