@@ -18,6 +18,7 @@ import {
   GQLCountryLogoInput,
   GQLMarriageInput
 } from '@gateway/graphql/schema'
+import { String } from 'lodash'
 
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
@@ -27,16 +28,11 @@ export interface IApplicationConfigPayload {
   DEATH: GQLDeathInput
   MARRIAGE: GQLMarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
-  ADDRESSES: number
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: GQLLoginBackgroundInput
 }
