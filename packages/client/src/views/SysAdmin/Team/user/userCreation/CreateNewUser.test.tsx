@@ -22,7 +22,9 @@ import {
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  getFileFromBase64String,
+  validImageB64String
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -38,7 +40,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
 
-export const mockUsers = {
+const mockUsers = {
   data: {
     searchUsers: {
       totalItems: 8,
@@ -54,7 +56,7 @@ export const mockUsers = {
             }
           ],
           username: 'api.user',
-          systemRole: 'API_USER',
+          systemRole: 'NATIONAL_REGISTRAR',
           role: {
             _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             labels: [
@@ -207,7 +209,7 @@ describe('create new user tests', () => {
             // @ts-ignore
             params: {
               locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.forms.userForm.sections[0].id
+              sectionId: mockOfflineData.userForms.sections[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -230,19 +232,20 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#phoneNumber_error')
+          .find('#familyNameEng_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
     })
 
-    it('clicking on confirm button with complete data takes user to preview page', async () => {
+    it('clicking on confirm button with complete data takes user to signature attachment page', async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-
-      expect(history.location.pathname).toContain('preview')
+      expect(history.location.pathname).toContain(
+        'preview/preview-registration-office'
+      )
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
@@ -266,8 +269,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[1].id,
-              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+              sectionId: mockOfflineData.userForms.sections[1].id,
+              groupId: mockOfflineData.userForms.sections[1].groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -341,7 +344,7 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
-            systemRole: 'API_USER',
+            systemRole: 'NATIONAL_REGISTRAR',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',
             underInvestigation: false,
@@ -409,7 +412,7 @@ describe('edit user tests', () => {
       component = testComponent
     })
 
-    it('clicking on continue button takes user review details page', async () => {
+    it('clicking on continue button takes user signature attachment page', async () => {
       const continueButtonElement = await waitForElement(
         component,
         '#confirm_form'
@@ -418,9 +421,8 @@ describe('edit user tests', () => {
       continueButtonElement.hostNodes().simulate('click')
       component.update()
       await flushPromises()
-      expect(history.location.pathname).toContain(
-        '/user/5e835e4d81fbf01e4dc554db/preview/'
-      )
+
+      expect(history.location.pathname).toContain('signature-attachment')
     })
   })
 
@@ -474,11 +476,29 @@ describe('edit user tests', () => {
     })
 
     it('clicking confirm button starts submitting the form', async () => {
+      await waitForElement(component, '#image_file_uploader_field')
+      component.update()
+      const file = new File(['(⌐□_□)'], 'chucknorris.png', {
+        type: 'image/png'
+      })
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { files: [file] } })
+
+      await flushPromises()
+      component.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
       submitButton.hostNodes().simulate('click')
+      await flushPromises()
+      component.update()
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })

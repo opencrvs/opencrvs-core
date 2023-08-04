@@ -12,7 +12,8 @@
 import React, { useEffect, useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   goToAdvancedSearch,
@@ -79,7 +80,6 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
-import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,

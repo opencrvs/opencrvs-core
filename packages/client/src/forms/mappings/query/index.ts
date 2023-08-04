@@ -10,15 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './field-mappings'
-export * from '@client/forms/register/fieldMappings/birth/query/documents-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/father-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/mother-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/declaration-mappings'
-export * from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/event-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/spouse-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/query/registration-mappings'
-export * from '@client/forms/register/fieldMappings/marriage/query/documents-mappings'
+export * from '@client/forms/register/fieldMappings/event/query/documents-mappings'
+export * from '@client/forms/register/fieldMappings/informant/query/informant-mappings'
 export * from '@client/forms/register/fieldMappings/marriage/query/event-mappings'
 export * from '@client/forms/register/customFieldMappings/query/customField-mappings'

@@ -59,10 +59,6 @@ type IState = {
   showError: boolean
 }
 
-const P = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-  margin: 16px 0 24px;
-`
 const QuestionWrapper = styled.div`
   margin-bottom: 66px;
   ${({ theme }) => theme.fonts.reg16};

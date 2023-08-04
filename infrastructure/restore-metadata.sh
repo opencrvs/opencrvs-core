@@ -68,6 +68,8 @@ restore_metadata () {
   docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash -c "$COMMAND"
 }
 
+tar -xzf $DIR/default_backups/minio.tar.gz -C /data/minio/
+
 restore_metadata "/default_backups/hearth-dev.gz";
 
 restore_metadata "/default_backups/openhim-dev.gz"

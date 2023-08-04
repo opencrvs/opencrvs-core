@@ -74,6 +74,7 @@ interface IConstantsMessages
   labelLanguage: MessageDescriptor
   labelPassword: MessageDescriptor
   labelPhone: MessageDescriptor
+  labelEmail: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   labelSystemRole: MessageDescriptor
@@ -135,7 +136,6 @@ interface IConstantsMessages
   maleOver18: MessageDescriptor
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
-  registrationTitle: MessageDescriptor
   withinTargetDays: MessageDescriptor
   withinTargetDaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
@@ -505,6 +505,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Phone label',
     id: 'constants.phoneNumber'
   },
+  labelEmail: {
+    defaultMessage: 'Email Address',
+    description: 'Email label',
+    id: 'constants.emailAddress'
+  },
+
   labelPin: {
     defaultMessage: 'PIN',
     description: 'PIN label',
@@ -838,11 +844,6 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for location',
     id: 'constants.location'
   },
-  registrationTitle: {
-    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
-    description: 'Label for registrationTitle',
-    id: 'constants.registrationTitle'
-  },
   withinTargetDays: {
     defaultMessage: `Within {registrationTargetDays} days`,
     description: `Label for registrations within {registrationTargetDays} days`,
@@ -982,6 +983,11 @@ const dynamicMessagesToDefine: Record<
   string | number | symbol,
   MessageDescriptor
 > = {
+  draft: {
+    id: 'constants.draft',
+    defaultMessage: 'Draft',
+    description: 'A label for draft'
+  },
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',

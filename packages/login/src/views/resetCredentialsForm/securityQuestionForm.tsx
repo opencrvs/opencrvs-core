@@ -33,6 +33,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
   & > div {
@@ -207,7 +208,9 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
               )}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="security-question-form" onSubmit={this.handleContinue}>
             <Content

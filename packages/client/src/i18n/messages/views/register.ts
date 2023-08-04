@@ -21,9 +21,10 @@ interface IRegisterMessages
   backToReviewButton: MessageDescriptor
   saveDeclarationConfirmModalTitle: MessageDescriptor
   saveDeclarationConfirmModalDescription: MessageDescriptor
-
   deleteDeclarationConfirmModalTitle: MessageDescriptor
   deleteDeclarationConfirmModalDescription: MessageDescriptor
+  exitWithoutSavingDeclarationConfirmModalTitle: MessageDescriptor
+  exitWithoutSavingDeclarationConfirmModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {
@@ -63,17 +64,15 @@ const messagesToDefine: IRegisterMessages = {
   },
   saveDeclarationConfirmModalTitle: {
     id: 'register.form.modal.title.saveDeclarationConfirm',
-    defaultMessage: 'Save your changes?',
+    defaultMessage: 'Save & exit?',
     description: 'Title for save declaration confirmation modal'
   },
-
   saveDeclarationConfirmModalDescription: {
     id: 'register.form.modal.desc.saveDeclarationConfirm',
     defaultMessage:
-      'By clicking save the old information will be deleted and new information will be saved',
+      'All inputted data will be kept secure for future editing. Are you ready to save any changes to this declaration form?',
     description: 'Description for save declaration confirmation modal'
   },
-
   deleteDeclarationConfirmModalTitle: {
     id: 'register.form.modal.title.deleteDeclarationConfirm',
     defaultMessage: 'Delete draft?',
@@ -81,8 +80,20 @@ const messagesToDefine: IRegisterMessages = {
   },
   deleteDeclarationConfirmModalDescription: {
     id: 'register.form.modal.desc.deleteDeclarationConfirm',
-    defaultMessage: 'Are you sure you want to delete this declaration?',
+    defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
     description: 'Description for delete declaration confirmation modal'
+  },
+  exitWithoutSavingDeclarationConfirmModalTitle: {
+    id: 'register.form.modal.title.exitWithoutSavingDeclarationConfirm',
+    defaultMessage: 'Exit without saving changes?',
+    description: 'Title for exit declaration without saving confirmation modal'
+  },
+  exitWithoutSavingDeclarationConfirmModalDescription: {
+    id: 'register.form.modal.desc.exitWithoutSavingDeclarationConfirm',
+    defaultMessage:
+      'You have unsaved changes on your declaration form. Are you sure you want to exit without saving?',
+    description:
+      'Description for exit declaration without saving confirmation modal'
   }
 }
 

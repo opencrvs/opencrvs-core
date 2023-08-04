@@ -22,7 +22,7 @@ describe('Child section mutation mapping related tests', () => {
         birthLocation: '54538456-fcf6-4276-86ac-122a7eb47703'
       }
     }
-    birthEventLocationMutationTransformer(0)(
+    birthEventLocationMutationTransformer({})(
       transformedData,
       draftData,
       'child',

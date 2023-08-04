@@ -19,11 +19,14 @@ import {
   RETRIEVAL_FLOW_PASSWORD
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
-import { generateNonce } from '@auth/features/verifyCode/service'
+import {
+  NotificationEvent,
+  generateNonce
+} from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
-
 interface IVerifyUserPayload {
-  mobile: string
+  mobile?: string
+  email?: string
   retrieveFlow: string
 }
 
@@ -38,9 +41,8 @@ export default async function verifyUserHandler(
 ): Promise<IVerifyUserResponse> {
   const payload = request.payload as IVerifyUserPayload
   let result
-
   try {
-    result = await verifyUser(payload.mobile)
+    result = await verifyUser(payload.mobile, payload.email)
   } catch (err) {
     throw unauthorized()
   }
@@ -57,7 +59,16 @@ export default async function verifyUserHandler(
   )
 
   if (!isUserNameRetrievalFlow) {
-    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    const notificationEvent = NotificationEvent.PASSWORD_RESET
+
+    await generateAndSendVerificationCode(
+      nonce,
+      result.scope,
+      notificationEvent,
+      result.userFullName,
+      result.mobile,
+      result.email
+    )
   }
 
   const response: IVerifyUserResponse = {
@@ -70,7 +81,8 @@ export default async function verifyUserHandler(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string().required(),
+  mobile: Joi.string(),
+  email: Joi.string().email(),
   retrieveFlow: Joi.string()
     .valid(RETRIEVAL_FLOW_USER_NAME, RETRIEVAL_FLOW_PASSWORD)
     .required()

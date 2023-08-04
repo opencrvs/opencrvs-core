@@ -14,7 +14,6 @@ import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
-import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
 import { BrowserTracing } from '@sentry/tracing'
@@ -35,7 +34,7 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      environment: process.env.NODE_ENV,
+      environment: process.env.HOSTNAME,
       dsn: window.config.SENTRY,
       integrations: [new BrowserTracing()],
       tracesSampleRate: 1.0
@@ -70,5 +69,3 @@ const { store, history } = createStore()
 const container = document.getElementById('root')
 const root = createRoot(container!)
 root.render(<App store={store} history={history} />)
-
-registerServiceWorker()

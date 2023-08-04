@@ -53,7 +53,7 @@ describe('Correction root resolvers', () => {
         telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         correction: {
           location: {
             _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
@@ -86,15 +86,11 @@ describe('Correction root resolvers', () => {
         name: [{ use: 'en', firstNames: 'Khaby', familyName: 'Lame Corrected' }]
       },
       informant: {
-        individual: {
-          name: [
-            { use: 'en', firstNames: 'Mother', familyName: 'Family Name' }
-          ],
-          telecom: [{ system: 'phone', value: '+8801622688231' }]
-        }
+        name: [{ use: 'en', firstNames: 'Mother', familyName: 'Family Name' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
       registration: {
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         correction: {
           location: {
             _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'

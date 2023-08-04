@@ -125,8 +125,10 @@ export interface IUser {
   username: string
   identifiers: IIdentifier[]
   email: string
-  mobile: string
+  mobile?: string
+  emailForNotification?: string
   passwordHash: string
+  oldPasswordHash?: string
   salt: string
   systemRole: string
   role: Types.ObjectId
@@ -272,7 +274,7 @@ const AdvanceSearchParameters = new Schema(
 
 const SearchesSchema = new Schema(
   {
-    searchId: { type: String, required: true, unique: true },
+    searchId: { type: String, required: true },
     name: { type: String, required: true },
     parameters: { type: AdvanceSearchParameters, required: true }
   },
@@ -296,8 +298,10 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
   email: { type: String },
+  emailForNotification: { type: String, unique: true, sparse: true },
   mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
+  oldPasswordHash: { type: String },
   salt: { type: String, required: true },
   systemRole: { type: String, required: true },
   role: { type: Schema.Types.ObjectId, ref: 'UserRole' },

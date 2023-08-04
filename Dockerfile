@@ -29,6 +29,7 @@ COPY packages/user-mgnt/package.json packages/user-mgnt/package.json
 COPY packages/workflow/package.json packages/workflow/package.json
 COPY packages/webhooks/package.json packages/webhooks/package.json
 COPY packages/documents/package.json packages/documents/package.json
+COPY packages/migration/package.json packages/migration/package.json
 COPY patches patches
 RUN yarn install
 

@@ -31,7 +31,7 @@ import {
   goToUserReviewForm
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   clearUserFormData,
   ISystemRolesMap,
@@ -49,13 +49,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
 
-export const FormTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1};
-  height: 72px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
 export const Action = styled.div`
   margin-top: 32px;
 `
@@ -167,7 +160,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           title={
             userId
               ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-              : intl.formatMessage(section.title)
+              : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}

@@ -177,7 +177,14 @@ describe('Registration type resolvers', () => {
   it('returns type from identifier', () => {
     const type = typeResolvers.IdentityType.type({
       value: '123456789',
-      type: 'PASSPORT'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'PASSPORT'
+          }
+        ]
+      }
     })
     expect(type).toBe('PASSPORT')
   })
@@ -348,7 +355,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: 'HEALTHCARE_WORKER'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -401,7 +408,7 @@ describe('Registration type resolvers', () => {
                   coding: [
                     {
                       system: 'http://opencrvs.org/specs/types',
-                      code: 'HEALTHCARE_WORKER'
+                      code: '[{"label":"Field Agent","lang":"en"},{"label":"Agent de terrain","lang":"fr"}]'
                     }
                   ]
                 }
@@ -435,6 +442,14 @@ describe('Registration type resolvers', () => {
                     {
                       system: 'http://opencrvs.org/specs/roles',
                       code: 'LOCAL_REGISTRAR'
+                    }
+                  ]
+                },
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: '[{"label":"Local Registrar","lang":"en"},{"label":"Registraire local","lang":"fr"}]'
                     }
                   ]
                 }
@@ -732,18 +747,6 @@ describe('Registration type resolvers', () => {
         )
       expect(attendantAtBirth).toEqual('PHYSICIAN')
     })
-    it('returns birthRegistrationType', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.birthRegistration))
-
-      // @ts-ignore
-      const birthRegistrationType =
-        await typeResolvers.BirthRegistration.birthRegistrationType(
-          mockComposition,
-          undefined,
-          { headers: undefined }
-        )
-      expect(birthRegistrationType).toEqual('BOTH_PARENTS')
-    })
     it('returns lastPreviousLiveBirth', async () => {
       fetch.mockResponseOnce(
         JSON.stringify(mockObservations.lastPreviousLiveBirth)
@@ -898,18 +901,6 @@ describe('Registration type resolvers', () => {
           { headers: undefined }
         )
       expect(attendantAtBirth).toEqual(null)
-    })
-    it('returns birthRegistrationType null', async () => {
-      // @ts-ignore
-      const birthRegistrationType =
-        await typeResolvers.BirthRegistration.birthRegistrationType(
-          {
-            section: []
-          },
-          undefined,
-          { headers: undefined }
-        )
-      expect(birthRegistrationType).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore

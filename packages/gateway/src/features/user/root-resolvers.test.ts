@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
-import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { generateAndStoreVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -764,7 +764,7 @@ describe('User root resolvers', () => {
     it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
@@ -785,7 +785,7 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -805,7 +805,7 @@ describe('User root resolvers', () => {
     it("throws error if any user tries to update some other user's phonenumber", async () => {
       const nonce = '12345'
       const mobile = '0711111111'
-      const code = await generateVerificationCode(nonce, mobile)
+      const code = await generateAndStoreVerificationCode(nonce, mobile)
 
       return expect(
         resolvers.Mutation.changePhone(
@@ -856,9 +856,25 @@ describe('User root resolvers', () => {
         Authorization: `Bearer ${inValidUserToken}`
       }
     })
-
+    //
     it('changes avatar for loggedin user', async () => {
-      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            avatar: {
+              type: 'image/jpeg',
+              data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+            }
+          }),
+          { status: 200 }
+        ]
+      )
 
       const avatar = {
         type: 'image/jpeg',
@@ -874,10 +890,29 @@ describe('User root resolvers', () => {
         { headers: authHeaderValidUser }
       )
 
-      expect(response).toEqual(avatar)
+      expect(response).toEqual({
+        type: 'image/jpeg',
+        data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+      })
     })
     it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
-      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+          }),
+          { status: 401 }
+        ],
+        [
+          JSON.stringify({
+            avatar: {
+              type: 'image/jpeg',
+              data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+            }
+          }),
+          { status: 401 }
+        ]
+      )
 
       return expect(
         resolvers.Mutation.changeAvatar(
@@ -1112,7 +1147,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('resendSMSInvite mutation', () => {
+  describe('resendInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1147,7 +1182,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
@@ -1163,7 +1198,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resendSMSInvite(
+        resolvers.Mutation.resendInvite(
           {},
           {
             userId: '123'
@@ -1178,7 +1213,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resendSMSInvite(
+      const res = await resolvers.Mutation.resendInvite(
         {},
         {
           userId: '123'
@@ -1190,7 +1225,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('usernameSMSReminder mutation', () => {
+  describe('usernameReminder mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1225,7 +1260,7 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
@@ -1241,7 +1276,7 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.usernameSMSReminder(
+        resolvers.Mutation.usernameReminder(
           {},
           {
             userId: '123'
@@ -1256,7 +1291,7 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.usernameSMSReminder(
+      const res = await resolvers.Mutation.usernameReminder(
         {},
         {
           userId: '123'
@@ -1268,7 +1303,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('resetPasswordSMS mutation', () => {
+  describe('resetPasswordInvite mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegAgent: { Authorization: string }
     beforeEach(() => {
@@ -1303,11 +1338,10 @@ describe('User root resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
           authHeaderRegAgent
         )
@@ -1320,11 +1354,10 @@ describe('User root resolvers', () => {
       fetch.mockResponses([JSON.stringify({}), { status: 401 }])
 
       await expect(
-        resolvers.Mutation.resetPasswordSMS(
+        resolvers.Mutation.resetPasswordInvite(
           {},
           {
-            userId: '123',
-            applicationName: 'opencrvs'
+            userId: '123'
           },
           { headers: authHeaderSysAdmin }
         )
@@ -1336,11 +1369,10 @@ describe('User root resolvers', () => {
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
-      const res = await resolvers.Mutation.resetPasswordSMS(
+      const res = await resolvers.Mutation.resetPasswordInvite(
         {},
         {
-          userId: '123',
-          applicationName: 'opencrvs'
+          userId: '123'
         },
         { headers: authHeaderSysAdmin }
       )

@@ -21,6 +21,10 @@ import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@auth/features/authenticate/handler'
+import authenticateSuperUserHandler, {
+  requestSchema as reqAuthSupSchema,
+  responseSchema as resAuthSupSchema
+} from '@auth/features/authenticateSuperUser/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
@@ -29,9 +33,9 @@ import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
 } from '@auth/features/refresh/handler'
-import resendSmsHandler, {
-  requestSchema as reqResendSmsSchema,
-  responseSchma as resResendSmsSchema
+import resendNotificationHandler, {
+  requestSchema as reqResendAuthenticationCodeSchema,
+  responseSchma as resResendAuthenticationCodeSchema
 } from '@auth/features/resend/handler'
 import getPlugins from '@auth/config/plugins'
 import * as database from '@auth/database'
@@ -149,21 +153,41 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"nonce": ""}' http://localhost:4040/resendSms
+  // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate-super-user
   server.route({
     method: 'POST',
-    path: '/resendSms',
-    handler: resendSmsHandler,
+    path: '/authenticate-super-user',
+    handler: authenticateSuperUserHandler,
     options: {
       tags: ['api'],
-      description: 'Resend another SMS code',
+      description: 'Authenticate with username and password',
       notes:
-        'Sends a new SMS code to the user based on the phone number associated with the nonce',
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
       validate: {
-        payload: reqResendSmsSchema
+        payload: reqAuthSupSchema
       },
       response: {
-        schema: resResendSmsSchema
+        schema: resAuthSupSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"nonce": ""}' http://localhost:4040/resendAuthenticationCode
+  server.route({
+    method: 'POST',
+    path: '/resendAuthenticationCode',
+    handler: resendNotificationHandler,
+    options: {
+      tags: ['api'],
+      description: 'Resend another authentication code',
+      notes:
+        'Sends a new authentication code to the user based on the phone number or email associated with the nonce',
+      validate: {
+        payload: reqResendAuthenticationCodeSchema
+      },
+      response: {
+        schema: resResendAuthenticationCodeSchema
       }
     }
   })

@@ -129,7 +129,8 @@ describe('Verify fhir templates', () => {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -171,7 +172,8 @@ describe('Verify fhir templates', () => {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',

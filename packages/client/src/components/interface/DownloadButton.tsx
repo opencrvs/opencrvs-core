@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
@@ -345,7 +345,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         ) : assignment && assignment.userId !== userId ? (
           <AvatarSmall
             avatar={{
-              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              data: assignment.avatarURL,
               type: 'image/jpeg'
             }}
           />

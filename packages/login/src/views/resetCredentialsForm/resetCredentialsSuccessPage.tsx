@@ -27,6 +27,7 @@ import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { RouteComponentProps } from 'react-router'
 import { selectCountryLogo } from '@login/login/selectors'
 import { IStoreState } from '@login/store'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Container = styled(Box)`
   position: relative;
@@ -52,7 +53,9 @@ export class ResetCredentialsSuccessView extends React.Component<
     return (
       <Frame
         header={<AppBar title="OpenCRVS" />}
-        skipToContentText="Skip to main content"
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         <Frame.LayoutCentered>
           <Container id="reset-credentials-success-page">
@@ -78,9 +81,13 @@ export class ResetCredentialsSuccessView extends React.Component<
                   color="grey500"
                   id="authenticating-label"
                 >
-                  {intl.formatMessage(messages.successPageSubtitle, {
-                    forgottenItem
-                  })}
+                  {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                    ? intl.formatMessage(messages.successPageSubtitlePhone, {
+                        forgottenItem
+                      })
+                    : intl.formatMessage(messages.successPageSubtitleEmail, {
+                        forgottenItem
+                      })}
                 </Text>
               </Stack>
 

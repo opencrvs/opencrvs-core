@@ -235,8 +235,9 @@ async function createDeceasedIndex(
   body.gender = deceased && deceased.gender
   body.deceasedIdentifier =
     deceased.identifier &&
-    deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    deceased.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
   body.deceasedDoB = deceased && deceased.birthDate
 }
 
@@ -366,8 +367,9 @@ function createInformantIndex(
   body.informantDoB = informant.birthDate
   body.informantIdentifier =
     informant.identifier &&
-    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
-      ?.value
+    informant.identifier.find(
+      (identifier) => identifier.type?.coding?.[0].code === 'NATIONAL_ID'
+    )?.value
 }
 
 async function createDeclarationIndex(
@@ -387,6 +389,10 @@ async function createDeclarationIndex(
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const emailExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-email'
   )
   const placeOfDeclarationExtension = findTaskExtension(
     task,
@@ -425,6 +431,7 @@ async function createDeclarationIndex(
     (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
+  body.contactEmail = emailExtension && emailExtension.valueString
   body.type =
     task &&
     task.businessStatus &&
