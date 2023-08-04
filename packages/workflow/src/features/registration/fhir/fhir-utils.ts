@@ -32,7 +32,6 @@ import {
 } from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
-import { unionBy } from 'lodash'
 import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
@@ -423,6 +422,24 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
   return existingRegStatusCode
 }
 
+function mergeFhirIdentifiers(
+  currentIdentifiers: fhir.Identifier[],
+  newIdentifiers: fhir.Identifier[]
+): fhir.Identifier[] {
+  const identifierMap = new Map<string, fhir.Identifier>()
+  currentIdentifiers
+    .filter((identifier) => Boolean(identifier.type?.coding?.[0]?.code))
+    .forEach((identifier) =>
+      identifierMap.set(identifier.type!.coding![0].code!, identifier)
+    )
+  newIdentifiers
+    .filter((identifier) => Boolean(identifier.type?.coding?.[0]?.code))
+    .forEach((identifier) =>
+      identifierMap.set(identifier.type!.coding![0].code!, identifier)
+    )
+  return [...identifierMap.values()]
+}
+
 export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
@@ -443,10 +460,9 @@ export async function mergePatientIdentifier(bundle: fhir.Bundle) {
                 ...entry,
                 resource: {
                   ...entry.resource,
-                  identifier: unionBy(
-                    (entry.resource as fhir.Patient).identifier,
-                    patientFromFhir.identifier,
-                    'type'
+                  identifier: mergeFhirIdentifiers(
+                    patientFromFhir.identifier ?? [],
+                    (entry.resource as fhir.Patient).identifier ?? []
                   )
                 }
               }
