@@ -1891,7 +1891,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   labelForHideAction={intl.formatMessage(messages.hideLabel)}
                   labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    viewRecord ? null : (
+                    viewRecord || isDuplicate ? null : (
                       <Link
                         font="reg16"
                         element="button"
