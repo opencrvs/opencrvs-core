@@ -24,9 +24,14 @@ import { createIntlCache } from 'react-intl'
 import { getLanguages } from '@client/i18n/selectors'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 
-const PageContainer = styled.div`
+const Container = styled.div`
   padding: 16px;
   background: ${({ theme }) => theme.colors.white};
+  display: flex;
+  justify-content: center;
+`
+const Content = styled.div`
+  max-width: 1024px;
 `
 export function PrintRecord() {
   const languages = useSelector(getLanguages)
@@ -53,9 +58,11 @@ export function PrintRecord() {
   }
 
   return (
-    <PageContainer>
-      <Header declaration={declaration} intls={intls} />
-      <Table declaration={declaration} intls={intls} />
-    </PageContainer>
+    <Container>
+      <Content>
+        <Header declaration={declaration} intls={intls} />
+        <Table declaration={declaration} intls={intls} />
+      </Content>
+    </Container>
   )
 }
