@@ -12,8 +12,8 @@
 
 import * as Minio from 'minio'
 import uuidPkg from 'uuid'
-import * as fileTypePKG from 'file-type'
-const { fromBuffer } = fileTypePKG
+import pkg from 'file-type'
+const { fromBuffer } = pkg
 
 const { v4: uuid } = uuidPkg
 

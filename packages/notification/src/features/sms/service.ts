@@ -17,12 +17,13 @@ import { logger } from '@notification/logger'
 export async function notifyCountryConfig(
   templateName: {
     email?: string
-    sms: string
-  },
-  recipient: {
-    email?: string
     sms?: string
   },
+  recipient: {
+    email?: string | null
+    sms?: string | null
+  },
+  type: 'user' | 'informant',
   variables: Record<string, string>,
   token: string,
   locale: string,
@@ -39,6 +40,7 @@ export async function notifyCountryConfig(
       body: JSON.stringify({
         templateName,
         recipient,
+        type,
         locale,
         variables,
         convertUnicode

@@ -20,10 +20,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { GET_INFORMANT_SMS_NOTIFICATIONS } from './queries'
-import {
-  Label,
-  Value
-} from '@client/views/SysAdmin/Config/Application/Components'
+import { Label } from '@client/views/SysAdmin/Config/Application/Components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { useOnlineStatus } from '@client/utils'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
@@ -48,6 +45,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;
@@ -209,7 +207,6 @@ const InformantNotification = () => {
                     )}
                   </Label>
                 }
-                value={<Value id={`${item.name}_value`}>{item.message}</Value>}
                 actions={
                   <ToggleWrapper>
                     <Toggle
@@ -252,7 +249,15 @@ const InformantNotification = () => {
         <Content
           title={intl.formatMessage(messages.informantNotifications)}
           titleColor={'copy'}
-          subtitle={intl.formatMessage(messages.informantNotificationSubtitle)}
+          subtitle={intl.formatMessage(messages.informantNotificationSubtitle, {
+            communicationType: (
+              <strong>
+                {window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD === 'sms'
+                  ? 'SMS'
+                  : 'Emails'}
+              </strong>
+            )
+          })}
           tabBarContent={
             <FormTabs
               sections={tabSections}

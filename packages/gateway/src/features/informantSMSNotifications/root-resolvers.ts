@@ -11,12 +11,8 @@
  */
 import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
-import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@gateway/constants'
-import {
-  IInformantSMSNotification,
-  INotificationMessages,
-  NOTIFICATION_NAME_MAPPING_WITH_RESOURCE
-} from '@gateway/features/informantSMSNotifications/type-resolvers'
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { IInformantSMSNotification } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import fetch from 'node-fetch'
 import { URL } from 'url'
 
@@ -58,33 +54,7 @@ export const resolvers: GQLResolver = {
       const informantSMSNotificationsResponse =
         (await informantSMSNotifications.json()) as IInformantSMSNotification[]
 
-      const notificationContentURL = new URL(
-        '/content/notification',
-        COUNTRY_CONFIG_URL
-      ).toString()
-      const notificationContent = await fetch(notificationContentURL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      const notificationContentResponse =
-        (await notificationContent.json()) as INotificationMessages
-      const notificationEnglishMessages =
-        notificationContentResponse.languages.find(
-          (item) => item.lang === 'en'
-        )?.messages
-
-      return informantSMSNotificationsResponse.map((informantSMSNoti) => {
-        const mappedName =
-          NOTIFICATION_NAME_MAPPING_WITH_RESOURCE[informantSMSNoti.name]
-        const message = notificationEnglishMessages
-          ? notificationEnglishMessages[mappedName]
-          : ''
-        return { ...informantSMSNoti, name: informantSMSNoti.name, message }
-      })
+      return informantSMSNotificationsResponse
     }
   },
 
@@ -126,34 +96,7 @@ export const resolvers: GQLResolver = {
       const informantSMSNotificationsResponse =
         (await res.json()) as IInformantSMSNotification[]
 
-      const notificationContentURL = new URL(
-        '/content/notification',
-        COUNTRY_CONFIG_URL
-      ).toString()
-
-      const notificationContent = await fetch(notificationContentURL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      const notificationContentResponse =
-        (await notificationContent.json()) as INotificationMessages
-      const notificationEnglishMessages =
-        notificationContentResponse.languages.find(
-          (item) => item.lang === 'en'
-        )?.messages
-
-      return informantSMSNotificationsResponse.map((informantSMSNoti) => {
-        const mappedName =
-          NOTIFICATION_NAME_MAPPING_WITH_RESOURCE[informantSMSNoti.name]
-        const message = notificationEnglishMessages
-          ? notificationEnglishMessages[mappedName]
-          : ''
-        return { ...informantSMSNoti, name: informantSMSNoti.name, message }
-      })
+      return informantSMSNotificationsResponse
     }
   }
 }

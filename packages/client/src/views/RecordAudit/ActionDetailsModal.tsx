@@ -16,13 +16,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  BirthSection,
-  DeathSection
-} from '@client/forms'
+import { IForm, IFormSection, IFormField } from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -297,10 +291,7 @@ const ActionDetailsModalListTable = ({
         (section) => section.id === item?.valueCode
       ) as IFormSection
 
-      if (
-        section.id === BirthSection.Documents ||
-        section.id === DeathSection.DeathDocuments
-      ) {
+      if (section.id === 'documents') {
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )
@@ -380,9 +371,9 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.individual?.name
+    const name = certificate.collector?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name,
+          certificate.collector.name,
           window.config.LANGUAGES
         )
       : {}

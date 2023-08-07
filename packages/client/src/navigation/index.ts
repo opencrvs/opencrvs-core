@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
+import { UserSection, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  EVENT_INFO,
+  DRAFT_DEATH_FORM,
   EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
@@ -30,8 +30,6 @@ import {
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
-  SELECT_BIRTH_INFORMANT,
-  SELECT_DEATH_INFORMANT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   TEAM_SEARCH,
@@ -44,8 +42,6 @@ import {
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
-  FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
   SYSTEM_LIST,
   VS_EXPORTS,
@@ -61,7 +57,11 @@ import {
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
-  PRINT_RECORD
+  PRINT_RECORD,
+  SELECT_DEATH_INFORMANT,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_MARRIAGE_FORM,
+  SELECT_MARRIAGE_INFORMANT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -130,24 +130,20 @@ type GoToUserProfile = {
 
 export type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
 
-export function goToBirthInformant(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_INFORMANT, {
-      declarationId
-    })
-  )
-}
-
 export function goToDeathInformant(declarationId: string) {
   return push(
-    formatUrl(SELECT_DEATH_INFORMANT, {
-      declarationId
+    formatUrl(DRAFT_DEATH_FORM, {
+      declarationId: declarationId.toString()
     })
   )
 }
 
-export function goToEventInfo(eventType: Event) {
-  return push(formatUrl(EVENT_INFO, { eventType }))
+export function goToMarriageInformant(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_MARRIAGE_FORM, {
+      declarationId: declarationId.toString()
+    })
+  )
 }
 
 export function goToEvents() {
@@ -194,10 +190,6 @@ export function goToDashboardView() {
 
 export function goToAdvancedSearch() {
   return push(ADVANCED_SEARCH)
-}
-
-export function goToFormConfigHome() {
-  return push(FORM_CONFIG_HOME)
 }
 
 export function goToApplicationConfig() {
@@ -305,6 +297,14 @@ export function goToDeclarationRecordAudit(
   declarationId: string
 ) {
   return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
+}
+
+export function goToBirthRegistrationAsParent(declarationId: string) {
+  return push(
+    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+      declarationId: declarationId.toString()
+    })
+  )
 }
 
 export function goToPrintCertificate(
@@ -424,12 +424,9 @@ export function goToIssueCertificatePayment(
   )
 }
 
-export function goToFormConfigWizard(event: Event, section: WizardSection) {
+export function goToDeathRegistration(declarationId: string) {
   return push(
-    formatUrl(FORM_CONFIG_WIZARD, {
-      event: event,
-      section: section
-    })
+    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
 }
 

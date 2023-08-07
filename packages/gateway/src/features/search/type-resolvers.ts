@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NATIVE_LANGUAGE } from '@gateway/constants'
+import {
+  AVATAR_API,
+  NATIVE_LANGUAGE,
+  USER_MANAGEMENT_URL
+} from '@gateway/constants'
+import { resolve } from 'url'
+import fetch from 'node-fetch'
 import {
   GQLAdvancedSearchParametersInput,
   GQLOperationHistorySearchSet,
@@ -20,6 +26,7 @@ import {
   IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -36,6 +43,18 @@ export interface ISearchCriteria {
   size?: number
   from?: number
   createdBy?: string
+}
+
+interface IAssignment {
+  officeName: string
+  firstName: string
+  lastName: string
+  userId: string
+}
+
+type IAvatarResponse = {
+  userName: string
+  avatarURI?: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -419,6 +438,26 @@ export const searchTypeResolvers: GQLResolver = {
     },
     timeInReadyToPrint(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'REGISTERED')
+    }
+  },
+  AssignmentData: {
+    async avatarURL(assignmentData: IAssignment, _, { headers: authHeader }) {
+      const response = await fetch(
+        resolve(USER_MANAGEMENT_URL, `users/${assignmentData.userId}/avatar`),
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      const { userName, avatarURI }: IAvatarResponse = await response.json()
+
+      if (avatarURI) {
+        const avatarURL = await getPresignedUrlFromUri(avatarURI, authHeader)
+        return avatarURL
+      }
+      return `${AVATAR_API}${userName}`
     }
   }
 }

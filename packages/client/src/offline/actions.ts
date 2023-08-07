@@ -22,12 +22,12 @@ import {
   IApplicationConfigResponse,
   IApplicationConfig,
   ICertificateTemplateData,
-  IApplicationConfigAnonymous
+  IApplicationConfigAnonymous,
+  LoadFormsResponse,
+  LoadValidatorsResponse,
+  LoadConditionalsResponse
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IFormConfig, IFormDataSet } from '@client/forms'
-import { IQuestionConfig } from '@client/forms/questionConfig'
 import { UserDetails } from '@client/utils/userUtils'
 
 const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
@@ -57,6 +57,18 @@ type LocationsLoadedAction = {
 export const LOCATIONS_FAILED = 'OFFLINE/LOCATIONS_FAILED'
 type LocationsFailedAction = {
   type: typeof LOCATIONS_FAILED
+  payload: Error
+}
+
+export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
+export type FormsLoadedAction = {
+  type: typeof FORMS_LOADED
+  payload: LoadFormsResponse
+}
+
+export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
+export type FormsFailedAction = {
+  type: typeof FORMS_FAILED
   payload: Error
 }
 
@@ -167,6 +179,21 @@ export const locationsLoaded = (
   payload: payload
 })
 
+export const locationsFailed = (error: Error): LocationsFailedAction => ({
+  type: LOCATIONS_FAILED,
+  payload: error
+})
+
+export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
+  type: FORMS_LOADED,
+  payload: payload
+})
+
+export const formsFailed = (error: Error): FormsFailedAction => ({
+  type: FORMS_FAILED,
+  payload: error
+})
+
 export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({
   type: FACILITIES_FAILED,
   payload: error
@@ -177,11 +204,6 @@ export const facilitiesLoaded = (
 ): FacilitiesLoadedAction => ({
   type: FACILITIES_LOADED,
   payload: payload
-})
-
-export const locationsFailed = (error: Error): LocationsFailedAction => ({
-  type: LOCATIONS_FAILED,
-  payload: error
 })
 
 /*
@@ -276,16 +298,6 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const UPDATE_OFFLINE_FORM_CONFIG = 'OFFLINE/UPDATE_FORM_CONFIG'
-type UpdateOfflineFormConfigAction = {
-  type: typeof UPDATE_OFFLINE_FORM_CONFIG
-  payload: {
-    formDrafts: IFormDraft[]
-    questionConfig?: IQuestionConfig[]
-    formDataset?: IFormDataSet[]
-  }
-}
-
 export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
 type UpdateOfflineCertificateAction = {
   type: typeof UPDATE_OFFLINE_CERTIFICATE
@@ -293,19 +305,6 @@ type UpdateOfflineCertificateAction = {
     certificate: ICertificateTemplateData
   }
 }
-
-export const updateOfflineFormConfig = (
-  formDrafts: IFormDraft[],
-  questionConfig?: IQuestionConfig[],
-  formDataset?: IFormDataSet[]
-): UpdateOfflineFormConfigAction => ({
-  type: UPDATE_OFFLINE_FORM_CONFIG,
-  payload: {
-    formDrafts,
-    questionConfig,
-    formDataset
-  }
-})
 
 export const updateOfflineCertificate = (
   certificate: ICertificateTemplateData
@@ -316,43 +315,32 @@ export const updateOfflineCertificate = (
   }
 })
 
-export const OFFLINE_FORM_CONFIG_UPDATED = 'OFFLINE/FORM_CONFIG_UPDATED'
-type OfflineFormConfigUpdatedAction = {
-  type: typeof OFFLINE_FORM_CONFIG_UPDATED
-  payload: {
-    formConfig: IFormConfig
-  }
-}
-export const offlineFormConfigUpdated = (
-  formConfig: IFormConfig
-): OfflineFormConfigUpdatedAction => ({
-  type: OFFLINE_FORM_CONFIG_UPDATED,
-  payload: {
-    formConfig
-  }
+export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
+  type: 'OFFLINE/VALIDATORS_LOADED' as const,
+  payload: payload
 })
 
-export const OFFLINE_FORM_CONFIG_ADD_FORM_DATASET =
-  'OFFLINE/FORM_CONFIG_ADD_FORM_DATASET'
-type OfflineFormConfigAddFormDatasetAction = {
-  type: typeof OFFLINE_FORM_CONFIG_ADD_FORM_DATASET
-  payload: {
-    formDatasetItem: IFormDataSet
-  }
-}
-export const offlineFormConfigAddFormDataset = (
-  formDatasetItem: IFormDataSet
-): OfflineFormConfigAddFormDatasetAction => ({
-  type: OFFLINE_FORM_CONFIG_ADD_FORM_DATASET,
-  payload: {
-    formDatasetItem
-  }
+export const validatorsFailed = (error: Error) => ({
+  type: 'OFFLINE/VALIDATORS_FAILED' as const,
+  payload: error
+})
+
+export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
+  type: 'OFFLINE/CONDITIONALS_LOADED' as const,
+  payload: payload
+})
+
+export const conditionalsFailed = (error: Error) => ({
+  type: 'OFFLINE/CONDITIONALS_FAILED' as const,
+  payload: error
 })
 
 export type Action =
   | GetLocations
   | LocationsFailedAction
   | LocationsLoadedAction
+  | FormsFailedAction
+  | FormsLoadedAction
   | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction
@@ -371,11 +359,12 @@ export type Action =
   | CertificatesLoadedAction
   | CertificatesLoadFailedAction
   | UpdateOfflineSystemsAction
-  | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
-  | OfflineFormConfigUpdatedAction
-  | OfflineFormConfigAddFormDatasetAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
+  | ReturnType<typeof validatorsLoaded>
+  | ReturnType<typeof validatorsFailed>
+  | ReturnType<typeof conditionalsLoaded>
+  | ReturnType<typeof conditionalsFailed>

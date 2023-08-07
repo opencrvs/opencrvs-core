@@ -69,11 +69,15 @@ export interface IDeclarationData {
   placeOfBirth?: string
   placeOfDeath?: string
   placeOfMarriage?: string
-  informant?: string
-  informantContact?: string
+  informant?: IInformantInfo
   registrationNo?: string
   nid?: string
   assignment?: GQLAssignmentData
+}
+
+interface IInformantInfo {
+  registrationEmail?: string
+  registrationPhone?: string
 }
 
 interface IGQLDeclaration {
@@ -373,14 +377,14 @@ export const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfMarriage: getLocation(declaration, resources, intl) || EMPTY_STRING,
-    informant:
-      ((declaration.data?.registration?.contactPoint as IFormSectionData)
-        ?.value as string) || EMPTY_STRING,
-    informantContact:
-      (
-        (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || EMPTY_STRING
+    informant: {
+      registrationPhone:
+        declaration.data?.informant?.registrationPhone?.toString() ||
+        EMPTY_STRING,
+      registrationEmail:
+        declaration.data?.informant?.registrationEmail?.toString() ||
+        EMPTY_STRING
+    }
   }
 }
 
@@ -422,8 +426,7 @@ export const getWQDeclarationData = (
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
-    placeOfBirth: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfBirth: EMPTY_STRING
   }
 }
 
@@ -464,8 +467,7 @@ export const getGQLDeclaration = (
     dateOfDeath: EMPTY_STRING,
     placeOfDeath: EMPTY_STRING,
     dateOfMarriage: EMPTY_STRING,
-    placeOfMarriage: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfMarriage: EMPTY_STRING
   }
 }
 

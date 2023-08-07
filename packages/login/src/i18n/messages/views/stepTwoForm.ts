@@ -46,14 +46,14 @@ const messagesToDefine: IStepTwoFormMessages = {
   stepTwoInstructionSMS: {
     id: 'login.stepTwoInstruction.sms',
     defaultMessage:
-      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 5 minutes.',
+      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 10 minutes.',
     description:
       'The instruction that appears in step two of the form that lets users know that code has been sent to phone'
   },
   stepTwoInstructionEMAIL: {
     id: 'login.stepTwoInstruction.email',
     defaultMessage:
-      'A verification code has been sent to your email. ending in {email}. This code will be valid for 5 minutes.',
+      'A verification code has been sent to your email. ending in {email}. This code will be valid for 10 minutes.',
     description:
       'The instruction that appears in step two of the form that lets users know that code has been sent to email'
   },
