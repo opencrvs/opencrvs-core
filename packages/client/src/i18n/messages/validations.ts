@@ -75,6 +75,11 @@ const messagesToDefine = {
       'The error message appears when input is less than or equal to 0',
     id: 'validations.greaterThanZero'
   },
+  isValidDate: {
+    defaultMessage: 'Must be a valid date',
+    description: 'The error message appears when the given date is not valid',
+    id: 'validations.isValidDate'
+  },
   isValidBirthDate: {
     defaultMessage: 'Must be a valid birth date',
     description:
