@@ -14,9 +14,7 @@ import {
   IFormSection,
   IFormField,
   FETCH_BUTTON,
-  LIST,
   PARAGRAPH,
-  SUBSECTION,
   WARNING,
   IFormFieldValue,
   IFormData,
@@ -38,13 +36,11 @@ import {
   ICheckboxGroupFormField,
   IRadioOption,
   ISelectOption,
-  BirthSection,
-  DeathSection,
-  MarriageSection,
-  Section,
   DOCUMENT_UPLOADER_WITH_OPTION,
   IAttachment,
-  IDocumentUploaderWithOptionsFormField
+  IDocumentUploaderWithOptionsFormField,
+  SUBSECTION_HEADER,
+  BULLET_LIST
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -80,9 +76,9 @@ import {
   buttonMessages,
   constantsMessages,
   formMessageDescriptors,
-  formMessages,
   userMessages
 } from '@client/i18n/messages'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import {
   getValidationErrorsForForm,
   IFieldErrors
@@ -103,11 +99,6 @@ interface PrintRecordTableProps {
   declaration: IDeclaration
   intls: IntlShape[]
 }
-
-const ErrorField = styled.p`
-  margin-top: 0;
-  margin-bottom: 0;
-`
 
 const StyledTable = styled.table`
   margin-top: 8px;
@@ -495,11 +486,6 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-const DOCUMENT_SECTION_CODES: Section[] = [
-  BirthSection.Documents,
-  DeathSection.DeathDocuments,
-  MarriageSection.Documents
-]
 export function PrintRecordTable(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
   const intl = useIntl()
@@ -810,9 +796,13 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     return nestedItems
   }
   function isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
-      (type) => type === field.type
-    )
+    return [
+      BULLET_LIST,
+      PARAGRAPH,
+      WARNING,
+      SUBSECTION_HEADER,
+      FETCH_BUTTON
+    ].find((type) => type === field.type)
   }
   function isVisibleField(field: IFormField, section: IFormSection) {
     const { declaration: draft } = props
@@ -981,7 +971,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
       })
       return {
         id: section.id,
-        title: formatMessage(intls, section.title),
+        title: section.title && formatMessage(intls, section.title),
         items: items.filter((item) => item)
       }
     })
@@ -1058,7 +1048,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     )
   }
   const documentSection = registerForm[props.declaration.event].sections.find(
-    ({ id }) => DOCUMENT_SECTION_CODES.includes(id)
+    ({ id }) => id === 'documents'
   )
   const documentSectionFields = (documentSection?.groups[0].fields.filter(
     (field) => field.type === DOCUMENT_UPLOADER_WITH_OPTION
@@ -1076,12 +1066,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
   return (
     <div>
       {transformedSectionData
-        .filter(
-          ({ id }) =>
-            ![BirthSection.Informant, DeathSection.Informant].includes(
-              id as BirthSection | DeathSection
-            )
-        )
+        .filter(({ id }) => id !== 'informant')
         .map((section, idx) => (
           <StyledTable key={`${section.id}_${idx}`}>
             <StyledTHead>
@@ -1129,11 +1114,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
         </StyledTable>
       )}
       {transformedSectionData
-        .filter(({ id }) =>
-          [BirthSection.Informant, DeathSection.Informant].includes(
-            id as BirthSection | DeathSection
-          )
-        )
+        .filter(({ id }) => id === 'informant')
         .map((section, idx) => (
           <StyledTable key={`${section.id}_${idx}`}>
             <StyledTHead>
@@ -1142,6 +1123,18 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
               </tr>
             </StyledTHead>
             <tbody>
+              {props.declaration.event !== Event.Marriage && (
+                <StyledTR>
+                  <StyledTD colSpan={2}>
+                    <StyledEM>
+                      {formatMessage(
+                        props.intls,
+                        reviewMessages.signatureDescription
+                      )}
+                    </StyledEM>
+                  </StyledTD>
+                </StyledTR>
+              )}
               {section.items.map((item, itemIdx) => (
                 <StyledTR key={`${item.label}_${itemIdx}`}>
                   <StyledTD>{item.label}</StyledTD>
@@ -1164,7 +1157,10 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
         <StyledTHead>
           <tr>
             <StyledTH colSpan={2}>
-              {formatMessage(props.intls, formMessages.registrationTitle)}
+              {formatMessage(props.intls, {
+                id: 'form.field.label.informantTitle',
+                defaultMessage: "Informant's details"
+              })}
             </StyledTH>
           </tr>
         </StyledTHead>
@@ -1237,7 +1233,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
         </tbody>
       </StyledTable>
       <SignatureBox>
-        {formatMessage(props.intls, formMessages.userAttachmentSection)}
+        {formatMessage(props.intls, userFormMessages.userAttachmentSection)}
       </SignatureBox>
     </div>
   )

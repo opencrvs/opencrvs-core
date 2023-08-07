@@ -220,13 +220,15 @@ function FormAppBar({
   declaration,
   duplicate,
   modifyDeclarationMethod,
-  deleteDeclarationMethod
+  deleteDeclarationMethod,
+  printDeclarationMethod
 }: {
   duplicate: boolean | undefined
   section: IFormSection
   declaration: IDeclaration
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
+  printDeclarationMethod: (declarationId: string) => void
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -441,15 +443,26 @@ function FormAppBar({
             desktopRight={
               <>
                 {!isCorrection(declaration) && (
-                  <Button
-                    id="save-exit-btn"
-                    type="primary"
-                    size="medium"
-                    onClick={handleSaveAndExit}
-                  >
-                    <Icon name="DownloadSimple" />
-                    {intl.formatMessage(buttonMessages.saveExitButton)}
-                  </Button>
+                  <>
+                    <Button
+                      id="save-exit-btn"
+                      type="primary"
+                      size="medium"
+                      onClick={handleSaveAndExit}
+                    >
+                      <Icon name="DownloadSimple" />
+                      {intl.formatMessage(buttonMessages.saveExitButton)}
+                    </Button>
+                    <Button
+                      id="print-btn"
+                      type="secondary"
+                      size="medium"
+                      onClick={() => printDeclarationMethod(declaration.id)}
+                    >
+                      <Icon name="Printer" />
+                      {intl.formatMessage(buttonMessages.printDeclaration)}
+                    </Button>
+                  </>
                 )}
                 <Button
                   id="exit-btn"
@@ -516,6 +529,15 @@ function FormAppBar({
                 >
                   <Icon name="DownloadSimple" />
                   {intl.formatMessage(buttonMessages.saveExitButton)}
+                </Button>
+                <Button
+                  id="print-btn"
+                  type="secondary"
+                  size="medium"
+                  onClick={() => printDeclarationMethod(declaration.id)}
+                >
+                  <Icon name="Printer" />
+                  {intl.formatMessage(buttonMessages.printDeclaration)}
                 </Button>
                 <Button type="secondary" size="medium" onClick={handleExit}>
                   <Icon name="X" />
@@ -923,6 +945,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               duplicate={duplicate}
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
+              printDeclarationMethod={this.props.goToPrintRecord}
             />
           }
           key={activeSection.id}

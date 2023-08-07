@@ -52,6 +52,7 @@ export {
   PencilSimpleLine,
   Phone,
   Plus,
+  Printer,
   SignOut,
   Star,
   Target,
