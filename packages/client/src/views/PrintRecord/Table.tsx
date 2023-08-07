@@ -45,7 +45,6 @@ import {
 import {
   getConditionalActionsForField,
   getListOfLocations,
-  getSectionFields,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
@@ -57,10 +56,6 @@ import {
 import { clone, get, flattenDeep } from 'lodash'
 import React from 'react'
 import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
-import {
-  IErrorsBySection,
-  RequiredField
-} from '@client/views/RegisterForm/review/ReviewSection'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
@@ -68,7 +63,6 @@ import {
   formatMessage,
   getLocationHierarchy
 } from './utils'
-import { IValidationResult } from '@client/utils/validate'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import styled from 'styled-components'
@@ -79,14 +73,7 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import {
-  getValidationErrorsForForm,
-  IFieldErrors
-} from '@client/forms/validation'
-import {
-  getViewableSection,
-  hasFieldChanged
-} from '@client/views/CorrectionForm/utils'
+import { getViewableSection } from '@client/views/CorrectionForm/utils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { Checkbox, Stack } from '@opencrvs/components/lib'
@@ -440,52 +427,6 @@ function renderValue(
   return value
 }
 
-const getErrorsOnFieldsBySection = (
-  formSections: IFormSection[],
-  offlineCountryConfig: IOfflineData,
-  draft: IDeclaration
-): IErrorsBySection => {
-  return formSections.reduce((sections, section: IFormSection) => {
-    const fields: IFormField[] = getSectionFields(
-      section,
-      draft.data[section.id],
-      draft.data
-    )
-
-    const errors = getValidationErrorsForForm(
-      fields,
-      draft.data[section.id] || {},
-      offlineCountryConfig,
-      draft.data
-    )
-
-    return {
-      ...sections,
-      [section.id]: fields.reduce((fields, field) => {
-        // REFACTOR
-        const validationErrors: IFieldErrors = errors[
-          field.name as keyof typeof errors
-        ] as IFieldErrors
-
-        const value = draft.data[section.id]
-          ? draft.data[section.id][field.name]
-          : null
-
-        const informationMissing =
-          validationErrors.errors.length > 0 ||
-          value === null ||
-          Object.values(validationErrors.nestedFields).some(
-            (nestedErrors) => nestedErrors.length > 0
-          )
-            ? validationErrors
-            : { errors: [], nestedFields: {} }
-
-        return { ...fields, [field.name]: informationMissing }
-      }, {})
-    }
-  }, {})
-}
-
 export function PrintRecordTable(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
   const intl = useIntl()
@@ -506,43 +447,14 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
       matchedField && matchedOption && formatMessage(intls, matchedOption.label)
     )
   }
-  function fieldHasErrors(
-    section: IFormSection,
-    field: IFormField,
-    sectionErrors: IErrorsBySection
-  ) {
-    if (
-      (
-        get(sectionErrors[section.id][field.name], 'errors') ||
-        getErrorForNestedField(section, field, sectionErrors)
-      ).length > 0
-    ) {
-      return true
-    }
-    return false
-  }
-
-  function getFieldValueWithErrorMessage(
-    section: IFormSection,
-    field: IFormField,
-    errorsOnField: any
-  ) {
-    return (
-      <RequiredField id={`required_label_${section.id}_${field.name}`}>
-        {field.ignoreFieldLabelOnErrorMessage ||
-          (field.previewGroup && formatMessage(props.intls, field.label) + ' ')}
-        {formatMessage(props.intls, errorsOnField.message, errorsOnField.props)}
-      </RequiredField>
-    )
-  }
 
   function getRenderableField(
-    section: IFormSection,
-    group: IFormSectionGroup,
+    _section: IFormSection,
+    _group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
-    fieldName: string,
+    _fieldName: string,
     value: IFormFieldValue | JSX.Element | undefined,
-    ignoreAction = false
+    _ignoreAction = false
   ) {
     const { intls } = props
 
@@ -552,33 +464,23 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     }
   }
 
-  function getNestedFieldValueOrError(
-    section: IFormSection,
+  function getNestedFieldValue(
     nestSectionData: IFormData,
-    nestedField: IFormField,
-    parentFieldErrors: IFieldErrors
+    nestedField: IFormField
   ) {
     const { intls } = props
-    const errorsOnNestedField =
-      parentFieldErrors.nestedFields[nestedField.name] || []
 
     return (
       <>
-        {errorsOnNestedField.length > 0
-          ? getFieldValueWithErrorMessage(
-              section,
-              nestedField,
-              errorsOnNestedField[0]
-            )
-          : renderValue(
-              nestSectionData,
-              'nestedFields',
-              nestedField,
-              intls,
-              offlineCountryConfiguration,
-              undefined,
-              intl
-            )}
+        {renderValue(
+          nestSectionData,
+          'nestedFields',
+          nestedField,
+          intls,
+          offlineCountryConfiguration,
+          undefined,
+          intl
+        )}
       </>
     )
   }
@@ -587,10 +489,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    visitedTags: string[],
-    errorsOnFields: IErrorsBySection,
-    data: IFormSectionData,
-    originalData?: IFormSectionData
+    visitedTags: string[]
   ) {
     const { declaration: draft } = props
 
@@ -625,7 +524,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           ) as IPreviewGroup[])) ||
         []
       const values = taggedFields
-        .map((field) => getValue(section, draft.data, field, errorsOnFields))
+        .map((field) => getValue(section, draft.data, field))
         .filter((value) => value)
 
       let completeValue = values[0]
@@ -645,20 +544,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           ))
       )
 
-      const hasErrors = taggedFields.reduce(
-        (accum, field) =>
-          accum || fieldHasErrors(section, field, errorsOnFields),
-        false
-      )
-
-      const hasAnyFieldChanged = taggedFields.reduce(
-        (accum, field) => accum || hasFieldChanged(field, data, originalData),
-        false
-      )
-      const draftOriginalData = draft.originalData
-      if (draftOriginalData && hasAnyFieldChanged && !hasErrors) {
-        completeValue = <>{completeValue}</>
-      }
+      completeValue = <>{completeValue}</>
 
       return getRenderableField(
         section,
@@ -671,23 +557,10 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     }
   }
 
-  function getErrorForNestedField(
-    section: IFormSection,
-    field: IFormField,
-    sectionErrors: IErrorsBySection
-  ): IValidationResult[] {
-    for (const key in sectionErrors[section.id]) {
-      return sectionErrors[section.id][key].nestedFields[field.name] || []
-    }
-    return []
-  }
-
   function getValue(
     section: IFormSection,
     data: IFormData,
     field: IFormField,
-    sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean,
     replaceEmpty?: boolean,
     isOriginalData?: boolean
   ) {
@@ -710,21 +583,13 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
   function getSinglePreviewField(
     section: IFormSection,
     group: IFormSectionGroup,
-    field: IFormField,
-    sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean
+    field: IFormField
   ) {
     const {
       declaration: { data }
     } = props
 
-    const value = getValue(
-      section,
-      data,
-      field,
-      sectionErrors,
-      ignoreNestedFieldWrapping
-    )
+    const value = getValue(section, data, field)
 
     return getRenderableField(
       section,
@@ -739,16 +604,13 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
   function getNestedPreviewField(
     section: IFormSection,
     group: IFormSectionGroup,
-    field: IFormField,
-    sectionErrors: IErrorsBySection
+    field: IFormField
   ) {
     const { declaration: draft } = props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
-    nestedItems.push(
-      getSinglePreviewField(section, group, field, sectionErrors, true)
-    )
+    nestedItems.push(getSinglePreviewField(section, group, field))
     ;(
       (field.nestedFields &&
         draft.data[section.id] &&
@@ -762,18 +624,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     ).forEach((nestedField) => {
       if (nestedField.previewGroup) {
         nestedItems.push(
-          getPreviewGroupsField(
-            section,
-            group,
-            nestedField,
-            visitedTags,
-            sectionErrors,
-            (draft.data[section.id][field.name] as IFormData).nestedFields,
-            (draft.originalData &&
-              (draft.originalData[section.id][field.name] as IFormData)
-                .nestedFields) ||
-              undefined
-          )
+          getPreviewGroupsField(section, group, nestedField, visitedTags)
         )
       } else {
         nestedItems.push(
@@ -782,11 +633,9 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
             group,
             nestedField.label,
             nestedField.name,
-            getNestedFieldValueOrError(
-              section,
+            getNestedFieldValue(
               draft.data[section.id][field.name] as IFormData,
-              nestedField,
-              sectionErrors[section.id][field.name]
+              nestedField
             ),
             nestedField.readonly
           )
@@ -858,7 +707,6 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
-    sectionErrors: IErrorsBySection,
     field: IFormField,
     items: any[],
     item: any
@@ -876,8 +724,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     const result = getSinglePreviewField(
       residingSection,
       group,
-      overriddenField,
-      sectionErrors
+      overriddenField
     )
 
     const { sectionID, groupID, fieldName } =
@@ -906,7 +753,6 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
 
   const transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection,
     offlineCountryConfiguration: IOfflineData
   ) => {
     const { intls, declaration: draft } = props
@@ -936,19 +782,10 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
             )
 
             tempItem = field.previewGroup
-              ? getPreviewGroupsField(
-                  section,
-                  group,
-                  field,
-                  visitedTags,
-                  errorsOnFields,
-                  draft.data[section.id],
-                  (draft.originalData && draft.originalData[section.id]) ||
-                    undefined
-                )
+              ? getPreviewGroupsField(section, group, field, visitedTags)
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(section, group, field, errorsOnFields)
-              : getSinglePreviewField(section, group, field, errorsOnFields)
+              ? getNestedPreviewField(section, group, field)
+              : getSinglePreviewField(section, group, field)
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
             }
@@ -957,7 +794,6 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
                 section,
                 group,
                 overriddenField as IFormField,
-                errorsOnFields,
                 field,
                 items,
                 tempItem
@@ -981,14 +817,8 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     registerForm[props.declaration.event],
     props.declaration
   )
-  const errorsOnFields = getErrorsOnFieldsBySection(
-    formSections,
-    offlineCountryConfiguration,
-    props.declaration
-  )
   const transformedSectionData = transformSectionData(
     formSections,
-    errorsOnFields,
     offlineCountryConfiguration
   )
   function renderSignatureBox() {
@@ -1141,6 +971,18 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
                   <StyledTD>{item.value}</StyledTD>
                 </StyledTR>
               ))}
+              {props.declaration.event === Event.Marriage && (
+                <StyledTR>
+                  <StyledTD colSpan={2}>
+                    <StyledEM>
+                      {formatMessage(
+                        props.intls,
+                        reviewMessages.signatureDescription
+                      )}
+                    </StyledEM>
+                  </StyledTD>
+                </StyledTR>
+              )}
             </tbody>
           </StyledTable>
         ))}
