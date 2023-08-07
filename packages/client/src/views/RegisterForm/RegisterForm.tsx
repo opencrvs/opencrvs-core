@@ -236,17 +236,8 @@ function FormAppBar({
       // that means it's a draft and has unsaved changes
       return true
     }
-    // to remove added blank sections
-    const decData = declaration.data
-    const cleanedDeclarationData: IFormData = {}
-    for (const key in decData) {
-      if (Object.keys(decData[key]).length > 0) {
-        cleanedDeclarationData[key] = decData[key]
-      }
-    }
-    console.log('cleanedDeclarationData', cleanedDeclarationData)
 
-    return !isEqual(declaration.originalData, cleanedDeclarationData)
+    return !isEqual(declaration.originalData, declaration.data)
   }
 
   const getRedirectionTabOnSaveOrExit = () => {
