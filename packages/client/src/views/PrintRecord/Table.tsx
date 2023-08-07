@@ -152,11 +152,10 @@ const DocumentTypeBox = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey500};
   padding: 2px 4px;
   margin-left: 39px;
-  ${({ theme }) => theme.fonts.reg14}
-
   :not(:first-child) {
     margin-top: 8px;
   }
+  ${({ theme }) => theme.fonts.reg14}
 `
 const SignatureBox = styled.div`
   margin-top: 8px;
@@ -177,6 +176,7 @@ const WarningText = styled.p`
   border-bottom: 1px solid ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bold14}
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
   line-height: 0.1em;
   text-transform: uppercase;
 
@@ -639,9 +639,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           ) as IPreviewGroup[])) ||
         []
       const values = taggedFields
-        .map((field) =>
-          getValueOrError(section, draft.data, field, errorsOnFields)
-        )
+        .map((field) => getValue(section, draft.data, field, errorsOnFields))
         .filter((value) => value)
 
       let completeValue = values[0]
@@ -698,7 +696,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     return []
   }
 
-  function getValueOrError(
+  function getValue(
     section: IFormSection,
     data: IFormData,
     field: IFormField,
@@ -720,59 +718,8 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
     if (replaceEmpty && !value) {
       value = '-'
     }
-    const errorsOnField =
-      get(sectionErrors[section.id][field.name], 'errors') ||
-      getErrorForNestedField(section, field, sectionErrors)
 
-    return errorsOnField.length > 0 ? (
-      <ErrorField>
-        {getFieldValueWithErrorMessage(section, field, errorsOnField[0])}
-      </ErrorField>
-    ) : field.nestedFields && !Boolean(ignoreNestedFieldWrapping) ? (
-      (
-        (data[section.id] &&
-          data[section.id][field.name] &&
-          (data[section.id][field.name] as IFormSectionData).value &&
-          field.nestedFields[
-            (data[section.id][field.name] as IFormSectionData).value as string
-          ]) ||
-        []
-      ).reduce((groupedValues, nestedField) => {
-        const errorsOnNestedField =
-          sectionErrors[section.id][field.name].nestedFields[
-            nestedField.name
-          ] || []
-        // Value of the parentField resembles with IFormData as a nested form
-        const nestedValue =
-          (data[section.id] &&
-            data[section.id][field.name] &&
-            renderValue(
-              data[section.id][field.name] as IFormData,
-              'nestedFields',
-              nestedField,
-              props.intls,
-              offlineCountryConfiguration,
-              isOriginalData,
-              intl
-            )) ||
-          ''
-        return (
-          <>
-            {groupedValues}
-            {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-            {errorsOnNestedField.length > 0
-              ? getFieldValueWithErrorMessage(
-                  section,
-                  field,
-                  errorsOnNestedField[0]
-                )
-              : nestedValue}
-          </>
-        )
-      }, <>{value}</>)
-    ) : (
-      <>{value}</>
-    )
+    return <>{value}</>
   }
   function getSinglePreviewField(
     section: IFormSection,
@@ -785,7 +732,7 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
       declaration: { data }
     } = props
 
-    const value = getValueOrError(
+    const value = getValue(
       section,
       data,
       field,
@@ -1120,31 +1067,38 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
   const declarationAciton = (
     props.declaration.data.history as unknown as History[]
   )
-    .reverse()
-    .find(
+    ?.reverse()
+    ?.find(
       (history) =>
         history.regStatus && [DECLARED, VALIDATED].includes(history.regStatus)
     )
 
   return (
     <div>
-      {transformedSectionData.map((section, idx) => (
-        <StyledTable key={`${section.id}_${idx}`}>
-          <StyledTHead>
-            <tr>
-              <StyledTH colSpan={2}>{section.title}</StyledTH>
-            </tr>
-          </StyledTHead>
-          <tbody>
-            {section.items.map((item, itemIdx) => (
-              <StyledTR key={`${item.label}_${itemIdx}`}>
-                <StyledTD>{item.label}</StyledTD>
-                <StyledTD>{item.value}</StyledTD>
-              </StyledTR>
-            ))}
-          </tbody>
-        </StyledTable>
-      ))}
+      {transformedSectionData
+        .filter(
+          ({ id }) =>
+            ![BirthSection.Informant, DeathSection.Informant].includes(
+              id as BirthSection | DeathSection
+            )
+        )
+        .map((section, idx) => (
+          <StyledTable key={`${section.id}_${idx}`}>
+            <StyledTHead>
+              <tr>
+                <StyledTH colSpan={2}>{section.title}</StyledTH>
+              </tr>
+            </StyledTHead>
+            <tbody>
+              {section.items.map((item, itemIdx) => (
+                <StyledTR key={`${item.label}_${itemIdx}`}>
+                  <StyledTD>{item.label}</StyledTD>
+                  <StyledTD>{item.value}</StyledTD>
+                </StyledTR>
+              ))}
+            </tbody>
+          </StyledTable>
+        ))}
       {documentSection && (
         <StyledTable>
           <StyledTHead>
@@ -1174,6 +1128,29 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
           </tbody>
         </StyledTable>
       )}
+      {transformedSectionData
+        .filter(({ id }) =>
+          [BirthSection.Informant, DeathSection.Informant].includes(
+            id as BirthSection | DeathSection
+          )
+        )
+        .map((section, idx) => (
+          <StyledTable key={`${section.id}_${idx}`}>
+            <StyledTHead>
+              <tr>
+                <StyledTH colSpan={2}>{section.title}</StyledTH>
+              </tr>
+            </StyledTHead>
+            <tbody>
+              {section.items.map((item, itemIdx) => (
+                <StyledTR key={`${item.label}_${itemIdx}`}>
+                  <StyledTD>{item.label}</StyledTD>
+                  <StyledTD>{item.value}</StyledTD>
+                </StyledTR>
+              ))}
+            </tbody>
+          </StyledTable>
+        ))}
       {renderSignatureBox()}
       <WarningText>
         <span>
@@ -1241,7 +1218,9 @@ export function PrintRecordTable(props: PrintRecordTableProps) {
             <StyledTD>
               {formatMessage(props.intls, constantsMessages.dateOfDeclaration)}
             </StyledTD>
-            <StyledTD>{formatLongDate(declarationAciton?.date)}</StyledTD>
+            <StyledTD>
+              {declarationAciton && formatLongDate(declarationAciton.date)}
+            </StyledTD>
           </StyledTR>
           <StyledTR>
             <StyledTD>
