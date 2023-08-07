@@ -30,7 +30,6 @@ const LocationSchema = z.array(
         'STATE',
         'DISTRICT',
         'LOCATION_LEVEL_3',
-        'LOCATION_LEVEL_3',
         'LOCATION_LEVEL_4',
         'LOCATION_LEVEL_5'
       ])
@@ -48,81 +47,6 @@ const LocationSchema = z.array(
       .optional()
   })
 )
-
-type LocationStatistic = {
-  year: number
-  male_population: number
-  female_population: number
-  population: number
-  crude_birth_rate: number
-}
-
-type Statistics = Array<Record<number, number>>
-
-export function setExtensions(
-  malePopulations: Statistics,
-  femalePopulations: Statistics,
-  totalPopulations: Statistics,
-  birthRates: Statistics
-) {
-  const extensions: fhir3.Extension[] = [
-    {
-      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
-      valueAttachment: {
-        contentType: 'application/geo+json',
-        data: '<base64>' // base64 encoded geoJSON feature object
-      }
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
-      valueString: JSON.stringify(malePopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
-      valueString: JSON.stringify(femalePopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
-      valueString: JSON.stringify(totalPopulations)
-    },
-    {
-      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
-      valueString: JSON.stringify(birthRates)
-    }
-  ]
-  return extensions
-}
-
-export function generateStatisticalExtensions(
-  sourceStatistic: LocationStatistic[]
-) {
-  const malePopulations: Statistics = []
-  const femalePopulations: Statistics = []
-  const totalPopulations: Statistics = []
-  const birthRates: Statistics = []
-
-  for (const data of sourceStatistic) {
-    femalePopulations.push({
-      [data.year]: data.female_population
-    })
-    malePopulations.push({
-      [data.year]: data.male_population
-    })
-    totalPopulations.push({
-      [data.year]: data.population
-    })
-    birthRates.push({
-      [data.year]: data.crude_birth_rate / 2
-    })
-  }
-
-  return setExtensions(
-    malePopulations,
-    femalePopulations,
-    totalPopulations,
-    birthRates
-  )
-}
 
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_URL).toString()
