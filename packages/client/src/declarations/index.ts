@@ -1199,7 +1199,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ({ id }) => id === action.payload.declarationId
       )
 
-      if (!declaration || declaration.data[action.payload.pageId]) {
+      if (
+        !declaration ||
+        declaration.data[action.payload.pageId] ||
+        action.payload.pageId === 'preview' ||
+        action.payload.pageId === 'review'
+      ) {
         return state
       }
       const modifiedDeclaration = {
