@@ -10,21 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { getOfflineData } from '@client/offline/selectors'
 import React from 'react'
-import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { messages as reviewMessages } from '@client/i18n/messages/views/review'
-import { IntlShape } from 'react-intl'
-import { IDeclaration } from '@client/declarations'
-import { constantsMessages } from '@client/i18n/messages'
-import { formatMessage } from '@client/views/PrintRecord/utils'
-import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 
 interface PrintRecordHeaderProps {
-  declaration: IDeclaration
-  intls: IntlShape[]
+  logoSrc: React.ImgHTMLAttributes<HTMLImageElement>['src']
+  title: string
+  heading: string
+  subject: string
+  info?: { label: string; value: string }
 }
 
 const Container = styled.div`
@@ -57,32 +52,29 @@ const Box = styled.div`
 `
 
 export function PrintRecordHeader(props: PrintRecordHeaderProps) {
-  const offlineData = useSelector(getOfflineData)
-  const { declaration, intls } = props
+  const { logoSrc, title, heading, subject, info } = props
 
   return (
     <Container>
-      <StyledCountryLogo src={offlineData.config.COUNTRY_LOGO.file} />
+      <StyledCountryLogo src={logoSrc} />
       <TextContainer>
         <CapitalText variant="bold12" element="span">
-          {formatMessage(intls, reviewMessages.govtName)}
+          {title}
         </CapitalText>
         <Text variant="bold18" element="span">
-          {formatMessage(intls, printRecordMessages.civilRegistrationCentre)}
+          {heading}
         </Text>
         <SubheaderText variant="bold12" element="span">
-          {formatMessage(intls, reviewMessages.headerSubjectWithoutName, {
-            eventType: props.declaration.event
-          })}
+          {subject}
         </SubheaderText>
       </TextContainer>
-      {declaration.data?.registration?.trackingId && (
+      {info && (
         <Box>
           <Text variant="bold12" element="span">
             <>
-              {formatMessage(intls, constantsMessages.trackingId)}
+              {info.label}
               <br />
-              {declaration.data.registration.trackingId}
+              {info.value}
             </>
           </Text>
         </Box>

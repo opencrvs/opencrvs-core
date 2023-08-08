@@ -19,10 +19,17 @@ import { useSelector } from 'react-redux'
 import { useParams, Redirect } from 'react-router'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
-import { createSeparateIntls } from '@client/views/PrintRecord/utils'
+import {
+  createSeparateIntls,
+  formatMessage
+} from '@client/views/PrintRecord/utils'
 import { createIntlCache } from 'react-intl'
 import { getLanguages } from '@client/i18n/selectors'
-import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
+import { PrintRecordBody as Body } from '@client/views/PrintRecord/Body'
+import { getOfflineData } from '@client/offline/selectors'
+import { messages as reviewMessages } from '@client/i18n/messages/views/review'
+import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
+import { constantsMessages } from '@client/i18n/messages'
 
 const Container = styled.div`
   padding: 16px;
@@ -35,6 +42,7 @@ const Content = styled.div`
 `
 export function PrintRecord() {
   const languages = useSelector(getLanguages)
+  const offlineData = useSelector(getOfflineData)
   const cache = createIntlCache()
   const intls = createSeparateIntls(languages, cache)
   const params = useParams<{ declarationId: string }>()
@@ -60,8 +68,30 @@ export function PrintRecord() {
   return (
     <Container>
       <Content>
-        <Header declaration={declaration} intls={intls} />
-        <Table declaration={declaration} intls={intls} />
+        <Header
+          logoSrc={offlineData.config.COUNTRY_LOGO.file}
+          title={formatMessage(intls, reviewMessages.govtName)}
+          heading={formatMessage(
+            intls,
+            printRecordMessages.civilRegistrationCentre
+          )}
+          subject={formatMessage(
+            intls,
+            reviewMessages.headerSubjectWithoutName,
+            {
+              eventType: declaration.event
+            }
+          )}
+          info={
+            declaration.data?.registration?.trackingId
+              ? {
+                  label: formatMessage(intls, constantsMessages.trackingId),
+                  value: declaration.data.registration.trackingId as string
+                }
+              : undefined
+          }
+        />
+        <Body declaration={declaration} intls={intls} />
       </Content>
     </Container>
   )
