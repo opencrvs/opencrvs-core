@@ -442,7 +442,7 @@ function FormAppBar({
             }
             desktopRight={
               <>
-                {!isCorrection(declaration) && (
+                {!duplicate && !isCorrection(declaration) && (
                   <>
                     <Button
                       id="save-exit-btn"
@@ -493,9 +493,11 @@ function FormAppBar({
             }
             mobileRight={
               <>
-                <Button type="icon" size="small" onClick={handleSaveAndExit}>
-                  <Icon name="DownloadSimple" />
-                </Button>
+                {!duplicate && !isCorrection(declaration) && (
+                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                    <Icon name="DownloadSimple" />
+                  </Button>
+                )}
                 <Button type="icon" size="small" onClick={handleExit}>
                   <Icon name="X" />
                 </Button>

@@ -917,6 +917,11 @@ export const DuplicateFormTabs = (props: IProps) => {
             size={ContentSize.LARGE}
             showTitleOnMobile
           >
+            <Text element="h1" variant="h4" align="left" id="title-text">
+              {intl.formatMessage(
+                duplicateMessages.duplicateDeclarationDetails
+              )}
+            </Text>
             <Stack direction="column" gap={20} alignItems={'stretch'}>
               {comparisonDelcarationData.map((sections, index) => {
                 return (
