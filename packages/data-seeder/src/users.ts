@@ -86,6 +86,15 @@ async function getUseres() {
       )}`
     )
   }
+  if (
+    parsedUsers.data.every(
+      ({ systemRole }) => systemRole !== 'NATIONAL_SYSTEM_ADMIN'
+    )
+  ) {
+    raise(
+      `At least one user with "NATIONAL_SYSTEM_ADMIN" systemRole must be created`
+    )
+  }
   return parsedUsers.data
 }
 

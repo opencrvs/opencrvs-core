@@ -23,17 +23,19 @@ const LabelSchema = z.array(
   })
 )
 
-const CountryRoleSchema = z
-  .object({
-    FIELD_AGENT: LabelSchema,
-    LOCAL_REGISTRAR: LabelSchema,
-    LOCAL_SYSTEM_ADMIN: LabelSchema,
-    NATIONAL_REGISTRAR: LabelSchema,
-    NATIONAL_SYSTEM_ADMIN: LabelSchema,
-    PERFORMANCE_MANAGEMENT: LabelSchema,
-    REGISTRATION_AGENT: LabelSchema
-  })
-  .partial()
+/*
+ * at least LOCAL_REGISTRAR & NATIONAL_SYSTEM_ADMIN
+ * roles are required
+ */
+const CountryRoleSchema = z.object({
+  FIELD_AGENT: LabelSchema.optional(),
+  LOCAL_REGISTRAR: LabelSchema,
+  LOCAL_SYSTEM_ADMIN: LabelSchema.optional(),
+  NATIONAL_REGISTRAR: LabelSchema.optional(),
+  NATIONAL_SYSTEM_ADMIN: LabelSchema,
+  PERFORMANCE_MANAGEMENT: LabelSchema.optional(),
+  REGISTRATION_AGENT: LabelSchema.optional()
+})
 
 const SYSTEM_ROLES = [
   'FIELD_AGENT',
