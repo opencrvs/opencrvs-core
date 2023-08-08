@@ -46,7 +46,7 @@ if (
   if (window.config.SENTRY) {
     Sentry.init({
       release: import.meta.env.REACT_APP_VERSION,
-      environment: import.meta.env.NODE_ENV,
+      environment: window.location.host,
       integrations: [new BrowserTracing()],
 
       // We recommend adjusting this value in production, or using tracesSampler
