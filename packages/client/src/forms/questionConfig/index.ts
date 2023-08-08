@@ -71,6 +71,7 @@ export interface IDefaultQuestionConfig extends IBaseQuestionConfig {
   helperText?: Message
   hideHeader?: boolean
   hideInPreview?: boolean
+  maxLength?: number
   options?: Array<
     Omit<CustomSelectOption, 'label'> & { label: MessageDescriptor }
   >

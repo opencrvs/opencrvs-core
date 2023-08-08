@@ -34,6 +34,7 @@ import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/
 import { registerForms } from '@client/forms/configuration/default/index'
 import { MessageDescriptor } from 'react-intl'
 import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
+import { maxLength } from '../../utils/validate'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
@@ -182,7 +183,8 @@ export function questionsTransformer(
         optionCondition: optionCondition || undefined,
         ignoreBottomMargin: ignoreBottomMargin ?? false,
         hideHeader: hideHeader ?? false,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
+        maxLength: maxLength ?? 250
       }
 
       if (validator && validator.length > 0) {
