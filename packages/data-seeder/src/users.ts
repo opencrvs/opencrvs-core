@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { COUNTRY_CONFIG_URL, GATEWAY_GQL_HOST, GATEWAY_URL } from './constants'
+import {
+  ACTIVATE_USERS,
+  COUNTRY_CONFIG_URL,
+  GATEWAY_GQL_HOST,
+  GATEWAY_URL
+} from './constants'
 import { z } from 'zod'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -164,6 +169,7 @@ export async function seedUsers(
             firstNames: givenNames
           }
         ],
+        ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
         primaryOffice
       }
       const res = await fetch(GATEWAY_GQL_HOST, {
