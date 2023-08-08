@@ -81,50 +81,13 @@ import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 import { Event, History } from '@client/utils/gateway'
 import { DECLARED, VALIDATED } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
   intls: IntlShape[]
 }
 
-const StyledTable = styled.table`
-  margin-top: 8px;
-  width: 100%;
-  border-spacing: 0;
-  border-collapse: separate;
-  border-radius: 4px;
-  border: 0.5px solid ${({ theme }) => theme.colors.grey500};
-  overflow: hidden;
-  table-layout: fixed;
-  ${({ theme }) => theme.fonts.bold14}
-`
-const StyledTHead = styled.thead`
-  background: ${({ theme }) => theme.colors.grey200};
-`
-const StyledTH = styled.th`
-  text-transform: uppercase;
-  text-align: left;
-  padding: 4px 8px;
-  border-bottom: 0.5px solid ${({ theme }) => theme.colors.grey500};
-`
-
-const StyledTR = styled.tr`
-  :not(:last-child) > td {
-    border-bottom: 0.5px solid ${({ theme }) => theme.colors.grey500};
-  }
-`
-const StyledTD = styled.td`
-  padding: 4px 8px;
-  vertical-align: top;
-  :not(:last-child) {
-    border-right: 0.5px solid ${({ theme }) => theme.colors.grey500};
-  }
-`
-
-const DocumentsTD = styled.td`
-  vertical-align: top;
-  padding: 0 8px;
-`
 const DocumentTypeBox = styled.div`
   border-radius: 2px;
   border: 1px solid ${({ theme }) => theme.colors.grey500};
@@ -162,9 +125,6 @@ const WarningText = styled.p`
     background: ${({ theme }) => theme.colors.white};
     padding: 0 16px;
   }
-`
-const StyledEM = styled.em`
-  ${({ theme }) => theme.fonts.reg14}
 `
 const StyledStack = styled(Stack)`
   flex: 1;
@@ -897,91 +857,94 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
       {transformedSectionData
         .filter(({ id }) => id !== 'informant')
         .map((section, idx) => (
-          <StyledTable key={`${section.id}_${idx}`}>
-            <StyledTHead>
-              <tr>
-                <StyledTH colSpan={2}>{section.title}</StyledTH>
-              </tr>
-            </StyledTHead>
-            <tbody>
-              {section.items.map((item, itemIdx) => (
-                <StyledTR key={`${item.label}_${itemIdx}`}>
-                  <StyledTD>{item.label}</StyledTD>
-                  <StyledTD>{item.value}</StyledTD>
-                </StyledTR>
-              ))}
-            </tbody>
-          </StyledTable>
+          <Table
+            key={`${section.id}_${idx}`}
+            heading={{
+              colSpan: 2,
+              label: section.title || ''
+            }}
+            rows={section.items.map((item) => ({
+              data: [{ value: item.label, bold: true }, { value: item.value }]
+            }))}
+          />
         ))}
       {documentSection && (
-        <StyledTable>
-          <StyledTHead>
-            <tr>
-              <StyledTH colSpan={2}>
-                {formatMessage(props.intls, reviewMessages.documentViewerTitle)}
-              </StyledTH>
-            </tr>
-          </StyledTHead>
-          <tbody>
-            {documentSectionFields
-              .slice(0, leftColumnSize)
-              .map((leftColumnField, index) => {
-                const rightColumnField =
-                  documentSectionFields[index + leftColumnSize]
-                return (
-                  <tr key={leftColumnField.name}>
-                    <DocumentsTD>
-                      {renderDocumentBox(leftColumnField)}
-                    </DocumentsTD>
-                    <DocumentsTD>
-                      {rightColumnField && renderDocumentBox(rightColumnField)}
-                    </DocumentsTD>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </StyledTable>
+        <Table
+          heading={{
+            label: formatMessage(
+              props.intls,
+              reviewMessages.documentViewerTitle
+            ),
+            colSpan: 2
+          }}
+          rows={documentSectionFields
+            .slice(0, leftColumnSize)
+            .map((leftColumnField, index) => {
+              const rightColumnField =
+                documentSectionFields[index + leftColumnSize]
+              return {
+                data: [
+                  { value: renderDocumentBox(leftColumnField) },
+                  {
+                    value:
+                      rightColumnField && renderDocumentBox(rightColumnField)
+                  }
+                ]
+              }
+            })}
+          borderedCell={false}
+        />
       )}
       {transformedSectionData
         .filter(({ id }) => id === 'informant')
-        .map((section, idx) => (
-          <StyledTable key={`${section.id}_${idx}`}>
-            <StyledTHead>
-              <tr>
-                <StyledTH colSpan={2}>{section.title}</StyledTH>
-              </tr>
-            </StyledTHead>
-            <tbody>
-              {props.declaration.event !== Event.Marriage && (
-                <StyledTR>
-                  <StyledTD colSpan={2}>
-                    <StyledEM>
-                      {formatMessage(
-                        props.intls,
-                        reviewMessages.signatureDescription
-                      )}
-                    </StyledEM>
-                  </StyledTD>
-                </StyledTR>
-              )}
-              {section.items.map((item, itemIdx) => (
-                <StyledTR key={`${item.label}_${itemIdx}`}>
-                  <StyledTD>{item.label}</StyledTD>
-                  <StyledTD>{item.value}</StyledTD>
-                </StyledTR>
-              ))}
-              {props.declaration.event === Event.Marriage && (
-                <StyledTR>
-                  <StyledTD colSpan={2}>
-                    <StyledEM>
-                      {formatMessage(props.intls, reviewMessages.terms)}
-                    </StyledEM>
-                  </StyledTD>
-                </StyledTR>
-              )}
-            </tbody>
-          </StyledTable>
-        ))}
+        .map((section, idx) => {
+          const items =
+            props.declaration.event === Event.Marriage
+              ? [
+                  ...section.items.map((item) => ({
+                    data: [
+                      { value: item.label, bold: true },
+                      { value: item.value }
+                    ]
+                  })),
+                  {
+                    data: [
+                      {
+                        value: formatMessage(props.intls, reviewMessages.terms),
+                        colSpan: 2,
+                        italic: true
+                      }
+                    ]
+                  }
+                ]
+              : [
+                  {
+                    data: [
+                      {
+                        value: formatMessage(
+                          props.intls,
+                          reviewMessages.signatureDescription
+                        ),
+                        colSpan: 2,
+                        italic: true
+                      }
+                    ]
+                  },
+                  ...section.items.map((item) => ({
+                    data: [
+                      { value: item.label, bold: true },
+                      { value: item.value }
+                    ]
+                  }))
+                ]
+          return (
+            <Table
+              key={`${section.id}_${idx}`}
+              heading={{ label: section.title || '', colSpan: 2 }}
+              rows={items}
+            />
+          )
+        })}
       {renderSignatureBox()}
       <WarningText>
         <span>
@@ -991,85 +954,86 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
           )}
         </span>
       </WarningText>
-      <StyledTable>
-        <StyledTHead>
-          <tr>
-            <StyledTH colSpan={2}>
-              {formatMessage(props.intls, {
-                id: 'form.field.label.informantTitle',
-                defaultMessage: "Informant's details"
-              })}
-            </StyledTH>
-          </tr>
-        </StyledTHead>
-        <tbody>
-          <StyledTR>
-            <StyledTD colSpan={2}>
-              <StyledEM>
-                {formatMessage(
+      <Table
+        heading={{
+          label: formatMessage(props.intls, {
+            id: 'form.section.declaration.title',
+            defaultMessage: 'Declaration details'
+          }),
+          colSpan: 2
+        }}
+        rows={[
+          {
+            data: [
+              {
+                value: formatMessage(
                   props.intls,
-                  printRecordMessages.informantAttestation,
-                  { eventType: props.declaration.event }
-                )}
-              </StyledEM>
-            </StyledTD>
-          </StyledTR>
-          <StyledTR>
-            <StyledTD>
-              {formatMessage(
-                props.intls,
-                printRecordMessages.placeOfDeclaration
-              )}
-            </StyledTD>
-            <StyledTD>
-              {declarationAciton?.location?.id &&
-                getLocationHierarchy(
-                  declarationAciton.location.id,
-                  offlineCountryConfiguration
-                ).map((loc) => (
-                  <span key={loc.id}>
-                    {formatLocationName(loc)}
-                    <br></br>
-                  </span>
-                ))}
-            </StyledTD>
-          </StyledTR>
-          <StyledTR>
-            <StyledTD>
-              {formatMessage(
-                props.intls,
-                printRecordMessages.civilRegistrationOffice
-              )}
-            </StyledTD>
-            <StyledTD>
-              {declarationAciton?.office &&
-                formatLocationName(
-                  declarationAciton?.office as unknown as ILocation
-                )}
-            </StyledTD>
-          </StyledTR>
-          <StyledTR>
-            <StyledTD>
-              {formatMessage(props.intls, constantsMessages.dateOfDeclaration)}
-            </StyledTD>
-            <StyledTD>
-              {declarationAciton && formatLongDate(declarationAciton.date)}
-            </StyledTD>
-          </StyledTR>
-          <StyledTR>
-            <StyledTD>
-              {formatMessage(
-                [props.intls[0]],
-                userMessages['REGISTRATION_AGENT']
-              )}
-            </StyledTD>
-            <StyledTD>
-              {declarationAciton?.user?.name &&
-                createNamesMap(declarationAciton.user.name)[intl.locale]}
-            </StyledTD>
-          </StyledTR>
-        </tbody>
-      </StyledTable>
+                  printRecordMessages.placeOfDeclaration
+                )
+              },
+              {
+                value:
+                  declarationAciton?.location?.id &&
+                  getLocationHierarchy(
+                    declarationAciton.location.id,
+                    offlineCountryConfiguration
+                  ).map((loc) => (
+                    <span key={loc.id}>
+                      {formatLocationName(loc)}
+                      <br></br>
+                    </span>
+                  ))
+              }
+            ]
+          },
+          {
+            data: [
+              {
+                value: formatMessage(
+                  props.intls,
+                  printRecordMessages.civilRegistrationOffice
+                )
+              },
+              {
+                value:
+                  declarationAciton?.office &&
+                  formatLocationName(
+                    declarationAciton?.office as unknown as ILocation
+                  )
+              }
+            ]
+          },
+          {
+            data: [
+              {
+                value: formatMessage(
+                  props.intls,
+                  constantsMessages.dateOfDeclaration
+                )
+              },
+              {
+                value:
+                  declarationAciton && formatLongDate(declarationAciton.date)
+              }
+            ]
+          },
+          {
+            data: [
+              {
+                value: formatMessage(
+                  [props.intls[0]],
+                  userMessages['REGISTRATION_AGENT']
+                )
+              },
+              {
+                value:
+                  declarationAciton?.user?.name &&
+                  createNamesMap(declarationAciton.user.name)[intl.locale]
+              }
+            ]
+          }
+        ]}
+      />
       <SignatureBox>
         {formatMessage(props.intls, userFormMessages.userAttachmentSection)}
       </SignatureBox>
