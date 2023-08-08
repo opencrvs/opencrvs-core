@@ -182,7 +182,8 @@ export function questionsTransformer(
         optionCondition: optionCondition || undefined,
         ignoreBottomMargin: ignoreBottomMargin ?? false,
         hideHeader: hideHeader ?? false,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
+        maxLength: maxLength ?? 250
       }
 
       if (validator && validator.length > 0) {
