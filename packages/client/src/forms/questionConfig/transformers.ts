@@ -34,7 +34,6 @@ import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/
 import { registerForms } from '@client/forms/configuration/default/index'
 import { MessageDescriptor } from 'react-intl'
 import { getDefaultLanguageMessage } from '@client/forms/configuration/customUtils'
-import { maxLength } from '../../utils/validate'
 
 export function fieldIdentifiersToQuestionConfig(
   event: Event,
