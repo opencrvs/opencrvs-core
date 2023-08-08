@@ -111,7 +111,10 @@ async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
   if (!res.ok) {
     raise(`Failed to fetch roles from gateway`)
   }
-  return res.json().then((res) => res.data.getSystemRoles)
+  const parsedResponse = parseGQLResponse<{ getSystemRoles: SystemRole[] }>(
+    await res.json()
+  )
+  return parsedResponse.getSystemRoles
 }
 
 async function updateRoles(

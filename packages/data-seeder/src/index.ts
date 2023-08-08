@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { AUTH_URL, SUPER_USER_PASSWORD } from './constants'
+import { AUTH_URL, GATEWAY_GQL_HOST, SUPER_USER_PASSWORD } from './constants'
 import fetch from 'node-fetch'
 import { seedCertificate } from './certificates'
 import { seedLocations } from './locations'
 import { seedRoles } from './roles'
 import { seedUsers } from './users'
-import { raise } from './utils'
+import { parseGQLResponse, raise } from './utils'
+import { print } from 'graphql'
+import gql from 'graphql-tag'
+import decode from 'jwt-decode'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', AUTH_URL).toString()
@@ -36,6 +39,57 @@ async function getToken(): Promise<string> {
   return body.token
 }
 
+const removeUserMutation = print(gql`
+  mutation removeUser(
+    $userId: String!
+    $action: String!
+    $reason: String!
+    $comment: String
+) {
+    auditUser(
+      userId: $userId
+      action: $action
+      reason: $reason
+      comment: $comment
+    )
+  }
+`)
+
+interface TokenPayload {
+  sub: string
+  exp: string
+  algorithm: string
+  scope: string[]
+}
+
+function getTokenPayload(token: string): TokenPayload {
+  try {
+    return decode<TokenPayload>(token)
+  } catch (err) {
+    raise(`getTokenPayload: Error occurred during token decode : ${err}`)
+  }
+}
+
+async function removeSuperuser(token: string) {
+  const { sub } = getTokenPayload(token)
+  const res = await fetch(GATEWAY_GQL_HOST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      query: removeUserMutation,
+      variables: {
+        userId: sub,
+        action: 'DEACTIVATE',
+        reason: 'Remove super user'
+      }
+    })
+  })
+  parseGQLResponse(await res.json())
+}
+
 async function main() {
   const token = await getToken()
   console.log('Seeding roles')
@@ -46,6 +100,7 @@ async function main() {
   await seedUsers(token, roleIdMap)
   console.log('Seeding certificates')
   await seedCertificate(token)
+  await removeSuperuser(token)
 }
 
 main()
