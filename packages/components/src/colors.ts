@@ -52,7 +52,9 @@ const config = {
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
   backgroundPrimary: '#36304E',
-  subheaderCopy: '#007A5E'
+  subheaderCopyBirth: '#007A5E',
+  subheaderCopyDeath: '#4B5EAA',
+  subheaderCopyMarriage: '#E4BC0C'
 }
 
 export const gradients = {

@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import { ILanguageState } from '@client/i18n/reducer'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { Event } from '@client/utils/gateway'
 import { createIntl, MessageDescriptor, IntlShape, IntlCache } from 'react-intl'
 
 export function formatMessage(
@@ -58,5 +60,15 @@ export function getLocationHierarchy(
       location = locations[parent]
     } while (location)
     return result.reverse()
+  }
+}
+
+export function getEventwiseSubjectColor(event: Event) {
+  if (event === Event.Death) {
+    return 'subheaderCopyDeath'
+  } else if (event === Event.Marriage) {
+    return 'subheaderCopyMarriage'
+  } else {
+    return 'subheaderCopyBirth'
   }
 }

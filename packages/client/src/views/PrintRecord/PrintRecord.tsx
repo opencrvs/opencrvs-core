@@ -21,7 +21,8 @@ import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import {
   createSeparateIntls,
-  formatMessage
+  formatMessage,
+  getEventwiseSubjectColor
 } from '@client/views/PrintRecord/utils'
 import { createIntlCache } from 'react-intl'
 import { getLanguages } from '@client/i18n/selectors'
@@ -90,6 +91,7 @@ export function PrintRecord() {
                 }
               : undefined
           }
+          subjectColor={getEventwiseSubjectColor(declaration.event)}
         />
         <Body declaration={declaration} intls={intls} />
       </Content>

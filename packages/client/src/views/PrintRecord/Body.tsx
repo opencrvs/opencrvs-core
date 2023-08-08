@@ -39,8 +39,8 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   IAttachment,
   IDocumentUploaderWithOptionsFormField,
-  SUBSECTION_HEADER,
-  BULLET_LIST
+  BULLET_LIST,
+  DIVIDER
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -605,13 +605,9 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     return nestedItems
   }
   function isViewOnly(field: IFormField) {
-    return [
-      BULLET_LIST,
-      PARAGRAPH,
-      WARNING,
-      SUBSECTION_HEADER,
-      FETCH_BUTTON
-    ].find((type) => type === field.type)
+    return [BULLET_LIST, PARAGRAPH, WARNING, DIVIDER, FETCH_BUTTON].find(
+      (type) => type === field.type
+    )
   }
   function isVisibleField(field: IFormField, section: IFormSection) {
     const { declaration: draft } = props
@@ -780,7 +776,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   const transformedSectionData = transformSectionData(
     formSections,
     offlineCountryConfiguration
-  )
+  ).filter((sec) => sec.items.length > 0)
   function renderSignatureBox() {
     if (props.declaration.event === Event.Marriage) {
       return (
@@ -851,7 +847,6 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
       (history) =>
         history.regStatus && [DECLARED, VALIDATED].includes(history.regStatus)
     )
-
   return (
     <div>
       {transformedSectionData

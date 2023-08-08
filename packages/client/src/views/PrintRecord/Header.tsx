@@ -13,6 +13,7 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import React from 'react'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
+import { colors } from '@opencrvs/components/lib'
 
 interface PrintRecordHeaderProps {
   logoSrc: React.ImgHTMLAttributes<HTMLImageElement>['src']
@@ -20,6 +21,7 @@ interface PrintRecordHeaderProps {
   heading: string
   subject: string
   info?: { label: string; value: string }
+  subjectColor: keyof typeof colors
 }
 
 const Container = styled.div`
@@ -36,8 +38,8 @@ const CapitalText = styled(Text)`
   text-transform: uppercase;
 `
 
-const SubheaderText = styled(CapitalText)`
-  color: ${({ theme }) => theme.colors.subheaderCopy};
+const SubheaderText = styled(CapitalText)<{ color: keyof typeof colors }>`
+  color: ${({ theme, color }) => theme.colors[color] || theme.colors.copy};
 `
 const StyledCountryLogo = styled(CountryLogo)`
   height: 48px;
@@ -52,7 +54,7 @@ const Box = styled.div`
 `
 
 export function PrintRecordHeader(props: PrintRecordHeaderProps) {
-  const { logoSrc, title, heading, subject, info } = props
+  const { logoSrc, title, heading, subject, info, subjectColor } = props
 
   return (
     <Container>
@@ -64,7 +66,7 @@ export function PrintRecordHeader(props: PrintRecordHeaderProps) {
         <Text variant="bold18" element="span">
           {heading}
         </Text>
-        <SubheaderText variant="bold12" element="span">
+        <SubheaderText variant="bold12" element="span" color={subjectColor}>
           {subject}
         </SubheaderText>
       </TextContainer>
