@@ -38,7 +38,9 @@ async function getToken(): Promise<string> {
 
 async function main() {
   const token = await getToken()
+  console.log('Seeding roles')
   const roleIdMap = await seedRoles(token)
+  console.log('Seeding locations')
   await seedLocations(token)
   console.log('Seeding users')
   await seedUsers(token, roleIdMap)
