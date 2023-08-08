@@ -15,6 +15,7 @@ import { z } from 'zod'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
 
 const UserSchema = z.array(
   z.object({
@@ -75,7 +76,7 @@ async function getUseres() {
   const parsedUsers = UserSchema.safeParse(await res.json())
   if (!parsedUsers.success) {
     raise(
-      `Error when getting users metadata from country-config: ${JSON.stringify(
+      `Error when getting users metadata from country-config: ${inspect(
         parsedUsers.error.issues
       )}`
     )

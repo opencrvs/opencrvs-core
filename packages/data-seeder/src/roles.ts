@@ -15,6 +15,7 @@ import fetch from 'node-fetch'
 import { z } from 'zod'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
 
 const LabelSchema = z.array(
   z.object({
@@ -153,7 +154,7 @@ async function fetchCountryRoles() {
   const parsedRoles = CountryRoleSchema.safeParse(await res.json())
   if (!parsedRoles.success) {
     raise(
-      `Error when getting roles from country-config: ${JSON.stringify(
+      `Error when getting roles from country-config: ${inspect(
         parsedRoles.error.issues
       )}`
     )
