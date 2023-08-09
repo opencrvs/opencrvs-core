@@ -18,7 +18,6 @@ import {
   GQLCountryLogoInput,
   GQLMarriageInput
 } from '@gateway/graphql/schema'
-import { String } from 'lodash'
 
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
