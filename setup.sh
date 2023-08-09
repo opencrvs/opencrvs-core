@@ -102,8 +102,9 @@ echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep_if_non_ci 10
 echo
-echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
+echo "As part of this script, we checkout another GIT repo: A country configuration module into the folder next to this one called: 'opencrvs-countryconfig'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
 [ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
+[ -d "../opencrvs-countryconfig" ] && echo "Enter your password to delete the existing country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-countryconfig
 
 sleep_if_non_ci 10
 echo
