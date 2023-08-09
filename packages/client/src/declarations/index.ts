@@ -20,7 +20,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
+import {
+  Attachment,
+  Event,
+  History,
+  Query,
+  SystemRoleType
+} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -1041,7 +1047,8 @@ function requestWithStateWrapper(
       }
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data)
+        ...getSignatureUrls(data.data),
+        ...getProfileIconUrls(data.data)
       ]
 
       await Promise.all(
@@ -1053,6 +1060,20 @@ function requestWithStateWrapper(
       reject(error)
     }
   })
+}
+
+function getProfileIconUrls(queryResultData: Query) {
+  const history =
+    queryResultData.fetchBirthRegistration?.history ||
+    queryResultData.fetchDeathRegistration?.history ||
+    queryResultData.fetchMarriageRegistration?.history
+
+  const userAvatars = (history ?? [])
+    .filter((h): h is History => Boolean(h))
+    .map((h) => h.user?.avatar?.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+  return [...new Set(userAvatars).values()]
 }
 
 function getAttachmentUrls(queryResultData: Query) {
