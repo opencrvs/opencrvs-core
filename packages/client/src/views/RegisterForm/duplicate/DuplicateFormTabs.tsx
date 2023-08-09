@@ -52,11 +52,9 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/Content'
-import {
-  recordAuditMessages,
-  regStatusMessages
-} from '@client/i18n/messages/views/recordAudit'
+import { regStatusMessages } from '@client/i18n/messages/views/recordAudit'
 import styled from 'styled-components'
+import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
@@ -783,11 +781,7 @@ export const DuplicateFormTabs = (props: IProps) => {
         {
           label: (
             <Text variant="bold16" element="span" color="grey600">
-              {intl.formatMessage(
-                duplicateRegData.type.toLowerCase() === Event.Birth
-                  ? recordAuditMessages.brn
-                  : recordAuditMessages.drn
-              )}
+              {intl.formatMessage(headerMessages.typeRN)}
             </Text>
           ),
           heading: {
