@@ -177,7 +177,14 @@ describe('Registration type resolvers', () => {
   it('returns type from identifier', () => {
     const type = typeResolvers.IdentityType.type({
       value: '123456789',
-      type: 'PASSPORT'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'PASSPORT'
+          }
+        ]
+      }
     })
     expect(type).toBe('PASSPORT')
   })

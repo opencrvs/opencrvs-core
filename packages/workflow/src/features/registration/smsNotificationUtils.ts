@@ -13,7 +13,7 @@ import { APPLICATION_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 
-export enum InformantSMSNotificationName {
+export enum InformantNotificationName {
   birthInProgressSMS = 'birthInProgressSMS',
   birthDeclarationSMS = 'birthDeclarationSMS',
   birthRegistrationSMS = 'birthRegistrationSMS',
@@ -26,7 +26,7 @@ export enum InformantSMSNotificationName {
 
 interface IInformantSMSNotification {
   _id: string
-  name: InformantSMSNotificationName
+  name: InformantNotificationName
   enabled: boolean
   updatedAt: number
   createdAt: number
@@ -54,7 +54,7 @@ export async function getInformantSMSNotification(token: string) {
 
 export function isInformantSMSNotificationEnabled(
   informantSMSNotifications: IInformantSMSNotification[],
-  name: InformantSMSNotificationName
+  name: InformantNotificationName
 ) {
   const isNotificationEnabled = informantSMSNotifications.find(
     (notification) => notification.name === name

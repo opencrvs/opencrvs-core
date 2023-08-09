@@ -322,7 +322,7 @@ interface IStoreDeclarationAction {
 interface IModifyDeclarationAction {
   type: typeof MODIFY_DECLARATION
   payload: {
-    declaration: IDeclaration | IPrintableDeclaration
+    declaration: IPrintableDeclaration | Partial<IDeclaration>
   }
 }
 
@@ -542,9 +542,8 @@ export function storeDeclaration(
 }
 
 export function modifyDeclaration(
-  declaration: IDeclaration | IPrintableDeclaration
+  declaration: IPrintableDeclaration | Partial<IDeclaration>
 ): IModifyDeclarationAction {
-  declaration.modifiedOn = Date.now()
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
@@ -610,6 +609,7 @@ export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
+  declaration.modifiedOn = Date.now()
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
@@ -1199,7 +1199,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ({ id }) => id === action.payload.declarationId
       )
 
-      if (!declaration || declaration.data[action.payload.pageId]) {
+      if (
+        !declaration ||
+        declaration.data[action.payload.pageId] ||
+        action.payload.pageId === 'preview' ||
+        action.payload.pageId === 'review'
+      ) {
         return state
       }
       const modifiedDeclaration = {
@@ -1271,7 +1276,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )?.value
       }
 
-      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
+      newDeclarations[currentDeclarationIndex] = {
+        ...newDeclarations[currentDeclarationIndex],
+        ...modifiedDeclaration
+      }
 
       return {
         ...state,
@@ -1858,6 +1866,25 @@ export function getMinioUrlsFromDeclaration(
     string,
     IAttachmentValue[]
   >
+
+  const userAvatars: string[] = Object.values(
+    declaration.originalData?.history || []
+  )
+    .map((history) => {
+      if (
+        typeof history === 'object' &&
+        history !== null &&
+        'user' in history
+      ) {
+        const user = history.user as { avatar?: { data?: string } }
+        return user.avatar?.data
+      }
+      return null
+    })
+    .filter((avatarData): avatarData is string => Boolean(avatarData))
+
+  minioUrls.push(...userAvatars)
+
   if (!documentsData) {
     return minioUrls
   }

@@ -115,7 +115,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.reviewActionDescriptionComplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -134,7 +138,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeDeclaration: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.reviewActionDescriptionIncomplete,
+              payload: {
+                deliveryMethod:
+                  window.config.INFORMANT_NOTIFICATION_DELIVERY_METHOD
+              }
             },
             modal: {
               title: {
@@ -318,9 +326,12 @@ class ReviewActionComponent extends React.Component<
       : ACTION.DECLARATION_TO_BE_DECLARED
 
     const actionContent =
-      (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)] &&
-        ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
-          .completionStatus[String(completeDeclaration)]) ||
+      (ACTION_TO_CONTENT_MAP[action].draftStatus[
+        String(draftDeclaration || alreadyRejectedDeclaration)
+      ] &&
+        ACTION_TO_CONTENT_MAP[action].draftStatus[
+          String(draftDeclaration || alreadyRejectedDeclaration)
+        ].completionStatus[String(completeDeclaration)]) ||
       null
     return !actionContent ? null : (
       <Container id={id}>
@@ -334,6 +345,7 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {intl.formatMessage(actionContent.description.message, {
+              ...actionContent.description.payload,
               eventType: declaration.event
             })}
           </Description>

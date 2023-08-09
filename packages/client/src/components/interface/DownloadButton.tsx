@@ -345,7 +345,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         ) : assignment && assignment.userId !== userId ? (
           <AvatarSmall
             avatar={{
-              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              data: assignment.avatarURL,
               type: 'image/jpeg'
             }}
           />

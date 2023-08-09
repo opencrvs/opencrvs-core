@@ -18,7 +18,8 @@ import {
   BirthRegistration,
   DeathRegistration,
   MarriageRegistration,
-  Address
+  Address,
+  IdentityType
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -134,14 +135,20 @@ export const bundleFieldToSectionFieldTransformer =
   }
 
 export const fieldValueSectionExchangeTransformer =
-  (fromSectionId: SectionId, fromSectionField: string) =>
+  (
+    fromSectionId: SectionId,
+    fromSectionField: string,
+    transformerMethod?: IFormFieldQueryMapFunction
+  ) =>
   (
     transformedData: TransformedData,
     queryData: QueryData,
     sectionId: SectionId,
     field: IFormField
   ) => {
-    if (Boolean(queryData[sectionId])) {
+    if (transformerMethod) {
+      transformerMethod(transformedData, queryData, sectionId, field)
+    } else if (Boolean(queryData[fromSectionId])) {
       transformedData[sectionId][field.name] =
         queryData[fromSectionId][fromSectionField]
     }
@@ -240,7 +247,7 @@ export const identityToNidVerificationFieldTransformer = (
     field
   )
   const existingIdentity = queryData[sectionId]?.identifier?.find(
-    (identity: fhir.Identifier) =>
+    (identity: IdentityType) =>
       (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
   )
   if (!transformedData[sectionId]) {
@@ -659,7 +666,7 @@ export const nestedIdentityValueToFieldTransformer =
     transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
 
     const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: fhir.Identifier) =>
+      (identity: IdentityType) =>
         (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
     )
     if (!transformedData[sectionId]) {

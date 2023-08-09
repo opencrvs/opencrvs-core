@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-module.exports = {
-  globDirectory: 'build/',
-  globPatterns: ['**/*.{json,ico,ttf,html,js}'],
-  globIgnores: ['**/config.js'],
-  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-  swDest: 'build/service-worker.js',
-  swSrc: 'src/src-sw.js'
+export function raise(msg: string): never {
+  console.log(msg)
+  process.exit(1)
+}
+
+export function parseGQLResponse<T>(
+  response: { data: T } | { errors: Array<{ message: string }> }
+) {
+  if ('errors' in response) {
+    raise(JSON.stringify(response.errors))
+  }
+  return response.data
 }

@@ -816,10 +816,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const { draft, pageRoute, goToPageGroup } = this.props
     const declaration = draft
     declaration.review = true
-    writeDeclaration(declaration)
     goToPageGroup(
       pageRoute,
       declaration.id,
@@ -1744,8 +1743,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <Accordion
               name="signatures"
               label="Signatures"
-              labelForHideAction="Hide"
-              labelForShowAction="Show"
+              labelForHideAction={intl.formatMessage(messages.hideLabel)}
+              labelForShowAction={intl.formatMessage(messages.showLabel)}
               expand={true}
             >
               <SignatureGenerator
@@ -1826,77 +1825,85 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <ReviewContainter>
-                {transformedSectionData.map((sec, index) => {
-                  return (
-                    <DeclarationDataContainer key={index}>
-                      <Accordion
-                        name="accordion-component"
-                        label={sec.title}
-                        action={
-                          sec.action && (
-                            <Link font="reg16" onClick={sec.action.handler}>
-                              {sec.action.label}
-                            </Link>
-                          )
-                        }
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        expand={true}
-                      >
-                        <ListViewSimplified id={'Section_' + sec.id}>
-                          {sec.items.map((item, index) => {
-                            return (
-                              <ListViewItemSimplified
-                                key={index}
-                                label={
-                                  item.type === SUBSECTION_HEADER ? (
-                                    <StyledLabel>{item.label}</StyledLabel>
-                                  ) : (
-                                    <Label>{item.label}</Label>
-                                  )
-                                }
-                                value={
-                                  <Value id={item.label.split(' ')[0]}>
-                                    {item.value}
-                                  </Value>
-                                }
-                                actions={
-                                  !item?.action?.disabled && (
-                                    <LinkButton
-                                      id={item.action.id}
-                                      disabled={item.action.disabled}
-                                      onClick={item.action.handler}
-                                    >
-                                      {item.action.label}
-                                    </LinkButton>
-                                  )
-                                }
-                              />
+                {transformedSectionData
+                  .filter((sec) => sec.items.length > 0)
+                  .map((sec, index) => {
+                    return (
+                      <DeclarationDataContainer key={index}>
+                        <Accordion
+                          name={sec.id}
+                          label={sec.title}
+                          action={
+                            sec.action && (
+                              <Link font="reg16" onClick={sec.action.handler}>
+                                {sec.action.label}
+                              </Link>
                             )
-                          })}
-                        </ListViewSimplified>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
+                          }
+                          labelForHideAction={intl.formatMessage(
+                            messages.hideLabel
+                          )}
+                          labelForShowAction={intl.formatMessage(
+                            messages.showLabel
+                          )}
+                          expand={true}
+                        >
+                          <ListViewSimplified id={'Section_' + sec.id}>
+                            {sec.items.map((item, index) => {
+                              return (
+                                <ListViewItemSimplified
+                                  key={index}
+                                  label={
+                                    item.type === SUBSECTION_HEADER ? (
+                                      <StyledLabel>{item.label}</StyledLabel>
+                                    ) : (
+                                      <Label>{item.label}</Label>
+                                    )
+                                  }
+                                  value={
+                                    <Value id={item.label.split(' ')[0]}>
+                                      {item.value}
+                                    </Value>
+                                  }
+                                  actions={
+                                    !item?.action?.disabled && (
+                                      <LinkButton
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                      >
+                                        {item.action.label}
+                                      </LinkButton>
+                                    )
+                                  }
+                                />
+                              )
+                            })}
+                          </ListViewSimplified>
+                        </Accordion>
+                      </DeclarationDataContainer>
+                    )
+                  })}
                 <Accordion
                   name="supporting-documents"
                   label={intl.formatMessage(messages.supportingDocuments)}
-                  labelForHideAction="Hide"
-                  labelForShowAction="Show"
+                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                  labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    <Link
-                      font="reg16"
-                      element="button"
-                      onClick={() =>
-                        this.editLinkClickHandlerForDraft(
-                          documentsSection.id,
-                          documentsSection.groups[0].id!
-                        )
-                      }
-                    >
-                      {intl.formatMessage(messages.editDocuments)}
-                    </Link>
+                    viewRecord || isDuplicate ? null : (
+                      <Link
+                        font="reg16"
+                        element="button"
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </Link>
+                    )
                   }
                   expand={true}
                 >
@@ -1907,8 +1914,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <Accordion
                     name="additional_comments"
                     label={intl.formatMessage(messages.additionalComments)}
-                    labelForHideAction="Hide"
-                    labelForShowAction="Show"
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
                     expand={true}
                   >
                     <InputField

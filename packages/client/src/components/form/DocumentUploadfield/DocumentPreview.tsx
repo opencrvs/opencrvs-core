@@ -128,6 +128,7 @@ export const DocumentPreview = ({
               </Button>
             )}
             <Button
+              id="preview_close"
               aria-label="Go back"
               size="medium"
               type="icon"

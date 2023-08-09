@@ -11,22 +11,28 @@
  */
 import * as React from 'react'
 import { FormikTouched, FormikValues } from 'formik'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  useIntl
+} from 'react-intl'
+import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten } from 'lodash'
+import _, {
+  isNull,
+  isUndefined,
+  merge,
+  flatten,
+  isEqual,
+  cloneDeep
+} from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
   TertiaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { Duplicate } from '@opencrvs/components/lib/icons'
-import {
-  FixedEventTopBar,
-  IEventTopBarProps,
-  IEventTopBarMenuAction
-} from '@opencrvs/components/lib/EventTopBar'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
 import { Alert } from '@opencrvs/components/lib/Alert'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -74,7 +80,7 @@ import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
@@ -86,7 +92,6 @@ import {
   VIEW_TYPE
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import {
@@ -107,6 +112,9 @@ import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
+import { Stack, ToggleMenu } from '@client/../../components/lib'
+import { useModal } from '@client/hooks/useModal'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -205,6 +213,387 @@ function getDeclarationIconColor(declaration: IDeclaration): string {
     : 'orange'
 }
 
+function FormAppBar({
+  section,
+  declaration,
+  duplicate,
+  modifyDeclarationMethod,
+  deleteDeclarationMethod
+}: {
+  duplicate: boolean | undefined
+  section: IFormSection
+  declaration: IDeclaration
+  modifyDeclarationMethod: (declration: IDeclaration) => void
+  deleteDeclarationMethod: (declration: IDeclaration) => void
+}) {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const [modal, openModal] = useModal()
+
+  const isFormDataAltered = () => {
+    if (!declaration.originalData) {
+      // if there is no originalData property
+      // that means it's a draft and has unsaved changes
+      return true
+    }
+
+    return !isEqual(declaration.originalData, declaration.data)
+  }
+
+  const getRedirectionTabOnSaveOrExit = () => {
+    const status =
+      declaration.submissionStatus || declaration.registrationStatus
+    switch (status) {
+      case 'DECLARED':
+        return WORKQUEUE_TABS.readyForReview
+      case 'DRAFT':
+        return WORKQUEUE_TABS.inProgress
+      case 'IN_PROGRESS':
+        return WORKQUEUE_TABS.inProgressFieldAgent
+      case 'REJECTED':
+        return WORKQUEUE_TABS.requiresUpdate
+      case 'VALIDATED':
+        return WORKQUEUE_TABS.readyForReview
+      default:
+        return WORKQUEUE_TABS.inProgress
+    }
+  }
+  const handleSaveAndExit = async () => {
+    const saveAndExitConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        id="save_declaration_confirmation"
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(messages.saveDeclarationConfirmModalTitle)}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel_save_exit"
+            key="cancel_save_exit"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="positive"
+            key="confirm_save_exit"
+            id="confirm_save_exit"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        <Stack>
+          <Text variant="reg16" element="p" color="grey500">
+            {intl.formatMessage(
+              messages.saveDeclarationConfirmModalDescription
+            )}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
+
+    if (saveAndExitConfirm) {
+      //saving current changes to original data
+      //so that we can revert changes back to data.originalData when users exits without saving
+      declaration.originalData = declaration.data
+      //save declaration and exit
+      dispatch(writeDeclaration(declaration))
+      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+    }
+  }
+
+  const handleExit = async () => {
+    const isDataAltered = isFormDataAltered()
+    if (!isDataAltered) {
+      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+      return
+    }
+    const exitConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(
+          messages.exitWithoutSavingDeclarationConfirmModalTitle
+        )}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel_save_without_exit"
+            key="cancel_save_without_exit"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            key="confirm_save_without_exit"
+            id="confirm_save_without_exit"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        <Stack>
+          <Text variant="reg16" element="p" color="grey500">
+            {intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalDescription
+            )}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
+
+    if (exitConfirm) {
+      if (!declaration.originalData) {
+        deleteDeclarationMethod(declaration)
+      } else {
+        modifyDeclarationMethod({
+          ...declaration,
+          data: declaration.originalData
+        })
+      }
+      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+    }
+  }
+
+  const handleDelete = async () => {
+    const deleteConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(messages.deleteDeclarationConfirmModalTitle)}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel_delete"
+            key="cancel_delete"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="negative"
+            key="confirm_delete"
+            id="confirm_delete"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        <Stack>
+          <Text variant="reg16" element="p" color="grey500">
+            {intl.formatMessage(
+              messages.deleteDeclarationConfirmModalDescription
+            )}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
+
+    deleteConfirm && deleteDeclarationMethod(declaration)
+    return
+  }
+  switch (section.viewType) {
+    case 'review':
+      return (
+        <>
+          <AppBar
+            desktopLeft={
+              duplicate ? (
+                <Duplicate />
+              ) : (
+                <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+              )
+            }
+            desktopTitle={
+              duplicate
+                ? intl.formatMessage(duplicateMessages.duplicateReviewHeader, {
+                    event: declaration.event
+                  })
+                : intl.formatMessage(messages.newVitalEventRegistration, {
+                    event: declaration.event
+                  })
+            }
+            desktopRight={
+              <>
+                {!duplicate && !isCorrection(declaration) && (
+                  <Button
+                    id="save-exit-btn"
+                    type="primary"
+                    size="medium"
+                    onClick={handleSaveAndExit}
+                  >
+                    <Icon name="DownloadSimple" />
+                    {intl.formatMessage(buttonMessages.saveExitButton)}
+                  </Button>
+                )}
+                <Button
+                  id="exit-btn"
+                  type="secondary"
+                  size="medium"
+                  onClick={handleExit}
+                >
+                  <Icon name="X" />
+                  {intl.formatMessage(buttonMessages.exitButton)}
+                </Button>
+              </>
+            }
+            mobileLeft={
+              duplicate ? (
+                <Duplicate />
+              ) : (
+                <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+              )
+            }
+            mobileTitle={
+              duplicate
+                ? intl.formatMessage(duplicateMessages.duplicateReviewHeader, {
+                    event: declaration.event
+                  })
+                : intl.formatMessage(messages.newVitalEventRegistration, {
+                    event: declaration.event
+                  })
+            }
+            mobileRight={
+              <>
+                {!duplicate && !isCorrection(declaration) && (
+                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                    <Icon name="DownloadSimple" />
+                  </Button>
+                )}
+                <Button type="icon" size="small" onClick={handleExit}>
+                  <Icon name="X" />
+                </Button>
+              </>
+            }
+          />
+          {modal}
+        </>
+      )
+    case 'preview':
+    case 'form':
+      return (
+        <>
+          <AppBar
+            desktopLeft={
+              <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+            }
+            desktopTitle={intl.formatMessage(
+              messages.newVitalEventRegistration,
+              {
+                event: declaration.event
+              }
+            )}
+            desktopRight={
+              <>
+                <Button
+                  id="save-exit-btn"
+                  type="primary"
+                  size="medium"
+                  onClick={handleSaveAndExit}
+                >
+                  <Icon name="DownloadSimple" />
+                  {intl.formatMessage(buttonMessages.saveExitButton)}
+                </Button>
+                <Button type="secondary" size="medium" onClick={handleExit}>
+                  <Icon name="X" />
+                  {intl.formatMessage(buttonMessages.exitButton)}
+                </Button>
+                {declaration.submissionStatus === SUBMISSION_STATUS.DRAFT && (
+                  <ToggleMenu
+                    id="eventToggleMenu"
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
+                    menuItems={[
+                      {
+                        label: intl.formatMessage(
+                          buttonMessages.deleteDeclaration
+                        ),
+                        handler: () => {
+                          handleDelete()
+                        }
+                      }
+                    ]}
+                  />
+                )}
+              </>
+            }
+            mobileLeft={
+              <DeclarationIcon color={getDeclarationIconColor(declaration)} />
+            }
+            mobileTitle={intl.formatMessage(
+              messages.newVitalEventRegistration,
+              {
+                event: declaration.event
+              }
+            )}
+            mobileRight={
+              <>
+                <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                  <Icon name="DownloadSimple" />
+                </Button>
+                <Button type="icon" size="small" onClick={handleExit}>
+                  <Icon name="X" />
+                </Button>
+                {declaration.submissionStatus === SUBMISSION_STATUS.DRAFT && (
+                  <ToggleMenu
+                    id="eventToggleMenu"
+                    toggleButton={
+                      <Icon
+                        name="DotsThreeVertical"
+                        color="primary"
+                        size="large"
+                      />
+                    }
+                    menuItems={[
+                      {
+                        label: intl.formatMessage(
+                          buttonMessages.deleteDeclaration
+                        ),
+                        handler: () => {
+                          handleDelete()
+                        }
+                      }
+                    ]}
+                  />
+                )}
+              </>
+            }
+          />
+          {modal}
+        </>
+      )
+  }
+  return null
+}
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -272,9 +661,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         hash: newHash + '-form-input'
       })
     }
-    const oldIsWritingDraft = prevProps.isWritingDraft
-    const newIsWritingDraft = this.props.isWritingDraft
-    if (oldIsWritingDraft && !newIsWritingDraft) {
+    if (prevProps.activeSection.id !== this.props.activeSection.id) {
       const sectionValues =
         this.props.declaration.data[this.props.activeSection.id] || {}
       this.props.activeSectionGroup.fields.forEach((field) => {
@@ -326,12 +713,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   logTime(timeMs: number) {
-    const declaration = this.props.declaration
-    if (!declaration.timeLoggedMS) {
-      declaration.timeLoggedMS = 0
-    }
-    declaration.timeLoggedMS += timeMs
-    this.props.modifyDeclaration(declaration)
+    const timeLoggedMS = (this.props.declaration.timeLoggedMS ?? 0) + timeMs
+    const declarationId = this.props.declaration.id
+    this.props.modifyDeclaration({ timeLoggedMS, id: declarationId })
   }
 
   confirmSubmission = (
@@ -455,9 +839,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     this.updateVisitedGroups()
 
-    this.props.writeDeclaration(this.props.declaration, () => {
-      this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
-    })
+    this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
   }
 
   updateVisitedGroups = () => {
@@ -498,73 +880,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  getEventTopBarPropsForCorrection = () => {
-    const { declaration, intl } = this.props
-
-    const backButton = (
-      <Button
-        type="tertiary"
-        size="small"
-        onClick={() => {
-          this.props.goToCertificateCorrection(
-            declaration.id,
-            CorrectionSection.Corrector
-          )
-        }}
-      >
-        <Icon name="ArrowLeft" size="medium" />
-        {intl.formatMessage(buttonMessages.back)}
-      </Button>
-    )
-
-    return {
-      title: intl.formatMessage(correctionMessages.title),
-      pageIcon: backButton,
-      goHome: () => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
-    }
-  }
-
-  getEventTopBarPropsForForm = (menuOption: IEventTopBarMenuAction) => {
-    const { intl, declaration, activeSectionGroup, goToHomeTab } = this.props
-
-    if (isCorrection(declaration)) {
-      return this.getEventTopBarPropsForCorrection()
-    }
-
-    let eventTopBarProps: IEventTopBarProps = {
-      title: intl.formatMessage(messages.newVitalEventRegistration, {
-        event: declaration.event
-      }),
-      iconColor: getDeclarationIconColor(declaration)
-    }
-
-    if (!!activeSectionGroup.showExitButtonOnly) {
-      eventTopBarProps = {
-        ...eventTopBarProps,
-        exitAction: {
-          handler: () => {
-            declaration.submissionStatus === SUBMISSION_STATUS.DRAFT &&
-            !declaration.review
-              ? this.onDeleteDeclaration(declaration)
-              : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
-          },
-          label: declaration.review
-            ? intl.formatMessage(buttonMessages.save)
-            : intl.formatMessage(buttonMessages.exitButton)
-        }
-      }
-    } else {
-      eventTopBarProps = {
-        ...eventTopBarProps,
-        saveAction: {
-          handler: this.onSaveAsDraftClicked,
-          label: intl.formatMessage(buttonMessages.save)
-        },
-        menuItems: [menuOption]
-      }
-    }
-    return eventTopBarProps
-  }
   setAllFieldsDirty = () =>
     this.props.declaration.visitedGroupIds?.some(
       (visitedGroup) =>
@@ -592,16 +907,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-    const menuItemDeleteOrClose =
-      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-        ? {
-            label: intl.formatMessage(buttonMessages.deleteDeclaration),
-            handler: () => this.toggleConfirmDeleteModalOpen()
-          }
-        : {
-            label: intl.formatMessage(buttonMessages.closeDeclaration),
-            handler: () => this.onCloseDeclaration()
-          }
     const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
     return (
       <>
@@ -611,7 +916,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
           }}
         ></TimeMounted>
         <Frame
-          header={<AppBar title="OpenCRVS" />}
+          header={
+            <FormAppBar
+              declaration={declaration}
+              section={activeSection}
+              duplicate={duplicate}
+              modifyDeclarationMethod={this.props.modifyDeclaration}
+              deleteDeclarationMethod={this.onDeleteDeclaration}
+            />
+          }
           key={activeSection.id}
           skipToContentText={intl.formatMessage(
             constantsMessages.skipToMainContent
@@ -625,63 +938,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
           {!isErrorOccured && (
             <>
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                <>
-                  <FixedEventTopBar
-                    title={intl.formatMessage(
-                      messages.newVitalEventRegistration,
-                      {
-                        event: declaration.event
-                      }
-                    )}
-                    iconColor={getDeclarationIconColor(declaration)}
-                    saveAction={{
-                      handler: this.onSaveAsDraftClicked,
-                      label: intl.formatMessage(buttonMessages.save)
-                    }}
-                    menuItems={[menuItemDeleteOrClose]}
-                  />
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={declaration}
-                    submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyDeclaration}
-                  />
-                </>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={declaration}
+                  submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyDeclaration}
+                />
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
-                  {isCorrection(declaration) ? (
-                    <FixedEventTopBar
-                      {...this.getEventTopBarPropsForCorrection()}
-                    />
-                  ) : (
-                    <FixedEventTopBar
-                      title={
-                        duplicate
-                          ? intl.formatMessage(
-                              duplicateMessages.duplicateReviewHeader,
-                              {
-                                event: declaration.event
-                              }
-                            )
-                          : intl.formatMessage(
-                              messages.newVitalEventRegistration,
-                              {
-                                event: declaration.event
-                              }
-                            )
-                      }
-                      pageIcon={duplicate ? <Duplicate /> : undefined}
-                      iconColor={getDeclarationIconColor(declaration)}
-                      saveAction={{
-                        handler: () =>
-                          this.props.goToHomeTab(
-                            this.getRedirectionTabOnSaveOrExit()
-                          ),
-                        label: intl.formatMessage(buttonMessages.exitButton)
-                      }}
-                    />
-                  )}
                   {duplicate && (
                     <DuplicateFormTabs
                       declaration={declaration}
@@ -710,9 +975,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
-                  <FixedEventTopBar
-                    {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
-                  />
                   <Frame.LayoutForm>
                     <Frame.SectionFormBackAction>
                       <BackButtonContainer>
@@ -731,10 +993,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         size={ContentSize.NORMAL}
                         id="register_form"
                         title={
-                          activeSectionGroup.title
-                            ? intl.formatMessage(activeSectionGroup.title)
-                            : activeSection.title &&
-                              intl.formatMessage(activeSection.title)
+                          (activeSectionGroup.title &&
+                            intl.formatMessage(activeSectionGroup.title)) ??
+                          (activeSection.title &&
+                            intl.formatMessage(activeSection.title))
                         }
                         showTitleOnMobile={true}
                         bottomActionButtons={
@@ -953,7 +1215,10 @@ function getValidSectionGroup(
   declaration: IDeclaration,
   sectionId: string,
   groupId?: string
-): { activeSection: IFormSection; activeSectionGroup: IFormSectionGroup } {
+): {
+  activeSection: IFormSection
+  activeSectionGroup: IFormSectionGroup
+} {
   const currentSection = sectionId
     ? sections.find((sec) => sec.id === sectionId)
     : firstVisibleSection(sections)

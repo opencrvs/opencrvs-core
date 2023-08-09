@@ -346,24 +346,28 @@ describe('Registration type resolvers', () => {
       expect(relationship).toEqual('Nephew')
     })
 
-    it('returns RelatedPerson individual', async () => {
-      const mock = fetch.mockResponseOnce(
-        JSON.stringify({
-          ...mockPatient
-        })
-      )
+    it('returns RelatedPerson name', async () => {
+      const mock = jest.fn().mockImplementation(() => {
+        return mockPatient
+      })
+      console.log('mock', mock)
       // @ts-ignore
-      const person = await typeResolvers.RelatedPerson.individual(
+      const person = await typeResolvers.RelatedPerson.name(
         {
           patient: {
             reference: 'Patient/123' // reference to deceased
           }
         },
         undefined,
-        { headers: undefined }
+        {
+          dataSources: {
+            patientAPI: {
+              getPatient: mock
+            }
+          }
+        }
       )
-      // console.log(response.mockPatient.na)
-      expect(person.name[0].family[0]).toEqual('Matinyana')
+      expect(person[0].family[0]).toEqual('Matinyana')
       expect(mock).toHaveBeenCalledTimes(1)
     })
 

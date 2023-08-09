@@ -194,7 +194,7 @@ export const draftToGqlTransformer = (
           /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
-              `on section ${section.id}`
+              ` on section ${section.id}`
           )
           /* eslint-enable no-console */
           inCompleteFieldList.push(

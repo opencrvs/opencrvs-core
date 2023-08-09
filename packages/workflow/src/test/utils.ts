@@ -95,6 +95,23 @@ export const testFhirBundle = {
                 reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
               }
             ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'informant-details'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7'
+              }
+            ]
           }
         ]
       }
@@ -165,7 +182,8 @@ export const testFhirBundle = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -189,6 +207,16 @@ export const testFhirBundle = {
           }
         ],
         gender: 'male'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7',
+      resource: {
+        resourceType: 'RelatedPerson',
+        active: true,
+        patient: {
+          reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
+        }
       }
     }
   ]
@@ -573,7 +601,8 @@ export const testFhirBundleWithIdsForDeath = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'bn'
           }
         ],
         gender: 'female',
@@ -711,6 +740,10 @@ export const taskResouceMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: { reference: 'DUMMY' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   note: [
@@ -1181,7 +1214,14 @@ export const motherMock = JSON.stringify({
   identifier: [
     {
       id: '12341234123412341',
-      type: 'NATIONAL_ID'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'NATIONAL_ID'
+          }
+        ]
+      }
     }
   ],
   name: [
@@ -1950,6 +1990,10 @@ export const deathTaskMock = JSON.stringify({
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
       valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
     }
   ],
   id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
@@ -2080,27 +2124,62 @@ export const mockFormDraft = [
   }
 ]
 const drnIdentifier = {
-  type: 'DEATH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'DEATH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022DSNEYUG'
 } as fhir.CodeableConcept
 
 const nidIdentifier = {
   value: '654654666',
-  type: 'NATIONAL_ID'
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'NATIONAL_ID'
+      }
+    ]
+  }
 } as fhir.CodeableConcept
 
 const brnIdentifier = {
-  type: 'BIRTH_REGISTRATION_NUMBER',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_REGISTRATION_NUMBER'
+      }
+    ]
+  },
   value: '2022BSNEYUG'
 } as fhir.CodeableConcept
 
 const mosipPsutTokenIdentifier = {
-  type: 'MOSIP_PSUT_TOKEN_ID',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'MOSIP_PSUT_TOKEN_ID'
+      }
+    ]
+  },
   value: '257803821990055124230310596669133515'
 } as fhir.CodeableConcept
 
 const birthPatientIdentifier = {
-  type: 'BIRTH_PATIENT_ENTRY',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/identifier-type',
+        code: 'BIRTH_PATIENT_ENTRY'
+      }
+    ]
+  },
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
 } as fhir.CodeableConcept
 

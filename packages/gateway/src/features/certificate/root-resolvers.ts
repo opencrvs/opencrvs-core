@@ -26,6 +26,9 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
+      if (!res.ok) {
+        return null
+      }
       return await res.json()
     },
     async getActiveCertificatesSVG(_, {}, { headers: authHeader }) {
