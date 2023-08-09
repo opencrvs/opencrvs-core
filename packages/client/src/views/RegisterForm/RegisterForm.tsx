@@ -18,14 +18,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, {
-  isNull,
-  isUndefined,
-  merge,
-  flatten,
-  isEqual,
-  cloneDeep
-} from 'lodash'
+import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -532,15 +525,17 @@ function FormAppBar({
                   <Icon name="DownloadSimple" />
                   {intl.formatMessage(buttonMessages.saveExitButton)}
                 </Button>
-                <Button
-                  id="print-btn"
-                  type="secondary"
-                  size="medium"
-                  onClick={() => printDeclarationMethod(declaration.id)}
-                >
-                  <Icon name="Printer" />
-                  {intl.formatMessage(buttonMessages.printDeclaration)}
-                </Button>
+                {section.viewType === 'preview' && (
+                  <Button
+                    id="print-btn"
+                    type="secondary"
+                    size="medium"
+                    onClick={() => printDeclarationMethod(declaration.id)}
+                  >
+                    <Icon name="Printer" />
+                    {intl.formatMessage(buttonMessages.printDeclaration)}
+                  </Button>
+                )}
                 <Button type="secondary" size="medium" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
