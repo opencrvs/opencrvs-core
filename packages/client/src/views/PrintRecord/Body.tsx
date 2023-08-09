@@ -98,6 +98,13 @@ const DocumentTypeBox = styled.div`
   }
   ${({ theme }) => theme.fonts.reg14}
 `
+
+const AvoidBreak = styled.div`
+  @media print {
+    break-inside: avoid;
+  }
+`
+
 const SignatureBox = styled.div`
   margin-top: 8px;
   height: 66px;
@@ -849,189 +856,203 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     )
   return (
     <div>
-      {transformedSectionData
-        .filter(({ id }) => id !== 'informant')
-        .map((section, idx) => (
-          <Table
-            key={`${section.id}_${idx}`}
-            heading={{
-              colSpan: 2,
-              label: section.title || ''
-            }}
-            rows={section.items.map((item) => ({
-              data: [{ value: item.label, bold: true }, { value: item.value }]
-            }))}
-          />
-        ))}
-      {documentSection && (
-        <Table
-          heading={{
-            label: formatMessage(
-              props.intls,
-              reviewMessages.documentViewerTitle
-            ),
-            colSpan: 2
-          }}
-          rows={documentSectionFields
-            .slice(0, leftColumnSize)
-            .map((leftColumnField, index) => {
-              const rightColumnField =
-                documentSectionFields[index + leftColumnSize]
-              return {
-                data: [
-                  { value: renderDocumentBox(leftColumnField) },
-                  {
-                    value:
-                      rightColumnField && renderDocumentBox(rightColumnField)
-                  }
-                ]
-              }
-            })}
-          borderedCell={false}
-        />
-      )}
-      {transformedSectionData
-        .filter(({ id }) => id === 'informant')
-        .map((section, idx) => {
-          const items =
-            props.declaration.event === Event.Marriage
-              ? [
-                  ...section.items.map((item) => ({
-                    data: [
-                      { value: item.label, bold: true },
-                      { value: item.value }
-                    ]
-                  })),
-                  {
-                    data: [
-                      {
-                        value: formatMessage(props.intls, reviewMessages.terms),
-                        colSpan: 2,
-                        italic: true
-                      }
-                    ]
-                  }
-                ]
-              : [
-                  {
-                    data: [
-                      {
-                        value: formatMessage(
-                          props.intls,
-                          reviewMessages.signatureDescription
-                        ),
-                        colSpan: 2,
-                        italic: true
-                      }
-                    ]
-                  },
-                  ...section.items.map((item) => ({
-                    data: [
-                      { value: item.label, bold: true },
-                      { value: item.value }
-                    ]
-                  }))
-                ]
-          return (
+      <AvoidBreak>
+        {transformedSectionData
+          .filter(({ id }) => id !== 'informant')
+          .map((section, idx) => (
             <Table
               key={`${section.id}_${idx}`}
-              heading={{ label: section.title || '', colSpan: 2 }}
-              rows={items}
+              heading={{
+                colSpan: 2,
+                label: section.title || ''
+              }}
+              rows={section.items.map((item) => ({
+                data: [{ value: item.label, bold: true }, { value: item.value }]
+              }))}
             />
-          )
-        })}
-      {renderSignatureBox()}
-      <WarningText>
-        <span>
-          {formatMessage(
-            props.intls,
-            printRecordMessages.warningDeclarationDetails
-          )}
-        </span>
-      </WarningText>
-      <Table
-        heading={{
-          label: formatMessage(props.intls, {
-            id: 'form.section.declaration.title',
-            defaultMessage: 'Declaration details'
-          }),
-          colSpan: 2
-        }}
-        rows={[
-          {
-            data: [
-              {
-                value: formatMessage(
-                  props.intls,
-                  printRecordMessages.placeOfDeclaration
-                )
-              },
-              {
-                value:
-                  declarationAciton?.location?.id &&
-                  getLocationHierarchy(
-                    declarationAciton.location.id,
-                    offlineCountryConfiguration
-                  ).map((loc) => (
-                    <span key={loc.id}>
-                      {formatLocationName(loc)}
-                      <br></br>
-                    </span>
-                  ))
-              }
-            ]
-          },
-          {
-            data: [
-              {
-                value: formatMessage(
-                  props.intls,
-                  printRecordMessages.civilRegistrationOffice
-                )
-              },
-              {
-                value:
-                  declarationAciton?.office &&
-                  formatLocationName(
-                    declarationAciton?.office as unknown as ILocation
+          ))}
+      </AvoidBreak>
+      <AvoidBreak>
+        {documentSection && (
+          <Table
+            heading={{
+              label: formatMessage(
+                props.intls,
+                reviewMessages.documentViewerTitle
+              ),
+              colSpan: 2
+            }}
+            rows={documentSectionFields
+              .slice(0, leftColumnSize)
+              .map((leftColumnField, index) => {
+                const rightColumnField =
+                  documentSectionFields[index + leftColumnSize]
+                return {
+                  data: [
+                    { value: renderDocumentBox(leftColumnField) },
+                    {
+                      value:
+                        rightColumnField && renderDocumentBox(rightColumnField)
+                    }
+                  ]
+                }
+              })}
+            borderedCell={false}
+          />
+        )}
+      </AvoidBreak>
+      <AvoidBreak>
+        {transformedSectionData
+          .filter(({ id }) => id === 'informant')
+          .map((section, idx) => {
+            const items =
+              props.declaration.event === Event.Marriage
+                ? [
+                    ...section.items.map((item) => ({
+                      data: [
+                        { value: item.label, bold: true },
+                        { value: item.value }
+                      ]
+                    })),
+                    {
+                      data: [
+                        {
+                          value: formatMessage(
+                            props.intls,
+                            reviewMessages.terms
+                          ),
+                          colSpan: 2,
+                          italic: true
+                        }
+                      ]
+                    }
+                  ]
+                : [
+                    {
+                      data: [
+                        {
+                          value: formatMessage(
+                            props.intls,
+                            reviewMessages.signatureDescription
+                          ),
+                          colSpan: 2,
+                          italic: true
+                        }
+                      ]
+                    },
+                    ...section.items.map((item) => ({
+                      data: [
+                        { value: item.label, bold: true },
+                        { value: item.value }
+                      ]
+                    }))
+                  ]
+            return (
+              <Table
+                key={`${section.id}_${idx}`}
+                heading={{ label: section.title || '', colSpan: 2 }}
+                rows={items}
+              />
+            )
+          })}
+        {renderSignatureBox()}
+      </AvoidBreak>
+      <AvoidBreak>
+        <WarningText>
+          <span>
+            {formatMessage(
+              props.intls,
+              printRecordMessages.warningDeclarationDetails
+            )}
+          </span>
+        </WarningText>
+
+        <Table
+          heading={{
+            label: formatMessage(props.intls, {
+              id: 'form.section.declaration.title',
+              defaultMessage: 'Declaration details'
+            }),
+            colSpan: 2
+          }}
+          rows={[
+            {
+              data: [
+                {
+                  value: formatMessage(
+                    props.intls,
+                    printRecordMessages.placeOfDeclaration
                   )
-              }
-            ]
-          },
-          {
-            data: [
-              {
-                value: formatMessage(
-                  props.intls,
-                  constantsMessages.dateOfDeclaration
-                )
-              },
-              {
-                value:
-                  declarationAciton && formatLongDate(declarationAciton.date)
-              }
-            ]
-          },
-          {
-            data: [
-              {
-                value: formatMessage(
-                  [props.intls[0]],
-                  userMessages['REGISTRATION_AGENT']
-                )
-              },
-              {
-                value:
-                  declarationAciton?.user?.name &&
-                  createNamesMap(declarationAciton.user.name)[intl.locale]
-              }
-            ]
-          }
-        ]}
-      />
-      <SignatureBox>
-        {formatMessage(props.intls, userFormMessages.userAttachmentSection)}
-      </SignatureBox>
+                },
+                {
+                  value:
+                    declarationAciton?.location?.id &&
+                    getLocationHierarchy(
+                      declarationAciton.location.id,
+                      offlineCountryConfiguration
+                    ).map((loc) => (
+                      <span key={loc.id}>
+                        {formatLocationName(loc)}
+                        <br></br>
+                      </span>
+                    ))
+                }
+              ]
+            },
+            {
+              data: [
+                {
+                  value: formatMessage(
+                    props.intls,
+                    printRecordMessages.civilRegistrationOffice
+                  )
+                },
+                {
+                  value:
+                    declarationAciton?.office &&
+                    formatLocationName(
+                      declarationAciton?.office as unknown as ILocation
+                    )
+                }
+              ]
+            },
+            {
+              data: [
+                {
+                  value: formatMessage(
+                    props.intls,
+                    constantsMessages.dateOfDeclaration
+                  )
+                },
+                {
+                  value:
+                    declarationAciton && formatLongDate(declarationAciton.date)
+                }
+              ]
+            },
+            {
+              data: [
+                {
+                  value: formatMessage(
+                    [props.intls[0]],
+                    userMessages['REGISTRATION_AGENT']
+                  )
+                },
+                {
+                  value:
+                    declarationAciton?.user?.name &&
+                    createNamesMap(declarationAciton.user.name)[intl.locale]
+                }
+              ]
+            }
+          ]}
+        />
+      </AvoidBreak>
+      <AvoidBreak>
+        <SignatureBox>
+          {formatMessage(props.intls, userFormMessages.userAttachmentSection)}
+        </SignatureBox>
+      </AvoidBreak>
     </div>
   )
 }
