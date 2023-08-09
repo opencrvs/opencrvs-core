@@ -816,10 +816,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const { draft, pageRoute, goToPageGroup } = this.props
     const declaration = draft
     declaration.review = true
-    writeDeclaration(declaration)
     goToPageGroup(
       pageRoute,
       declaration.id,
@@ -1891,7 +1890,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   labelForHideAction={intl.formatMessage(messages.hideLabel)}
                   labelForShowAction={intl.formatMessage(messages.showLabel)}
                   action={
-                    viewRecord ? null : (
+                    viewRecord || isDuplicate ? null : (
                       <Link
                         font="reg16"
                         element="button"

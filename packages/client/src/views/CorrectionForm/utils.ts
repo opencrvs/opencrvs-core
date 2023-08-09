@@ -38,7 +38,8 @@ import {
   IAttachmentValue,
   CHECKBOX,
   ICheckboxFormField,
-  SUBSECTION_HEADER
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -660,7 +661,8 @@ export function isViewOnly(field: IFormField) {
     WARNING,
     TEXTAREA,
     SUBSECTION_HEADER,
-    FETCH_BUTTON
+    FETCH_BUTTON,
+    DIVIDER
   ].find((type) => type === field.type)
 }
 
