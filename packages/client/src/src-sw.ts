@@ -112,7 +112,7 @@ registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('/index.html') as RouteHandler, {
+  new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     denylist: [/^\/__.*$/]
   })
 )
