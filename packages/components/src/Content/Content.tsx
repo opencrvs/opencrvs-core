@@ -66,7 +66,7 @@ export const Body = styled.div`
 `
 const Footer = styled.div`
   display: flex;
-  padding: 24px 20px;
+  padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 16px;
   }
@@ -149,7 +149,7 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '16px 20px')};
+  padding: ${(props) => (props.noPadding ? 0 : '24px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: ${(props) => (props.noPadding ? 0 : '16px')};
   }
