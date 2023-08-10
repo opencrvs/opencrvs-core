@@ -39,13 +39,13 @@ async function getToken(): Promise<string> {
   return body.token
 }
 
-const removeUserMutation = print(gql`
-  mutation removeUser(
+const deactivateUserMutation = print(gql`
+  mutation deactivateUser(
     $userId: String!
     $action: String!
     $reason: String!
     $comment: String
-) {
+  ) {
     auditUser(
       userId: $userId
       action: $action
@@ -70,7 +70,7 @@ function getTokenPayload(token: string): TokenPayload {
   }
 }
 
-async function removeSuperuser(token: string) {
+async function deactivateSuperuser(token: string) {
   const { sub } = getTokenPayload(token)
   const res = await fetch(GATEWAY_GQL_HOST, {
     method: 'POST',
@@ -79,7 +79,7 @@ async function removeSuperuser(token: string) {
       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify({
-      query: removeUserMutation,
+      query: deactivateUserMutation,
       variables: {
         userId: sub,
         action: 'DEACTIVATE',
@@ -100,7 +100,7 @@ async function main() {
   await seedUsers(token, roleIdMap)
   console.log('Seeding certificates')
   await seedCertificate(token)
-  await removeSuperuser(token)
+  await deactivateSuperuser(token)
 }
 
 main()
