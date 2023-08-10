@@ -66,9 +66,7 @@ const config = {
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
-  ADDRESSES: 1,
-  ADMIN_LEVELS: 2
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
 }
 
 vi.stubGlobal('config', config)
