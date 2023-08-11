@@ -57,12 +57,11 @@ import { clone, get, flattenDeep } from 'lodash'
 import React from 'react'
 import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { generateLocations } from '@client/utils/locationUtils'
 import {
-  formatLocationName,
-  formatMessage,
-  getLocationHierarchy
-} from './utils'
+  generateLocations,
+  getLocalizedLocationName
+} from '@client/utils/locationUtils'
+import { formatMessage, getLocationHierarchy } from './utils'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import styled from 'styled-components'
@@ -150,6 +149,7 @@ function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
+  intl: IntlShape,
   intls: IntlShape[],
   offlineCountryConfig: IOfflineData
 ) {
@@ -179,7 +179,7 @@ function renderSelectDynamicLabel(
       }
 
       if (selectedLocation) {
-        return formatLocationName(selectedLocation)
+        return getLocalizedLocationName(intl, selectedLocation)
       } else {
         return false
       }
@@ -247,6 +247,10 @@ function renderValue(
 ) {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
 
+  const onlyCurrentlySelectedIntl = intls.filter(
+    (i) => i.locale === intl.locale
+  )
+
   // Showing State & District Name instead of their ID
   if (
     [
@@ -283,7 +287,8 @@ function renderValue(
         value,
         dynamicOption,
         sectionData,
-        intls,
+        intl,
+        onlyCurrentlySelectedIntl,
         offlineCountryConfiguration
       )
     }
@@ -304,7 +309,8 @@ function renderValue(
         value,
         dynamicOption,
         sectionData,
-        intls,
+        intl,
+        onlyCurrentlySelectedIntl,
         offlineCountryConfiguration
       )
     }
@@ -312,7 +318,11 @@ function renderValue(
     return value
   }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
-    return renderSelectOrRadioLabel(value, field.options, intls)
+    return renderSelectOrRadioLabel(
+      value,
+      field.options,
+      onlyCurrentlySelectedIntl
+    )
   }
   if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
     const sectionData = draftData[sectionId]
@@ -320,7 +330,8 @@ function renderValue(
       value,
       field.dynamicOptions,
       sectionData,
-      intls,
+      intl,
+      onlyCurrentlySelectedIntl,
       offlineCountryConfiguration
     )
   }
@@ -342,23 +353,35 @@ function renderValue(
   }
 
   if (field.type === RADIO_GROUP) {
-    return renderSelectOrRadioLabel(value, field.options, intls)
+    return renderSelectOrRadioLabel(
+      value,
+      field.options,
+      onlyCurrentlySelectedIntl
+    )
   }
 
   if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
     return renderSelectOrRadioLabel(
       (value && (value as IFormSectionData).value) || '',
       field.options,
-      intls
+      onlyCurrentlySelectedIntl
     )
   }
 
   if (field.type === CHECKBOX) {
-    return getCheckboxFieldValue(field, String(value), intls)
+    return getCheckboxFieldValue(
+      field,
+      String(value),
+      onlyCurrentlySelectedIntl
+    )
   }
 
   if (value && field.type === CHECKBOX_GROUP) {
-    return getCheckBoxGroupFieldValue(field, value as string[], intls)
+    return getCheckBoxGroupFieldValue(
+      field,
+      value as string[],
+      onlyCurrentlySelectedIntl
+    )
   }
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
@@ -992,7 +1015,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
                       offlineCountryConfiguration
                     ).map((loc) => (
                       <span key={loc.id}>
-                        {formatLocationName(loc)}
+                        {getLocalizedLocationName(intl, loc)}
                         <br></br>
                       </span>
                     ))
@@ -1010,7 +1033,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
                 {
                   value:
                     declarationAciton?.office &&
-                    formatLocationName(
+                    getLocalizedLocationName(
+                      intl,
                       declarationAciton?.office as unknown as ILocation
                     )
                 }

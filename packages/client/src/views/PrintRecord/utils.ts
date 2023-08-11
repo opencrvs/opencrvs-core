@@ -37,13 +37,6 @@ export function createSeparateIntls(
     )
 }
 
-export function formatLocationName(location: ILocation) {
-  const locales = window.config.LANGUAGES.split(',') || []
-  return locales.length > 1
-    ? [location.alias, location.name].join(' / ')
-    : location.name
-}
-
 export function getLocationHierarchy(
   locationKey: string,
   offlineCountryConfig: IOfflineData
