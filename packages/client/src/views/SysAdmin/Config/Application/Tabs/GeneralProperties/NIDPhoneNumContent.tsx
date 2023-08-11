@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'

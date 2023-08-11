@@ -28,47 +28,6 @@ export enum UserStatus {
   DISABLED
 }
 
-export const transformRoleDataToDefinitions = (
-  fields: IFormField[],
-  data: any,
-  userFormData: IFormSectionData
-): IFormField[] => {
-  const roles = data as Array<any>
-  const transformTypes = (types: string[]) =>
-    types.map((type) => ({
-      label: userMessages[type],
-      value: type
-    }))
-
-  return fields.map((field) => {
-    if (field.name === 'systemRole') {
-      if (userFormData && userFormData.systemRole) {
-        userFormData.systemRole = ''
-      }
-      ;(field as ISelectFormFieldWithOptions).options = roles.map(
-        ({ value }: { value: string }) => ({
-          label: userMessages[value],
-          value
-        })
-      )
-      return field
-    } else if (field.name === 'type') {
-      if (userFormData && userFormData.type) {
-        userFormData.type = ''
-      }
-      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options =
-        roles.reduce(
-          (options, { value, types }) => ({
-            ...options,
-            [value]: transformTypes(types)
-          }),
-          {}
-        )
-      return field
-    } else return field
-  })
-}
-
 const AuditDescriptionMapping: {
   [key: string]: MessageDescriptor
 } = {
@@ -128,10 +87,6 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
     !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
   )
-}
-
-export function checkIfLocalLanguageProvided() {
-  return window.config.LANGUAGES.split(',').length > 1
 }
 
 export function getUserSystemRole(

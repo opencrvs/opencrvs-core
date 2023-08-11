@@ -22,7 +22,7 @@ import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { HOME } from '@client/navigation/routes'
 

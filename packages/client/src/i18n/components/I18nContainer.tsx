@@ -23,7 +23,6 @@ type StateProps = {
 
 const mapStateToProps = (state: IStoreState): StateProps => {
   const locale = getLanguage(state)
-
   return {
     locale,
     messages: getMessages(state)

@@ -22,6 +22,7 @@ export type Ii18nReduxFormFieldProps = {
   type: string
   min?: number
   maxLength?: number
+  inputWidth?: number
   placeholder?: string
   label?: string
   focusInput: boolean

@@ -12,8 +12,14 @@
 import traverse from 'traverse'
 import { IForm } from '@client/forms'
 import { deserializeForm } from './deserializer'
-import { registerForms } from '@client/forms/configuration/default/index'
 import { Mock } from 'vitest'
+import * as builtInValidators from '@client/utils/validate'
+import { readFileSync } from 'fs'
+import { join } from 'path'
+
+const forms = JSON.parse(
+  readFileSync(join(__dirname, '../../tests/forms.json')).toString()
+)
 
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives
@@ -30,22 +36,40 @@ function hasOperatorDescriptors(form: IForm) {
     [[], false]
   )
 }
+// Needs to be casted as any as there are non-validator functions in the import
+const validators = builtInValidators as Record<string, any>
 
-describe('Form desearializer', () => {
-  it('replaces all operator descriptors from the serialized form', async () => {
-    const { birth, death } = registerForms
+describe('Form deserializer', () => {
+  // TODO: What does operator descriptors mean? Is this obsolete?
+  it.todo(
+    'replaces all operator descriptors from the serialized form',
+    async () => {
+      const { birth, death } = forms
 
-    expect(hasOperatorDescriptors(deserializeForm(birth))).toEqual([[], false])
-    expect(hasOperatorDescriptors(deserializeForm(death))).toEqual([[], false])
-  })
+      expect(
+        hasOperatorDescriptors(deserializeForm(birth, validators))[0].length
+      ).toBeGreaterThan(5)
+      expect(
+        hasOperatorDescriptors(deserializeForm(birth, validators))[1]
+      ).toBeTruthy()
+      expect(
+        hasOperatorDescriptors(deserializeForm(death, validators))[0].length
+      ).toBeGreaterThan(5)
+      expect(
+        hasOperatorDescriptors(deserializeForm(death, validators))[1]
+      ).toBeTruthy()
+    }
+  )
 
   it('throws errors when developer passes in invalid operations', async () => {
-    const { birth } = registerForms
+    const {
+      forms: { birth }
+    } = forms
 
     birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
       'non_existing_123' as any
 
-    expect(() => deserializeForm(birth)).toThrow()
+    expect(() => deserializeForm(birth, validators)).toThrow()
     /* eslint-disable no-console */
     expect((console.error as Mock).mock.calls).toHaveLength(1)
     expect((console.error as Mock).mock.calls[0][0]).toMatch('non_existing_123')

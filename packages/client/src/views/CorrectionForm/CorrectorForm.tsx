@@ -60,7 +60,7 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-export function getGroupWithVisibleFields(
+function getGroupWithVisibleFields(
   section: IFormSection,
   declaration: IDeclaration
 ) {
@@ -184,7 +184,7 @@ function CorrectorFormComponent(props: IFullProps) {
     <>
       <ActionPageLight
         id="corrector_form"
-        title={intl.formatMessage(section.title)}
+        title={section.title && intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
         goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}

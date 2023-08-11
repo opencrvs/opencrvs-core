@@ -16,10 +16,11 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
-import { ThemeProvider } from '@client/styledComponents'
+import { ThemeProvider } from 'styled-components'
 import { getSchema } from '@client/tests/graphql-schema-mock'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { join } from 'path'
 import {
   configure,
   mount,
@@ -58,17 +59,14 @@ import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import * as builtInValidators from '@client/utils/validate'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 export const registrationClerkScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
-export const fieldAgentScopeToken =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NjQ5OTgyNzUsImV4cCI6MTU5NjUzNDI3NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydkZWNsYXJlJ10ifQ.uriNBNUYD9xColqKq7FraHf8X8b1erMXqRkyzRDJzQk'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-export const sysadminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNTU5MTk5MTE3LCJleHAiOjE1NTk4MDM5MTcsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1Y2VlNmM1MzU0NWRjMTYwYTIyODQyYjQifQ.Typ3XPwbfofrvWrYuWWHBEIuhzUypsSlTpPZUionO1SxTcAGbm0msn0chpdMw6AJtV0JbC0u-7lpmzpbpHjeQ98emt29pez1EteP8ZapQQmivT55DnwB0_YRg4BdlBGC561aOf6btnFtQsMULhJ8DkPNWUaa-a5_8gPEZmpUVExUw1yslGNCsGwPoNkEEcpXZ8dc-QWXWOFz7eEvKUAXTiLzOQFt4ea7BjU0fVBgMpLr5JmK42OAU3k6xvJHLNM3b8OlPm3fsmsfqZY7_n7L7y7ia5lKFAuFf33pii1_VtG-NZKhu8OecioOpb8ShIqHseU0sDFl58tIf7o1uMS9DQ'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
@@ -164,8 +162,6 @@ export function createShallowRenderedComponent(
   return shallow(node)
 }
 
-export const wait = () => new Promise((res) => process.nextTick(res))
-
 export const resizeWindow = (width: number, height: number) => {
   const resizeEvent = document.createEvent('Event')
   resizeEvent.initEvent('resize', true, true)
@@ -218,45 +214,6 @@ export const selectOption = (
 }
 
 const currentUserId = '123'
-
-export const graphQLEventLocationAddressMock = {
-  id: 'd3225149-d28a-4cc6-be41-4ba89d165ad3',
-  type: 'PRIVATE_HOME',
-  address: {
-    type: null,
-    line: ['', '', '', '', '', '', 'URBAN'],
-    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
-    city: null,
-    postalCode: null,
-    country: 'FAR',
-    __typename: 'Address'
-  },
-  __typename: 'Location'
-}
-
-export const graphQLPersonAddressMock = [
-  {
-    type: 'PRIMARY_ADDRESS',
-    line: ['', '', '', '', '', '', 'URBAN'],
-    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
-    city: null,
-    postalCode: null,
-    country: 'FAR',
-    __typename: 'Address'
-  },
-  {
-    type: 'SECONDARY_ADDRESS',
-    line: ['', '', '', '', '', '', 'URBAN'],
-    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
-    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
-    city: null,
-    postalCode: null,
-    country: 'FAR',
-    __typename: 'Address'
-  }
-]
 
 export const eventAddressData = {
   country: 'FAR',
@@ -324,943 +281,6 @@ export const secondaryInternationalAddressLines = {
   internationalAddressLine2Secondary: '',
   internationalAddressLine3Secondary: '',
   internationalPostcodeSecondary: ''
-}
-
-// This object has more than 10 drafts to utilize pagination testing in draft tab
-export const currentUserDeclarations = {
-  userID: currentUserId,
-  declarations: [
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871160',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '78f2f8a7-5daa-4fdc-918c-d386036c3e56',
-      data: {
-        child: {
-          firstNames: '',
-          familyName: 'পল',
-          firstNamesEng: '',
-          familyNameEng: 'Paul',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          motherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        '': {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558419428583,
-      modifiedOn: 1558419488611
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871161',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871162',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871163',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871164',
-      data: {
-        child: {
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871167',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c487116',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: '',
-          familyNameEng: '',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: 'b77b78af-a259-4bc1-85d5-b1e8c1382271',
-      data: {
-        deceased: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212121211111,
-          fetchButton: '',
-          firstNames: '',
-          familyName: 'ইসলাম',
-          firstNamesEng: '',
-          familyNameEng: '',
-          nationality: 'BGD',
-          gender: 'male',
-          maritalStatus: 'MARRIED',
-          birthDate: '1940-01-01',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        informant: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          informantID: 1111111111111,
-          fetchButton: '',
-          informantFirstNames: 'স্যাম',
-          informantFamilyName: 'পল',
-          informantFirstNamesEng: 'Sam',
-          informantFamilyNameEng: 'Paul',
-          nationality: 'BGD',
-          informantBirthDate: '2000-01-01',
-          relationship: 'OTHER',
-          informantPhone: '01711111111',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        deathEvent: {
-          deathDate: '2010-01-01',
-          manner: 'NATURAL_CAUSES',
-          deathPlace: '',
-          placeOfDeath: 'PRIMARY_ADDRESS',
-          deathLocation: '',
-          ...eventAddressData
-        },
-        causeOfDeath: {
-          causeOfDeathEstablished: false,
-          methodOfCauseOfDeath: '',
-          causeOfDeathCode: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'death',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558532017732,
-      modifiedOn: 1558532146774
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871167',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: '72c18939-70c1-40b4-9b80-b162c4871168',
-      data: {
-        child: {
-          firstNames: 'রফিক',
-          familyName: 'ইসলাম',
-          firstNamesEng: 'Rafiq',
-          familyNameEng: 'Islam',
-          gender: 'male',
-          childBirthDate: '2010-01-01',
-          attendantAtBirth: '',
-          birthType: '',
-          multipleBirth: 1,
-          weightAtBirth: '',
-          placeOfBirth: '',
-          birthLocation: '',
-          ...eventAddressData
-        },
-        mother: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212312331212,
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: 'বেগম',
-          familyName: 'রোকেয়া',
-          firstNamesEng: 'Begum',
-          familyNameEng: 'Rokeya',
-          motherBirthDate: '1980-01-01',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          educationalAttainment: '',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        father: {
-          detailsExist: false,
-          iDType: '',
-          iDTypeOther: '',
-          iD: '',
-          fetchButton: '',
-          nationality: 'BGD',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          fatherBirthDate: '',
-          maritalStatus: 'MARRIED',
-          dateOfMarriage: '',
-          primaryAddressSameAsOtherPrimary: true,
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        registration: {
-          informantType: '',
-          whoseContactDetails: '',
-          registrationPhone: '01711111111',
-          phoneVerificationWarning: '',
-          commentsOrNotes: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'birth',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558418612279,
-      modifiedOn: 1558418756714
-    },
-    {
-      id: 'b77b78af-a259-4bc1-85d5-b1e8c1382272',
-      data: {
-        deceased: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212121211111,
-          fetchButton: '',
-          firstNames: '',
-          familyName: 'ইসলাম',
-          firstNamesEng: '',
-          familyNameEng: '',
-          nationality: 'BGD',
-          gender: 'male',
-          maritalStatus: 'MARRIED',
-          birthDate: '1940-01-01',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        informant: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          informantID: 1111111111111,
-          fetchButton: '',
-          informantFirstNames: 'স্যাম',
-          informantFamilyName: 'পল',
-          informantFirstNamesEng: 'Sam',
-          informantFamilyNameEng: 'Paul',
-          nationality: 'BGD',
-          informantBirthDate: '2000-01-01',
-          relationship: 'SON',
-          informantPhone: '01711111111',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        deathEvent: {
-          deathDate: '2010-01-01',
-          manner: 'NATURAL_CAUSES',
-          deathPlace: '',
-          placeOfDeath: 'PRIMARY_ADDRESS',
-          deathLocation: '',
-          ...eventAddressData
-        },
-        causeOfDeath: {
-          causeOfDeathEstablished: false,
-          methodOfCauseOfDeath: '',
-          causeOfDeathCode: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'death',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558532017732,
-      modifiedOn: 1558532146774
-    },
-    {
-      id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
-      data: {
-        deceased: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212121211112,
-          fetchButton: '',
-          firstNames: '',
-          familyName: 'ইসলাম',
-          firstNamesEng: '',
-          familyNameEng: 'Islam',
-          nationality: 'BGD',
-          gender: 'male',
-          maritalStatus: 'MARRIED',
-          birthDate: '1940-01-01',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        informant: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          informantID: 1111111111111,
-          fetchButton: '',
-          informantFirstNames: 'স্যাম',
-          informantFamilyName: 'পল',
-          informantFirstNamesEng: 'Sam',
-          informantFamilyNameEng: 'Paul',
-          nationality: 'BGD',
-          informantBirthDate: '2000-01-01',
-          relationship: 'SON',
-          informantPhone: '01711111111',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        deathEvent: {
-          deathDate: '2010-01-01',
-          manner: 'NATURAL_CAUSES',
-          deathPlace: '',
-          placeOfDeath: 'PRIMARY_ADDRESS',
-          deathLocation: '',
-          ...eventAddressData
-        },
-        causeOfDeath: {
-          causeOfDeathEstablished: false,
-          methodOfCauseOfDeath: '',
-          causeOfDeathCode: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'death',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558532017732,
-      modifiedOn: 1558532146774
-    },
-    {
-      id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
-      data: {
-        deceased: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          iD: 1212121211112,
-          fetchButton: '',
-          firstNames: '',
-          familyName: '',
-          firstNamesEng: '',
-          familyNameEng: '',
-          nationality: 'BGD',
-          gender: 'male',
-          maritalStatus: 'MARRIED',
-          birthDate: '1940-01-01',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        informant: {
-          iDType: 'NATIONAL_ID',
-          iDTypeOther: '',
-          informantID: 1111111111111,
-          fetchButton: '',
-          informantFirstNames: 'স্যাম',
-          informantFamilyName: 'পল',
-          informantFirstNamesEng: 'Sam',
-          informantFamilyNameEng: 'Paul',
-          nationality: 'BGD',
-          informantBirthDate: '2000-01-01',
-          relationship: 'SON',
-          ...primaryAddressData,
-          ...primaryInternationalAddressLines,
-          ...secondaryAddressData,
-          ...secondaryInternationalAddressLines
-        },
-        deathEvent: {
-          deathDate: '2010-01-01',
-          manner: 'NATURAL_CAUSES',
-          deathPlace: '',
-          placeOfDeath: 'PRIMARY_ADDRESS',
-          deathLocation: '',
-          ...eventAddressData
-        },
-        causeOfDeath: {
-          causeOfDeathEstablished: false,
-          methodOfCauseOfDeath: '',
-          causeOfDeathCode: ''
-        },
-        documents: { imageUploader: '', paragraph: '', list: '' },
-        preview: {}
-      },
-      event: 'death',
-      submissionStatus: 'DRAFT',
-      savedOn: 1558532017732
-    }
-  ]
 }
 
 export const userDetails: UserDetails = {
@@ -1676,6 +696,7 @@ export const mockDeclarationData = {
     birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {
+    detailsExist: true,
     firstNames: 'স্পিভক',
     familyName: 'গায়ত্রী',
     firstNamesEng: 'Liz',
@@ -1818,12 +839,7 @@ export const mockDeathDeclarationData = {
     ]
   },
   registration: {
-    contactPoint: {
-      nestedFields: {
-        registrationPhone: '01557394982'
-      },
-      value: 'SPOUSE'
-    },
+    informantType: 'SPOUSE',
     registrationPhone: '01557394986',
     registrationNumber: '201908122365DDSS0SE1',
     contact: 'OTHER',
@@ -2033,10 +1049,7 @@ export const mockDeathRegistrationSectionData = {
     value: 'MOTHER'
   },
   whoseContactDetails: 'MOTHER',
-  informantType: {
-    value: 'MOTHER',
-    nestedFields: { otherInformantType: '' }
-  },
+  informantType: 'MOTHER',
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
@@ -2065,7 +1078,7 @@ export const mockDeathRegistrationSectionData = {
   ]
 }
 
-export const mockFetchCertificatesTemplatesDefinition = [
+const mockFetchCertificatesTemplatesDefinition = [
   {
     id: '12313546',
     event: Event.Birth,
@@ -2094,7 +1107,6 @@ export const mockConfigResponse = {
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig,
   systems: mockOfflineData.systems
 }
 
@@ -2107,7 +1119,8 @@ export const mockOfflineDataDispatch = {
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
-  formConfig: mockOfflineData.formConfig,
+  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
+    .forms,
   systems: mockOfflineData.systems
 }
 
@@ -2364,19 +1377,6 @@ export async function getReviewFormFromStore(
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
-}
-
-export async function setPinCode(component: ReactWrapper) {
-  component.find('#createPinBtn').hostNodes().simulate('click')
-
-  for (let i = 1; i <= 8; i++) {
-    component
-      .find(`#keypad-${i % 2}`)
-      .hostNodes()
-      .simulate('click')
-  }
-  await flushPromises()
-  component.update()
 }
 
 export function setPageVisibility(isVisible: boolean) {
@@ -2880,338 +1880,343 @@ export const mockUserGraphqlOperation = {
     variables: draftToGqlTransformer(
       {
         sections: [
-          deserializeFormSection({
-            id: 'user' as Section,
-            viewType: 'form',
-            name: {
-              defaultMessage: 'User',
-              description: 'The name of the user form',
-              id: 'constants.user'
-            },
-            title: {
-              defaultMessage: 'Create new user',
-              description: 'The title of user form',
-              id: 'form.section.user.title'
-            },
-            groups: [
-              {
-                id: 'registration-office',
-                title: {
-                  defaultMessage: 'Assigned Registration Office',
-                  description: 'Assigned Registration Office section',
-                  id: 'form.section.assignedRegistrationOffice'
-                },
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'values.skippedOfficeSelction && values.registrationOffice'
-                  }
-                ],
-                fields: [
-                  {
-                    name: 'assignedRegistrationOffice',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'Assigned registration office',
-                      description: 'Assigned Registration Office section',
-                      id: 'form.section.assignedRegistrationOfficeGroupTitle'
-                    },
-                    required: false,
-                    hidden: true,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'registrationOffice',
-                    type: 'LOCATION_SEARCH_INPUT',
-                    label: {
-                      defaultMessage: 'Registration Office',
-                      description: 'Registration office',
-                      id: 'form.field.label.registrationOffice'
-                    },
-                    required: true,
-                    initialValue: '',
-                    searchableResource: ['facilities'],
-                    searchableType: ['CRVS_OFFICE'],
-                    locationList: [],
-                    validate: [
-                      {
-                        operation: 'officeMustBeSelected'
-                      }
-                    ],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldNameTransformer',
-                        parameters: ['primaryOffice']
-                      },
-                      query: {
-                        operation: 'locationIDToFieldTransformer',
-                        parameters: ['primaryOffice']
-                      }
-                    }
-                  }
-                ]
+          deserializeFormSection(
+            {
+              id: 'user' as Section,
+              viewType: 'form',
+              name: {
+                defaultMessage: 'User',
+                description: 'The name of the user form',
+                id: 'constants.user'
               },
-              {
-                id: 'user-view-group',
-                fields: [
-                  {
-                    name: 'userDetails',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'User details',
-                      description: 'User details section',
-                      id: 'form.section.userDetails'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'firstNames',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Bengali first name',
-                      description: 'Bengali first name',
-                      id: 'form.field.label.firstNameBN'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['bn']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['bn']
-                      }
-                    }
-                  },
-                  {
-                    name: 'familyName',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Bengali last name',
-                      description: 'Bengali last name',
-                      id: 'form.field.label.lastNameBN'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['bn']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['bn']
-                      }
-                    }
-                  },
-                  {
-                    name: 'firstNamesEng',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'English first name',
-                      description: 'English first name',
-                      id: 'form.field.label.firstNameEN'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'firstNames']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'firstNames']
-                      }
-                    }
-                  },
-                  {
-                    name: 'familyNameEng',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'English last name',
-                      description: 'English last name',
-                      id: 'form.field.label.lastNameEN'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'familyName']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'familyName']
-                      }
-                    }
-                  },
-                  {
-                    name: 'phoneNumber',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Phone number',
-                      description: 'Input label for phone input',
-                      id: 'form.field.label.phoneNumber'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'phoneNumberFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'msisdnTransformer',
-                        parameters: ['user.mobile']
-                      },
-                      query: {
-                        operation: 'localPhoneTransformer',
-                        parameters: ['user.mobile']
-                      }
-                    }
-                  },
-                  {
-                    name: 'nid',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'NID',
-                      description: 'National ID',
-                      id: 'form.field.label.NID'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [
-                      {
-                        operation: 'validIDNumber',
-                        parameters: ['NATIONAL_ID']
-                      }
-                    ],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToIdentifierWithTypeTransformer',
-                        parameters: ['NATIONAL_ID']
-                      },
-                      query: {
-                        operation: 'identifierWithTypeToFieldTransformer',
-                        parameters: ['NATIONAL_ID']
-                      }
-                    }
-                  },
-                  {
-                    name: 'accountDetails',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'Account details',
-                      description: 'Account details section',
-                      id: 'form.section.accountDetails'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'systemRole',
-                    type: 'SELECT_WITH_OPTIONS',
-                    label: {
-                      defaultMessage: 'Role',
-                      description: 'Role label',
-                      id: 'constants.role'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [],
-                    options: []
-                  },
-                  {
-                    name: 'role',
-                    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-                    label: {
-                      defaultMessage: 'Type',
-                      description:
-                        'Label for type of event in work queue list item',
-                      id: 'constants.type'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [],
-                    dynamicOptions: {
-                      dependency: 'systemRole',
-                      options: {}
-                    }
-                  },
-                  {
-                    name: 'device',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Device',
-                      description: 'User device',
-                      id: 'form.field.label.userDevice'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  }
-                ]
+              title: {
+                defaultMessage: 'Create new user',
+                description: 'The title of user form',
+                id: 'form.section.user.title'
               },
-              {
-                id: 'signature-attachment',
-                title: {
-                  defaultMessage: 'Attach the signature',
-                  description: 'Title for user signature attachment',
-                  id: 'form.field.label.userSignatureAttachmentTitle'
-                },
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
-                  }
-                ],
-                fields: [
-                  {
-                    name: 'attachmentTitle',
-                    type: 'FIELD_GROUP_TITLE',
-                    hidden: true,
-                    label: {
-                      defaultMessage: 'Attachments',
-                      description: 'label for user signature attachment',
-                      id: 'form.field.label.userAttachmentSection'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
+              groups: [
+                {
+                  id: 'registration-office',
+                  title: {
+                    defaultMessage: 'Assigned Registration Office',
+                    description: 'Assigned Registration Office section',
+                    id: 'form.section.assignedRegistrationOffice'
                   },
-                  {
-                    name: 'signature',
-                    type: 'SIMPLE_DOCUMENT_UPLOADER',
-                    label: {
-                      defaultMessage: 'User’s signature',
-                      description: 'Input label for user signature attachment',
-                      id: 'form.field.label.userSignatureAttachment'
+                  conditionals: [
+                    {
+                      action: 'hide',
+                      expression:
+                        'values.skippedOfficeSelction && values.registrationOffice'
+                    }
+                  ],
+                  fields: [
+                    {
+                      name: 'assignedRegistrationOffice',
+                      type: 'FIELD_GROUP_TITLE',
+                      label: {
+                        defaultMessage: 'Assigned registration office',
+                        description: 'Assigned Registration Office section',
+                        id: 'form.section.assignedRegistrationOfficeGroupTitle'
+                      },
+                      required: false,
+                      hidden: true,
+                      initialValue: '',
+                      validator: []
                     },
-                    description: {
-                      defaultMessage:
-                        'Ask the user to sign a piece of paper and then scan or take a photo.',
-                      description: 'Description for user signature attachment',
-                      id: 'form.field.label.userSignatureAttachmentDesc'
+                    {
+                      name: 'registrationOffice',
+                      type: 'LOCATION_SEARCH_INPUT',
+                      label: {
+                        defaultMessage: 'Registration Office',
+                        description: 'Registration office',
+                        id: 'form.field.label.registrationOffice'
+                      },
+                      required: true,
+                      initialValue: '',
+                      searchableResource: ['facilities'],
+                      searchableType: ['CRVS_OFFICE'],
+                      locationList: [],
+                      validator: [
+                        {
+                          operation: 'officeMustBeSelected'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldNameTransformer',
+                          parameters: ['primaryOffice']
+                        },
+                        query: {
+                          operation: 'locationIDToFieldTransformer',
+                          parameters: ['primaryOffice']
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  id: 'user-view-group',
+                  fields: [
+                    {
+                      name: 'userDetails',
+                      type: 'FIELD_GROUP_TITLE',
+                      label: {
+                        defaultMessage: 'User details',
+                        description: 'User details section',
+                        id: 'form.section.userDetails'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: []
                     },
-                    allowedDocType: ['image/png'],
-                    initialValue: '',
-                    required: false,
-                    validate: []
-                  }
-                ]
-              }
-            ]
-          })
+                    {
+                      name: 'firstNames',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'Bengali first name',
+                        description: 'Bengali first name',
+                        id: 'form.field.label.firstNameBN'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: [{ operation: 'bengaliOnlyNameFormat' }],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldToNameTransformer',
+                          parameters: ['bn']
+                        },
+                        query: {
+                          operation: 'nameToFieldTransformer',
+                          parameters: ['bn']
+                        }
+                      }
+                    },
+                    {
+                      name: 'familyName',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'Bengali last name',
+                        description: 'Bengali last name',
+                        id: 'form.field.label.lastNameBN'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [{ operation: 'bengaliOnlyNameFormat' }],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldToNameTransformer',
+                          parameters: ['bn']
+                        },
+                        query: {
+                          operation: 'nameToFieldTransformer',
+                          parameters: ['bn']
+                        }
+                      }
+                    },
+                    {
+                      name: 'firstNamesEng',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'English first name',
+                        description: 'English first name',
+                        id: 'form.field.label.firstNameEN'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: [{ operation: 'englishOnlyNameFormat' }],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldToNameTransformer',
+                          parameters: ['en', 'firstNames']
+                        },
+                        query: {
+                          operation: 'nameToFieldTransformer',
+                          parameters: ['en', 'firstNames']
+                        }
+                      }
+                    },
+                    {
+                      name: 'familyNameEng',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'English last name',
+                        description: 'English last name',
+                        id: 'form.field.label.lastNameEN'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [{ operation: 'englishOnlyNameFormat' }],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldToNameTransformer',
+                          parameters: ['en', 'familyName']
+                        },
+                        query: {
+                          operation: 'nameToFieldTransformer',
+                          parameters: ['en', 'familyName']
+                        }
+                      }
+                    },
+                    {
+                      name: 'phoneNumber',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'Phone number',
+                        description: 'Input label for phone input',
+                        id: 'form.field.label.phoneNumber'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [{ operation: 'phoneNumberFormat' }],
+                      mapping: {
+                        mutation: {
+                          operation: 'msisdnTransformer',
+                          parameters: ['user.mobile']
+                        },
+                        query: {
+                          operation: 'localPhoneTransformer',
+                          parameters: ['user.mobile']
+                        }
+                      }
+                    },
+                    {
+                      name: 'nid',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'NID',
+                        description: 'National ID',
+                        id: 'form.field.label.NID'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [
+                        {
+                          operation: 'validIDNumber',
+                          parameters: ['NATIONAL_ID']
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'fieldToIdentifierWithTypeTransformer',
+                          parameters: ['NATIONAL_ID']
+                        },
+                        query: {
+                          operation: 'identifierWithTypeToFieldTransformer',
+                          parameters: ['NATIONAL_ID']
+                        }
+                      }
+                    },
+                    {
+                      name: 'accountDetails',
+                      type: 'FIELD_GROUP_TITLE',
+                      label: {
+                        defaultMessage: 'Account details',
+                        description: 'Account details section',
+                        id: 'form.section.accountDetails'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: []
+                    },
+                    {
+                      name: 'systemRole',
+                      type: 'SELECT_WITH_OPTIONS',
+                      label: {
+                        defaultMessage: 'Role',
+                        description: 'Role label',
+                        id: 'constants.role'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [],
+                      options: []
+                    },
+                    {
+                      name: 'role',
+                      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+                      label: {
+                        defaultMessage: 'Type',
+                        description:
+                          'Label for type of event in work queue list item',
+                        id: 'constants.type'
+                      },
+                      required: true,
+                      initialValue: '',
+                      validator: [],
+                      dynamicOptions: {
+                        dependency: 'systemRole',
+                        options: {}
+                      }
+                    },
+                    {
+                      name: 'device',
+                      type: 'TEXT',
+                      label: {
+                        defaultMessage: 'Device',
+                        description: 'User device',
+                        id: 'form.field.label.userDevice'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: []
+                    }
+                  ]
+                },
+                {
+                  id: 'signature-attachment',
+                  title: {
+                    defaultMessage: 'Attach the signature',
+                    description: 'Title for user signature attachment',
+                    id: 'form.field.label.userSignatureAttachmentTitle'
+                  },
+                  conditionals: [
+                    {
+                      action: 'hide',
+                      expression:
+                        'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
+                    }
+                  ],
+                  fields: [
+                    {
+                      name: 'attachmentTitle',
+                      type: 'FIELD_GROUP_TITLE',
+                      hidden: true,
+                      label: {
+                        defaultMessage: 'Attachments',
+                        description: 'label for user signature attachment',
+                        id: 'form.field.label.userAttachmentSection'
+                      },
+                      required: false,
+                      initialValue: '',
+                      validator: []
+                    },
+                    {
+                      name: 'signature',
+                      type: 'SIMPLE_DOCUMENT_UPLOADER',
+                      label: {
+                        defaultMessage: 'User’s signature',
+                        description:
+                          'Input label for user signature attachment',
+                        id: 'form.field.label.userSignatureAttachment'
+                      },
+                      description: {
+                        defaultMessage:
+                          'Ask the user to sign a piece of paper and then scan or take a photo.',
+                        description:
+                          'Description for user signature attachment',
+                        id: 'form.field.label.userSignatureAttachmentDesc'
+                      },
+                      allowedDocType: ['image/png'],
+                      initialValue: '',
+                      required: false,
+                      validator: []
+                    }
+                  ]
+                }
+              ]
+            },
+            builtInValidators as any
+          )
         ]
       },
       { user: mockCompleteFormData }
@@ -3222,22 +2227,6 @@ export const mockUserGraphqlOperation = {
       createOrUpdateUserMutation: { username: 'hossain123', __typename: 'User' }
     }
   }
-}
-
-export const mockIncompleteFormData = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
-  nid: '101488192',
-  phoneNumber: '',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  userDetails: '',
-  username: ''
 }
 
 export const mockDataWithRegistarRoleSelected = {
@@ -3263,6 +2252,5 @@ export const mockDataWithRegistarRoleSelected = {
 
 export {
   mockOfflineData,
-  mockOfflineDataWithLocationHierarchy,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'

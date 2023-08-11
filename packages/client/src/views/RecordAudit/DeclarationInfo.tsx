@@ -42,6 +42,14 @@ const ShowOnMobile = styled.div`
     margin-top: 32px;
   }
 `
+const StyledSummaryRow = styled(Summary.Row)`
+  th {
+    vertical-align: baseline;
+  }
+`
+const StyledDiv = styled.div`
+  padding-bottom: 4px;
+`
 
 interface ILabel {
   [key: string]: string | undefined
@@ -58,7 +66,12 @@ export const GetDeclarationInfo = ({
   intl: IntlShape
   actions: React.ReactElement[]
 }) => {
-  let informant = getCaptitalizedWord(declaration?.informant)
+  const informantPhone = declaration?.informant?.registrationPhone
+  const informantEmail = declaration?.informant?.registrationEmail
+  const mainContact =
+    [informantPhone, informantEmail].filter(Boolean).length > 0
+      ? [informantPhone, informantEmail].filter(Boolean)
+      : undefined
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
@@ -75,10 +88,6 @@ export const GetDeclarationInfo = ({
       : finalStatus === 'Draft'
       ? intl.formatMessage(dynamicConstantsMessages.draft)
       : finalStatus
-
-  if (declaration?.informantContact && informant) {
-    informant = informant + ' · ' + declaration.informantContact
-  }
 
   let info: ILabel = {
     status: declaration?.status && displayStatus,
@@ -102,8 +111,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.birth),
       dateOfBirth: declaration?.dateOfBirth,
-      placeOfBirth: declaration?.placeOfBirth,
-      informant: removeUnderscore(informant)
+      placeOfBirth: declaration?.placeOfBirth
     }
   } else if (info.type === 'Death') {
     if (
@@ -120,8 +128,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.death),
       dateOfDeath: declaration?.dateOfDeath,
-      placeOfDeath: declaration?.placeOfDeath,
-      informant: removeUnderscore(informant)
+      placeOfDeath: declaration?.placeOfDeath
     }
   } else if (info.type === 'Marriage') {
     if (
@@ -138,8 +145,7 @@ export const GetDeclarationInfo = ({
       ...info,
       type: intl.formatMessage(constantsMessages.marriage),
       dateOfMarriage: declaration?.dateOfMarriage,
-      placeOfMarriage: declaration?.placeOfMarriage,
-      informant: removeUnderscore(informant)
+      placeOfMarriage: declaration?.placeOfMarriage
     }
   }
 
@@ -173,6 +179,16 @@ export const GetDeclarationInfo = ({
             />
           )
         })}
+        <StyledSummaryRow
+          key="contact-summary"
+          data-testid="contact"
+          label={intl.formatMessage(recordAuditMessages.contact)}
+          placeholder={intl.formatMessage(recordAuditMessages.noContact)}
+          value={mainContact?.map((contact, index) => (
+            <StyledDiv key={'contact_' + index}>{contact}</StyledDiv>
+          ))}
+          locked={!isDownloaded}
+        />
       </Summary>
 
       <ShowOnMobile>{mobileActions.map((action) => action)}</ShowOnMobile>

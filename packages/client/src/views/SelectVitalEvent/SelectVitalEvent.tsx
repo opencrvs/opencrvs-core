@@ -10,82 +10,47 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
-import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
-  goToBirthInformant,
   goToDeathInformant,
-  goToEventInfo
+  goToBirthRegistrationAsParent,
+  goToMarriageInformant
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_ENTER_TIME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
-} from '@client/utils/constants'
+
 import {
   storeDeclaration,
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
 
-const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  margin-top: 16px;
-  margin-bottom: 24px;
-`
 const Actions = styled.div`
-  padding-bottom: 24px;
   & > div {
     margin-bottom: 16px;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-bottom: 16px;
-  }
 `
 
-const fadeFromBottom = keyframes`
-from {
-   -webkit-transform: translateY(100%);
-   transform: translateY(100%);
-  }
-`
-const StyledContainer = styled.div`
-  top: 0;
-  min-height: calc(100vh);
-  width: 100%;
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromBottom} ${PAGE_TRANSITIONS_ENTER_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-    z-index: 999;
-  }
-
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-done {
-    position: fixed;
-  }
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
-    z-index: 999;
-    position: fixed;
-  }
-`
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeDeclaration: typeof storeDeclaration
-    goToEventInfo: typeof goToEventInfo
-    goToBirthInformant: typeof goToBirthInformant
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToDeathInformant: typeof goToDeathInformant
+    goToMarriageInformant: typeof goToMarriageInformant
   }
 > {
   state = {
@@ -96,29 +61,25 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
-        let declaration: IDeclaration
-        switch (this.state.goTo as Event) {
-          case Event.Birth:
-            declaration = createDeclaration(Event.Birth)
-            this.props.storeDeclaration(declaration)
-            this.props.goToBirthInformant(declaration.id)
-            break
-          case Event.Death:
-            declaration = createDeclaration(Event.Death)
-            this.props.storeDeclaration(declaration)
-            this.props.goToDeathInformant(declaration.id)
-            break
-          case Event.Marriage:
-            declaration = createDeclaration(Event.Marriage)
-            this.props.storeDeclaration(declaration)
-            this.props.goToDeathInformant(declaration.id)
-            break
-          default:
-            throw new Error(`Unknown eventType ${this.state.goTo}`)
-        }
-      } else {
-        this.props.goToEventInfo(this.state.goTo as Event)
+      let declaration: IDeclaration
+      switch (this.state.goTo as Event) {
+        case Event.Birth:
+          declaration = createDeclaration(Event.Birth)
+          this.props.storeDeclaration(declaration)
+          this.props.goToBirthRegistrationAsParent(declaration.id)
+          break
+        case Event.Death:
+          declaration = createDeclaration(Event.Death)
+          this.props.storeDeclaration(declaration)
+          this.props.goToDeathInformant(declaration.id)
+          break
+        case Event.Marriage:
+          declaration = createDeclaration(Event.Marriage)
+          this.props.storeDeclaration(declaration)
+          this.props.goToMarriageInformant(declaration.id)
+          break
+        default:
+          throw new Error(`Unknown eventType ${this.state.goTo}`)
       }
     }
   }
@@ -126,49 +87,80 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <StyledContainer
-        id="select-vital-event-view"
-        className={PAGE_TRANSITIONS_CLASSNAME}
-      >
-        <Container>
-          <FixedEventTopBar
-            title={intl.formatMessage(messages.registerNewEventTitle)}
-            goHome={this.props.goToHome}
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={<Icon name="Draft" size="large" />}
+            desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
+            desktopRight={
+              <Button
+                id="goBack"
+                type="secondary"
+                size="medium"
+                onClick={this.props.goToHome}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.exitButton)}
+              </Button>
+            }
+            mobileLeft={<Icon name="Draft" size="large" />}
+            mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
+            mobileRight={
+              <Button type="icon" size="medium" onClick={this.props.goToHome}>
+                <Icon name="X" />
+              </Button>
+            }
           />
-          <BodyContent>
-            <Title>
-              {intl.formatMessage(messages.registerNewEventHeading)}
-            </Title>
-            {this.state.noEventSelectedError && (
-              <ErrorText id="require-error">
-                {intl.formatMessage(messages.errorMessage)}
-              </ErrorText>
-            )}
-            <Actions id="select_vital_event_view">
-              <RadioButton
-                size="large"
-                key="birthevent"
-                name="birthevent"
-                label={intl.formatMessage(constantsMessages.birth)}
-                value="birth"
-                id="select_birth_event"
-                selected={this.state.goTo === 'birth' ? 'birth' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'birth', noEventSelectedError: false })
-                }
-              />
-              <RadioButton
-                size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
-                }
-              />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <Content
+          title={intl.formatMessage(messages.registerNewEventHeading)}
+          bottomActionButtons={[
+            <Button
+              key="select-vital-event-continue"
+              id="continue"
+              type="primary"
+              size="large"
+              onClick={this.handleContinue}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </Button>
+          ]}
+        >
+          {this.state.noEventSelectedError && (
+            <ErrorText id="require-error">
+              {intl.formatMessage(messages.errorMessage)}
+            </ErrorText>
+          )}
+          <Actions id="select_vital_event_view">
+            <RadioButton
+              size="large"
+              key="birthevent"
+              name="birthevent"
+              label={intl.formatMessage(constantsMessages.birth)}
+              value="birth"
+              id="select_birth_event"
+              selected={this.state.goTo === 'birth' ? 'birth' : ''}
+              onChange={() =>
+                this.setState({ goTo: 'birth', noEventSelectedError: false })
+              }
+            />
+            <RadioButton
+              size="large"
+              key="deathevent"
+              name="deathevent"
+              label={intl.formatMessage(constantsMessages.death)}
+              value="death"
+              id="select_death_event"
+              selected={this.state.goTo === 'death' ? 'death' : ''}
+              onChange={() =>
+                this.setState({ goTo: 'death', noEventSelectedError: false })
+              }
+            />
+            {window.config.MARRIAGE_REGISTRATION && (
               <RadioButton
                 size="large"
                 key="marriagevent"
@@ -184,13 +176,10 @@ class SelectVitalEventView extends React.Component<
                   })
                 }
               />
-            </Actions>
-            <PrimaryButton id="continue" onClick={this.handleContinue}>
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </BodyContent>
-        </Container>
-      </StyledContainer>
+            )}
+          </Actions>
+        </Content>
+      </Frame>
     )
   }
 }
@@ -199,7 +188,7 @@ export const SelectVitalEvent = connect(null, {
   goBack,
   goToHome,
   storeDeclaration,
-  goToBirthInformant,
+  goToBirthRegistrationAsParent,
   goToDeathInformant,
-  goToEventInfo
+  goToMarriageInformant
 })(injectIntl(SelectVitalEventView))

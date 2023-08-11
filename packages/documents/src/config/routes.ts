@@ -13,10 +13,19 @@ import { documentUploadHandler } from '@documents/features/uploadDocument/handle
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
 import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
+import { MINIO_BUCKET } from '@documents/minio/constants'
 
 export const getRoutes = () => {
   const routes = [
     // get presigned URL
+    {
+      method: 'GET',
+      path: `/presigned-url/${MINIO_BUCKET}/{fileUri}`,
+      handler: createPreSignedUrl,
+      config: {
+        tags: ['api']
+      }
+    },
     {
       method: 'POST',
       path: '/presigned-url',

@@ -37,21 +37,10 @@ async function extractMessages() {
       messages: Record<string, string>
     }>
   }
-  let contentfulIds: Record<string, string>
   try {
     login = JSON.parse(
       fs
-        .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/login.json`
-        )
-        .toString()
-    )
-
-    contentfulIds = JSON.parse(
-      fs
-        .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/contentful-ids.json`
-        )
+        .readFileSync(`${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`)
         .toString()
     )
   } catch (err) {
@@ -79,7 +68,6 @@ async function extractMessages() {
       results.forEach((r) => {
         reactIntlDescriptions[r.id] = r.description
       })
-      const contentfulKeysToMigrate: string[] = []
       const englishTranslations = login.data.find(
         (obj: ILanguage) => obj.lang === 'en-US' || obj.lang === 'en'
       )?.messages
@@ -94,28 +82,10 @@ async function extractMessages() {
               `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/login.json`
+                `${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`
               )}`
             )}`
           )
-        }
-
-        if (contentfulIds && !existsInContentful(contentfulIds, key)) {
-          console.log(
-            `${chalk.red(
-              `You have set up a Contentful Content Management System.  OpenCRVS core has created this new key in this version: ${chalk.white(
-                key
-              )} in ${chalk.white(`${key}`)}`
-            )}`
-          )
-          console.log(
-            `${chalk.yellow(
-              'This key must be migrated into your Contentful CMS.  Saving to ...'
-            )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/contentful-keys-to-migrate.json`
-            )}`
-          )
-          contentfulKeysToMigrate.push(key)
         }
       })
 
@@ -131,12 +101,8 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/api/content/login/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
-      )
-      fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/contentful-keys-to-migrate.json`,
-        JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })
   } catch (err) {

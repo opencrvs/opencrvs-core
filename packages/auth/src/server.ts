@@ -21,6 +21,10 @@ import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@auth/features/authenticate/handler'
+import authenticateSuperUserHandler, {
+  requestSchema as reqAuthSupSchema,
+  responseSchema as resAuthSupSchema
+} from '@auth/features/authenticateSuperUser/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
@@ -145,6 +149,26 @@ export async function createServer() {
       },
       response: {
         schema: resAuthSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate-super-user
+  server.route({
+    method: 'POST',
+    path: '/authenticate-super-user',
+    handler: authenticateSuperUserHandler,
+    options: {
+      tags: ['api'],
+      description: 'Authenticate with username and password',
+      notes:
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
+      validate: {
+        payload: reqAuthSupSchema
+      },
+      response: {
+        schema: resAuthSupSchema
       }
     }
   })

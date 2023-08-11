@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
+import { ISerializedForm } from '@client/forms'
+import { Conditional } from '@client/forms/conditionals'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { questionsTransformer } from '@client/forms/questionConfig'
-import { merge } from 'lodash'
-
+import { Validator } from '@client/forms/validators'
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
 }
@@ -27,11 +26,20 @@ export interface IContentResponse {
   languages: ILanguage[]
 }
 
-export interface ICountryLogo {
+export interface LoadFormsResponse {
+  forms: {
+    version: string
+    birth: ISerializedForm
+    death: ISerializedForm
+    marriage: ISerializedForm
+  }
+}
+
+interface ICountryLogo {
   fileName: string
   file: string
 }
-export interface ILoginBackground {
+interface ILoginBackground {
   backgroundColor?: string
   backgroundImage?: string
   imageFit?: string
@@ -88,23 +96,20 @@ export interface IApplicationConfig {
     }
     PRINT_IN_ADVANCE: boolean
   }
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
-  ADDRESSES: number
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: ILoginBackground
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
-  formConfig: IFormConfig
   systems: System[]
 }
 
@@ -125,19 +130,6 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
-  /*
-   * This is a temporary fix to merge the config from the config API with the global config object.
-   * Without this questionsTransformer doesn't have the correct window.config.ADMIN_LEVELS value
-   * when the application is loaded with no offline data.
-   * This causes:
-   * - incorrect form fields for address to be shown in the forms
-   * - runtime errors if an implementing country has customized address fields
-   */
-  merge(window.config, response.config)
-
-  response.formConfig.questionConfig = questionsTransformer(
-    response.formConfig.questionConfig
-  )
 
   return response
 }
@@ -154,6 +146,46 @@ async function loadConfigAnonymousUser(): Promise<
     throw Error(res.statusText)
   }
   return await res.json()
+}
+
+async function loadForms(): Promise<LoadFormsResponse> {
+  const url = `${window.config.CONFIG_API_URL}/forms`
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 201) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+
+  return {
+    forms: { ...response }
+  }
+}
+
+export type LoadValidatorsResponse = Record<string, Validator>
+async function importValidators(): Promise<LoadValidatorsResponse> {
+  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+  const validators = await import(
+    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/validators.js`
+  )
+
+  return validators
+}
+
+export type LoadConditionalsResponse = Record<string, Conditional>
+export async function importConditionals(): Promise<LoadConditionalsResponse> {
+  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
+  const { conditionals } = await import(
+    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`
+  )
+  return conditionals
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -213,29 +245,39 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 function generateLocationResource(fhirLocation: fhir.Location): ILocation {
-  const loc = {} as ILocation
-  loc.id = fhirLocation.id as string
-  loc.name = fhirLocation.name as string
-  loc.alias =
-    fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : ''
-  loc.status = fhirLocation.status as string
-  loc.physicalType =
-    fhirLocation.physicalType &&
-    fhirLocation.physicalType.coding &&
-    fhirLocation.physicalType.coding[0].display
-      ? fhirLocation.physicalType.coding[0].display
-      : ''
-  loc.type =
-    fhirLocation.type &&
-    fhirLocation.type.coding &&
-    fhirLocation.type.coding[0].code
-      ? fhirLocation.type.coding[0].code
-      : ''
-  loc.partOf =
-    fhirLocation.partOf && fhirLocation.partOf.reference
-      ? fhirLocation.partOf.reference
-      : ''
-  return loc
+  return {
+    id: fhirLocation.id as string,
+    name: fhirLocation.name as string,
+    statisticalId:
+      fhirLocation.identifier
+        ?.find(
+          (id) => id.system === 'http://opencrvs.org/specs/id/statistical-code'
+        )
+        ?.value?.replace('ADMIN_STRUCTURE_', '') ?? '',
+    alias:
+      fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : '',
+    status: fhirLocation.status as string,
+    physicalType:
+      fhirLocation.physicalType &&
+      fhirLocation.physicalType.coding &&
+      fhirLocation.physicalType.coding[0].display
+        ? fhirLocation.physicalType.coding[0].display
+        : '',
+    jurisdictionType:
+      fhirLocation.identifier?.find(
+        (id) => id.system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+      )?.value ?? '',
+    type:
+      fhirLocation.type &&
+      fhirLocation.type.coding &&
+      fhirLocation.type.coding[0].code
+        ? fhirLocation.type.coding[0].code
+        : '',
+    partOf:
+      fhirLocation.partOf && fhirLocation.partOf.reference
+        ? fhirLocation.partOf.reference
+        : ''
+  }
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
@@ -285,5 +327,8 @@ export const referenceApi = {
   loadFacilities,
   loadContent,
   loadConfig,
+  loadForms,
+  importValidators,
+  importConditionals,
   loadConfigAnonymousUser
 }

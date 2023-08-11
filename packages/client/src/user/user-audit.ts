@@ -12,7 +12,7 @@
 import { IFormField, RADIO_GROUP, TEXTAREA } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
-import { conditionals } from '@client/forms/utils'
+import { builtInConditionals as conditionals } from '@client/forms/conditionals'
 
 export interface IUserAuditForm {
   fields: IFormField[]
@@ -24,7 +24,7 @@ export const userAuditForm: IUserAuditForm = {
       name: 'reason',
       type: RADIO_GROUP,
       required: true,
-      validate: [],
+      validator: [],
       initialValue: '',
       label: messages.auditReason,
       size: RadioSize.LARGE,
@@ -42,7 +42,7 @@ export const userAuditForm: IUserAuditForm = {
       name: 'reason',
       type: RADIO_GROUP,
       required: true,
-      validate: [],
+      validator: [],
       initialValue: '',
       label: messages.auditReason,
       size: RadioSize.LARGE,
@@ -64,7 +64,7 @@ export const userAuditForm: IUserAuditForm = {
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: false,
       conditionals: [conditionals.userAuditReasonSpecified]
     },
@@ -73,7 +73,7 @@ export const userAuditForm: IUserAuditForm = {
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',
-      validate: [],
+      validator: [],
       required: true,
       conditionals: [conditionals.userAuditReasonOther]
     }

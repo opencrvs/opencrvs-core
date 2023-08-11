@@ -17,6 +17,7 @@ import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advan
 import { constantsMessages, formMessages } from '@client/i18n/messages'
 import {
   IOfflineData,
+  LocationType,
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@client/offline/reducer'
@@ -25,7 +26,7 @@ import {
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { IntlShape } from 'react-intl'
-import { LocationType, RegStatus } from '@client/utils/gateway'
+import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
@@ -181,7 +182,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     }
   }
 
-  if (localState.eventLocationType === LocationType.HealthFacility) {
+  if (localState.eventLocationType === LocationType.HEALTH_FACILITY) {
     eventLocationId = localState.eventLocationId
     eventCountry = ''
     eventLocationLevel1 = ''
@@ -329,12 +330,12 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   localState.eventCountry = ''
   localState.eventLocationType = ''
   if (reduxState.eventLocationId) {
-    localState.eventLocationType = LocationType.HealthFacility
+    localState.eventLocationType = LocationType.HEALTH_FACILITY
     localState.eventLocationId = reduxState.eventLocationId
   }
 
   if (reduxState.eventCountry) {
-    localState.eventLocationType = LocationType.PrivateHome
+    localState.eventLocationType = LocationType.PRIVATE_HOME
     localState.eventCountry = reduxState.eventCountry
     localState.eventLocationLevel1 = reduxState.eventLocationLevel1 || ''
     localState.eventLocationLevel2 = reduxState.eventLocationLevel2 || ''
@@ -456,7 +457,7 @@ export const getAccordionActiveStateMap = (
   }
 }
 
-export const determineDateFromDateRangePickerVal = (
+const determineDateFromDateRangePickerVal = (
   dateRangePickerValue?: IDateRangePickerValue
 ): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
   if (!dateRangePickerValue) {
@@ -478,7 +479,7 @@ export const determineDateFromDateRangePickerVal = (
   return value
 }
 
-export const convertDateValuesToDateRangePicker = (
+const convertDateValuesToDateRangePicker = (
   exact?: string,
   rangeStart?: string,
   rangeEnd?: string

@@ -20,7 +20,7 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Event } from '@client/utils/gateway'
 import {
   IRejectRegistrationForm,

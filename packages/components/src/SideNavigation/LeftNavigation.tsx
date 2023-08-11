@@ -66,6 +66,7 @@ const ApplicationNameContainer = styled.div`
   height: 56px;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  box-sizing: border-box;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

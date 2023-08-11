@@ -18,10 +18,11 @@ import { AppBar, Content, ContentSize, Frame } from '@opencrvs/components'
 import { goBack, goToPerformanceHome } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
 import { useLocation } from 'react-router'
+import { constantsMessages } from '@client/i18n/messages'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -82,7 +83,9 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
             mobileTitle={title}
           />
         }
-        skipToContentText="Skip to main content"
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         {window.config && url ? (
           <StyledIFrame

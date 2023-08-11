@@ -11,9 +11,12 @@
  */
 import fetch from 'node-fetch'
 import { DOCUMENTS_URL } from '@config/config/constants'
-import { IAuthHeader } from './fhirService'
 import { internal } from '@hapi/boom'
 import { logger } from '@config/logger'
+
+interface IAuthHeader {
+  Authorization: string
+}
 
 export async function getDocumentUrl(fileUri: string, authHeader: IAuthHeader) {
   const url = new URL('/presigned-url', DOCUMENTS_URL).toString()

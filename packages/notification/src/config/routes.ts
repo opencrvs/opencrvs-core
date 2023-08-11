@@ -101,7 +101,8 @@ export default function getRoutes() {
       handler: sendBirthDeclarationConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth declaration entry',
+        description:
+          'Sends an sms or email to a user for birth declaration entry',
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -121,7 +122,8 @@ export default function getRoutes() {
       handler: sendBirthRegistrationConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth registration entry',
+        description:
+          'Sends an sms or email to a user for birth registration entry',
         auth: {
           scope: [RouteScope.REGISTER]
         },
@@ -137,7 +139,7 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description:
-          'Sends an sms to a user for birth declaration rejection entry',
+          'Sends an sms or email to a user for birth declaration rejection entry',
         auth: {
           scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
         },
@@ -152,7 +154,8 @@ export default function getRoutes() {
       handler: sendDeathInProgressConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for death in-progress entry',
+        description:
+          'Sends an sms or email to a user for death in-progress entry',
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -172,7 +175,8 @@ export default function getRoutes() {
       handler: sendDeathDeclarationConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for death declaration entry',
+        description:
+          'Sends an sms or email to a user for death declaration entry',
         auth: {
           scope: [
             RouteScope.DECLARE,

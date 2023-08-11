@@ -68,6 +68,7 @@ ignore:
   - 'packages/client/src/index.tsx'
   - 'packages/client/src/registerServiceWorker.ts'
   - 'packages/client/src/src-sw.js'
+  - 'packages/client/src/src-sw.ts'
   - 'packages/client/src/tests/graphql-schema-mock.ts'
   - 'packages/workflow/src/index.ts'
   - 'packages/gateway/src/index.ts'

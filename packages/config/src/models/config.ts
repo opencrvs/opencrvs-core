@@ -59,17 +59,15 @@ export interface IApplicationConfigurationModel extends Document {
   CURRENCY: ICurrency
   DEATH: IDeath
   MARRIAGE: IMarriage
+  MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
-  ADDRESSES: number
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: ILoginBackground
 }
 
@@ -137,6 +135,7 @@ const configSchema = new Schema({
   CURRENCY: { type: currencySchema, required: false },
   DEATH: { type: deathSchema, required: false },
   MARRIAGE: { type: marriageSchema, required: false },
+  MARRIAGE_REGISTRATION: { type: Boolean, required: false },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,
@@ -147,11 +146,6 @@ const configSchema = new Schema({
     required: false,
     default: 'DISTRICT'
   },
-  HIDE_EVENT_REGISTER_INFORMATION: {
-    type: Boolean,
-    required: false,
-    default: false
-  },
   EXTERNAL_VALIDATION_WORKQUEUE: {
     type: Boolean,
     required: false,
@@ -159,12 +153,6 @@ const configSchema = new Schema({
   },
   PHONE_NUMBER_PATTERN: { type: String, required: false },
   NID_NUMBER_PATTERN: { type: String, required: false },
-  ADDRESSES: {
-    type: Number,
-    required: false,
-    enum: [1, 2],
-    default: 1
-  },
   DATE_OF_BIRTH_UNKNOWN: { type: Boolean, required: true, default: false },
   INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true },
   INFORMANT_SIGNATURE_REQUIRED: {
@@ -172,13 +160,7 @@ const configSchema = new Schema({
     required: true,
     default: false
   },
-  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
-  ADMIN_LEVELS: {
-    type: Number,
-    required: true,
-    enum: [1, 2, 3, 4, 5],
-    default: 2
-  }
+  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)
