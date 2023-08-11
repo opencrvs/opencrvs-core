@@ -508,15 +508,17 @@ function FormAppBar({
             )}
             desktopRight={
               <>
-                <Button
-                  id="save-exit-btn"
-                  type="primary"
-                  size="medium"
-                  onClick={handleSaveAndExit}
-                >
-                  <Icon name="DownloadSimple" />
-                  {intl.formatMessage(buttonMessages.saveExitButton)}
-                </Button>
+                {!isCorrection(declaration) && (
+                  <Button
+                    id="save-exit-btn"
+                    type="primary"
+                    size="medium"
+                    onClick={handleSaveAndExit}
+                  >
+                    <Icon name="DownloadSimple" />
+                    {intl.formatMessage(buttonMessages.saveExitButton)}
+                  </Button>
+                )}
                 <Button type="secondary" size="medium" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
@@ -556,9 +558,11 @@ function FormAppBar({
             )}
             mobileRight={
               <>
-                <Button type="icon" size="small" onClick={handleSaveAndExit}>
-                  <Icon name="DownloadSimple" />
-                </Button>
+                {!isCorrection(declaration) && (
+                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                    <Icon name="DownloadSimple" />
+                  </Button>
+                )}
                 <Button type="icon" size="small" onClick={handleExit}>
                   <Icon name="X" />
                 </Button>
