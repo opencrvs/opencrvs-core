@@ -42,7 +42,8 @@ const mockConfig = {
       ON_TIME: 0,
       LATE: 0,
       DELAYED: 0
-    }
+    },
+    PRINT_IN_ADVANCE: true
   },
   COUNTRY_LOGO: {
     fileName: 'logo.png',
@@ -57,15 +58,26 @@ const mockConfig = {
     FEE: {
       ON_TIME: 0,
       DELAYED: 0
-    }
+    },
+    PRINT_IN_ADVANCE: true
   },
   MARRIAGE: {
     REGISTRATION_TARGET: 45,
     FEE: {
       ON_TIME: 0,
       DELAYED: 0
-    }
+    },
+    PRINT_IN_ADVANCE: true
   },
+  PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
+  NID_NUMBER_PATTERN: '^[0-9]{10}$',
+  LOGIN_BACKGROUND: {
+    backgroundColor: '36304E'
+  },
+  MARRIAGE_REGISTRATION: false,
+  DATE_OF_BIRTH_UNKNOWN: false,
+  INFORMANT_SIGNATURE: true,
+  INFORMANT_SIGNATURE_REQUIRED: true,
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
@@ -103,11 +115,7 @@ describe('applicationHandler', () => {
 
   it('get application config using mongoose', async () => {
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
-    fetch.mockResponse(
-      JSON.stringify({
-        mockConfig
-      })
-    )
+    fetch.mockResponse(JSON.stringify(mockConfig))
 
     const res = await server.server.inject({
       method: 'GET',
@@ -120,11 +128,7 @@ describe('applicationHandler', () => {
     mockConfig.id = '61c4664e663fc6af203b63b8'
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'update')
-    fetch.mockResponse(
-      JSON.stringify({
-        mockConfig
-      })
-    )
+    fetch.mockResponse(JSON.stringify(mockConfig))
 
     const res = await server.server.inject({
       method: 'POST',

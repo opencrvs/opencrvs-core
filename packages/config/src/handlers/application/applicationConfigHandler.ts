@@ -27,24 +27,32 @@ export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const [certificates, config, systems] = await Promise.all([
-    getActiveCertificatesHandler(request, h).then((certs) =>
-      Promise.all(
-        certs.map(async (cert) => ({
-          ...cert,
-          svgCode: await getDocumentUrl(cert.svgCode, {
-            Authorization: request.headers.authorization
-          })
-        }))
-      )
-    ),
-    getApplicationConfig(request, h),
-    getSystems(request, h)
-  ])
-  return {
-    config,
-    certificates,
-    systems
+  try {
+    const [certificates, config, systems] = await Promise.all([
+      getActiveCertificatesHandler(request, h).then((certs) =>
+        Promise.all(
+          certs.map(async (cert) => ({
+            ...cert,
+            svgCode: await getDocumentUrl(cert.svgCode, {
+              Authorization: request.headers.authorization
+            })
+          }))
+        )
+      ),
+      getApplicationConfig(request, h),
+      getSystems(request, h)
+    ])
+    return {
+      config,
+      certificates,
+      systems
+    }
+  } catch (ex) {
+    logger.error(ex)
+    if (process.env.NODE_ENV === 'development') {
+      throw ex
+    }
+    return {}
   }
 }
 
@@ -84,7 +92,8 @@ export async function getApplicationConfig(
     configFromCountryConfig
   )
   const { error, value } = applicationConfigResponseValidation.validate(
-    stripApplicationConfig
+    stripApplicationConfig,
+    { allowUnknown: true }
   )
   if (error) {
     throw badData(error.details[0].message)
