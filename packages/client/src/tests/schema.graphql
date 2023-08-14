@@ -613,11 +613,9 @@ type ApplicationConfiguration {
   DEATH: Death
   MARRIAGE: Marriage
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   LOGIN_BACKGROUND: LoginBackground
 }
 
@@ -629,11 +627,9 @@ input ApplicationConfigurationInput {
   DEATH: DeathInput
   MARRIAGE: MarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS: String
-  HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
-  ADDRESSES: Int
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
 

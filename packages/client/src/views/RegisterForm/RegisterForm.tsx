@@ -991,6 +991,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <Frame.Section>
                       <Content
                         size={ContentSize.NORMAL}
+                        key={activeSectionGroup.id}
                         id="register_form"
                         title={
                           (activeSectionGroup.title &&

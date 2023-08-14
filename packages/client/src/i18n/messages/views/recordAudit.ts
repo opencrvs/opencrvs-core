@@ -28,6 +28,7 @@ interface IRecordAuditMessages
   placeOfBirth: MessageDescriptor
   placeOfDeath: MessageDescriptor
   placeOfMarriage: MessageDescriptor
+  rn: MessageDescriptor
   noName: MessageDescriptor
   noStatus: MessageDescriptor
   noType: MessageDescriptor
@@ -124,6 +125,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.placeOfMarriage',
     defaultMessage: 'Place of marriage',
     description: 'Label for place of marriage'
+  },
+  rn: {
+    id: 'recordAudit.rn',
+    defaultMessage: 'Registration no.',
+    description: 'Label for Birth Registration Number'
   },
   registrationNo: {
     id: 'recordAudit.registrationNo',
