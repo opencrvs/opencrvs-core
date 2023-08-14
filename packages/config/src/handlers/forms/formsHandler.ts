@@ -19,6 +19,7 @@ import fetch from 'node-fetch'
 import { logger } from '@config/config/logger'
 import { badData } from '@hapi/boom'
 import { registrationForms } from './validation'
+import { fromZodError } from 'zod-validation-error'
 
 interface IFormsPayload {
   version: string
@@ -46,10 +47,15 @@ export default async function getForm(
   const forms: IFormsPayload = await response.json()
 
   if (process.env.NODE_ENV === 'development') {
-    const result = registrationForms.validate(forms)
+    const result = registrationForms.safeParse(forms)
 
-    if (result.error) {
-      throw badData(result.error.details[0].message)
+    if (!result.success) {
+      throw badData(
+        fromZodError(result.error, {
+          prefix: 'Form validation error',
+          maxIssuesInMessage: 5
+        }).message
+      )
     }
   }
 
