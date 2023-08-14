@@ -53,7 +53,7 @@ echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core ::::::::::::::::
 echo
 echo -e "\033[32m:::::::: In the terminal above OpenCRVS core is starting ::::::::\033[0m"
 echo
-bash $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/setup-scripts/verify-dev-stack-running.sh
+bash $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/development-environment/verify-dev-stack-running.sh
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo

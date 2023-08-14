@@ -630,6 +630,7 @@ export interface GQLUserInput {
   username?: string
   mobile?: string
   password?: string
+  status?: GQLStatus
   systemRole: GQLSystemRoleType
   role?: string
   email?: string

@@ -10,4 +10,4 @@
 
 # OpenHIM is crashing on the first seed for an unknown reason.  This is technical debt
 # https://github.com/opencrvs/opencrvs-core/issues/5693#issuecomment-1663448525
-for i in {1..5}; do yarn seed:database && break || sleep 15; done
+for i in {1..5}; do ACTIVATE_USERS=true lerna run seed --stream --scope @opencrvs/data-seeder && break || sleep 15; done

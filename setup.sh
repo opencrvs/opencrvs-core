@@ -383,14 +383,14 @@ set -- $(stty size) #$1=rows, $2=columns
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
-tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
+tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -p 30
 tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
 tmux set -p @mytitle "opencrvs-farajaland"
 DIR=$(cd "$(dirname "$0")"; pwd)
-tmux send-keys -t opencrvs "bash setup-scripts/setup-countryconfig.sh $DIR" C-m
+tmux send-keys -t opencrvs "bash development-environment/setup-countryconfig.sh $DIR" C-m
 tmux setw -g mouse on
 tmux attach -t opencrvs
 
