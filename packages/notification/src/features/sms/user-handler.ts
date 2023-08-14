@@ -54,6 +54,7 @@ export async function sendUserCredentials(
       email: templateNames.ONBOARDING_INVITE['email']
     },
     { email: payload.email, sms: payload.msisdn },
+    'user',
     {
       firstNames,
       username: payload.username,
@@ -80,6 +81,7 @@ export async function sendResetPasswordInvite(
       email: templateNames.PASSWORD_RESET_BY_SYSTEM_ADMIN['email']
     },
     { email: payload.email, sms: payload.msisdn },
+    'user',
     {
       firstNames,
       password: payload.password
@@ -106,6 +108,7 @@ export async function retrieveUserName(
       email: templateNames.USERNAME_REMINDER['email']
     },
     { email: payload.email, sms: payload.msisdn },
+    'user',
     {
       firstNames,
       username: payload.username
@@ -132,6 +135,7 @@ export async function sendUserAuthenticationCode(
       email: templateNames[payload.notificationEvent]['email']
     },
     { email: payload.email, sms: payload.msisdn },
+    'user',
     {
       firstNames,
       authCode: payload.code
@@ -158,6 +162,7 @@ export async function updateUserName(
       email: templateNames.USERNAME_UPDATED['email']
     },
     { email: payload.email, sms: payload.msisdn },
+    'user',
     {
       firstNames,
       username: payload.username

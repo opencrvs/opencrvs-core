@@ -40,6 +40,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
+import { getLocalizedLocationName } from '@client/utils/locationUtils'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -103,7 +104,7 @@ export function AdministrativeLevels() {
 
           if (currentOffice) {
             LocationBreadCrumb.push({
-              label: currentOffice.name,
+              label: getLocalizedLocationName(intl, currentOffice),
               paramId: currentOffice.id
             })
             currentLocationId = currentOffice.partOf.split('/')[1]
@@ -186,7 +187,7 @@ export function AdministrativeLevels() {
                             dispatch(goToTeamUserList(level.id))
                         }}
                       >
-                        {level?.name}
+                        {getLocalizedLocationName(intl, level)}
                       </Link>
                     }
                     actions={

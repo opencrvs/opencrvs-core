@@ -37,11 +37,13 @@ describe('when user is selecting the vital event', () => {
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app.find('#select_birth_event').hostNodes().simulate('change')
-
         app.find('#continue').hostNodes().simulate('click')
+        app.update()
       })
-      it('takes user to the event info view', () => {
-        expect(app.find('#birth-info-container').hostNodes()).toHaveLength(1)
+      it('takes user to the event info view', async () => {
+        expect(app.find('#content-name').hostNodes().first().text()).toBe(
+          'Who is applying for birth registration?'
+        )
       })
     })
 
@@ -66,7 +68,7 @@ describe('when user is selecting the vital event', () => {
 
     describe('when clicked on cross button', () => {
       beforeEach(async () => {
-        app.find('#crcl-btn').hostNodes().simulate('click')
+        app.find('#goBack').hostNodes().simulate('click')
         await flushPromises()
         app.update()
       })

@@ -18,7 +18,7 @@ vi.unmock('@client/utils/referenceApi')
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
-export const mockFetchLocations = {
+const mockFetchLocations = {
   resourceType: 'Bundle',
   id: 'ed2915f5-7257-4ae6-8499-4121a42c1a88',
   meta: {
@@ -198,7 +198,7 @@ export const mockFetchLocations = {
   ]
 }
 
-export const parsedLocations = {
+const parsedLocations = {
   '7dbf10a9-23d9-4038-8b1c-9f6547ab4877': {
     id: '7dbf10a9-23d9-4038-8b1c-9f6547ab4877',
     name: 'Central',
@@ -223,7 +223,7 @@ export const parsedLocations = {
   }
 }
 
-export const mockFetchOffices = {
+const mockFetchOffices = {
   resourceType: 'Bundle',
   id: '2ff926ac-e873-4f8b-b78d-b5a6d6537b07',
   meta: {
@@ -347,7 +347,7 @@ export const mockFetchOffices = {
   ]
 }
 
-export const mockFetchFacilities = {
+const mockFetchFacilities = {
   resourceType: 'Bundle',
   id: '946900ea-0aa7-487d-9059-2942d2f54743',
   meta: {
@@ -467,7 +467,7 @@ export const mockFetchFacilities = {
   ]
 }
 
-export const parsedFacilities = {
+const parsedFacilities = {
   'b3de59a0-835d-4c62-b91b-bc86e312d08e': {
     id: 'b3de59a0-835d-4c62-b91b-bc86e312d08e',
     name: 'HQ Office',
@@ -514,65 +514,6 @@ export const parsedFacilities = {
   }
 }
 
-export const mockCertificatesTemplatesDefinitionData = {
-  birth: {
-    svgCode: '<svg></svg>'
-  },
-  death: {
-    svgCode: '<svg></svg/>'
-  }
-}
-
-export const mockFetchCertificatesTemplatesDefinition = [
-  {
-    event: 'birth',
-    status: 'ACTIVE',
-    svgCode: '<svg></svg>',
-    svgDateCreated: 1640696680593,
-    svgDateUpdated: 1644326332088,
-    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
-  },
-  {
-    event: 'death',
-    status: 'ACTIVE',
-    svgCode: '<svg></svg>',
-    svgDateCreated: 1640696804785,
-    svgDateUpdated: 1643885502999,
-    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
-  }
-]
-
-export const mockCertificateTemplate = {
-  data: {
-    getActiveCertificatesSVG: [
-      {
-        event: 'birth',
-        status: 'ACTIVE',
-        svgCode: '<svg><svg/>',
-        svgDateCreated: '1640696680593',
-        svgDateUpdated: '1643292458812',
-        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-        user: 'jonathan.campbell',
-        __typename: 'CertificateSVG',
-        id: '61cb0b68ab0cc2e187089786'
-      },
-      {
-        event: 'death',
-        status: 'ACTIVE',
-        svgCode: '<svg><svg/>',
-        svgDateCreated: '1640696804785',
-        svgDateUpdated: '1643292520393',
-        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
-        user: 'jonathan.campbell',
-        __typename: 'CertificateSVG',
-        id: '61cb0be4ab0cc2e187089787'
-      }
-    ]
-  }
-}
-
 const statuses = {
   PENDING: 'pending',
   ACTIVE: 'active',
@@ -580,7 +521,7 @@ const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-export const mockFetchConfig = {
+const mockFetchConfig = {
   config: {
     API_GATEWAY_URL: 'http://localhost:7070/',
     CONFIG_API_URL: 'http://localhost:2021',
@@ -590,7 +531,6 @@ export const mockFetchConfig = {
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
     DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-    HIDE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
     PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
     SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
@@ -602,8 +542,6 @@ export const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1,
-    ADMIN_LEVELS: 2,
     INTEGRATIONS: [
       {
         name: 'MOSIP',
@@ -633,7 +571,6 @@ export const mockFetchConfig = {
       svgDateCreated: 1640696804785
     }
   ],
-  formConfig: { questionConfig: [] },
   systems: [
     {
       name: 'MOSIP',

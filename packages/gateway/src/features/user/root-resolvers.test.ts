@@ -856,9 +856,25 @@ describe('User root resolvers', () => {
         Authorization: `Bearer ${inValidUserToken}`
       }
     })
-
+    //
     it('changes avatar for loggedin user', async () => {
-      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            avatar: {
+              type: 'image/jpeg',
+              data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+            }
+          }),
+          { status: 200 }
+        ]
+      )
 
       const avatar = {
         type: 'image/jpeg',
@@ -874,10 +890,29 @@ describe('User root resolvers', () => {
         { headers: authHeaderValidUser }
       )
 
-      expect(response).toEqual(avatar)
+      expect(response).toEqual({
+        type: 'image/jpeg',
+        data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+      })
     })
     it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
-      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+          }),
+          { status: 401 }
+        ],
+        [
+          JSON.stringify({
+            avatar: {
+              type: 'image/jpeg',
+              data: '/ocrvs/a3e65485-5de7-4fac-a976-8d3d0f22a86c.jpg'
+            }
+          }),
+          { status: 401 }
+        ]
+      )
 
       return expect(
         resolvers.Mutation.changeAvatar(

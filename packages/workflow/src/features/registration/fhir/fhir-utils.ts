@@ -20,7 +20,8 @@ import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
-  getSectionEntryBySectionCode
+  getSectionEntryBySectionCode,
+  findRelatedPersonEntry
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch, { RequestInit } from 'node-fetch'
@@ -31,7 +32,6 @@ import {
 } from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
-import { unionBy } from 'lodash'
 import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
@@ -39,7 +39,14 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+}
+
+export async function getSharedContactEmail(fhirBundle: fhir.Bundle) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error('Invalid FHIR bundle found for declaration')
+  }
+  return getEmailAddress(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export function concatenateName(fhirNames: fhir.HumanName[]) {
@@ -47,6 +54,7 @@ export function concatenateName(fhirNames: fhir.HumanName[]) {
   const name = fhirNames.find((humanName: fhir.HumanName) => {
     return humanName.use === language
   })
+
   if (!name || !name.family) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
@@ -56,20 +64,32 @@ export function concatenateName(fhirNames: fhir.HumanName[]) {
     .concat(name.family)
 }
 
+export async function getSubjectName(
+  fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE
+) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
+  }
+  const person = await findPersonEntry(sectionCode, fhirBundle)
+  if (!person || !person.name) {
+    throw new Error("Didn't find subject's name information")
+  }
+
+  return concatenateName(person.name)
+}
+
 export async function getInformantName(
   fhirBundle: fhir.Bundle,
   sectionCode: string = CHILD_SECTION_CODE
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getInformantName: Invalid FHIR bundle found for declaration'
-    )
+    throw new Error('getSubjectName: Invalid FHIR bundle found for declaration')
   }
-  const informant = await findPersonEntry(sectionCode, fhirBundle)
+  const informant = await findRelatedPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
-
   return concatenateName(informant.name)
 }
 
@@ -298,10 +318,7 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
 }
 
 //TODO: need to modifty for marriage event
-export async function getPhoneNo(
-  taskResource: fhir.Task,
-  eventType: EVENT_TYPE
-) {
+export function getPhoneNo(taskResource: fhir.Task, eventType: EVENT_TYPE) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
     const phoneExtension =
@@ -316,9 +333,33 @@ export async function getPhoneNo(
     phoneNumber = phoneExtension && phoneExtension.valueString
   }
   if (!phoneNumber) {
-    return false
+    return null
   }
   return phoneNumber
+}
+
+//TODO: need to modifty for marriage event
+export function getEmailAddress(
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
+  let emailAddress
+  if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
+    const emailExtension =
+      taskResource &&
+      taskResource.extension &&
+      taskResource.extension.find((extension) => {
+        return (
+          extension.url ===
+          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-email`
+        )
+      })
+    emailAddress = emailExtension && emailExtension.valueString
+  }
+  if (!emailAddress) {
+    return null
+  }
+  return emailAddress
 }
 
 //TODO: need to modifty for marriage event
@@ -326,32 +367,34 @@ export async function getEventInformantName(
   composition: fhir.Composition,
   eventType: EVENT_TYPE
 ) {
-  let informantSection
+  let subjectSection
   if (eventType === EVENT_TYPE.BIRTH) {
-    informantSection = getSectionEntryBySectionCode(
+    subjectSection = getSectionEntryBySectionCode(
       composition,
       CHILD_SECTION_CODE
     )
   } else if (eventType === EVENT_TYPE.DEATH) {
-    informantSection = getSectionEntryBySectionCode(
+    subjectSection = getSectionEntryBySectionCode(
       composition,
       DECEASED_SECTION_CODE
     )
   }
 
-  const informant =
-    informantSection && (await getFromFhir(`/${informantSection.reference}`))
+  const subject =
+    subjectSection && (await getFromFhir(`/${subjectSection.reference}`))
   const language = getDefaultLanguage()
-  if (!informant || !informant.name) {
+  if (!subject || !subject.name) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const name = informant.name.find((humanName: fhir.HumanName) => {
+  const name = subject.name.find((humanName: fhir.HumanName) => {
     return humanName.use === language
   })
+
   if (!name || !name.family) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
+
   return ''
     .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')
@@ -379,38 +422,57 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
   return existingRegStatusCode
 }
 
+function mergeFhirIdentifiers(
+  currentIdentifiers: fhir.Identifier[],
+  newIdentifiers: fhir.Identifier[]
+): fhir.Identifier[] {
+  const identifierMap = new Map<string, fhir.Identifier>()
+  currentIdentifiers
+    .filter((identifier) => Boolean(identifier.type?.coding?.[0]?.code))
+    .forEach((identifier) =>
+      identifierMap.set(identifier.type!.coding![0].code!, identifier)
+    )
+  newIdentifiers
+    .filter((identifier) => Boolean(identifier.type?.coding?.[0]?.code))
+    .forEach((identifier) =>
+      identifierMap.set(identifier.type!.coding![0].code!, identifier)
+    )
+  return [...identifierMap.values()]
+}
+
 export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
-  SECTION_CODE[event].map(async (sectionCode: string) => {
-    const section = getSectionEntryBySectionCode(composition, sectionCode)
-    const patient = getPatientBySection(bundle, section)
-    const patientFromFhir: fhir.Patient = await getFromFhir(
-      `/Patient/${patient?.id}`
-    )
-    if (patientFromFhir) {
-      bundle.entry =
-        bundle &&
-        bundle.entry &&
-        bundle.entry.map((entry) => {
-          if (entry.resource?.id === patientFromFhir.id) {
-            return {
-              ...entry,
-              resource: {
-                ...entry.resource,
-                identifier: unionBy(
-                  (entry.resource as fhir.Patient).identifier,
-                  patientFromFhir.identifier,
-                  'type'
-                )
+  return Promise.all(
+    SECTION_CODE[event].map(async (sectionCode: string) => {
+      const section = getSectionEntryBySectionCode(composition, sectionCode)
+      const patient = getPatientBySection(bundle, section)
+      const patientFromFhir: fhir.Patient = await getFromFhir(
+        `/Patient/${patient?.id}`
+      )
+      if (patientFromFhir) {
+        bundle.entry =
+          bundle &&
+          bundle.entry &&
+          bundle.entry.map((entry) => {
+            if (entry.resource?.id === patientFromFhir.id) {
+              return {
+                ...entry,
+                resource: {
+                  ...entry.resource,
+                  identifier: mergeFhirIdentifiers(
+                    patientFromFhir.identifier ?? [],
+                    (entry.resource as fhir.Patient).identifier ?? []
+                  )
+                }
               }
+            } else {
+              return entry
             }
-          } else {
-            return entry
-          }
-        })
-    }
-  })
+          })
+      }
+    })
+  )
 }
 
 export async function forwardEntriesToHearth(

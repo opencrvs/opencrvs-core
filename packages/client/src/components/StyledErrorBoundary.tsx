@@ -12,7 +12,7 @@
 import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'

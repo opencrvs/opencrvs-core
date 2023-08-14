@@ -19,7 +19,10 @@ import {
 import { cloneDeep } from 'lodash'
 
 export const marriageEventLocationMutationTransformer =
-  (lineNumber = 0, transformedFieldName?: string) =>
+  (transformationParams: {
+    lineNumber?: number
+    transformedFieldName?: string
+  }) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -47,18 +50,17 @@ export const marriageEventLocationMutationTransformer =
       }
       transformedData.eventLocation = defaultLocation
     }
-    if (lineNumber > 0) {
-      transformedData.eventLocation.address.line[lineNumber - 1] = `${
-        draftData[sectionId][field.name]
-      }`
-    } else if (transformedFieldName) {
-      transformedData.eventLocation.address[transformedFieldName] = `${
-        draftData[sectionId][field.name]
-      }`
-    } else {
-      transformedData.eventLocation.address[field.name] = `${
-        draftData[sectionId][field.name]
-      }`
+    if (
+      transformationParams.lineNumber ||
+      transformationParams.lineNumber === 0
+    ) {
+      transformedData.eventLocation.address.line[
+        transformationParams.lineNumber
+      ] = `${draftData[sectionId][field.name]}`
+    } else if (transformationParams.transformedFieldName) {
+      transformedData.eventLocation.address[
+        transformationParams.transformedFieldName
+      ] = `${draftData[sectionId][field.name]}`
     }
     if (field.name === 'addressLine4') {
       transformedData.eventLocation.partOf = `Location/${

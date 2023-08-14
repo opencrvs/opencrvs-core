@@ -48,6 +48,8 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
+  password: String
+  status: Status
   systemRole: SystemRoleType!
   role: String
   email: String

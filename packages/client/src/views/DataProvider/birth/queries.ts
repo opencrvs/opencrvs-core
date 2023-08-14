@@ -19,6 +19,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
+        identifier {
+          id
+          type
+          otherType
+        }
         name {
           use
           firstNames
@@ -31,33 +36,31 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-            fieldsModifiedByIdentity
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          occupation
-          nationality
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+          fieldsModifiedByIdentity
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        occupation
+        nationality
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       mother {
@@ -142,6 +145,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        contactEmail
         duplicates {
           compositionId
           trackingId
@@ -215,6 +219,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+          alias
           address {
             state
             district
@@ -275,17 +280,15 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }
@@ -393,32 +396,30 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         relationship
         otherRelationship
-        individual {
+        _fhirIDPatient
+        identifier {
           id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          ageOfIndividualInYears
-          exactDateOfBirthUnknown
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
+          type
+          otherType
+        }
+        name {
+          use
+          firstNames
+          familyName
+        }
+        nationality
+        occupation
+        birthDate
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
         }
       }
       registration {
@@ -427,6 +428,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        contactEmail
         informantsSignature
         informantsSignatureURI
         status {
@@ -490,6 +492,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         office {
           id
           name
+          alias
           address {
             state
             district
@@ -550,17 +553,15 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
-            individual {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              telecom {
-                system
-                value
-                use
-              }
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
             }
           }
         }

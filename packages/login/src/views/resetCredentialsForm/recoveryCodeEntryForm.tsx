@@ -31,6 +31,7 @@ import { Link } from '@opencrvs/components/lib/Link'
 import { Toast } from '@opencrvs/components/lib/Toast'
 
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { constantsMessages } from '@login/i18n/messages/constants'
 
 const Actions = styled.div`
   & > div {
@@ -158,7 +159,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               )}
             />
           }
-          skipToContentText="Skip to main content"
+          skipToContentText={intl.formatMessage(
+            constantsMessages.skipToMainContent
+          )}
         >
           <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
             <Content

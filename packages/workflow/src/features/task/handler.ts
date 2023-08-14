@@ -15,6 +15,7 @@ import { HEARTH_URL } from '@workflow/constants'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import {
   getEntryId,
+  getSharedContactEmail,
   getSharedContactMsisdn
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getToken } from '@workflow/utils/authUtils'
@@ -52,13 +53,19 @@ export default async function updateTaskHandler(
         }] body: ${await res.text()}`
       )
     }
-    const msisdn = await getSharedContactMsisdn(payload)
+    const sms = await getSharedContactMsisdn(payload)
+    const email = await getSharedContactEmail(payload)
     /* sending notification to the contact */
-    if (msisdn) {
+    if (sms || email) {
       logger.info(`updateTaskHandler(${event}) sending event notification`)
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      sendEventNotification(
+        payload,
+        event,
+        { sms, email },
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     } else {
       logger.info(
         'updateTaskHandler(reject declaration) could not send event notification'

@@ -31,6 +31,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         firstName
         lastName
         officeName
+        avatarURL
       }
     }
     operationHistories {

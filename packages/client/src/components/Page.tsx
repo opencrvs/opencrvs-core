@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -31,7 +31,6 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 
@@ -71,22 +70,11 @@ const StyledSpinner = styled(Spinner)`
   /** Show spinner after 2 seconds */
   animation: ${spinnerAppearAnimation} 2s forwards;
 `
-export const StyledText = styled.div`
-  position: absolute;
-  top: 44%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 251px;
-  height: 32px;
-  ${({ theme }) => theme.fonts.h3};
-  color: ${({ theme }) => theme.colors.grey600};
-`
 
 interface IPageProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
-  formConfigLoaded: boolean
   loadingError: boolean
   offlineData: IOfflineData | undefined
   children?: React.ReactNode
@@ -145,16 +133,10 @@ class Component extends React.Component<
       initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
-      formConfigLoaded,
       children
     } = this.props
 
-    if (
-      offlineDataLoaded &&
-      initialDeclarationsLoaded &&
-      registerFormLoaded &&
-      formConfigLoaded
-    ) {
+    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -176,7 +158,6 @@ const mapStateToProps = (store: IStoreState) => {
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store),
-    formConfigLoaded: isFormConfigLoaded(store),
     offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }

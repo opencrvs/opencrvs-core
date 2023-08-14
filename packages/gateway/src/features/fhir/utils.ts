@@ -127,7 +127,7 @@ export function selectOrCreatePersonResource(
     fhirBundle.entry.push(personEntry)
   } else {
     if (!section.entry || !section.entry[0]) {
-      throw new Error('Expected person section ot have an entry')
+      throw new Error('Expected person section to have an entry')
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
@@ -882,7 +882,18 @@ export function setObjectPropInResourceArray(
     if (!resource[label][context._index[label]]) {
       resource[label][context._index[label]] = {}
     }
-    resource[label][context._index[label]][propName] = value
+    if (label === 'identifier' && propName === 'type') {
+      resource[label][context._index[label]][propName] = {
+        coding: [
+          {
+            system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+            code: value
+          }
+        ]
+      }
+    } else {
+      resource[label][context._index[label]][propName] = value
+    }
   }
 }
 
@@ -924,7 +935,7 @@ export function setArrayPropInResourceObject(
 
 export function findExtension(
   url: string,
-  extensions: fhir.Extension[]
+  extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   const extension =
     extensions &&
@@ -960,7 +971,7 @@ export async function setCertificateCollector(
     if (!certificate) return
     if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
       certificate.collector = {
-        individual: { name },
+        name,
         relationship: 'PRINT_IN_ADVANCE',
         otherRelationship: role
       }
@@ -1413,37 +1424,28 @@ export function isTaskResponse(resBody: fhir.Bundle): boolean {
   return resBody.entry[0].response.location.indexOf('Task') > -1
 }
 
-export async function setInformantReference(
+export function setInformantReference(
   sectionCode: string,
+  sectionTitle: string,
   relatedPerson: fhir.RelatedPerson,
   fhirBundle: ITemplatedBundle,
   context: any
 ) {
+  selectOrCreatePersonResource(sectionCode, sectionTitle, fhirBundle)
   const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      logger.error('Expected person entry not found on the bundle')
-      return
-    }
-    relatedPerson.patient = {
-      reference: personEntry.fullUrl
-    }
-  } else {
-    const composition = await fetchFHIR(
-      `/Composition/${fhirBundle.entry[0].resource.id}`,
-      context.authHeader
-    )
-
-    const sec = findCompositionSection(sectionCode, composition)
-    if (sec && sec.entry) {
-      relatedPerson.patient = {
-        reference: sec.entry[0].reference
-      }
-    }
+  if (!section?.entry) {
+    throw new Error(`${sectionCode} not found in composition!`)
+  }
+  const personSectionEntry = section.entry[0]
+  const personEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === personSectionEntry.reference
+  )
+  if (!personEntry) {
+    logger.error('Expected person entry not found on the bundle')
+    return
+  }
+  relatedPerson.patient = {
+    reference: personEntry.fullUrl
   }
 }
 

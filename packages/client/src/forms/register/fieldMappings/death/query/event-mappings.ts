@@ -11,7 +11,6 @@
  */
 import { IFormField, IFormData } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { transformStatusData } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 import format from '@client/utils/date-formatting'
@@ -83,36 +82,35 @@ export function getDeathRegistrationSectionTransformer(
   queryData: any,
   sectionId: string
 ) {
-  if (!transformedData[REGISTRATION_SECTION]) {
-    transformedData[REGISTRATION_SECTION] = {}
+  if (!transformedData['registration']) {
+    transformedData['registration'] = {}
   }
 
-  if (queryData[REGISTRATION_SECTION].id) {
-    transformedData[REGISTRATION_SECTION]._fhirID =
-      queryData[REGISTRATION_SECTION].id
+  if (queryData['registration'].id) {
+    transformedData['registration']._fhirID = queryData['registration'].id
   }
-  if (queryData[REGISTRATION_SECTION].trackingId) {
-    transformedData[REGISTRATION_SECTION].trackingId =
-      queryData[REGISTRATION_SECTION].trackingId
+  if (queryData['registration'].trackingId) {
+    transformedData['registration'].trackingId =
+      queryData['registration'].trackingId
   }
 
-  if (queryData[REGISTRATION_SECTION].registrationNumber) {
-    transformedData[REGISTRATION_SECTION].registrationNumber =
-      queryData[REGISTRATION_SECTION].registrationNumber
+  if (queryData['registration'].registrationNumber) {
+    transformedData['registration'].registrationNumber =
+      queryData['registration'].registrationNumber
   }
 
   if (
-    queryData[REGISTRATION_SECTION].type &&
-    queryData[REGISTRATION_SECTION].type === 'DEATH'
+    queryData['registration'].type &&
+    queryData['registration'].type === 'DEATH'
   ) {
-    transformedData[REGISTRATION_SECTION].type = Event.Death
+    transformedData['registration'].type = Event.Death
   }
 
-  if (queryData[REGISTRATION_SECTION].status) {
+  if (queryData['registration'].status) {
     transformStatusData(
       transformedData,
-      queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[],
-      REGISTRATION_SECTION
+      queryData['registration'].status as GQLRegWorkflow[],
+      'registration'
     )
   }
 

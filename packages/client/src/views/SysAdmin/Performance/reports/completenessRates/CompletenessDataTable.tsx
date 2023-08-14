@@ -28,7 +28,7 @@ import {
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Table } from '@opencrvs/components/lib/Table/Table'
 
 interface ITableProps extends WrappedComponentProps {
