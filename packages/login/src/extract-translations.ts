@@ -40,9 +40,7 @@ async function extractMessages() {
   try {
     login = JSON.parse(
       fs
-        .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/login.json`
-        )
+        .readFileSync(`${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`)
         .toString()
     )
   } catch (err) {
@@ -84,7 +82,7 @@ async function extractMessages() {
               `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/login.json`
+                `${COUNTRY_CONFIG_PATH}/src/api/content/login/login.json`
               )}`
             )}`
           )
@@ -103,7 +101,7 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/login/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/api/content/login/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
     })

@@ -38,7 +38,8 @@ export async function sendDeathInProgressConfirmation(
     'informant',
     {
       trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
+      crvsOffice: payload.crvsOffice,
+      informantName: payload.informantName
     }
   )
   return h.response().code(200)
@@ -63,7 +64,8 @@ export async function sendDeathDeclarationConfirmation(
     {
       name: payload.name,
       trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
+      crvsOffice: payload.crvsOffice,
+      informantName: payload.informantName
     }
   )
   return h.response().code(200)

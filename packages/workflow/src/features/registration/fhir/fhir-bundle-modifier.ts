@@ -165,7 +165,7 @@ export async function invokeRegistrationValidation(
   token: string
 ): Promise<{ bundle: fhir.Bundle; regValidationError?: boolean }> {
   try {
-    const res = await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    const res = await fetch(`${RESOURCE_SERVICE_URL}event-registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -175,7 +175,7 @@ export async function invokeRegistrationValidation(
     })
     if (!res.ok) {
       const errorData = await res.json()
-      throw `System error: ${res.statusText} ${res.status} ${errorData.boomCustromMessage}`
+      throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
     }
     return { bundle }
   } catch (err) {

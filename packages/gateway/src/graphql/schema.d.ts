@@ -630,6 +630,7 @@ export interface GQLUserInput {
   username?: string
   mobile?: string
   password?: string
+  status?: GQLStatus
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -685,17 +686,12 @@ export interface GQLApplicationConfiguration {
   MARRIAGE?: GQLMarriage
   MARRIAGE_REGISTRATION?: boolean
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  ADDRESSES?: number
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
-  ADMIN_LEVELS?: number
   LOGIN_BACKGROUND?: GQLLoginBackground
 }
 
@@ -707,17 +703,12 @@ export interface GQLApplicationConfigurationInput {
   DEATH?: GQLDeathInput
   MARRIAGE?: GQLMarriageInput
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  ADDRESSES?: number
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
-  ADMIN_LEVELS?: number
   LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
 
@@ -6028,17 +6019,12 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   MARRIAGE?: ApplicationConfigurationToMARRIAGEResolver<TParent>
   MARRIAGE_REGISTRATION?: ApplicationConfigurationToMARRIAGE_REGISTRATIONResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_BIRTH_EVENT_REGISTER_INFORMATIONResolver<TParent>
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_DEATH_EVENT_REGISTER_INFORMATIONResolver<TParent>
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_MARRIAGE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
-  ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
   INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
-  ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
   LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
 
@@ -6138,42 +6124,6 @@ export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
   ): TResult
 }
 
-export interface ApplicationConfigurationToHIDE_BIRTH_EVENT_REGISTER_INFORMATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToHIDE_DEATH_EVENT_REGISTER_INFORMATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToHIDE_MARRIAGE_EVENT_REGISTER_INFORMATIONResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
   TParent = any,
   TResult = any
@@ -6210,18 +6160,6 @@ export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
   ): TResult
 }
 
-export interface ApplicationConfigurationToADDRESSESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
   TParent = any,
   TResult = any
@@ -6247,18 +6185,6 @@ export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
 }
 
 export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ApplicationConfigurationToADMIN_LEVELSResolver<
   TParent = any,
   TResult = any
 > {

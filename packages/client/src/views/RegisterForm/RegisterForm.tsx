@@ -18,7 +18,14 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import _, {
+  isNull,
+  isUndefined,
+  merge,
+  flatten,
+  isEqual,
+  cloneDeep
+} from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -357,9 +364,7 @@ function FormAppBar({
       } else {
         modifyDeclarationMethod({
           ...declaration,
-          data: {
-            ...declaration.originalData
-          }
+          data: declaration.originalData
         })
       }
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
@@ -433,7 +438,7 @@ function FormAppBar({
             }
             desktopRight={
               <>
-                {!isCorrection(declaration) && (
+                {!duplicate && !isCorrection(declaration) && (
                   <Button
                     id="save-exit-btn"
                     type="primary"
@@ -473,9 +478,11 @@ function FormAppBar({
             }
             mobileRight={
               <>
-                <Button type="icon" size="small" onClick={handleSaveAndExit}>
-                  <Icon name="DownloadSimple" />
-                </Button>
+                {!duplicate && !isCorrection(declaration) && (
+                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                    <Icon name="DownloadSimple" />
+                  </Button>
+                )}
                 <Button type="icon" size="small" onClick={handleExit}>
                   <Icon name="X" />
                 </Button>
@@ -706,12 +713,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   logTime(timeMs: number) {
-    const declaration = this.props.declaration
-    if (!declaration.timeLoggedMS) {
-      declaration.timeLoggedMS = 0
-    }
-    declaration.timeLoggedMS += timeMs
-    this.props.modifyDeclaration(declaration)
+    const timeLoggedMS = (this.props.declaration.timeLoggedMS ?? 0) + timeMs
+    const declarationId = this.props.declaration.id
+    this.props.modifyDeclaration({ timeLoggedMS, id: declarationId })
   }
 
   confirmSubmission = (
@@ -987,6 +991,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <Frame.Section>
                       <Content
                         size={ContentSize.NORMAL}
+                        key={activeSectionGroup.id}
                         id="register_form"
                         title={
                           (activeSectionGroup.title &&

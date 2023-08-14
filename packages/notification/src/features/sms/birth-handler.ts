@@ -21,12 +21,14 @@ import { messageKeys } from '@notification/i18n/messages'
 export interface IInProgressPayload extends IEventMessageRecipient {
   trackingId: string
   crvsOffice: string
+  informantName: string
 }
 
 export interface IDeclarationPayload extends IEventMessageRecipient {
   trackingId: string
   name: string
   crvsOffice: string
+  informantName: string
 }
 
 export interface IRegistrationPayload extends IEventMessageRecipient {
@@ -68,7 +70,8 @@ export async function sendBirthInProgressConfirmation(
     'informant',
     {
       trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
+      crvsOffice: payload.crvsOffice,
+      informantName: payload.informantName
     }
   )
   return h.response().code(200)
@@ -93,7 +96,8 @@ export async function sendBirthDeclarationConfirmation(
     {
       name: payload.name,
       crvsOffice: payload.crvsOffice,
-      trackingId: payload.trackingId
+      trackingId: payload.trackingId,
+      informantName: payload.informantName
     }
   )
   return h.response().code(200)
@@ -159,7 +163,8 @@ export const inProgressNotificationSchema = Joi.object({
     sms: Joi.string().allow(null)
   }),
   trackingId: Joi.string().length(7).required(),
-  crvsOffice: Joi.string().required()
+  crvsOffice: Joi.string().required(),
+  informantName: Joi.string()
 })
 
 export const declarationNotificationSchema = Joi.object({
@@ -192,6 +197,6 @@ export const rejectionNotificationSchema = Joi.object({
   }),
   trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required(),
-  name: Joi.string().required(),
-  informantName: Joi.string()
+  informantName: Joi.string(),
+  name: Joi.string().required()
 })
