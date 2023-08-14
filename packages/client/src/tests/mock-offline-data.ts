@@ -453,9 +453,6 @@ export const mockOfflineData = {
     FIELD_AGENT_AUDIT_LOCATIONS:
       'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
     DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION',
-    HIDE_BIRTH_EVENT_REGISTER_INFORMATION: false,
-    HIDE_DEATH_EVENT_REGISTER_INFORMATION: false,
-    HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: true,
     _id: '61a8c105c04ac94fe46ceb27',
     COUNTRY: 'BGD',
@@ -478,11 +475,9 @@ export const mockOfflineData = {
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
-    ADDRESSES: 1,
     DATE_OF_BIRTH_UNKNOWN: true,
     INFORMANT_SIGNATURE: false,
-    INFORMANT_SIGNATURE_REQUIRED: false,
-    ADMIN_LEVELS: 2
+    INFORMANT_SIGNATURE_REQUIRED: false
   },
   anonymousConfig: {
     APPLICATION_NAME: 'Farajaland CRVS',
