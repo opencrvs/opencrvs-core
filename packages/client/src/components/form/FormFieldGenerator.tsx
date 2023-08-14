@@ -234,142 +234,105 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       mode: fieldDefinition.mode,
       ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
     }
-const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
-  ({
-    fieldDefinition,
-    onChange,
-    onBlur,
-    onSetFieldValue,
-    resetDependentSelectValues,
-    resetNestedInputValues,
-    error,
-    touched,
-    value,
-    nestedFields,
-    draftData,
-    disabled,
-    dynamicDispatch,
-    onUploadingStateChanged,
-    setFieldTouched,
-    requiredErrorMessage
-  }) => {
-    const inputFieldProps = {
+
+    const intl = useIntl()
+    const onChangeGroupInput = React.useCallback(
+      (val: string) => onSetFieldValue(fieldDefinition.name, val),
+      [fieldDefinition.name, onSetFieldValue]
+    )
+    const isOnline = useOnlineStatus()
+
+    const inputProps = {
       id: fieldDefinition.name,
-      label: fieldDefinition.label,
-      helperText: fieldDefinition.helperText,
-      tooltip: fieldDefinition.tooltip,
-      description: fieldDefinition.description,
-      required: fieldDefinition.required,
-      disabled: fieldDefinition.disabled,
-      prefix: fieldDefinition.prefix,
-      postfix: fieldDefinition.postfix,
-      unit: fieldDefinition.unit,
-      hideAsterisk: fieldDefinition.hideAsterisk,
-      hideInputHeader: fieldDefinition.hideHeader,
-      error,
-      touched,
-      mode: fieldDefinition.mode,
+      onChange,
+      onBlur,
+      value,
+      disabled: fieldDefinition.disabled ?? disabled,
+      error: Boolean(error),
+      touched: Boolean(touched),
+      placeholder: fieldDefinition.placeholder,
       ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
     }
-
-      const intl = useIntl()
-      const onChangeGroupInput = React.useCallback(
-        (val: string) => onSetFieldValue(fieldDefinition.name, val),
-        [fieldDefinition.name, onSetFieldValue]
-      )
-      const isOnline = useOnlineStatus()
-
-      const inputProps = {
-        id: fieldDefinition.name,
-        onChange,
-        onBlur,
-        value,
-        disabled: fieldDefinition.disabled ?? disabled,
-        error: Boolean(error),
-        touched: Boolean(touched),
-        placeholder: fieldDefinition.placeholder,
-        ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
-      }
-      if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
-        return (
-          <InputField {...inputFieldProps}>
-            <Select
-              {...inputProps}
-              isDisabled={fieldDefinition.disabled}
-              value={value as string}
-              onChange={(val: string) => {
-                resetDependentSelectValues(fieldDefinition.name)
-                onSetFieldValue(fieldDefinition.name, val)
-              }}
-              onFocus={() =>
-                handleSelectFocus(
-                  fieldDefinition.name,
-                  fieldDefinition.options.length > 10
-                )
-              }
-              options={fieldDefinition.options}
-            />
-          </InputField>
-        )
-      }
-      if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-        return (
-          <DocumentUploaderWithOption
+    if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Select
             {...inputProps}
-            name={fieldDefinition.name}
-            label={fieldDefinition.label}
+            isDisabled={fieldDefinition.disabled}
+            value={value as string}
+            onChange={(val: string) => {
+              resetDependentSelectValues(fieldDefinition.name)
+              onSetFieldValue(fieldDefinition.name, val)
+            }}
+            onFocus={() =>
+              handleSelectFocus(
+                fieldDefinition.name,
+                fieldDefinition.options.length > 10
+              )
+            }
             options={fieldDefinition.options}
-            splitView={fieldDefinition.splitView}
-            files={value as IFileValue[]}
-            extraValue={fieldDefinition.extraValue || ''}
-            hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-            onComplete={(files: IFileValue[]) => {
-              onSetFieldValue(fieldDefinition.name, files)
-              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-            }}
-            onUploadingStateChanged={onUploadingStateChanged}
-            requiredErrorMessage={requiredErrorMessage}
           />
-        )
-      }
-      if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
-        return (
-          <SimpleDocumentUploader
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+      return (
+        <DocumentUploaderWithOption
+          {...inputProps}
+          name={fieldDefinition.name}
+          label={fieldDefinition.label}
+          options={fieldDefinition.options}
+          splitView={fieldDefinition.splitView}
+          files={value as IFileValue[]}
+          extraValue={fieldDefinition.extraValue || ''}
+          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+          onComplete={(files: IFileValue[]) => {
+            onSetFieldValue(fieldDefinition.name, files)
+            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+          }}
+          onUploadingStateChanged={onUploadingStateChanged}
+          requiredErrorMessage={requiredErrorMessage}
+        />
+      )
+    }
+    if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
+      return (
+        <SimpleDocumentUploader
+          {...inputProps}
+          name={fieldDefinition.name}
+          label={fieldDefinition.label}
+          description={fieldDefinition.description}
+          allowedDocType={fieldDefinition.allowedDocType}
+          files={value as IAttachmentValue}
+          error={error}
+          onComplete={(file) => {
+            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            onSetFieldValue(fieldDefinition.name, file)
+          }}
+          onUploadingStateChanged={onUploadingStateChanged}
+          requiredErrorMessage={requiredErrorMessage}
+        />
+      )
+    }
+    if (fieldDefinition.type === RADIO_GROUP) {
+      return (
+        <InputField {...inputFieldProps}>
+          <RadioGroup
             {...inputProps}
-            name={fieldDefinition.name}
-            label={fieldDefinition.label}
-            description={fieldDefinition.description}
-            allowedDocType={fieldDefinition.allowedDocType}
-            files={value as IAttachmentValue}
-            error={error}
-            onComplete={(file) => {
-              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-              onSetFieldValue(fieldDefinition.name, file)
+            size={fieldDefinition.size}
+            onChange={(val: string) => {
+              resetDependentSelectValues(fieldDefinition.name)
+              onSetFieldValue(fieldDefinition.name, val)
             }}
-            onUploadingStateChanged={onUploadingStateChanged}
-            requiredErrorMessage={requiredErrorMessage}
+            options={fieldDefinition.options}
+            name={fieldDefinition.name}
+            value={value as string}
+            notice={fieldDefinition.notice}
+            flexDirection={fieldDefinition.flexDirection}
           />
-        )
-      }
-      if (fieldDefinition.type === RADIO_GROUP) {
-        return (
-          <InputField {...inputFieldProps}>
-            <RadioGroup
-              {...inputProps}
-              size={fieldDefinition.size}
-              onChange={(val: string) => {
-                resetDependentSelectValues(fieldDefinition.name)
-                onSetFieldValue(fieldDefinition.name, val)
-              }}
-              options={fieldDefinition.options}
-              name={fieldDefinition.name}
-              value={value as string}
-              notice={fieldDefinition.notice}
-              flexDirection={fieldDefinition.flexDirection}
-            />
-          </InputField>
-        )
-      }
+        </InputField>
+      )
+    }
 
     if (
       fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
@@ -399,56 +362,56 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-      if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
-        return (
-          <InformativeRadioGroup
-            inputProps={inputProps}
-            value={value as string}
-            onSetFieldValue={onSetFieldValue}
-            fieldDefinition={fieldDefinition}
-            inputFieldProps={inputFieldProps}
+    if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+      return (
+        <InformativeRadioGroup
+          inputProps={inputProps}
+          value={value as string}
+          onSetFieldValue={onSetFieldValue}
+          fieldDefinition={fieldDefinition}
+          inputFieldProps={inputFieldProps}
+        />
+      )
+    }
+
+    if (fieldDefinition.type === CHECKBOX_GROUP) {
+      return (
+        <InputField {...inputFieldProps}>
+          <CheckboxGroup
+            {...inputProps}
+            options={fieldDefinition.options}
+            name={fieldDefinition.name}
+            value={value as string[]}
+            onChange={(val: string[]) =>
+              onSetFieldValue(fieldDefinition.name, val)
+            }
           />
-        )
-      }
+        </InputField>
+      )
+    }
 
-      if (fieldDefinition.type === CHECKBOX_GROUP) {
-        return (
-          <InputField {...inputFieldProps}>
-            <CheckboxGroup
-              {...inputProps}
-              options={fieldDefinition.options}
-              name={fieldDefinition.name}
-              value={value as string[]}
-              onChange={(val: string[]) =>
-                onSetFieldValue(fieldDefinition.name, val)
-              }
-            />
-          </InputField>
-        )
-      }
-
-      if (fieldDefinition.type === CHECKBOX) {
-        const { checkedValue = true, uncheckedValue = false } = fieldDefinition
-        return (
-          <InputField {...inputFieldProps}>
-            <Checkbox
-              {...inputProps}
-              label={fieldDefinition.label}
-              name={fieldDefinition.name}
-              value={String(value)}
-              selected={(value as string) === checkedValue}
-              onChange={(event: { target: { value: string } }) =>
-                onSetFieldValue(
-                  fieldDefinition.name,
-                  event.target.value === String(checkedValue)
-                    ? uncheckedValue
-                    : checkedValue
-                )
-              }
-            />
-          </InputField>
-        )
-      }
+    if (fieldDefinition.type === CHECKBOX) {
+      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
+      return (
+        <InputField {...inputFieldProps}>
+          <Checkbox
+            {...inputProps}
+            label={fieldDefinition.label}
+            name={fieldDefinition.name}
+            value={String(value)}
+            selected={(value as string) === checkedValue}
+            onChange={(event: { target: { value: string } }) =>
+              onSetFieldValue(
+                fieldDefinition.name,
+                event.target.value === String(checkedValue)
+                  ? uncheckedValue
+                  : checkedValue
+              )
+            }
+          />
+        </InputField>
+      )
+    }
 
     if (fieldDefinition.type === DATE) {
       return (

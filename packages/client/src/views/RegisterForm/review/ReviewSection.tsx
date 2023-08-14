@@ -16,6 +16,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import {
+  Divider,
   InputField,
   ISelectOption as SelectComponentOptions,
   Text,
@@ -145,7 +146,6 @@ import {
 } from '@client/views/RegisterForm/review/SignatureGenerator'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
-import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -925,7 +925,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       value,
       subtitle:
         fieldType &&
-        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(fieldType),
+        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION_HEADER].includes(fieldType),
       action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
@@ -1301,7 +1301,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field.name,
       value,
       field.readonly ||
-        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION].includes(field.type),
+        [FIELD_GROUP_TITLE, PARAGRAPH, SUBSECTION_HEADER].includes(field.type),
       field.type
     )
   }
@@ -1955,8 +1955,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 {isReviewDeclaration &&
                   getSignature(declaration?.event as Event)}
                 {isReviewDeclaration && this.userHasDeclareScope() && (
-                  <InputWrapper>
-                    <SubSectionDivider label=""></SubSectionDivider>
+                  <Accordion
+                    name="registration_office_select"
+                    label={''}
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
+                    expand={true}
+                  >
+                    <Divider />
                     <RegistrationOfficeSelect
                       value={registrationOffice}
                       onChange={(value: string) => {
@@ -1968,7 +1974,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                           )
                       }}
                     />
-                  </InputWrapper>
+                  </Accordion>
                 )}
                 {totalFileSizeExceeded && (
                   <StyledAlert type="warning">

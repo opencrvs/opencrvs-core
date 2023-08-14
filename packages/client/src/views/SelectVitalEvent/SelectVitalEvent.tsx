@@ -36,6 +36,7 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@client/utils/constants'
+
 import {
   storeDeclaration,
   IDeclaration,
@@ -58,8 +59,8 @@ class SelectVitalEventView extends React.Component<
     storeDeclaration: typeof storeDeclaration
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToDeathInformant: typeof goToDeathInformant
-    goToMarriageInformant: typeof goToMarriageInformant
     user: UserDetails | null
+    goToMarriageInformant: typeof goToMarriageInformant
   }
 > {
   state = {

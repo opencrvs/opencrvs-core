@@ -1173,6 +1173,7 @@ export interface GQLRegistrationInput {
   witnessOneSignature?: string
   witnessTwoSignature?: string
   informantType?: string
+  registrationOffice?: string
   otherInformantType?: string
   contact?: string
   contactRelationship?: string
