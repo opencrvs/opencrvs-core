@@ -25,7 +25,6 @@
               },
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "informantType",
@@ -190,7 +189,6 @@
               "id": "contact-view-group",
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
@@ -3092,7 +3090,6 @@
               },
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "informantType",
@@ -3266,7 +3263,6 @@
               "id": "contact-view-group",
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
@@ -5404,7 +5400,6 @@
               },
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "informantType",
@@ -5485,7 +5480,6 @@
               "id": "contact-view-group",
               "conditionals": [],
               "preventContinueIfError": true,
-              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
