@@ -200,8 +200,10 @@ export default function microservices() {
     console.log(services)
     Object.values(services).forEach((service) => {
       fetch(service.url)
-        .then((res) => {
-          if (res.status === 200) {
+        .then(async (res) => {
+          const responseBody = await res.json()
+
+          if (responseBody.status === 'ok') {
             return setHealthy(service)
           }
 
@@ -277,7 +279,7 @@ export default function microservices() {
       </div>
 
       <Table
-        totalItems={15}
+        totalItems={Object.keys(services).length}
         pageSize={5}
         columns={columns}
         currentPage={currentPage}

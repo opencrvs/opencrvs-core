@@ -26,7 +26,7 @@ export default function dependencies() {
   type ButtonType = 'primary' | 'secondary'
 
   const router = useRouter()
-  const pingUrl = 'http://localhost:7070/ping?service'
+  const pingUrl = 'http://localhost:7070/ping?'
   const columns = [
     { label: 'Service', width: 25, key: 'service' },
     { label: 'Port', width: 20, key: 'port' },
@@ -36,53 +36,53 @@ export default function dependencies() {
   ]
   const [modalState, setModalState] = useState(false)
   const [Running, setRunning] = useState<ButtonType>('secondary')
+  const [currentPage, setCurrentPage] = useState(1)
   const [services, setServices] = useState({
     CountryConfig: {
       name: 'CountryConfig',
-      url: `${pingUrl}=countryconfig`,
+      url: `${pingUrl}service=countryconfig`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Openhim: {
       name: 'Openhim',
-      acceptedStatusCodes: [200, 404],
-      url: `${pingUrl}=openhim`,
+      url: `${pingUrl}service=openhim`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     MongoDB: {
       name: 'MongoDB',
-      url: 'https://stackoverflow.com/questions/37839365/simple-http-tcp-health-check-for-mongodb/37852368#37852368',
+      url: `${pingUrl}dependency=mongodb`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Influx: {
       name: 'Influx',
-      url: `${pingUrl}=influx`,
+      url: `${pingUrl}dependency=influxdb`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Minio: {
       name: 'Minio',
-      url: 'http://localhost:3535/minio/health/cluster',
+      url: `${pingUrl}dependency=minio`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Kibana: {
       name: 'Kibana',
-      url: 'https://kibana.farajaland.opencrvs.org/api/status',
+      url: `${pingUrl}dependency=kibana`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
     },
     Elasticsearch: {
       name: 'Elasticsearch',
-      url: 'http://localhost:9200/_cluster/health',
+      url: `${pingUrl}dependency=elasticsearch`,
       status: 'LOADING',
       type: 'dependency',
       icon: <LoadingGrey />
@@ -132,8 +132,9 @@ export default function dependencies() {
 
     Object.values(services).forEach((service) => {
       fetch(service.url)
-        .then((res) => {
-          if (res.status === 200) {
+        .then(async (res) => {
+          const responseBody = await res.json()
+          if (responseBody.status === 'ok') {
             return setHealthy(service)
           }
 
@@ -210,8 +211,12 @@ export default function dependencies() {
       </div>
 
       <Table
+        totalItems={Object.keys(services).length}
         pageSize={5}
         columns={columns}
+        currentPage={currentPage}
+        isFullPage={true}
+        onPageChange={(page) => setCurrentPage(page)}
         content={Object.values(services).map((service) => ({
           service: service.name,
           port: '3002',
