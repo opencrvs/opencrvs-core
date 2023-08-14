@@ -83,7 +83,7 @@ const SpaceDiv = styled.div`
   height: 16px;
 `
 
-export enum ContentSize {
+enum ContentSize {
   LARGE = 'large',
   NORMAL = 'normal'
 }

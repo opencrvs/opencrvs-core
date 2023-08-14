@@ -25,7 +25,6 @@ import {
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_REG_TYPE_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
@@ -120,12 +119,9 @@ test('should build a minimal FHIR registration document without error', async ()
         nationality: ['BGD'],
         educationalAttainment: 'NO_SCHOOLING'
       },
-      informant: {
-        relationship: 'MOTHER'
-      },
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         contactPhoneNumber: '01733333333',
         paperFormID: '12345678',
         draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
@@ -180,10 +176,8 @@ test('should build a minimal FHIR registration document without error', async ()
                 contentType: 'image/jpg',
                 data: 'data:image/png;base64,2324256'
               },
-              individual: {
-                name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-                identifier: [{ id: '123456', type: 'PASSPORT' }]
-              }
+              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+              identifier: [{ id: '123456', type: 'PASSPORT' }]
             },
             hasShowedVerifiedDocument: true,
             payments: [
@@ -221,7 +215,6 @@ test('should build a minimal FHIR registration document without error', async ()
       birthType: 2,
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
-      birthRegistrationType: 'INFORMANT_ONLY',
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
@@ -233,8 +226,6 @@ test('should build a minimal FHIR registration document without error', async ()
           birthType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283',
           weightAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293',
           attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
-          birthRegistrationType:
-            '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
           childrenBornAliveToMother:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
           foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
@@ -258,7 +249,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[1].resource.name[0].family[0]).toBe('Doe')
   expect(fhir.entry[1].resource.name[0].use).toBe('en')
   expect(fhir.entry[1].resource.identifier[0].value).toBe('123456')
-  expect(fhir.entry[1].resource.identifier[0].type).toBe('OTHER')
+  expect(fhir.entry[1].resource.identifier[0].type.coding[0].code).toBe('OTHER')
   expect(fhir.entry[1].resource.identifier[0].otherType).toBe('Custom type')
   expect(fhir.entry[1].resource.birthDate).toBe('2000-01-28')
   expect(fhir.entry[1].resource.maritalStatus.text).toBe('MARRIED')
@@ -371,9 +362,9 @@ test('should build a minimal FHIR registration document without error', async ()
   /* RelatedPerson Test cases */
 
   /* Task Test cases */
-  expect(fhir.entry[5].resource.resourceType).toBe('Task')
-  expect(fhir.entry[5].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eebce')
-  expect(fhir.entry[5].resource.code).toEqual({
+  expect(fhir.entry[4].resource.resourceType).toBe('Task')
+  expect(fhir.entry[4].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eebce')
+  expect(fhir.entry[4].resource.code).toEqual({
     coding: [
       {
         system: `${OPENCRVS_SPECIFICATION_URL}types`,
@@ -381,27 +372,27 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[5].resource.extension[0]).toEqual({
+  expect(fhir.entry[4].resource.extension[0]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: 'MOTHER'
   })
-  expect(fhir.entry[5].resource.extension[1]).toEqual({
+  expect(fhir.entry[4].resource.extension[1]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: '01733333333'
   })
-  expect(fhir.entry[5].resource.extension[3]).toEqual({
+  expect(fhir.entry[4].resource.extension[3]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`,
     valueInteger: 1234
   })
-  expect(fhir.entry[5].resource.status).toEqual('draft')
-  expect(fhir.entry[5].resource.lastModified).toEqual(
+  expect(fhir.entry[4].resource.status).toEqual('draft')
+  expect(fhir.entry[4].resource.lastModified).toEqual(
     '2018-10-31T09:45:05+10:00'
   )
-  expect(fhir.entry[5].resource.note[0]).toEqual({
+  expect(fhir.entry[4].resource.note[0]).toEqual({
     text: 'This is just a test data',
     time: '2018-10-31T09:40:05+10:00'
   })
-  expect(fhir.entry[5].resource.identifier).toEqual([
+  expect(fhir.entry[4].resource.identifier).toEqual([
     { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
     {
       system: 'http://opencrvs.org/specs/id/draft-id',
@@ -552,7 +543,14 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[10].resource.identifier).toEqual([
     {
       id: '123456',
-      type: 'PASSPORT'
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/identifier-type',
+            code: 'PASSPORT'
+          }
+        ]
+      }
     }
   ])
 
@@ -665,56 +663,49 @@ test('should build a minimal FHIR registration document without error', async ()
       display: 'Birth attendant title'
     }
   ])
+
   expect(fhir.entry[17].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )
-  expect(fhir.entry[17].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[17].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
+  )
+  expect(fhir.entry[17].resource.id).toBe(
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
+  )
+  expect(fhir.entry[17].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[17].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[17].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: BIRTH_REG_TYPE_CODE,
-      display: 'Birth registration type'
-    }
-  ])
-  expect(fhir.entry[18].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
-  )
-  expect(fhir.entry[18].resource.valueQuantity.value).toBe(2)
-  expect(fhir.entry[18].resource.context.reference).toEqual(
-    fhir.entry[12].fullUrl
-  )
-  expect(fhir.entry[18].resource.code.coding).toEqual([
-    {
-      system: 'http://loinc.org',
       code: NUMBER_BORN_ALIVE_CODE,
       display: 'Number born alive to mother'
     }
   ])
-  expect(fhir.entry[19].resource.id).toBe(
+  expect(fhir.entry[18].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
   )
-  expect(fhir.entry[19].resource.valueQuantity.value).toBe(0)
+  expect(fhir.entry[18].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[19].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[19].resource.code.coding).toEqual([
+  expect(fhir.entry[18].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
-  expect(fhir.entry[20].resource.id).toBe(
+  expect(fhir.entry[19].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
   )
-  expect(fhir.entry[20].resource.valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[20].resource.context.reference).toEqual(
+  expect(fhir.entry[19].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[19].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[20].resource.code.coding).toEqual([
+  expect(fhir.entry[19].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,
@@ -800,8 +791,8 @@ test('creates task with contact other relationship', async () => {
     {
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        contact: 'OTHER',
-        contactRelationship: 'Friend',
+        informantType: 'OTHER',
+        otherInformantType: 'Friend',
         contactPhoneNumber: '01733333333',
         paperFormID: '12345678',
         trackingId: 'B123456',
@@ -855,10 +846,8 @@ test('creates task with contact other relationship', async () => {
                 contentType: 'image/jpg',
                 data: 'ExampleData'
               },
-              individual: {
-                name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-                identifier: [{ id: '123456', type: 'PASSPORT' }]
-              }
+              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+              identifier: [{ id: '123456', type: 'PASSPORT' }]
             },
             hasShowedVerifiedDocument: true,
             payments: [
@@ -929,7 +918,7 @@ test('should build bundle for correction fhir builders', async () => {
       },
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        contact: 'MOTHER',
+        informantType: 'MOTHER',
         contactPhoneNumber: '01733333333',
         paperFormID: '12345678',
         draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',

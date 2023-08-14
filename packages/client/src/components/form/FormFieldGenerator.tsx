@@ -34,7 +34,7 @@ import {
   getFieldHelperText
 } from '@client/forms/utils'
 
-import styled, { keyframes } from '@client/styledComponents'
+import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
 import {
   SELECT_WITH_DYNAMIC_OPTIONS,
@@ -46,7 +46,6 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
   TEL,
-  SUBSECTION,
   WARNING,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField,
@@ -62,7 +61,7 @@ import {
   ITextFormField,
   Ii18nTextFormField,
   LINK,
-  LIST,
+  BULLET_LIST,
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
@@ -85,13 +84,15 @@ import {
   IDateRangePickerValue,
   TIME,
   NID_VERIFICATION_BUTTON,
-  INidVerificationButton
+  INidVerificationButton,
+  DIVIDER,
+  HEADING3,
+  SUBSECTION_HEADER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
-import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
+import { SubSectionHeader } from '@client/components/form/SubSectionHeader'
 
-import { FormList } from '@client/components/form/FormList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
@@ -142,6 +143,8 @@ import {
 } from 'react-router'
 import { saveDraftAndRedirectToNidIntegration } from '@client/views/OIDPVerificationCallback/utils'
 import { getDraftsState } from '@client/declarations/selectors'
+import { BulletList, Divider } from '@opencrvs/components'
+import { Heading3 } from '@opencrvs/components/lib/Heading3/Heading3'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -154,11 +157,6 @@ const FormItem = styled.div<{
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '28px'};
-`
-
-const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-top: 16px;
 `
 
 const LocationSearchFormField = styled(LocationSearch)`
@@ -236,105 +234,142 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       mode: fieldDefinition.mode,
       ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
     }
-
-    const intl = useIntl()
-    const onChangeGroupInput = React.useCallback(
-      (val: string) => onSetFieldValue(fieldDefinition.name, val),
-      [fieldDefinition.name, onSetFieldValue]
-    )
-    const isOnline = useOnlineStatus()
-
-    const inputProps = {
+const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
+  ({
+    fieldDefinition,
+    onChange,
+    onBlur,
+    onSetFieldValue,
+    resetDependentSelectValues,
+    resetNestedInputValues,
+    error,
+    touched,
+    value,
+    nestedFields,
+    draftData,
+    disabled,
+    dynamicDispatch,
+    onUploadingStateChanged,
+    setFieldTouched,
+    requiredErrorMessage
+  }) => {
+    const inputFieldProps = {
       id: fieldDefinition.name,
-      onChange,
-      onBlur,
-      value,
-      disabled: fieldDefinition.disabled ?? disabled,
-      error: Boolean(error),
-      touched: Boolean(touched),
-      placeholder: fieldDefinition.placeholder,
+      label: fieldDefinition.label,
+      helperText: fieldDefinition.helperText,
+      tooltip: fieldDefinition.tooltip,
+      description: fieldDefinition.description,
+      required: fieldDefinition.required,
+      disabled: fieldDefinition.disabled,
+      prefix: fieldDefinition.prefix,
+      postfix: fieldDefinition.postfix,
+      unit: fieldDefinition.unit,
+      hideAsterisk: fieldDefinition.hideAsterisk,
+      hideInputHeader: fieldDefinition.hideHeader,
+      error,
+      touched,
+      mode: fieldDefinition.mode,
       ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
     }
-    if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
-      return (
-        <InputField {...inputFieldProps}>
-          <Select
+
+      const intl = useIntl()
+      const onChangeGroupInput = React.useCallback(
+        (val: string) => onSetFieldValue(fieldDefinition.name, val),
+        [fieldDefinition.name, onSetFieldValue]
+      )
+      const isOnline = useOnlineStatus()
+
+      const inputProps = {
+        id: fieldDefinition.name,
+        onChange,
+        onBlur,
+        value,
+        disabled: fieldDefinition.disabled ?? disabled,
+        error: Boolean(error),
+        touched: Boolean(touched),
+        placeholder: fieldDefinition.placeholder,
+        ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
+      }
+      if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
+        return (
+          <InputField {...inputFieldProps}>
+            <Select
+              {...inputProps}
+              isDisabled={fieldDefinition.disabled}
+              value={value as string}
+              onChange={(val: string) => {
+                resetDependentSelectValues(fieldDefinition.name)
+                onSetFieldValue(fieldDefinition.name, val)
+              }}
+              onFocus={() =>
+                handleSelectFocus(
+                  fieldDefinition.name,
+                  fieldDefinition.options.length > 10
+                )
+              }
+              options={fieldDefinition.options}
+            />
+          </InputField>
+        )
+      }
+      if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+        return (
+          <DocumentUploaderWithOption
             {...inputProps}
-            isDisabled={fieldDefinition.disabled}
-            value={value as string}
-            onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
-              onSetFieldValue(fieldDefinition.name, val)
-            }}
-            onFocus={() =>
-              handleSelectFocus(
-                fieldDefinition.name,
-                fieldDefinition.options.length > 10
-              )
-            }
-            options={fieldDefinition.options}
-          />
-        </InputField>
-      )
-    }
-    if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-      return (
-        <DocumentUploaderWithOption
-          {...inputProps}
-          name={fieldDefinition.name}
-          label={fieldDefinition.label}
-          options={fieldDefinition.options}
-          splitView={fieldDefinition.splitView}
-          files={value as IFileValue[]}
-          extraValue={fieldDefinition.extraValue || ''}
-          hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-          onComplete={(files: IFileValue[]) => {
-            onSetFieldValue(fieldDefinition.name, files)
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-          }}
-          onUploadingStateChanged={onUploadingStateChanged}
-          requiredErrorMessage={requiredErrorMessage}
-        />
-      )
-    }
-    if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
-      return (
-        <SimpleDocumentUploader
-          {...inputProps}
-          name={fieldDefinition.name}
-          label={fieldDefinition.label}
-          description={fieldDefinition.description}
-          allowedDocType={fieldDefinition.allowedDocType}
-          files={value as IAttachmentValue}
-          error={error}
-          onComplete={(file) => {
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-            onSetFieldValue(fieldDefinition.name, file)
-          }}
-          onUploadingStateChanged={onUploadingStateChanged}
-          requiredErrorMessage={requiredErrorMessage}
-        />
-      )
-    }
-    if (fieldDefinition.type === RADIO_GROUP) {
-      return (
-        <InputField {...inputFieldProps}>
-          <RadioGroup
-            {...inputProps}
-            size={fieldDefinition.size}
-            onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
-              onSetFieldValue(fieldDefinition.name, val)
-            }}
-            options={fieldDefinition.options}
             name={fieldDefinition.name}
-            value={value as string}
-            notice={fieldDefinition.notice}
-            flexDirection={fieldDefinition.flexDirection}
+            label={fieldDefinition.label}
+            options={fieldDefinition.options}
+            splitView={fieldDefinition.splitView}
+            files={value as IFileValue[]}
+            extraValue={fieldDefinition.extraValue || ''}
+            hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
+            onComplete={(files: IFileValue[]) => {
+              onSetFieldValue(fieldDefinition.name, files)
+              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            }}
+            onUploadingStateChanged={onUploadingStateChanged}
+            requiredErrorMessage={requiredErrorMessage}
           />
-        </InputField>
-      )
-    }
+        )
+      }
+      if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
+        return (
+          <SimpleDocumentUploader
+            {...inputProps}
+            name={fieldDefinition.name}
+            label={fieldDefinition.label}
+            description={fieldDefinition.description}
+            allowedDocType={fieldDefinition.allowedDocType}
+            files={value as IAttachmentValue}
+            error={error}
+            onComplete={(file) => {
+              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+              onSetFieldValue(fieldDefinition.name, file)
+            }}
+            onUploadingStateChanged={onUploadingStateChanged}
+            requiredErrorMessage={requiredErrorMessage}
+          />
+        )
+      }
+      if (fieldDefinition.type === RADIO_GROUP) {
+        return (
+          <InputField {...inputFieldProps}>
+            <RadioGroup
+              {...inputProps}
+              size={fieldDefinition.size}
+              onChange={(val: string) => {
+                resetDependentSelectValues(fieldDefinition.name)
+                onSetFieldValue(fieldDefinition.name, val)
+              }}
+              options={fieldDefinition.options}
+              name={fieldDefinition.name}
+              value={value as string}
+              notice={fieldDefinition.notice}
+              flexDirection={fieldDefinition.flexDirection}
+            />
+          </InputField>
+        )
+      }
 
     if (
       fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
@@ -364,56 +399,56 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
-      return (
-        <InformativeRadioGroup
-          inputProps={inputProps}
-          value={value as string}
-          onSetFieldValue={onSetFieldValue}
-          fieldDefinition={fieldDefinition}
-          inputFieldProps={inputFieldProps}
-        />
-      )
-    }
-
-    if (fieldDefinition.type === CHECKBOX_GROUP) {
-      return (
-        <InputField {...inputFieldProps}>
-          <CheckboxGroup
-            {...inputProps}
-            options={fieldDefinition.options}
-            name={fieldDefinition.name}
-            value={value as string[]}
-            onChange={(val: string[]) =>
-              onSetFieldValue(fieldDefinition.name, val)
-            }
+      if (fieldDefinition.type === INFORMATIVE_RADIO_GROUP) {
+        return (
+          <InformativeRadioGroup
+            inputProps={inputProps}
+            value={value as string}
+            onSetFieldValue={onSetFieldValue}
+            fieldDefinition={fieldDefinition}
+            inputFieldProps={inputFieldProps}
           />
-        </InputField>
-      )
-    }
+        )
+      }
 
-    if (fieldDefinition.type === CHECKBOX) {
-      const { checkedValue = true, uncheckedValue = false } = fieldDefinition
-      return (
-        <InputField {...inputFieldProps}>
-          <Checkbox
-            {...inputProps}
-            label={fieldDefinition.label}
-            name={fieldDefinition.name}
-            value={String(value)}
-            selected={(value as string) === checkedValue}
-            onChange={(event: { target: { value: string } }) =>
-              onSetFieldValue(
-                fieldDefinition.name,
-                event.target.value === String(checkedValue)
-                  ? uncheckedValue
-                  : checkedValue
-              )
-            }
-          />
-        </InputField>
-      )
-    }
+      if (fieldDefinition.type === CHECKBOX_GROUP) {
+        return (
+          <InputField {...inputFieldProps}>
+            <CheckboxGroup
+              {...inputProps}
+              options={fieldDefinition.options}
+              name={fieldDefinition.name}
+              value={value as string[]}
+              onChange={(val: string[]) =>
+                onSetFieldValue(fieldDefinition.name, val)
+              }
+            />
+          </InputField>
+        )
+      }
+
+      if (fieldDefinition.type === CHECKBOX) {
+        const { checkedValue = true, uncheckedValue = false } = fieldDefinition
+        return (
+          <InputField {...inputFieldProps}>
+            <Checkbox
+              {...inputProps}
+              label={fieldDefinition.label}
+              name={fieldDefinition.name}
+              value={String(value)}
+              selected={(value as string) === checkedValue}
+              onChange={(event: { target: { value: string } }) =>
+                onSetFieldValue(
+                  fieldDefinition.name,
+                  event.target.value === String(checkedValue)
+                    ? uncheckedValue
+                    : checkedValue
+                )
+              }
+            />
+          </InputField>
+        )
+      }
 
     if (fieldDefinition.type === DATE) {
       return (
@@ -479,16 +514,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
-    if (fieldDefinition.type === SUBSECTION) {
+    if (fieldDefinition.type === DIVIDER) {
+      return <Divider />
+    }
+    if (fieldDefinition.type === HEADING3) {
+      return <Heading3>{fieldDefinition.label}</Heading3>
+    }
+    if (fieldDefinition.type === SUBSECTION_HEADER) {
       return (
-        <SubSectionDivider
-          label={fieldDefinition.label}
-          required={inputFieldProps.required}
-        />
+        <>
+          <SubSectionHeader label={fieldDefinition.label} />
+          <Divider />
+        </>
       )
     }
     if (fieldDefinition.type === FIELD_GROUP_TITLE) {
-      return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
+      return <Heading3>{fieldDefinition.label}</Heading3>
     }
     if (fieldDefinition.type === PARAGRAPH) {
       const label = fieldDefinition.label as unknown as MessageDescriptor
@@ -504,8 +545,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </Text>
       )
     }
-    if (fieldDefinition.type === LIST) {
-      return <FormList {...inputProps} list={fieldDefinition.items} />
+    if (fieldDefinition.type === BULLET_LIST) {
+      return (
+        <BulletList
+          font={'reg16'}
+          {...inputProps}
+          items={fieldDefinition.items}
+        />
+      )
     }
     if (fieldDefinition.type === NUMBER) {
       let inputFieldWidth = fieldDefinition.inputFieldWidth
@@ -991,7 +1038,7 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === DYNAMIC_LIST
               ? ({
                   ...field,
-                  type: LIST,
+                  type: BULLET_LIST,
                   items: getFieldOptionsByValueMapper(
                     field as IDynamicListFormField,
                     draftData as IFormData,

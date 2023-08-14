@@ -447,6 +447,9 @@ const dummyBirthRegistrationResponse = {
       comments: [],
       input: [],
       output: [],
+      signature: {
+        data: signatureImage
+      },
       certificates: null,
       __typename: 'History'
     },
@@ -1414,6 +1417,9 @@ const dummyDeathRegistrationResponse = {
       comments: [],
       input: [],
       output: [],
+      signature: {
+        data: signatureImage
+      },
       certificates: null,
       __typename: 'History'
     },

@@ -181,13 +181,6 @@ describe('Verify handler', () => {
         .spyOn(require('./utils'), 'sendEventNotification')
         .mockReturnValue('')
 
-      jest
-        .spyOn(
-          require('../../utils/formDraftUtils'),
-          'checkFormDraftStatusToAddTestExtension'
-        )
-        .mockReturnValue('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -1080,6 +1073,10 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     )
     fetch.resetMocks()
     server = await createServer()
+
+    jest
+      .spyOn(require('./fhir/fhir-utils'), 'getInformantName')
+      .mockReturnValue('informant name')
   })
 
   it('returns error', async () => {

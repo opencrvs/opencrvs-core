@@ -93,6 +93,7 @@ export interface IUserPayload
   id?: string
   identifiers: GQLUserIdentifierInput[]
   systemRole: string
+  password?: string
   role: string
   title: string
   signature?: GQLSignatureInput
@@ -248,6 +249,18 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    }
+  },
+
+  Avatar: {
+    data(avatar: IAvatar, _, { dataSources }) {
+      if (avatar.data) {
+        const staticData = dataSources.minioAPI.getStaticData(avatar.data)
+        return staticData.then((data) => {
+          return data.presignedURL
+        })
+      }
+      return null
     }
   }
 }

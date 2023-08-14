@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IDuplicateDeclarationMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  duplicateDeclarationDetails: MessageDescriptor
   duplicateReviewHeader: MessageDescriptor
   duplicateContentTitle: MessageDescriptor
   duplicateContentSubtitle: MessageDescriptor
@@ -23,6 +24,11 @@ interface IDuplicateDeclarationMessages
 }
 
 const messagesToDefine: IDuplicateDeclarationMessages = {
+  duplicateDeclarationDetails: {
+    id: 'duplicates.content.header',
+    defaultMessage: 'Declaration Details',
+    description: 'Declaration details header of two duplicate ones'
+  },
   duplicateReviewHeader: {
     id: 'duplicates.review.header',
     defaultMessage: 'Potential {event} duplicate review',

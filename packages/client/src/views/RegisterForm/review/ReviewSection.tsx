@@ -23,12 +23,13 @@ import {
 } from '@opencrvs/components/lib/'
 
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Accordion } from '@opencrvs/components/lib/Accordion'
+import { Link } from '@opencrvs/components/lib/Link'
 import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@opencrvs/components/lib/DocumentViewer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -36,11 +37,9 @@ import {
 } from '@client/declarations'
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
-  BirthSection,
   CHECKBOX,
   CHECKBOX_GROUP,
   DATE,
-  DeathSection,
   DOCUMENT_UPLOADER_WITH_OPTION,
   FETCH_BUTTON,
   FIELD_GROUP_TITLE,
@@ -62,32 +61,29 @@ import {
   IPreviewGroup,
   IRadioOption,
   ISelectOption,
-  LIST,
+  BULLET_LIST,
   LOCATION_SEARCH_INPUT,
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   REVIEW_OVERRIDE_POSITION,
-  Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
   NID_VERIFICATION_BUTTON,
-  SUBSECTION,
-  WARNING
+  WARNING,
+  SUBSECTION_HEADER,
+  DIVIDER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   getBirthSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
-import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
-import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
   getListOfLocations,
   getSectionFields,
-  getSelectedInformantAndContactType,
   getVisibleSectionGroupsBasedOnConditions,
   renderSelectOrRadioLabel
 } from '@client/forms/utils'
@@ -114,18 +110,12 @@ import {
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Scope } from '@client/utils/authUtils'
-import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
-import {
-  ACCUMULATED_FILE_SIZE,
-  ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
-  REJECTED
-} from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { clone, flatten, flattenDeep, get, isArray } from 'lodash'
-import { findDOMNode } from 'react-dom'
 import {
   injectIntl,
   IntlShape,
@@ -149,7 +139,6 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
-import { marriageSectionMapping } from '@client/forms/register/fieldMappings/marriage/mutation/documents-mappings'
 import {
   SignatureGenerator,
   SignatureInputProps
@@ -158,6 +147,8 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { RegistrationOfficeSelect } from '@client/views/RegisterForm/review/RegistrationOfficeSelect'
 import { SubSectionDivider } from '@client/components/form/SubSectionDivider'
 import { UserDetails } from '@client/utils/userUtils'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -172,65 +163,55 @@ export const RequiredField = styled.span`
   }
 `
 
-export const ErrorField = styled.p`
+const ErrorField = styled.p`
   margin-top: 0;
   margin-bottom: 0;
 `
 
 const Row = styled.div`
   display: flex;
-  flex: 1;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.background};
+  flex-direction: row;
+  padding: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
   }
 `
+const Wrapper = styled.div``
+
 const RightColumn = styled.div`
   width: 40%;
   border-radius: 4px;
-  margin-left: 24px;
-
-  &:first-child {
-    margin-left: 0;
-  }
-
-  &:last-child {
-    margin-right: -24px;
-  }
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
-const Items = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-`
 const LeftColumn = styled.div`
-  width: 60%;
+  flex-grow: 1;
+  max-width: 840px;
   margin-bottom: 200px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
 
-  &:first-child {
-    margin-left: 0;
-  }
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 100%;
-    margin-bottom: 0;
-  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
+    margin: 0;
   }
 `
 
 export const ZeroDocument = styled.div`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.bold16};
+  height: 700px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
@@ -247,46 +228,38 @@ const FooterArea = styled.div`
 `
 
 const FormData = styled.div`
+  padding-top: 24px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  padding: 32px;
-  border-radius: 4px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 24px;
+  }
+`
+const ReviewContainter = styled.div`
+  padding: 0px 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0px 24px;
   }
 `
 const StyledAlert = styled(Alert)`
   margin-top: 24px;
 `
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  ${({ theme }) => theme.fonts.h3};
-  padding: 16px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-`
+const DeclarationDataContainer = styled.div``
+
 const Label = styled.span<{ section?: boolean }>`
   ${({ theme, section }) => {
     return section ? theme.fonts.bold18 : theme.fonts.bold16
   }};
 `
+const StyledLabel = styled.span`
+  ${({ theme }) => theme.fonts.h3}
+`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
-const SectionContainer = styled.div`
-  margin-bottom: 40px;
-`
 
 const DocumentListPreviewContainer = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: block;
-  }
-`
-
-const InputWrapper = styled.div`
-  margin-top: 56px;
+  display: block;
 `
 
 type onChangeReviewForm = (
@@ -323,7 +296,6 @@ type State = {
   editClickedSectionId: string
   editClickedSectionGroupId: string
   editClickFieldName: string
-  activeSection: Section | null
   previewImage: IFileValue | null
 }
 
@@ -654,12 +626,6 @@ export const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-export const SECTION_MAPPING = {
-  [Event.Birth]: birthSectionMapping,
-  [Event.Death]: deathSectionMapping,
-  [Event.Marriage]: marriageSectionMapping
-}
-
 enum SignatureSectionType {
   INFORMANT_SIGNATURE = 'informantsSignature',
   BRIDE_SIGNATURE = 'brideSignature',
@@ -679,23 +645,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       editClickedSectionGroupId: '',
       editClickFieldName: '',
       editClickedSectionId: '',
-      activeSection: null,
       previewImage: null
     }
   }
 
   UNSAFE_componentWillUpdate() {
     this.hasChangesBeenMade = false
-  }
-
-  componentDidMount() {
-    !isMobileDevice() &&
-      ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-      window.addEventListener('scroll', this.onScroll)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll)
   }
 
   getVisibleSections = (formSections: IFormSection[]) => {
@@ -717,55 +672,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
 
     return this.getVisibleSections(sections)
-  }
-
-  getDocumentSections = (registerForm: IForm): IFormSection[] => {
-    const sections = registerForm.sections.filter(
-      ({ hasDocumentSection }) => hasDocumentSection
-    )
-
-    return this.getVisibleSections(sections)
-  }
-
-  docSections = this.getDocumentSections(
-    this.props.registerForm[this.props.draft.event]
-  )
-
-  onScroll = () => {
-    const scrollY = window.scrollY + window.innerHeight / 2
-    let minDistance = 100000
-    let sectionYTop = 0
-    let sectionYBottom = 0
-    let distance = 0
-    let sectionElement: HTMLElement
-    let activeSection = this.state.activeSection
-
-    // TODO: Refactor "findDOMNode" away, as it's deprecated
-    // eslint-disable-next-line react/no-find-dom-node
-    const node = findDOMNode(this) as HTMLElement
-
-    this.docSections.forEach((section: IFormSection) => {
-      sectionElement = node.querySelector(
-        '#Section_' + section.id
-      ) as HTMLElement
-      sectionYTop = sectionElement.offsetTop
-      sectionYBottom = sectionElement.offsetTop + sectionElement.offsetHeight
-
-      distance = Math.abs(sectionYTop - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-
-      distance = Math.abs(sectionYBottom - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-    })
-    this.setState({
-      activeSection
-    })
   }
 
   getLabelForDoc = (docForWhom: string, docType: string) => {
@@ -796,10 +702,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
   getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
-    const options = this.prepSectionDocsBasedOnScrollFlag(
-      declaration,
-      this.state.activeSection || this.docSections[0].id
-    )
+    const options = this.prepSectionDocOptions(declaration)
 
     return (
       <DocumentListPreviewContainer>
@@ -814,37 +717,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
-  prepSectionDocsBasedOnScrollFlag = (
-    draft: IDeclaration,
-    activeSection: Section
+  prepSectionDocOptions = (
+    draft: IDeclaration
   ): IDocumentViewerOptions & {
     uploadedDocuments: IFileValue[]
   } => {
-    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
-      let selectOptions: SelectComponentOptions[] = []
-      let documentOptions: SelectComponentOptions[] = []
-      let uploadedDocuments: IFileValue[] = []
-      for (const section of this.docSections) {
-        const prepDocumentOption = this.prepSectionDocuments(draft, section.id)
-        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
-        documentOptions = [
-          ...documentOptions,
-          ...prepDocumentOption.documentOptions
-        ]
-        uploadedDocuments = [
-          ...uploadedDocuments,
-          ...prepDocumentOption.uploadedDocuments
-        ]
-      }
-      return { selectOptions, documentOptions, uploadedDocuments }
-    } else {
-      return this.prepSectionDocuments(draft, activeSection)
-    }
+    let selectOptions: SelectComponentOptions[] = []
+    let documentOptions: SelectComponentOptions[] = []
+    let uploadedDocuments: IFileValue[] = []
+
+    const prepDocumentOption = this.prepSectionDocuments(draft)
+    selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+    documentOptions = [
+      ...documentOptions,
+      ...prepDocumentOption.documentOptions
+    ]
+    uploadedDocuments = [
+      ...uploadedDocuments,
+      ...prepDocumentOption.uploadedDocuments
+    ]
+    return { selectOptions, documentOptions, uploadedDocuments }
   }
 
   prepSectionDocuments = (
-    draft: IDeclaration,
-    activeSection: Section
+    draft: IDeclaration
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const { documentsSection } = this.props
 
@@ -864,38 +760,28 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
-      const sectionMapping = SECTION_MAPPING[draft.event]
+      const label =
+        this.getLabelForDoc(
+          document.optionValues[0] as string,
+          document.optionValues[1] as string
+        ) || (document.optionValues[1] as string)
 
-      const allowedDocumentType: string[] =
-        sectionMapping[activeSection as keyof typeof sectionMapping] || []
-
-      if (
-        allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
-      ) {
-        const label =
-          this.getLabelForDoc(
-            document.optionValues[0] as string,
-            document.optionValues[1] as string
-          ) || (document.optionValues[1] as string)
-
-        /**
-         * Skip insertion if the value already exist
-         */
-        if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
-          return true
-        }
-
-        documentOptions.push({
-          value: document.data,
-          label
-        })
-        selectOptions.push({
-          value: label,
-          label
-        })
+      /**
+       * Skip insertion if the value already exist
+       */
+      if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
         return true
       }
-      return false
+
+      documentOptions.push({
+        value: document.data,
+        label
+      })
+      selectOptions.push({
+        value: label,
+        label
+      })
+      return true
     })
 
     return {
@@ -929,10 +815,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const { draft, pageRoute, goToPageGroup } = this.props
     const declaration = draft
     declaration.review = true
-    writeDeclaration(declaration)
     goToPageGroup(
       pageRoute,
       declaration.id,
@@ -996,7 +881,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, WARNING, SUBSECTION, FETCH_BUTTON].find(
+    return [BULLET_LIST, PARAGRAPH, WARNING, DIVIDER, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -1036,6 +921,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     return {
       label: intl.formatMessage(fieldLabel),
+      type: group.fields.find((field) => field.name === fieldName)?.type,
       value,
       subtitle:
         fieldType &&
@@ -1220,7 +1106,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
         .filter((value) => value)
-
       let completeValue = values[0]
       values.shift()
       values.forEach(
@@ -1629,8 +1514,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
     return (
       event === Event.Birth &&
-      ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
-        (section.id === BirthSection.Father && !!data.father?.detailsExist))
+      ((section.id === 'mother' && !!data.mother?.detailsExist) ||
+        (section.id === 'father' && !!data.father?.detailsExist))
     )
   }
 
@@ -1638,8 +1523,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const { registerForm, draft: declaration } = this.props
     const fields = registerForm[declaration.event].sections.find((section) =>
       declaration.event === Event.Birth
-        ? section.id === BirthSection.Child
-        : section.id === DeathSection.Deceased
+        ? section.id === 'child'
+        : section.id === 'deceased'
     )?.groups[0]?.fields
     if (!fields) return false
     return (
@@ -1728,7 +1613,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item),
         action: this.shouldShowChangeAll(section)
           ? {
@@ -1776,12 +1661,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
-    const disableSubmit = Boolean(
-      errorsOnFields.registration?.contactPoint?.nestedFields?.registrationPhone
-        ?.length > 0 ||
-        errorsOnFields.registration?.contactPoint?.errors.length !== 0
-    )
-
     const isSignatureMissing = () => {
       if (isCorrection(declaration)) {
         return false
@@ -1823,7 +1702,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
-    const sectionName = this.state.activeSection || this.docSections[0].id
     const informantName = getDraftInformantFullName(
       declaration,
       intl.locale,
@@ -1877,10 +1755,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
         return (
           <>
-            <SignatureGenerator
-              description={intl.formatMessage(messages.signatureDescription)}
-              {...informantsSignatureInputPros}
-            />
+            <Accordion
+              name="signatures"
+              label="Signatures"
+              labelForHideAction={intl.formatMessage(messages.hideLabel)}
+              labelForShowAction={intl.formatMessage(messages.showLabel)}
+              expand={true}
+            >
+              <SignatureGenerator
+                description={intl.formatMessage(messages.signatureDescription)}
+                {...informantsSignatureInputPros}
+              />
+            </Accordion>
           </>
         )
       } else if ([Event.Marriage].includes(eventType)) {
@@ -1933,99 +1819,128 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       !isCorrection(declaration) && !isDuplicate && !viewRecord
 
     return (
-      <FullBodyContent>
+      <Wrapper>
         <Row>
           <LeftColumn>
             {!isCorrection(declaration) && isDuplicate && (
               <DuplicateForm declaration={declaration} />
             )}
-            <Items>
-              <ReviewHeader
-                id="review_header"
-                logoSource={
-                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
-                }
-                title={intl.formatMessage(messages.govtName)}
-                subject={
-                  informantName
-                    ? intl.formatMessage(messages.headerSubjectWithName, {
-                        eventType: event,
-                        name: informantName
-                      })
-                    : intl.formatMessage(messages.headerSubjectWithoutName, {
-                        eventType: event
-                      })
-                }
-              />
-              <FormData>
-                {transformedSectionData.map((sec, index) => {
-                  const { uploadedDocuments, selectOptions } =
-                    this.prepSectionDocuments(declaration, sec.id)
-                  return (
-                    <SectionContainer key={index}>
-                      {sec.title && (
-                        <Title>
-                          {sec.title}
-                          {sec.action && (
-                            <LinkButton onClick={sec.action.handler}>
-                              {sec.action.label}
-                            </LinkButton>
+            <ReviewHeader
+              id="review_header"
+              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+              title={intl.formatMessage(messages.govtName)}
+              subject={
+                informantName
+                  ? intl.formatMessage(messages.headerSubjectWithName, {
+                      eventType: event,
+                      name: informantName
+                    })
+                  : intl.formatMessage(messages.headerSubjectWithoutName, {
+                      eventType: event
+                    })
+              }
+            />
+            <FormData>
+              <ReviewContainter>
+                {transformedSectionData
+                  .filter((sec) => sec.items.length > 0)
+                  .map((sec, index) => {
+                    return (
+                      <DeclarationDataContainer key={index}>
+                        <Accordion
+                          name={sec.id}
+                          label={sec.title}
+                          action={
+                            sec.action && (
+                              <Link font="reg16" onClick={sec.action.handler}>
+                                {sec.action.label}
+                              </Link>
+                            )
+                          }
+                          labelForHideAction={intl.formatMessage(
+                            messages.hideLabel
                           )}
-                        </Title>
-                      )}
-                      {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
-                        <DocumentListPreviewContainer>
-                          <DocumentListPreview
-                            id={sec.id}
-                            documents={uploadedDocuments}
-                            onSelect={this.selectForPreview}
-                            dropdownOptions={selectOptions}
-                            inReviewSection={true}
-                          />
-                        </DocumentListPreviewContainer>
-                      )}
-                      <ListViewSimplified id={'Section_' + sec.id}>
-                        {sec.items.map((item, index) => {
-                          return (
-                            <ListViewItemSimplified
-                              key={index}
-                              label={
-                                <Label section={item.subtitle}>
-                                  {item.label}
-                                </Label>
-                              }
-                              value={
-                                <Value id={item.label.split(' ')[0]}>
-                                  {item.value}
-                                </Value>
-                              }
-                              actions={
-                                !item?.action?.disabled && (
-                                  <LinkButton
-                                    id={item.action.id}
-                                    disabled={item.action.disabled}
-                                    onClick={item.action.handler}
-                                  >
-                                    {item.action.label}
-                                  </LinkButton>
-                                )
-                              }
-                            />
+                          labelForShowAction={intl.formatMessage(
+                            messages.showLabel
+                          )}
+                          expand={true}
+                        >
+                          <ListViewSimplified id={'Section_' + sec.id}>
+                            {sec.items.map((item, index) => {
+                              return (
+                                <ListViewItemSimplified
+                                  key={index}
+                                  label={
+                                    item.type === SUBSECTION_HEADER ? (
+                                      <StyledLabel>{item.label}</StyledLabel>
+                                    ) : (
+                                      <Label section={item.subtitle}>
+                                        {item.label}
+                                      </Label>
+                                    )
+                                  }
+                                  value={
+                                    <Value id={item.label.split(' ')[0]}>
+                                      {item.value}
+                                    </Value>
+                                  }
+                                  actions={
+                                    !item?.action?.disabled && (
+                                      <LinkButton
+                                        id={item.action.id}
+                                        disabled={item.action.disabled}
+                                        onClick={item.action.handler}
+                                      >
+                                        {item.action.label}
+                                      </LinkButton>
+                                    )
+                                  }
+                                />
+                              )
+                            })}
+                          </ListViewSimplified>
+                        </Accordion>
+                      </DeclarationDataContainer>
+                    )
+                  })}
+                <Accordion
+                  name="supporting-documents"
+                  label={intl.formatMessage(messages.supportingDocuments)}
+                  labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                  labelForShowAction={intl.formatMessage(messages.showLabel)}
+                  action={
+                    viewRecord || isDuplicate ? null : (
+                      <Link
+                        font="reg16"
+                        element="button"
+                        onClick={() =>
+                          this.editLinkClickHandlerForDraft(
+                            documentsSection.id,
+                            documentsSection.groups[0].id!
                           )
-                        })}
-                      </ListViewSimplified>
-                    </SectionContainer>
-                  )
-                })}
-                {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                  this.getAllAttachmentInPreviewList(declaration)}
+                        }
+                      >
+                        {intl.formatMessage(messages.editDocuments)}
+                      </Link>
+                    )
+                  }
+                  expand={true}
+                >
+                  {this.getAllAttachmentInPreviewList(declaration)}
+                </Accordion>
+
                 {(!isCorrection(declaration) || viewRecord) && (
-                  <InputWrapper>
+                  <Accordion
+                    name="additional_comments"
+                    label={intl.formatMessage(messages.additionalComments)}
+                    labelForHideAction={intl.formatMessage(messages.hideLabel)}
+                    labelForShowAction={intl.formatMessage(messages.showLabel)}
+                    expand={true}
+                  >
                     <InputField
                       id="additional_comments"
                       touched={false}
                       required={false}
-                      label={intl.formatMessage(messages.additionalComments)}
                     >
                       <TextArea
                         {...{
@@ -2034,7 +1949,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         }}
                       />
                     </InputField>
-                  </InputWrapper>
+                  </Accordion>
                 )}
 
                 {isReviewDeclaration &&
@@ -2062,81 +1977,64 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   </StyledAlert>
                 )}
-                {viewRecord || isDuplicate ? null : (
-                  <>
-                    {!isCorrection(declaration) ? (
-                      <>
-                        {isDuplicate && (
-                          <DuplicateWarning
-                            duplicateIds={declaration.duplicates?.map(
-                              (duplicate) => duplicate.compositionId
-                            )}
-                          />
-                        )}
-                        <ReviewAction
-                          completeDeclaration={isComplete}
-                          totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
-                          alreadyRejectedDeclaration={
-                            this.props.draft.registrationStatus === REJECTED
-                          }
-                          draftDeclaration={draft}
-                          declaration={declaration}
-                          submitDeclarationAction={submitClickEvent}
-                          rejectDeclarationAction={rejectDeclarationClickEvent}
-                          disableSubmit={disableSubmit}
+              </ReviewContainter>
+              {viewRecord || isDuplicate ? null : (
+                <>
+                  {!isCorrection(declaration) ? (
+                    <>
+                      {isDuplicate && (
+                        <DuplicateWarning
+                          duplicateIds={declaration.duplicates?.map(
+                            (duplicate) => duplicate.compositionId
+                          )}
                         />
-                      </>
-                    ) : (
-                      <FooterArea>
-                        <PrimaryButton
-                          id="continue_button"
-                          onClick={onContinue}
-                          disabled={!isComplete || !this.hasChangesBeenMade}
-                        >
-                          {intl.formatMessage(buttonMessages.continueButton)}
-                        </PrimaryButton>
-                      </FooterArea>
-                    )}
-                  </>
-                )}
-              </FormData>
-            </Items>
+                      )}
+                      <ReviewAction
+                        completeDeclaration={isComplete}
+                        totalFileSizeExceeded={totalFileSizeExceeded}
+                        declarationToBeValidated={this.userHasValidateScope()}
+                        declarationToBeRegistered={this.userHasRegisterScope()}
+                        alreadyRejectedDeclaration={
+                          this.props.draft.registrationStatus === REJECTED
+                        }
+                        draftDeclaration={draft}
+                        declaration={declaration}
+                        submitDeclarationAction={submitClickEvent}
+                        rejectDeclarationAction={rejectDeclarationClickEvent}
+                      />
+                    </>
+                  ) : (
+                    <FooterArea>
+                      <Button
+                        type="primary"
+                        size="large"
+                        id="continue_button"
+                        onClick={onContinue}
+                        disabled={!isComplete || !this.hasChangesBeenMade}
+                      >
+                        <Icon name="Target" />
+                        {intl.formatMessage(buttonMessages.continueButton)}
+                      </Button>
+                    </FooterArea>
+                  )}
+                </>
+              )}
+            </FormData>
           </LeftColumn>
           <RightColumn>
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer
-                id={'document_section_' + this.state.activeSection}
-                key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocsBasedOnScrollFlag(
-                  declaration,
-                  this.state.activeSection || this.docSections[0].id
-                )}
+                id="document_section"
+                options={this.prepSectionDocOptions(declaration)}
               >
-                <ZeroDocument id={`zero_document_${sectionName}`}>
-                  {ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    intl.formatMessage(messages.zeroDocumentsText, {
-                      section: sectionName
-                    })}
-                  {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
+                <ZeroDocument id={`zero_document`}>
+                  {intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
                   {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"
-                      disabled={
-                        isCorrection(declaration) ||
-                        motherDoesNotExistAndStateIsMother(
-                          declaration,
-                          sectionName
-                        ) ||
-                        fatherDoesNotExistAndStateIsFather(
-                          declaration,
-                          sectionName
-                        )
-                      }
+                      disabled={isCorrection(declaration)}
                       onClick={() =>
                         this.editLinkClickHandlerForDraft(
                           documentsSection.id,
@@ -2192,7 +2090,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             disableDelete={true}
           />
         )}
-      </FullBodyContent>
+      </Wrapper>
     )
   }
 }
@@ -2218,42 +2116,11 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   return readyOnlyField
 }
 
-function motherDoesNotExistAndStateIsMother(
-  declaration: IDeclaration,
-  activeState: string
-) {
-  const selectedInformantAndContactType = getSelectedInformantAndContactType(
-    declaration.data
-  )
-
-  return (
-    !Boolean(declaration.data.mother?.detailsExist) &&
-    activeState === 'mother' &&
-    selectedInformantAndContactType.selectedInformantType !== 'MOTHER' &&
-    selectedInformantAndContactType.selectedContactType !== 'MOTHER'
-  )
-}
-
-function fatherDoesNotExistAndStateIsFather(
-  declaration: IDeclaration,
-  activeState: string
-) {
-  const selectedInformantAndContactType = getSelectedInformantAndContactType(
-    declaration.data
-  )
-  return (
-    !Boolean(declaration.data.father?.detailsExist) &&
-    activeState === 'father' &&
-    selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
-    selectedInformantAndContactType.selectedContactType !== 'FATHER'
-  )
-}
-
 export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
-    registrationSection: getBirthSection(state, BirthSection.Registration),
-    documentsSection: getBirthSection(state, BirthSection.Documents),
+    registrationSection: getBirthSection(state, 'registration'),
+    documentsSection: getBirthSection(state, 'documents'),
     scope: getScope(state),
     offlineCountryConfiguration: getOfflineData(state),
     language: getLanguage(state),

@@ -69,14 +69,18 @@ export interface IDeclarationData {
   placeOfBirth?: string
   placeOfDeath?: string
   placeOfMarriage?: string
-  informant?: string
-  informantContact?: string
+  informant?: IInformantInfo
   registrationNo?: string
   nid?: string
   assignment?: GQLAssignmentData
 }
 
-export interface IGQLDeclaration {
+interface IInformantInfo {
+  registrationEmail?: string
+  registrationPhone?: string
+}
+
+interface IGQLDeclaration {
   id: string
   child?: { name: Array<GQLHumanName | null> }
   deceased?: { name: Array<GQLHumanName | null> }
@@ -133,7 +137,7 @@ export const getFieldValue = (
   return original
 }
 
-export const getLocation = (
+const getLocation = (
   declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
@@ -286,25 +290,25 @@ export const removeUnderscore = (word: string): string => {
   return finalWord
 }
 
-export const isBirthDeclaration = (
+const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
   return (declaration && declaration.type === 'Birth') || false
 }
 
-export const isDeathDeclaration = (
+const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
   return (declaration && declaration.type === 'Death') || false
 }
 
-export const isMarriageDeclaration = (
+const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
   return (declaration && declaration.type === 'Marriage') || false
 }
 
-export const getDraftDeclarationName = (declaration: IDeclaration) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = EMPTY_STRING
   const declarationName = []
   if (declaration.event === Event.Birth) {
@@ -326,10 +330,6 @@ export const getDraftDeclarationName = (declaration: IDeclaration) => {
       .join(' & ')
   }
   return name
-}
-
-export function notNull<T>(value: T | null): value is T {
-  return value !== null
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {
@@ -366,14 +366,14 @@ export const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfMarriage: getLocation(declaration, resources, intl) || EMPTY_STRING,
-    informant:
-      ((declaration.data?.registration?.contactPoint as IFormSectionData)
-        ?.value as string) || EMPTY_STRING,
-    informantContact:
-      (
-        (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || EMPTY_STRING
+    informant: {
+      registrationPhone:
+        declaration.data?.informant?.registrationPhone?.toString() ||
+        EMPTY_STRING,
+      registrationEmail:
+        declaration.data?.informant?.registrationEmail?.toString() ||
+        EMPTY_STRING
+    }
   }
 }
 
@@ -415,8 +415,7 @@ export const getWQDeclarationData = (
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
-    placeOfBirth: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfBirth: EMPTY_STRING
   }
 }
 
@@ -457,8 +456,7 @@ export const getGQLDeclaration = (
     dateOfDeath: EMPTY_STRING,
     placeOfDeath: EMPTY_STRING,
     dateOfMarriage: EMPTY_STRING,
-    placeOfMarriage: EMPTY_STRING,
-    informant: EMPTY_STRING
+    placeOfMarriage: EMPTY_STRING
   }
 }
 

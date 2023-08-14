@@ -25,10 +25,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import {
-  GQLEventSearchSet,
-  GQLEventSearchResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -133,7 +130,7 @@ export function updateRegistrarWorkqueue(
   }
 }
 
-export async function getWorkqueueOfCurrentUser(): Promise<string> {
+async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
 
@@ -179,9 +176,7 @@ function mergeWorkQueueData(
     ) {
       return
     }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
+    destinationWorkQueue.data[workQueueId].results?.forEach((declaration) => {
       if (declaration == null) {
         return
       }
@@ -296,7 +291,7 @@ async function getWorkqueueData(
   )
 }
 
-export async function writeRegistrarWorkqueueByUser(
+async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {

@@ -32,7 +32,7 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import { withTheme } from '@client/styledComponents'
+import styled, { withTheme } from 'styled-components'
 import { Hamburger } from './Hamburger'
 import {
   BRN_DRN_TEXT,
@@ -62,7 +62,6 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {

@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { postMetrics } from '@gateway/features/fhir/utils'
+import {
+  isBase64FileString,
+  postMetrics,
+  uploadBase64ToMinio
+} from '@gateway/features/fhir/utils'
 import {
   IUserModelData,
   IUserPayload,
@@ -454,6 +458,15 @@ export const resolvers: GQLResolver = {
           )
         )
       }
+
+      if (isBase64FileString(avatar.data)) {
+        const docUploadResponse = await uploadBase64ToMinio(
+          avatar.data,
+          authHeader
+        )
+        avatar.data = docUploadResponse
+      }
+
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserAvatar`, {
         method: 'POST',
         body: JSON.stringify({ userId, avatar }),
@@ -605,13 +618,14 @@ export const resolvers: GQLResolver = {
 
 function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
   const userPayload: IUserPayload = {
-    name: (user.name as GQLHumanNameInput[]).map((name: GQLHumanNameInput) => ({
+    name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName as string,
       given: (name.firstNames || '').split(' ') as string[]
     })),
     systemRole: user.systemRole as string,
     role: user.role as string,
+    ...(user.password && { password: user.password }),
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',

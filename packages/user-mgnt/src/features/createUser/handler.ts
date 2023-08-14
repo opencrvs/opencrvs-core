@@ -45,7 +45,7 @@ export default async function createUser(
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
-  let autoGenPassword = null
+  let password = null
 
   try {
     const practitioner = createFhirPractitioner(user, false)
@@ -88,9 +88,9 @@ export default async function createUser(
       user.status = statuses.ACTIVE
     }
 
-    autoGenPassword = generateRandomPassword(hasDemoScope(request))
+    password = user.password ?? generateRandomPassword(hasDemoScope(request))
 
-    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    const { hash, salt } = generateSaltedHash(password)
     user.salt = salt
     user.passwordHash = hash
 
@@ -124,7 +124,7 @@ export default async function createUser(
   sendCredentialsNotification(
     user.name,
     user.username,
-    autoGenPassword,
+    password,
     {
       Authorization: request.headers.authorization
     },

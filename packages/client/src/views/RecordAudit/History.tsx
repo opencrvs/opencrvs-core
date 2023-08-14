@@ -13,7 +13,7 @@ import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import {

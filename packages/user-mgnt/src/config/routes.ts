@@ -117,8 +117,8 @@ const enum RouteScope {
   VERIFY = 'verify'
 }
 
-export const getRoutes = () => {
-  const routes = [
+export const getRoutes: () => Hapi.ServerRoute[] = () => {
+  return [
     // add ping route by default for health check
     {
       method: 'GET',
@@ -760,7 +760,7 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/updateRole',
       handler: updateRole,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Update user role for particular system role',
         notes: 'This is responsible for update userRole',
@@ -776,5 +776,4 @@ export const getRoutes = () => {
       }
     }
   ]
-  return routes
 }

@@ -17,7 +17,7 @@ import { ADVANCED_SEARCH_PARAM_FIELDS } from './mutations'
  * id and userMgntUserID return the same value
  * we should refactor this to just keep one of them
  */
-export const FETCH_USER = gql`
+const FETCH_USER = gql`
   ${ADVANCED_SEARCH_PARAM_FIELDS}
   query fetchUser($userId: String!) {
     getUser(userId: $userId) {

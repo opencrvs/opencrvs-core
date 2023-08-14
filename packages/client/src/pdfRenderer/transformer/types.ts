@@ -51,7 +51,7 @@ export type TransformerPayload =
 
 export type Condition = IInformantNameCondition | IOfflineAddressCondition
 
-export interface IFieldTransformer {
+interface IFieldTransformer {
   field: string
   operation: string
   parameters?: TransformerPayload
@@ -83,7 +83,7 @@ export enum ConditionOperation {
   VALUE_EXISTS = 'VALUE_EXISTS',
   VALUE_DOES_NOT_EXISTS = 'VALUE_DOES_NOT_EXISTS'
 }
-export interface ICondition {
+interface ICondition {
   key: string
   operation?: ConditionOperation
   values: string[]
@@ -172,7 +172,7 @@ export interface IEventWiseKey {
   [event: string]: string // {birth: child.dob}
 }
 // Based on the need, add more here
-export type ConditionType = 'COMPARE_DATE_IN_DAYS'
+type ConditionType = 'COMPARE_DATE_IN_DAYS'
 
 export interface IConditionExecutorPayload {
   fromKey: IEventWiseKey | ExecutorKey
@@ -185,7 +185,7 @@ export interface IConditionExecutorPayload {
   }[]
 }
 
-export type ArithmeticOperationType =
+type ArithmeticOperationType =
   | 'ADDITION'
   | 'SUBTRACTION'
   | 'DIVISION'

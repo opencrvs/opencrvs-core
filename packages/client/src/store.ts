@@ -55,10 +55,6 @@ import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
-import {
-  formConfigReducer,
-  IFormConfigState
-} from './forms/configuration/formConfig/reducer'
 import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
@@ -75,7 +71,6 @@ export interface IStoreState {
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
-  formConfig: IFormConfigState
   advancedSearch: IAdvancedSearchParamState
 }
 
@@ -102,7 +97,6 @@ export const createStore = <T>(
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
-    formConfig: formConfigReducer,
     advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore

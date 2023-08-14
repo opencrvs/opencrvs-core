@@ -27,7 +27,7 @@ import {
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { useDispatch } from 'react-redux'

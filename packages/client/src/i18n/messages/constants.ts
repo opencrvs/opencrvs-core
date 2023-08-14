@@ -695,11 +695,6 @@ const messagesToDefine = {
     description: 'Label for location',
     id: 'constants.location'
   },
-  registrationTitle: {
-    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
-    description: 'Label for registrationTitle',
-    id: 'constants.registrationTitle'
-  },
   withinTargetDays: {
     defaultMessage: `Within {registrationTargetDays} days`,
     description: `Label for registrations within {registrationTargetDays} days`,

@@ -48,8 +48,12 @@ export const resolvers: GQLResolver = {
         MARRIAGE: applicationConfig.MARRIAGE as GQLMarriageInput,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
-        HIDE_EVENT_REGISTER_INFORMATION:
-          applicationConfig.HIDE_EVENT_REGISTER_INFORMATION as boolean,
+        HIDE_BIRTH_EVENT_REGISTER_INFORMATION:
+          applicationConfig.HIDE_BIRTH_EVENT_REGISTER_INFORMATION as boolean,
+        HIDE_DEATH_EVENT_REGISTER_INFORMATION:
+          applicationConfig.HIDE_DEATH_EVENT_REGISTER_INFORMATION as boolean,
+        HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION:
+          applicationConfig.HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION as boolean,
         EXTERNAL_VALIDATION_WORKQUEUE:
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,

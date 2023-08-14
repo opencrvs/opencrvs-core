@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { countries } from '@client/forms/countries'
 import { identityNameMapper } from '@client/forms/identity'
@@ -48,7 +48,7 @@ type Identifier = {
   id: string
   type: string
 }
-export type IParentDetails = {
+type IParentDetails = {
   name: Name[]
   birthDate: string
   nationality: [string]

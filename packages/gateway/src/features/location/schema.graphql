@@ -15,30 +15,13 @@ input LocationInput {
   alias: [String]
   description: String
   partOf: String
-  type: LocationType
+  type: String
   telecom: [ContactPointInput]
   address: AddressInput
   longitude: Float
   latitude: Float
   altitude: Float
   geoData: String
-}
-
-enum LocationType {
-  HEALTH_FACILITY
-  COMMUNITY
-  HOSPITAL
-  OTHER_HEALTH_INSTITUTION
-  ADMIN_STRUCTURE
-  CRVS_OFFICE
-  PRIVATE_HOME
-  DECEASED_USUAL_RESIDENCE
-  SECONDARY_ADDRESS
-  PRIMARY_ADDRESS
-  MILITARY_BASE_OR_CANTONMENT
-  IDP_CAMP # -> Disaster Camp
-  UNHCR_CAMP # -> UNHCR Camp
-  OTHER
 }
 
 type Location { # -> Location (mostly the same property name except:)
@@ -50,7 +33,7 @@ type Location { # -> Location (mostly the same property name except:)
   alias: [String!]
   description: String
   partOf: String
-  type: LocationType
+  type: String
   telecom: [ContactPoint]
   address: Address
   longitude: Float # -> position.longitude

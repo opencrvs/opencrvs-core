@@ -38,10 +38,6 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
 import { vi } from 'vitest'
 
-export interface IMotherSectionFormData {
-  firstName: string
-}
-
 describe('form component', () => {
   let component: ReactWrapper<{}, {}>
 

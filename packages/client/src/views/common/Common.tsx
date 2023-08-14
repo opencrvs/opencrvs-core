@@ -13,10 +13,9 @@ import * as React from 'react'
 
 import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
-import { isEqual } from 'lodash-es'
 import { selectCountryBackground } from '@client/offline/selectors'
 
-export interface IProps {
+interface IProps {
   children: React.ReactNode
   id?: string
 }
@@ -62,7 +61,7 @@ const StyledPage = styled.div<{
     box-sizing: border-box;
   }
 `
-export const Container = styled.div`
+const Container = styled.div`
   margin: auto;
   height: auto;
   width: min(380px, 90%);

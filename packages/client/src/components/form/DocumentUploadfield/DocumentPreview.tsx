@@ -9,13 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { IFileValue, IAttachmentValue } from '@client/forms'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { DividerVertical } from '@opencrvs/components/lib/Divider'
+import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
-const PreviewContainer = styled.div`
+import { useState } from 'react'
+
+const ViewerWrapper = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
@@ -24,25 +31,16 @@ const PreviewContainer = styled.div`
   z-index: 4;
   width: 100%;
   height: 100%;
-  background: ${({ theme }) => theme.colors.grey600};
-`
-const PreviewContainerHeader = styled.div`
-  width: 100%;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 99999;
+  background: ${({ theme }) => theme.colors.white};
 `
 
-const ImageHolder = styled.div`
+const ViewerContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   display: flex;
+  align-items: center;
   & img {
     max-height: 80vh;
     max-width: 80vw;
@@ -50,58 +48,109 @@ const ImageHolder = styled.div`
   }
 `
 
-const Title = styled.span`
-  padding-left: 16px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.reg16};
-`
-const BackButton = styled.button`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.white};
-`
-type IProps = {
+interface IProps {
   previewImage: IFileValue | IAttachmentValue
   disableDelete?: boolean
   title?: string
   goBack: () => void
   onDelete: (image: IFileValue | IAttachmentValue) => void
+  id?: string
 }
 
-export class DocumentPreview extends React.Component<IProps> {
-  render = () => {
-    const { previewImage, title, goBack, onDelete, disableDelete } = this.props
-    return (
-      <PreviewContainer id="preview_image_field">
-        <PreviewContainerHeader>
-          <BackButton id="preview_back" onClick={goBack}>
-            <ArrowBack />
-            <Title>{title}</Title>
-          </BackButton>
-          {!disableDelete && (
-            <span>
+export const DocumentPreview = ({
+  previewImage,
+  title,
+  goBack,
+  onDelete,
+  disableDelete,
+  id
+}: IProps) => {
+  const [zoom, setZoom] = useState(1)
+  const [rotation, setRotation] = useState(0)
+
+  const zoomIn = () => setZoom((prevState) => prevState + 0.2)
+  const zoomOut = () =>
+    setZoom((prevState) => (prevState >= 1 ? prevState - 0.2 : prevState))
+  const rotateLeft = () => setRotation((prevState) => (prevState - 90) % 360)
+
+  return (
+    <ViewerWrapper id={id ?? 'preview_image_field'}>
+      <AppBar
+        desktopLeft={<Icon name="Paperclip" size="large" />}
+        desktopTitle={title}
+        desktopRight={
+          <Stack gap={8}>
+            <PanControls
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              rotateLeft={rotateLeft}
+            />
+            {!disableDelete && (
+              <>
+                <DividerVertical />
+                <Button
+                  id="preview_delete"
+                  type="icon"
+                  onClick={() => onDelete(previewImage)}
+                >
+                  <Icon name="TrashSimple" color="red" />
+                </Button>
+              </>
+            )}
+            <DividerVertical />
+            <Button
+              id="preview_close"
+              aria-label="Go close"
+              size="medium"
+              type="icon"
+              onClick={goBack}
+            >
+              <Icon name="X" size="medium" />
+            </Button>
+          </Stack>
+        }
+        mobileLeft={<Icon name="Paperclip" size="large" />}
+        mobileTitle={title}
+        mobileRight={
+          <Stack gap={8}>
+            <PanControls
+              zoomIn={zoomIn}
+              zoomOut={zoomOut}
+              rotateLeft={rotateLeft}
+            />
+            {!disableDelete && (
               <Button
                 id="preview_delete"
-                icon={() => <Delete color="white" />}
+                type="icon"
                 onClick={() => onDelete(previewImage)}
-              />
-            </span>
-          )}
-        </PreviewContainerHeader>
-        <ImageHolder>
-          {previewImage.data && (
-            <PanViewer
-              key={Math.random()}
-              image={previewImage.data}
-              controllerCenter={true}
-            />
-          )}
-        </ImageHolder>
-      </PreviewContainer>
-    )
-  }
+              >
+                <Icon name="TrashSimple" color="red" />
+              </Button>
+            )}
+            <Button
+              id="preview_close"
+              aria-label="Go back"
+              size="medium"
+              type="icon"
+              onClick={goBack}
+            >
+              <Icon name="X" size="medium" />
+            </Button>
+          </Stack>
+        }
+      />
+
+      <ViewerContainer>
+        {previewImage.data && (
+          <PanViewer
+            key={Math.random()}
+            id="document_image"
+            image={previewImage.data}
+            zoom={zoom}
+            rotation={rotation}
+          />
+        )}
+      </ViewerContainer>
+    </ViewerWrapper>
+  )
 }
