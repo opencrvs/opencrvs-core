@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrecacheEntry, precacheAndRoute } from 'workbox-precaching'
+import {
+  PrecacheEntry,
+  createHandlerBoundToURL,
+  precacheAndRoute
+} from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
@@ -108,7 +112,7 @@ registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 registerRoute(
-  new NavigationRoute('/index.html' as unknown as RouteHandler, {
+  new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     denylist: [/^\/__.*$/]
   })
 )
