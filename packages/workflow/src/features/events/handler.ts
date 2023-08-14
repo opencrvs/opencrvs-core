@@ -92,7 +92,7 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (
-              hasRegisterScope(request) &&
+              (hasRegisterScope(request) || hasValidateScope(request)) &&
               hasCorrectionEncounterSection(firstEntry as fhir.Composition)
             ) {
               return Events[`${eventType}_REQUEST_CORRECTION`]

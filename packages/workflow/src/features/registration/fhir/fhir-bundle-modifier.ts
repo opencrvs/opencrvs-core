@@ -52,6 +52,7 @@ import {
 import {
   getToken,
   getTokenPayload,
+  hasRegisterScope,
   ITokenPayload,
   USER_SCOPE
 } from '@workflow/utils/authUtils'
@@ -129,9 +130,10 @@ export async function markBundleAsValidated(
 }
 
 export async function markBundleAsRequestedForCorrection(
-  bundle: fhir.Bundle & fhir.BundleEntry,
+  request: Hapi.Request,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const bundle = request.payload as fhir.Bundle & fhir.BundleEntry
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
@@ -155,6 +157,8 @@ export async function markBundleAsRequestedForCorrection(
     getTokenPayload(token),
     regStatusCode?.code
   )
+
+  taskResource.status = hasRegisterScope(request) ? 'accepted' : 'requested'
 
   return bundle
 }

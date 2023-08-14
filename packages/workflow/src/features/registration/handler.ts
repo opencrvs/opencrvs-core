@@ -518,7 +518,7 @@ export async function markEventAsRequestedForCorrectionHandler(
 ) {
   try {
     const payload = await markBundleAsRequestedForCorrection(
-      request.payload as fhir.Bundle,
+      request,
       getToken(request)
     )
     return await postToHearth(payload)

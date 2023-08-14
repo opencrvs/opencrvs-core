@@ -15,7 +15,7 @@ import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput
 } from '@gateway/graphql/schema'
-import { hasScope } from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
   buildFHIRBundle,
   checkUserAssignment
@@ -37,11 +37,11 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (hasScope(authHeader, 'register')) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
+      if (inScope(authHeader, ['register', 'validate'])) {
+        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        // if (!hasAssignedToThisUser) {
+        //   throw new UnassignError('User has been unassigned')
+        // }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
