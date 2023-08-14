@@ -46,7 +46,7 @@ import {
   getDeclarationStatus,
   getTimeLoggedFromTask,
   getDeclarationType,
-  getStartedByFieldAgent,
+  getRecordInitiator,
   getPaymentReconciliation,
   getObservationValueByCode,
   isNotification,
@@ -616,7 +616,7 @@ export async function generateRejectedPoints(
 
   const tags = {
     eventType: getDeclarationType(task),
-    startedBy: getStartedByFieldAgent(taskHistory),
+    startedBy: getRecordInitiator(taskHistory),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
