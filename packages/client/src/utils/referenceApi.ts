@@ -121,6 +121,14 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+
+  if (res && res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
+
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }

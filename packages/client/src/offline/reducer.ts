@@ -523,6 +523,20 @@ function reducer(
 
     case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(
+            configurationErrorNotification(
+              payload.message + ' to load application configuration properly'
+            )
+          )
+        )
+      }
       return loop(
         {
           ...state,
