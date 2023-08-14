@@ -75,7 +75,7 @@ type IBaseLoadingProps = {
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-export class LoadingIndicatorComp extends React.Component<IProps> {
+class LoadingIndicatorComp extends React.Component<IProps> {
   render() {
     const { loading, noDeclaration, hasError, intl } = this.props
 

@@ -76,9 +76,7 @@ const mockConfig = {
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
-  EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
-  ADDRESSES: 1,
-  ADMIN_LEVELS: 2
+  EXTERNAL_VALIDATION_WORKQUEUE: true // this flag will decide whether to show external validation workqueue on registrar home
 } as unknown as IApplicationConfigurationModel
 
 describe('applicationHandler', () => {
@@ -105,6 +103,11 @@ describe('applicationHandler', () => {
 
   it('get application config using mongoose', async () => {
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
+    fetch.mockResponse(
+      JSON.stringify({
+        mockConfig
+      })
+    )
 
     const res = await server.server.inject({
       method: 'GET',
@@ -117,6 +120,11 @@ describe('applicationHandler', () => {
     mockConfig.id = '61c4664e663fc6af203b63b8'
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'update')
+    fetch.mockResponse(
+      JSON.stringify({
+        mockConfig
+      })
+    )
 
     const res = await server.server.inject({
       method: 'POST',

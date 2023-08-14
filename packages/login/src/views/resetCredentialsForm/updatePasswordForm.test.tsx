@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as routes from '@login/navigation/routes'
-import { createStore } from '@login/store'
 import { createTestApp } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'

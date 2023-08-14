@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import {
   SuccessButton,
@@ -117,10 +117,12 @@ class IDVerifierComponent extends React.Component<
           />
         )}
 
-        <LabelValuePair
-          label={intl.formatMessage(certificateMessages.familyName)}
-          value={String(collectorInformation.familyName)}
-        />
+        {collectorInformation.familyName && (
+          <LabelValuePair
+            label={intl.formatMessage(certificateMessages.familyName)}
+            value={String(collectorInformation.familyName)}
+          />
+        )}
 
         {collectorInformation.birthDate && (
           <LabelValuePair

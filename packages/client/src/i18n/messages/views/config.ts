@@ -651,7 +651,7 @@ const messagesToDefine: IConfigMessages = {
   informantNotificationSubtitle: {
     id: 'config.informantNotification.subtitle',
     defaultMessage:
-      'Select the SMS notification to send to the Informant to keep them informed of the progress to their declaration. SMS copy can be updated from.... ',
+      'Select the notifications to send to the informant to keep them informed of the progress to their declaration. Your system is configured to send {communicationType}.',
     description: 'Subtile for informant sms notification'
   },
   inProgressSMS: {

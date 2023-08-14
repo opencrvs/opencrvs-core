@@ -181,7 +181,9 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping?service=nonsense'
     })
-    expect(res.result.message).toEqual('Invalid request query input')
+    expect(res.result.message).toEqual(
+      `"service" must be one of [auth, user-mgnt, metrics, notification, countryconfig, search, workflow, gateway]`
+    )
   })
   it('Fails the health check for a failed health check on a running service', async () => {
     fetch.mockResponse(

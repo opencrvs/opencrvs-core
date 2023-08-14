@@ -13,9 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
@@ -56,112 +54,106 @@ const Label = styled.div`
   }
 `
 
-type IProps = {
+type Props = {
   id?: string
   documents?: IFileValue[] | null
   processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
   label?: string
-  theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
   dropdownOptions?: ISelectOption[]
   onDelete?: (image: IFileValue | IAttachmentValue) => void
   inReviewSection?: boolean
 }
 
-class DocumentListPreviewComponent extends React.Component<IProps> {
-  getFormattedLabelForDocType = (docType: string) => {
+export const DocumentListPreview = ({
+  id,
+  documents,
+  processingDocuments,
+  attachment,
+  label,
+  onSelect,
+  dropdownOptions,
+  onDelete,
+  inReviewSection
+}: Props) => {
+  const getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
-      this.props.dropdownOptions &&
-      this.props.dropdownOptions.find((option) => option.value === docType)
+      dropdownOptions &&
+      dropdownOptions.find((option) => option.value === docType)
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
-  render() {
-    const {
-      id,
-      documents,
-      processingDocuments,
-      label,
-      attachment,
-      theme,
-      onDelete
-    } = this.props
-    return (
-      <Wrapper id={`preview-list-${id}`}>
-        {documents &&
-          documents.map((document: IFileValue, key: number) => (
-            <Container key={`preview_${key}`}>
-              <Label>
-                <Icon color="currentColor" name="Paperclip" size="medium" />
-                <Link
-                  id={`document_${(document.optionValues[1] as string).replace(
-                    /\s/g,
-                    ''
-                  )}_link`}
-                  key={key}
-                  onClick={(_) => this.props.onSelect(document)}
-                >
-                  <span>
-                    {(!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                      this.props.inReviewSection &&
-                      this.props.dropdownOptions &&
-                      this.props.dropdownOptions[key]?.label) ||
-                      this.getFormattedLabelForDocType(
-                        document.optionValues[1] as string
-                      ) ||
-                      (document.optionValues[1] as string)}
-                  </span>
-                </Link>
-              </Label>
-              {onDelete && (
-                <DeleteContainer
-                  id="preview_delete"
-                  type="icon"
-                  size="small"
-                  aria-label="Delete attachment"
-                  onClick={() => onDelete(document)}
-                >
-                  <Icon color="red" name="TrashSimple" size="small" />
-                </DeleteContainer>
-              )}
-            </Container>
-          ))}
-        {processingDocuments &&
-          processingDocuments.map(({ label }) => (
-            <Container key={label}>
-              <Label>
-                <Icon color="disabled" name="Paperclip" size="medium" />
-                <Link disabled={true} key={label}>
-                  <span>
-                    {this.getFormattedLabelForDocType(label) || label}
-                  </span>
-                </Link>
-              </Label>
-              <SpinnerContainer size={20} id={`document_${label}_processing`} />
-            </Container>
-          ))}
-        {attachment && attachment.data && label && (
-          <Container>
+
+  return (
+    <Wrapper id={`preview-list-${id}`}>
+      {documents &&
+        documents.map((document: IFileValue, key: number) => (
+          <Container key={`preview_${key}`}>
             <Label>
-              <Icon color="grey600" name="Paperclip" size="medium" />
-              <Link onClick={(_) => this.props.onSelect(attachment)}>
-                <span>{this.getFormattedLabelForDocType(label) || label}</span>
+              <Icon color="currentColor" name="Paperclip" size="medium" />
+              <Link
+                id={`document_${(document.optionValues[1] as string).replace(
+                  /\s/g,
+                  ''
+                )}_link`}
+                key={key}
+                onClick={(_) => onSelect(document)}
+              >
+                <span>
+                  {(inReviewSection &&
+                    dropdownOptions &&
+                    dropdownOptions[key]?.label) ||
+                    getFormattedLabelForDocType(
+                      document.optionValues[1] as string
+                    ) ||
+                    (document.optionValues[1] as string)}
+                </span>
               </Link>
             </Label>
-            <DeleteContainer
-              id="preview_delete"
-              type="icon"
-              size="small"
-              aria-label="Delete attachment"
-              onClick={() => onDelete && onDelete(attachment)}
-            >
-              <Icon color="red" name="TrashSimple" size="small" />
-            </DeleteContainer>
+            {onDelete && (
+              <DeleteContainer
+                id="preview_delete"
+                type="icon"
+                size="small"
+                aria-label="Delete attachment"
+                onClick={() => onDelete(document)}
+              >
+                <Icon color="red" name="TrashSimple" size="small" />
+              </DeleteContainer>
+            )}
           </Container>
-        )}
-      </Wrapper>
-    )
-  }
+        ))}
+      {processingDocuments &&
+        processingDocuments.map(({ label }) => (
+          <Container key={label}>
+            <Label>
+              <Icon color="disabled" name="Paperclip" size="medium" />
+              <Link disabled={true} key={label}>
+                <span>{getFormattedLabelForDocType(label) || label}</span>
+              </Link>
+            </Label>
+            <SpinnerContainer size={20} id={`document_${label}_processing`} />
+          </Container>
+        ))}
+      {attachment && attachment.data && label && (
+        <Container>
+          <Label>
+            <Icon color="grey600" name="Paperclip" size="medium" />
+            <Link onClick={(_) => onSelect(attachment)}>
+              <span>{getFormattedLabelForDocType(label) || label}</span>
+            </Link>
+          </Label>
+          <DeleteContainer
+            id="preview_delete"
+            type="icon"
+            size="small"
+            aria-label="Delete attachment"
+            onClick={() => onDelete && onDelete(attachment)}
+          >
+            <Icon color="red" name="TrashSimple" size="small" />
+          </DeleteContainer>
+        </Container>
+      )}
+    </Wrapper>
+  )
 }
-
-export const DocumentListPreview = withTheme(DocumentListPreviewComponent)

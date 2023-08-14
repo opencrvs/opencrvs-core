@@ -56,7 +56,7 @@ import {
   recordAuditMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
@@ -76,7 +76,7 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  top: 56px;
+  top: 0;
   width: 100%;
   position: sticky;
   z-index: 1;
@@ -123,7 +123,7 @@ export const getVisibleSections = (
   )
 }
 
-export const getViewableSection = (
+const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
 ): IFormSection[] => {
@@ -587,7 +587,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       })
       return {
         id: section.id,
-        title: intl.formatMessage(section.title),
+        title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item)
       }
     })
@@ -677,11 +677,14 @@ export const DuplicateFormTabs = (props: IProps) => {
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
         registeredAt: (eventData.history as History[]).find(
-          (data) => data.action === null
+          (data) =>
+            data.action === null && data.regStatus === RegStatus.Registered
         )?.office?.name,
         registeredBy: getName(
-          (eventData.history as History[]).find((data) => data.action === null)
-            ?.user?.name as HumanName[],
+          (eventData.history as History[]).find(
+            (data) =>
+              data.action === null && data.regStatus === RegStatus.Registered
+          )?.user?.name as HumanName[],
           language
         )
       }
@@ -696,10 +699,14 @@ export const DuplicateFormTabs = (props: IProps) => {
           props.declaration.data.registration?.registrationNumber,
         registeredAt: (
           props.declaration.data.history as unknown as History[]
-        ).find((data) => data.action === null)?.office?.name,
+        ).find(
+          (data) =>
+            data.action === null && data.regStatus === RegStatus.Registered
+        )?.office?.name,
         registeredBy: getName(
           (props.declaration.data.history as unknown as History[]).find(
-            (data) => data.action === null
+            (data) =>
+              data.action === null && data.regStatus === RegStatus.Registered
           )?.user?.name as HumanName[],
           language
         )
@@ -910,6 +917,11 @@ export const DuplicateFormTabs = (props: IProps) => {
             size={ContentSize.LARGE}
             showTitleOnMobile
           >
+            <Text element="h1" variant="h4" align="left" id="title-text">
+              {intl.formatMessage(
+                duplicateMessages.duplicateDeclarationDetails
+              )}
+            </Text>
             <Stack direction="column" gap={20} alignItems={'stretch'}>
               {comparisonDelcarationData.map((sections, index) => {
                 return (

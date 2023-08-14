@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import { ISelect2Props } from '@opencrvs/components/lib/Select/Select2'
 import React from 'react'
 import { IPerformanceSelectOption } from '@client/views/SysAdmin/Performance/PerformanceSelect'

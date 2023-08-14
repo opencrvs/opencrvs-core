@@ -12,7 +12,7 @@
 import { Checkbox, DateField, Link } from '@client/../../components/lib'
 import { IDateRangePickerValue } from '@client/forms'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import format from '@client/utils/date-formatting'
 import startOfMonth from 'date-fns/startOfMonth'
 import subYears from 'date-fns/subYears'

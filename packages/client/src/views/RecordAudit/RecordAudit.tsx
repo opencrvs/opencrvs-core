@@ -16,7 +16,7 @@ import {
   Navigation,
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
-import styled from '@client/styledComponents'
+import styled from 'styled-components'
 import {
   DeclarationIcon,
   Edit,

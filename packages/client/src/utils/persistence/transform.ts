@@ -170,4 +170,4 @@ const extractPersistDirectivePaths = (
   return { query, paths }
 }
 
-export { addPersistFieldToDocument, extractPersistDirectivePaths }
+export { extractPersistDirectivePaths }

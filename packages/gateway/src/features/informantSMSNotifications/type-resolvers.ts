@@ -15,28 +15,8 @@ export interface IInformantSMSNotification {
   _id: string
   name: string
   enabled: boolean
-  message?: string
   updatedAt: string
   createdAt: string
-}
-
-export interface INotificationMessages {
-  languages: Array<{
-    lang: string
-    displayName: string
-    messages: Record<string, string>
-  }>
-}
-
-export const NOTIFICATION_NAME_MAPPING_WITH_RESOURCE = {
-  birthInProgressSMS: 'birthInProgressNotification',
-  birthDeclarationSMS: 'birthDeclarationNotification',
-  birthRegistrationSMS: 'birthRegistrationNotification',
-  birthRejectionSMS: 'birthRejectionNotification',
-  deathInProgressSMS: 'deathInProgressNotification',
-  deathDeclarationSMS: 'deathDeclarationNotification',
-  deathRegistrationSMS: 'deathRegistrationNotification',
-  deathRejectionSMS: 'deathRejectionNotification'
 }
 
 export const informantSMSNotiTypeResolvers: GQLResolver = {

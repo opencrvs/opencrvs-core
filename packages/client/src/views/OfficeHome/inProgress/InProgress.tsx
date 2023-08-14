@@ -37,7 +37,8 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { ITheme, withTheme } from '@client/styledComponents'
+import { withTheme } from 'styled-components'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
@@ -125,7 +126,7 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-export class InProgressComponent extends React.Component<
+class InProgressComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
@@ -207,7 +208,7 @@ export class InProgressComponent extends React.Component<
         } else if (isMarriageEvent(reg)) {
           const groomNames = reg.groomName as GQLHumanName[]
           const groomNamesMap = createNamesMap(groomNames)
-          const brideNames = reg.groomName as GQLHumanName[]
+          const brideNames = reg.brideName as GQLHumanName[]
           const brideNamesMap = createNamesMap(brideNames)
           const groomName = groomNamesMap[locale] || groomNamesMap[LANG_EN]
           const brideName = brideNamesMap[locale] || brideNamesMap[LANG_EN]

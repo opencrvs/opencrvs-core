@@ -14,8 +14,6 @@ import { APPLICATION_VERSION } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
 import React from 'react'
 
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
 export async function validateApplicationVersion() {
   const runningVer = localStorage.getItem('running-version')
 
