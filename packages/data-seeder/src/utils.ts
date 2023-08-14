@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { inspect } from 'util'
+
 export function raise(msg: string): never {
   console.log(msg)
   process.exit(1)
@@ -18,7 +20,7 @@ export function parseGQLResponse<T>(
   response: { data: T } | { errors: Array<{ message: string }> }
 ) {
   if ('errors' in response) {
-    raise(JSON.stringify(response.errors))
+    raise(inspect(response.errors))
   }
   return response.data
 }

@@ -18,3 +18,5 @@ export const GATEWAY_GQL_HOST =
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 
 export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
+
+export const ACTIVATE_USERS = process.env.ACTIVATE_USERS ?? 'false'
