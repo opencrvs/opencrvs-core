@@ -15,7 +15,6 @@ import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { merge } from 'lodash'
 import { Validator } from '@client/forms/validators'
 import { OPENCRVS_SPECIFICATION_URL } from '@client/utils/constants'
 
@@ -102,17 +101,12 @@ export interface IApplicationConfig {
   MARRIAGE_REGISTRATION: boolean
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION: boolean
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
-  ADDRESSES: number
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
-  ADMIN_LEVELS: number
   LOGIN_BACKGROUND: ILoginBackground
 }
 export interface IApplicationConfigResponse {
@@ -138,19 +132,6 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       return { ...rest, id: _id }
     }
   )
-  /*
-   * This is a temporary fix to merge the config from the config API with the global config object.
-   * Without this questionsTransformer doesn't have the correct window.config.ADMIN_LEVELS value
-   * when the application is loaded with no offline data.
-   * This causes:
-   * - incorrect form fields for address to be shown in the forms
-   * - runtime errors if an implementing country has customized address fields
-   */
-
-  /*
-  We can deprecate this when addresses is moved into Farajaland I think
-  */
-  merge(window.config, response.config)
 
   return response
 }

@@ -35,7 +35,7 @@ type LocalisationFile = {
 
 function writeTranslations(data: LocalisationFile) {
   fs.writeFileSync(
-    `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json`,
+    `${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`,
     JSON.stringify(data, null, 2)
   )
 }
@@ -43,9 +43,7 @@ function writeTranslations(data: LocalisationFile) {
 function readTranslations() {
   return JSON.parse(
     fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json`
-      )
+      .readFileSync(`${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`)
       .toString()
   )
 }
@@ -66,7 +64,7 @@ async function extractMessages() {
         `Your environment variables may not be set.
         Please add valid COUNTRY_CONFIG_PATH, as an environment variable.
         If they are set correctly, then something is wrong with
-        this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json`
+        this file: ${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`
       )
     } else {
       console.error(err)
@@ -106,9 +104,7 @@ async function extractMessages() {
         console.log(`You are missing the following content keys from your country configuration package:\n
 ${chalk.white(missingKeys.join('\n'))}\n
 Translate the keys and add them to this file:
-${chalk.white(
-  `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/client.json`
-)}`)
+${chalk.white(`${COUNTRY_CONFIG_PATH}/src/api/content/client/client.json`)}`)
 
         if (write) {
           console.log(
@@ -142,7 +138,7 @@ ${chalk.green('Tip 🪄')}: ${chalk.white(
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/features/languages/content/client/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/api/content/client/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
     })

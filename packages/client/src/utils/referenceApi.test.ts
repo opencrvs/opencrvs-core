@@ -531,7 +531,6 @@ const mockFetchConfig = {
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
     DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-    HIDE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
     PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
     SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
@@ -543,8 +542,6 @@ const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1,
-    ADMIN_LEVELS: 2,
     INTEGRATIONS: [
       {
         name: 'MOSIP',

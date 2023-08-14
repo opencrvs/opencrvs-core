@@ -205,8 +205,6 @@ export type AdvancedSearchParametersInput = {
 
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
-  ADDRESSES?: Maybe<Scalars['Int']>
-  ADMIN_LEVELS?: Maybe<Scalars['Int']>
   APPLICATION_NAME?: Maybe<Scalars['String']>
   BIRTH?: Maybe<Birth>
   COUNTRY_LOGO?: Maybe<CountryLogo>
@@ -215,9 +213,6 @@ export type ApplicationConfiguration = {
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
@@ -228,8 +223,6 @@ export type ApplicationConfiguration = {
 }
 
 export type ApplicationConfigurationInput = {
-  ADDRESSES?: InputMaybe<Scalars['Int']>
-  ADMIN_LEVELS?: InputMaybe<Scalars['Int']>
   APPLICATION_NAME?: InputMaybe<Scalars['String']>
   BIRTH?: InputMaybe<BirthInput>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
@@ -238,9 +231,6 @@ export type ApplicationConfigurationInput = {
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
-  HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  HIDE_DEATH_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
@@ -7693,14 +7683,9 @@ export type UpdateApplicationConfigMutation = {
     APPLICATION_NAME?: string | null
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
-    HIDE_BIRTH_EVENT_REGISTER_INFORMATION?: boolean | null
-    HIDE_DEATH_EVENT_REGISTER_INFORMATION?: boolean | null
-    HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION?: boolean | null
     DATE_OF_BIRTH_UNKNOWN?: boolean | null
     INFORMANT_SIGNATURE?: boolean | null
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
-    ADDRESSES?: number | null
-    ADMIN_LEVELS?: number | null
     LOGIN_BACKGROUND?: {
       __typename?: 'LoginBackground'
       backgroundColor?: string | null
