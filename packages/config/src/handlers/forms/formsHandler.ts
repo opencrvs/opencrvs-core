@@ -57,6 +57,21 @@ export default async function getForm(
         }).message
       )
     }
+    // const parsedForms = result.data
+    // const requiredSections = ['registration', 'documents']
+    // ;(['birth', 'death', 'marriage'] as const).forEach((event) => {
+    //   if (
+    //     parsedForms[event].sections.filter(({ id }) =>
+    //       requiredSections.includes(id)
+    //     ).length < 2
+    //   ) {
+    //     throw badData(
+    //       `Form validation error: expected "${requiredSections.join(
+    //         ','
+    //       )}" sections to be present in ${event} form`
+    //     )
+    //   }
+    // })
   }
 
   const formVersion: IFormVersionModel | null = await FormVersions.findOne({

@@ -62,8 +62,17 @@ const section = z.object({
   mapping: z.object({}).passthrough().optional()
 })
 
+const requiredSections = ['registration', 'documents']
+
 const form = z.object({
-  sections: z.array(section)
+  sections: z.array(section).refine(
+    (sections) => {
+      sections.filter(({ id }) => requiredSections.includes(id)).length >= 2
+    },
+    {
+      message: `${requiredSections.join(' & ')} sections are required`
+    }
+  )
 })
 
 export const registrationForms = z.object({
