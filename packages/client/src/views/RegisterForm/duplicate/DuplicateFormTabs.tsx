@@ -783,11 +783,7 @@ export const DuplicateFormTabs = (props: IProps) => {
         {
           label: (
             <Text variant="bold16" element="span" color="grey600">
-              {intl.formatMessage(
-                duplicateRegData.type.toLowerCase() === Event.Birth
-                  ? recordAuditMessages.brn
-                  : recordAuditMessages.drn
-              )}
+              {intl.formatMessage(recordAuditMessages.rn)}
             </Text>
           ),
           heading: {
