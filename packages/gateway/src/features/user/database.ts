@@ -33,7 +33,7 @@ export async function start() {
   logger.info(`REDIS_HOST, ${JSON.stringify(REDIS_HOST)}`)
   redisClient = redis.createClient({
     host: REDIS_HOST,
-    retry_strategy: (options) => {
+    retry_strategy: () => {
       return 1000
     }
   })

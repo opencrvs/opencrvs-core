@@ -1,24 +1,31 @@
 FROM node:gallium-alpine
-WORKDIR /usr/src/app
+WORKDIR /app
+RUN ls
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Install npm dependencies first (so they may be cached if dependencies don't change)
-COPY package.json package.json
-COPY packages/config/tsconfig.json packages/config/tsconfig.json
-COPY packages/config/package.json packages/config/package.json
-COPY packages/commons packages/commons
-COPY yarn.lock yarn.lock
+COPY . .
+
+RUN rm -rf /app/packages/*
+
+COPY packages/config /app/packages/config
+COPY packages/commons /app/packages/commons
+
 RUN yarn install --production
 
-# Copy package build
-COPY --from=opencrvs-build /packages/config packages/config
+WORKDIR /app/packages/commons
 
-# Copy dependant package(s) source
-COPY --from=opencrvs-build packages/commons packages/commons
+RUN yarn build
+
+WORKDIR /app/packages/config
+
+RUN yarn add @types/fhir --dev
+RUN yarn add @types/jsonwebtoken --dev
+RUN yarn add @types/lodash --dev
+
+RUN yarn build
 
 EXPOSE 2021
-WORKDIR /usr/src/app/packages/config
 
 CMD yarn start:prod
