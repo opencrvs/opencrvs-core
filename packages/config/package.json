@@ -36,6 +36,7 @@
     "tsconfig-paths": "^3.13.0"
   },
   "devDependencies": {
+    "copyfiles": "^2.1.1",
     "@types/fhir": "^0.0.30",
     "@types/boom": "^7.3.1",
     "@types/jwt-decode": "^2.2.1",
