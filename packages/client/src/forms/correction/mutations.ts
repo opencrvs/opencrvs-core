@@ -12,11 +12,11 @@
 import { gql } from '@apollo/client'
 
 export const REQUEST_BIRTH_REG_CORRECTION = gql`
-  mutation requestBirthRegistrationCorrection(
+  mutation createBirthRegistrationCorrection(
     $id: ID!
     $details: BirthRegistrationInput!
   ) {
-    requestBirthRegistrationCorrection(id: $id, details: $details)
+    createBirthRegistrationCorrection(id: $id, details: $details)
   }
 `
 export const REQUEST_DEATH_REG_CORRECTION = gql`

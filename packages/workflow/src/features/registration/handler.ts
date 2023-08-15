@@ -20,10 +20,11 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection,
+  markBundleAsCorrected,
   validateDeceasedDetails,
   makeTaskAnonymous,
-  markBundleAsIssued
+  markBundleAsIssued,
+  markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -48,7 +49,11 @@ import {
   getTaskEventType
 } from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
-import { getToken } from '@workflow/utils/authUtils'
+import {
+  getToken,
+  hasRegisterScope,
+  hasValidateScope
+} from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
@@ -517,11 +522,22 @@ export async function markEventAsRequestedForCorrectionHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = await markBundleAsRequestedForCorrection(
-      request,
-      getToken(request)
-    )
-    return await postToHearth(payload)
+    if (hasRegisterScope(request)) {
+      const payload = await markBundleAsCorrected(
+        request.payload as fhir.Bundle,
+        getToken(request)
+      )
+      return await postToHearth(payload)
+    }
+    if (hasValidateScope(request)) {
+      const payload = await markBundleAsRequestedForCorrection(
+        request.payload as fhir.Bundle,
+        getToken(request)
+      )
+      return await postToHearth(payload)
+    }
+
+    throw new Error('User does not have a register or validate scope')
   } catch (error) {
     logger.error(
       `Workflow/markEventAsRequestedForCorrectionHandler: error: ${error}`

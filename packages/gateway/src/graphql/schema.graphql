@@ -176,6 +176,10 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
+  createBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!

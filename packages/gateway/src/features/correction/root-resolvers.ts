@@ -32,6 +32,31 @@ import { UnassignError } from '@gateway/utils/unassignError'
 
 export const resolvers: GQLResolver = {
   Mutation: {
+    async createBirthRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      if (inScope(authHeader, ['register'])) {
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
+        try {
+          await validateBirthDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
+        return await createEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.BIRTH
+        )
+      } else {
+        throw new Error('User does not have a register scope')
+      }
+    },
     async requestBirthRegistrationCorrection(
       _,
       { id, details },
@@ -108,6 +133,25 @@ export const resolvers: GQLResolver = {
       }
     }
   }
+}
+
+async function createEventRegistrationCorrection(
+  id: string,
+  authHeader: IAuthHeader,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  eventType: EVENT_TYPE
+) {
+  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
+
+  const res = await fetchFHIR(
+    '',
+    authHeader,
+    'POST',
+    JSON.stringify(fhirBundle)
+  )
+
+  // return composition-id
+  return getIDFromResponse(res)
 }
 
 async function requestEventRegistrationCorrection(

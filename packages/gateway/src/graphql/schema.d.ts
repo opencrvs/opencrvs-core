@@ -68,6 +68,7 @@ export interface GQLMutation {
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markBirthAsIssued: string
+  createBirthRegistrationCorrection: string
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
@@ -2654,6 +2655,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
+  createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
@@ -2835,6 +2837,22 @@ export interface MutationToMarkBirthAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsIssuedArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToCreateBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateBirthRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

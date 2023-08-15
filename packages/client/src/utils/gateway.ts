@@ -1066,7 +1066,7 @@ export type Mutation = {
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
-  requestBirthRegistrationCorrection: Scalars['ID']
+  createBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   requestMarriageRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
@@ -1273,7 +1273,7 @@ export type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
-export type MutationRequestBirthRegistrationCorrectionArgs = {
+export type MutationcreateBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
@@ -2340,14 +2340,14 @@ export type CreateOrUpdateCertificateSvgMutation = {
   } | null
 }
 
-export type RequestBirthRegistrationCorrectionMutationVariables = Exact<{
+export type createBirthRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type RequestBirthRegistrationCorrectionMutation = {
+export type createBirthRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
-  requestBirthRegistrationCorrection: string
+  createBirthRegistrationCorrection: string
 }
 
 export type RequestDeathRegistrationCorrectionMutationVariables = Exact<{

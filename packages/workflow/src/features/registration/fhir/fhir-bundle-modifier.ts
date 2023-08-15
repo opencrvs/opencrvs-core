@@ -52,7 +52,6 @@ import {
 import {
   getToken,
   getTokenPayload,
-  hasRegisterScope,
   ITokenPayload,
   USER_SCOPE
 } from '@workflow/utils/authUtils'
@@ -130,10 +129,9 @@ export async function markBundleAsValidated(
 }
 
 export async function markBundleAsRequestedForCorrection(
-  request: Hapi.Request,
+  bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const bundle = request.payload as fhir.Bundle & fhir.BundleEntry
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
@@ -158,7 +156,38 @@ export async function markBundleAsRequestedForCorrection(
     regStatusCode?.code
   )
 
-  taskResource.status = hasRegisterScope(request) ? 'accepted' : 'requested'
+  taskResource.status = 'requested'
+
+  return bundle
+}
+
+export async function markBundleAsCorrected(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle)
+  const practitioner = await getLoggedInPractitionerResource(token)
+  const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+  await mergePatientIdentifier(bundle)
+
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  taskResource.extension.push({
+    url: REQUEST_CORRECTION_EXTENSION_URL,
+    valueString: regStatusCode?.code
+  })
+
+  await setupLastRegLocation(taskResource, practitioner)
+
+  setupLastRegUser(taskResource, practitioner)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    regStatusCode?.code
+  )
 
   return bundle
 }
