@@ -12,7 +12,7 @@ RUN rm -rf /app/packages/*
 COPY packages/config /app/packages/config
 COPY packages/commons /app/packages/commons
 
-RUN yarn install --production
+RUN yarn install
 
 WORKDIR /app/packages/commons
 
