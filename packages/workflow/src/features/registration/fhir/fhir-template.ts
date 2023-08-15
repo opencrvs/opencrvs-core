@@ -78,7 +78,7 @@ function createTaskRefTemplate(event: EVENT_TYPE) {
     fullUrl: `urn:uuid:${uuid()}`,
     resource: {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'accepted',
       code: {
         coding: [
           {

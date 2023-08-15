@@ -328,7 +328,7 @@ export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
     fullUrl: `urn:uuid:${refUuid}`,
     resource: {
       resourceType: 'Task',
-      status: 'requested',
+      status: 'accepted',
       code: {
         coding: [
           {
