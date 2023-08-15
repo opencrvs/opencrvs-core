@@ -18,6 +18,9 @@ WORKDIR /app
 RUN yarn install
 
 # Build login
+WORKDIR /app/packages/components
+RUN yarn build
+
 WORKDIR /app/packages/login
 RUN yarn build
 

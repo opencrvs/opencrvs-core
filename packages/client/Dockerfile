@@ -18,6 +18,9 @@ WORKDIR /app
 RUN yarn install
 
 # Build client
+WORKDIR /app/packages/components
+RUN yarn build
+
 WORKDIR /app/packages/client
 RUN yarn build
 
