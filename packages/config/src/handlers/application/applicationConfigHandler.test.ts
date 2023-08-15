@@ -88,7 +88,9 @@ const mockConfig = {
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
-  EXTERNAL_VALIDATION_WORKQUEUE: true // this flag will decide whether to show external validation workqueue on registrar home
+  EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
+  USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email'
 } as unknown as IApplicationConfigurationModel
 
 describe('applicationHandler', () => {

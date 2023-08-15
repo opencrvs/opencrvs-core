@@ -106,6 +106,8 @@ export interface IApplicationConfig {
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
   LOGIN_BACKGROUND: ILoginBackground
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

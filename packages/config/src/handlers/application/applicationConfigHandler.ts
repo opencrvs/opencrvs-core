@@ -256,5 +256,7 @@ const applicationConfigResponseValidation = Joi.object({
   MARRIAGE_REGISTRATION: Joi.boolean().required(),
   DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
   INFORMANT_SIGNATURE: Joi.boolean().required(),
-  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required()
+  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required(),
+  USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional()
 })
