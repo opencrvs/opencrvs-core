@@ -15,6 +15,7 @@ export default function Modal(props: {
       id={'modalID'}
       actions={[
         <Button
+          key={null}
           onClick={props.closeModal}
           type="secondary"
           style={{
