@@ -1,6 +1,5 @@
 FROM node:gallium-alpine
 WORKDIR /app
-RUN ls
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
@@ -19,7 +18,6 @@ WORKDIR /app/packages/commons
 RUN yarn build
 
 WORKDIR /app/packages/config
-
 
 RUN yarn build
 

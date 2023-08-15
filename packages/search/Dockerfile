@@ -9,16 +9,8 @@ RUN rm -rf /app/data/*
 
 COPY packages/search /app/packages/search
 COPY packages/commons /app/packages/commons
-COPY packages/components /app/packages/components
 
-# error TS2688: Cannot find type definition file for 'fhir'.
 RUN yarn install
-
-RUN ls
-WORKDIR /app/packages
-RUN ls
-WORKDIR /app/data
-RUN ls
 
 WORKDIR /app/packages/commons
 

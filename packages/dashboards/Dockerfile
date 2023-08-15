@@ -7,8 +7,6 @@ RUN rm -rf /app/packages/*
 COPY packages/dashboards /packages/dashboards
 
 WORKDIR /packages/dashboards
- 
-RUN ls && pwd
 
 ENV METABASE_JAR=/app/metabase.jar
 ENV MB_DB_INIT_SQL_FILE=/metabase.init.db.sql
