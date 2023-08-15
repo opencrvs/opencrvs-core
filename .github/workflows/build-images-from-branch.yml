@@ -55,6 +55,7 @@ jobs:
   build:
     needs: base
     strategy:
+      fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ubuntu-latest
