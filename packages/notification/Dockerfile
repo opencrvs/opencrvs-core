@@ -20,8 +20,6 @@ RUN yarn build
 
 WORKDIR /app/packages/notification
 
-RUN yarn add @types/jsonwebtoken --dev
-
 RUN yarn build
 
 EXPOSE 2020

@@ -19,8 +19,6 @@ RUN yarn build
 
 WORKDIR /app/packages/gateway
 
-RUN yarn add @types/jsonwebtoken --dev
-RUN yarn add @types/redis --dev
 
 RUN yarn build
 

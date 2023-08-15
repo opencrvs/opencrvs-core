@@ -15,8 +15,6 @@ RUN yarn install
 
 WORKDIR /app/packages/commons
 
-RUN yarn add @types/jsonwebtoken --dev
-
 RUN yarn build
 
 WORKDIR /app/packages/webhooks

@@ -20,9 +20,6 @@ RUN yarn build
 
 WORKDIR /app/packages/config
 
-RUN yarn add @types/fhir --dev
-RUN yarn add @types/jsonwebtoken --dev
-RUN yarn add @types/lodash --dev
 
 RUN yarn build
 

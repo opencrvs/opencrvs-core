@@ -19,8 +19,6 @@ RUN yarn build
 
 WORKDIR /app/packages/metrics
 
-RUN yarn add @types/lodash --dev
-
 RUN yarn build
 
 EXPOSE 1050

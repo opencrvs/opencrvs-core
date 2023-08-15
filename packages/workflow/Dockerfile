@@ -19,7 +19,6 @@ RUN yarn build
 
 WORKDIR /app/packages/workflow
 
-RUN yarn add @types/lodash --dev
 
 RUN yarn build
 

@@ -19,8 +19,6 @@ RUN yarn build
 
 WORKDIR /app/packages/user-mgnt
 
-RUN yarn add @types/jsonwebtoken --dev
-
 RUN yarn build
 
 EXPOSE 3030
