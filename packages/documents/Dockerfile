@@ -19,8 +19,6 @@ RUN yarn build
 
 WORKDIR /app/packages/documents
 
-RUN yarn add 
-
 RUN yarn build
 
 EXPOSE 9050
