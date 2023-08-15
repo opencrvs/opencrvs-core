@@ -12,6 +12,7 @@ export default function Modal(props: {
 
   return (
     <ResponsiveModal
+      id={'modalID'}
       actions={[
         <Button
           onClick={props.closeModal}

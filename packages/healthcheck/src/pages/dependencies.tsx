@@ -22,7 +22,7 @@ const ServiceContent = styled(Content)`
   width: 200%;
 `
 
-export default function dependencies() {
+export default function Dependencies() {
   type ButtonType = 'primary' | 'secondary'
 
   const router = useRouter()

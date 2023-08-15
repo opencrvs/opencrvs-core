@@ -22,7 +22,7 @@ const ServiceContent = styled(Content)`
   width: 200%;
 `
 
-export default function microservices() {
+export default function Microservices() {
   type ButtonType = 'primary' | 'secondary'
 
   const router = useRouter()
@@ -197,7 +197,7 @@ export default function microservices() {
         }
       }))
     }
-    console.log(services)
+    // console.log(services)
     Object.values(services).forEach((service) => {
       fetch(service.url)
         .then(async (res) => {
