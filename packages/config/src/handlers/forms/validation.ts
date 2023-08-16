@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { TypeOf, z } from 'zod'
+import { z } from 'zod'
+
+const handlebarTemplate = z.object({
+  fieldName: z.string(),
+  operation: z.string(),
+  parameters: z.array(z.any()).optional()
+})
 
 const messageDescriptor = z.object({
   defaultMessage: z.string().optional(),
@@ -40,7 +46,11 @@ const field = z
     name: z.string(),
     type: z.string(),
     label: messageDescriptor,
-    conditionals: z.array(conditional).optional()
+    conditionals: z.array(conditional).optional(),
+    mapping: z
+      .object({ template: handlebarTemplate.optional() })
+      .passthrough()
+      .optional()
   })
   .passthrough()
 
@@ -59,21 +69,22 @@ const section = z.object({
   name: messageDescriptor,
   title: messageDescriptor.optional(),
   groups: z.array(group),
-  mapping: z.object({}).passthrough().optional()
+  mapping: z
+    .object({ template: z.array(handlebarTemplate).optional() })
+    .passthrough()
+    .optional()
 })
 
-function duplicateFieldNames(sec: TypeOf<typeof section>): string[] {
-  const fieldsCount = sec.groups
-    .flatMap((group) => group.fields)
-    .reduce((counter, field) => {
-      if (counter.has(field.name)) {
-        counter.set(field.name, counter.get(field.name)! + 1)
-      } else {
-        counter.set(field.name, 1)
-      }
-      return counter
-    }, new Map<string, number>())
-  return [...fieldsCount.entries()]
+function findDuplicates(arr: string[]): string[] {
+  const freqCount = arr.reduce((counter, str) => {
+    if (counter.has(str)) {
+      counter.set(str, counter.get(str)! + 1)
+    } else {
+      counter.set(str, 1)
+    }
+    return counter
+  }, new Map<string, number>())
+  return [...freqCount.entries()]
     .filter(([_, count]) => count > 1)
     .map(([name, _]) => name)
 }
@@ -84,22 +95,49 @@ const form = z.object({
   sections: z
     .array(
       section.refine(
-        (sec) => duplicateFieldNames(sec).length === 0,
+        (sec) =>
+          findDuplicates(
+            sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
+          ).length === 0,
         (sec) => ({
-          message: `Duplicate fields: ${duplicateFieldNames(sec).join(
-            ', '
-          )} found in section: ${sec.name}`
+          message: `Field names in a section should all be unique. Duplicate field(s): ${findDuplicates(
+            sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
+          ).join(', ')} found`
         })
       )
     )
     .refine(
-      (sections) => {
-        sections.filter(({ id }) => requiredSections.includes(id)).length >= 2
-      },
+      (sections) =>
+        sections.filter(({ id }) => requiredSections.includes(id)).length >= 2,
       {
         message: `${requiredSections
           .map((sec) => `"${sec}"`)
           .join(' & ')} sections are required`
+      }
+    )
+    .refine(
+      (sections) => {
+        findDuplicates(
+          sections
+            .flatMap((sec) => sec.groups)
+            .flatMap((group) => group.fields)
+            .map(({ mapping }) => mapping?.template?.fieldName)
+            .filter((maybeName): maybeName is string => Boolean(maybeName))
+        ).length === 0
+      },
+      (sections) => {
+        const duplicateCertificateHandlebars = findDuplicates(
+          sections
+            .flatMap((sec) => sec.groups)
+            .flatMap((group) => group.fields)
+            .map(({ mapping }) => mapping?.template?.fieldName)
+            .filter((maybeName): maybeName is string => Boolean(maybeName))
+        )
+        return {
+          message: `All the certificate handlebars should be unique for an event. Duplicates found for: ${duplicateCertificateHandlebars.join(
+            ', '
+          )}`
+        }
       }
     )
 })
