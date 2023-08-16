@@ -691,6 +691,8 @@ export interface GQLApplicationConfiguration {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackground
 }
@@ -708,6 +710,8 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
@@ -6031,6 +6035,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
+  USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
   LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
@@ -6180,6 +6186,30 @@ export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
 }
 
 export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<
   TParent = any,
   TResult = any
 > {
