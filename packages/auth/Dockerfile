@@ -5,17 +5,11 @@ WORKDIR /app
 COPY . .
 
 RUN rm -rf /app/packages/*
-RUN rm -rf /app/node_modules/*
-RUN rm -rf /app/data/*
-RUN rm -rf /app/.git/*
 
 COPY packages/auth /app/packages/auth
 COPY packages/commons /app/packages/commons
 
 RUN yarn install
-
-# RUN du -h -d 1 | sort -n
-RUN ls -lh
 
 WORKDIR /app/packages/commons
 
@@ -25,6 +19,15 @@ WORKDIR /app/packages/auth
 
 RUN yarn build
 
-EXPOSE 4040
 
-CMD yarn start:prod
+# Step 2. Build the actual image
+
+FROM nginx
+
+COPY --from=0 /app/packages/auth/build/ /usr/share/nginx/html/
+
+COPY infrastructure/nginx-deploy-config.sh /
+
+RUN chmod +x /nginx-deploy-config.sh
+CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
+

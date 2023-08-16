@@ -14,7 +14,6 @@ COPY packages/components /app/packages/components
 
 RUN apk update && apk add make python3 g++
 
-WORKDIR /app
 RUN yarn install
 
 # Build login
