@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { z } from 'zod'
+import { TypeOf, z } from 'zod'
 
 const messageDescriptor = z.object({
   defaultMessage: z.string().optional(),
@@ -62,17 +62,46 @@ const section = z.object({
   mapping: z.object({}).passthrough().optional()
 })
 
+function duplicateFieldNames(sec: TypeOf<typeof section>): string[] {
+  const fieldsCount = sec.groups
+    .flatMap((group) => group.fields)
+    .reduce((counter, field) => {
+      if (counter.has(field.name)) {
+        counter.set(field.name, counter.get(field.name)! + 1)
+      } else {
+        counter.set(field.name, 1)
+      }
+      return counter
+    }, new Map<string, number>())
+  return [...fieldsCount.entries()]
+    .filter(([_, count]) => count > 1)
+    .map(([name, _]) => name)
+}
+
 const requiredSections = ['registration', 'documents']
 
 const form = z.object({
-  sections: z.array(section).refine(
-    (sections) => {
-      sections.filter(({ id }) => requiredSections.includes(id)).length >= 2
-    },
-    {
-      message: `${requiredSections.join(' & ')} sections are required`
-    }
-  )
+  sections: z
+    .array(
+      section.refine(
+        (sec) => duplicateFieldNames(sec).length === 0,
+        (sec) => ({
+          message: `Duplicate fields: ${duplicateFieldNames(sec).join(
+            ', '
+          )} found in section: ${sec.name}`
+        })
+      )
+    )
+    .refine(
+      (sections) => {
+        sections.filter(({ id }) => requiredSections.includes(id)).length >= 2
+      },
+      {
+        message: `${requiredSections
+          .map((sec) => `"${sec}"`)
+          .join(' & ')} sections are required`
+      }
+    )
 })
 
 export const registrationForms = z.object({
