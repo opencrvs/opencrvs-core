@@ -1035,6 +1035,7 @@ export type Mutation = {
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
   createBirthRegistration: CreatedIds
+  createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
   createMarriageRegistration: CreatedIds
   createNotification: Notification
@@ -1066,7 +1067,7 @@ export type Mutation = {
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
-  createBirthRegistrationCorrection: Scalars['ID']
+  requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   requestMarriageRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
@@ -1125,6 +1126,11 @@ export type MutationChangePhoneArgs = {
 
 export type MutationCreateBirthRegistrationArgs = {
   details: BirthRegistrationInput
+}
+
+export type MutationCreateBirthRegistrationCorrectionArgs = {
+  details: BirthRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationCreateDeathRegistrationArgs = {
@@ -1273,7 +1279,7 @@ export type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
-export type MutationcreateBirthRegistrationCorrectionArgs = {
+export type MutationRequestBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
@@ -1790,12 +1796,15 @@ export type QuestionnaireQuestionInput = {
 export type RecordDetails = BirthRegistration | DeathRegistration
 
 export enum RegAction {
+  ApprovedCorrection = 'APPROVED_CORRECTION',
   Assigned = 'ASSIGNED',
+  Corrected = 'CORRECTED',
   Downloaded = 'DOWNLOADED',
   FlaggedAsPotentialDuplicate = 'FLAGGED_AS_POTENTIAL_DUPLICATE',
   MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
   MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
+  RejectedCorrection = 'REJECTED_CORRECTION',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
   Verified = 'VERIFIED',
@@ -2003,7 +2012,7 @@ export type RemoveBookmarkedSeachInput = {
 
 export type Response = {
   __typename?: 'Response'
-  msg: Scalars['String']
+  roleIdMap: Scalars['Map']
 }
 
 export type Role = {
@@ -2284,6 +2293,7 @@ export type UserInput = {
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
+  password?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
@@ -2340,12 +2350,12 @@ export type CreateOrUpdateCertificateSvgMutation = {
   } | null
 }
 
-export type createBirthRegistrationCorrectionMutationVariables = Exact<{
+export type CreateBirthRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type createBirthRegistrationCorrectionMutation = {
+export type CreateBirthRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   createBirthRegistrationCorrection: string
 }
@@ -2451,33 +2461,6 @@ export type CreateOrUpdateUserMutationVariables = Exact<{
 export type CreateOrUpdateUserMutation = {
   __typename?: 'Mutation'
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
-}
-
-export type GetSystemRolesQueryVariables = Exact<{
-  value?: InputMaybe<ComparisonInput>
-}>
-
-export type GetSystemRolesQuery = {
-  __typename?: 'Query'
-  getSystemRoles?: Array<{
-    __typename?: 'SystemRole'
-    id: string
-    value: SystemRoleType
-    roles: Array<{
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
-    }>
-  }> | null
-}
-
-export type UpdateRoleMutationVariables = Exact<{
-  systemRole?: InputMaybe<SystemRoleInput>
-}>
-
-export type UpdateRoleMutation = {
-  __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; msg: string }
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -4902,6 +4885,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       groomSignature?: string | null
       groomSignatureURI?: string | null
       brideSignature?: string | null
@@ -5234,6 +5218,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       groomSignature?: string | null
       groomSignatureURI?: string | null
       brideSignature?: string | null

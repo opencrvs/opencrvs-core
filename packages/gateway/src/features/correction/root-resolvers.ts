@@ -38,10 +38,10 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (inScope(authHeader, ['register'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
+        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        // if (!hasAssignedToThisUser) {
+        //   throw new UnassignError('User has been unassigned')
+        // }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
@@ -73,6 +73,56 @@ export const resolvers: GQLResolver = {
           throw new UserInputError(error.message)
         }
         return await requestEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.BIRTH
+        )
+      } else {
+        throw new Error('User does not have a register scope')
+      }
+    },
+    async approveBirthRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      if (inScope(authHeader, ['register', 'validate'])) {
+        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        // if (!hasAssignedToThisUser) {
+        //   throw new UnassignError('User has been unassigned')
+        // }
+        try {
+          await validateBirthDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
+        return await approveEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.BIRTH
+        )
+      } else {
+        throw new Error('User does not have a register scope')
+      }
+    },
+    async rejectBirthRegistrationCorrection(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      if (inScope(authHeader, ['register', 'validate'])) {
+        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        // if (!hasAssignedToThisUser) {
+        //   throw new UnassignError('User has been unassigned')
+        // }
+        try {
+          await validateBirthDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
+        return await rejectEventRegistrationCorrection(
           id,
           authHeader,
           details,
@@ -161,6 +211,72 @@ async function requestEventRegistrationCorrection(
   eventType: EVENT_TYPE
 ) {
   const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
+  const task = fhirBundle.entry?.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  task.resource.status = 'requested'
+
+  const res = await fetchFHIR(
+    '',
+    authHeader,
+    'POST',
+    JSON.stringify(fhirBundle)
+  )
+
+  // return composition-id
+  return getIDFromResponse(res)
+}
+
+async function approveEventRegistrationCorrection(
+  id: string,
+  authHeader: IAuthHeader,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  eventType: EVENT_TYPE
+) {
+  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
+  const task = fhirBundle.entry?.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  task.resource.status = 'accepted'
+
+  const res = await fetchFHIR(
+    '',
+    authHeader,
+    'POST',
+    JSON.stringify(fhirBundle)
+  )
+
+  // return composition-id
+  return getIDFromResponse(res)
+}
+
+async function rejectEventRegistrationCorrection(
+  id: string,
+  authHeader: IAuthHeader,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
+  eventType: EVENT_TYPE
+) {
+  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
+  const task = fhirBundle.entry?.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  task.resource.status = 'rejected'
+
   const res = await fetchFHIR(
     '',
     authHeader,

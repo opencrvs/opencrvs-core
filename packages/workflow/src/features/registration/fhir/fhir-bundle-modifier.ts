@@ -156,8 +156,6 @@ export async function markBundleAsRequestedForCorrection(
     regStatusCode?.code
   )
 
-  taskResource.status = 'requested'
-
   return bundle
 }
 

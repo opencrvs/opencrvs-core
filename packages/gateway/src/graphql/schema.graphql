@@ -184,6 +184,14 @@ type Mutation {
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
+  approveBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  rejectBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
@@ -1484,6 +1492,9 @@ enum RegAction {
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
+  APPROVED_CORRECTION
+  REJECTED_CORRECTION
+  CORRECTED
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE

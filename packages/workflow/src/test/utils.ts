@@ -120,7 +120,7 @@ export const testFhirBundle = {
       fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         intent: '',
         focus: {
           reference: 'urn:uuid:888'
@@ -335,7 +335,7 @@ export const testFhirBundleWithIds = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -528,7 +528,7 @@ export const testFhirBundleWithIdsForDeath = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -641,7 +641,7 @@ export const testFhirTaskBundle = {
         'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         intent: '',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
@@ -697,7 +697,7 @@ export const testDeathFhirTaskBundle = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -724,7 +724,7 @@ export const testDeathFhirTaskBundle = {
 
 export const taskResouceMock = JSON.stringify({
   resourceType: 'Task',
-  status: 'accepted',
+  status: 'ready',
   code: {
     coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
   },
@@ -1762,7 +1762,7 @@ export const testMarriageFhirBundle = {
       fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         intent: '',
         focus: {
           reference: 'urn:uuid:888'
@@ -1964,7 +1964,7 @@ export const testInProgressDeathFhirBundle = {
 
 export const deathTaskMock = JSON.stringify({
   resourceType: 'Task',
-  status: 'accepted',
+  status: 'ready',
   code: {
     coding: [
       {

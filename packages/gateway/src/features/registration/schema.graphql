@@ -26,6 +26,9 @@ enum RegAction {
   UNASSIGNED
   REINSTATED
   REQUESTED_CORRECTION
+  APPROVED_CORRECTION
+  REJECTED_CORRECTION
+  CORRECTED
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
@@ -531,6 +534,14 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   requestBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  approveBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  rejectBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!

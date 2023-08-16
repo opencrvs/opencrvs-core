@@ -155,7 +155,7 @@ export const mockBirthFhirBundle = {
       fullUrl: 'urn:uuid:791afdc5-2d8b-4e05-bd99-4aeea0b0480c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -740,7 +740,7 @@ export const mockBirthFhirBundleWithoutCompositionId = {
       fullUrl: 'urn:uuid:412e286c-8839-4f1d-b7c0-4d069b2ec58c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -1379,7 +1379,7 @@ export const mockDeathFhirBundle = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -1778,7 +1778,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2231,7 +2231,7 @@ export const mockTaskBundle = {
         'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2255,7 +2255,7 @@ export const mockBirthRejectionTaskBundle = {
         'http://localhost:3447/fhir/Task/16b3a085-0cf8-40db-8213-58ecc8f72790/_history/99c8a143-675e-4a5c-a6d7-aaa5f10e8b9e',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2340,7 +2340,7 @@ export const mockBirthRejectionTaskBundleWithoutCompositionReference = {
         'http://localhost:3447/fhir/Task/16b3a085-0cf8-40db-8213-58ecc8f72790/_history/99c8a143-675e-4a5c-a6d7-aaa5f10e8b9e',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2422,7 +2422,7 @@ export const mockDeathRejectionTaskBundle = {
         'http://localhost:3447/fhir/Task/be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a/_history/57a41663-6f07-42b7-9cce-c2945ddd3a0c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2499,7 +2499,7 @@ export const mockMarriageRejectionTaskBundle = {
         'http://localhost:3447/fhir/Task/be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a/_history/57a41663-6f07-42b7-9cce-c2945ddd3a0c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2576,7 +2576,7 @@ export const mockDeathRejectionTaskBundleWithoutCompositionReference = {
         'http://localhost:3447/fhir/Task/be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a/_history/57a41663-6f07-42b7-9cce-c2945ddd3a0c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -2784,7 +2784,7 @@ export const mockBirthFhirBundleWithoutParents = {
       fullUrl: 'urn:uuid:791afdc5-2d8b-4e05-bd99-4aeea0b0480c',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -3541,7 +3541,7 @@ export const mockMinimalDeathFhirBundle = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -3810,7 +3810,7 @@ export const mockMinimalMarriageFhirBundle = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -4069,7 +4069,7 @@ export const mockTaskBirthCorrectionBundle = {
         'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         intent: '',
         input: [
           {
@@ -4133,7 +4133,7 @@ export const mockTaskBundleWithExtensions = {
         'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -4535,7 +4535,7 @@ export const mockMarriageFhirBundle = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -4863,7 +4863,7 @@ export const mockMarriageFhirBundleWithoutCompositionId = {
       fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
       resource: {
         resourceType: 'Task',
-        status: 'accepted',
+        status: 'ready',
         code: {
           coding: [
             {

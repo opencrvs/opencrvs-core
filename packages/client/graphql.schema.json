@@ -1893,30 +1893,6 @@
         "description": null,
         "fields": [
           {
-            "name": "ADDRESSES",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ADMIN_LEVELS",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "APPLICATION_NAME",
             "description": null,
             "args": [],
@@ -2007,42 +1983,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
               "ofType": null
             },
             "isDeprecated": false,
@@ -2145,30 +2085,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "ADDRESSES",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ADMIN_LEVELS",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "APPLICATION_NAME",
             "description": null,
             "type": {
@@ -2258,42 +2174,6 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_BIRTH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_DEATH_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HIDE_MARRIAGE_EVENT_REGISTER_INFORMATION",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null,
@@ -10105,6 +9985,55 @@
             "deprecationReason": null
           },
           {
+            "name": "createBirthRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BirthRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "createDeathRegistration",
             "description": null,
             "args": [
@@ -15857,7 +15786,19 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "APPROVED_CORRECTION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ASSIGNED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CORRECTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -15888,6 +15829,12 @@
           },
           {
             "name": "REINSTATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REJECTED_CORRECTION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -17999,7 +17946,7 @@
         "description": null,
         "fields": [
           {
-            "name": "msg",
+            "name": "roleIdMap",
             "description": null,
             "args": [],
             "type": {
@@ -18007,7 +17954,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Map",
                 "ofType": null
               }
             },
@@ -20446,6 +20393,18 @@
                   }
                 }
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "password",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,

@@ -70,6 +70,8 @@ export interface GQLMutation {
   markBirthAsIssued: string
   createBirthRegistrationCorrection: string
   requestBirthRegistrationCorrection: string
+  approveBirthRegistrationCorrection: string
+  rejectBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
   markEventAsNotDuplicate: string
@@ -1373,6 +1375,9 @@ export const enum GQLRegAction {
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  APPROVED_CORRECTION = 'APPROVED_CORRECTION',
+  REJECTED_CORRECTION = 'REJECTED_CORRECTION',
+  CORRECTED = 'CORRECTED',
   DOWNLOADED = 'DOWNLOADED',
   VIEWED = 'VIEWED',
   MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE',
@@ -2657,6 +2662,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
   createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
+  approveBirthRegistrationCorrection?: MutationToApproveBirthRegistrationCorrectionResolver<TParent>
+  rejectBirthRegistrationCorrection?: MutationToRejectBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
   markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
@@ -2869,6 +2876,38 @@ export interface MutationToRequestBirthRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToRequestBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToApproveBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRejectBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToRejectBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRejectBirthRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

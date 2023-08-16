@@ -1028,8 +1028,26 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.UNASSIGNED
   } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VERIFIED
-  } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
+  } else if (
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
+    task.status === 'requested'
+  ) {
     return GQLRegAction.REQUESTED_CORRECTION
+  } else if (
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
+    task.status === 'completed'
+  ) {
+    return GQLRegAction.CORRECTED
+  } else if (
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
+    task.status === 'accepted'
+  ) {
+    return GQLRegAction.APPROVED_CORRECTION
+  } else if (
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
+    task.status === 'rejected'
+  ) {
+    return GQLRegAction.REJECTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
