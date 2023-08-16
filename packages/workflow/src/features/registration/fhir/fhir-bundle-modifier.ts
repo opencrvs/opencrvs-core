@@ -41,7 +41,8 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef
+  getPractitionerRef,
+  getSystem
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import * as Hapi from '@hapi/hapi'
@@ -544,24 +545,36 @@ function isSystemInitiated(scopes: string[] | undefined) {
   return Boolean(scopes?.some((scope) => SYSTEM_SCOPES.includes(scope)))
 }
 
-export function setupSystemIdentifier(request: Hapi.Request) {
+export async function setupSystemIdentifier(request: Hapi.Request) {
   const token = getToken(request)
   const { sub: systemId } = getTokenPayload(token)
   const bundle = request.payload as fhir.Bundle
   const taskResource = getTaskResource(bundle)
   const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+
+  if (!isSystemInitiated(request.auth.credentials.scope)) {
+    return
+  }
+
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
+
   taskResource.identifier = taskResource.identifier.filter(
     ({ system }) => system != systemIdentifierUrl
   )
-  if (isSystemInitiated(request.auth.credentials.scope)) {
-    taskResource.identifier.push({
-      system: systemIdentifierUrl,
-      value: systemId
-    })
-  }
+
+  const systemInformation = await getSystem(systemId, {
+    Authorization: `Bearer ${token}`
+  })
+
+  const { name, username, type } = systemInformation
+  const systemInformationJSON = { name, username, type }
+
+  taskResource.identifier.push({
+    system: systemIdentifierUrl,
+    value: JSON.stringify(systemInformationJSON)
+  })
 }
 
 export function setupLastRegUser(

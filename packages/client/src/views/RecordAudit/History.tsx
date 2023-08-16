@@ -243,11 +243,11 @@ export const GetHistory = ({
     user: (
       <>
         {isFlaggedAsPotentialDuplicate(item) ? (
-          <SystemUser name={item.system?.name} />
+          <SystemUser name={item.system?.name || ''} />
         ) : isVerifiedAction(item) ? (
           <div />
         ) : isSystemInitiated(item) ? (
-          <HealthSystemUser name={item.system?.name} />
+          <HealthSystemUser name={item.system?.name || ''} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
@@ -276,7 +276,7 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) || !item.user?.systemRole ? (
-      intl.formatMessage(getSystemType(item.system?.type))
+      intl.formatMessage(getSystemType(item.system?.type || ''))
     ) : (
       getUserRole(currentLanguage, item.user?.role)
     ),

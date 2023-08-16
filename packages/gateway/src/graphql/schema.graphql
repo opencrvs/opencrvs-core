@@ -762,6 +762,7 @@ input UserInput {
   username: String
   mobile: String
   password: String
+  status: Status
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -962,7 +963,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
-  system: System
+  system: IntegratedSystem
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1489,6 +1490,12 @@ enum RegAction {
 
 type StatusReason {
   text: String
+}
+
+type IntegratedSystem {
+  name: String
+  username: String
+  type: String
 }
 
 type Comment {

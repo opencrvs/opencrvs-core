@@ -627,3 +627,27 @@ export const longDateTransformer =
 
     return transformedData
   }
+
+export const childFieldToIdentityTransformer =
+  (idTypes: string[]) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: 'child'
+  ) => {
+    const transformedSection = transformedData[sectionId]
+    if (!transformedSection.identifier) {
+      transformedSection.identifier = []
+    }
+
+    idTypes.forEach((idType) => {
+      if (!draftData[sectionId][idType]) {
+        return
+      }
+
+      transformedSection.identifier.push({
+        id: draftData[sectionId][idType],
+        type: idType
+      })
+    })
+  }
