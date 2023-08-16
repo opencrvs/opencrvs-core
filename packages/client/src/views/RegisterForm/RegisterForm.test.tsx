@@ -625,6 +625,7 @@ describe('when user is in the register form from sent for review edit', () => {
       .simulate('click')
     component.update()
 
+    await flushPromises()
     const modifyTime =
       testAppStore.getState().declarationsState.declarations[0].modifiedOn
 

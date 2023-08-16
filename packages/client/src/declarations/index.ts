@@ -20,7 +20,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Attachment, Event, Query, SystemRoleType } from '@client/utils/gateway'
+import {
+  Attachment,
+  Event,
+  History,
+  Query,
+  SystemRoleType
+} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -322,7 +328,7 @@ interface IStoreDeclarationAction {
 interface IModifyDeclarationAction {
   type: typeof MODIFY_DECLARATION
   payload: {
-    declaration: IDeclaration | IPrintableDeclaration
+    declaration: IPrintableDeclaration | Partial<IDeclaration>
   }
 }
 
@@ -542,9 +548,8 @@ export function storeDeclaration(
 }
 
 export function modifyDeclaration(
-  declaration: IDeclaration | IPrintableDeclaration
+  declaration: IPrintableDeclaration | Partial<IDeclaration>
 ): IModifyDeclarationAction {
-  declaration.modifiedOn = Date.now()
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
@@ -610,6 +615,7 @@ export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
+  declaration.modifiedOn = Date.now()
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
@@ -1041,7 +1047,8 @@ function requestWithStateWrapper(
       }
       const allfetchableURLs = [
         ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data)
+        ...getSignatureUrls(data.data),
+        ...getProfileIconUrls(data.data)
       ]
 
       await Promise.all(
@@ -1053,6 +1060,20 @@ function requestWithStateWrapper(
       reject(error)
     }
   })
+}
+
+function getProfileIconUrls(queryResultData: Query) {
+  const history =
+    queryResultData.fetchBirthRegistration?.history ||
+    queryResultData.fetchDeathRegistration?.history ||
+    queryResultData.fetchMarriageRegistration?.history
+
+  const userAvatars = (history ?? [])
+    .filter((h): h is History => Boolean(h))
+    .map((h) => h.user?.avatar?.data)
+    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+
+  return [...new Set(userAvatars).values()]
 }
 
 function getAttachmentUrls(queryResultData: Query) {
@@ -1199,7 +1220,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ({ id }) => id === action.payload.declarationId
       )
 
-      if (!declaration || declaration.data[action.payload.pageId]) {
+      if (
+        !declaration ||
+        declaration.data[action.payload.pageId] ||
+        action.payload.pageId === 'preview' ||
+        action.payload.pageId === 'review'
+      ) {
         return state
       }
       const modifiedDeclaration = {
@@ -1271,7 +1297,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )?.value
       }
 
-      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
+      newDeclarations[currentDeclarationIndex] = {
+        ...newDeclarations[currentDeclarationIndex],
+        ...modifiedDeclaration
+      }
 
       return {
         ...state,

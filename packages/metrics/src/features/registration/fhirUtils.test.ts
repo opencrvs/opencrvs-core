@@ -17,7 +17,7 @@ import {
   getObservationValueByCode,
   getTimeLoggedFromTask,
   isNotification,
-  getStartedByFieldAgent,
+  getRecordInitiator,
   FHIR_RESOURCE_TYPE,
   CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
@@ -1224,7 +1224,7 @@ describe('fhirUtils', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
 
-    expect(getStartedByFieldAgent(taskHistory)).toEqual(
+    expect(getRecordInitiator(taskHistory)).toEqual(
       'fe16875f-3e5f-47bc-85d6-16482a63e7df'
     )
   })
@@ -1233,7 +1233,7 @@ describe('fhirUtils', () => {
     const taskHistory = require('./test-data/task-history.json')
     taskHistory.entry[1].resource.businessStatus.coding[0].code = ''
 
-    expect(() => getStartedByFieldAgent(taskHistory)).toThrowError(
+    expect(() => getRecordInitiator(taskHistory)).toThrowError(
       'Task not found!'
     )
   })

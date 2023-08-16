@@ -699,10 +699,14 @@ export const DuplicateFormTabs = (props: IProps) => {
           props.declaration.data.registration?.registrationNumber,
         registeredAt: (
           props.declaration.data.history as unknown as History[]
-        ).find((data) => data.action === null)?.office?.name,
+        ).find(
+          (data) =>
+            data.action === null && data.regStatus === RegStatus.Registered
+        )?.office?.name,
         registeredBy: getName(
           (props.declaration.data.history as unknown as History[]).find(
-            (data) => data.action === null
+            (data) =>
+              data.action === null && data.regStatus === RegStatus.Registered
           )?.user?.name as HumanName[],
           language
         )
@@ -779,11 +783,7 @@ export const DuplicateFormTabs = (props: IProps) => {
         {
           label: (
             <Text variant="bold16" element="span" color="grey600">
-              {intl.formatMessage(
-                duplicateRegData.type.toLowerCase() === Event.Birth
-                  ? recordAuditMessages.brn
-                  : recordAuditMessages.drn
-              )}
+              {intl.formatMessage(recordAuditMessages.rn)}
             </Text>
           ),
           heading: {
@@ -913,6 +913,11 @@ export const DuplicateFormTabs = (props: IProps) => {
             size={ContentSize.LARGE}
             showTitleOnMobile
           >
+            <Text element="h1" variant="h4" align="left" id="title-text">
+              {intl.formatMessage(
+                duplicateMessages.duplicateDeclarationDetails
+              )}
+            </Text>
             <Stack direction="column" gap={20} alignItems={'stretch'}>
               {comparisonDelcarationData.map((sections, index) => {
                 return (

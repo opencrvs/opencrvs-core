@@ -109,7 +109,11 @@ export async function sendEventNotification(
           authHeader,
           {
             trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle)
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -205,7 +209,11 @@ export async function sendEventNotification(
           authHeader,
           {
             trackingId: getTrackingId(fhirBundle),
-            crvsOffice: await getCRVSOfficeName(fhirBundle)
+            crvsOffice: await getCRVSOfficeName(fhirBundle),
+            informantName: await getInformantName(
+              fhirBundle,
+              INFORMANT_SECTION_CODE
+            )
           }
         )
       }
@@ -226,11 +234,11 @@ export async function sendEventNotification(
           {
             trackingId: getTrackingId(fhirBundle),
             crvsOffice: await getCRVSOfficeName(fhirBundle),
-            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             informantName: await getInformantName(
               fhirBundle,
               INFORMANT_SECTION_CODE
-            )
+            ),
+            name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE)
           }
         )
       }
