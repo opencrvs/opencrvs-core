@@ -5,7 +5,6 @@ WORKDIR /app
 COPY . .
 
 RUN rm -rf /app/packages/*
-RUN rm -rf /app/data/*
 
 COPY packages/search /app/packages/search
 COPY packages/commons /app/packages/commons
@@ -20,6 +19,16 @@ WORKDIR /app/packages/search
 
 RUN yarn build
 
-EXPOSE 9090
 
-CMD yarn start:prod
+# Step 2. Build the actual image
+
+FROM nginx
+
+COPY --from=0 /app/packages/search/build/ /usr/share/nginx/html/
+
+COPY infrastructure/nginx-deploy-config.sh /
+
+RUN chmod +x /nginx-deploy-config.sh
+CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
+
+
