@@ -45,6 +45,7 @@ const field = z
   .object({
     name: z.string(),
     type: z.string(),
+    custom: z.boolean().optional(),
     label: messageDescriptor,
     conditionals: z.array(conditional).optional(),
     mapping: z
@@ -91,20 +92,115 @@ function findDuplicates(arr: string[]): string[] {
 
 const REQUIRED_SECTIONS = ['registration', 'documents'] as const
 
+// TODO: add all the address fields in child section
+// & fill out all the other sections
+const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
+  child: ['firstNamesEng', 'familyNameEng', 'gender', 'childBirthDate'],
+  mother: [],
+  father: [],
+  deceased: [],
+  groom: [],
+  bride: [],
+  informant: [],
+  witnessOne: [],
+  witnessTwo: []
+}
+
+// const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
+//   child: ['attendantAtBirth', 'birthType', 'weightAtBirth'],
+//   mother: [],
+//   father: [],
+//   deceased: [],
+//   groom: [],
+//   bride: [],
+//   informant: [],
+//   witnessOne: [],
+//   witnessTwo: []
+// }
+
 const form = z.object({
   sections: z
     .array(
-      section.refine(
-        (sec) =>
-          findDuplicates(
-            sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
-          ).length === 0,
-        (sec) => ({
-          message: `Field names in a section should all be unique. Duplicate field(s): ${findDuplicates(
-            sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
-          ).join(', ')} found`
-        })
-      )
+      section
+        .refine(
+          (sec) =>
+            findDuplicates(
+              sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
+            ).length === 0,
+          (sec) => ({
+            message: `Field names in a section should all be unique. Duplicate field(s): ${findDuplicates(
+              sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
+            ).join(', ')} found`
+          })
+        )
+        .refine(
+          (sec) => {
+            const fieldsInSection = sec.groups.flatMap((group) =>
+              group.fields.map(({ name }) => name)
+            )
+            return (
+              (REQUIRED_FIELDS_IN_SECTION[sec.id]?.filter(
+                (reqField) => !fieldsInSection.includes(reqField)
+              ).length ?? 0) === 0
+            )
+          },
+          (sec) => {
+            const fieldsInSection = sec.groups.flatMap((group) =>
+              group.fields.map(({ name }) => name)
+            )
+            const notIncludedRequiredFields = (
+              REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []
+            ).filter((reqField) => !fieldsInSection.includes(reqField))
+            return {
+              message: `Missing required fields "${notIncludedRequiredFields.join(
+                ', '
+              )}" found`
+            }
+          }
+        )
+      // .refine(
+      //   (sec) => {
+      //     const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
+      //       group.fields
+      //         .filter(({ custom }) => !Boolean(custom))
+      //         .filter(
+      //           ({ name }) =>
+      //             !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
+      //         )
+      //         .map(({ name }) => name)
+      //     )
+      //     return (
+      //       nonCustomfieldsInSection.filter(
+      //         (nonCustomField) =>
+      //           !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
+      //             nonCustomField
+      //           )
+      //       ).length === 0
+      //     )
+      //   },
+      //   (sec) => {
+      //     const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
+      //       group.fields
+      //         .filter(({ custom }) => !Boolean(custom))
+      //         .filter(
+      //           ({ name }) =>
+      //             !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
+      //         )
+      //         .map(({ name }) => name)
+      //     )
+      //     const unrecognizedFields = nonCustomfieldsInSection.filter(
+      //       (nonCustomField) =>
+      //         !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
+      //           nonCustomField
+      //         )
+      //     )
+      //     return {
+      //       message: `Use "custom" property to make a field custom. Unrecognized non custom fields "${unrecognizedFields.join(
+      //         ', '
+      //       )}" found`
+      //     }
+      //   }
+      // )
     )
     .refine(
       (sections) =>
