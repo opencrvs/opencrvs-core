@@ -89,7 +89,7 @@ function findDuplicates(arr: string[]): string[] {
     .map(([name, _]) => name)
 }
 
-const requiredSections = ['registration', 'documents']
+const REQUIRED_SECTIONS = ['registration', 'documents'] as const
 
 const form = z.object({
   sections: z
@@ -108,35 +108,47 @@ const form = z.object({
     )
     .refine(
       (sections) =>
-        sections.filter(({ id }) => requiredSections.includes(id)).length >= 2,
+        sections.filter(({ id }) =>
+          REQUIRED_SECTIONS.includes(id as typeof REQUIRED_SECTIONS[number])
+        ).length >= 2,
       {
-        message: `${requiredSections
-          .map((sec) => `"${sec}"`)
-          .join(' & ')} sections are required`
+        message: `${REQUIRED_SECTIONS.map((sec) => `"${sec}"`).join(
+          ' & '
+        )} sections are required`
       }
     )
     .refine(
       (sections) => {
         findDuplicates(
           sections
-            .flatMap((sec) => sec.groups)
-            .flatMap((group) => group.fields)
-            .map(({ mapping }) => mapping?.template?.fieldName)
+            .flatMap((sec) => [
+              ...(sec.mapping?.template ?? []).map(
+                ({ fieldName }) => fieldName
+              ),
+              ...sec.groups
+                .flatMap((group) => group.fields)
+                .map(({ mapping }) => mapping?.template?.fieldName)
+            ])
             .filter((maybeName): maybeName is string => Boolean(maybeName))
         ).length === 0
       },
       (sections) => {
         const duplicateCertificateHandlebars = findDuplicates(
           sections
-            .flatMap((sec) => sec.groups)
-            .flatMap((group) => group.fields)
-            .map(({ mapping }) => mapping?.template?.fieldName)
+            .flatMap((sec) => [
+              ...(sec.mapping?.template ?? []).map(
+                ({ fieldName }) => fieldName
+              ),
+              ...sec.groups
+                .flatMap((group) => group.fields)
+                .map(({ mapping }) => mapping?.template?.fieldName)
+            ])
             .filter((maybeName): maybeName is string => Boolean(maybeName))
         )
         return {
-          message: `All the certificate handlebars should be unique for an event. Duplicates found for: ${duplicateCertificateHandlebars.join(
+          message: `All the certificate handlebars should be unique for an event. Duplicate handlebars for "${duplicateCertificateHandlebars.join(
             ', '
-          )}`
+          )}"`
         }
       }
     )
