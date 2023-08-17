@@ -58,7 +58,11 @@ export const resolvers: GQLResolver = {
         INFORMANT_SIGNATURE_REQUIRED:
           applicationConfig.INFORMANT_SIGNATURE_REQUIRED as boolean,
         LOGIN_BACKGROUND:
-          applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput
+          applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput,
+        USER_NOTIFICATION_DELIVERY_METHOD:
+          applicationConfig.USER_NOTIFICATION_DELIVERY_METHOD as string,
+        INFORMANT_NOTIFICATION_DELIVERY_METHOD:
+          applicationConfig.INFORMANT_NOTIFICATION_DELIVERY_METHOD as string
       }
 
       const res = await fetch(

@@ -19,6 +19,11 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
+        identifier {
+          id
+          type
+          otherType
+        }
         name {
           use
           firstNames

@@ -442,7 +442,7 @@ function FormAppBar({
                   <Button
                     id="save-exit-btn"
                     type="primary"
-                    size="medium"
+                    size="small"
                     onClick={handleSaveAndExit}
                   >
                     <Icon name="DownloadSimple" />
@@ -452,7 +452,7 @@ function FormAppBar({
                 <Button
                   id="exit-btn"
                   type="secondary"
-                  size="medium"
+                  size="small"
                   onClick={handleExit}
                 >
                   <Icon name="X" />
@@ -511,13 +511,13 @@ function FormAppBar({
                 <Button
                   id="save-exit-btn"
                   type="primary"
-                  size="medium"
+                  size="small"
                   onClick={handleSaveAndExit}
                 >
                   <Icon name="DownloadSimple" />
                   {intl.formatMessage(buttonMessages.saveExitButton)}
                 </Button>
-                <Button type="secondary" size="medium" onClick={handleExit}>
+                <Button type="secondary" size="small" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
                 </Button>

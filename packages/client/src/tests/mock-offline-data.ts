@@ -477,7 +477,9 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     DATE_OF_BIRTH_UNKNOWN: true,
     INFORMANT_SIGNATURE: false,
-    INFORMANT_SIGNATURE_REQUIRED: false
+    INFORMANT_SIGNATURE_REQUIRED: false,
+    USER_NOTIFICATION_DELIVERY_METHOD: 'email',
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email'
   },
   anonymousConfig: {
     APPLICATION_NAME: 'Farajaland CRVS',

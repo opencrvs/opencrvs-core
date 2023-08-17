@@ -24,6 +24,8 @@ const applicationConfigMutation = gql`
       DATE_OF_BIRTH_UNKNOWN
       INFORMANT_SIGNATURE
       INFORMANT_SIGNATURE_REQUIRED
+      USER_NOTIFICATION_DELIVERY_METHOD
+      INFORMANT_NOTIFICATION_DELIVERY_METHOD
       LOGIN_BACKGROUND {
         backgroundColor
         backgroundImage

@@ -2237,6 +2237,7 @@ export const mockDataWithRegistarRoleSelected = {
   familyNameEng: 'Hossain',
   firstNames: 'Jeff',
   firstNamesEng: 'Jeff',
+  email: 'jeff@gmail.com',
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',

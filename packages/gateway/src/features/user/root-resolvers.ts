@@ -39,10 +39,7 @@ import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
-import {
-  validateAttachments,
-  validateNotificationDeliveryMethod
-} from '@gateway/utils/validators'
+import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -263,7 +260,6 @@ export const resolvers: GQLResolver = {
       }
 
       try {
-        await validateNotificationDeliveryMethod(user)
         if (user.signature) {
           await validateAttachments([user.signature])
         }
@@ -626,6 +622,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     systemRole: user.systemRole as string,
     role: user.role as string,
     ...(user.password && { password: user.password }),
+    ...(user.status && { status: user.status }),
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
