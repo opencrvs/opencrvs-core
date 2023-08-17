@@ -144,6 +144,7 @@ import {
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { addSchemaLevelResolveFunction } from 'graphql-tools'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1123,6 +1124,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           accum || this.hasFieldChanged(field, data, originalData),
         false
       )
+
       const draftOriginalData = draft.originalData
       if (draftOriginalData && hasAnyFieldChanged && !hasErrors) {
         const previousValues = taggedFields
@@ -1236,6 +1238,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     if (!originalData[field.name] && data[field.name] === '') {
       return false
     }
+
     const hasChanged = data[field.name] !== originalData[field.name]
     this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
     return hasChanged

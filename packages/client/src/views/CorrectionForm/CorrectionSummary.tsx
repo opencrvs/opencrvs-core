@@ -205,7 +205,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <>
         <ActionPageLight
           id="corrector_form"
-          title={intl.formatMessage(messages.title)}
+          title={'pöö'}
           hideBackground
           goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
