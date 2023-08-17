@@ -86,6 +86,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
+import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -96,6 +97,7 @@ const SupportingDocument = styled.div`
 `
 interface IProps {
   userPrimaryOffice?: UserDetails['primaryOffice']
+  userRole?: UserDetails['systemRole']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -164,7 +166,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration,
       intl,
       goBack,
-      declaration: { event }
+      declaration: { event },
+      userRole
     } = this.props
     const formSections = getViewableSection(registerForm[event], declaration)
     const relationShip = (
@@ -197,7 +200,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
-        {intl.formatMessage(buttonMessages.makeCorrection)}
+        {userRole === ROLE_REGISTRATION_AGENT
+          ? intl.formatMessage(buttonMessages.sendForApproval)
+          : intl.formatMessage(buttonMessages.makeCorrection)}
       </SuccessButton>
     )
 
@@ -952,7 +957,8 @@ export const CorrectionSummary = connect(
     registerForm: getRegisterForm(state),
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
-    userPrimaryOffice: getUserDetails(state)?.primaryOffice
+    userPrimaryOffice: getUserDetails(state)?.primaryOffice,
+    userRole: getUserDetails(state)?.systemRole
   }),
   {
     modifyDeclaration,
