@@ -19,9 +19,16 @@ RUN yarn build
 
 WORKDIR /app/packages/workflow
 
-
 RUN yarn build
 
-EXPOSE 5050
 
-CMD yarn start:prod
+# Step 2. Build the actual image
+
+FROM nginx
+
+COPY --from=0 /app/packages/workflow/build/ /usr/share/nginx/html/
+
+COPY infrastructure/nginx-deploy-config.sh /
+
+RUN chmod +x /nginx-deploy-config.sh
+CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
