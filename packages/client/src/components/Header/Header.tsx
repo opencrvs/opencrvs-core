@@ -125,6 +125,10 @@ interface IState {
   showLogoutModal: boolean
 }
 
+interface Forms {
+  [formName: string]: IForm
+}
+
 enum ACTIVE_MENU_ITEM {
   DECLARATIONS,
   CONFIG,
@@ -327,7 +331,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  getFieldNames = (forms: IForm[]) => {
+  getFieldNames = (forms: Forms) => {
     const fieldNames = []
     for (const form in forms) {
       for (const section of forms[form].sections) {
