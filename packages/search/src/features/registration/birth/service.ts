@@ -70,7 +70,7 @@ function getTypeFromTask(task: fhir.Task) {
    *
    * is when a correction is requested by a registration agent
    */
-  if (task.status === 'ready') {
+  if (task.status === 'requested') {
     return 'CORRECTION_REQUESTED'
   }
 
