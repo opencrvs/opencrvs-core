@@ -13,7 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IHeaderMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  typeBrnDrn: MessageDescriptor
+  typeRN: MessageDescriptor
   typePhone: MessageDescriptor
   nationalId: MessageDescriptor
   placeHolderTrackingId: MessageDescriptor
@@ -30,9 +30,9 @@ interface IHeaderMessages
 }
 
 const messagesToDefine: IHeaderMessages = {
-  typeBrnDrn: {
-    id: 'home.header.typeBrnDrn',
-    defaultMessage: 'BRN/DRN',
+  typeRN: {
+    id: 'home.header.typeRN',
+    defaultMessage: 'Registration no.',
     description: 'Search menu brn drn type'
   },
   typePhone: {

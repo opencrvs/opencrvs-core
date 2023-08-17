@@ -68,6 +68,8 @@ export interface IApplicationConfigurationModel extends Document {
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   LOGIN_BACKGROUND: ILoginBackground
 }
 
@@ -160,7 +162,9 @@ const configSchema = new Schema({
     required: true,
     default: false
   },
-  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false }
+  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
+  USER_NOTIFICATION_DELIVERY_METHOD: { type: String, required: false },
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: { type: String, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)

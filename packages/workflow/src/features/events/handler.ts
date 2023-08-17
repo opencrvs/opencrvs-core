@@ -192,7 +192,7 @@ export async function fhirWorkflowEventHandler(
   }
 
   if (event !== Events.UNKNOWN && event !== Events.EVENT_NOT_DUPLICATE) {
-    setupSystemIdentifier(request)
+    await setupSystemIdentifier(request)
   }
 
   let response

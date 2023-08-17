@@ -16,6 +16,7 @@ import { parseGQLResponse, raise } from './utils'
 import { TypeOf, z } from 'zod'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
 
 type CertificateMeta = TypeOf<typeof CertificateSchema>[number]
 
@@ -36,7 +37,7 @@ async function getCertificate() {
   const parsedCertificates = CertificateSchema.safeParse(await res.json())
   if (!parsedCertificates.success) {
     raise(
-      `Getting certificates from country-config errored with: ${JSON.stringify(
+      `Getting certificates from country-config errored with: ${inspect(
         parsedCertificates.error.issues
       )}`
     )
