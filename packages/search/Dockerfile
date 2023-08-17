@@ -30,5 +30,3 @@ COPY infrastructure/nginx-deploy-config.sh /
 
 RUN chmod +x /nginx-deploy-config.sh
 CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
-
-

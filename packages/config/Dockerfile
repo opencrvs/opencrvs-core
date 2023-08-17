@@ -1,9 +1,6 @@
 FROM node:gallium-alpine
 WORKDIR /app
 
-# Override the base log level (info).
-ENV NPM_CONFIG_LOGLEVEL warn
-
 COPY . .
 
 RUN rm -rf /app/packages/*
@@ -21,6 +18,14 @@ WORKDIR /app/packages/config
 
 RUN yarn build
 
-EXPOSE 2021
 
-CMD yarn start:prod
+# Step 2. Build the actual image
+
+FROM nginx
+
+COPY --from=0 /app/packages/config/build/ /usr/share/nginx/html/
+
+COPY infrastructure/nginx-deploy-config.sh /
+
+RUN chmod +x /nginx-deploy-config.sh
+CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
