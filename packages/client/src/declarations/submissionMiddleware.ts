@@ -47,6 +47,10 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  GQLCorrectionInput,
+  MutationToRequestRegistrationCorrectionArgs
+} from '@opencrvs/gateway/src/graphql/schema'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -61,8 +65,9 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
   [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
-  [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
+  [SubmissionAction.REQUEST_CORRECTION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.MAKE_CORRECTION]: SUBMISSION_STATUS.REQUESTING_CORRECTION,
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.CERTIFYING,
@@ -168,6 +173,13 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         : event === Event.Death
         ? getDeathMutation(submissionAction)
         : getMarriageMutation(submissionAction)
+
+    if (!mutation) {
+      throw new Error(
+        'Unknown mutation for submission action ' + submissionAction
+      )
+    }
+
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         const response = await client.mutate({
@@ -190,6 +202,17 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             })
           )
         }
+      } else if (submissionAction === SubmissionAction.REQUEST_CORRECTION) {
+        await client.mutate<
+          { requestRegistrationCorrection: string },
+          MutationToRequestRegistrationCorrectionArgs
+        >({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: gqlDetails.registration.correction
+          }
+        })
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,

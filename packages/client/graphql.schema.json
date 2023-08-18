@@ -1989,6 +1989,18 @@
             "deprecationReason": null
           },
           {
+            "name": "INFORMANT_NOTIFICATION_DELIVERY_METHOD",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "INFORMANT_SIGNATURE",
             "description": null,
             "args": [],
@@ -2062,6 +2074,18 @@
           },
           {
             "name": "PHONE_NUMBER_PATTERN",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_NOTIFICATION_DELIVERY_METHOD",
             "description": null,
             "args": [],
             "type": {
@@ -2181,6 +2205,18 @@
             "deprecationReason": null
           },
           {
+            "name": "INFORMANT_NOTIFICATION_DELIVERY_METHOD",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "INFORMANT_SIGNATURE",
             "description": null,
             "type": {
@@ -2242,6 +2278,18 @@
           },
           {
             "name": "PHONE_NUMBER_PATTERN",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_NOTIFICATION_DELIVERY_METHOD",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -9637,6 +9685,55 @@
             "deprecationReason": null
           },
           {
+            "name": "approveBirthRegistrationCorrection",
+            "description": null,
+            "args": [
+              {
+                "name": "details",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BirthRegistrationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "auditUser",
             "description": null,
             "args": [
@@ -11327,36 +11424,7 @@
             "deprecationReason": null
           },
           {
-            "name": "removeBookmarkedAdvancedSearch",
-            "description": null,
-            "args": [
-              {
-                "name": "removeBookmarkedSearchInput",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "RemoveBookmarkedSeachInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "BookMarkedSearches",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "requestBirthRegistrationCorrection",
+            "name": "rejectBirthRegistrationCorrection",
             "description": null,
             "args": [
               {
@@ -11405,34 +11473,18 @@
             "deprecationReason": null
           },
           {
-            "name": "requestDeathRegistrationCorrection",
+            "name": "removeBookmarkedAdvancedSearch",
             "description": null,
             "args": [
               {
-                "name": "details",
+                "name": "removeBookmarkedSearchInput",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "DeathRegistrationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
-                "name": "id",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "RemoveBookmarkedSeachInput",
                     "ofType": null
                   }
                 },
@@ -11442,19 +11494,15 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "BookMarkedSearches",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "requestMarriageRegistrationCorrection",
+            "name": "requestRegistrationCorrection",
             "description": null,
             "args": [
               {
@@ -11465,7 +11513,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "MarriageRegistrationInput",
+                    "name": "CorrectionInput",
                     "ofType": null
                   }
                 },
@@ -15929,6 +15977,12 @@
           },
           {
             "name": "CERTIFIED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CORRECTION_REQUESTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -20487,6 +20541,18 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "SignatureInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "status",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "Status",
               "ofType": null
             },
             "defaultValue": null,

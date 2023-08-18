@@ -582,12 +582,18 @@ export interface GQLBirthRegistrationInput {
   updatedAt?: GQLDate
 }
 
-export interface GQLCorrectionRequestInput {
-  requestingIndividual: string
-  reason: string
-  comment: string
-  hasShowedVerifiedDocument: boolean
-  updates: Array<GQLCorrectionRequestUpdateInput>
+export interface GQLCorrectionInput {
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
+  attestedAndCopied?: boolean
+  noSupportingDocumentationRequired?: boolean
+  payments: Array<GQLPaymentInput>
+  values?: Array<GQLCorrectionValueInput | null>
+  location?: GQLLocationInput
+  data?: string
+  reason?: string
+  otherReason?: string
+  note?: string
 }
 
 export interface GQLReinstated {
@@ -1220,10 +1226,21 @@ export interface GQLQuestionnaireQuestionInput {
   value?: string
 }
 
-export interface GQLCorrectionRequestUpdateInput {
-  sectionId: string
-  fieldId: string
-  value: string
+export interface GQLPaymentInput {
+  paymentId?: string
+  type?: GQLPaymentType
+  total?: number
+  amount?: number
+  outcome?: GQLPaymentOutcomeType
+  date?: GQLDate
+  data?: string
+}
+
+export interface GQLCorrectionValueInput {
+  section?: string
+  fieldName?: string
+  oldValue?: string
+  newValue?: string
 }
 
 export const enum GQLRegStatus {
@@ -1690,18 +1707,14 @@ export interface GQLCertificateInput {
   data?: string
 }
 
-export interface GQLCorrectionInput {
-  requester?: string
-  hasShowedVerifiedDocument?: boolean
-  attestedAndCopied?: boolean
-  noSupportingDocumentationRequired?: boolean
-  payments?: Array<GQLPaymentInput | null>
-  values?: Array<GQLCorrectionValueInput | null>
-  location?: GQLLocationInput
-  data?: string
-  reason?: string
-  otherReason?: string
-  note?: string
+export const enum GQLPaymentType {
+  MANUAL = 'MANUAL'
+}
+
+export const enum GQLPaymentOutcomeType {
+  COMPLETED = 'COMPLETED',
+  ERROR = 'ERROR',
+  PARTIAL = 'PARTIAL'
 }
 
 export interface GQLLabelInput {
@@ -1783,33 +1796,6 @@ export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
   createdAt?: GQLDate
-}
-
-export interface GQLPaymentInput {
-  paymentId?: string
-  type?: GQLPaymentType
-  total?: number
-  amount?: number
-  outcome?: GQLPaymentOutcomeType
-  date?: GQLDate
-  data?: string
-}
-
-export interface GQLCorrectionValueInput {
-  section?: string
-  fieldName?: string
-  oldValue?: string
-  newValue?: string
-}
-
-export const enum GQLPaymentType {
-  MANUAL = 'MANUAL'
-}
-
-export const enum GQLPaymentOutcomeType {
-  COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR',
-  PARTIAL = 'PARTIAL'
 }
 
 /*********************************
@@ -2874,7 +2860,7 @@ export interface MutationToMarkBirthAsIssuedResolver<
 
 export interface MutationToRequestRegistrationCorrectionArgs {
   id: string
-  details: GQLCorrectionRequestInput
+  details: GQLCorrectionInput
 }
 export interface MutationToRequestRegistrationCorrectionResolver<
   TParent = any,

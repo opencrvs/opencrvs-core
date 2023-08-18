@@ -176,7 +176,7 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  requestRegistrationCorrection(id: ID!, details: CorrectionRequestInput!): ID!
+  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   createBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -714,12 +714,18 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
-input CorrectionRequestInput {
-  requestingIndividual: String!
-  reason: String!
-  comment: String!
-  hasShowedVerifiedDocument: Boolean!
-  updates: [CorrectionRequestUpdateInput!]!
+input CorrectionInput {
+  requester: ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput!]!
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  otherReason: String
+  note: String
 }
 
 type Reinstated {
@@ -1328,10 +1334,21 @@ input QuestionnaireQuestionInput {
   value: String
 }
 
-input CorrectionRequestUpdateInput {
-  sectionId: String!
-  fieldId: String!
-  value: String!
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+  data: String
+}
+
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
 }
 
 enum RegStatus {
@@ -1797,18 +1814,14 @@ input CertificateInput {
   data: String
 }
 
-input CorrectionInput {
-  requester: ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput]
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
 }
 
 input LabelInput {
@@ -1879,31 +1892,4 @@ input CommentInput {
   user: UserInput
   comment: String
   createdAt: Date
-}
-
-input PaymentInput {
-  paymentId: ID
-  type: PaymentType
-  total: Float
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
-  data: String
-}
-
-input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
-}
-
-enum PaymentType {
-  MANUAL
-}
-
-enum PaymentOutcomeType {
-  COMPLETED
-  ERROR
-  PARTIAL
 }

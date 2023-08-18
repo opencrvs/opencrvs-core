@@ -334,6 +334,11 @@ const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
     defaultMessage: 'Updated',
     description: 'Declaration has been updated',
     id: 'recordAudit.regStatus.updatedDeclaration'
+  },
+  [RegStatus.CorrectionRequested]: {
+    defaultMessage: 'Correction requested',
+    description: 'Label for when someone requested correction',
+    id: 'recordAudit.regStatus.correctionRequested'
   }
 }
 

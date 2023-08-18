@@ -213,6 +213,7 @@ export type ApplicationConfiguration = {
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
@@ -220,6 +221,7 @@ export type ApplicationConfiguration = {
   MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
+  USER_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
 }
 
 export type ApplicationConfigurationInput = {
@@ -231,12 +233,14 @@ export type ApplicationConfigurationInput = {
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: InputMaybe<Scalars['String']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   MARRIAGE?: InputMaybe<MarriageInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
+  USER_NOTIFICATION_DELIVERY_METHOD?: InputMaybe<Scalars['String']>
 }
 
 export type AssignmentData = {
@@ -1035,6 +1039,7 @@ export type MonthWiseEstimationMetric = {
 export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
+  approveBirthRegistrationCorrection: Scalars['ID']
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
@@ -1073,10 +1078,9 @@ export type Mutation = {
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
+  rejectBirthRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
-  requestBirthRegistrationCorrection: Scalars['ID']
-  requestDeathRegistrationCorrection: Scalars['ID']
-  requestMarriageRegistrationCorrection: Scalars['ID']
+  requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
   resetPasswordInvite?: Maybe<Scalars['String']>
   toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
@@ -1093,6 +1097,11 @@ export type MutationActivateUserArgs = {
   password: Scalars['String']
   securityQNAs: Array<InputMaybe<SecurityQuestionAnswer>>
   userId: Scalars['String']
+}
+
+export type MutationApproveBirthRegistrationCorrectionArgs = {
+  details: BirthRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationAuditUserArgs = {
@@ -1282,22 +1291,17 @@ export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
 }
 
-export type MutationRemoveBookmarkedAdvancedSearchArgs = {
-  removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
-}
-
-export type MutationRequestBirthRegistrationCorrectionArgs = {
+export type MutationRejectBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationRequestDeathRegistrationCorrectionArgs = {
-  details: DeathRegistrationInput
-  id: Scalars['ID']
+export type MutationRemoveBookmarkedAdvancedSearchArgs = {
+  removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
-export type MutationRequestMarriageRegistrationCorrectionArgs = {
-  details: MarriageRegistrationInput
+export type MutationRequestRegistrationCorrectionArgs = {
+  details: CorrectionInput
   id: Scalars['ID']
 }
 
@@ -1821,6 +1825,7 @@ export enum RegAction {
 export enum RegStatus {
   Archived = 'ARCHIVED',
   Certified = 'CERTIFIED',
+  CorrectionRequested = 'CORRECTION_REQUESTED',
   DeclarationUpdated = 'DECLARATION_UPDATED',
   Declared = 'DECLARED',
   InProgress = 'IN_PROGRESS',
@@ -2304,6 +2309,7 @@ export type UserInput = {
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
+  status?: InputMaybe<Status>
   systemRole: SystemRoleType
   username?: InputMaybe<Scalars['String']>
 }
@@ -2367,24 +2373,14 @@ export type CreateBirthRegistrationCorrectionMutation = {
   createBirthRegistrationCorrection: string
 }
 
-export type RequestDeathRegistrationCorrectionMutationVariables = Exact<{
+export type RequestRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
-  details: DeathRegistrationInput
+  details: CorrectionInput
 }>
 
-export type RequestDeathRegistrationCorrectionMutation = {
+export type RequestRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
-  requestDeathRegistrationCorrection: string
-}
-
-export type RequestMarriageRegistrationCorrectionMutationVariables = Exact<{
-  id: Scalars['ID']
-  details: MarriageRegistrationInput
-}>
-
-export type RequestMarriageRegistrationCorrectionMutation = {
-  __typename?: 'Mutation'
-  requestMarriageRegistrationCorrection: string
+  requestRegistrationCorrection: string
 }
 
 export type FetchPersonQueryVariables = Exact<{
@@ -2468,6 +2464,33 @@ export type CreateOrUpdateUserMutationVariables = Exact<{
 export type CreateOrUpdateUserMutation = {
   __typename?: 'Mutation'
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
+}
+
+export type GetSystemRolesQueryVariables = Exact<{
+  value?: InputMaybe<ComparisonInput>
+}>
+
+export type GetSystemRolesQuery = {
+  __typename?: 'Query'
+  getSystemRoles?: Array<{
+    __typename?: 'SystemRole'
+    id: string
+    value: SystemRoleType
+    roles: Array<{
+      __typename?: 'Role'
+      _id: string
+      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+    }>
+  }> | null
+}
+
+export type UpdateRoleMutationVariables = Exact<{
+  systemRole?: InputMaybe<SystemRoleInput>
+}>
+
+export type UpdateRoleMutation = {
+  __typename?: 'Mutation'
+  updateRole: { __typename?: 'Response'; roleIdMap: any }
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -3317,6 +3340,12 @@ export type FetchBirthRegistrationForReviewQuery = {
       id?: string | null
       birthDate?: string | null
       gender?: string | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+      } | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -7570,6 +7599,8 @@ export type UpdateApplicationConfigMutation = {
     DATE_OF_BIRTH_UNKNOWN?: boolean | null
     INFORMANT_SIGNATURE?: boolean | null
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
+    USER_NOTIFICATION_DELIVERY_METHOD?: string | null
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string | null
     LOGIN_BACKGROUND?: {
       __typename?: 'LoginBackground'
       backgroundColor?: string | null

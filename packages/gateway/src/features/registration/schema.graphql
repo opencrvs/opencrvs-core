@@ -173,20 +173,6 @@ interface EventRegistration {
   createdAt: Date
 }
 
-input CorrectionRequestUpdateInput {
-  sectionId: String!
-  fieldId: String!
-  value: String!
-}
-
-input CorrectionRequestInput {
-  requestingIndividual: String!
-  reason: String!
-  comment: String!
-  hasShowedVerifiedDocument: Boolean!
-  updates: [CorrectionRequestUpdateInput!]!
-}
-
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -322,7 +308,7 @@ input CorrectionInput {
   hasShowedVerifiedDocument: Boolean
   attestedAndCopied: Boolean
   noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput]
+  payments: [PaymentInput!]!
   values: [CorrectionValueInput]
   location: LocationInput
   data: String
@@ -550,7 +536,7 @@ type Mutation {
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  requestRegistrationCorrection(id: ID!, details: CorrectionRequestInput!): ID!
+  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   createBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!

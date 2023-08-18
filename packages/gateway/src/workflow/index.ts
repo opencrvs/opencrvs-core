@@ -1,28 +1,33 @@
 import { IAuthHeader } from '@gateway/common-types'
 import { WORKFLOW_URL } from '@gateway/constants'
-import { GQLCorrectionRequestInput } from '@gateway/graphql/schema'
+import { GQLCorrectionInput } from '@gateway/graphql/schema'
+import fetch from 'node-fetch'
 
-const createRequest = <T = any>(
+const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,
   body: Record<string, any>
 ): Promise<T> => {
-  return fetch(new URL(path, WORKFLOW_URL).href, {
+  const response = await fetch(new URL(path, WORKFLOW_URL).href, {
     method,
     headers: {
       'Content-Type': 'application/json',
       ...authHeader
     },
     body: JSON.stringify(body)
-  }).then((response) => {
-    return response.json()
   })
+
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+
+  return response.json()
 }
 
 export function requestBirthRegistrationCorrection(
   recordId: string,
-  correctionDetails: GQLCorrectionRequestInput,
+  correctionDetails: GQLCorrectionInput,
   authHeader: IAuthHeader
 ) {
   return createRequest(

@@ -11,7 +11,7 @@
  */
 import { gql } from '@apollo/client'
 import {
-  REQUEST_BIRTH_REG_CORRECTION,
+  REQUEST_REG_CORRECTION,
   CREATE_BIRTH_REG_CORRECTION
 } from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
@@ -147,11 +147,10 @@ export function getBirthMutation(action: SubmissionAction) {
       return COLLECT_BIRTH_CERTIFICATE
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_BIRTH_CERTIFICATE
-    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
+    case SubmissionAction.MAKE_CORRECTION:
       return CREATE_BIRTH_REG_CORRECTION
-    case SubmissionAction.CORRECTION_REQUESTED: {
-      console.log('execute')
-      return REQUEST_BIRTH_REG_CORRECTION
+    case SubmissionAction.REQUEST_CORRECTION: {
+      return REQUEST_REG_CORRECTION
     }
   }
 }

@@ -27,17 +27,38 @@ import { createNewAuditEvent } from '@workflow/records/audit'
 import { badRequest, conflict } from '@hapi/boom'
 
 const CorrectionRequestInput = z.object({
-  requestingIndividual: z.string(),
-  reason: z.string(),
-  comment: z.string(),
+  requester: z.string(),
   hasShowedVerifiedDocument: z.boolean(),
-  updates: z.array(
-    z.object({
-      sectionId: z.string(),
-      fieldId: z.string(),
-      value: z.string()
-    })
-  )
+  noSupportingDocumentationRequired: z.boolean().optional(),
+  payments: z
+    .array(
+      z.object({
+        paymentId: z.string().optional(),
+        type: z.string().optional(),
+        total: z.number().optional(),
+        amount: z.number().optional(),
+        outcome: z.string().optional(),
+        date: z.string().optional(),
+        data: z.string().optional()
+      })
+    )
+    .default([]),
+  location: z.object({
+    _fhirID: z.string()
+  }),
+  values: z
+    .array(
+      z.object({
+        section: z.string().optional(),
+        fieldName: z.string().optional(),
+        oldValue: z.string().optional(),
+        newValue: z.string().optional()
+      })
+    )
+    .default([]),
+  reason: z.string(),
+  note: z.string(),
+  otherReason: z.string()
 })
 
 type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
@@ -169,16 +190,16 @@ function createCorrectionRequestTask(
       .concat([
         {
           url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-          valueString: correctionDetails.requestingIndividual
+          valueString: correctionDetails.requester
         },
         {
           url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
           valueBoolean: correctionDetails.hasShowedVerifiedDocument
         }
       ]),
-    input: correctionDetails.updates.map((update) => ({
-      valueCode: update.sectionId,
-      valueId: update.fieldId,
+    input: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
       type: {
         coding: [
           {
@@ -187,7 +208,7 @@ function createCorrectionRequestTask(
           }
         ]
       },
-      valueString: update.value
+      valueString: update.newValue
     })),
     reason: {
       text: correctionDetails.reason,

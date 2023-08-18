@@ -79,6 +79,7 @@ const statusMessageMap = {
   [SUBMISSION_STATUS.REGISTERING]: messages.statusRegistering,
   [SUBMISSION_STATUS.REQUESTING_CORRECTION]:
     messages.statusRequestingCorrection,
+  [SUBMISSION_STATUS.REQUESTED_CORRECTION]: messages.statusRequestingCorrection,
   [SUBMISSION_STATUS.READY_TO_REJECT]: messages.statusWaitingToReject,
   [SUBMISSION_STATUS.REJECTING]: messages.statusRejecting,
   [SUBMISSION_STATUS.READY_TO_REINSTATE]: messages.statusWaitingToBeReinstated,

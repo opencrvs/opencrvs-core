@@ -216,7 +216,7 @@ export function updateDeclarationRegistrationWithCorrection(
           amount: 0,
           outcome: 'COMPLETED' as const,
           data: EMPTY_STRING,
-          date: Date.now()
+          date: new Date().toISOString()
         }
       ]
     }

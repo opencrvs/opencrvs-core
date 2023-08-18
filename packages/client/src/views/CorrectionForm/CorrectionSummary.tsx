@@ -974,17 +974,19 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   makeCorrection = (userRole: SystemRoleType | undefined) => {
     const declaration = this.props.declaration
     if (userRole === ROLE_REGISTRATION_AGENT) {
-      declaration.action = SubmissionAction.CORRECTION_REQUESTED
-      declaration.submissionStatus = SUBMISSION_STATUS.CORRECTION_REQUESTED
+      declaration.action = SubmissionAction.REQUEST_CORRECTION
+      declaration.submissionStatus = SUBMISSION_STATUS.REQUESTED_CORRECTION
     } else {
-      declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
+      declaration.action = SubmissionAction.MAKE_CORRECTION
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
     }
     updateDeclarationRegistrationWithCorrection(declaration, {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
+
     this.props.writeDeclaration(declaration)
+
     if (userRole === ROLE_REGISTRATION_AGENT) {
       this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
     } else {

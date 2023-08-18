@@ -20,29 +20,8 @@ export const CREATE_BIRTH_REG_CORRECTION = gql`
   }
 `
 
-export const REQUEST_BIRTH_REG_CORRECTION = gql`
-  mutation requestBirthRegistrationCorrection(
-    $id: ID!
-    $details: BirthRegistrationInput!
-  ) {
-    requestBirthRegistrationCorrection(id: $id, details: $details)
-  }
-`
-
-export const REQUEST_DEATH_REG_CORRECTION = gql`
-  mutation requestDeathRegistrationCorrection(
-    $id: ID!
-    $details: DeathRegistrationInput!
-  ) {
-    requestDeathRegistrationCorrection(id: $id, details: $details)
-  }
-`
-
-export const REQUEST_MARRIAGE_REG_CORRECTION = gql`
-  mutation requestMarriageRegistrationCorrection(
-    $id: ID!
-    $details: MarriageRegistrationInput!
-  ) {
-    requestMarriageRegistrationCorrection(id: $id, details: $details)
+export const REQUEST_REG_CORRECTION = gql`
+  mutation requestRegistrationCorrection($id: ID!, $details: CorrectionInput!) {
+    requestRegistrationCorrection(id: $id, details: $details)
   }
 `

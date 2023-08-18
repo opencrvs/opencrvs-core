@@ -13,8 +13,7 @@ import { IAuthHeader } from '@gateway/common-types'
 import {
   GQLResolver,
   GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLCorrectionRequestInput
+  GQLDeathRegistrationInput
 } from '@gateway/graphql/schema'
 import { inScope } from '@gateway/features/user/utils'
 import {
@@ -26,6 +25,7 @@ import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 import { validateBirthDeclarationAttachments } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import { UnassignError } from '@gateway/utils/unassignError'
+import { requestBirthRegistrationCorrection } from '@gateway/workflow'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -65,7 +65,8 @@ export const resolvers: GQLResolver = {
           throw new UnassignError('User has been unassigned')
         }
 
-        return await requestEventRegistrationCorrection(id, details, authHeader)
+        await requestBirthRegistrationCorrection(id, details, authHeader)
+        return id
       } else {
         throw new Error('User does not have a register or validate scope')
       }
@@ -140,16 +141,6 @@ async function createEventRegistrationCorrection(
 
   // return composition-id
   return getIDFromResponse(res)
-}
-
-async function requestEventRegistrationCorrection(
-  id: string,
-  correctionDetails: GQLCorrectionRequestInput,
-  authHeader: IAuthHeader
-) {
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(correctionDetails))
-
-  return id
 }
 
 async function approveEventRegistrationCorrection(

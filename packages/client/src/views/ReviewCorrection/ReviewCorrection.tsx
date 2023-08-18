@@ -36,7 +36,7 @@ import { merge } from 'lodash'
 
 type URLParams = { recordId: string }
 
-function applyCorrectionToData(record: Record) {
+function applyCorrectionToData(record: any) {
   if (!record.data.history) {
     // Should never happen
     return record
