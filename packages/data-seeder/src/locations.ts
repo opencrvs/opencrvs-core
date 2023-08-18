@@ -178,7 +178,8 @@ async function getLocations() {
   parsedLocations.data
     .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
     .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
+      const parentId = facilityOrOffice.partOf.split('/')[1]
+      if (!adminStructureMap.get(parentId) && parentId !== '0') {
         raise(
           `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
         )

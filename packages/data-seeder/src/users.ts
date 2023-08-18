@@ -47,8 +47,10 @@ const UserSchema = z.array(
       'Local System Admin',
       'National System Admin',
       'Performance Manager',
-      'National Registrar'
+      'National Registrar',
+      'Secretary'
     ]),
+    title: z.string(),
     username: z.string(),
     mobile: z.string(),
     email: z.string().email(),
