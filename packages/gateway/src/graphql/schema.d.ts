@@ -630,6 +630,7 @@ export interface GQLUserInput {
   username?: string
   mobile?: string
   password?: string
+  status?: GQLStatus
   systemRole: GQLSystemRoleType
   role?: string
   email?: string
@@ -690,6 +691,8 @@ export interface GQLApplicationConfiguration {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackground
 }
@@ -707,6 +710,8 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
+  USER_NOTIFICATION_DELIVERY_METHOD?: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
   LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
@@ -830,7 +835,7 @@ export interface GQLHistory {
   requester?: string
   hasShowedVerifiedDocument?: boolean
   otherReason?: string
-  system?: GQLSystem
+  system?: GQLIntegratedSystem
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -1383,6 +1388,12 @@ export interface GQLStatusReason {
   text?: string
 }
 
+export interface GQLIntegratedSystem {
+  name?: string
+  username?: string
+  type?: string
+}
+
 export interface GQLComment {
   id: string
   user?: GQLUser
@@ -1892,6 +1903,7 @@ export interface GQLResolver {
   Certificate?: GQLCertificateTypeResolver
   DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
+  IntegratedSystem?: GQLIntegratedSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   RoleLabel?: GQLRoleLabelTypeResolver
@@ -6023,6 +6035,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
+  USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
   LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
@@ -6172,6 +6186,30 @@ export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
 }
 
 export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<
   TParent = any,
   TResult = any
 > {
@@ -9122,6 +9160,42 @@ export interface GQLStatusReasonTypeResolver<TParent = any> {
 }
 
 export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLIntegratedSystemTypeResolver<TParent = any> {
+  name?: IntegratedSystemToNameResolver<TParent>
+  username?: IntegratedSystemToUsernameResolver<TParent>
+  type?: IntegratedSystemToTypeResolver<TParent>
+}
+
+export interface IntegratedSystemToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToTypeResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

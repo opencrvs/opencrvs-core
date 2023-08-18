@@ -15,6 +15,7 @@ import fetch from 'node-fetch'
 import { z } from 'zod'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
+import { inspect } from 'util'
 
 const LabelSchema = z.array(
   z.object({
@@ -22,17 +23,19 @@ const LabelSchema = z.array(
   })
 )
 
-const CountryRoleSchema = z
-  .object({
-    FIELD_AGENT: LabelSchema,
-    LOCAL_REGISTRAR: LabelSchema,
-    LOCAL_SYSTEM_ADMIN: LabelSchema,
-    NATIONAL_REGISTRAR: LabelSchema,
-    NATIONAL_SYSTEM_ADMIN: LabelSchema,
-    PERFORMANCE_MANAGEMENT: LabelSchema,
-    REGISTRATION_AGENT: LabelSchema
-  })
-  .partial()
+/*
+ * at least LOCAL_REGISTRAR & NATIONAL_SYSTEM_ADMIN
+ * roles are required
+ */
+const CountryRoleSchema = z.object({
+  FIELD_AGENT: LabelSchema.optional(),
+  LOCAL_REGISTRAR: LabelSchema,
+  LOCAL_SYSTEM_ADMIN: LabelSchema.optional(),
+  NATIONAL_REGISTRAR: LabelSchema.optional(),
+  NATIONAL_SYSTEM_ADMIN: LabelSchema,
+  PERFORMANCE_MANAGEMENT: LabelSchema.optional(),
+  REGISTRATION_AGENT: LabelSchema.optional()
+})
 
 const SYSTEM_ROLES = [
   'FIELD_AGENT',
@@ -108,7 +111,10 @@ async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
   if (!res.ok) {
     raise(`Failed to fetch roles from gateway`)
   }
-  return res.json().then((res) => res.data.getSystemRoles)
+  const parsedResponse = parseGQLResponse<{ getSystemRoles: SystemRole[] }>(
+    await res.json()
+  )
+  return parsedResponse.getSystemRoles
 }
 
 async function updateRoles(
@@ -153,7 +159,7 @@ async function fetchCountryRoles() {
   const parsedRoles = CountryRoleSchema.safeParse(await res.json())
   if (!parsedRoles.success) {
     raise(
-      `Error when getting roles from country-config: ${JSON.stringify(
+      `Error when getting roles from country-config: ${inspect(
         parsedRoles.error.issues
       )}`
     )

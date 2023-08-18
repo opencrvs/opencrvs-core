@@ -39,11 +39,6 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false
 
-export const SUPER_USER_PASSWORD = process.env.SUPER_USER_PASSWORD ?? 'password'
-
-export const USER_NOTIFICATION_DELIVERY_METHOD =
-  process.env.USER_NOTIFICATION_DELIVERY_METHOD || 'sms'
-
 export const AVATAR_API =
   'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
 

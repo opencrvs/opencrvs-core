@@ -21,6 +21,7 @@ export interface BulletListProps {
 
 const List = styled.ul`
   list-style-type: disc;
+  padding-inline-start: 24px;
 `
 const ListItem = styled.li`
   margin-bottom: 12px;

@@ -762,6 +762,7 @@ input UserInput {
   username: String
   mobile: String
   password: String
+  status: Status
   systemRole: SystemRoleType!
   role: String
   email: String
@@ -822,6 +823,8 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
   LOGIN_BACKGROUND: LoginBackground
 }
@@ -839,6 +842,8 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
@@ -962,7 +967,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
-  system: System
+  system: IntegratedSystem
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1489,6 +1494,12 @@ enum RegAction {
 
 type StatusReason {
   text: String
+}
+
+type IntegratedSystem {
+  name: String
+  username: String
+  type: String
 }
 
 type Comment {
