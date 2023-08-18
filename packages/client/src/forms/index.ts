@@ -84,7 +84,8 @@ export enum SubmissionAction {
   ARCHIVE_DECLARATION = 'archive',
   REQUEST_CORRECTION_DECLARATION = 'request correction',
   ISSUE_DECLARATION = 'issue certificate',
-  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration',
+  CORRECTION_REQUESTED = 'correction requested'
 }
 
 export enum DownloadAction {

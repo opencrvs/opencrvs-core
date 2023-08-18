@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { gql } from '@apollo/client'
-import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import {
+  REQUEST_BIRTH_REG_CORRECTION,
+  CREATE_BIRTH_REG_CORRECTION
+} from '@client/forms/correction/mutations'
 import { SubmissionAction } from '@client/forms'
 
 const SUBMIT_BIRTH_DECLARATION = gql`
@@ -145,6 +148,10 @@ export function getBirthMutation(action: SubmissionAction) {
     case SubmissionAction.ISSUE_DECLARATION:
       return ISSUE_BIRTH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
+      return CREATE_BIRTH_REG_CORRECTION
+    case SubmissionAction.CORRECTION_REQUESTED: {
+      console.log('execute')
       return REQUEST_BIRTH_REG_CORRECTION
+    }
   }
 }

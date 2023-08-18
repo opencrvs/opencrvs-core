@@ -11,7 +11,7 @@
  */
 import { gql } from '@apollo/client'
 
-export const REQUEST_BIRTH_REG_CORRECTION = gql`
+export const CREATE_BIRTH_REG_CORRECTION = gql`
   mutation createBirthRegistrationCorrection(
     $id: ID!
     $details: BirthRegistrationInput!
@@ -19,6 +19,16 @@ export const REQUEST_BIRTH_REG_CORRECTION = gql`
     createBirthRegistrationCorrection(id: $id, details: $details)
   }
 `
+
+export const REQUEST_BIRTH_REG_CORRECTION = gql`
+  mutation requestBirthRegistrationCorrection(
+    $id: ID!
+    $details: BirthRegistrationInput!
+  ) {
+    requestBirthRegistrationCorrection(id: $id, details: $details)
+  }
+`
+
 export const REQUEST_DEATH_REG_CORRECTION = gql`
   mutation requestDeathRegistrationCorrection(
     $id: ID!

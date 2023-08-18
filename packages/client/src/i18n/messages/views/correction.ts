@@ -66,6 +66,7 @@ interface ICorrectionMessages
   correctionSummaryProofOfPayment: MessageDescriptor
   correctionSummaryTotalPaymentLabel: MessageDescriptor
   correctionRequiredLabel: MessageDescriptor
+  correctionForApprovalDialogTitle: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -364,6 +365,31 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.required',
     defaultMessage: 'Required for correction',
     description: 'Payment and proof of payment input error'
+  },
+  correctionForApprovalDialogTitle: {
+    id: 'correction.correctionForApprovalDialog.title',
+    defaultMessage: 'Send record correction for approval ?',
+    description:
+      'The title for the dialog when record correction sent by registration agent for approval'
+  },
+  correctionForApprovalDialogCancel: {
+    defaultMessage: 'Cancel',
+    description:
+      'The cancel button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.cancel'
+  },
+  correctionForApprovalDialogConfirm: {
+    defaultMessage: 'Confirm',
+    description:
+      'The send button for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.actions.send'
+  },
+  correctionForApprovalDialogDescription: {
+    defaultMessage:
+      'The Registrar will be notified of this correction request and a record of this request will be recorded',
+    description:
+      'The description for the dialog when record correction sent by registration agent for approval',
+    id: 'correction.correctionForApprovalDialog.description'
   }
 }
 
