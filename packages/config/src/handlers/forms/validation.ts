@@ -92,31 +92,192 @@ function findDuplicates(arr: string[]): string[] {
 
 const REQUIRED_SECTIONS = ['registration', 'documents'] as const
 
-// TODO: add all the address fields in child section
-// & fill out all the other sections
+const REQUIRED_EVENT_ADDRESS_FIELDS = [
+  'country',
+  'state',
+  'district',
+  'ruralOrUrban',
+  'cityUrbanOption',
+  'addressLine3UrbanOption',
+  'addressLine2UrbanOption',
+  'numberUrbanOption',
+  'postalCode',
+  'addressLine5',
+  'internationalState',
+  'internationalDistrict',
+  'internationalCity',
+  'internationalAddressLine1',
+  'internationalAddressLine2',
+  'internationalAddressLine3',
+  'internationalPostcode'
+]
+
+const REQUIRED_PRIMARY_ADDRESS_FIELDS = [
+  'primaryAddress',
+  'countryPrimary',
+  'statePrimary',
+  'districtPrimary',
+  'ruralOrUrbanPrimary',
+  'cityUrbanOptionPrimary',
+  'addressLine3UrbanOptionPrimary',
+  'addressLine2UrbanOptionPrimary',
+  'numberUrbanOptionPrimary',
+  'postcodePrimary',
+  'addressLine5Primary',
+  'internationalStatePrimary',
+  'internationalDistrictPrimary',
+  'internationalCityPrimary',
+  'internationalAddressLine1Primary',
+  'internationalAddressLine2Primary',
+  'internationalAddressLine3Primary',
+  'internationalPostcodePrimary'
+]
+
 const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
-  child: ['firstNamesEng', 'familyNameEng', 'gender', 'childBirthDate'],
-  mother: [],
-  father: [],
-  deceased: [],
-  groom: [],
-  bride: [],
-  informant: [],
+  child: [
+    'firstNamesEng',
+    'familyNameEng',
+    'gender',
+    'childBirthDate',
+    'placeOfBirthTitle',
+    'placeOfBirth',
+    'birthLocation',
+    ...REQUIRED_EVENT_ADDRESS_FIELDS
+  ],
+  mother: [
+    'firstNamesEng',
+    'familyNameEng',
+    'detailsExist',
+    'reasonNotApplying',
+    'motherBirthDate',
+    'nationality',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  father: [
+    'firstNamesEng',
+    'familyNameEng',
+    'detailsExist',
+    'reasonNotApplying',
+    'fatherBirthDate',
+    'nationality',
+    'primaryAddressSameAsOtherPrimary',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  deceased: [
+    'firstNamesEng',
+    'familyNameEng',
+    'gender',
+    'deceasedBirthDate',
+    'nationality',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  deathEvent: [
+    'deathDate',
+    'placeOfDeathTitle',
+    'placeOfDeath',
+    'deathLocation',
+    ...REQUIRED_EVENT_ADDRESS_FIELDS
+  ],
+  marriageEvent: [
+    'marriageDate',
+    'placeOfMarriageTitle',
+    ...REQUIRED_EVENT_ADDRESS_FIELDS
+  ],
+  groom: [
+    'firstNamesEng',
+    'familyNameEng',
+    'groomBirthDate',
+    'nationality',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  bride: [
+    'firstNamesEng',
+    'familyNameEng',
+    'brideBirthDate',
+    'nationality',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  informant: [
+    'informantType',
+    'otherInformantType',
+    'firstNamesEng',
+    'familyNameEng',
+    'informantBirthDate',
+    'nationality',
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+  ],
+  witnessOne: [
+    'firstNamesEng',
+    'familyNameEng',
+    'relationship',
+    'otherRelationship'
+  ],
+  witnessTwo: [
+    'firstNamesEng',
+    'familyNameEng',
+    'relationship',
+    'otherRelationship'
+  ]
+}
+
+const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
+  child: ['attendantAtBirth', 'birthType', 'weightAtBirth'],
+  mother: [
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'motherID',
+    'motherNidVerification',
+    'maritalStatus',
+    'multipleBirth',
+    'occupation',
+    'educationalAttainment'
+  ],
+  father: [
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'fatherID',
+    'fatherNidVerification',
+    'maritalStatus',
+    'occupation',
+    'educationalAttainment'
+  ],
+  deceased: [
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'deceasedID',
+    'maritalStatus'
+  ],
+  deathEvent: [
+    'mannerOfDeath',
+    'causeOfDeathEstablished',
+    'causeOfDeathMethod',
+    'deathDescription'
+  ],
+  marriageEvent: ['typeOfMarriage'],
+  groom: [
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'groomID',
+    'marriedLastNameEng'
+  ],
+  bride: [
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'brideID',
+    'marriedLastNameEng'
+  ],
+  informant: [
+    'registrationPhone',
+    'registrationEmail',
+    'exactDateOfBirthUnknown',
+    'ageOfIndividualInYears',
+    'informantID',
+    'informantNidVerification',
+    'primaryAddressSameAsOtherPrimary'
+  ],
   witnessOne: [],
   witnessTwo: []
 }
-
-// const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
-//   child: ['attendantAtBirth', 'birthType', 'weightAtBirth'],
-//   mother: [],
-//   father: [],
-//   deceased: [],
-//   groom: [],
-//   bride: [],
-//   informant: [],
-//   witnessOne: [],
-//   witnessTwo: []
-// }
 
 const form = z.object({
   sections: z
@@ -158,49 +319,54 @@ const form = z.object({
             }
           }
         )
-      // .refine(
-      //   (sec) => {
-      //     const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
-      //       group.fields
-      //         .filter(({ custom }) => !Boolean(custom))
-      //         .filter(
-      //           ({ name }) =>
-      //             !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
-      //         )
-      //         .map(({ name }) => name)
-      //     )
-      //     return (
-      //       nonCustomfieldsInSection.filter(
-      //         (nonCustomField) =>
-      //           !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
-      //             nonCustomField
-      //           )
-      //       ).length === 0
-      //     )
-      //   },
-      //   (sec) => {
-      //     const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
-      //       group.fields
-      //         .filter(({ custom }) => !Boolean(custom))
-      //         .filter(
-      //           ({ name }) =>
-      //             !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
-      //         )
-      //         .map(({ name }) => name)
-      //     )
-      //     const unrecognizedFields = nonCustomfieldsInSection.filter(
-      //       (nonCustomField) =>
-      //         !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
-      //           nonCustomField
-      //         )
-      //     )
-      //     return {
-      //       message: `Use "custom" property to make a field custom. Unrecognized non custom fields "${unrecognizedFields.join(
-      //         ', '
-      //       )}" found`
-      //     }
-      //   }
-      // )
+        .refine(
+          (sec) => {
+            if (!REQUIRED_FIELDS_IN_SECTION[sec.id]) {
+              return true
+            }
+            const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
+              group.fields
+                .filter(({ custom }) => !Boolean(custom))
+                .filter(({ type }) => type !== 'DIVIDER')
+                .filter(
+                  ({ name }) =>
+                    !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
+                )
+                .map(({ name }) => name)
+            )
+            return (
+              nonCustomfieldsInSection.filter(
+                (nonCustomField) =>
+                  !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
+                    nonCustomField
+                  )
+              ).length === 0
+            )
+          },
+          (sec) => {
+            const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
+              group.fields
+                .filter(({ custom }) => !Boolean(custom))
+                .filter(({ type }) => type !== 'DIVIDER')
+                .filter(
+                  ({ name }) =>
+                    !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
+                )
+                .map(({ name }) => name)
+            )
+            const unrecognizedFields = nonCustomfieldsInSection.filter(
+              (nonCustomField) =>
+                !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
+                  nonCustomField
+                )
+            )
+            return {
+              message: `Use "custom" property to make a field custom. Unrecognized non custom fields "${unrecognizedFields.join(
+                ', '
+              )}" found`
+            }
+          }
+        )
     )
     .refine(
       (sections) =>
