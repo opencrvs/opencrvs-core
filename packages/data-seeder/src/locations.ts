@@ -217,9 +217,6 @@ export async function seedLocations(token: string) {
     })
   const savedLocationsSet = new Set(savedLocations)
   const locations = (await getLocations()).filter((location) => {
-    if (savedLocationsSet.has(location.id)) {
-      console.log(`Location with id "${location.id}" already exists. Skipping`)
-    }
     return !savedLocationsSet.has(location.id)
   })
   const res = await fetch(`${GATEWAY_URL}/location?`, {
