@@ -17,7 +17,7 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { connect } from 'react-redux'
-import { get, propertyOf } from 'lodash'
+import { get } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -53,7 +53,8 @@ import {
   SuccessButton,
   SecondaryButton,
   LinkButton,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
@@ -81,12 +82,12 @@ import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Location } from '@client/utils/gateway'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -109,6 +110,7 @@ type IStateProps = {
 
 type IState = {
   isFileUploading: boolean
+  showPrompt: boolean
 }
 
 type IDispatchProps = {
@@ -128,7 +130,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      isFileUploading: false
+      isFileUploading: false,
+      showPrompt: false
     }
   }
 
@@ -160,6 +163,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     })
   }
 
+  togglePrompt = () => {
+    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  }
+
   render() {
     const {
       registerForm,
@@ -169,6 +176,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration: { event },
       userRole
     } = this.props
+    const { showPrompt } = this.state
     const formSections = getViewableSection(registerForm[event], declaration)
     const relationShip = (
       declaration.data.corrector.relationship as IFormSectionData
@@ -192,7 +200,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <SuccessButton
         id="make_correction"
         key="make_correction"
-        onClick={this.makeCorrection}
+        onClick={() => {
+          userRole === ROLE_REGISTRATION_AGENT
+            ? this.togglePrompt()
+            : this.makeCorrection()
+        }}
         disabled={
           sectionHasError(this.group, this.section, declaration) ||
           this.state.isFileUploading
@@ -210,7 +222,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       <>
         <ActionPageLight
           id="corrector_form"
-          title={'pöö'}
+          title={intl.formatMessage(messages.title)}
           hideBackground
           goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
@@ -367,6 +379,35 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             />
           </Content>
         </ActionPageLight>
+        <ResponsiveModal
+          id="withoutCorrectionForApprovalPrompt"
+          show={showPrompt}
+          title={intl.formatMessage(messages.correctionForApprovalDialogTitle)}
+          contentHeight={96}
+          handleClose={this.togglePrompt}
+          actions={[
+            <TertiaryButton
+              id="cancel"
+              key="cancel"
+              onClick={this.togglePrompt}
+            >
+              {intl.formatMessage(messages.correctionForApprovalDialogCancel)}
+            </TertiaryButton>,
+            <SuccessButton
+              id="send"
+              key="continue"
+              // onClick={() => {
+              //   this.props.actionProps.negativeAction.handler()
+              // this.makeCorrection()
+              //   this.togglePrompt()
+              // }}
+            >
+              {intl.formatMessage(messages.correctionForApprovalDialogConfirm)}
+            </SuccessButton>
+          ]}
+        >
+          {intl.formatMessage(messages.correctionForApprovalDialogDescription)}
+        </ResponsiveModal>
       </>
     )
   }
@@ -938,7 +979,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+    this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
   }
 
   gotoReviewPage = () => {
