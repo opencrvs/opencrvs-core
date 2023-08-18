@@ -134,6 +134,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
   }
   body.type = getTypeFromTask(task)
   body.modifiedAt = Date.now().toString()
+
   if (body.type === REJECTED_STATUS) {
     const rejectAnnotation: fhir.Annotation = (task &&
       task.note &&
@@ -180,6 +181,7 @@ async function indexAndSearchComposition(
         result.body.hits.hits.length > 0 &&
         result.body.hits.hits[0]._source.createdAt) ||
       Date.now().toString(),
+    modifiedAt: Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 

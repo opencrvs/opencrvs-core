@@ -173,6 +173,20 @@ interface EventRegistration {
   createdAt: Date
 }
 
+input CorrectionRequestUpdateInput {
+  sectionId: String!
+  fieldId: String!
+  value: String!
+}
+
+input CorrectionRequestInput {
+  requestingIndividual: String!
+  reason: String!
+  comment: String!
+  hasShowedVerifiedDocument: Boolean!
+  updates: [CorrectionRequestUpdateInput!]!
+}
+
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -536,11 +550,8 @@ type Mutation {
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  requestRegistrationCorrection(id: ID!, details: CorrectionRequestInput!): ID!
   createBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
@@ -576,10 +587,6 @@ type Mutation {
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
-  requestDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
   #MARRIAGE
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
@@ -590,10 +597,6 @@ type Mutation {
   ): MarriageRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
-  requestMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
   markEventAsDuplicate(
     id: String!
     reason: String!

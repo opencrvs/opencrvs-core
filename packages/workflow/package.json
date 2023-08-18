@@ -35,7 +35,8 @@
     "pino": "^6.0.0",
     "short-uid": "^0.1.0",
     "tsconfig-paths": "^3.13.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@types/fhir": "^0.0.30",

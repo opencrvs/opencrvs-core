@@ -19,6 +19,12 @@ export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 
+export const SEARCH_SERVICE_URL =
+  process.env.SEARCH_SERVICE_URL || 'http://localhost:9090/'
+
+export const METRICS_SERVICE_URL =
+  process.env.METRICS_SERVICE_URL || 'http://localhost:1050/'
+
 export const MOSIP_TOKEN_SEEDER_URL =
   process.env.MOSIP_TOKEN_SEEDER_URL || 'http://localhost:8085'
 export const RESOURCE_SERVICE_URL =
@@ -40,3 +46,5 @@ export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
 export const DEFAULT_TIMEOUT = 600000
+export const HEARTH_MONGO_URL =
+  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'

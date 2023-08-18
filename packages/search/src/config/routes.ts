@@ -82,6 +82,15 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/record',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles indexing a new or existing record'
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/{eventType}',
       handler: birthEventHandler,
       config: {

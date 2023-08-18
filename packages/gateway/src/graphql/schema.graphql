@@ -176,11 +176,8 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
+  requestRegistrationCorrection(id: ID!, details: CorrectionRequestInput!): ID!
   createBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
@@ -214,10 +211,6 @@ type Mutation {
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
-  requestDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
   markEventAsUnassigned(id: String!): ID!
   createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
@@ -227,10 +220,6 @@ type Mutation {
   ): MarriageRegistration!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
-  requestMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
   markEventAsDuplicate(
     id: String!
     reason: String!
@@ -723,6 +712,14 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
+}
+
+input CorrectionRequestInput {
+  requestingIndividual: String!
+  reason: String!
+  comment: String!
+  hasShowedVerifiedDocument: Boolean!
+  updates: [CorrectionRequestUpdateInput!]!
 }
 
 type Reinstated {
@@ -1329,6 +1326,12 @@ input RelatedPersonInput {
 input QuestionnaireQuestionInput {
   fieldId: String
   value: String
+}
+
+input CorrectionRequestUpdateInput {
+  sectionId: String!
+  fieldId: String!
+  value: String!
 }
 
 enum RegStatus {

@@ -1020,6 +1020,7 @@ export async function getCertificatesFromTask(
 }
 export function getActionFromTask(task: fhir.Task) {
   const extensions = task.extension || []
+
   if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
     return GQLRegAction.DOWNLOADED
   } else if (findExtension(ASSIGNED_EXTENSION_URL, extensions)) {
@@ -1028,26 +1029,6 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.UNASSIGNED
   } else if (findExtension(VERIFIED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VERIFIED
-  } else if (
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
-    task.status === 'requested'
-  ) {
-    return GQLRegAction.REQUESTED_CORRECTION
-  } else if (
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
-    task.status === 'completed'
-  ) {
-    return GQLRegAction.CORRECTED
-  } else if (
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
-    task.status === 'accepted'
-  ) {
-    return GQLRegAction.APPROVED_CORRECTION
-  } else if (
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions) &&
-    task.status === 'rejected'
-  ) {
-    return GQLRegAction.REJECTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
@@ -1058,6 +1039,21 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.MARKED_AS_NOT_DUPLICATE
   } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
     return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
+  }
+  if (
+    task.businessStatus?.coding?.find(
+      (coding: fhir.Coding) => coding.code === 'CORRECTION_REQUESTED'
+    )
+  ) {
+    if (task.status === 'requested') {
+      return GQLRegAction.REQUESTED_CORRECTION
+    } else if (task.status === 'completed') {
+      return GQLRegAction.CORRECTED
+    } else if (task.status === 'accepted') {
+      return GQLRegAction.APPROVED_CORRECTION
+    } else if (task.status === 'rejected') {
+      return GQLRegAction.REJECTED_CORRECTION
+    }
   }
   return null
 }

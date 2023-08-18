@@ -9,11 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as pino from 'pino'
-export const logger = pino()
+import { upsertEvent } from '@search/features/registration/birth/service'
+import { logger } from '@search/logger'
+import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 
-const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
+export async function recordHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    await upsertEvent(request)
+  } catch (error) {
+    logger.error(`Search/recordHandler: error: ${error}`)
+    return internal(error)
+  }
 
-if (level) {
-  logger.level = level
+  return h.response().code(200)
 }

@@ -13,20 +13,17 @@ import { IAuthHeader } from '@gateway/common-types'
 import {
   GQLResolver,
   GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput
+  GQLDeathRegistrationInput,
+  GQLCorrectionRequestInput
 } from '@gateway/graphql/schema'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import { inScope } from '@gateway/features/user/utils'
 import {
   buildFHIRBundle,
   checkUserAssignment
 } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
-import {
-  validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments,
-  validateMarriageDeclarationAttachments
-} from '@gateway/utils/validators'
+import { validateBirthDeclarationAttachments } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import { UnassignError } from '@gateway/utils/unassignError'
 
@@ -38,10 +35,10 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (inScope(authHeader, ['register'])) {
-        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        // if (!hasAssignedToThisUser) {
-        //   throw new UnassignError('User has been unassigned')
-        // }
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
@@ -57,29 +54,20 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have a register scope')
       }
     },
-    async requestBirthRegistrationCorrection(
+    async requestRegistrationCorrection(
       _,
       { id, details },
       { headers: authHeader }
     ) {
       if (inScope(authHeader, ['register', 'validate'])) {
-        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        // if (!hasAssignedToThisUser) {
-        //   throw new UnassignError('User has been unassigned')
-        // }
-        try {
-          await validateBirthDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
         }
-        return await requestEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.BIRTH
-        )
+
+        return await requestEventRegistrationCorrection(id, details, authHeader)
       } else {
-        throw new Error('User does not have a register scope')
+        throw new Error('User does not have a register or validate scope')
       }
     },
     async approveBirthRegistrationCorrection(
@@ -88,10 +76,10 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (inScope(authHeader, ['register', 'validate'])) {
-        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        // if (!hasAssignedToThisUser) {
-        //   throw new UnassignError('User has been unassigned')
-        // }
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
@@ -113,10 +101,10 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (inScope(authHeader, ['register', 'validate'])) {
-        // const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        // if (!hasAssignedToThisUser) {
-        //   throw new UnassignError('User has been unassigned')
-        // }
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
@@ -127,56 +115,6 @@ export const resolvers: GQLResolver = {
           authHeader,
           details,
           EVENT_TYPE.BIRTH
-        )
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async requestDeathRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (hasScope(authHeader, 'register')) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateDeathDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await requestEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.DEATH
-        )
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async requestMarriageRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (hasScope(authHeader, 'register')) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateMarriageDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await requestEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.MARRIAGE
         )
       } else {
         throw new Error('User does not have a register scope')
@@ -206,30 +144,12 @@ async function createEventRegistrationCorrection(
 
 async function requestEventRegistrationCorrection(
   id: string,
-  authHeader: IAuthHeader,
-  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
-  eventType: EVENT_TYPE
+  correctionDetails: GQLCorrectionRequestInput,
+  authHeader: IAuthHeader
 ) {
-  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-  const task = fhirBundle.entry?.find(
-    (entry) => entry.resource?.resourceType === 'Task'
-  )
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(correctionDetails))
 
-  if (!task) {
-    throw new Error('Task not found')
-  }
-
-  task.resource.status = 'requested'
-
-  const res = await fetchFHIR(
-    '',
-    authHeader,
-    'POST',
-    JSON.stringify(fhirBundle)
-  )
-
-  // return composition-id
-  return getIDFromResponse(res)
+  return id
 }
 
 async function approveEventRegistrationCorrection(

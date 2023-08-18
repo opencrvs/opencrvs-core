@@ -68,8 +68,8 @@ export interface GQLMutation {
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markBirthAsIssued: string
+  requestRegistrationCorrection: string
   createBirthRegistrationCorrection: string
-  requestBirthRegistrationCorrection: string
   approveBirthRegistrationCorrection: string
   rejectBirthRegistrationCorrection: string
   markEventAsVoided: string
@@ -83,14 +83,12 @@ export interface GQLMutation {
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   markDeathAsIssued: string
-  requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
   createMarriageRegistration: GQLCreatedIds
   markMarriageAsValidated?: string
   markMarriageAsRegistered: GQLMarriageRegistration
   markMarriageAsCertified: string
   markMarriageAsIssued: string
-  requestMarriageRegistrationCorrection: string
   markEventAsDuplicate: string
   createOrUpdateUser: GQLUser
   activateUser?: string
@@ -582,6 +580,14 @@ export interface GQLBirthRegistrationInput {
   lastPreviousLiveBirth?: GQLDate
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLCorrectionRequestInput {
+  requestingIndividual: string
+  reason: string
+  comment: string
+  hasShowedVerifiedDocument: boolean
+  updates: Array<GQLCorrectionRequestUpdateInput>
 }
 
 export interface GQLReinstated {
@@ -1212,6 +1218,12 @@ export interface GQLRelatedPersonInput {
 export interface GQLQuestionnaireQuestionInput {
   fieldId?: string
   value?: string
+}
+
+export interface GQLCorrectionRequestUpdateInput {
+  sectionId: string
+  fieldId: string
+  value: string
 }
 
 export const enum GQLRegStatus {
@@ -2673,8 +2685,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
+  requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
-  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   approveBirthRegistrationCorrection?: MutationToApproveBirthRegistrationCorrectionResolver<TParent>
   rejectBirthRegistrationCorrection?: MutationToRejectBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
@@ -2688,14 +2700,12 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   markDeathAsIssued?: MutationToMarkDeathAsIssuedResolver<TParent>
-  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
   createMarriageRegistration?: MutationToCreateMarriageRegistrationResolver<TParent>
   markMarriageAsValidated?: MutationToMarkMarriageAsValidatedResolver<TParent>
   markMarriageAsRegistered?: MutationToMarkMarriageAsRegisteredResolver<TParent>
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
-  requestMarriageRegistrationCorrection?: MutationToRequestMarriageRegistrationCorrectionResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
@@ -2862,6 +2872,22 @@ export interface MutationToMarkBirthAsIssuedResolver<
   ): TResult
 }
 
+export interface MutationToRequestRegistrationCorrectionArgs {
+  id: string
+  details: GQLCorrectionRequestInput
+}
+export interface MutationToRequestRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToCreateBirthRegistrationCorrectionArgs {
   id: string
   details: GQLBirthRegistrationInput
@@ -2873,22 +2899,6 @@ export interface MutationToCreateBirthRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToCreateBirthRegistrationCorrectionArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestBirthRegistrationCorrectionArgs {
-  id: string
-  details: GQLBirthRegistrationInput
-}
-export interface MutationToRequestBirthRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestBirthRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -3102,22 +3112,6 @@ export interface MutationToMarkDeathAsIssuedResolver<
   ): TResult
 }
 
-export interface MutationToRequestDeathRegistrationCorrectionArgs {
-  id: string
-  details: GQLDeathRegistrationInput
-}
-export interface MutationToRequestDeathRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestDeathRegistrationCorrectionArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface MutationToMarkEventAsUnassignedArgs {
   id: string
 }
@@ -3207,22 +3201,6 @@ export interface MutationToMarkMarriageAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkMarriageAsIssuedArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestMarriageRegistrationCorrectionArgs {
-  id: string
-  details: GQLMarriageRegistrationInput
-}
-export interface MutationToRequestMarriageRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestMarriageRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
