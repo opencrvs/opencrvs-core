@@ -23,6 +23,8 @@ interface IRegisterMessages
   saveDeclarationConfirmModalDescription: MessageDescriptor
   deleteDeclarationConfirmModalTitle: MessageDescriptor
   deleteDeclarationConfirmModalDescription: MessageDescriptor
+  exitWithoutSavingModalForCorrectionRecordTitle: MessageDescriptor
+  exitWithoutSavingModalForCorrectionRecordDescription: MessageDescriptor
   exitWithoutSavingDeclarationConfirmModalTitle: MessageDescriptor
   exitWithoutSavingDeclarationConfirmModalDescription: MessageDescriptor
 }
@@ -82,6 +84,19 @@ const messagesToDefine: IRegisterMessages = {
     id: 'register.form.modal.desc.deleteDeclarationConfirm',
     defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
     description: 'Description for delete declaration confirmation modal'
+  },
+  exitWithoutSavingModalForCorrectionRecordTitle: {
+    id: 'register.form.modal.title.exitWithoutSavingModalForCorrection',
+    defaultMessage: 'Exit correct record?',
+    description:
+      'Title for exiting correction record without saving confirmation'
+  },
+  exitWithoutSavingModalForCorrectionRecordDescription: {
+    id: 'register.form.modal.desc.exitWithoutSavingModalForCorrection',
+    defaultMessage:
+      'Are you sure you want to exit? Any corrections you have made will not be saved.',
+    description:
+      'Description for exit declaration without saving confirmation modal for correct record'
   },
   exitWithoutSavingDeclarationConfirmModalTitle: {
     id: 'register.form.modal.title.exitWithoutSavingDeclarationConfirm',
