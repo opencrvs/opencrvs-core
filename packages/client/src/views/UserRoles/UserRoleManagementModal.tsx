@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { Text } from '@opencrvs/components/lib/Text'
 import { ResponsiveModal, Select, Stack, TextInput } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from 'styled-components'
@@ -28,6 +28,7 @@ import {
   ISystemRole,
   RolesInput
 } from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { Tooltip } from '@opencrvs/components/lib/Tooltip'
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
@@ -222,19 +223,26 @@ export function UserRoleManagementModal(props: IProps) {
                 }
               />
               {actives[index] && (
-                <Button
-                  id="editButton"
-                  type="icon"
-                  onClick={() => {
-                    const newActiveItems = new Array(userRoles.length).fill(
-                      true
-                    )
-                    newActiveItems[index] = false
-                    setActives(newActiveItems)
-                  }}
+                <Tooltip
+                  content={intl.formatMessage(
+                    constantsMessages.notCurrentlyActive
+                  )}
                 >
-                  <Icon name="Pencil" color="primary" />
-                </Button>
+                  <Button
+                    id="editButton"
+                    type="icon"
+                    disabled
+                    onClick={() => {
+                      const newActiveItems = new Array(userRoles.length).fill(
+                        true
+                      )
+                      newActiveItems[index] = false
+                      setActives(newActiveItems)
+                    }}
+                  >
+                    <Icon name="Pencil" color="primary" />
+                  </Button>
+                </Tooltip>
               )}
             </Stack>
           )
