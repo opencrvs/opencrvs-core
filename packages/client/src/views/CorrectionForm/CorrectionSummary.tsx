@@ -88,6 +88,7 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { SystemRoleType } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -203,7 +204,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         onClick={() => {
           userRole === ROLE_REGISTRATION_AGENT
             ? this.togglePrompt()
-            : this.makeCorrection()
+            : this.makeCorrection(userRole)
         }}
         disabled={
           sectionHasError(this.group, this.section, declaration) ||
@@ -396,11 +397,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             <SuccessButton
               id="send"
               key="continue"
-              // onClick={() => {
-              //   this.props.actionProps.negativeAction.handler()
-              // this.makeCorrection()
-              //   this.togglePrompt()
-              // }}
+              onClick={() => {
+                this.makeCorrection(userRole)
+                this.togglePrompt()
+              }}
             >
               {intl.formatMessage(messages.correctionForApprovalDialogConfirm)}
             </SuccessButton>
@@ -971,15 +971,25 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
   }
 
-  makeCorrection = () => {
+  makeCorrection = (userRole: SystemRoleType | undefined) => {
     const declaration = this.props.declaration
-    declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
-    declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    if (userRole === ROLE_REGISTRATION_AGENT) {
+      declaration.action = SubmissionAction.CORRECTION_REQUESTED
+      declaration.submissionStatus = SUBMISSION_STATUS.CORRECTION_REQUESTED
+    } else {
+      declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
+      declaration.submissionStatus =
+        SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    }
     updateDeclarationRegistrationWithCorrection(declaration, {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+    if (userRole === ROLE_REGISTRATION_AGENT) {
+      this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+    } else {
+      this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+    }
   }
 
   gotoReviewPage = () => {
