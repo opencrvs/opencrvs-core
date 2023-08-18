@@ -225,7 +225,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   mother: [
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
-    'motherID',
+    'iD',
     'motherNidVerification',
     'maritalStatus',
     'multipleBirth',
@@ -235,7 +235,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   father: [
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
-    'fatherID',
+    'iD',
     'fatherNidVerification',
     'maritalStatus',
     'occupation',
@@ -257,13 +257,13 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   groom: [
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
-    'groomID',
+    'iD',
     'marriedLastNameEng'
   ],
   bride: [
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
-    'brideID',
+    'iD',
     'marriedLastNameEng'
   ],
   informant: [
