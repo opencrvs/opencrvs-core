@@ -120,7 +120,12 @@ export const routes = [
           .concat({ resource: correctionRequestWithLocationExtensions })
       }
 
-      await sendBundleToHearth(bundleWithCorrectionRequestTask)
+      // Only send new task to Hearth so it doesn't change anything else
+      await sendBundleToHearth({
+        ...bundle,
+        entry: [{ resource: correctionRequestWithLocationExtensions }]
+      })
+
       await createNewAuditEvent(
         bundleWithCorrectionRequestTask,
         getToken(request)
@@ -184,6 +189,14 @@ function createCorrectionRequestTask(
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/contact-person',
+        valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/contact-person-email',
+        valueString: 'todo@example.com'
       },
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',
