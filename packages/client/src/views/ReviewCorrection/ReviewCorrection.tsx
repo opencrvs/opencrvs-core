@@ -34,7 +34,7 @@ import { IStoreState } from '@client/store'
 
 import { merge } from 'lodash'
 
-type URLParams = { recordId: string }
+type URLParams = { declarationId: string }
 
 function applyCorrectionToData(record: any) {
   if (!record.data.history) {
@@ -62,7 +62,7 @@ function applyCorrectionToData(record: any) {
 }
 
 export function ReviewCorrection() {
-  const { recordId } = useParams<URLParams>()
+  const { declarationId } = useParams<URLParams>()
   const match = useRouteMatch()
 
   const location = useLocation()
@@ -73,7 +73,7 @@ export function ReviewCorrection() {
   )
 
   const records = useRecord()
-  const record = records.findById(recordId)
+  const record = records.findById(declarationId)
 
   if (!record) {
     return (
