@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -158,7 +161,9 @@ class ReadyForReviewComponent extends React.Component<
             ) => {
               e && e.stopPropagation()
               this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.declarationStatus === 'CORRECTION_REQUESTED'
+                  ? REVIEW_CORRECTION
+                  : REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''

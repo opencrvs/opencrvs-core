@@ -32,7 +32,7 @@ export const REVIEW_EVENT_PARENT_FORM_PAGE =
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:declarationId/events/:event/parent/:pageId/group/:groupId'
 
-export const REVIEW_CORRECTION = '/review-correction/:recordId'
+export const REVIEW_CORRECTION = '/review-correction/:declarationId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:declarationId/:pageId'
 

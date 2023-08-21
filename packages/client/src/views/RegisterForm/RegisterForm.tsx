@@ -316,13 +316,28 @@ function FormAppBar({
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
       return
     }
+    const [exitModalTitle, exitModalDescription] = isCorrection(declaration)
+      ? [
+          intl.formatMessage(
+            messages.exitWithoutSavingModalForCorrectionRecordTitle
+          ),
+          intl.formatMessage(
+            messages.exitWithoutSavingModalForCorrectionRecordDescription
+          )
+        ]
+      : [
+          intl.formatMessage(
+            messages.exitWithoutSavingDeclarationConfirmModalTitle
+          ),
+          intl.formatMessage(
+            messages.exitWithoutSavingDeclarationConfirmModalDescription
+          )
+        ]
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
         responsive={false}
-        title={intl.formatMessage(
-          messages.exitWithoutSavingDeclarationConfirmModalTitle
-        )}
+        title={exitModalTitle}
         actions={[
           <Button
             type="tertiary"
@@ -350,9 +365,7 @@ function FormAppBar({
       >
         <Stack>
           <Text variant="reg16" element="p" color="grey500">
-            {intl.formatMessage(
-              messages.exitWithoutSavingDeclarationConfirmModalDescription
-            )}
+            {exitModalDescription}
           </Text>
         </Stack>
       </ResponsiveModal>
@@ -508,15 +521,17 @@ function FormAppBar({
             )}
             desktopRight={
               <>
-                <Button
-                  id="save-exit-btn"
-                  type="primary"
-                  size="small"
-                  onClick={handleSaveAndExit}
-                >
-                  <Icon name="DownloadSimple" />
-                  {intl.formatMessage(buttonMessages.saveExitButton)}
-                </Button>
+                {!isCorrection(declaration) && (
+                  <Button
+                    id="save-exit-btn"
+                    type="primary"
+                    size="small"
+                    onClick={handleSaveAndExit}
+                  >
+                    <Icon name="DownloadSimple" />
+                    {intl.formatMessage(buttonMessages.saveExitButton)}
+                  </Button>
+                )}
                 <Button type="secondary" size="small" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
@@ -556,9 +571,11 @@ function FormAppBar({
             )}
             mobileRight={
               <>
-                <Button type="icon" size="small" onClick={handleSaveAndExit}>
-                  <Icon name="DownloadSimple" />
-                </Button>
+                {!isCorrection(declaration) && (
+                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                    <Icon name="DownloadSimple" />
+                  </Button>
+                )}
                 <Button type="icon" size="small" onClick={handleExit}>
                   <Icon name="X" />
                 </Button>
