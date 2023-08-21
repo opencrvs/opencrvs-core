@@ -34,6 +34,7 @@ import {
   getTask
 } from '@metrics/features/registration/fhirUtils'
 import { EventType } from '@metrics/config/routes'
+import { fetchTaskHistory } from '@metrics/api'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -520,20 +521,36 @@ export async function correctionEventHandler(
   h: Hapi.ResponseToolkit
 ) {
   const task = getTask(request.payload as fhir.Bundle)
+
   if (!task) {
     return badRequest('No task found in received bundle')
   }
-  if (task.status === 'ready') {
+
+  const history = await fetchTaskHistory(task.id, {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  })
+
+  const latestCorrectionTask = history.entry?.find(
+    (entry) =>
+      entry.resource.businessStatus?.coding?.[0].code === 'CORRECTION_REQUESTED'
+  )
+
+  if (!latestCorrectionTask) {
+    return badRequest('No correction task found in received bundle')
+  }
+
+  if (latestCorrectionTask.resource.status === 'ready') {
     return correctionHandler(request, h)
   }
-  if (task.status === 'accepted') {
+  if (latestCorrectionTask.resource.status === 'accepted') {
     return approveCorrectionHandler(request, h)
   }
-  if (task.status === 'rejected') {
+  if (latestCorrectionTask.resource.status === 'rejected') {
     return rejectCorrectionHandler(request, h)
   }
 
-  if (task.status === 'requested') {
+  if (latestCorrectionTask.resource.status === 'requested') {
     return requestCorrectionHandler(request, h)
   }
 

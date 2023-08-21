@@ -19,6 +19,23 @@ import {
   DOCUMENTS_URL
 } from '@metrics/constants'
 
+export type TaskWithoutId = Omit<fhir.Task, 'id'>
+export type Task = TaskWithoutId & { id: string; lastModified: string }
+
+export type BundleEntry<T extends fhir.Resource = fhir.Resource> = Omit<
+  fhir.BundleEntry,
+  'resource'
+> & {
+  resource: T
+}
+
+export type Bundle<T extends fhir.Resource = fhir.Resource> = Omit<
+  fhir.Bundle,
+  'entry'
+> & {
+  entry: Array<BundleEntry<T>>
+}
+
 export function fetchFHIR<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
@@ -43,7 +60,7 @@ export function fetchFHIR<T = any>(
 }
 
 export function fetchTaskHistory(taskId: string, authHeader: IAuthHeader) {
-  return fetchFHIR<fhir.Bundle>(`Task/${taskId}/_history`, authHeader)
+  return fetchFHIR<Bundle<Task>>(`Task/${taskId}/_history`, authHeader)
 }
 
 export const fetchLocation = async (

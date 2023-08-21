@@ -1,13 +1,16 @@
 import { IAuthHeader } from '@gateway/common-types'
 import { WORKFLOW_URL } from '@gateway/constants'
-import { GQLCorrectionInput } from '@gateway/graphql/schema'
+import {
+  GQLCorrectionInput,
+  GQLCorrectionRejectionInput
+} from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,
-  body: Record<string, any>
+  body?: Record<string, any>
 ): Promise<T> => {
   const response = await fetch(new URL(path, WORKFLOW_URL).href, {
     method,
@@ -15,7 +18,7 @@ const createRequest = async <T = any>(
       'Content-Type': 'application/json',
       ...authHeader
     },
-    body: JSON.stringify(body)
+    body: body ? JSON.stringify(body) : undefined
   })
 
   if (!response.ok) {
@@ -30,7 +33,7 @@ const createRequest = async <T = any>(
   return response.json()
 }
 
-export function requestBirthRegistrationCorrection(
+export function requestRegistrationCorrection(
   recordId: string,
   correctionDetails: GQLCorrectionInput,
   authHeader: IAuthHeader
@@ -40,5 +43,18 @@ export function requestBirthRegistrationCorrection(
     `/records/${recordId}/request-correction`,
     authHeader,
     correctionDetails
+  )
+}
+
+export function rejectRegistrationCorrection(
+  recordId: string,
+  details: GQLCorrectionRejectionInput,
+  authHeader: IAuthHeader
+) {
+  return createRequest(
+    'POST',
+    `/records/${recordId}/reject-correction`,
+    authHeader,
+    details
   )
 }

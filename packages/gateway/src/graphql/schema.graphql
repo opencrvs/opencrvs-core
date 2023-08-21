@@ -163,6 +163,8 @@ type Query {
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
+  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
+  rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
@@ -176,16 +178,7 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   createBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  approveBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  rejectBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
@@ -688,6 +681,24 @@ input NotificationInput {
   updatedAt: Date
 }
 
+input CorrectionInput {
+  requester: ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput!]!
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  otherReason: String
+  note: String
+}
+
+input CorrectionRejectionInput {
+  reason: String!
+}
+
 type CreatedIds {
   compositionId: String
   trackingId: String
@@ -712,20 +723,6 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
-}
-
-input CorrectionInput {
-  requester: ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput!]!
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
 }
 
 type Reinstated {
@@ -1272,6 +1269,23 @@ input LocationInput {
   geoData: String
 }
 
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+  data: String
+}
+
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
+}
+
 input RegistrationInput {
   _fhirID: ID
   draftId: String
@@ -1332,23 +1346,6 @@ input RelatedPersonInput {
 input QuestionnaireQuestionInput {
   fieldId: String
   value: String
-}
-
-input PaymentInput {
-  paymentId: ID
-  type: PaymentType
-  total: Float
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
-  data: String
-}
-
-input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
 }
 
 enum RegStatus {
@@ -1797,6 +1794,16 @@ input DeceasedInput {
   deathDate: String
 }
 
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
 input RegWorkflowInput {
   type: RegStatus
   user: UserInput
@@ -1812,16 +1819,6 @@ input CertificateInput {
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
   data: String
-}
-
-enum PaymentType {
-  MANUAL
-}
-
-enum PaymentOutcomeType {
-  COMPLETED
-  ERROR
-  PARTIAL
 }
 
 input LabelInput {

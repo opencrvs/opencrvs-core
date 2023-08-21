@@ -16,16 +16,15 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
+import { BundleEntry, Task, TaskWithoutId } from '@workflow/records/fhir'
 
 export const INFORMANT_CODE = 'informant-details'
 
-export function isTask(
-  resource: fhir.Resource | undefined
-): resource is fhir.Task {
+export function isTask(resource: fhir.Resource | undefined): resource is Task {
   return resource?.resourceType === 'Task'
 }
 
-export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
+export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry): Task {
   if (
     !bundle ||
     bundle.type !== 'document' ||
@@ -44,14 +43,14 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
   }
 }
 
-export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
-  let taskResource = getTaskResourceFromFhirBundle(fhirBundle) as fhir.Task
+export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle): Task {
+  let taskResource = getTaskResourceFromFhirBundle(fhirBundle)
   if (!taskResource) {
     const taskEntry = createTaskRefTemplate(getEventType(fhirBundle))
     if (!fhirBundle.entry) {
       fhirBundle.entry = []
     }
-    taskResource = taskEntry.resource as fhir.Task
+    taskResource = taskEntry.resource as Task
     if (!taskResource.focus) {
       taskResource.focus = { reference: '' }
     }
@@ -61,24 +60,21 @@ export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
   return taskResource
 }
 
-export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
-  const taskEntry =
-    fhirBundle.entry &&
-    fhirBundle.entry.find((entry) => {
-      if (entry.resource && entry.resource.resourceType === 'Task') {
-        return true
-      }
-      return false
-    })
-  return taskEntry && taskEntry.resource
+export function getTaskResourceFromFhirBundle(
+  fhirBundle: fhir.Bundle
+): Task | undefined {
+  const resources = fhirBundle.entry?.map((entry) => entry.resource!) || []
+
+  return resources.find(isTask)
 }
 
-function createTaskRefTemplate(event: EVENT_TYPE) {
+function createTaskRefTemplate(event: EVENT_TYPE): BundleEntry<TaskWithoutId> {
   return {
     fullUrl: `urn:uuid:${uuid()}`,
     resource: {
       resourceType: 'Task',
       status: 'ready',
+      intent: 'order',
       code: {
         coding: [
           {

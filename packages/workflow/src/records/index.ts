@@ -9,6 +9,13 @@ import {
 } from './fhir'
 const client = new MongoClient(HEARTH_MONGO_URL)
 
+export class RecordNotFoundError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'RecordNotFoundError'
+  }
+}
+
 export async function getFHIRBundleWithRecordID(
   recordId: string
 ): Promise<Bundle> {
@@ -21,7 +28,7 @@ export async function getFHIRBundleWithRecordID(
     .findOne<fhir.Composition>({ id: recordId })
 
   if (!composition) {
-    throw new Error('Cannot find composition with id ' + recordId)
+    throw new RecordNotFoundError('Cannot find composition with id ' + recordId)
   }
 
   const referenceSections = composition

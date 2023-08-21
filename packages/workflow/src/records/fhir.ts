@@ -1,12 +1,21 @@
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
-export type BundleEntry = Omit<fhir.BundleEntry, 'resource'> & {
-  resource: fhir.Resource
+export type TaskWithoutId = Omit<fhir.Task, 'id'>
+export type Task = TaskWithoutId & { id: string; lastModified: string }
+
+export type BundleEntry<T extends fhir.Resource = fhir.Resource> = Omit<
+  fhir.BundleEntry,
+  'resource'
+> & {
+  resource: T
 }
 
-export type Bundle = Omit<fhir.Bundle, 'entry'> & {
-  entry: Array<BundleEntry>
+export type Bundle<T extends fhir.Resource = fhir.Resource> = Omit<
+  fhir.Bundle,
+  'entry'
+> & {
+  entry: Array<BundleEntry<T>>
 }
 
 export type BundleEntryWithFullUrl = Omit<fhir.BundleEntry, 'fullUrl'> & {
@@ -71,4 +80,31 @@ export async function sendBundleToHearth(
   }
 
   return res.json()
+}
+
+export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
+  const res = await fetch(
+    new URL(`/fhir/Task/${taskId}/_history?_count=100`, HEARTH_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching task history from Hearth failed with [${res.status}] body: ${res.statusText}`
+    )
+  }
+
+  return res.json()
+}
+
+export function sortTasksDescending(tasks: Task[]) {
+  return tasks.slice().sort((a, b) => {
+    return (
+      new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+    )
+  })
 }

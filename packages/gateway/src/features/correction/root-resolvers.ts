@@ -25,7 +25,10 @@ import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 import { validateBirthDeclarationAttachments } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
 import { UnassignError } from '@gateway/utils/unassignError'
-import { requestBirthRegistrationCorrection } from '@gateway/workflow'
+import {
+  rejectRegistrationCorrection,
+  requestRegistrationCorrection
+} from '@gateway/workflow'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -65,60 +68,26 @@ export const resolvers: GQLResolver = {
           throw new UnassignError('User has been unassigned')
         }
 
-        await requestBirthRegistrationCorrection(id, details, authHeader)
+        await requestRegistrationCorrection(id, details, authHeader)
         return id
       } else {
         throw new Error('User does not have a register or validate scope')
       }
     },
-    async approveBirthRegistrationCorrection(
+    async rejectRegistrationCorrection(
       _,
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, ['register', 'validate'])) {
+      if (inScope(authHeader, ['register'])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
         }
-        try {
-          await validateBirthDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await approveEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.BIRTH
-        )
+        await rejectRegistrationCorrection(id, details, authHeader)
+        return id
       } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async rejectBirthRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (inScope(authHeader, ['register', 'validate'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateBirthDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await rejectEventRegistrationCorrection(
-          id,
-          authHeader,
-          details,
-          EVENT_TYPE.BIRTH
-        )
-      } else {
-        throw new Error('User does not have a register scope')
+        throw new Error('User does not have a register or validate scope')
       }
     }
   }
@@ -131,62 +100,6 @@ async function createEventRegistrationCorrection(
   eventType: EVENT_TYPE
 ) {
   const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-
-  const res = await fetchFHIR(
-    '',
-    authHeader,
-    'POST',
-    JSON.stringify(fhirBundle)
-  )
-
-  // return composition-id
-  return getIDFromResponse(res)
-}
-
-async function approveEventRegistrationCorrection(
-  id: string,
-  authHeader: IAuthHeader,
-  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
-  eventType: EVENT_TYPE
-) {
-  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-  const task = fhirBundle.entry?.find(
-    (entry) => entry.resource?.resourceType === 'Task'
-  )
-
-  if (!task) {
-    throw new Error('Task not found')
-  }
-
-  task.resource.status = 'accepted'
-
-  const res = await fetchFHIR(
-    '',
-    authHeader,
-    'POST',
-    JSON.stringify(fhirBundle)
-  )
-
-  // return composition-id
-  return getIDFromResponse(res)
-}
-
-async function rejectEventRegistrationCorrection(
-  id: string,
-  authHeader: IAuthHeader,
-  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
-  eventType: EVENT_TYPE
-) {
-  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-  const task = fhirBundle.entry?.find(
-    (entry) => entry.resource?.resourceType === 'Task'
-  )
-
-  if (!task) {
-    throw new Error('Task not found')
-  }
-
-  task.resource.status = 'rejected'
 
   const res = await fetchFHIR(
     '',
