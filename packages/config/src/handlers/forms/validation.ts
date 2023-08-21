@@ -385,20 +385,25 @@ const form = z.object({
       }
     )
     .refine(
-      (sections) => {
+      (sections) =>
         findDuplicates(
           sections
             .flatMap((sec) => [
-              ...(sec.mapping?.template ?? []).map(
-                ({ fieldName }) => fieldName
-              ),
+              ...(sec.mapping?.template ?? []).map(({ fieldName }) => {
+                // Log the following to observe all available handlebars
+                // console.log('section handlebar: ', fieldName)
+                return fieldName
+              }),
               ...sec.groups
                 .flatMap((group) => group.fields)
-                .map(({ mapping }) => mapping?.template?.fieldName)
+                .map(({ mapping }) => {
+                  // Log the following to observe all available handlebars
+                  // console.log('field handlebar: ', mapping?.template?.fieldName)
+                  return mapping?.template?.fieldName
+                })
             ])
             .filter((maybeName): maybeName is string => Boolean(maybeName))
-        ).length === 0
-      },
+        ).length === 0,
       (sections) => {
         const duplicateCertificateHandlebars = findDuplicates(
           sections

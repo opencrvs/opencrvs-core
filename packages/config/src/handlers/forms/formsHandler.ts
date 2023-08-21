@@ -17,9 +17,9 @@ import FormVersions, {
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { logger } from '@config/config/logger'
-/*import { badData } from '@hapi/boom'
+import { badData } from '@hapi/boom'
 import { registrationForms } from './validation'
-import { fromZodError } from 'zod-validation-error'*/
+import { fromZodError } from 'zod-validation-error'
 
 interface IFormsPayload {
   version: string
@@ -46,7 +46,7 @@ export default async function getForm(
 
   const forms: IFormsPayload = await response.json()
 
-  /*if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     const result = registrationForms.safeParse(forms)
 
     if (!result.success) {
@@ -57,7 +57,7 @@ export default async function getForm(
         }).message
       )
     }
-  }*/
+  }
 
   const formVersion: IFormVersionModel | null = await FormVersions.findOne({
     version: forms.version
