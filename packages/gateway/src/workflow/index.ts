@@ -19,6 +19,11 @@ const createRequest = async <T = any>(
   })
 
   if (!response.ok) {
+    if (response.status === 400) {
+      const data = await response.json()
+      throw new Error(data.message)
+    }
+
     throw new Error(response.statusText)
   }
 

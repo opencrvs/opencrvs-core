@@ -180,23 +180,20 @@ function createCorrectionRequestTask(
     focus: previousTask.focus,
     id: previousTask.id,
     identifier: previousTask.identifier,
-    extension: previousTask.extension
-      ?.filter(
-        ({ url }) =>
-          url !== 'http://opencrvs.org/specs/extension/requestingIndividual' &&
-          url !==
-            'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument'
-      )
-      .concat([
-        {
-          url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-          valueString: correctionDetails.requester
-        },
-        {
-          url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
-          valueBoolean: correctionDetails.hasShowedVerifiedDocument
-        }
-      ]),
+    extension: [
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+        valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+        valueBoolean: correctionDetails.hasShowedVerifiedDocument
+      }
+    ],
     input: correctionDetails.values.map((update) => ({
       valueCode: update.section,
       valueId: update.fieldName,
