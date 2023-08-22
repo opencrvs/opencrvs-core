@@ -57,7 +57,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
+  MAKE_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
@@ -1466,7 +1466,7 @@ export function setInformantReference(
 export function hasRequestCorrectionExtension(task: fhir.Task) {
   const extension =
     task.extension &&
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+    findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
 export const fetchDocuments = async <T = any>(

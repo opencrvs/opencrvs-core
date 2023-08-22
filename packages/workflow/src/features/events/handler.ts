@@ -20,7 +20,7 @@ import {
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
-  markEventAsRequestedForCorrectionHandler,
+  markEventCorrectedHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
@@ -92,10 +92,10 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (
-              (hasRegisterScope(request) || hasValidateScope(request)) &&
+              hasRegisterScope(request) &&
               hasCorrectionEncounterSection(firstEntry as fhir.Composition)
             ) {
-              return Events[`${eventType}_REQUEST_CORRECTION`]
+              return Events[`${eventType}_MAKE_CORRECTION`]
             } else if (!hasCertificateDataInDocRef(fhirBundle)) {
               return Events[`${eventType}_MARK_ISSUE`]
             } else {
@@ -239,11 +239,11 @@ export async function fhirWorkflowEventHandler(
       }
       break
     }
-    case Events.BIRTH_REQUEST_CORRECTION:
-    case Events.DEATH_REQUEST_CORRECTION:
-    case Events.MARRIAGE_REQUEST_CORRECTION:
-      response = await markEventAsRequestedForCorrectionHandler(request, h)
-      await triggerEvent(event, request.payload, request.headers)
+    case Events.BIRTH_MAKE_CORRECTION:
+    case Events.DEATH_MAKE_CORRECTION:
+    case Events.MARRIAGE_MAKE_CORRECTION:
+      response = await markEventCorrectedHandler(request, h)
+      await triggerEvent(event, response, request.headers)
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
@@ -361,16 +361,12 @@ export async function triggerEvent(
   payload: Hapi.Request['payload'],
   headers: Record<string, string> = {}
 ) {
-  try {
-    await fetch(`${OPENHIM_URL}${event}`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to forward to openhim for error : ${err}`)
-  }
+  return fetch(`${OPENHIM_URL}${event}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    }
+  })
 }

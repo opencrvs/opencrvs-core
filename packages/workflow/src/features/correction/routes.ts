@@ -142,37 +142,19 @@ export const routes = [
           .concat({ resource: correctionRequestWithLocationExtensions })
       }
 
-      try {
-        // Only send new task to Hearth so it doesn't change anything else
-        await sendBundleToHearth({
-          ...bundle,
-          entry: [{ resource: correctionRequestWithLocationExtensions }]
-        })
+      // Only send new task to Hearth so it doesn't change anything else
+      await sendBundleToHearth({
+        ...bundle,
+        entry: [{ resource: correctionRequestWithLocationExtensions }]
+      })
 
-        await createNewAuditEvent(
-          bundleWithCorrectionRequestTask,
-          getToken(request)
-        )
-        await indexBundle(bundleWithCorrectionRequestTask, getToken(request))
-      } catch (error) {
-        throw error
-      }
+      await createNewAuditEvent(
+        bundleWithCorrectionRequestTask,
+        getToken(request)
+      )
+      await indexBundle(bundleWithCorrectionRequestTask, getToken(request))
 
       return {}
-    }
-  },
-  {
-    method: 'POST',
-    path: '/records/{recordId}/make-correction',
-    handler: (request: Request) => {
-      return 'success'
-    }
-  },
-  {
-    method: 'POST',
-    path: '/records/{recordId}/approve-correction',
-    handler: (request: Request) => {
-      return 'success'
     }
   },
   {
@@ -331,6 +313,12 @@ function createCorrectionRequestTask(
     id: previousTask.id,
     identifier: previousTask.identifier,
     extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
       {
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
@@ -338,10 +326,6 @@ function createCorrectionRequestTask(
       {
         url: 'http://opencrvs.org/specs/extension/contact-person',
         valueString: correctionDetails.requester
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/contact-person-email',
-        valueString: 'todo@example.com'
       },
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',

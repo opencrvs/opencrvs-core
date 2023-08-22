@@ -63,6 +63,9 @@ export interface GQLMutation {
   voidNotification?: GQLNotification
   requestRegistrationCorrection: string
   rejectRegistrationCorrection: string
+  createBirthRegistrationCorrection: string
+  createDeathRegistrationCorrection: string
+  createMarriageRegistrationCorrection: string
   createBirthRegistration: GQLCreatedIds
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
@@ -70,7 +73,6 @@ export interface GQLMutation {
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markBirthAsIssued: string
-  createBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
   markEventAsNotDuplicate: string
@@ -573,12 +575,6 @@ export interface GQLCorrectionRejectionInput {
   reason: string
 }
 
-export interface GQLCreatedIds {
-  compositionId?: string
-  trackingId?: string
-  isPotentiallyDuplicate?: boolean
-}
-
 export interface GQLBirthRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
@@ -597,11 +593,6 @@ export interface GQLBirthRegistrationInput {
   lastPreviousLiveBirth?: GQLDate
   createdAt?: GQLDate
   updatedAt?: GQLDate
-}
-
-export interface GQLReinstated {
-  taskEntryResourceID: string
-  registrationStatus?: GQLRegStatus
 }
 
 export interface GQLDeathRegistrationInput {
@@ -639,6 +630,17 @@ export interface GQLMarriageRegistrationInput {
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLCreatedIds {
+  compositionId?: string
+  trackingId?: string
+  isPotentiallyDuplicate?: boolean
+}
+
+export interface GQLReinstated {
+  taskEntryResourceID: string
+  registrationStatus?: GQLRegStatus
 }
 
 export interface GQLUserInput {
@@ -1246,6 +1248,12 @@ export interface GQLQuestionnaireQuestionInput {
   value?: string
 }
 
+export interface GQLMedicalPractitionerInput {
+  name?: string
+  qualification?: string
+  lastVisitDate?: GQLDate
+}
+
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   ARCHIVED = 'ARCHIVED',
@@ -1258,12 +1266,6 @@ export const enum GQLRegStatus {
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
   ISSUED = 'ISSUED'
-}
-
-export interface GQLMedicalPractitionerInput {
-  name?: string
-  qualification?: string
-  lastVisitDate?: GQLDate
 }
 
 export interface GQLHumanNameInput {
@@ -2669,6 +2671,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   voidNotification?: MutationToVoidNotificationResolver<TParent>
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
+  createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
+  createDeathRegistrationCorrection?: MutationToCreateDeathRegistrationCorrectionResolver<TParent>
+  createMarriageRegistrationCorrection?: MutationToCreateMarriageRegistrationCorrectionResolver<TParent>
   createBirthRegistration?: MutationToCreateBirthRegistrationResolver<TParent>
   updateBirthRegistration?: MutationToUpdateBirthRegistrationResolver<TParent>
   markBirthAsVerified?: MutationToMarkBirthAsVerifiedResolver<TParent>
@@ -2676,7 +2681,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markBirthAsIssued?: MutationToMarkBirthAsIssuedResolver<TParent>
-  createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
   markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
@@ -2776,6 +2780,54 @@ export interface MutationToRejectRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToRejectRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToCreateBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToCreateDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateDeathRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToCreateMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateMarriageRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -2887,22 +2939,6 @@ export interface MutationToMarkBirthAsIssuedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsIssuedArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToCreateBirthRegistrationCorrectionArgs {
-  id: string
-  details: GQLBirthRegistrationInput
-}
-export interface MutationToCreateBirthRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToCreateBirthRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

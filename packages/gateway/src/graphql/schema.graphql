@@ -165,6 +165,18 @@ type Mutation {
   voidNotification(id: ID!): Notification
   requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
+  createBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
+  createDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
+  createMarriageRegistrationCorrection(
+    id: ID!
+    details: MarriageRegistrationInput!
+  ): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
@@ -178,10 +190,6 @@ type Mutation {
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  createBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
@@ -699,12 +707,6 @@ input CorrectionRejectionInput {
   reason: String!
 }
 
-type CreatedIds {
-  compositionId: String
-  trackingId: String
-  isPotentiallyDuplicate: Boolean
-}
-
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -723,11 +725,6 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
-}
-
-type Reinstated {
-  taskEntryResourceID: ID!
-  registrationStatus: RegStatus
 }
 
 input DeathRegistrationInput {
@@ -765,6 +762,17 @@ input MarriageRegistrationInput {
   questionnaire: [QuestionnaireQuestionInput]
   createdAt: Date
   updatedAt: Date
+}
+
+type CreatedIds {
+  compositionId: String
+  trackingId: String
+  isPotentiallyDuplicate: Boolean
+}
+
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
 }
 
 input UserInput {
@@ -1348,6 +1356,12 @@ input QuestionnaireQuestionInput {
   value: String
 }
 
+input MedicalPractitionerInput {
+  name: String
+  qualification: String
+  lastVisitDate: Date
+}
+
 enum RegStatus {
   IN_PROGRESS
   ARCHIVED
@@ -1360,12 +1374,6 @@ enum RegStatus {
   CERTIFIED
   REJECTED
   ISSUED
-}
-
-input MedicalPractitionerInput {
-  name: String
-  qualification: String
-  lastVisitDate: Date
 }
 
 input HumanNameInput {

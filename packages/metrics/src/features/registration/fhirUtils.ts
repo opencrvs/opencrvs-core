@@ -59,7 +59,7 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
 
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
+export const MAKE_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/makeCorrection`
 
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
@@ -187,7 +187,7 @@ export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
 export function hasRequestCorrectionExtension(task: fhir.Task) {
   const extension =
     task.extension &&
-    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+    findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
 

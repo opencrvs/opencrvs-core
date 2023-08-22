@@ -314,6 +314,19 @@ export const getRoutes = () => {
     // Request correction
     {
       method: 'POST',
+      path: '/events/{event}/make-correction',
+      handler: analyticsDataRefreshingRoute(correctionEventHandler),
+      config: {
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(EventType))
+          })
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/{event}/request-correction',
       handler: analyticsDataRefreshingRoute(correctionEventHandler),
       config: {
