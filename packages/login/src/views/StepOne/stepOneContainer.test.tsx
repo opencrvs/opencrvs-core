@@ -50,7 +50,9 @@ describe('Login app step one', () => {
               imageFit: 'FILL'
             },
             SENTRY: '',
-            LOGROCKET: ''
+            LOGROCKET: '',
+            USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
+            INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'
           }
         })
       )

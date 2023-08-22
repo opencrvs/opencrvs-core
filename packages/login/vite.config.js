@@ -53,7 +53,6 @@ export default defineConfig(({ mode }) => {
           }
         ]
       },
-      registerType: 'autoUpdate',
       devOptions: {
         enabled: false
       }
