@@ -9,18 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
 
-export function hasSpouseDetailsTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) {
-  if (queryData.spouse) {
-    transformedData[sectionId][field.name] = { value: 'Yes', nestedFields: {} }
-  } else {
-    transformedData[sectionId][field.name] = { value: 'No', nestedFields: {} }
-  }
-  return transformedData
-}
+import { convertToLocal } from './registration-mappings'
+
+describe('phone number conversion from international format back to local format', () => {
+  it('replaces country code', async () => {
+    expect(convertToLocal('+260211000000', 'ZMB')).toBe('0211000000')
+    expect(convertToLocal('+358504700715', 'FIN')).toBe('0504700715')
+    expect(convertToLocal('+237666666666', 'CMR')).toBe('666666666')
+  })
+})

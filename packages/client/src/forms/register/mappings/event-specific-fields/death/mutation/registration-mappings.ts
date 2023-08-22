@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ICertificate, IFormData, TransformedData } from '@client/forms'
-import { transformCertificateData } from '@client/forms/register/mappings/mutation'
 
-export function setMarriageRegistrationSectionTransformer(
+import { IFormData, ICertificate, TransformedData } from '@client/forms'
+import { transformCertificateData } from '@client/forms/register/mappings/mutation/utils'
+
+export function setDeathRegistrationSectionTransformer(
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
@@ -33,38 +34,6 @@ export function setMarriageRegistrationSectionTransformer(
         draftData.registration.registrationNumber
     }
 
-    if (draftData[sectionId].groomSignatureURI) {
-      transformedData[sectionId].groomSignature =
-        draftData[sectionId].groomSignatureURI
-    } else if (draftData[sectionId].groomSignature) {
-      transformedData[sectionId].groomSignature =
-        draftData[sectionId].groomSignature
-    }
-
-    if (draftData[sectionId].brideSignatureURI) {
-      transformedData[sectionId].brideSignature =
-        draftData[sectionId].brideSignatureURI
-    } else if (draftData[sectionId].brideSignature) {
-      transformedData[sectionId].brideSignature =
-        draftData[sectionId].brideSignature
-    }
-
-    if (draftData[sectionId].witnessOneSignatureURI) {
-      transformedData[sectionId].witnessOneSignature =
-        draftData[sectionId].witnessOneSignatureURI
-    } else if (draftData[sectionId].witnessOneSignature) {
-      transformedData[sectionId].witnessOneSignature =
-        draftData[sectionId].witnessOneSignature
-    }
-
-    if (draftData[sectionId].witnessTwoSignatureURI) {
-      transformedData[sectionId].witnessTwoSignature =
-        draftData[sectionId].witnessTwoSignatureURI
-    } else if (draftData[sectionId].witnessTwoSignature) {
-      transformedData[sectionId].witnessTwoSignature =
-        draftData[sectionId].witnessTwoSignature
-    }
-
     if (!transformedData[sectionId].status) {
       transformedData[sectionId].status = [
         {
@@ -83,12 +52,22 @@ export function setMarriageRegistrationSectionTransformer(
       })
     }
 
-    if (draftData[sectionId].certificates) {
+    if (draftData.registration.certificates) {
       transformCertificateData(
         transformedData,
-        (draftData[sectionId].certificates as ICertificate[])[0],
-        sectionId
+        (draftData.registration.certificates as ICertificate[])[0],
+        'registration'
       )
     }
   }
+
+  if (draftData[sectionId].informantsSignatureURI) {
+    transformedData[sectionId].informantsSignature =
+      draftData[sectionId].informantsSignatureURI
+  } else if (draftData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      draftData[sectionId].informantsSignature
+  }
+
+  return transformedData
 }

@@ -20,6 +20,7 @@ import {
 } from '@client/forms'
 import { IdentityType } from '@client/utils/gateway'
 import { set } from 'lodash'
+import { convertToMSISDN } from '@client/forms/utils'
 
 interface IPersonName {
   [key: string]: string
@@ -253,7 +254,6 @@ export const eventLocationMutationTransformer =
       field.name === config.useCase &&
       transformedData.eventLocation
     ) {
-      debugger
       transformedData.eventLocation.type = `${draftData[sectionId][field.name]}`
       if (
         transformedData.eventLocation.type === 'DECEASED_USUAL_RESIDENCE' &&
@@ -718,4 +718,59 @@ export const childFieldToIdentityTransformer =
         type: idType
       })
     })
+  }
+export function eventFieldToAttachmentTransformer(
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) {
+  return fieldToAttachmentTransformer(
+    transformedData,
+    draftData,
+    sectionId,
+    field,
+    'registration'
+  )
+}
+export const customFieldToQuestionnaireTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const value: IFormSectionData = draftData[sectionId][
+    field.name
+  ] as IFormSectionData
+  if (!transformedData.questionnaire) {
+    transformedData.questionnaire = []
+  }
+  transformedData.questionnaire.push({
+    fieldId: field.customQuesstionMappingId,
+    value: String(value)
+  })
+
+  return transformedData
+}
+
+export const msisdnTransformer =
+  (transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName ? transformedFieldName : field.name
+
+    set(
+      transformedData,
+      fieldName,
+      convertToMSISDN(
+        draftData[sectionId][field.name] as string,
+        window.config.COUNTRY
+      )
+    )
+
+    return transformedData
   }

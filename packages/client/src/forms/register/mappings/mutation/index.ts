@@ -10,10 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './field-mappings'
-export * from '@client/forms/register/mappings/fields/birth/mutation/registration-mappings'
-export * from '@client/forms/register/mappings/fields/death/mutation/deceased-mappings'
-export * from '@client/forms/register/mappings/fields/marriage/mutation/registration-mappings'
-export * from '@client/forms/register/mappings/fields/event/mutation/documents-mappings'
-export * from '@client/forms/register/mappings/fields/informant/mutation/informant-mappings'
-export * from '@client/forms/register/mappings/fields/marriage/mutation/event-mappings'
-export * from '@client/forms/register/mappings/fields/customFields/mutation/customField-mappings'
+export * from './informant-mappings'
+export * from '@client/forms/register/mappings/event-specific-fields/birth/mutation/registration-mappings'
+export * from '@client/forms/register/mappings/event-specific-fields/death/mutation/deceased-mappings'
+export * from '@client/forms/register/mappings/event-specific-fields/death/mutation/registration-mappings'
+export * from '@client/forms/register/mappings/event-specific-fields/marriage/mutation/event-mappings'
+export * from '@client/forms/register/mappings/event-specific-fields/marriage/mutation/registration-mappings'

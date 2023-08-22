@@ -9,49 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IFormField,
-  IFormData,
-  ICertificate,
-  TransformedData,
-  IFormFieldMutationMapFunction
-} from '@client/forms'
-import { cloneDeep } from 'lodash'
-import { transformCertificateData } from '@client/forms/register/mappings/fields/birth/mutation/registration-mappings'
+import { ICertificate, IFormData, TransformedData } from '@client/forms'
+import { transformCertificateData } from '@client/forms/register/mappings/mutation/utils'
 
-export const fieldToDeceasedDateTransformation =
-  (
-    alternativeSectionId?: string,
-    nestedTransformer?: IFormFieldMutationMapFunction
-  ) =>
-  (
-    transformedData: TransformedData,
-    draftData: IFormData,
-    sectionId: string,
-    field: IFormField
-  ) => {
-    if (!draftData[sectionId] || !draftData[sectionId][field.name]) {
-      return transformedData
-    }
-
-    let fieldValue = draftData[sectionId][field.name]
-
-    if (nestedTransformer) {
-      const clonedTransformedData = cloneDeep(transformedData)
-      nestedTransformer(clonedTransformedData, draftData, sectionId, field)
-      fieldValue = clonedTransformedData[sectionId][field.name]
-    }
-
-    transformedData[
-      alternativeSectionId ? alternativeSectionId : sectionId
-    ].deceased = {
-      deceased: true,
-      deathDate: fieldValue
-    }
-    return transformedData
-  }
-
-export function setDeathRegistrationSectionTransformer(
+export function setMarriageRegistrationSectionTransformer(
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
@@ -72,6 +33,38 @@ export function setDeathRegistrationSectionTransformer(
         draftData.registration.registrationNumber
     }
 
+    if (draftData[sectionId].groomSignatureURI) {
+      transformedData[sectionId].groomSignature =
+        draftData[sectionId].groomSignatureURI
+    } else if (draftData[sectionId].groomSignature) {
+      transformedData[sectionId].groomSignature =
+        draftData[sectionId].groomSignature
+    }
+
+    if (draftData[sectionId].brideSignatureURI) {
+      transformedData[sectionId].brideSignature =
+        draftData[sectionId].brideSignatureURI
+    } else if (draftData[sectionId].brideSignature) {
+      transformedData[sectionId].brideSignature =
+        draftData[sectionId].brideSignature
+    }
+
+    if (draftData[sectionId].witnessOneSignatureURI) {
+      transformedData[sectionId].witnessOneSignature =
+        draftData[sectionId].witnessOneSignatureURI
+    } else if (draftData[sectionId].witnessOneSignature) {
+      transformedData[sectionId].witnessOneSignature =
+        draftData[sectionId].witnessOneSignature
+    }
+
+    if (draftData[sectionId].witnessTwoSignatureURI) {
+      transformedData[sectionId].witnessTwoSignature =
+        draftData[sectionId].witnessTwoSignatureURI
+    } else if (draftData[sectionId].witnessTwoSignature) {
+      transformedData[sectionId].witnessTwoSignature =
+        draftData[sectionId].witnessTwoSignature
+    }
+
     if (!transformedData[sectionId].status) {
       transformedData[sectionId].status = [
         {
@@ -90,22 +83,12 @@ export function setDeathRegistrationSectionTransformer(
       })
     }
 
-    if (draftData.registration.certificates) {
+    if (draftData[sectionId].certificates) {
       transformCertificateData(
         transformedData,
-        (draftData.registration.certificates as ICertificate[])[0],
-        'registration'
+        (draftData[sectionId].certificates as ICertificate[])[0],
+        sectionId
       )
     }
   }
-
-  if (draftData[sectionId].informantsSignatureURI) {
-    transformedData[sectionId].informantsSignature =
-      draftData[sectionId].informantsSignatureURI
-  } else if (draftData[sectionId].informantsSignature) {
-    transformedData[sectionId].informantsSignature =
-      draftData[sectionId].informantsSignature
-  }
-
-  return transformedData
 }

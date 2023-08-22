@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  setBirthRegistrationSectionTransformer,
-  changeHirerchyMutationTransformer
-} from '@client/forms/register/mappings/fields/birth/mutation/registration-mappings'
+import { setBirthRegistrationSectionTransformer } from '@client/forms/register/mappings/event-specific-fields/birth/mutation/registration-mappings'
 import {
   mockDeclarationData,
   mockBirthRegistrationSectionData
@@ -76,25 +73,5 @@ describe('Birth registration mutation mapping related tests', () => {
       '201908122365BDSS0SE1'
     )
     expect(transformedData.registration.certificates).toEqual([{}])
-  })
-
-  it('changeHierarchyMutation transformer test', () => {
-    const transformedData: TransformedData = {
-      registrationPhone: ''
-    }
-
-    const mockBirthDeclaration = cloneDeep(mockDeclarationData)
-    mockBirthDeclaration.registration = mockBirthRegistrationSectionData
-    const field = { name: 'whoseContactDetails' } as IFormField
-    changeHirerchyMutationTransformer()(
-      transformedData,
-      mockBirthDeclaration,
-      'registration',
-      field,
-      { name: 'registrationPhone' } as IFormField
-    )
-    expect(transformedData).toEqual({
-      registrationPhone: '01557394986'
-    })
   })
 })

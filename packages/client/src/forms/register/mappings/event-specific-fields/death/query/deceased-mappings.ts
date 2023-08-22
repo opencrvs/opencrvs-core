@@ -10,9 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormField, IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
-import { transformStatusData } from '@client/forms/register/mappings/fields/birth/query/registration-mappings'
 import format from '@client/utils/date-formatting'
 
 export const deceasedDateToFieldTransformation =
@@ -63,64 +60,3 @@ export const deceasedDateFormatTransformation =
     }
     return transformedData
   }
-
-export const deathPlaceToFieldTransformer = (
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (!queryData.eventLocation || !queryData.eventLocation.type) {
-    return transformedData
-  }
-  transformedData[sectionId][field.name] = queryData.eventLocation.type
-  return transformedData
-}
-
-export function getDeathRegistrationSectionTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string
-) {
-  if (!transformedData['registration']) {
-    transformedData['registration'] = {}
-  }
-
-  if (queryData['registration'].id) {
-    transformedData['registration']._fhirID = queryData['registration'].id
-  }
-  if (queryData['registration'].trackingId) {
-    transformedData['registration'].trackingId =
-      queryData['registration'].trackingId
-  }
-
-  if (queryData['registration'].registrationNumber) {
-    transformedData['registration'].registrationNumber =
-      queryData['registration'].registrationNumber
-  }
-
-  if (
-    queryData['registration'].type &&
-    queryData['registration'].type === 'DEATH'
-  ) {
-    transformedData['registration'].type = Event.Death
-  }
-
-  if (queryData['registration'].status) {
-    transformStatusData(
-      transformedData,
-      queryData['registration'].status as GQLRegWorkflow[],
-      'registration'
-    )
-  }
-
-  if (queryData[sectionId].informantsSignature) {
-    transformedData[sectionId].informantsSignature =
-      queryData[sectionId].informantsSignature
-  }
-
-  if (queryData[sectionId].informantsSignatureURI) {
-    transformedData[sectionId].informantsSignatureURI =
-      queryData[sectionId].informantsSignatureURI
-  }
-}

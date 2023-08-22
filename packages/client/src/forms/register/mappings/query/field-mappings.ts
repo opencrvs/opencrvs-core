@@ -19,7 +19,8 @@ import {
   DeathRegistration,
   MarriageRegistration,
   Address,
-  IdentityType
+  IdentityType,
+  EventRegistration
 } from '@client/utils/gateway'
 import {
   IAttachment,
@@ -29,7 +30,11 @@ import {
   TransformedData,
   IFormSectionData,
   ISelectFormFieldWithOptions,
-  AddressCases
+  AddressCases,
+  CHECKBOX,
+  IQuestionnaireQuestion,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
@@ -43,7 +48,7 @@ import {
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/utils/countries'
 import { MessageDescriptor } from 'react-intl'
-import { getSelectedOption } from '@client/forms/utils'
+import { getSelectedOption, getFieldOptions } from '@client/forms/utils'
 import {
   countryAlpha3toAlpha2,
   getLocationNameMapOfFacility
@@ -264,8 +269,12 @@ export const identityToNidVerificationFieldTransformer = (
   return transformedData
 }
 
-export const addressLineToFieldTransformer =
-  (addressType: string, lineNumber = 0) =>
+export const addressQueryTransformer =
+  (config: {
+    useCase: string
+    lineNumber?: number
+    transformedFieldName?: string
+  }) =>
   (
     transformedData: IFormData,
     queryData: QueryData,
@@ -276,46 +285,29 @@ export const addressLineToFieldTransformer =
       queryData[sectionId] &&
       queryData[sectionId].address &&
       queryData[sectionId].address.find(
-        (addr: Address) => addr.type === addressType
+        (addr: Address) => addr.type === config.useCase
       )
 
     if (!address) {
       return transformedData
     }
 
-    transformedData[sectionId][field.name] =
-      (address.line && address.line[lineNumber]) || ''
+    if (config.lineNumber) {
+      transformedData[sectionId][field.name] =
+        (address.line && address.line[config.lineNumber]) || ''
+    }
+    if (config.transformedFieldName) {
+      transformedData[sectionId][field.name] =
+        address[
+          config.transformedFieldName ? config.transformedFieldName : field.name
+        ]
+    }
     return transformedData
   }
 
 interface IAddress {
   [key: string]: any
 }
-
-export const addressFhirPropertyToFieldTransformer =
-  (addressType: string, transformedFieldName: string) =>
-  (
-    transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
-    field: IFormField
-  ) => {
-    const address =
-      queryData[sectionId] &&
-      queryData[sectionId].address &&
-      (queryData[sectionId].address as GQLAddress[]).find(
-        (addr) => addr.type === addressType
-      )
-
-    if (!address) {
-      return transformedData
-    }
-
-    transformedData[sectionId][field.name] =
-      address[transformedFieldName ? transformedFieldName : field.name]
-
-    return transformedData
-  }
 
 export const sameAddressFieldTransformer =
   (
@@ -440,7 +432,7 @@ export function attachmentToFieldTransformer(
 
 export const eventLocationQueryTransformer =
   (
-    transformationParams: {
+    config: {
       lineNumber?: number
       transformedFieldName?: string
     },
@@ -461,16 +453,10 @@ export const eventLocationQueryTransformer =
     const country = address.country
     const fieldValue =
       address[
-        transformationParams.transformedFieldName
-          ? transformationParams.transformedFieldName
-          : field.name
+        config.transformedFieldName ? config.transformedFieldName : field.name
       ]
-    if (
-      transformationParams.lineNumber ||
-      transformationParams.lineNumber === 0
-    ) {
-      transformedData[sectionId][field.name] =
-        line[transformationParams.lineNumber]
+    if (config.lineNumber || config.lineNumber === 0) {
+      transformedData[sectionId][field.name] = line[config.lineNumber]
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
@@ -1185,3 +1171,94 @@ export const childIdentityToFieldTransformer =
       ] = identifier.id
     })
   }
+export function eventAttachmentToFieldTransformer(
+  transformedData: IFormData,
+  queryData: EventRegistration,
+  sectionId: keyof EventRegistration,
+  field: IFormField
+) {
+  return attachmentToFieldTransformer(
+    transformedData,
+    queryData,
+    sectionId,
+    field,
+    'registration'
+  )
+}
+export function questionnaireToTemplateFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField,
+  _: IFormField,
+  offlineCountryConfig?: IOfflineData
+) {
+  if (!queryData.questionnaire) {
+    return
+  }
+  const selectedQuestion: IQuestionnaireQuestion =
+    queryData.questionnaire.filter(
+      (question: IQuestionnaireQuestion) =>
+        question.fieldId === field.customQuesstionMappingId
+    )[0]
+
+  /* transformedData[sectionId] is undefined when mapping templates */
+  if (!selectedQuestion) {
+    return
+  }
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+
+  if (!field.custom) {
+    transformedData[sectionId][field.name] = selectedQuestion.value
+    return
+  }
+
+  switch (field.type) {
+    case SELECT_WITH_DYNAMIC_OPTIONS:
+      if (!offlineCountryConfig) {
+        return
+      }
+      const options = getFieldOptions(field, queryData, offlineCountryConfig)
+      transformedData[sectionId][field.name] =
+        options
+          .find((option) => option.value === selectedQuestion.value)
+          ?.label.defaultMessage?.toString() || selectedQuestion.value
+      break
+    case SELECT_WITH_OPTIONS:
+      transformedData[sectionId][field.name] =
+        field.options
+          .find((option) => option.value === selectedQuestion.value)
+          ?.label.defaultMessage?.toString() || selectedQuestion.value
+      break
+    case CHECKBOX:
+      transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
+      break
+
+    default:
+      transformedData[sectionId][field.name] = selectedQuestion.value
+  }
+}
+
+export function questionnaireToCustomFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) {
+  if (queryData.questionnaire) {
+    const selectedQuestion: IQuestionnaireQuestion =
+      queryData.questionnaire.filter(
+        (question: IQuestionnaireQuestion) =>
+          question.fieldId === field.customQuesstionMappingId
+      )[0]
+    if (selectedQuestion) {
+      /* transformedData[sectionId] is undefined when mapping templates */
+      if (!transformedData[sectionId]) {
+        transformedData[sectionId] = {}
+      }
+      transformedData[sectionId][field.name] = selectedQuestion.value
+    }
+  }
+}
