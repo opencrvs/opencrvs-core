@@ -19,22 +19,7 @@ import {
   DOCUMENTS_URL
 } from '@metrics/constants'
 
-export type TaskWithoutId = Omit<fhir.Task, 'id'>
-export type Task = TaskWithoutId & { id: string; lastModified: string }
-
-export type BundleEntry<T extends fhir.Resource = fhir.Resource> = Omit<
-  fhir.BundleEntry,
-  'resource'
-> & {
-  resource: T
-}
-
-export type Bundle<T extends fhir.Resource = fhir.Resource> = Omit<
-  fhir.Bundle,
-  'entry'
-> & {
-  entry: Array<BundleEntry<T>>
-}
+import { Bundle, Task } from '@opencrvs/commons'
 
 export function fetchFHIR<T = any>(
   suffix: string,

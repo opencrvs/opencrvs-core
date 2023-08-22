@@ -1,18 +1,70 @@
 import { HEARTH_MONGO_URL } from '@workflow/constants'
 import { MongoClient } from 'mongodb'
-import {
-  Bundle,
-  BundleEntry,
-  findFromBundleById,
-  isComposition,
-  isRelatedPerson
-} from './fhir'
+import { findFromBundleById, isComposition, isRelatedPerson } from './fhir'
+import { Bundle, BundleEntry } from '@opencrvs/commons'
 const client = new MongoClient(HEARTH_MONGO_URL)
 
 export class RecordNotFoundError extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'RecordNotFoundError'
+  }
+}
+
+/*
+ * This is a development-time only function to verify there exists no references
+ * inside the bundle entries that are not resolved in the bundle.
+ */
+function checkForUnresolvedReferences(bundle: Bundle) {
+  const EXCLUDED_PATHS = ['Location.partOf.reference']
+
+  function check(
+    object: Record<string, any>,
+    path: string,
+    rootResource: Record<string, any>
+  ) {
+    for (const key of Object.keys(object)) {
+      if (EXCLUDED_PATHS.includes(path + '.' + key)) {
+        continue
+      }
+      const value = object[key]
+      if (typeof value === 'string') {
+        const collectionReference = /^[A-Z][a-z]+\/.*/
+        if (collectionReference.test(value)) {
+          const id = value.split('/')[1]
+          try {
+            findFromBundleById(bundle, id)
+          } catch (error) {
+            console.log('-----------------------------------')
+            console.log()
+            console.log(
+              'Unresolved reference found: ' + value,
+              JSON.stringify(rootResource)
+            )
+            console.log(
+              'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned'
+            )
+            console.log()
+            console.log(JSON.stringify(bundle))
+            console.log()
+            console.log('-----------------------------------')
+            throw error
+          }
+        }
+      } else if (Array.isArray(value)) {
+        for (const item of value) {
+          if (typeof item === 'object') {
+            check(item, path + '.' + key, rootResource)
+          }
+        }
+      } else if (typeof value === 'object') {
+        check(value, path + '.' + key, rootResource)
+      }
+    }
+  }
+
+  for (const entry of bundle.entry!) {
+    check(entry.resource, entry.resource.resourceType, entry.resource)
   }
 }
 
@@ -178,6 +230,49 @@ export async function getFHIRBundleWithRecordID(
             in: { $concat: ['Encounter/', '$$encounter.id'] }
           }
         },
+        /*
+         * Creates a list of all references inside Task.extensions
+         */
+        taskReferenceIds: {
+          $reduce: {
+            input: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$bundle',
+                    as: 'item',
+                    cond: { $eq: ['$$item.resourceType', 'Task'] }
+                  }
+                },
+                as: 'task',
+                in: {
+                  $map: {
+                    input: {
+                      $filter: {
+                        input: '$$task.extension',
+                        as: 'extension',
+                        cond: { $ne: ['$$extension.valueReference', undefined] }
+                      }
+                    },
+                    as: 'extension',
+                    in: {
+                      $arrayElemAt: [
+                        {
+                          $split: ['$$extension.valueReference.reference', '/']
+                        },
+                        1
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            initialValue: [],
+            in: {
+              $concatArrays: ['$$value', '$$this']
+            }
+          }
+        },
         encounterLocationIds: {
           $reduce: {
             input: {
@@ -212,6 +307,34 @@ export async function getFHIRBundleWithRecordID(
         }
       }
     },
+    // Get Task extension references
+    {
+      $lookup: {
+        from: 'Practitioner',
+        localField: `taskReferenceIds`,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    {
+      $lookup: {
+        from: 'Location',
+        localField: `taskReferenceIds`,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    // Get Patients by RelatedPersonIds
     {
       $lookup: {
         from: 'Patient',
@@ -225,7 +348,6 @@ export async function getFHIRBundleWithRecordID(
         bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
-    // Get Patients by RelatedPersonIds
     // Get Locations by Encounter location ids
     {
       $lookup: {
@@ -291,6 +413,17 @@ export async function getFHIRBundleWithRecordID(
     .toArray()
 
   const bundle = result[0]
+
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      checkForUnresolvedReferences(bundle)
+    } catch (error) {
+      console.log(error)
+
+      throw error
+    }
+  }
+
   const allEntries = result[0].entry!
   const bundleWithFullURLReferences = resolveReferenceFullUrls(
     bundle,

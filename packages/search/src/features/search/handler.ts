@@ -42,6 +42,7 @@ export async function searchAssignment(
   const payload = request.payload as IAssignmentPayload
   try {
     const results = await searchByCompositionId(payload.compositionId, client)
+
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined

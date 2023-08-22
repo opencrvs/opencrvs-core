@@ -23,17 +23,21 @@ import { z } from 'zod'
 import { Request } from '@hapi/hapi'
 import { getLoggedInPractitionerResource } from '../user/utils'
 import { getToken } from '@workflow/utils/authUtils'
+import { Bundle, Extension, Task } from '@opencrvs/commons'
+
+import { indexBundle } from '@workflow/records/search'
+import { createNewAuditEvent } from '@workflow/records/audit'
+import { badRequest, conflict, notFound } from '@hapi/boom'
 import {
-  Bundle,
   getTaskHistory,
   isTask,
   sendBundleToHearth,
   sortTasksDescending
 } from '@workflow/records/fhir'
-
-import { indexBundle } from '@workflow/records/search'
-import { createNewAuditEvent } from '@workflow/records/audit'
-import { badRequest, conflict, notFound } from '@hapi/boom'
+import {
+  ASSIGNED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '../task/fhir/constants'
 
 const CorrectionRequestInput = z.object({
   requester: z.string(),
@@ -86,6 +90,12 @@ function validateRequest<T extends z.ZodType>(
   }
 }
 
+function extensionsWithoutAssignment(extensions: Extension[]) {
+  return extensions.filter(
+    (extension) => extension.url !== ASSIGNED_EXTENSION_URL
+  )
+}
+
 export const routes = [
   {
     method: 'POST',
@@ -103,8 +113,8 @@ export const routes = [
           'There is already a pending correction request for this record'
         )
       }
-
       const previousTask = getTaskResource(bundle)
+
       const correctionRequestTask = createCorrectionRequestTask(
         previousTask,
         correctionDetails
@@ -132,17 +142,21 @@ export const routes = [
           .concat({ resource: correctionRequestWithLocationExtensions })
       }
 
-      // Only send new task to Hearth so it doesn't change anything else
-      await sendBundleToHearth({
-        ...bundle,
-        entry: [{ resource: correctionRequestWithLocationExtensions }]
-      })
+      try {
+        // Only send new task to Hearth so it doesn't change anything else
+        await sendBundleToHearth({
+          ...bundle,
+          entry: [{ resource: correctionRequestWithLocationExtensions }]
+        })
 
-      await createNewAuditEvent(
-        bundleWithCorrectionRequestTask,
-        getToken(request)
-      )
-      await indexBundle(bundleWithCorrectionRequestTask, getToken(request))
+        await createNewAuditEvent(
+          bundleWithCorrectionRequestTask,
+          getToken(request)
+        )
+        await indexBundle(bundleWithCorrectionRequestTask, getToken(request))
+      } catch (error) {
+        throw error
+      }
 
       return {}
     }
@@ -187,14 +201,17 @@ export const routes = [
         )
       }
 
-      const previousTask = getTaskResource(bundle)
+      const currentCorrectionRequestedTask = getTaskResource(bundle)
 
-      const correctionRejectionTask: fhir.Task = {
-        ...previousTask,
+      const correctionRejectionTask: Task = {
+        ...currentCorrectionRequestedTask,
         status: 'rejected',
         reason: {
           text: rejectionDetails.reason
-        }
+        },
+        extension: extensionsWithoutAssignment(
+          currentCorrectionRequestedTask.extension
+        )
       }
 
       const practitioner = await getLoggedInPractitionerResource(
@@ -216,7 +233,9 @@ export const routes = [
         entry: [{ resource: correctionRejectionWithLocationExtensions }]
       })
 
-      const taskHistory = await getTaskHistory(previousTask.id)
+      const taskHistory = await getTaskHistory(
+        currentCorrectionRequestedTask.id
+      )
 
       const previousTaskBeforeCorrection = sortTasksDescending(
         taskHistory.entry.map((x) => x.resource)
@@ -233,11 +252,34 @@ export const routes = [
           'Record did not have any tasks before correction. This should never happen'
         )
       }
+
+      const reinstateTask = {
+        ...firstNonCorrectionTask,
+        extension: [
+          ...extensionsWithoutAssignment(firstNonCorrectionTask.extension),
+          { url: REINSTATED_EXTENSION_URL }
+        ]
+      }
+
+      const reinstateTaskWithPractitionerExtensions = setupLastRegUser(
+        reinstateTask,
+        practitioner
+      )
+
+      const reinstateTaskWithLocationExtensions = await setupLastRegLocation(
+        reinstateTaskWithPractitionerExtensions,
+        practitioner
+      )
+
       try {
         // Reinstate previous task
         await sendBundleToHearth({
           ...bundle,
-          entry: [{ resource: firstNonCorrectionTask }]
+          entry: [
+            {
+              resource: reinstateTaskWithLocationExtensions
+            }
+          ]
         })
 
         // Re-enstate previous task
@@ -265,7 +307,8 @@ function hasActiveCorrectionRequest(bundle: Bundle) {
     if (entry.resource.resourceType !== 'Task') {
       return false
     }
-    const task = entry.resource as fhir.Task
+    const task = entry.resource as Task
+
     return (
       task.status === 'requested' &&
       task.businessStatus?.coding?.some(
@@ -276,7 +319,7 @@ function hasActiveCorrectionRequest(bundle: Bundle) {
 }
 
 function createCorrectionRequestTask(
-  previousTask: fhir.Task,
+  previousTask: Task,
   correctionDetails: CorrectionRequestInput
 ) {
   return {

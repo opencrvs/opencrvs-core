@@ -1,26 +1,8 @@
 import { HEARTH_URL } from '@workflow/constants'
+
+import { BundleEntryWithFullUrl, Bundle, Task } from '@opencrvs/commons'
+
 import fetch from 'node-fetch'
-
-export type TaskWithoutId = Omit<fhir.Task, 'id'>
-export type Task = TaskWithoutId & { id: string; lastModified: string }
-
-export type BundleEntry<T extends fhir.Resource = fhir.Resource> = Omit<
-  fhir.BundleEntry,
-  'resource'
-> & {
-  resource: T
-}
-
-export type Bundle<T extends fhir.Resource = fhir.Resource> = Omit<
-  fhir.Bundle,
-  'entry'
-> & {
-  entry: Array<BundleEntry<T>>
-}
-
-export type BundleEntryWithFullUrl = Omit<fhir.BundleEntry, 'fullUrl'> & {
-  fullUrl: string
-}
 
 export function findFromBundleById(
   bundle: fhir.Bundle,
@@ -56,9 +38,7 @@ export function isRelatedPerson(
 ): resource is fhir.RelatedPerson {
   return resource.resourceType === 'RelatedPerson'
 }
-export function isTask(
-  resource: fhir.Resource
-): resource is Omit<fhir.Task, 'focus'> & { focus: { reference: string } } {
+export function isTask(resource: fhir.Resource): resource is Task {
   return resource.resourceType === 'Task'
 }
 

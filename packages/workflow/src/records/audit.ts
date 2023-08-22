@@ -1,7 +1,7 @@
 import { METRICS_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { Bundle } from './fhir'
 import { getEventType } from '@workflow/features/registration/utils'
+import { Bundle } from '@opencrvs/commons'
 
 export async function createNewAuditEvent(bundle: Bundle, authToken: string) {
   const eventType = getEventType(bundle).toLowerCase()

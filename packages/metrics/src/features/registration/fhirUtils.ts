@@ -15,7 +15,7 @@ import {
   fetchPractitionerRole,
   fetchTaskHistory
 } from '@metrics/api'
-
+import { Composition, Task } from '@opencrvs/commons'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
@@ -140,9 +140,6 @@ function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
   }
   return task as Task[]
 }
-
-export type Task = fhir.Task & { id: string }
-export type Composition = fhir.Composition & { id: string }
 
 export function getPaymentReconciliation(bundle: fhir.Bundle) {
   return getResourceByType<fhir.PaymentReconciliation>(
@@ -517,7 +514,7 @@ export async function fetchDeclarationsBeginnerRole(
       bundle.entry &&
       bundle.entry
         .map((entry) => entry.resource)
-        .filter((resource): resource is fhir.Task =>
+        .filter((resource): resource is Task =>
           Boolean(resource && isTaskResource(resource))
         )
 

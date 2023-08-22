@@ -446,6 +446,7 @@ export async function generateEventDurationPoint(
   if (!currentTask || !currentTask.lastModified) {
     throw new Error('Current task not found')
   }
+
   const previousTask = await getPreviousTask(
     currentTask,
     allowedPreviousStates,

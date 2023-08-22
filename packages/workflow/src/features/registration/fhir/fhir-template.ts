@@ -16,7 +16,7 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
-import { BundleEntry, Task, TaskWithoutId } from '@workflow/records/fhir'
+import { BundleEntry, Task, TaskWithoutId } from '@opencrvs/commons'
 
 export const INFORMANT_CODE = 'informant-details'
 

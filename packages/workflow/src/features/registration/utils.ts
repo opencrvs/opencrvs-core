@@ -42,6 +42,7 @@ import {
   InformantNotificationName,
   isInformantSMSNotificationEnabled
 } from './smsNotificationUtils'
+import { Task } from '@opencrvs/commons'
 
 interface INotificationPayload {
   recipient: {
@@ -662,7 +663,7 @@ export async function fetchTaskByCompositionIdFromHearth(id: string) {
   const taskBundle: fhir.Bundle = await fetchHearth(
     `/Task?focus=Composition/${id}`
   )
-  return taskBundle.entry?.[0]?.resource as fhir.Task
+  return taskBundle.entry?.[0]?.resource as Task
 }
 
 export function getVoidEvent(event: EVENT_TYPE): Events {

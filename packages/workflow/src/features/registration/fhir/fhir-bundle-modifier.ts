@@ -59,6 +59,7 @@ import {
 import fetch from 'node-fetch'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { triggerEvent } from '@workflow/features/events/handler'
+import { Task } from '@opencrvs/commons'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -79,7 +80,7 @@ export async function modifyRegistrationBundle(
   /* setting unique trackingid here */
   fhirBundle = setTrackingId(fhirBundle)
 
-  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
+  const taskResource = selectOrCreateTaskRefResource(fhirBundle) as Task
   const eventType = getEventType(fhirBundle)
   /* setting registration type here */
   setupRegistrationType(taskResource, eventType)
@@ -519,9 +520,9 @@ export async function setupRegistrationWorkflow(
 }
 
 export async function setupLastRegLocation(
-  taskResource: fhir.Task,
+  taskResource: Task,
   practitioner: fhir.Practitioner
-): Promise<fhir.Task> {
+): Promise<Task> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
@@ -609,9 +610,9 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
 }
 
 export function setupLastRegUser(
-  taskResource: fhir.Task,
+  taskResource: Task,
   practitioner: fhir.Practitioner
-): fhir.Task {
+): Task {
   if (!taskResource.extension) {
     taskResource.extension = []
   }

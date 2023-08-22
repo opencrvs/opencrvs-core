@@ -1,6 +1,6 @@
+import { Bundle } from '@opencrvs/commons'
 import { SEARCH_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { Bundle } from './fhir'
 
 export async function indexBundle(bundle: Bundle, authToken: string) {
   const res = await fetch(new URL('/record', SEARCH_SERVICE_URL).href, {

@@ -4313,6 +4313,7 @@ export async function checkUserAssignment(
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
   const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+
   return userId === res?.userId
 }
 
