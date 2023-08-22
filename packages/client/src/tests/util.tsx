@@ -58,7 +58,7 @@ import { vi } from 'vitest'
 import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 
 export const registerScopeToken =
