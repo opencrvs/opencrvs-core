@@ -87,7 +87,7 @@ import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/uti
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import { SystemRoleType } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
@@ -380,12 +380,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             />
           </Content>
         </ActionPageLight>
-        <ResponsiveModal
+        <Dialog
           id="withoutCorrectionForApprovalPrompt"
-          show={showPrompt}
+          isOpen={showPrompt}
           title={intl.formatMessage(messages.correctionForApprovalDialogTitle)}
-          contentHeight={96}
-          handleClose={this.togglePrompt}
+          onClose={this.togglePrompt}
           actions={[
             <TertiaryButton
               id="cancel"
@@ -407,7 +406,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           ]}
         >
           {intl.formatMessage(messages.correctionForApprovalDialogDescription)}
-        </ResponsiveModal>
+        </Dialog>
       </>
     )
   }
