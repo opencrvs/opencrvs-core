@@ -9,11 +9,13 @@
     "./monitoring": "./build/dist/monitoring.js"
   },
   "scripts": {
+    "start": "yarn build:watch",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
     "build": "tsc",
+    "build:watch": "tsc --watch",
     "build:clean": "rm -rf build"
   },
   "private": true,

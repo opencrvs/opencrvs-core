@@ -67,7 +67,7 @@ import {
   sendBundleToHearth,
   sortTasksDescending
 } from '@workflow/records/fhir'
-import { getFHIRBundleWithRecordID } from '@workflow/records'
+import { getRecordById } from '@workflow/records'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -151,7 +151,12 @@ export async function markBundleAsCorrected(
 
   let nextStatus: fhir.Coding | undefined
 
-  const fullBundle = await getFHIRBundleWithRecordID(composition.id)
+  const fullBundle = await getRecordById(composition.id, [
+    'REGISTERED',
+    'CERTIFIED',
+    'ISSUED',
+    'CORRECTION_REQUESTED'
+  ])
 
   let currentStatusTask = getTaskResource(fullBundle)
   const historyBundle = await getTaskHistory(currentStatusTask.id)

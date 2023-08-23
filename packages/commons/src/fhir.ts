@@ -4,6 +4,7 @@ type RequiredResourceType<T> = Omit<T, 'resourceType'> & {
 
 export type CompositionWithoutId = Omit<fhir.Composition, 'id'>
 export type Extension = fhir.Extension
+export type Practitioner = fhir.Practitioner
 export type BusinessStatus = Omit<fhir.CodeableConcept, 'coding'> & {
   coding: fhir.Coding[]
 }

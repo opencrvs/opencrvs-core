@@ -3,6 +3,77 @@ import { HEARTH_URL } from '@workflow/constants'
 import { BundleEntryWithFullUrl, Bundle, Task } from '@opencrvs/commons'
 
 import fetch from 'node-fetch'
+import { CorrectionRequestInput } from './correction-request'
+
+export function createCorrectionRequestTask(
+  previousTask: Task,
+  correctionDetails: CorrectionRequestInput
+) {
+  return {
+    resourceType: 'Task',
+    status: 'requested',
+    intent: 'proposal',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/contact-person',
+        valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+        valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+        valueBoolean: correctionDetails.hasShowedVerifiedDocument
+      }
+    ],
+    input: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      valueString: update.newValue
+    })),
+    reason: {
+      text: correctionDetails.reason,
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/otherReason',
+          valueString: ''
+        }
+      ]
+    },
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'CORRECTION_REQUESTED'
+        }
+      ]
+    }
+  }
+}
 
 export function findFromBundleById(
   bundle: fhir.Bundle,

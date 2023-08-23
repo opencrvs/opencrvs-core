@@ -1,7 +1,9 @@
+import { Bundle, BundleEntry, StateIdenfitiers } from '@opencrvs/commons'
 import { HEARTH_MONGO_URL } from '@workflow/constants'
 import { MongoClient } from 'mongodb'
+
 import { findFromBundleById, isComposition, isRelatedPerson } from './fhir'
-import { Bundle, BundleEntry } from '@opencrvs/commons'
+
 const client = new MongoClient(HEARTH_MONGO_URL)
 
 export class RecordNotFoundError extends Error {
@@ -68,9 +70,10 @@ function checkForUnresolvedReferences(bundle: Bundle) {
   }
 }
 
-export async function getFHIRBundleWithRecordID(
-  recordId: string
-): Promise<Bundle> {
+export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
+  recordId: string,
+  allowedStates: T
+): Promise<StateIdenfitiers[T[number]]> {
   const connectedClient = await client.connect()
 
   const db = connectedClient.db()
@@ -430,7 +433,7 @@ export async function getFHIRBundleWithRecordID(
     allEntries
   )
 
-  return {
+  const record = {
     resourceType: 'Bundle',
     type: 'document',
     entry: bundleWithFullURLReferences.map((entry) => {
@@ -441,6 +444,8 @@ export async function getFHIRBundleWithRecordID(
       }
     })
   }
+
+  return record as StateIdenfitiers[T[number]]
 }
 
 const SECTIONS_WITH_ID_REFERENCES = [

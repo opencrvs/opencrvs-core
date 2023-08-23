@@ -9,75 +9,34 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import {
-  RecordNotFoundError,
-  getFHIRBundleWithRecordID
-} from '@workflow/records'
-import { getTaskResource } from '../registration/fhir/fhir-template'
-import {
-  setupLastRegLocation,
-  setupLastRegUser
-} from '../registration/fhir/fhir-bundle-modifier'
-import { z } from 'zod'
-import { Request } from '@hapi/hapi'
-import { getLoggedInPractitionerResource } from '../user/utils'
-import { getToken } from '@workflow/utils/authUtils'
-import { Bundle, Extension, Task } from '@opencrvs/commons'
-
-import { indexBundle } from '@workflow/records/search'
-import { createNewAuditEvent } from '@workflow/records/audit'
 import { badRequest, conflict, notFound } from '@hapi/boom'
+import { Request } from '@hapi/hapi'
 import {
-  getTaskHistory,
-  isTask,
-  sendBundleToHearth,
-  sortTasksDescending
-} from '@workflow/records/fhir'
+  Bundle,
+  CertifiedRecord,
+  CorrectionRequestedRecord,
+  IssuedRecord,
+  RegisteredRecord,
+  Task,
+  isCorrectionRequestedTask
+} from '@opencrvs/commons'
+import { getRecordById, RecordNotFoundError } from '@workflow/records'
+import { createNewAuditEvent } from '@workflow/records/audit'
 import {
-  ASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
-} from '../task/fhir/constants'
+  CorrectionRejectionInput,
+  CorrectionRequestInput
+} from '@workflow/records/correction-request'
+import { isTask, sendBundleToHearth } from '@workflow/records/fhir'
+import { indexBundle } from '@workflow/records/search'
+import {
+  toCorrectionRejected,
+  toCorrectionRequested
+} from '@workflow/records/state-transitions'
+import { createRoute } from '@workflow/states'
+import { getToken } from '@workflow/utils/authUtils'
+import { z } from 'zod'
 
-const CorrectionRequestInput = z.object({
-  requester: z.string(),
-  hasShowedVerifiedDocument: z.boolean(),
-  noSupportingDocumentationRequired: z.boolean().optional(),
-  payments: z
-    .array(
-      z.object({
-        paymentId: z.string().optional(),
-        type: z.string().optional(),
-        total: z.number().optional(),
-        amount: z.number().optional(),
-        outcome: z.string().optional(),
-        date: z.string().optional(),
-        data: z.string().optional()
-      })
-    )
-    .default([]),
-  location: z.object({
-    _fhirID: z.string()
-  }),
-  values: z
-    .array(
-      z.object({
-        section: z.string().optional(),
-        fieldName: z.string().optional(),
-        oldValue: z.string().optional(),
-        newValue: z.string().optional()
-      })
-    )
-    .default([]),
-  reason: z.string(),
-  note: z.string(),
-  otherReason: z.string()
-})
-const CorrectionRejectionInput = z.object({
-  reason: z.string()
-})
-
-type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
+import { getLoggedInPractitionerResource } from '../user/utils'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -90,86 +49,79 @@ function validateRequest<T extends z.ZodType>(
   }
 }
 
-function extensionsWithoutAssignment(extensions: Extension[]) {
-  return extensions.filter(
-    (extension) => extension.url !== ASSIGNED_EXTENSION_URL
-  )
-}
-
 export const routes = [
-  {
+  createRoute({
     method: 'POST',
     path: '/records/{recordId}/request-correction',
-    handler: async (request: Request) => {
+    allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
+    action: 'REQUEST_CORRECTION',
+    handler: async (request: Request): Promise<CorrectionRequestedRecord> => {
       const correctionDetails = validateRequest(
         CorrectionRequestInput,
         request.payload
       )
 
-      const bundle = await getFHIRBundleWithRecordID(request.params.recordId)
+      const bundle = await getRecordById(request.params.recordId, [
+        'REGISTERED',
+        'CERTIFIED',
+        'ISSUED'
+      ])
 
       if (hasActiveCorrectionRequest(bundle)) {
         throw conflict(
           'There is already a pending correction request for this record'
         )
       }
-      const previousTask = getTaskResource(bundle)
-
-      const correctionRequestTask = createCorrectionRequestTask(
-        previousTask,
-        correctionDetails
-      )
-
       const practitioner = await getLoggedInPractitionerResource(
         getToken(request)
       )
 
-      const correctionRequestTaskWithPractitionerExtensions = setupLastRegUser(
-        correctionRequestTask,
-        practitioner
+      const recordInCorrectionRequestedState = await toCorrectionRequested(
+        bundle,
+        practitioner,
+        correctionDetails
       )
 
-      const correctionRequestWithLocationExtensions =
-        await setupLastRegLocation(
-          correctionRequestTaskWithPractitionerExtensions,
-          practitioner
-        )
-
-      const bundleWithCorrectionRequestTask = {
-        ...bundle,
-        entry: bundle.entry
-          .filter((entry) => entry.resource.id !== previousTask.id)
-          .concat({ resource: correctionRequestWithLocationExtensions })
-      }
-
-      // Only send new task to Hearth so it doesn't change anything else
+      // @todo Only send new task to Hearth so it doesn't change anything else
       await sendBundleToHearth({
         ...bundle,
-        entry: [{ resource: correctionRequestWithLocationExtensions }]
+        entry: [
+          {
+            resource: recordInCorrectionRequestedState.entry
+              .map(({ resource }) => resource)
+              .find(isTask)
+          }
+        ]
       })
 
       await createNewAuditEvent(
-        bundleWithCorrectionRequestTask,
+        recordInCorrectionRequestedState,
         getToken(request)
       )
-      await indexBundle(bundleWithCorrectionRequestTask, getToken(request))
+      await indexBundle(recordInCorrectionRequestedState, getToken(request))
 
-      return {}
+      return recordInCorrectionRequestedState
     }
-  },
-  {
+  }),
+  createRoute({
     method: 'POST',
     path: '/records/{recordId}/reject-correction',
-    handler: async (request: Request) => {
+    allowedStartStates: ['CORRECTION_REQUESTED'],
+    action: 'REJECT_CORRECTION',
+    handler: async (
+      request: Request
+    ): Promise<RegisteredRecord | CertifiedRecord | IssuedRecord> => {
       const rejectionDetails = validateRequest(
         CorrectionRejectionInput,
         request.payload
       )
 
-      let bundle: Bundle
+      let record: CorrectionRequestedRecord
 
       try {
-        bundle = await getFHIRBundleWithRecordID(request.params.recordId)
+        record = await getRecordById(request.params.recordId, [
+          'CORRECTION_REQUESTED'
+        ])
       } catch (error) {
         if (error instanceof RecordNotFoundError) {
           throw notFound(error.message)
@@ -177,111 +129,52 @@ export const routes = [
         throw error
       }
 
-      if (!hasActiveCorrectionRequest(bundle)) {
+      if (!hasActiveCorrectionRequest(record)) {
         throw conflict(
           'There is no a pending correction request for this record'
         )
       }
 
-      const currentCorrectionRequestedTask = getTaskResource(bundle)
-
-      const correctionRejectionTask: Task = {
-        ...currentCorrectionRequestedTask,
-        status: 'rejected',
-        reason: {
-          text: rejectionDetails.reason
-        },
-        extension: extensionsWithoutAssignment(
-          currentCorrectionRequestedTask.extension
-        )
-      }
-
-      const practitioner = await getLoggedInPractitionerResource(
-        getToken(request)
-      )
-
-      const correctionRejectionTaskWithPractitionerExtensions =
-        setupLastRegUser(correctionRejectionTask, practitioner)
-
-      const correctionRejectionWithLocationExtensions =
-        await setupLastRegLocation(
-          correctionRejectionTaskWithPractitionerExtensions,
-          practitioner
+      const recordInPreviousStateWithCorrectionRejection =
+        await toCorrectionRejected(
+          record,
+          await getLoggedInPractitionerResource(getToken(request)),
+          rejectionDetails
         )
 
-      // Store rejected task in Hearth
+      // Mark previous CORRECTION_REQUESTED task as rejected
+      // Reinstate previous REGISTERED / CERTIFIED / ISSUED task
       await sendBundleToHearth({
-        ...bundle,
-        entry: [{ resource: correctionRejectionWithLocationExtensions }]
+        ...recordInPreviousStateWithCorrectionRejection,
+        entry: recordInPreviousStateWithCorrectionRejection.entry
+          .map(({ resource }) => resource)
+          .filter(isTask)
+          .map((resource) => ({ resource }))
       })
 
-      const taskHistory = await getTaskHistory(
-        currentCorrectionRequestedTask.id
-      )
-
-      const previousTaskBeforeCorrection = sortTasksDescending(
-        taskHistory.entry.map((x) => x.resource)
-      )
-
-      const firstNonCorrectionTask = previousTaskBeforeCorrection.find((task) =>
-        task.businessStatus?.coding?.some(
-          (coding) => coding.code !== 'CORRECTION_REQUESTED'
-        )
-      )
-
-      if (!firstNonCorrectionTask) {
-        throw new Error(
-          'Record did not have any tasks before correction. This should never happen'
-        )
-      }
-
-      const reinstateTask = {
-        ...firstNonCorrectionTask,
-        extension: [
-          ...extensionsWithoutAssignment(firstNonCorrectionTask.extension),
-          { url: REINSTATED_EXTENSION_URL }
-        ]
-      }
-
-      const reinstateTaskWithPractitionerExtensions = setupLastRegUser(
-        reinstateTask,
-        practitioner
-      )
-
-      const reinstateTaskWithLocationExtensions = await setupLastRegLocation(
-        reinstateTaskWithPractitionerExtensions,
-        practitioner
-      )
-
-      try {
-        // Reinstate previous task
-        await sendBundleToHearth({
-          ...bundle,
-          entry: [
-            {
-              resource: reinstateTaskWithLocationExtensions
+      // This is just for backwards compatibility reasons as a lot of existing code assimes there
+      // is only one task in the bundle
+      const recordWithOnlyThePreviousTask = {
+        ...recordInPreviousStateWithCorrectionRejection,
+        entry: recordInPreviousStateWithCorrectionRejection.entry.filter(
+          (entry) => {
+            if (!isTask(entry.resource)) {
+              return true
             }
-          ]
-        })
-
-        // Re-enstate previous task
-
-        const bundleWithTask = {
-          ...bundle,
-          entry: bundle.entry
-            .filter((entry) => !isTask(entry.resource))
-            .concat({ resource: firstNonCorrectionTask })
-        }
-
-        await createNewAuditEvent(bundleWithTask, getToken(request))
-        await indexBundle(bundleWithTask, getToken(request))
-
-        return {}
-      } catch (error) {
-        throw error
+            return !isCorrectionRequestedTask(entry.resource)
+          }
+        )
       }
+
+      await createNewAuditEvent(
+        recordWithOnlyThePreviousTask,
+        getToken(request)
+      )
+      await indexBundle(recordWithOnlyThePreviousTask, getToken(request))
+
+      return recordWithOnlyThePreviousTask
     }
-  }
+  })
 ]
 
 function hasActiveCorrectionRequest(bundle: Bundle) {
@@ -298,74 +191,4 @@ function hasActiveCorrectionRequest(bundle: Bundle) {
       )
     )
   })
-}
-
-function createCorrectionRequestTask(
-  previousTask: Task,
-  correctionDetails: CorrectionRequestInput
-) {
-  return {
-    resourceType: 'Task',
-    status: 'requested',
-    intent: 'proposal',
-    code: previousTask.code,
-    focus: previousTask.focus,
-    id: previousTask.id,
-    identifier: previousTask.identifier,
-    extension: [
-      ...previousTask.extension.filter((extension) =>
-        [
-          'http://opencrvs.org/specs/extension/informants-signature',
-          'http://opencrvs.org/specs/extension/contact-person-email'
-        ].includes(extension.url)
-      ),
-      {
-        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
-        valueInteger: 0
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/contact-person',
-        valueString: correctionDetails.requester
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-        valueString: correctionDetails.requester
-      },
-      {
-        url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
-        valueBoolean: correctionDetails.hasShowedVerifiedDocument
-      }
-    ],
-    input: correctionDetails.values.map((update) => ({
-      valueCode: update.section,
-      valueId: update.fieldName,
-      type: {
-        coding: [
-          {
-            system: 'http://terminology.hl7.org/CodeSystem/action-type',
-            code: 'update'
-          }
-        ]
-      },
-      valueString: update.newValue
-    })),
-    reason: {
-      text: correctionDetails.reason,
-      extension: [
-        {
-          url: 'http://opencrvs.org/specs/extension/otherReason',
-          valueString: ''
-        }
-      ]
-    },
-    lastModified: new Date().toISOString(),
-    businessStatus: {
-      coding: [
-        {
-          system: 'http://opencrvs.org/specs/reg-status',
-          code: 'CORRECTION_REQUESTED'
-        }
-      ]
-    }
-  }
 }
