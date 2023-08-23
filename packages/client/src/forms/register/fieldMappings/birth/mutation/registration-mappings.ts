@@ -59,8 +59,8 @@ export function transformCertificateData(
     }
     if (certificateData.collector.affidavitFile) {
       collector.affidavit = [
+        //@ts-ignore
         {
-          id: '123456789',
           contentType: (certificateData.collector.affidavitFile as IFileValue)
             .type,
           data: (certificateData.collector.affidavitFile as IFileValue).data
