@@ -1,10 +1,14 @@
-export type TaskWithoutId = Omit<fhir.Task, 'id'>
+type RequiredResourceType<T> = Omit<T, 'resourceType'> & {
+  resourceType: string
+}
+
 export type CompositionWithoutId = Omit<fhir.Composition, 'id'>
 export type Extension = fhir.Extension
 export type BusinessStatus = Omit<fhir.CodeableConcept, 'coding'> & {
   coding: fhir.Coding[]
 }
 
+export type TaskWithoutId = RequiredResourceType<Omit<fhir.Task, 'id'>>
 export type Task = Omit<TaskWithoutId, 'extension' | 'businessStatus'> & {
   id: string
   lastModified: string
@@ -13,9 +17,8 @@ export type Task = Omit<TaskWithoutId, 'extension' | 'businessStatus'> & {
 }
 
 export type Composition = CompositionWithoutId & { id: string }
-type Resource =
-  | (Omit<fhir.Resource, 'resourceType'> & { resourceType: string })
-  | Task
+
+type Resource = RequiredResourceType<fhir.Resource>
 
 export type BundleEntry<T extends Resource = Resource> = Omit<
   fhir.BundleEntry,
