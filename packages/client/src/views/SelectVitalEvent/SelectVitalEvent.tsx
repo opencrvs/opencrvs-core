@@ -173,7 +173,7 @@ class SelectVitalEventView extends React.Component<
                 this.setState({ goTo: 'death', noEventSelectedError: false })
               }
             />
-            {window.config.MARRIAGE_REGISTRATION && (
+            {window.config.MARRIAGE_REGISTRATION && !isFieldAgent && (
               <RadioButton
                 size="large"
                 key="marriagevent"
