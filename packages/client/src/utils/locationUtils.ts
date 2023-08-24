@@ -181,7 +181,8 @@ export type LocationName = string | MessageDescriptor
 
 export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
-  offlineLocations: Record<string, ILocation>
+  offlineLocations: Record<string, ILocation>,
+  countryAsString?: boolean
 ): Record<string, LocationName> {
   let location: ILocation = facilityLocation
   let continueLoop = true
@@ -190,12 +191,14 @@ export function getLocationNameMapOfFacility(
     const parent = location.partOf.split('/')[1]
     if (parent === '0') {
       continueLoop = false
-      map.country = countries.find(
-        ({ value }) => value === window.config.COUNTRY
-      )?.label as MessageDescriptor
+      map.country = countryAsString
+        ? (countries.find(({ value }) => value === window.config.COUNTRY)?.label
+            .defaultMessage as string)
+        : (countries.find(({ value }) => value === window.config.COUNTRY)
+            ?.label as MessageDescriptor)
     } else {
       location = offlineLocations[parent]
-      map[location.jurisdictionType as string] = location.name
+      map[location.jurisdictionType?.toLowerCase() as string] = location.name
     }
   }
   return map
