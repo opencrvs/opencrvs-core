@@ -336,8 +336,6 @@ input RegistrationInput {
   witnessTwoSignature: String # -> extension(url='http://opencrvs.org/specs/extension/witness-two-signature').valueString
   informantType: String # -> Observation.valueString
   otherInformantType: String
-  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
-  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflowInput]

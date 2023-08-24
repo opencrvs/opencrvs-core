@@ -1202,8 +1202,6 @@ export interface GQLRegistrationInput {
   witnessTwoSignature?: string
   informantType?: string
   otherInformantType?: string
-  contact?: string
-  contactRelationship?: string
   contactPhoneNumber?: string
   contactEmail?: string
   status?: Array<GQLRegWorkflowInput | null>
