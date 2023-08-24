@@ -855,7 +855,19 @@ const setAddressPropFromFHIRProp = (
         ]?.name ||
         addressFromQuery[fhirProp as keyof typeof FHIRPropLocationLevel] ||
         ''
-  transformedData[sectionId][fieldName] = value
+  if (fhirProp === 'country') {
+    transformedData[sectionId][fieldName] = value
+  } else if (
+    addressFromQuery?.['country'] === window.config.COUNTRY &&
+    !fieldName.includes('international')
+  ) {
+    transformedData[sectionId][fieldName] = value
+  } else if (
+    addressFromQuery?.['country'] !== window.config.COUNTRY &&
+    fieldName.includes('international')
+  ) {
+    transformedData[sectionId][fieldName] = value
+  }
 }
 
 export const addressFHIRPropertyTemplateTransformer =
@@ -998,7 +1010,8 @@ export const eventLocationAddressFHIRPropertyTemplateTransformer =
       queryData.eventLocation?.type &&
       queryData.eventLocation?.type === 'HEALTH_FACILITY' &&
       queryData.eventLocation?.id &&
-      fhirProp in SupportedFacilityFHIRProp
+      fhirProp in SupportedFacilityFHIRProp &&
+      !field.name.includes('international')
     ) {
       if (!offlineData) {
         return
