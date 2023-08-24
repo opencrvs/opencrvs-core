@@ -26,7 +26,7 @@ import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
-import { RegisterForm } from '../RegisterForm/RegisterForm'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { useSelector } from 'react-redux'
 import { Event, History } from '@client/utils/gateway'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
