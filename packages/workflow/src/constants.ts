@@ -32,7 +32,8 @@ export const RESOURCE_SERVICE_URL =
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
-
+export const DOCUMENTS_URL =
+  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const SENTRY_DSN = process.env.SENTRY_DSN

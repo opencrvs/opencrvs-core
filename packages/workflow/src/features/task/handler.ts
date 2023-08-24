@@ -22,6 +22,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/utils'
+import { Bundle, Task } from '@opencrvs/commons'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
@@ -30,12 +31,9 @@ export default async function updateTaskHandler(
 ) {
   try {
     const token = getToken(request)
-    const payload = await modifyTaskBundle(
-      request.payload as fhir.Bundle,
-      token
-    )
+    const payload = await modifyTaskBundle(request.payload as Bundle, token)
     const taskId = getEntryId(payload)
-    const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
+    const taskResource = payload.entry?.[0].resource as Task | undefined
     if (!taskResource) {
       throw new Error('TaskBundle has no entry')
     }

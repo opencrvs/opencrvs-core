@@ -63,9 +63,10 @@ import {
   setupSystemIdentifier
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
+import { Bundle, Composition } from '@opencrvs/commons'
 
 function detectEvent(request: Hapi.Request): Events {
-  const fhirBundle = request.payload as fhir.Bundle
+  const fhirBundle = request.payload as Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
@@ -74,7 +75,7 @@ function detectEvent(request: Hapi.Request): Events {
     if (firstEntry) {
       const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
-        const composition = firstEntry as fhir.Composition
+        const composition = firstEntry as Composition
         const isADuplicate = composition?.extension?.find(
           (ext) =>
             ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
@@ -93,7 +94,7 @@ function detectEvent(request: Hapi.Request): Events {
           } else {
             if (
               hasRegisterScope(request) &&
-              hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              hasCorrectionEncounterSection(firstEntry as Composition)
             ) {
               return Events[`${eventType}_MAKE_CORRECTION`]
             } else if (!hasCertificateDataInDocRef(fhirBundle)) {

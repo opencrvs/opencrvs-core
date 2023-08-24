@@ -34,19 +34,26 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
 import { SECTION_CODE } from '@workflow/features/events/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
+import { Bundle, Task } from '@opencrvs/commons'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getPhoneNo(
+    getTaskResource(fhirBundle as Bundle) as fhir.Task,
+    getEventType(fhirBundle)
+  )
 }
 
 export async function getSharedContactEmail(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return getEmailAddress(getTaskResource(fhirBundle), getEventType(fhirBundle))
+  return getEmailAddress(
+    getTaskResource(fhirBundle as Bundle) as fhir.Task,
+    getEventType(fhirBundle)
+  )
 }
 
 export function concatenateName(fhirNames: fhir.HumanName[]) {
@@ -99,7 +106,7 @@ export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
       'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
     )
   }
-  const taskResource = getTaskResource(fhirBundle)
+  const taskResource = getTaskResource(fhirBundle as Bundle)
   const regLastOfficeExt = taskResource?.extension?.find(
     (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
@@ -140,7 +147,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
 }
 
 export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
-  const eventType = getTaskEventType(taskResource) as EVENT_TYPE
+  const eventType = getTaskEventType(taskResource as Task) as EVENT_TYPE
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&
@@ -180,7 +187,10 @@ export function hasRegistrationNumber(
   eventType: EVENT_TYPE
 ) {
   try {
-    getRegistrationNumber(getTaskResource(fhirBundle), eventType)
+    getRegistrationNumber(
+      getTaskResource(fhirBundle as Bundle) as fhir.Task,
+      eventType
+    )
     return true
   } catch (error) {
     return false

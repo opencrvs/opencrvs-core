@@ -51,7 +51,7 @@ import {
   HEARTH_URL,
   DOCUMENTS_URL
 } from '@gateway/constants'
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,

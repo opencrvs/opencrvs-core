@@ -690,17 +690,16 @@ input NotificationInput {
 }
 
 input CorrectionInput {
-  requester: ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput!]!
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
+  requester: String!
+  hasShowedVerifiedDocument: Boolean!
+  noSupportingDocumentationRequired: Boolean!
+  attachments: [AttachmentInput!]!
+  payment: CorrectionPaymentInput
+  values: [CorrectionValueInput!]!
+  location: LocationInput!
+  reason: String!
+  otherReason: String!
+  note: String!
 }
 
 input CorrectionRejectionInput {
@@ -982,10 +981,12 @@ type History {
   regStatus: RegStatus
   ipAddress: String
   action: RegAction
+  note: String
   statusReason: StatusReason
   reason: String
   requester: String
   hasShowedVerifiedDocument: Boolean
+  noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
   location: Location
@@ -996,6 +997,8 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  payment: Payment
+  documents: [Attachment!]!
   duplicateOf: String
   potentialDuplicates: [String!]
 }
@@ -1277,21 +1280,33 @@ input LocationInput {
   geoData: String
 }
 
-input PaymentInput {
-  paymentId: ID
-  type: PaymentType
-  total: Float
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
+input AttachmentInput {
+  _fhirID: ID
+  contentType: String
   data: String
+  uri: String
+  status: String
+  originalFileName: String
+  systemFileName: String
+  type: String
+  description: String
+  subject: String
+  createdAt: Date
+}
+
+input CorrectionPaymentInput {
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentData: String
 }
 
 input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
+  section: String!
+  fieldName: String!
+  oldValue: String!
+  newValue: String!
 }
 
 input RegistrationInput {
@@ -1556,6 +1571,14 @@ type InputOutput {
   valueString: String
 }
 
+type Payment {
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentURL: String
+}
+
 type RoleLabel {
   lang: String!
   label: String!
@@ -1783,20 +1806,6 @@ input AddressInput {
   to: Date
 }
 
-input AttachmentInput {
-  _fhirID: ID
-  contentType: String
-  data: String
-  uri: String
-  status: String
-  originalFileName: String
-  systemFileName: String
-  type: String
-  description: String
-  subject: String
-  createdAt: Date
-}
-
 input DeceasedInput {
   deceased: Boolean
   deathDate: String
@@ -1871,15 +1880,6 @@ input MarriageFeeInput {
   DELAYED: Float
 }
 
-type Payment {
-  paymentId: ID
-  type: PaymentType
-  total: Float
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
-}
-
 interface AuditLogItemBase {
   time: String!
   ipAddress: String!
@@ -1897,4 +1897,14 @@ input CommentInput {
   user: UserInput
   comment: String
   createdAt: Date
+}
+
+input PaymentInput {
+  paymentId: ID
+  type: PaymentType
+  total: Float
+  amount: Float
+  outcome: PaymentOutcomeType
+  date: Date
+  data: String
 }

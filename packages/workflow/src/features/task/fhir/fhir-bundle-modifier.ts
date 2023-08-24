@@ -17,8 +17,9 @@ import {
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { Bundle, Task } from '@opencrvs/commons'
 
-export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
+export async function modifyTaskBundle(fhirBundle: Bundle, token: string) {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -28,7 +29,7 @@ export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
     throw new Error('Invalid FHIR bundle found for task')
   }
   // Checking for duplicate status update
-  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as fhir.Task)
+  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as Task)
 
   const taskResource = getTaskResource(fhirBundle)
   const practitioner = await getLoggedInPractitionerResource(token)

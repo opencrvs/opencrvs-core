@@ -63,13 +63,20 @@ input PaymentInput {
   data: String
 }
 
-type Payment { # -> PaymentReconciliation
-  paymentId: ID # -> .identifier
-  type: PaymentType # -> .detail.type
-  total: Float # -> .total
-  amount: Float # .detail.amount
-  outcome: PaymentOutcomeType # -> .outcome
-  date: Date # -> .detail.date
+input CorrectionPaymentInput {
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentData: String
+}
+
+type Payment {
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+  attachmentURL: String
 }
 
 input MedicalPractitionerInput { # -> Encounter.participant
@@ -146,10 +153,12 @@ type History {
   regStatus: RegStatus
   ipAddress: String
   action: RegAction
+  note: String
   statusReason: StatusReason
   reason: String
   requester: String
   hasShowedVerifiedDocument: Boolean
+  noSupportingDocumentationRequired: Boolean
   otherReason: String
   #This doesn't resolve to the System model properly rather
   #uses the getSystem endpoint in user-mgnt
@@ -162,6 +171,8 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  payment: Payment
+  documents: [Attachment!]!
   duplicateOf: String
   potentialDuplicates: [String!]
 }
@@ -297,24 +308,23 @@ type MarriageRegistration implements EventRegistration { # -> Composition
 }
 
 input CorrectionValueInput {
-  section: String
-  fieldName: String
-  oldValue: String
-  newValue: String
+  section: String!
+  fieldName: String!
+  oldValue: String!
+  newValue: String!
 }
 
 input CorrectionInput {
-  requester: ID # -> Practitioner ID
-  hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
-  noSupportingDocumentationRequired: Boolean
-  payments: [PaymentInput!]!
-  values: [CorrectionValueInput]
-  location: LocationInput
-  data: String
-  reason: String
-  otherReason: String
-  note: String
+  requester: String! # MOTHER, OTHER...
+  hasShowedVerifiedDocument: Boolean!
+  noSupportingDocumentationRequired: Boolean!
+  attachments: [AttachmentInput!]!
+  payment: CorrectionPaymentInput
+  values: [CorrectionValueInput!]!
+  location: LocationInput!
+  reason: String!
+  otherReason: String!
+  note: String!
 }
 
 input RegistrationInput {

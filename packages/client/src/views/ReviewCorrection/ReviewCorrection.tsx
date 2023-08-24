@@ -33,6 +33,7 @@ import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { IStoreState } from '@client/store'
 
 import { merge } from 'lodash'
+import { updateDeclarationRegistrationWithCorrection } from '../CorrectionForm/utils'
 
 type URLParams = { declarationId: string }
 
@@ -46,7 +47,7 @@ function applyCorrectionToData(record: any) {
     (task: History) => task.action === 'REQUESTED_CORRECTION'
   )
 
-  const patch = correctionRequestTask.input.reduce(
+  const proposedChangesPatch = correctionRequestTask.input.reduce(
     (acc: Record<string, Record<string, string>>, curr: any) => {
       acc[curr.valueCode] = acc[curr.valueCode] || {}
       acc[curr.valueCode][curr.valueId] = curr.valueString
@@ -55,9 +56,25 @@ function applyCorrectionToData(record: any) {
     {}
   )
 
+  const declarationData = merge(record.data, proposedChangesPatch)
   return {
     ...record,
-    data: merge(record.data, patch)
+    data: {
+      ...declarationData,
+      registration: {
+        ...declarationData.registration,
+        correction: updateDeclarationRegistrationWithCorrection({
+          corrector: {
+            relationship: correctionRequestTask.requester,
+            hasShowedVerifiedDocument:
+              correctionRequestTask.hasShowedVerifiedDocument
+          },
+          reason: {
+            type: correctionRequestTask.reason
+          }
+        })
+      }
+    }
   }
 }
 
@@ -87,22 +104,26 @@ export function ReviewCorrection() {
   }
 
   const recordWithProposedChanges = applyCorrectionToData(record)
+  console.log(record)
 
   return (
-    <RegisterForm
-      match={{
-        ...match,
-        params: {
-          declarationId: record.id,
-          pageId: 'review',
-          groupId: 'review-view-group'
-        }
-      }}
-      pageRoute={''}
-      location={location}
-      history={history}
-      registerForm={registerForm}
-      declaration={recordWithProposedChanges}
-    />
+    <>
+      <button>test</button>
+      <RegisterForm
+        match={{
+          ...match,
+          params: {
+            declarationId: record.id,
+            pageId: 'review',
+            groupId: 'review-view-group'
+          }
+        }}
+        pageRoute={''}
+        location={location}
+        history={history}
+        registerForm={registerForm}
+        declaration={recordWithProposedChanges}
+      />
+    </>
   )
 }

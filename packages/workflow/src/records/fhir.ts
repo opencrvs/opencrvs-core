@@ -1,14 +1,174 @@
+import {
+  Bundle,
+  BundleEntry,
+  BundleEntryWithFullUrl,
+  DocumentReference,
+  getUUID,
+  PaymentReconciliation,
+  Task,
+  Unsaved
+} from '@opencrvs/commons'
 import { HEARTH_URL } from '@workflow/constants'
-
-import { BundleEntryWithFullUrl, Bundle, Task } from '@opencrvs/commons'
-
 import fetch from 'node-fetch'
-import { CorrectionRequestInput } from './correction-request'
+
+import {
+  CorrectionRequestInput,
+  CorrectionRequestPaymentInput
+} from './correction-request'
+
+export function createCorrectionProofOfLegalCorrectionDocument(
+  subjectReference: string,
+  attachmentURL: string,
+  attachmentType: string
+): Unsaved<BundleEntry<DocumentReference>> {
+  const temporaryDocumentReferenceId = getUUID()
+  return {
+    fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
+    resource: {
+      resourceType: 'DocumentReference',
+      masterIdentifier: {
+        value: temporaryDocumentReferenceId,
+        system: 'urn:ietf:rfc:3986'
+      },
+      status: 'current',
+      indexed: new Date().toISOString(),
+      subject: {
+        reference: subjectReference
+      },
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/documentType',
+            code: attachmentType
+          }
+        ]
+      },
+      content: [
+        {
+          attachment: {
+            contentType: 'image/jpg',
+            data: attachmentURL
+          }
+        }
+      ],
+      identifier: []
+    }
+  }
+}
+
+export function createCorrectionPaymentResources(
+  paymentDetails: CorrectionRequestPaymentInput
+): [Unsaved<BundleEntry<PaymentReconciliation>>]
+
+export function createCorrectionPaymentResources(
+  paymentDetails: CorrectionRequestPaymentInput,
+  attachmentURL?: string
+): [
+  Unsaved<BundleEntry<PaymentReconciliation>>,
+  Unsaved<BundleEntry<DocumentReference>>
+]
+
+export function createCorrectionPaymentResources(
+  paymentDetails: CorrectionRequestPaymentInput,
+  attachmentURL?: string
+):
+  | [
+      Unsaved<BundleEntry<PaymentReconciliation>>,
+      Unsaved<BundleEntry<DocumentReference>>
+    ]
+  | [Unsaved<BundleEntry<PaymentReconciliation>>] {
+  const temporaryPaymentId = getUUID()
+  const temporaryDocumentReferenceId = getUUID()
+
+  const paymentBundleEntry: Unsaved<BundleEntry<PaymentReconciliation>> = {
+    fullUrl: `urn:uuid:${temporaryPaymentId}`,
+    resource: {
+      resourceType: 'PaymentReconciliation',
+      status: 'active',
+      detail: [
+        {
+          type: {
+            coding: [
+              {
+                code: paymentDetails.type
+              }
+            ]
+          },
+          amount: {
+            value: paymentDetails.amount
+          },
+          date: paymentDetails.date
+        }
+      ],
+      outcome: {
+        coding: [
+          {
+            code: paymentDetails.outcome
+          }
+        ]
+      }
+    }
+  }
+
+  if (!attachmentURL) {
+    return [paymentBundleEntry]
+  }
+
+  return [
+    paymentBundleEntry,
+    {
+      fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
+      resource: {
+        resourceType: 'DocumentReference',
+        masterIdentifier: {
+          value: temporaryDocumentReferenceId,
+          system: 'urn:ietf:rfc:3986'
+        },
+        status: 'current',
+        indexed: new Date().toISOString(),
+        subject: {
+          reference: `urn:uuid:${temporaryPaymentId}`
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/documentType',
+              code: 'PROOF_OF_PAYMENT'
+            }
+          ]
+        },
+        content: [
+          {
+            attachment: {
+              contentType: 'image/jpg',
+              data: attachmentURL
+            }
+          }
+        ],
+        identifier: []
+      }
+    }
+  ]
+}
+
+export function createCorrectionEncounter(): Unsaved<
+  BundleEntry<fhir3.Encounter>
+> {
+  return {
+    fullUrl: `urn:uuid:${getUUID()}`,
+    resource: {
+      resourceType: 'Encounter',
+      status: 'finished'
+    }
+  }
+}
 
 export function createCorrectionRequestTask(
-  previousTask: Task,
-  correctionDetails: CorrectionRequestInput
-) {
+  previousTask: Task, // @todo do not require previous task, pass values from outside
+  correctionDetails: CorrectionRequestInput,
+  correctionEncounter: Unsaved<BundleEntry<fhir3.Encounter>>,
+  paymentReconciliation?: Unsaved<BundleEntry<PaymentReconciliation>>
+): Task {
   return {
     resourceType: 'Task',
     status: 'requested',
@@ -16,6 +176,7 @@ export function createCorrectionRequestTask(
     code: previousTask.code,
     focus: previousTask.focus,
     id: previousTask.id,
+    encounter: { reference: correctionEncounter.fullUrl },
     identifier: previousTask.identifier,
     extension: [
       ...previousTask.extension.filter((extension) =>
@@ -28,9 +189,19 @@ export function createCorrectionRequestTask(
         url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
         valueInteger: 0
       },
+      ...(paymentReconciliation
+        ? [
+            {
+              url: 'http://opencrvs.org/specs/extension/paymentDetails',
+              valueReference: {
+                reference: paymentReconciliation.fullUrl
+              }
+            }
+          ]
+        : []),
       {
-        url: 'http://opencrvs.org/specs/extension/contact-person',
-        valueString: correctionDetails.requester
+        url: 'http://opencrvs.org/specs/extension/noSupportingDocumentationRequired',
+        valueBoolean: correctionDetails.noSupportingDocumentationRequired
       },
       {
         url: 'http://opencrvs.org/specs/extension/requestingIndividual',
@@ -59,10 +230,15 @@ export function createCorrectionRequestTask(
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/otherReason',
-          valueString: ''
+          valueString: correctionDetails.otherReason
         }
       ]
     },
+    note: [
+      {
+        text: correctionDetails.note
+      }
+    ],
     lastModified: new Date().toISOString(),
     businessStatus: {
       coding: [
@@ -76,7 +252,7 @@ export function createCorrectionRequestTask(
 }
 
 export function findFromBundleById(
-  bundle: fhir.Bundle,
+  bundle: Bundle,
   id: string
 ): BundleEntryWithFullUrl {
   const resource = bundle.entry?.find((item) => item.resource?.id === id)
@@ -94,28 +270,7 @@ export function findFromBundleById(
   return resource as BundleEntryWithFullUrl
 }
 
-export function isComposition(
-  resource: fhir.Resource
-): resource is fhir.Composition {
-  return resource.resourceType === 'Composition'
-}
-export function isEncounter(
-  resource: fhir.Resource
-): resource is fhir.Encounter {
-  return resource.resourceType === 'Encounter'
-}
-export function isRelatedPerson(
-  resource: fhir.Resource
-): resource is fhir.RelatedPerson {
-  return resource.resourceType === 'RelatedPerson'
-}
-export function isTask(resource: fhir.Resource): resource is Task {
-  return resource.resourceType === 'Task'
-}
-
-export async function sendBundleToHearth(
-  payload: fhir.Bundle
-): Promise<fhir.Bundle> {
+export async function sendBundleToHearth(payload: Bundle): Promise<Bundle> {
   const res = await fetch(HEARTH_URL, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -126,7 +281,7 @@ export async function sendBundleToHearth(
 
   if (!res.ok) {
     throw new Error(
-      `FHIR post to /fhir failed with [${res.status}] body: ${res.statusText}`
+      `FHIR post to /fhir failed with [${res.status}] body: ${await res.text()}`
     )
   }
 

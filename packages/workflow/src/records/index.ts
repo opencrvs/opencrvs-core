@@ -1,8 +1,15 @@
-import { Bundle, BundleEntry, StateIdenfitiers } from '@opencrvs/commons'
+import {
+  Bundle,
+  BundleEntry,
+  Composition,
+  StateIdenfitiers,
+  isComposition,
+  isRelatedPerson
+} from '@opencrvs/commons'
 import { HEARTH_MONGO_URL } from '@workflow/constants'
 import { MongoClient } from 'mongodb'
 
-import { findFromBundleById, isComposition, isRelatedPerson } from './fhir'
+import { findFromBundleById } from './fhir'
 
 const client = new MongoClient(HEARTH_MONGO_URL)
 
@@ -80,7 +87,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 
   const composition = await db
     .collection('Composition')
-    .findOne<fhir.Composition>({ id: recordId })
+    .findOne<Composition>({ id: recordId })
 
   if (!composition) {
     throw new RecordNotFoundError('Cannot find composition with id ' + recordId)
@@ -422,7 +429,6 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       checkForUnresolvedReferences(bundle)
     } catch (error) {
       console.log(error)
-
       throw error
     }
   }
@@ -448,36 +454,17 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   return record as StateIdenfitiers[T[number]]
 }
 
-const SECTIONS_WITH_ID_REFERENCES = [
-  'birth-encounter',
-  'death-encounter',
-  'marriage-encounter'
-]
-
-function sectionReferenceShouldBeFullUrl(section: fhir.CompositionSection) {
-  return !(
-    section.code?.coding?.[0]?.code &&
-    SECTIONS_WITH_ID_REFERENCES.includes(section.code.coding[0].code)
-  )
-}
-
 function resolveReferenceFullUrls(bundle: Bundle, entries: BundleEntry[]) {
   return entries.map((entry) => {
     const resource = entry.resource!
     if (isComposition(resource)) {
       resource.section?.forEach((section) => {
-        if (sectionReferenceShouldBeFullUrl(section)) {
-          section.entry?.forEach((entry) => {
-            entry.reference = findFromBundleById(
-              bundle,
-              entry.reference!.split('/')[1]
-            )?.fullUrl
-          })
-        } else {
-          section.entry?.forEach((entry) => {
-            entry.reference = entry.reference!.split('/')[1]
-          })
-        }
+        section.entry?.forEach((entry) => {
+          entry.reference = findFromBundleById(
+            bundle,
+            entry.reference!.split('/')[1]
+          )?.fullUrl
+        })
       })
     }
 

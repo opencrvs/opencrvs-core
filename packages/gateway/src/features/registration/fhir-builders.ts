@@ -98,7 +98,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,

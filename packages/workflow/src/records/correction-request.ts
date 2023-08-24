@@ -1,42 +1,46 @@
 import { z } from 'zod'
 
+export const CorrectionRequestPaymentInput = z.object({
+  type: z.string(),
+  amount: z.number(),
+  outcome: z.string(),
+  date: z.string().datetime(),
+  attachmentData: z.string().optional()
+})
 export const CorrectionRequestInput = z.object({
   requester: z.string(),
   hasShowedVerifiedDocument: z.boolean(),
-  noSupportingDocumentationRequired: z.boolean().optional(),
-  payments: z
+  noSupportingDocumentationRequired: z.boolean(),
+  attachments: z
     .array(
       z.object({
-        paymentId: z.string().optional(),
-        type: z.string().optional(),
-        total: z.number().optional(),
-        amount: z.number().optional(),
-        outcome: z.string().optional(),
-        date: z.string().optional(),
-        data: z.string().optional()
+        type: z.string(),
+        data: z.string()
       })
     )
     .default([]),
+  payment: CorrectionRequestPaymentInput.optional(),
   location: z.object({
     _fhirID: z.string()
   }),
-  values: z
-    .array(
-      z.object({
-        section: z.string().optional(),
-        fieldName: z.string().optional(),
-        oldValue: z.string().optional(),
-        newValue: z.string().optional()
-      })
-    )
-    .default([]),
+  values: z.array(
+    z.object({
+      section: z.string(),
+      fieldName: z.string(),
+      oldValue: z.string(),
+      newValue: z.string()
+    })
+  ),
   reason: z.string(),
-  note: z.string(),
-  otherReason: z.string()
+  otherReason: z.string(),
+  note: z.string()
 })
 export const CorrectionRejectionInput = z.object({
   reason: z.string()
 })
 
 export type CorrectionRequestInput = z.infer<typeof CorrectionRequestInput>
+export type CorrectionRequestPaymentInput = z.infer<
+  typeof CorrectionRequestPaymentInput
+>
 export type CorrectionRejectionInput = z.infer<typeof CorrectionRejectionInput>

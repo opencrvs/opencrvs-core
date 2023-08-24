@@ -1,4 +1,4 @@
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { WORKFLOW_URL } from '@gateway/constants'
 import {
   GQLCorrectionInput,

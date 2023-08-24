@@ -1,4 +1,4 @@
-import { Lifecycle, ServerRoute } from '@hapi/hapi'
+import { Request, ServerRoute } from '@hapi/hapi'
 import {
   CertifiedRecord,
   CorrectionRequestedRecord,
@@ -9,6 +9,7 @@ import {
   StateIdenfitiers,
   IssuedRecord
 } from '@opencrvs/commons'
+import { getRecordById } from './records'
 
 export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type Certify = Nominal<{}, 'Certify'>
@@ -61,7 +62,8 @@ type RecordStateChangeRouteHandler<
   method: string
   path: string
   handler: (
-    ...params: Parameters<Lifecycle.Method>
+    request: Request,
+    record: StateIdenfitiers[T[number]]
   ) => PromiseOrValue<
     GetEndState<
       StateIdenfitiers[T[number]],
@@ -77,7 +79,13 @@ export function createRoute<
   return {
     path: params.path,
     method: params.method,
-    handler: params.handler
+    handler: async (request: Request) => {
+      const record = await getRecordById(
+        request.params.recordId,
+        params.allowedStartStates
+      )
+      return params.handler(request, record)
+    }
   }
 }
 

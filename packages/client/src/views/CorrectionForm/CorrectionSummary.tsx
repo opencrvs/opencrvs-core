@@ -981,9 +981,17 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
     }
-    updateDeclarationRegistrationWithCorrection(declaration, {
-      userPrimaryOffice: this.props.userPrimaryOffice
-    })
+    const correction = updateDeclarationRegistrationWithCorrection(
+      declaration.data,
+      {
+        userPrimaryOffice: this.props.userPrimaryOffice
+      }
+    )
+
+    declaration.data.registration.correction = {
+      ...((declaration.data.registration.correction as IFormSectionData) || {}),
+      ...correction
+    }
 
     this.props.writeDeclaration(declaration)
 

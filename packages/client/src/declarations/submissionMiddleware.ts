@@ -210,16 +210,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            // TODO ensure payload format before getting here in
-            // packages/client/src/views/CorrectionForm/utils.ts:156
-            details: {
-              requester: '',
-              hasShowedVerifiedDocument: false,
-              reason: '',
-              note: '',
-              otherReason: '',
-              ...gqlDetails.registration.correction
-            }
+            details: gqlDetails.registration.correction
           }
         })
       } else if (

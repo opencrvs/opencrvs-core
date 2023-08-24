@@ -558,17 +558,16 @@ export interface GQLNotificationInput {
 }
 
 export interface GQLCorrectionInput {
-  requester?: string
-  hasShowedVerifiedDocument?: boolean
-  attestedAndCopied?: boolean
-  noSupportingDocumentationRequired?: boolean
-  payments: Array<GQLPaymentInput>
-  values?: Array<GQLCorrectionValueInput | null>
-  location?: GQLLocationInput
-  data?: string
-  reason?: string
-  otherReason?: string
-  note?: string
+  requester: string
+  hasShowedVerifiedDocument: boolean
+  noSupportingDocumentationRequired: boolean
+  attachments: Array<GQLAttachmentInput>
+  payment?: GQLCorrectionPaymentInput
+  values: Array<GQLCorrectionValueInput>
+  location: GQLLocationInput
+  reason: string
+  otherReason: string
+  note: string
 }
 
 export interface GQLCorrectionRejectionInput {
@@ -850,10 +849,12 @@ export interface GQLHistory {
   regStatus?: GQLRegStatus
   ipAddress?: string
   action?: GQLRegAction
+  note?: string
   statusReason?: GQLStatusReason
   reason?: string
   requester?: string
   hasShowedVerifiedDocument?: boolean
+  noSupportingDocumentationRequired?: boolean
   otherReason?: string
   system?: GQLIntegratedSystem
   location?: GQLLocation
@@ -864,6 +865,8 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  payment?: GQLPayment
+  documents: Array<GQLAttachment>
   duplicateOf?: string
   potentialDuplicates?: Array<string>
 }
@@ -1169,21 +1172,33 @@ export interface GQLLocationInput {
   geoData?: string
 }
 
-export interface GQLPaymentInput {
-  paymentId?: string
-  type?: GQLPaymentType
-  total?: number
-  amount?: number
-  outcome?: GQLPaymentOutcomeType
-  date?: GQLDate
+export interface GQLAttachmentInput {
+  _fhirID?: string
+  contentType?: string
   data?: string
+  uri?: string
+  status?: string
+  originalFileName?: string
+  systemFileName?: string
+  type?: string
+  description?: string
+  subject?: string
+  createdAt?: GQLDate
+}
+
+export interface GQLCorrectionPaymentInput {
+  type: GQLPaymentType
+  amount: number
+  outcome: GQLPaymentOutcomeType
+  date: GQLDate
+  attachmentData?: string
 }
 
 export interface GQLCorrectionValueInput {
-  section?: string
-  fieldName?: string
-  oldValue?: string
-  newValue?: string
+  section: string
+  fieldName: string
+  oldValue: string
+  newValue: string
 }
 
 export interface GQLRegistrationInput {
@@ -1448,6 +1463,14 @@ export interface GQLInputOutput {
   valueString?: string
 }
 
+export interface GQLPayment {
+  type: GQLPaymentType
+  amount: number
+  outcome: GQLPaymentOutcomeType
+  date: GQLDate
+  attachmentURL?: string
+}
+
 export interface GQLRoleLabel {
   lang: string
   label: string
@@ -1676,20 +1699,6 @@ export interface GQLAddressInput {
   to?: GQLDate
 }
 
-export interface GQLAttachmentInput {
-  _fhirID?: string
-  contentType?: string
-  data?: string
-  uri?: string
-  status?: string
-  originalFileName?: string
-  systemFileName?: string
-  type?: string
-  description?: string
-  subject?: string
-  createdAt?: GQLDate
-}
-
 export interface GQLDeceasedInput {
   deceased?: boolean
   deathDate?: string
@@ -1764,15 +1773,6 @@ export interface GQLMarriageFeeInput {
   DELAYED?: number
 }
 
-export interface GQLPayment {
-  paymentId?: string
-  type?: GQLPaymentType
-  total?: number
-  amount?: number
-  outcome?: GQLPaymentOutcomeType
-  date?: GQLDate
-}
-
 export interface GQLAuditLogItemBase {
   time: string
   ipAddress: string
@@ -1801,6 +1801,16 @@ export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
   createdAt?: GQLDate
+}
+
+export interface GQLPaymentInput {
+  paymentId?: string
+  type?: GQLPaymentType
+  total?: number
+  amount?: number
+  outcome?: GQLPaymentOutcomeType
+  date?: GQLDate
+  data?: string
 }
 
 /*********************************
@@ -1916,6 +1926,7 @@ export interface GQLResolver {
   IntegratedSystem?: GQLIntegratedSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  Payment?: GQLPaymentTypeResolver
   RoleLabel?: GQLRoleLabelTypeResolver
   AdvancedSeachParameters?: GQLAdvancedSeachParametersTypeResolver
   EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
@@ -1934,7 +1945,6 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
-  Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
@@ -7059,10 +7069,12 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   regStatus?: HistoryToRegStatusResolver<TParent>
   ipAddress?: HistoryToIpAddressResolver<TParent>
   action?: HistoryToActionResolver<TParent>
+  note?: HistoryToNoteResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
   requester?: HistoryToRequesterResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
+  noSupportingDocumentationRequired?: HistoryToNoSupportingDocumentationRequiredResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
   system?: HistoryToSystemResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
@@ -7073,6 +7085,8 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  payment?: HistoryToPaymentResolver<TParent>
+  documents?: HistoryToDocumentsResolver<TParent>
   duplicateOf?: HistoryToDuplicateOfResolver<TParent>
   potentialDuplicates?: HistoryToPotentialDuplicatesResolver<TParent>
 }
@@ -7122,6 +7136,15 @@ export interface HistoryToActionResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface HistoryToNoteResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
@@ -7150,6 +7173,18 @@ export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToNoSupportingDocumentationRequiredResolver<
   TParent = any,
   TResult = any
 > {
@@ -7246,6 +7281,24 @@ export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToPaymentResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToDocumentsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9319,6 +9372,59 @@ export interface InputOutputToValueStringResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLPaymentTypeResolver<TParent = any> {
+  type?: PaymentToTypeResolver<TParent>
+  amount?: PaymentToAmountResolver<TParent>
+  outcome?: PaymentToOutcomeResolver<TParent>
+  date?: PaymentToDateResolver<TParent>
+  attachmentURL?: PaymentToAttachmentURLResolver<TParent>
+}
+
+export interface PaymentToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToAmountResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PaymentToAttachmentURLResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -11437,69 +11543,6 @@ export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLPaymentTypeResolver<TParent = any> {
-  paymentId?: PaymentToPaymentIdResolver<TParent>
-  type?: PaymentToTypeResolver<TParent>
-  total?: PaymentToTotalResolver<TParent>
-  amount?: PaymentToAmountResolver<TParent>
-  outcome?: PaymentToOutcomeResolver<TParent>
-  date?: PaymentToDateResolver<TParent>
-}
-
-export interface PaymentToPaymentIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToTotalResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToAmountResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PaymentToDateResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

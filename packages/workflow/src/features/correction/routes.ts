@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { badRequest, conflict, notFound } from '@hapi/boom'
-import { Request } from '@hapi/hapi'
+import { badRequest, conflict } from '@hapi/boom'
 import {
   Bundle,
   CertifiedRecord,
   CorrectionRequestedRecord,
+  getAuthHeader,
+  isCorrectionRequestedTask,
   IssuedRecord,
+  isTask,
   RegisteredRecord,
-  Task,
-  isCorrectionRequestedTask
+  Task
 } from '@opencrvs/commons'
-import { getRecordById, RecordNotFoundError } from '@workflow/records'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import {
   CorrectionRejectionInput,
   CorrectionRequestInput
 } from '@workflow/records/correction-request'
-import { isTask, sendBundleToHearth } from '@workflow/records/fhir'
+import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import {
   toCorrectionRejected,
@@ -37,6 +37,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
 import { getLoggedInPractitionerResource } from '../user/utils'
+import { uploadBase64ToMinio } from '@workflow/documents'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -55,50 +56,48 @@ export const routes = [
     path: '/records/{recordId}/request-correction',
     allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
     action: 'REQUEST_CORRECTION',
-    handler: async (request: Request): Promise<CorrectionRequestedRecord> => {
+    handler: async (request, record): Promise<CorrectionRequestedRecord> => {
       const correctionDetails = validateRequest(
         CorrectionRequestInput,
         request.payload
       )
+      const token = getToken(request)
 
-      const bundle = await getRecordById(request.params.recordId, [
-        'REGISTERED',
-        'CERTIFIED',
-        'ISSUED'
-      ])
-
-      if (hasActiveCorrectionRequest(bundle)) {
+      if (hasActiveCorrectionRequest(record)) {
         throw conflict(
           'There is already a pending correction request for this record'
         )
       }
-      const practitioner = await getLoggedInPractitionerResource(
-        getToken(request)
+      const practitioner = await getLoggedInPractitionerResource(token)
+
+      const paymentAttachmentUrl =
+        correctionDetails.payment?.attachmentData &&
+        (await uploadBase64ToMinio(
+          correctionDetails.payment.attachmentData,
+          getAuthHeader(request)
+        ))
+
+      const proofOfLegalCorrectionAttachments = await Promise.all(
+        correctionDetails.attachments.map(async (attachment) => ({
+          type: attachment.type,
+          url: await uploadBase64ToMinio(
+            attachment.data,
+            getAuthHeader(request)
+          )
+        }))
       )
 
       const recordInCorrectionRequestedState = await toCorrectionRequested(
-        bundle,
+        record,
         practitioner,
-        correctionDetails
+        correctionDetails,
+        proofOfLegalCorrectionAttachments,
+        paymentAttachmentUrl
       )
 
-      // @todo Only send new task to Hearth so it doesn't change anything else
-      await sendBundleToHearth({
-        ...bundle,
-        entry: [
-          {
-            resource: recordInCorrectionRequestedState.entry
-              .map(({ resource }) => resource)
-              .find(isTask)
-          }
-        ]
-      })
-
-      await createNewAuditEvent(
-        recordInCorrectionRequestedState,
-        getToken(request)
-      )
-      await indexBundle(recordInCorrectionRequestedState, getToken(request))
+      await sendBundleToHearth(recordInCorrectionRequestedState)
+      await createNewAuditEvent(recordInCorrectionRequestedState, token)
+      await indexBundle(recordInCorrectionRequestedState, token)
 
       return recordInCorrectionRequestedState
     }
@@ -109,25 +108,13 @@ export const routes = [
     allowedStartStates: ['CORRECTION_REQUESTED'],
     action: 'REJECT_CORRECTION',
     handler: async (
-      request: Request
+      request,
+      record
     ): Promise<RegisteredRecord | CertifiedRecord | IssuedRecord> => {
       const rejectionDetails = validateRequest(
         CorrectionRejectionInput,
         request.payload
       )
-
-      let record: CorrectionRequestedRecord
-
-      try {
-        record = await getRecordById(request.params.recordId, [
-          'CORRECTION_REQUESTED'
-        ])
-      } catch (error) {
-        if (error instanceof RecordNotFoundError) {
-          throw notFound(error.message)
-        }
-        throw error
-      }
 
       if (!hasActiveCorrectionRequest(record)) {
         throw conflict(

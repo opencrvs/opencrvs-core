@@ -1,12 +1,15 @@
 import {
+  BundleEntry,
   CertifiedRecord,
   changeState,
   CorrectionRequestedRecord,
   Extension,
   IssuedRecord,
+  isUnsavedPaymentReconciliationBundleEntry,
   Practitioner,
   RegisteredRecord,
-  Task
+  Task,
+  Unsaved
 } from '@opencrvs/commons'
 import {
   setupLastRegLocation,
@@ -20,6 +23,9 @@ import {
   CorrectionRequestInput
 } from './correction-request'
 import {
+  createCorrectionEncounter,
+  createCorrectionPaymentResources,
+  createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
   getTaskHistory,
   sortTasksDescending
@@ -28,13 +34,40 @@ import {
 export async function toCorrectionRequested(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
   practitioner: Practitioner,
-  correctionDetails: CorrectionRequestInput
+  correctionDetails: CorrectionRequestInput,
+  proofOfLegalCorrectionAttachments: Array<{ type: string; url: string }>,
+  paymentAttachmentURL?: string
 ): Promise<CorrectionRequestedRecord> {
   const previousTask = getTaskResource(record)
 
+  let correctionPaymentBundleEntries: Unsaved<BundleEntry>[] = []
+
+  if (correctionDetails.payment) {
+    correctionPaymentBundleEntries = createCorrectionPaymentResources(
+      correctionDetails.payment,
+      paymentAttachmentURL
+    )
+  }
+
+  const correctionEncounter = createCorrectionEncounter()
+  const otherDocumentReferences = proofOfLegalCorrectionAttachments.map(
+    (attachment) =>
+      createCorrectionProofOfLegalCorrectionDocument(
+        correctionEncounter.fullUrl,
+        attachment.url,
+        attachment.type
+      )
+  )
+
+  const paymentReconciliation = correctionPaymentBundleEntries.find(
+    isUnsavedPaymentReconciliationBundleEntry
+  )
+
   const correctionRequestTask = createCorrectionRequestTask(
     previousTask,
-    correctionDetails
+    correctionDetails,
+    correctionEncounter,
+    paymentReconciliation
   )
 
   const correctionRequestTaskWithPractitionerExtensions = setupLastRegUser(
@@ -52,6 +85,9 @@ export async function toCorrectionRequested(
       ...record,
       entry: record.entry
         .filter((entry) => entry.resource.id !== previousTask.id)
+        .concat(correctionPaymentBundleEntries)
+        .concat(otherDocumentReferences)
+        .concat(correctionEncounter)
         .concat({ resource: correctionRequestWithLocationExtensions })
     },
     'CORRECTION_REQUESTED'

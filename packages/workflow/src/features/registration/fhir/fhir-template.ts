@@ -16,7 +16,7 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
-import { BundleEntry, Task, TaskWithoutId } from '@opencrvs/commons'
+import { Bundle, BundleEntry, Task, TaskWithoutId } from '@opencrvs/commons'
 
 export const INFORMANT_CODE = 'informant-details'
 
@@ -24,7 +24,7 @@ export function isTask(resource: fhir.Resource | undefined): resource is Task {
   return resource?.resourceType === 'Task'
 }
 
-export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry): Task {
+export function getTaskResource(bundle: Bundle | BundleEntry): Task {
   if (
     !bundle ||
     bundle.type !== 'document' ||

@@ -42,7 +42,7 @@ import {
   InformantNotificationName,
   isInformantSMSNotificationEnabled
 } from './smsNotificationUtils'
-import { Task } from '@opencrvs/commons'
+import { Bundle, Task } from '@opencrvs/commons'
 
 interface INotificationPayload {
   recipient: {
@@ -165,7 +165,7 @@ export async function sendEventNotification(
               INFORMANT_SECTION_CODE
             ),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle),
+              getTaskResource(fhirBundle as Bundle) as fhir.Task,
               EVENT_TYPE[eventType]
             )
           }
@@ -261,7 +261,7 @@ export async function sendEventNotification(
             crvsOffice: await getCRVSOfficeName(fhirBundle),
             name: await getSubjectName(fhirBundle, DECEASED_SECTION_CODE),
             registrationNumber: getRegistrationNumber(
-              getTaskResource(fhirBundle),
+              getTaskResource(fhirBundle as Bundle) as fhir.Task,
               EVENT_TYPE[eventType]
             ),
             informantName: await getInformantName(
@@ -405,7 +405,7 @@ export function getEventType(fhirBundle: fhir.Bundle) {
         firstEntry as fhir.Composition
       ) as EVENT_TYPE
     } else {
-      return getTaskEventType(firstEntry as fhir.Task) as EVENT_TYPE
+      return getTaskEventType(firstEntry as Task) as EVENT_TYPE
     }
   }
   throw new Error('Invalid FHIR bundle found')
@@ -663,7 +663,7 @@ export async function fetchTaskByCompositionIdFromHearth(id: string) {
   const taskBundle: fhir.Bundle = await fetchHearth(
     `/Task?focus=Composition/${id}`
   )
-  return taskBundle.entry?.[0]?.resource as Task
+  return taskBundle.entry?.[0]?.resource as fhir.Task
 }
 
 export function getVoidEvent(event: EVENT_TYPE): Events {

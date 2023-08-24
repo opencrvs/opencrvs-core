@@ -504,17 +504,16 @@ export type ContactPointInput = {
 }
 
 export type CorrectionInput = {
-  attestedAndCopied?: InputMaybe<Scalars['Boolean']>
-  data?: InputMaybe<Scalars['String']>
-  hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
-  location?: InputMaybe<LocationInput>
-  noSupportingDocumentationRequired?: InputMaybe<Scalars['Boolean']>
-  note?: InputMaybe<Scalars['String']>
-  otherReason?: InputMaybe<Scalars['String']>
-  payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
-  reason?: InputMaybe<Scalars['String']>
-  requester?: InputMaybe<Scalars['ID']>
-  values?: InputMaybe<Array<InputMaybe<CorrectionValueInput>>>
+  attachments: Array<AttachmentInput>
+  hasShowedVerifiedDocument: Scalars['Boolean']
+  location: LocationInput
+  noSupportingDocumentationRequired: Scalars['Boolean']
+  note: Scalars['String']
+  otherReason: Scalars['String']
+  payment?: InputMaybe<CorrectionPaymentInput>
+  reason: Scalars['String']
+  requester: Scalars['String']
+  values: Array<CorrectionValueInput>
 }
 
 export type CorrectionMetric = {
@@ -523,11 +522,23 @@ export type CorrectionMetric = {
   total: Scalars['Float']
 }
 
+export type CorrectionPaymentInput = {
+  amount: Scalars['Float']
+  attachmentData?: InputMaybe<Scalars['String']>
+  date: Scalars['Date']
+  outcome: PaymentOutcomeType
+  type: PaymentType
+}
+
+export type CorrectionRejectionInput = {
+  reason: Scalars['String']
+}
+
 export type CorrectionValueInput = {
-  fieldName?: InputMaybe<Scalars['String']>
-  newValue?: InputMaybe<Scalars['String']>
-  oldValue?: InputMaybe<Scalars['String']>
-  section?: InputMaybe<Scalars['String']>
+  fieldName: Scalars['String']
+  newValue: Scalars['String']
+  oldValue: Scalars['String']
+  section: Scalars['String']
 }
 
 export type CountryLogo = {
@@ -779,14 +790,18 @@ export type History = {
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  documents: Array<Attachment>
   duplicateOf?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   ipAddress?: Maybe<Scalars['String']>
   location?: Maybe<Location>
+  noSupportingDocumentationRequired?: Maybe<Scalars['Boolean']>
+  note?: Maybe<Scalars['String']>
   office?: Maybe<Location>
   otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  payment?: Maybe<Payment>
   potentialDuplicates?: Maybe<Array<Scalars['String']>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
@@ -1039,7 +1054,6 @@ export type MonthWiseEstimationMetric = {
 export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
-  approveBirthRegistrationCorrection: Scalars['ID']
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
@@ -1049,7 +1063,9 @@ export type Mutation = {
   createBirthRegistration: CreatedIds
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
+  createDeathRegistrationCorrection: Scalars['ID']
   createMarriageRegistration: CreatedIds
+  createMarriageRegistrationCorrection: Scalars['ID']
   createNotification: Notification
   createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
   createOrUpdateUser: User
@@ -1078,7 +1094,7 @@ export type Mutation = {
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
-  rejectBirthRegistrationCorrection: Scalars['ID']
+  rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
@@ -1097,11 +1113,6 @@ export type MutationActivateUserArgs = {
   password: Scalars['String']
   securityQNAs: Array<InputMaybe<SecurityQuestionAnswer>>
   userId: Scalars['String']
-}
-
-export type MutationApproveBirthRegistrationCorrectionArgs = {
-  details: BirthRegistrationInput
-  id: Scalars['ID']
 }
 
 export type MutationAuditUserArgs = {
@@ -1153,8 +1164,18 @@ export type MutationCreateDeathRegistrationArgs = {
   details: DeathRegistrationInput
 }
 
+export type MutationCreateDeathRegistrationCorrectionArgs = {
+  details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
 export type MutationCreateMarriageRegistrationArgs = {
   details: MarriageRegistrationInput
+}
+
+export type MutationCreateMarriageRegistrationCorrectionArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationCreateNotificationArgs = {
@@ -1291,8 +1312,8 @@ export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
 }
 
-export type MutationRejectBirthRegistrationCorrectionArgs = {
-  details: BirthRegistrationInput
+export type MutationRejectRegistrationCorrectionArgs = {
+  details: CorrectionRejectionInput
   id: Scalars['ID']
 }
 
@@ -1420,12 +1441,11 @@ export type OperationHistorySearchSet = {
 
 export type Payment = {
   __typename?: 'Payment'
-  amount?: Maybe<Scalars['Float']>
-  date?: Maybe<Scalars['Date']>
-  outcome?: Maybe<PaymentOutcomeType>
-  paymentId?: Maybe<Scalars['ID']>
-  total?: Maybe<Scalars['Float']>
-  type?: Maybe<PaymentType>
+  amount: Scalars['Float']
+  attachmentURL?: Maybe<Scalars['String']>
+  date: Scalars['Date']
+  outcome: PaymentOutcomeType
+  type: PaymentType
 }
 
 export type PaymentInput = {

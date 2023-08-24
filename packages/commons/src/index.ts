@@ -12,3 +12,5 @@
 export * from './token-verifier'
 export * from './fhir'
 export * from './record'
+export * from './uuid'
+export * from './auth'
