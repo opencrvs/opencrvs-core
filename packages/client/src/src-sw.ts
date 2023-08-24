@@ -11,14 +11,16 @@
  */
 import {
   PrecacheEntry,
+  cleanupOutdatedCaches,
   createHandlerBoundToURL,
   precacheAndRoute
 } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { Queue } from 'workbox-background-sync'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
-import { RouteHandler, skipWaiting } from 'workbox-core'
+import { clientsClaim } from 'workbox-core'
 
+declare let self: ServiceWorkerGlobalScope
 interface OnSyncCallbackOptions {
   queue: Queue
 }
@@ -74,21 +76,21 @@ self.addEventListener('message', async (event) => {
     return
   }
 
-  switch (event.data) {
-    case 'skipWaiting':
-      // About caches variable: https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/delete
-      caches
-        .keys()
-        .then((cs) => cs.forEach((c) => caches.delete(c)))
-        .then(() => skipWaiting())
-      break
-    default:
-      break
-  }
+  // if (event.data && event.data === 'SKIP_WAITING') {
+  //   console.log('skioiiiiiiip')
+
+  //   self.skipWaiting()
+  // }
 })
+
+self.skipWaiting()
+clientsClaim()
 
 /* eslint-disable-next-line no-restricted-globals */
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
+
+// clean old assets
+cleanupOutdatedCaches()
 
 /*
  * As the config file can change after the app is built, we cannot precache it
@@ -113,6 +115,7 @@ registerRoute(/https(.+)minio\.(.+)\/ocrvs\/+/, new CacheFirst())
  */
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
+    // allowlist: [/^\/$/],
     denylist: [/^\/__.*$/]
   })
 )

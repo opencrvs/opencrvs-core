@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "baseUrl": "src",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,9 +17,6 @@
     "jsx": "react",
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "typings"
-  ],
+  "include": ["src", "typings"],
   "extends": "./tsconfig.paths.json"
 }

@@ -45,6 +45,7 @@ export default defineConfig(({ mode }) => {
 
   const VitePWAPlugin = () => {
     return VitePWA({
+      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
@@ -56,7 +57,7 @@ export default defineConfig(({ mode }) => {
       srcDir: 'src/',
       filename: 'src-sw.ts',
       devOptions: {
-        enabled: false,
+        enabled: true,
         type: 'module',
         navigateFallback: 'index.html'
       }
