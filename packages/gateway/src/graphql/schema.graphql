@@ -1273,8 +1273,6 @@ input RegistrationInput {
   witnessTwoSignature: String
   informantType: String
   otherInformantType: String
-  contact: String
-  contactRelationship: String
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflowInput]

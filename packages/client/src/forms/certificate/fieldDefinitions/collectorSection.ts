@@ -98,6 +98,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
             familyNameField: 'familyNameEng'
           }
         },
+        birthDateField: 'informantBirthDate',
         nationalityField: 'nationality'
       }
     },
@@ -112,6 +113,7 @@ export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCerti
             familyNameField: 'familyNameEng'
           }
         },
+        birthDateField: 'informantBirthDate',
         nationalityField: 'nationality'
       }
     },
