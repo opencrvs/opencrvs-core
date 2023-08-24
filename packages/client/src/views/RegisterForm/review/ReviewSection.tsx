@@ -166,11 +166,11 @@ const ErrorField = styled.p`
   margin-bottom: 0;
 `
 
-const Row = styled.div`
+const Row = styled.div<{ position?: 'left' | 'center' }>`
   display: flex;
   gap: 24px;
   width: 100%;
-  justify-content: center;
+  justify-content: ${({ position }) => position || 'center'};
   background-color: ${({ theme }) => theme.colors.background};
   flex-direction: row;
   padding: 24px;
@@ -238,8 +238,8 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const ReviewContainter = styled.div<{ paddingY?: boolean }>`
-  padding: ${({ paddingY }) => (paddingY ? '32px' : '0px 32px')};
+const ReviewContainter = styled.div<{ paddingT?: boolean }>`
+  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px 24px;
   }
@@ -1822,7 +1822,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   id="correction_header"
                   subject={'Correction request'}
                 />
-                <ReviewContainter paddingY={true}>
+                <ReviewContainter paddingT={true}>
                   <ListViewSimplified
                     id={'correction_information'}
                     bottomBorder={false}
@@ -1918,19 +1918,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     ]}
                   />
                 </ReviewContainter>
-                <ReviewAction
-                  completeDeclaration={isComplete}
-                  totalFileSizeExceeded={totalFileSizeExceeded}
-                  declarationToBeValidated={this.userHasValidateScope()}
-                  declarationToBeRegistered={this.userHasRegisterScope()}
-                  alreadyRejectedDeclaration={
-                    this.props.draft.registrationStatus === REJECTED
-                  }
-                  draftDeclaration={draft}
-                  declaration={declaration}
-                  submitDeclarationAction={submitClickEvent}
-                  rejectDeclarationAction={rejectDeclarationClickEvent}
-                />
+                <Row position="left">
+                  <Button
+                    type="positive"
+                    size="large"
+                    id="ApproveCorrectionBtn"
+                  >
+                    <Icon name="Check" />
+                    {intl.formatMessage(buttonMessages.approve)}
+                  </Button>
+                  <Button type="negative" size="large" id="rejectCorrectionBtn">
+                    <Icon name="X" />
+                    {intl.formatMessage(buttonMessages.reject)}
+                  </Button>
+                </Row>
               </Card>
             )}
             <Card>
