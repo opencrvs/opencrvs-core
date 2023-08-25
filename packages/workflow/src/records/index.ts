@@ -1,7 +1,6 @@
 import {
   Bundle,
   BundleEntry,
-  Composition,
   StateIdenfitiers,
   isComposition,
   isRelatedPerson
@@ -78,6 +77,63 @@ function checkForUnresolvedReferences(bundle: Bundle) {
   }
 }
 
+const COLLECTIONS_TO_AUTOMATICALLY_JOIN = [
+  'DocumentReference',
+  'Encounter',
+  'Location',
+  'Observation',
+  'Patient',
+  'PaymentReconciliation',
+  'Practitioner',
+  'PractitionerRole',
+  'RelatedPerson',
+  'Task'
+]
+
+/*
+ * Reads the array of UUIDs in "localField" and tries to join all collections one by one
+ */
+
+function autoJoinAllCollections(localField: string) {
+  return COLLECTIONS_TO_AUTOMATICALLY_JOIN.map((collection) => [
+    {
+      $lookup: {
+        from: collection,
+        localField,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    }
+  ])
+}
+
+function filterByType(resourceType: fhir3.FhirResource['resourceType']) {
+  return {
+    $filter: {
+      input: '$bundle',
+      as: 'item',
+      cond: { $eq: ['$$item.resourceType', resourceType] }
+    }
+  }
+}
+
+function flattenArray(nestedQuery: Record<string, any>) {
+  return {
+    $reduce: {
+      input: nestedQuery,
+      initialValue: [],
+      in: {
+        $concatArrays: ['$$value', '$$this']
+      }
+    }
+  }
+}
+
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
   allowedStates: T
@@ -86,22 +142,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 
   const db = connectedClient.db()
 
-  const composition = await db
-    .collection('Composition')
-    .findOne<Composition>({ id: recordId })
-
-  if (!composition) {
-    throw new RecordNotFoundError('Cannot find composition with id ' + recordId)
-  }
-
-  const referenceSections = composition
-    .section!.filter((section) => section.entry && section.entry.length > 0)
-    .map((section) => ({
-      sectionId: section.code!.coding![0].code,
-      referencingCollection: section.entry![0].reference!.split('/')[0]
-    }))
-
-  const query = [
+  const query: Array<Record<string, any>> = [
     {
       $match: {
         id: recordId
@@ -114,80 +155,56 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       }
     },
     { $unwind: '$composition' },
+    /*
+     * Reads all references from Composition.section end makes a list "extensionReferences" of all UUIDs found
+     */
     {
       $addFields: {
         bundle: ['$composition'],
-        extensions: {
-          $arrayToObject: {
-            $map: {
-              input: '$composition.section',
-              as: 'el',
-              in: [
-                {
-                  $let: {
-                    vars: {
-                      firstElement: {
-                        $arrayElemAt: ['$$el.code.coding', 0]
-                      }
-                    },
-                    in: '$$firstElement.code'
-                  }
+        extensionReferences: flattenArray({
+          $map: {
+            input: '$composition.section',
+            as: 'el',
+            in: {
+              $let: {
+                vars: {
+                  firstElement: { $arrayElemAt: ['$$el.entry', 0] }
                 },
-                {
-                  $let: {
-                    vars: {
-                      firstElement: { $arrayElemAt: ['$$el.entry', 0] }
-                    },
+                in: {
+                  $map: {
+                    input: '$$el.entry',
+                    as: 'entry',
                     in: {
-                      $map: {
-                        input: '$$el.entry',
-                        as: 'entry',
-                        in: {
-                          $let: {
-                            vars: {
-                              collectionName: {
-                                $arrayElemAt: [
-                                  { $split: ['$$entry.reference', '/'] },
-                                  0
-                                ]
-                              },
-                              id: {
-                                $arrayElemAt: [
-                                  { $split: ['$$entry.reference', '/'] },
-                                  1
-                                ]
-                              }
-                            },
-                            in: '$$id'
+                      $let: {
+                        vars: {
+                          collectionName: {
+                            $arrayElemAt: [
+                              { $split: ['$$entry.reference', '/'] },
+                              0
+                            ]
+                          },
+                          id: {
+                            $arrayElemAt: [
+                              { $split: ['$$entry.reference', '/'] },
+                              1
+                            ]
                           }
-                        }
+                        },
+                        in: '$$id'
                       }
                     }
                   }
                 }
-              ]
+              }
             }
           }
-        }
+        })
       }
     },
-
-    ...referenceSections.map((section) => [
-      {
-        $lookup: {
-          from: section.referencingCollection,
-          localField: `extensions.${section.sectionId}`,
-          foreignField: 'id',
-          as: 'joinResult'
-        }
-      },
-      {
-        $addFields: {
-          bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-        }
-      }
-    ]),
-    // Add task to bundle
+    ...autoJoinAllCollections('extensionReferences'),
+    /*
+     * Next, find all tasks that reference the composition
+     */
     {
       $addFields: {
         compositionIdForJoining: {
@@ -210,15 +227,12 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     },
     {
       $addFields: {
+        /*
+         * Creates a list "relatedPerson" of all patient references inside RelatedPerson
+         */
         relatedPersonPatientIds: {
           $map: {
-            input: {
-              $filter: {
-                input: '$bundle',
-                as: 'item',
-                cond: { $eq: ['$$item.resourceType', 'RelatedPerson'] }
-              }
-            },
+            input: filterByType('RelatedPerson'),
             as: 'relatedPerson',
             in: {
               $arrayElemAt: [
@@ -228,15 +242,12 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
             }
           }
         },
+        /*
+         * Creates a list "encounterIds" of all encounters. This is later on used for finding all Observations
+         */
         encounterIds: {
           $map: {
-            input: {
-              $filter: {
-                input: '$bundle',
-                as: 'item',
-                cond: { $eq: ['$$item.resourceType', 'Encounter'] }
-              }
-            },
+            input: filterByType('Encounter'),
             as: 'encounter',
             in: { $concat: ['Encounter/', '$$encounter.id'] }
           }
@@ -244,119 +255,82 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         /*
          * Creates a list of all references inside Task.extensions
          */
-        taskNoteAuthorIds: {
-          $reduce: {
-            input: {
-              $map: {
-                input: {
-                  $filter: {
-                    input: '$bundle',
-                    as: 'item',
-                    cond: { $eq: ['$$item.resourceType', 'Task'] }
-                  }
-                },
-                as: 'task',
-                in: {
-                  $map: {
-                    input: {
-                      $filter: {
-                        input: '$$task.note',
-                        as: 'note',
-                        cond: { $ne: ['$$note.authorString', undefined] }
-                      }
-                    },
-                    as: 'note',
-                    in: {
-                      $arrayElemAt: [
-                        {
-                          $split: ['$$note.authorString', '/']
-                        },
-                        1
-                      ]
-                    }
-                  }
-                }
-              }
-            },
-            initialValue: [],
+        taskReferenceIds: flattenArray({
+          $map: {
+            input: filterByType('Task'),
+            as: 'task',
             in: {
-              $concatArrays: ['$$value', '$$this']
-            }
-          }
-        },
-
-        taskReferenceIds: {
-          $reduce: {
-            input: {
               $map: {
                 input: {
                   $filter: {
-                    input: '$bundle',
-                    as: 'item',
-                    cond: { $eq: ['$$item.resourceType', 'Task'] }
-                  }
-                },
-                as: 'task',
-                in: {
-                  $map: {
-                    input: {
-                      $filter: {
-                        input: '$$task.extension',
-                        as: 'extension',
-                        cond: { $ne: ['$$extension.valueReference', undefined] }
-                      }
-                    },
+                    input: '$$task.extension',
                     as: 'extension',
-                    in: {
-                      $arrayElemAt: [
-                        {
-                          $split: ['$$extension.valueReference.reference', '/']
-                        },
-                        1
-                      ]
-                    }
+                    cond: { $ne: ['$$extension.valueReference', undefined] }
                   }
+                },
+                as: 'extension',
+                in: {
+                  $arrayElemAt: [
+                    {
+                      $split: ['$$extension.valueReference.reference', '/']
+                    },
+                    1
+                  ]
                 }
               }
-            },
-            initialValue: [],
-            in: {
-              $concatArrays: ['$$value', '$$this']
             }
           }
-        },
-        encounterLocationIds: {
-          $reduce: {
-            input: {
+        }),
+        /*
+         * Creates a list of all authors inside Task.note
+         */
+        taskNoteAuthorIds: flattenArray({
+          $map: {
+            input: filterByType('Task'),
+            as: 'task',
+            in: {
               $map: {
                 input: {
                   $filter: {
-                    input: '$bundle',
-                    as: 'item',
-                    cond: { $eq: ['$$item.resourceType', 'Encounter'] }
+                    input: '$$task.note',
+                    as: 'note',
+                    cond: { $ne: ['$$note.authorString', undefined] }
                   }
                 },
-                as: 'encounter',
+                as: 'note',
                 in: {
-                  $map: {
-                    input: '$$encounter.location',
-                    as: 'location',
-                    in: {
-                      $arrayElemAt: [
-                        { $split: ['$$location.location.reference', '/'] },
-                        1
-                      ]
-                    }
-                  }
+                  $arrayElemAt: [
+                    {
+                      $split: ['$$note.authorString', '/']
+                    },
+                    1
+                  ]
                 }
               }
-            },
-            initialValue: [],
-            in: {
-              $concatArrays: ['$$value', '$$this']
             }
           }
-        }
+        }),
+        /*
+         * Creates a list of all location ids inside Encounter.location
+         */
+        encounterLocationIds: flattenArray({
+          $map: {
+            input: filterByType('Encounter'),
+            as: 'encounter',
+            in: {
+              $map: {
+                input: '$$encounter.location',
+                as: 'location',
+                in: {
+                  $arrayElemAt: [
+                    { $split: ['$$location.location.reference', '/'] },
+                    1
+                  ]
+                }
+              }
+            }
+          }
+        })
       }
     },
     // Get task note Practitioner references
