@@ -147,6 +147,7 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { addSchemaLevelResolveFunction } from 'graphql-tools'
+import { ReviewSectionCorrection } from './ReviewSectionCorrection'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -166,12 +167,18 @@ const ErrorField = styled.p`
   margin-bottom: 0;
 `
 
-const Row = styled.div<{ position?: 'left' | 'center' }>`
+const Row = styled.div<{
+  position?: 'left' | 'center'
+  background?: 'white' | 'background'
+}>`
   display: flex;
   gap: 24px;
   width: 100%;
   justify-content: ${({ position }) => position || 'center'};
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme, background }) =>
+    !background || background === 'background'
+      ? theme.colors.background
+      : theme.colors.white};
   flex-direction: row;
   padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -1815,125 +1822,133 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <Wrapper>
         <Row>
           <LeftColumn>
-            {declaration.registrationStatus ===
-              SUBMISSION_STATUS.CORRECTION_REQUESTED && (
-              <Card>
-                <ReviewHeader
-                  id="correction_header"
-                  subject={'Correction request'}
-                />
-                <ReviewContainter paddingT={true}>
-                  <ListViewSimplified
-                    id={'correction_information'}
-                    bottomBorder={false}
-                  >
-                    <ListViewItemSimplified
-                      label={<Label>Submitter</Label>}
-                      value={<Value>Riku Rouvival</Value>}
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Office</Label>}
-                      value={<Value>Bhurungamari Union Parishad</Value>}
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Requested on</Label>}
-                      value={<Value>10 October 2018</Value>}
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Requested by</Label>}
-                      value={<Value>Court</Value>}
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Reason</Label>}
-                      value={
-                        <Value>
-                          Requested to do so by the court (judicial order)
-                        </Value>
-                      }
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Support documents</Label>}
-                      value={
-                        <Value>
-                          AffadVait <br /> Court order
-                        </Value>
-                      }
-                    />
-                    <ListViewItemSimplified
-                      label={<Label>Comments</Label>}
-                      value={
-                        <Value>
-                          This is my example comment. Hello world. Welcome to
-                          the wonderfull
-                        </Value>
-                      }
-                    />
-                  </ListViewSimplified>
-                  <Divider />
-                  <Table
-                    columns={[
-                      {
-                        label: 'Item',
-                        width: 33,
-                        key: 'item'
-                      },
-                      {
-                        label: 'Original',
-                        width: 33,
-                        key: 'original'
-                      },
-                      {
-                        label: 'Correction',
-                        width: 33,
-                        key: 'correction'
-                      }
-                    ]}
-                    content={[
-                      {
-                        item: 'Place of delivery',
-                        original: (
-                          <>
-                            Hospital <br /> Pembury hospital
-                          </>
-                        ),
-                        correction: (
-                          <>
-                            Permanent address of mother
-                            <br />
-                            Line 1
-                            <br />
-                            Line 2
-                            <br />
-                            Line 3
-                            <br />
-                            Line 4
-                          </>
-                        )
-                      },
-                      {
-                        item: 'Date of birth',
-                        original: '03 November 1988',
-                        correction: '04 November 1988'
-                      }
-                    ]}
+            <ReviewSectionCorrection declaration={declaration}>
+              {({ toggleRejectModal, toggleApproveModal }) => (
+                <Card>
+                  <ReviewHeader
+                    id="correction_header"
+                    subject={'Correction request'}
                   />
-                </ReviewContainter>
-                <Row position="left">
-                  <Button
-                    type="positive"
-                    size="large"
-                    id="ApproveCorrectionBtn"
-                  >
-                    <Icon name="Check" />
-                    {intl.formatMessage(buttonMessages.approve)}
-                  </Button>
-                  <Button type="negative" size="large" id="rejectCorrectionBtn">
-                    <Icon name="X" />
-                    {intl.formatMessage(buttonMessages.reject)}
-                  </Button>
-                </Row>
-              </Card>
-            )}
+                  <ReviewContainter paddingT={true}>
+                    <ListViewSimplified
+                      id={'correction_information'}
+                      bottomBorder={false}
+                    >
+                      <ListViewItemSimplified
+                        label={<Label>Submitter</Label>}
+                        value={<Value>Riku Rouvival</Value>}
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Office</Label>}
+                        value={<Value>Bhurungamari Union Parishad</Value>}
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Requested on</Label>}
+                        value={<Value>10 October 2018</Value>}
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Requested by</Label>}
+                        value={<Value>Court</Value>}
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Reason</Label>}
+                        value={
+                          <Value>
+                            Requested to do so by the court (judicial order)
+                          </Value>
+                        }
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Support documents</Label>}
+                        value={
+                          <Value>
+                            AffadVait <br /> Court order
+                          </Value>
+                        }
+                      />
+                      <ListViewItemSimplified
+                        label={<Label>Comments</Label>}
+                        value={
+                          <Value>
+                            This is my example comment. Hello world. Welcome to
+                            the wonderfull
+                          </Value>
+                        }
+                      />
+                    </ListViewSimplified>
+                    <Divider />
+                    <Table
+                      columns={[
+                        {
+                          label: 'Item',
+                          width: 33,
+                          key: 'item'
+                        },
+                        {
+                          label: 'Original',
+                          width: 33,
+                          key: 'original'
+                        },
+                        {
+                          label: 'Correction',
+                          width: 33,
+                          key: 'correction'
+                        }
+                      ]}
+                      content={[
+                        {
+                          item: 'Place of delivery',
+                          original: (
+                            <>
+                              Hospital <br /> Pembury hospital
+                            </>
+                          ),
+                          correction: (
+                            <>
+                              Permanent address of mother
+                              <br />
+                              Line 1
+                              <br />
+                              Line 2
+                              <br />
+                              Line 3
+                              <br />
+                              Line 4
+                            </>
+                          )
+                        },
+                        {
+                          item: 'Date of birth',
+                          original: '03 November 1988',
+                          correction: '04 November 1988'
+                        }
+                      ]}
+                    />
+                  </ReviewContainter>
+                  <Row position="left" background="white">
+                    <Button
+                      type="positive"
+                      size="large"
+                      id="ApproveCorrectionBtn"
+                      onClick={toggleApproveModal}
+                    >
+                      <Icon name="Check" />
+                      {intl.formatMessage(buttonMessages.approve)}
+                    </Button>
+                    <Button
+                      type="negative"
+                      size="large"
+                      id="rejectCorrectionBtn"
+                      onClick={toggleRejectModal}
+                    >
+                      <Icon name="X" />
+                      {intl.formatMessage(buttonMessages.reject)}
+                    </Button>
+                  </Row>
+                </Card>
+              )}
+            </ReviewSectionCorrection>
+
             <Card>
               {!isCorrection(declaration) && isDuplicate && (
                 <DuplicateForm declaration={declaration} />

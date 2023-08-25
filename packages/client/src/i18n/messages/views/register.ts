@@ -27,6 +27,10 @@ interface IRegisterMessages
   exitWithoutSavingModalForCorrectionRecordDescription: MessageDescriptor
   exitWithoutSavingDeclarationConfirmModalTitle: MessageDescriptor
   exitWithoutSavingDeclarationConfirmModalDescription: MessageDescriptor
+  saveCorrectionConfirmModalTitle: MessageDescriptor
+  saveCorrectionConfirmModalDescription: MessageDescriptor
+  saveCorrectionRejectModalTitle: MessageDescriptor
+  saveCorrectionRejectModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {
@@ -109,6 +113,28 @@ const messagesToDefine: IRegisterMessages = {
       'You have unsaved changes on your declaration form. Are you sure you want to exit without saving?',
     description:
       'Description for exit declaration without saving confirmation modal'
+  },
+  saveCorrectionConfirmModalTitle: {
+    id: 'register.form.modal.title.saveCorrectionConfirm',
+    defaultMessage: 'Approve correction?',
+    description: 'Title for save correction confirmation modal'
+  },
+  saveCorrectionConfirmModalDescription: {
+    id: 'register.form.modal.desc.saveCorrectionConfirm',
+    defaultMessage:
+      'The declarant will be notified of this correction and a record of this decision will be recorded',
+    description: 'Description for save correction confirmation modal'
+  },
+  saveCorrectionRejectModalTitle: {
+    id: 'register.form.modal.title.saveCorrectionReject',
+    defaultMessage: 'Reject correction?',
+    description: 'Title for reject correction modal'
+  },
+  saveCorrectionRejectModalDescription: {
+    id: 'register.form.modal.desc.saveCorrectionReject',
+    defaultMessage:
+      'The declarant will be notified of this decision and a record of this decision will be recorded',
+    description: 'Description for reject correction modal'
   }
 }
 
