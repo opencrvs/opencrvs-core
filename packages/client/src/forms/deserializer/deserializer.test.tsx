@@ -66,7 +66,7 @@ describe('Form deserializer', () => {
       forms: { birth }
     } = forms
 
-    birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
+    birth.sections[2].groups[0].fields[0].mapping!.mutation!.operation =
       'non_existing_123' as any
 
     expect(() => deserializeForm(birth, validators)).toThrow()

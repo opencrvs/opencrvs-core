@@ -145,7 +145,7 @@ describe('when user is previewing the form data', () => {
         await goToEndOfForm(app)
       })
 
-      it('check whether submit button is enabled or not', async () => {
+      it('check whether submit button is enabled or not', () => {
         expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
           false
         )
