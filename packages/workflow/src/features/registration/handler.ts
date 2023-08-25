@@ -42,7 +42,8 @@ import {
   sendEventNotification,
   sendRegisteredNotification,
   isEventNonNotifiable,
-  hasTaskRegLastOffice
+  hasTaskRegLastOffice,
+  getEventType
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -231,15 +232,19 @@ export async function createRegistrationHandler(
       logger.info('createRegistrationHandler could not send event notification')
       return { resBundle, payloadForInvokingValidation: payload }
     }
-    logger.info('createRegistrationHandler sending event notification')
-    sendEventNotification(
-      payload,
-      event,
-      { sms, email },
-      {
-        Authorization: request.headers.authorization
-      }
-    )
+    const eventType = getEventType(payload)
+    // informant is not identified for death, marriage
+    if (eventType === EVENT_TYPE.BIRTH) {
+      logger.info('createRegistrationHandler sending event notification')
+      sendEventNotification(
+        payload,
+        event,
+        { sms, email },
+        {
+          Authorization: request.headers.authorization
+        }
+      )
+    }
     return { resBundle, payloadForInvokingValidation: payload }
   } catch (error) {
     logger.error(
@@ -352,7 +357,7 @@ export async function markEventAsRegisteredCallbackHandler(
     }
     await sendBundleToHearth(bundle)
     //TODO: We have to configure sms and identify informant for marriage event
-    if (event !== EVENT_TYPE.MARRIAGE) {
+    if (event === EVENT_TYPE.BIRTH) {
       const sms = getPhoneNo(task, event)
       const email = getEmailAddress(task, event)
       const informantName = await getInformantName(bundle, INFORMANT_CODE)
