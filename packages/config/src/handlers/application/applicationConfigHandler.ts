@@ -120,7 +120,9 @@ export async function getLoginConfigHandler(
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
     'PHONE_NUMBER_PATTERN',
-    'LOGIN_BACKGROUND'
+    'LOGIN_BACKGROUND',
+    'USER_NOTIFICATION_DELIVERY_METHOD',
+    'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
   ])
   return { config: refineConfigResponse }
 }

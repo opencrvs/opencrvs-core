@@ -13,7 +13,7 @@
 import styled from 'styled-components'
 
 export const Heading3 = styled.div`
-  ${({ theme }) => theme.fonts.h2};
+  ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
   margin-top: 24px;
 `

@@ -138,7 +138,6 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'familyNameEng',
     'gender',
     'childBirthDate',
-    'placeOfBirthTitle',
     'placeOfBirth',
     'birthLocation',
     ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
