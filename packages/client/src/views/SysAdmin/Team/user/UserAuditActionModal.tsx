@@ -189,7 +189,11 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'active') {
     actions.push(
-      <DangerButton id="deactivate-action" onClick={handleConfirm}>
+      <DangerButton
+        id="deactivate-action"
+        onClick={handleConfirm}
+        disabled={Boolean(formError)}
+      >
         {intl.formatMessage(buttonMessages.deactivate)}
       </DangerButton>
     )
@@ -202,7 +206,11 @@ function UserAuditActionModalComponent(
 
   if (user && user.status === 'deactivated') {
     actions.push(
-      <SuccessButton id="reactivate-action" onClick={handleConfirm}>
+      <SuccessButton
+        id="reactivate-action"
+        onClick={handleConfirm}
+        disabled={Boolean(formError)}
+      >
         {intl.formatMessage(buttonMessages.reactivate)}
       </SuccessButton>
     )
