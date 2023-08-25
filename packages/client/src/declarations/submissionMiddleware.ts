@@ -47,10 +47,7 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  GQLCorrectionInput,
-  MutationToRequestRegistrationCorrectionArgs
-} from '@opencrvs/gateway/src/graphql/schema'
+import { MutationToRequestRegistrationCorrectionArgs } from '@opencrvs/gateway/src/graphql/schema'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction

@@ -4,6 +4,7 @@ import {
   changeState,
   CorrectionRequestedRecord,
   Extension,
+  getTaskFromBundle,
   IssuedRecord,
   isUnsavedPaymentReconciliationBundleEntry,
   Practitioner,
@@ -15,7 +16,7 @@ import {
   setupLastRegLocation,
   setupLastRegUser
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 import {
@@ -38,7 +39,7 @@ export async function toCorrectionRequested(
   proofOfLegalCorrectionAttachments: Array<{ type: string; url: string }>,
   paymentAttachmentURL?: string
 ): Promise<CorrectionRequestedRecord> {
-  const previousTask = getTaskResource(record)
+  const previousTask = getTaskFromBundle(record)
 
   let correctionPaymentBundleEntries: Unsaved<BundleEntry>[] = []
 
@@ -99,7 +100,7 @@ export async function toCorrectionRejected(
   practitioner: Practitioner,
   rejectionDetails: CorrectionRejectionInput
 ): Promise<RegisteredRecord | CertifiedRecord | IssuedRecord> {
-  const currentCorrectionRequestedTask = getTaskResource(record)
+  const currentCorrectionRequestedTask = getTaskFromBundle(record)
 
   const correctionRejectionTask: Task = {
     ...currentCorrectionRequestedTask,

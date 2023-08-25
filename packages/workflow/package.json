@@ -36,7 +36,8 @@
     "short-uid": "^0.1.0",
     "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2",
-    "zod": "^3.17.3"
+    "zod": "^3.17.3",
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
     "@types/fhir": "0.0.37",

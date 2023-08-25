@@ -90,3 +90,12 @@ export function isUnsavedPaymentReconciliationBundleEntry(
     isPaymentReconciliation(entry.resource)
   )
 }
+
+export function getTaskFromBundle(bundle: Bundle): Task {
+  const task = bundle.entry.map(({ resource }) => resource).find(isTask)
+
+  if (!task) {
+    throw new Error('No task found in bundle')
+  }
+  return task
+}

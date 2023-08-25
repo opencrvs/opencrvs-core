@@ -10,6 +10,7 @@ import { HEARTH_MONGO_URL } from '@workflow/constants'
 import { MongoClient } from 'mongodb'
 
 import { findFromBundleById } from './fhir'
+import { sortBy, uniqBy } from 'lodash'
 
 const client = new MongoClient(HEARTH_MONGO_URL)
 
@@ -243,6 +244,47 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
         /*
          * Creates a list of all references inside Task.extensions
          */
+        taskNoteAuthorIds: {
+          $reduce: {
+            input: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$bundle',
+                    as: 'item',
+                    cond: { $eq: ['$$item.resourceType', 'Task'] }
+                  }
+                },
+                as: 'task',
+                in: {
+                  $map: {
+                    input: {
+                      $filter: {
+                        input: '$$task.note',
+                        as: 'note',
+                        cond: { $ne: ['$$note.authorString', undefined] }
+                      }
+                    },
+                    as: 'note',
+                    in: {
+                      $arrayElemAt: [
+                        {
+                          $split: ['$$note.authorString', '/']
+                        },
+                        1
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            initialValue: [],
+            in: {
+              $concatArrays: ['$$value', '$$this']
+            }
+          }
+        },
+
         taskReferenceIds: {
           $reduce: {
             input: {
@@ -315,6 +357,20 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
             }
           }
         }
+      }
+    },
+    // Get task note Practitioner references
+    {
+      $lookup: {
+        from: 'Practitioner',
+        localField: `taskNoteAuthorIds`,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
       }
     },
     // Get Task extension references
@@ -433,10 +489,22 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     }
   }
 
-  const allEntries = result[0].entry!
+  const allEntries = uniqBy(result[0].entry!, ({ resource }) => resource.id)
+
+  /*
+   * Many places in the code assumes that the composition is the first entry in the bundle.
+   */
+
+  const entriesInBackwardsCompatibleOrder = sortBy(allEntries, (entry) => {
+    if (isComposition(entry.resource)) {
+      return 0
+    }
+    return 1
+  })
+
   const bundleWithFullURLReferences = resolveReferenceFullUrls(
     bundle,
-    allEntries
+    entriesInBackwardsCompatibleOrder
   )
 
   const record = {

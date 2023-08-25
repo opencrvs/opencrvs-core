@@ -211,6 +211,18 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       history {
+        documents {
+          id
+          data
+          type
+        }
+        payment {
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
         hasShowedVerifiedDocument

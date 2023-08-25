@@ -20,6 +20,15 @@ export const CREATE_BIRTH_REG_CORRECTION = gql`
   }
 `
 
+export const CREATE_DEATH_REG_CORRECTION = gql`
+  mutation createDeathRegistrationCorrection(
+    $id: ID!
+    $details: DeathRegistrationInput!
+  ) {
+    createDeathRegistrationCorrection(id: $id, details: $details)
+  }
+`
+
 export const REQUEST_REG_CORRECTION = gql`
   mutation requestRegistrationCorrection($id: ID!, $details: CorrectionInput!) {
     requestRegistrationCorrection(id: $id, details: $details)

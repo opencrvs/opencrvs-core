@@ -179,6 +179,18 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        documents {
+          id
+          data
+          type
+        }
+        payment {
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
         hasShowedVerifiedDocument
