@@ -33,6 +33,7 @@ import * as queries from './register/mappings/query'
 import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
+import * as labels from '@client/forms/certificate/fieldDefinitions/label'
 import {
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER,
@@ -175,19 +176,19 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
 export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
-    labelMapper: Operation<MessageDescriptor>
+    labelMapper: Operation<typeof labels>
   }
   helperText?: {
     dependency: string
-    helperTextMapper: Operation<MessageDescriptor>
+    helperTextMapper: Operation<typeof labels>
   }
   tooltip?: {
     dependency: string
-    tooltipMapper: Operation<MessageDescriptor>
+    tooltipMapper: Operation<typeof labels>
   }
   unit?: {
     dependency: string
-    unitMapper: Operation<MessageDescriptor>
+    unitMapper: Operation<typeof labels>
   }
   type?:
     | IStaticFieldType

@@ -1010,6 +1010,8 @@ export const mockBirthRegistrationSectionData = {
 export const mockDeathRegistrationSectionData = {
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
+  type: 'death',
+  commentsOrNotes: '',
   regStatus: {
     type: 'REGISTERED',
     officeName: 'MokhtarPur',
