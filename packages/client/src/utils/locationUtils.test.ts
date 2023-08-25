@@ -169,8 +169,8 @@ describe('locationUtil tests', () => {
 
       const map = getLocationNameMapOfFacility(facilityLocation, locations)
       expect(map).toEqual({
-        DISTRICT: 'Abwe',
-        STATE: 'Central',
+        district: 'Abwe',
+        state: 'Central',
         country: {
           defaultMessage: 'Bangladesh',
           description: 'ISO Country: BGD',

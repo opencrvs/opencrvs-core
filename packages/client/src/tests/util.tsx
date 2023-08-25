@@ -232,7 +232,7 @@ export const eventAddressData = {
   internationalAddressLine1: '',
   internationalAddressLine2: '',
   internationalAddressLine3: '',
-  internationalPostcode: ''
+  internationalPostalCode: ''
 }
 
 export const primaryAddressData = {
@@ -245,7 +245,7 @@ export const primaryAddressData = {
   addressLine3UrbanOptionPrimary: '',
   addressLine2UrbanOptionPrimary: '',
   numberUrbanOptionPrimary: '',
-  postcodePrimary: '',
+  postalCodePrimary: '',
   addressLine5Primary: 'my village'
 }
 
@@ -259,7 +259,7 @@ export const secondaryAddressData = {
   addressLine3UrbanOptionSecondary: 'my secondary res area',
   addressLine2UrbanOptionSecondary: 'my secondary street',
   numberUrbanOptionSecondary: 12,
-  postcodeSecondary: 'my secondary postcode',
+  postalCodeSecondary: 'my secondary postcode',
   addressLine5Secondary: ''
 }
 
@@ -270,7 +270,7 @@ export const primaryInternationalAddressLines = {
   internationalAddressLine1Primary: '',
   internationalAddressLine2Primary: '',
   internationalAddressLine3Primary: '',
-  internationalPostcodePrimary: ''
+  internationalPostalCodePrimary: ''
 }
 
 export const secondaryInternationalAddressLines = {
@@ -280,7 +280,7 @@ export const secondaryInternationalAddressLines = {
   internationalAddressLine1Secondary: '',
   internationalAddressLine2Secondary: '',
   internationalAddressLine3Secondary: '',
-  internationalPostcodeSecondary: ''
+  internationalPostalCodeSecondary: ''
 }
 
 export const userDetails: UserDetails = {
@@ -680,6 +680,21 @@ export const mockRegistrarUserResponse = {
   }
 }
 
+export function appendStringToKeys(
+  obj: Record<string, any>,
+  appendString: string
+): Record<string, any> {
+  const newObj: Record<string, any> = {}
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      newObj[key + appendString] = obj[key]
+    }
+  }
+
+  return newObj
+}
+
 export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
@@ -709,10 +724,10 @@ export const mockDeclarationData = {
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
     exactDateOfBirthUnknown: false,
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Mother'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Mother'),
+    ...appendStringToKeys(secondaryAddressData, 'Mother'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Mother')
   },
   father: {
     detailsExist: true,
@@ -728,10 +743,10 @@ export const mockDeclarationData = {
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines,
+    ...appendStringToKeys(primaryAddressData, 'Father'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Father'),
+    ...appendStringToKeys(secondaryAddressData, 'Father'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Father'),
     primaryAddressSameAsOtherPrimary: true
   },
   registration: {
@@ -777,10 +792,10 @@ export const mockDeathDeclarationData = {
     maritalStatus: 'MARRIED',
     birthDate: '1987-02-16',
     exactDateOfBirthUnknown: false,
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Deceased'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Deceased'),
+    ...appendStringToKeys(secondaryAddressData, 'Deceased'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Deceased')
   },
   informant: {
     informantIdType: 'NATIONAL_ID',
@@ -793,10 +808,10 @@ export const mockDeathDeclarationData = {
     nationality: 'BGD',
     informantBirthDate: '',
     relationship: 'MOTHER',
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Informant'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Informant'),
+    ...appendStringToKeys(secondaryAddressData, 'Informant'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Informant')
   },
   father: {
     fatherFirstNames: 'মোক্তার',
@@ -820,7 +835,7 @@ export const mockDeathDeclarationData = {
     manner: 'ACCIDENT',
     placeOfDeath: 'OTHER',
     deathLocation: '',
-    ...eventAddressData
+    ...appendStringToKeys(eventAddressData, 'Placeofdeath')
   },
   causeOfDeath: {
     causeOfDeathEstablished: false,
@@ -910,23 +925,8 @@ export const mockMarriageDeclarationData = {
     firstNamesEng: 'Sadman',
     familyNameEng: 'Anik',
     marriedLastNameEng: 'Groom Last Name',
-    countryPrimary: 'FAR',
-    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrbanPrimary: 'URBAN',
-    cityUrbanOptionPrimary: '',
-    addressLine3UrbanOptionPrimary: '',
-    addressLine2UrbanOptionPrimary: '',
-    numberUrbanOptionPrimary: '',
-    postcodePrimary: '',
-    addressLine5Primary: '',
-    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    internationalCityPrimary: '',
-    internationalAddressLine1Primary: '',
-    internationalAddressLine2Primary: '',
-    internationalAddressLine3Primary: '',
-    internationalPostcodePrimary: '',
+    ...appendStringToKeys(primaryAddressData, 'Groom'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Groom'),
     _fhirID: '89113c35-1310-4d8f-9352-0269a04a1c4a'
   },
   bride: {
@@ -937,39 +937,14 @@ export const mockMarriageDeclarationData = {
     firstNamesEng: 'Kaitlin',
     familyNameEng: 'Samo',
     marriedLastNameEng: 'Bride Last Name',
-    countryPrimary: 'FAR',
-    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrbanPrimary: 'URBAN',
-    cityUrbanOptionPrimary: '',
-    addressLine3UrbanOptionPrimary: '',
-    addressLine2UrbanOptionPrimary: '',
-    numberUrbanOptionPrimary: '',
-    postcodePrimary: '',
-    addressLine5Primary: '',
-    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    internationalCityPrimary: '',
-    internationalAddressLine1Primary: '',
-    internationalAddressLine2Primary: '',
-    internationalAddressLine3Primary: '',
-    internationalPostcodePrimary: '',
+    ...appendStringToKeys(primaryAddressData, 'Bride'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Bride'),
     _fhirID: '09a68a88-921f-4eaf-8424-7d9d43e5804c'
   },
   marriageEvent: {
     marriageDate: '2020-12-12',
     typeOfMarriage: 'MONOGAMY',
-    country: 'FAR',
-    state: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    district: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrban: 'URBAN',
-    addressLine3UrbanOption: '',
-    addressLine2UrbanOption: '',
-    numberUrbanOption: '',
-    addressLine5: '',
-    internationalAddressLine1: '',
-    internationalAddressLine2: '',
-    internationalAddressLine3: ''
+    ...appendStringToKeys(eventAddressData, 'Placeofmarriage')
   },
   witnessOne: {
     firstNamesEng: 'Sadman',
