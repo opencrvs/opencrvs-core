@@ -1187,11 +1187,12 @@ export interface GQLAttachmentInput {
 }
 
 export interface GQLCorrectionPaymentInput {
+  _fhirID?: string
+  attachmentData?: string
   type: GQLPaymentType
   amount: number
   outcome: GQLPaymentOutcomeType
   date: GQLDate
-  attachmentData?: string
 }
 
 export interface GQLCorrectionValueInput {
@@ -1462,6 +1463,7 @@ export interface GQLInputOutput {
 }
 
 export interface GQLPayment {
+  id: string
   type: GQLPaymentType
   amount: number
   outcome: GQLPaymentOutcomeType
@@ -9379,11 +9381,21 @@ export interface InputOutputToValueStringResolver<
 }
 
 export interface GQLPaymentTypeResolver<TParent = any> {
+  id?: PaymentToIdResolver<TParent>
   type?: PaymentToTypeResolver<TParent>
   amount?: PaymentToAmountResolver<TParent>
   outcome?: PaymentToOutcomeResolver<TParent>
   date?: PaymentToDateResolver<TParent>
   attachmentURL?: PaymentToAttachmentURLResolver<TParent>
+}
+
+export interface PaymentToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface PaymentToTypeResolver<TParent = any, TResult = any> {

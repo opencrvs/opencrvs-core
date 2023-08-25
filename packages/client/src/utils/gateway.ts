@@ -523,6 +523,7 @@ export type CorrectionMetric = {
 }
 
 export type CorrectionPaymentInput = {
+  _fhirID?: InputMaybe<Scalars['ID']>
   amount: Scalars['Float']
   attachmentData?: InputMaybe<Scalars['String']>
   date: Scalars['Date']
@@ -1444,6 +1445,7 @@ export type Payment = {
   amount: Scalars['Float']
   attachmentURL?: Maybe<Scalars['String']>
   date: Scalars['Date']
+  id: Scalars['ID']
   outcome: PaymentOutcomeType
   type: PaymentType
 }

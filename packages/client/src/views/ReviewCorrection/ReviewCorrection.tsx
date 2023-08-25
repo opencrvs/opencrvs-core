@@ -27,13 +27,19 @@ import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { CorrectionInput, Event, History } from '@client/utils/gateway'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { IStoreState } from '@client/store'
 
 import { merge } from 'lodash'
-import { IDeclaration } from '@client/declarations'
+import {
+  IDeclaration,
+  SUBMISSION_STATUS,
+  modifyDeclaration,
+  writeDeclaration
+} from '@client/declarations'
+import { SubmissionAction } from '@client/forms'
 
 type URLParams = { declarationId: string }
 
@@ -67,7 +73,9 @@ function applyCorrectionToData(record: IDeclaration) {
   )
 
   const correction: CorrectionInput = {
-    attachments: correctionRequestTask.documents,
+    attachments: correctionRequestTask.documents.map((document) => ({
+      _fhirID: document._fhirID
+    })),
     hasShowedVerifiedDocument: correctionRequestTask.hasShowedVerifiedDocument!,
     noSupportingDocumentationRequired:
       correctionRequestTask.noSupportingDocumentationRequired!,
@@ -76,7 +84,13 @@ function applyCorrectionToData(record: IDeclaration) {
     },
     note: '', //correctionRequestTask.note!,
     otherReason: correctionRequestTask.otherReason!,
-    payment: correctionRequestTask.payment!,
+    payment: correctionRequestTask.payment && {
+      _fhirID: correctionRequestTask.payment.id,
+      type: correctionRequestTask.payment.type,
+      amount: correctionRequestTask.payment.amount,
+      outcome: correctionRequestTask.payment.outcome,
+      date: correctionRequestTask.payment.date
+    },
     reason: correctionRequestTask.reason!,
     requester: correctionRequestTask.requester!,
     values: correctionRequestTask.input.map((input) => ({
@@ -91,6 +105,8 @@ function applyCorrectionToData(record: IDeclaration) {
 
   return {
     ...record,
+    submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+    action: SubmissionAction.MAKE_CORRECTION,
     data: {
       ...declarationData,
       registration: {
@@ -107,6 +123,8 @@ export function ReviewCorrection() {
 
   const location = useLocation()
   const history = useHistory()
+
+  const dispatch = useDispatch()
 
   const registerForm = useSelector((state: IStoreState) =>
     getEventReviewForm(state, Event.Birth)
@@ -127,11 +145,17 @@ export function ReviewCorrection() {
   }
 
   const recordWithProposedChanges = applyCorrectionToData(record)
-  console.log(record)
 
   return (
     <>
-      <button>test</button>
+      <button
+        onClick={() => {
+          dispatch(modifyDeclaration(recordWithProposedChanges))
+          dispatch(writeDeclaration(recordWithProposedChanges))
+        }}
+      >
+        test
+      </button>
       <RegisterForm
         match={{
           ...match,

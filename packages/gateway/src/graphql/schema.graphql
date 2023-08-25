@@ -1295,11 +1295,12 @@ input AttachmentInput {
 }
 
 input CorrectionPaymentInput {
+  _fhirID: ID
+  attachmentData: String
   type: PaymentType!
   amount: Float!
   outcome: PaymentOutcomeType!
   date: Date!
-  attachmentData: String
 }
 
 input CorrectionValueInput {
@@ -1570,6 +1571,7 @@ type InputOutput {
 }
 
 type Payment {
+  id: ID!
   type: PaymentType!
   amount: Float!
   outcome: PaymentOutcomeType!
