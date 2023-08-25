@@ -182,6 +182,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         documents {
           id
           data
+          uri
           type
         }
         payment {
@@ -194,6 +195,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherReason
         requester
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus

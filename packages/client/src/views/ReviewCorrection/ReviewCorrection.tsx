@@ -28,24 +28,34 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { useSelector } from 'react-redux'
-import { Event, History } from '@client/utils/gateway'
+import { CorrectionInput, Event, History } from '@client/utils/gateway'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { IStoreState } from '@client/store'
 
 import { merge } from 'lodash'
-import { updateDeclarationRegistrationWithCorrection } from '../CorrectionForm/utils'
+import { IDeclaration } from '@client/declarations'
 
 type URLParams = { declarationId: string }
 
-function applyCorrectionToData(record: any) {
-  if (!record.data.history) {
-    // Should never happen
-    return record
+function applyCorrectionToData(record: IDeclaration) {
+  const history = record.data.history as unknown as History[]
+  if (!history) {
+    throw new Error('No history found from declaration. Should never happen')
   }
 
-  const correctionRequestTask = record.data.history.find(
+  const correctionRequestTask = history.find(
     (task: History) => task.action === 'REQUESTED_CORRECTION'
   )
+
+  if (!correctionRequestTask) {
+    throw new Error('No correction request task found. Should never happen')
+  }
+
+  if (!correctionRequestTask.input) {
+    throw new Error(
+      'Correction request task did not have an input field. Should never happen'
+    )
+  }
 
   const proposedChangesPatch = correctionRequestTask.input.reduce(
     (acc: Record<string, Record<string, string>>, curr: any) => {
@@ -56,23 +66,36 @@ function applyCorrectionToData(record: any) {
     {}
   )
 
-  const declarationData = merge(record.data, proposedChangesPatch)
+  const correction: CorrectionInput = {
+    attachments: correctionRequestTask.documents,
+    hasShowedVerifiedDocument: correctionRequestTask.hasShowedVerifiedDocument!,
+    noSupportingDocumentationRequired:
+      correctionRequestTask.noSupportingDocumentationRequired!,
+    location: {
+      _fhirID: correctionRequestTask.location!._fhirID
+    },
+    note: '', //correctionRequestTask.note!,
+    otherReason: correctionRequestTask.otherReason!,
+    payment: correctionRequestTask.payment!,
+    reason: correctionRequestTask.reason!,
+    requester: correctionRequestTask.requester!,
+    values: correctionRequestTask.input.map((input) => ({
+      fieldName: input!.valueId,
+      newValue: input!.valueString,
+      section: input!.valueCode,
+      oldValue: (record.data[input!.valueCode][input!.valueId] as string) || ''
+    }))
+  }
+
+  const declarationData = merge({}, record.data, proposedChangesPatch)
+
   return {
     ...record,
     data: {
       ...declarationData,
       registration: {
         ...declarationData.registration,
-        correction: updateDeclarationRegistrationWithCorrection({
-          corrector: {
-            relationship: correctionRequestTask.requester,
-            hasShowedVerifiedDocument:
-              correctionRequestTask.hasShowedVerifiedDocument
-          },
-          reason: {
-            type: correctionRequestTask.reason
-          }
-        })
+        correction: correction
       }
     }
   }

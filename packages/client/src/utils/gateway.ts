@@ -855,9 +855,9 @@ export enum ImageFit {
 
 export type InputOutput = {
   __typename?: 'InputOutput'
-  valueCode?: Maybe<Scalars['String']>
-  valueId?: Maybe<Scalars['String']>
-  valueString?: Maybe<Scalars['String']>
+  valueCode: Scalars['String']
+  valueId: Scalars['String']
+  valueString: Scalars['String']
 }
 
 export type IntegratedSystem = {
@@ -2391,6 +2391,16 @@ export type CreateBirthRegistrationCorrectionMutation = {
   createBirthRegistrationCorrection: string
 }
 
+export type CreateDeathRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type CreateDeathRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  createDeathRegistrationCorrection: string
+}
+
 export type RequestRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: CorrectionInput
@@ -3563,6 +3573,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       __typename?: 'History'
       otherReason?: string | null
       requester?: string | null
+      noSupportingDocumentationRequired?: boolean | null
       hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null
@@ -3576,6 +3587,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'Attachment'
         id: string
         data?: string | null
+        uri?: string | null
         type?: string | null
       }>
       payment?: {
@@ -3650,15 +3662,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -3966,15 +3978,15 @@ export type FetchBirthRegistrationForCertificateQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -4298,6 +4310,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherReason?: string | null
       requester?: string | null
       hasShowedVerifiedDocument?: boolean | null
+      noSupportingDocumentationRequired?: boolean | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
@@ -4306,6 +4319,21 @@ export type FetchDeathRegistrationForReviewQuery = {
       reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
+      documents: Array<{
+        __typename?: 'Attachment'
+        id: string
+        data?: string | null
+        uri?: string | null
+        type?: string | null
+      }>
+      payment?: {
+        __typename?: 'Payment'
+        type: PaymentType
+        amount: number
+        outcome: PaymentOutcomeType
+        date: any
+        attachmentURL?: string | null
+      } | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4370,15 +4398,15 @@ export type FetchDeathRegistrationForReviewQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -4669,15 +4697,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -5039,11 +5067,27 @@ export type FetchMarriageRegistrationForReviewQuery = {
       otherReason?: string | null
       requester?: string | null
       hasShowedVerifiedDocument?: boolean | null
+      noSupportingDocumentationRequired?: boolean | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
+      documents: Array<{
+        __typename?: 'Attachment'
+        id: string
+        data?: string | null
+        uri?: string | null
+        type?: string | null
+      }>
+      payment?: {
+        __typename?: 'Payment'
+        type: PaymentType
+        amount: number
+        outcome: PaymentOutcomeType
+        date: any
+        attachmentURL?: string | null
+      } | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -5103,15 +5147,15 @@ export type FetchMarriageRegistrationForReviewQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -5440,15 +5484,15 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       } | null> | null
       input?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       output?: Array<{
         __typename?: 'InputOutput'
-        valueCode?: string | null
-        valueId?: string | null
-        valueString?: string | null
+        valueCode: string
+        valueId: string
+        valueString: string
       } | null> | null
       certificates?: Array<{
         __typename?: 'Certificate'
@@ -8637,15 +8681,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null> | null
           input?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           output?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           certificates?: Array<{
             __typename?: 'Certificate'
@@ -8920,15 +8964,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null> | null
           input?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           output?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           certificates?: Array<{
             __typename?: 'Certificate'
@@ -9232,15 +9276,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null> | null
           input?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           output?: Array<{
             __typename?: 'InputOutput'
-            valueCode?: string | null
-            valueId?: string | null
-            valueString?: string | null
+            valueCode: string
+            valueId: string
+            valueString: string
           } | null> | null
           certificates?: Array<{
             __typename?: 'Certificate'

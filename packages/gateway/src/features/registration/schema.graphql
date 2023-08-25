@@ -136,9 +136,9 @@ type DuplicatesInfo {
 }
 
 type InputOutput {
-  valueCode: String
-  valueId: String
-  valueString: String
+  valueCode: String!
+  valueId: String!
+  valueString: String!
 }
 
 type IntegratedSystem {

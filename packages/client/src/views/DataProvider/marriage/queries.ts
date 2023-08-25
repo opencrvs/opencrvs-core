@@ -214,6 +214,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         documents {
           id
           data
+          uri
           type
         }
         payment {
@@ -226,6 +227,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         otherReason
         requester
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus

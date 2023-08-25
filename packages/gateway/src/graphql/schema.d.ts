@@ -1456,9 +1456,9 @@ export interface GQLComment {
 }
 
 export interface GQLInputOutput {
-  valueCode?: string
-  valueId?: string
-  valueString?: string
+  valueCode: string
+  valueId: string
+  valueString: string
 }
 
 export interface GQLPayment {

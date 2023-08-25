@@ -202,6 +202,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         otherReason
         requester
+        noSupportingDocumentationRequired
         hasShowedVerifiedDocument
         date
         action
@@ -211,6 +212,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         documents {
           id
           data
+          uri
           type
         }
         payment {

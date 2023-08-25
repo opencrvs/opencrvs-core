@@ -1564,9 +1564,9 @@ type Comment {
 }
 
 type InputOutput {
-  valueCode: String
-  valueId: String
-  valueString: String
+  valueCode: String!
+  valueId: String!
+  valueString: String!
 }
 
 type Payment {
