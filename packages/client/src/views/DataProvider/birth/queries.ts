@@ -208,6 +208,18 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         regStatus
         dhis2Notification
         ipAddress
+        documents {
+          id
+          data
+          type
+        }
+        payment {
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         statusReason {
           text
         }

@@ -1927,10 +1927,8 @@ export type RegistrationInput = {
   book?: InputMaybe<Scalars['String']>
   brideSignature?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
-  contact?: InputMaybe<Scalars['String']>
   contactEmail?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
-  contactRelationship?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
   draftId?: InputMaybe<Scalars['String']>
   groomSignature?: InputMaybe<Scalars['String']>
@@ -3574,6 +3572,20 @@ export type FetchBirthRegistrationForReviewQuery = {
       reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
+      documents: Array<{
+        __typename?: 'Attachment'
+        id: string
+        data?: string | null
+        type?: string | null
+      }>
+      payment?: {
+        __typename?: 'Payment'
+        type: PaymentType
+        amount: number
+        outcome: PaymentOutcomeType
+        date: any
+        attachmentURL?: string | null
+      } | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null

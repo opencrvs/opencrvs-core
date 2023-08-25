@@ -17076,18 +17076,6 @@
             "deprecationReason": null
           },
           {
-            "name": "contact",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "contactEmail",
             "description": null,
             "type": {
@@ -17101,18 +17089,6 @@
           },
           {
             "name": "contactPhoneNumber",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "contactRelationship",
             "description": null,
             "type": {
               "kind": "SCALAR",
