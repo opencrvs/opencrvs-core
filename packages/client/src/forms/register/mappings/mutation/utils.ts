@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { GQLRelatedPerson } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRelatedPersonInput } from '@opencrvs/gateway/src/graphql/schema'
 import { ICertificate, IFileValue, TransformedData } from '@client/forms'
 import { omit } from 'lodash'
 
@@ -26,7 +26,7 @@ export function transformCertificateData(
   ]
   // for collector mapping
   if (certificateData && certificateData.collector) {
-    let collector: GQLRelatedPerson = {}
+    let collector: GQLRelatedPersonInput = {}
     if (certificateData.collector.type) {
       collector.relationship = certificateData.collector.type as string
     }
@@ -52,7 +52,6 @@ export function transformCertificateData(
     if (certificateData.collector.affidavitFile) {
       collector.affidavit = [
         {
-          id: '123456789',
           contentType: (certificateData.collector.affidavitFile as IFileValue)
             .type,
           data: (certificateData.collector.affidavitFile as IFileValue).data

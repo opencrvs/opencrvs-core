@@ -49,7 +49,6 @@ describe('Birth registration mutation mapping related tests', () => {
           ],
           affidavit: [
             {
-              id: '123456789',
               contentType: 'abc',
               data: 'BASE64 data'
             }
