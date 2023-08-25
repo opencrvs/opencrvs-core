@@ -128,7 +128,7 @@ class Component extends React.Component<
           </Toast>
         )}
         {configurationError && (
-          <Toast type="error" id="formValidationErrorNotification">
+          <Toast type="warning" id="formValidationErrorNotification">
             {configurationError}
           </Toast>
         )}
