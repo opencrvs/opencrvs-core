@@ -2433,6 +2433,14 @@ export const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       taskResource.id = fieldValue as string
     },
+    contact: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantShareContact(taskResource, fieldValue)
+    },
     informantsSignature: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2549,8 +2557,9 @@ export const builders: IFieldBuilders = {
       fieldValue: string,
       context: any
     ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      createInformantShareContact(taskResource, fieldValue)
+      // contact has seperate field, thus commented
+      // const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      // createInformantShareContact(taskResource, fieldValue)
 
       const relatedPersonResource = selectOrCreateInformantSection(
         INFORMANT_CODE,
