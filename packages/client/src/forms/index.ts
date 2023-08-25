@@ -27,15 +27,18 @@ import { IOfflineData } from '@client/offline/reducer'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import * as labels from './mappings/label'
-import * as mutations from './mappings/mutation'
-import * as graphQLQueries from './mappings/queries'
-import * as queries from './mappings/query'
-import * as responseTransformers from './mappings/response-transformers'
-import * as types from './mappings/type'
+import * as mutations from './register/mappings/mutation'
+import * as graphQLQueries from './register/legacy'
+import * as queries from './register/mappings/query'
+import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
-import { AnyFn } from './mappings/deserializer'
+import * as labels from '@client/forms/certificate/fieldDefinitions/label'
+import {
+  BIRTH_REGISTRATION_NUMBER,
+  DEATH_REGISTRATION_NUMBER,
+  NATIONAL_ID
+} from '@client/utils/constants'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -157,6 +160,19 @@ export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
 
+export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+  switch (key) {
+    case NATIONAL_ID:
+      return BIG_NUMBER
+    case BIRTH_REGISTRATION_NUMBER:
+      return BIG_NUMBER
+    case DEATH_REGISTRATION_NUMBER:
+      return BIG_NUMBER
+    default:
+      return TEXT
+  }
+}
+
 export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
@@ -179,7 +195,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
     | {
         kind: 'dynamic'
         dependency: string
-        typeMapper: Operation<typeof types>
+        typeMapper: Operation<typeof identityTypeMapper>
       }
   validator?: Array<{
     dependencies: string[]
@@ -844,7 +860,7 @@ export type IMutationDescriptor =
   | MutationDefaultOperation
 
 export type X = FunctionParamsToDescriptor<
-  Params<typeof mutations['birthEventLocationMutationTransformer']>,
+  Params<typeof mutations['eventLocationMutationTransformer']>,
   IMutationDescriptor
 >
 

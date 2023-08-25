@@ -30,7 +30,7 @@ import {
 import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
-import { sectionTransformer } from '@client/forms/mappings/query'
+import { sectionTransformer } from '@client/forms/register/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   EventRegistration,

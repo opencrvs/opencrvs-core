@@ -31,7 +31,7 @@ import {
   NUMBER
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { countries } from '@client/forms/countries'
+import { countries } from '@client/utils/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'

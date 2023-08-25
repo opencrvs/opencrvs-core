@@ -97,40 +97,39 @@ const REQUIRED_EVENT_ADDRESS_FIELDS = [
   'state',
   'district',
   'ruralOrUrban',
-  'cityUrbanOption',
+  'city',
   'addressLine3UrbanOption',
   'addressLine2UrbanOption',
-  'numberUrbanOption',
+  'addressLine1UrbanOption',
   'postalCode',
-  'addressLine5',
+  'addressLine1RuralOption',
   'internationalState',
   'internationalDistrict',
   'internationalCity',
   'internationalAddressLine1',
   'internationalAddressLine2',
   'internationalAddressLine3',
-  'internationalPostcode'
+  'internationalPostalCode'
 ]
 
 const REQUIRED_PRIMARY_ADDRESS_FIELDS = [
-  'primaryAddress',
   'countryPrimary',
   'statePrimary',
   'districtPrimary',
   'ruralOrUrbanPrimary',
-  'cityUrbanOptionPrimary',
+  'cityPrimary',
   'addressLine3UrbanOptionPrimary',
   'addressLine2UrbanOptionPrimary',
-  'numberUrbanOptionPrimary',
-  'postcodePrimary',
-  'addressLine5Primary',
+  'addressLine1UrbanOptionPrimary',
+  'postalCodePrimary',
+  'addressLine1RuralOptionPrimary',
   'internationalStatePrimary',
   'internationalDistrictPrimary',
   'internationalCityPrimary',
   'internationalAddressLine1Primary',
   'internationalAddressLine2Primary',
   'internationalAddressLine3Primary',
-  'internationalPostcodePrimary'
+  'internationalPostalCodePrimary'
 ]
 
 const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
@@ -142,7 +141,7 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'placeOfBirthTitle',
     'placeOfBirth',
     'birthLocation',
-    ...REQUIRED_EVENT_ADDRESS_FIELDS
+    ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
   ],
   mother: [
     'firstNamesEng',
@@ -151,7 +150,7 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'reasonNotApplying',
     'motherBirthDate',
     'nationality',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
     'firstNamesEng',
@@ -161,7 +160,7 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'fatherBirthDate',
     'nationality',
     'primaryAddressSameAsOtherPrimary',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Father`)
   ],
   deceased: [
     'firstNamesEng',
@@ -169,33 +168,33 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'gender',
     'deceasedBirthDate',
     'nationality',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Deceased`)
   ],
   deathEvent: [
     'deathDate',
     'placeOfDeathTitle',
     'placeOfDeath',
     'deathLocation',
-    ...REQUIRED_EVENT_ADDRESS_FIELDS
+    ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofdeath`)
   ],
   marriageEvent: [
     'marriageDate',
     'placeOfMarriageTitle',
-    ...REQUIRED_EVENT_ADDRESS_FIELDS
+    ...REQUIRED_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofmarriage`)
   ],
   groom: [
     'firstNamesEng',
     'familyNameEng',
     'groomBirthDate',
     'nationality',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Groom`)
   ],
   bride: [
     'firstNamesEng',
     'familyNameEng',
     'brideBirthDate',
     'nationality',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Bride`)
   ],
   informant: [
     'informantType',
@@ -204,7 +203,7 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'familyNameEng',
     'informantBirthDate',
     'nationality',
-    ...REQUIRED_PRIMARY_ADDRESS_FIELDS
+    ...REQUIRED_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Informant`)
   ],
   witnessOne: [
     'firstNamesEng',
@@ -223,6 +222,7 @@ const REQUIRED_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
 const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   child: ['attendantAtBirth', 'birthType', 'weightAtBirth'],
   mother: [
+    'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
@@ -233,6 +233,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'educationalAttainment'
   ],
   father: [
+    'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
@@ -242,6 +243,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'educationalAttainment'
   ],
   deceased: [
+    'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'deceasedID',
@@ -255,18 +257,21 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   ],
   marriageEvent: ['typeOfMarriage'],
   groom: [
+    'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
     'marriedLastNameEng'
   ],
   bride: [
+    'primaryAddress',
     'exactDateOfBirthUnknown',
     'ageOfIndividualInYears',
     'iD',
     'marriedLastNameEng'
   ],
   informant: [
+    'primaryAddress',
     'registrationPhone',
     'registrationEmail',
     'exactDateOfBirthUnknown',
@@ -380,20 +385,25 @@ const form = z.object({
       }
     )
     .refine(
-      (sections) => {
+      (sections) =>
         findDuplicates(
           sections
             .flatMap((sec) => [
-              ...(sec.mapping?.template ?? []).map(
-                ({ fieldName }) => fieldName
-              ),
+              ...(sec.mapping?.template ?? []).map(({ fieldName }) => {
+                // Log the following to observe all available handlebars
+                // console.log('section handlebar: ', fieldName)
+                return fieldName
+              }),
               ...sec.groups
                 .flatMap((group) => group.fields)
-                .map(({ mapping }) => mapping?.template?.fieldName)
+                .map(({ mapping }) => {
+                  // Log the following to observe all available handlebars
+                  // console.log('field handlebar: ', mapping?.template?.fieldName)
+                  return mapping?.template?.fieldName
+                })
             ])
             .filter((maybeName): maybeName is string => Boolean(maybeName))
-        ).length === 0
-      },
+        ).length === 0,
       (sections) => {
         const duplicateCertificateHandlebars = findDuplicates(
           sections
