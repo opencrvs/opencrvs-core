@@ -2081,7 +2081,7 @@ export const relatedPersonMock = JSON.stringify({
   patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
 })
 
-export function wrapInBundle(...resources: [fhir.Resource | string]): string {
+export function wrapInBundle(...resources: [fhir3.Resource | string]): string {
   return JSON.stringify({
     resourceType: 'Bundle',
     type: 'document',
@@ -2133,7 +2133,7 @@ const drnIdentifier = {
     ]
   },
   value: '2022DSNEYUG'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 const nidIdentifier = {
   value: '654654666',
@@ -2145,7 +2145,7 @@ const nidIdentifier = {
       }
     ]
   }
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 const brnIdentifier = {
   type: {
@@ -2157,7 +2157,7 @@ const brnIdentifier = {
     ]
   },
   value: '2022BSNEYUG'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 const mosipPsutTokenIdentifier = {
   type: {
@@ -2169,7 +2169,7 @@ const mosipPsutTokenIdentifier = {
     ]
   },
   value: '257803821990055124230310596669133515'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 const birthPatientIdentifier = {
   type: {
@@ -2181,7 +2181,7 @@ const birthPatientIdentifier = {
     ]
   },
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 export const mosipDeceasedPatientMock = {
   resourceType: 'Patient',

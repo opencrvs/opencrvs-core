@@ -31,6 +31,9 @@ export type Composition = CompositionWithoutId & { id: string }
 
 export type PaymentReconciliation = Saved<fhir3.PaymentReconciliation>
 export type DocumentReference = Saved<fhir3.DocumentReference>
+export type Patient = Saved<fhir3.Patient>
+export type RelatedPerson = Saved<fhir3.RelatedPerson>
+export type Location = Saved<fhir3.Location>
 
 export type Resource = fhir3.Resource
 

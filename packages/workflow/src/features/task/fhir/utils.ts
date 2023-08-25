@@ -43,7 +43,7 @@ export function getTaskEventType(task: Task) {
 }
 
 export function filterTaskExtensions(
-  extensions: fhir.Extension[],
+  extensions: fhir3.Extension[],
   urls: string[],
   status: RegStatus | undefined
 ) {

@@ -63,7 +63,13 @@ import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
 } from '@workflow/features/events/utils'
-import { Bundle, BundleEntry, Task } from '@opencrvs/commons'
+import {
+  Bundle,
+  BundleEntry,
+  Composition,
+  Patient,
+  Task
+} from '@opencrvs/commons'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -290,9 +296,7 @@ export async function markEventAsRegisteredCallbackHandler(
   if (!task.focus || !task.focus.reference) {
     throw new Error(`Task ${task.id} doesn't have a focus reference`)
   }
-  const composition: fhir3.Composition = await getFromFhir(
-    `/${task.focus.reference}`
-  )
+  const composition: Composition = await getFromFhir(`/${task.focus.reference}`)
   const event = getTaskEventType(task) as EVENT_TYPE
 
   try {
@@ -306,7 +310,7 @@ export async function markEventAsRegisteredCallbackHandler(
     /** pushing registrationNumber on related person's identifier
      *  taking patients as an array because MARRIAGE Event has two types of patient
      */
-    const patients: fhir3.Patient[] = await updatePatientIdentifierWithRN(
+    const patients: Patient[] = await updatePatientIdentifierWithRN(
       composition,
       SECTION_CODE[event],
       REG_NUMBER_SYSTEM[event],

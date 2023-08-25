@@ -62,13 +62,15 @@ import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/cons
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   Bundle,
+  Composition,
+  Patient,
   Practitioner,
   Task,
-  isCorrectionRequestedTask
+  isCorrectionRequestedTask,
+  isTask
 } from '@opencrvs/commons'
 import {
   getTaskHistory,
-  isTask,
   sendBundleToHearth,
   sortTasksDescending
 } from '@workflow/records/fhir'
@@ -703,11 +705,11 @@ export async function checkForDuplicateStatusUpdate(taskResource: Task) {
 }
 
 export async function updatePatientIdentifierWithRN(
-  composition: fhir3.Composition,
+  composition: Composition,
   sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<fhir3.Patient[]> {
+): Promise<Patient[]> {
   return await Promise.all(
     sectionCodes.map(async (sectionCode) => {
       const section = getSectionEntryBySectionCode(composition, sectionCode)
@@ -753,9 +755,9 @@ const statuses = {
 }
 
 export async function validateDeceasedDetails(
-  patient: fhir3.Patient,
+  patient: Patient,
   authHeader: { Authorization: string }
-): Promise<fhir3.Patient> {
+): Promise<Patient> {
   /*
     In OCRVS-1637 https://github.com/opencrvs/opencrvs-core/pull/964 we attempted to create a longitudinal
     record of life events by an attempt to use an existing person in gateway if an identifier is supplied that we already
@@ -824,7 +826,10 @@ export async function validateDeceasedDetails(
               birthPatientBundle
             )}`
           )
-          let birthPatient: Partial<fhir3.Patient> = {}
+          let birthPatient: Partial<fhir3.Patient> &
+            Pick<fhir3.Patient, 'resourceType'> = {
+            resourceType: 'Patient'
+          }
           if (
             birthPatientBundle &&
             birthPatientBundle.entry &&
@@ -848,7 +853,11 @@ export async function validateDeceasedDetails(
             })
           }
           logger.info(`birthPatient: ${JSON.stringify(birthPatient)}`)
-          if (birthPatient && birthPatient.identifier) {
+          if (
+            birthPatient &&
+            birthPatient.identifier &&
+            birthPatient.resourceType
+          ) {
             // If existing patient can be found
             // mark existing OpenCRVS birth patient as deceased with link to this patient
             // Keep both Patient copies as a history of name at birth, may not be that recorde for name at death etc ...
@@ -865,6 +874,7 @@ export async function validateDeceasedDetails(
               },
               value: patient.id
             } as fhir3.CodeableConcept)
+
             await updateResourceInHearth(birthPatient)
             // mark patient with link to the birth patient
             patient.identifier?.push({
