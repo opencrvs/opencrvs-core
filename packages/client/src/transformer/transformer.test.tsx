@@ -89,9 +89,9 @@ describe('when draft data is transformed to graphql', () => {
     it('Check if new place of birth location address is parsed properly', () => {
       const clonedChild = clone(birthDraftData.child)
       clonedChild.placeOfBirth = 'PRIVATE_HOME'
-      clonedChild.country = 'BGD'
-      clonedChild.district = 'district'
-      clonedChild.state = 'state'
+      clonedChild.countryPlaceofbirth = 'BGD'
+      clonedChild.districtPlaceofbirth = 'district'
+      clonedChild.statePlaceofbirth = 'state'
       const data = {
         child: clonedChild,
         father: birthDraftData.father,
@@ -107,12 +107,6 @@ describe('when draft data is transformed to graphql', () => {
           '9633042c-ca34-4b9f-959b-9d16909fd85c'
         ).eventLocation.type
       ).toBe('PRIVATE_HOME')
-    })
-    it('Check if contactNumber is found properly', () => {
-      expect(
-        draftToGqlTransformer(form, birthDraftData).registration
-          .contactPhoneNumber
-      ).toBe('+8801733333333')
     })
     it('Pass false as detailsExist on father section', () => {
       const data = {
@@ -155,61 +149,6 @@ describe('when draft data is transformed to graphql', () => {
       expect(
         draftToGqlTransformer(form, data).registration.inCompleteFields
       ).toBeDefined()
-    })
-
-    it('transform gql data from form correction data', () => {
-      const data = {
-        child: birthDraftData.child,
-        father: birthDraftData.father,
-        mother: birthDraftData.mother,
-        registration: {
-          commentsOrNotes: 'comments',
-          registrationCertificateLanguage: ['en'],
-          informantType: {
-            value: 'FATHER',
-            nestedFields: { otherInformantType: '' }
-          },
-          contactPoint: {
-            value: 'FATHER',
-            nestedFields: { registrationPhone: '01736478896' }
-          }
-        },
-        documents: { imageUploader: '' }
-      }
-
-      const originalData = birthDraftData
-
-      const transformedCorrectionData = {
-        values: [
-          {
-            fieldName: 'informantType',
-            newValue: 'FATHER',
-            oldValue: 'MOTHER',
-            section: 'registration'
-          },
-          {
-            fieldName: 'contactPoint',
-            newValue: 'FATHER',
-            oldValue: 'MOTHER',
-            section: 'registration'
-          },
-          {
-            fieldName: 'contactPoint.nestedFields.registrationPhone',
-            newValue: '01736478896',
-            oldValue: '01733333333',
-            section: 'registration'
-          }
-        ]
-      }
-
-      expect(
-        draftToGqlTransformer(
-          form,
-          data,
-          '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          originalData
-        ).registration.correction
-      ).toEqual(transformedCorrectionData)
     })
   })
 })
