@@ -58,7 +58,7 @@ import { vi } from 'vitest'
 import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 
 export const registerScopeToken =
@@ -234,7 +234,7 @@ export const eventAddressData = {
   internationalAddressLine1: '',
   internationalAddressLine2: '',
   internationalAddressLine3: '',
-  internationalPostcode: ''
+  internationalPostalCode: ''
 }
 
 export const primaryAddressData = {
@@ -247,7 +247,7 @@ export const primaryAddressData = {
   addressLine3UrbanOptionPrimary: '',
   addressLine2UrbanOptionPrimary: '',
   numberUrbanOptionPrimary: '',
-  postcodePrimary: '',
+  postalCodePrimary: '',
   addressLine5Primary: 'my village'
 }
 
@@ -261,7 +261,7 @@ export const secondaryAddressData = {
   addressLine3UrbanOptionSecondary: 'my secondary res area',
   addressLine2UrbanOptionSecondary: 'my secondary street',
   numberUrbanOptionSecondary: 12,
-  postcodeSecondary: 'my secondary postcode',
+  postalCodeSecondary: 'my secondary postcode',
   addressLine5Secondary: ''
 }
 
@@ -272,7 +272,7 @@ export const primaryInternationalAddressLines = {
   internationalAddressLine1Primary: '',
   internationalAddressLine2Primary: '',
   internationalAddressLine3Primary: '',
-  internationalPostcodePrimary: ''
+  internationalPostalCodePrimary: ''
 }
 
 export const secondaryInternationalAddressLines = {
@@ -282,7 +282,7 @@ export const secondaryInternationalAddressLines = {
   internationalAddressLine1Secondary: '',
   internationalAddressLine2Secondary: '',
   internationalAddressLine3Secondary: '',
-  internationalPostcodeSecondary: ''
+  internationalPostalCodeSecondary: ''
 }
 
 export const userDetails: UserDetails = {
@@ -682,6 +682,21 @@ export const mockRegistrarUserResponse = {
   }
 }
 
+export function appendStringToKeys(
+  obj: Record<string, any>,
+  appendString: string
+): Record<string, any> {
+  const newObj: Record<string, any> = {}
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      newObj[key + appendString] = obj[key]
+    }
+  }
+
+  return newObj
+}
+
 export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
@@ -711,10 +726,10 @@ export const mockDeclarationData = {
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
     exactDateOfBirthUnknown: false,
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Mother'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Mother'),
+    ...appendStringToKeys(secondaryAddressData, 'Mother'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Mother')
   },
   father: {
     detailsExist: true,
@@ -730,27 +745,35 @@ export const mockDeclarationData = {
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines,
+    ...appendStringToKeys(primaryAddressData, 'Father'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Father'),
+    ...appendStringToKeys(secondaryAddressData, 'Father'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Father'),
     primaryAddressSameAsOtherPrimary: true
   },
+  informant: {
+    informantType: 'MOTHER',
+    otherInformantType: '',
+    registrationPhone: '01733333333',
+    registrationEmail: 'sdfsbg@hgh.com',
+    firstNames: 'স্পিভক',
+    familyName: 'গায়ত্রী',
+    firstNamesEng: 'Liz',
+    familyNameEng: 'Test',
+    iD: '6546511876932',
+    iDType: 'NATIONAL_ID',
+    motherBirthDate: '1949-05-31',
+    dateOfMarriage: '1972-09-19',
+    maritalStatus: 'MARRIED',
+    educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
+    nationality: 'BGD',
+    exactDateOfBirthUnknown: false,
+    ...appendStringToKeys(primaryAddressData, 'Mother'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Mother'),
+    ...appendStringToKeys(secondaryAddressData, 'Mother'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Mother')
+  },
   registration: {
-    contactPoint: {
-      nestedFields: {
-        registrationPhone: '01557394989'
-      },
-      value: 'MOTHER'
-    },
-    whoseContactDetails: {
-      value: 'MOTHER',
-      nestedFields: { registrationPhone: '01557394986' }
-    },
-    informantType: {
-      value: 'MOTHER',
-      nestedFields: { otherInformantType: '' }
-    },
     informantsSignature: 'data:image/png;base64,abcd',
 
     registrationNumber: '201908122365BDSS0SE1',
@@ -779,12 +802,15 @@ export const mockDeathDeclarationData = {
     maritalStatus: 'MARRIED',
     birthDate: '1987-02-16',
     exactDateOfBirthUnknown: false,
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Deceased'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Deceased'),
+    ...appendStringToKeys(secondaryAddressData, 'Deceased'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Deceased')
   },
   informant: {
+    informantType: 'SPOUSE',
+    registrationPhone: '01733333333',
+    registrationEmail: 'sesrthsthsr@sdfsgt.com',
     informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
     informantID: '1230000000000',
@@ -795,10 +821,10 @@ export const mockDeathDeclarationData = {
     nationality: 'BGD',
     informantBirthDate: '',
     relationship: 'MOTHER',
-    ...primaryAddressData,
-    ...primaryInternationalAddressLines,
-    ...secondaryAddressData,
-    ...secondaryInternationalAddressLines
+    ...appendStringToKeys(primaryAddressData, 'Informant'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Informant'),
+    ...appendStringToKeys(secondaryAddressData, 'Informant'),
+    ...appendStringToKeys(secondaryInternationalAddressLines, 'Informant')
   },
   father: {
     fatherFirstNames: 'মোক্তার',
@@ -822,7 +848,7 @@ export const mockDeathDeclarationData = {
     manner: 'ACCIDENT',
     placeOfDeath: 'OTHER',
     deathLocation: '',
-    ...eventAddressData
+    ...appendStringToKeys(eventAddressData, 'Placeofdeath')
   },
   causeOfDeath: {
     causeOfDeathEstablished: false,
@@ -841,12 +867,10 @@ export const mockDeathDeclarationData = {
     ]
   },
   registration: {
-    informantType: 'SPOUSE',
-    registrationPhone: '01557394986',
+    trackingId: 'DJDTKUQ',
+    type: 'death',
     registrationNumber: '201908122365DDSS0SE1',
-    contact: 'OTHER',
-    contactPhoneNumber: '+8801671010143',
-    contactRelationship: 'Friend',
+    commentsOrNotes: '',
     regStatus: {
       type: 'REGISTERED',
       officeName: 'MokhtarPur',
@@ -867,25 +891,13 @@ export const mockDeathDeclarationData = {
 
 export const mockMarriageDeclarationData = {
   registration: {
-    informantType: {
-      value: 'GROOM',
-      nestedFields: {
-        otherInformantType: ''
-      }
-    },
-    contactPoint: {
-      value: 'GROOM',
-      nestedFields: {
-        registrationPhone: '0751515152'
-      }
-    },
-    _fhirID: 'a833a452-3472-408f-87e3-ad7c6e2cdcd9',
     trackingId: 'M2LA47X',
     registrationNumber: '2023M2LA47X',
     type: 'marriage',
-    groomSignature: 'data:image/png;base64,iVBORw0KGgoAAQmCC',
-    brideSignature: 'data:image/png;base64,iVBORw0KGgomCC',
-    witnessOneSignature: 'data:image/png;base64,iVBORw0KGgNSUCC',
+    groomSignature: 'data:image/png;base64,iVBORw0KGkSuQmCC',
+    brideSignature: 'data:image/png;base64,iVBORw0KGkSuQmCC',
+    witnessOneSignature: 'data:image/png;base64,iVBORw0KGkSuQmCC',
+    witnessTwoSignature: 'data:image/png;base64,iVBORw0KGkSuQmCC',
     commentsOrNotes: '',
     regStatus: {
       type: 'REGISTERED',
@@ -904,6 +916,14 @@ export const mockMarriageDeclarationData = {
       }
     ]
   },
+  informant: {
+    informantType: 'GROOM',
+    otherInformantType: '',
+    exactDateOfBirthUnknown: '',
+    registrationPhone: '01733333333',
+    registrationEmail: 'stheyhyj@segstg.com',
+    _fhirID: '429445a4-f87c-467f-9d3c-f17f595a1143'
+  },
   groom: {
     nationality: 'FAR',
     iD: '1296566563',
@@ -912,23 +932,8 @@ export const mockMarriageDeclarationData = {
     firstNamesEng: 'Sadman',
     familyNameEng: 'Anik',
     marriedLastNameEng: 'Groom Last Name',
-    countryPrimary: 'FAR',
-    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrbanPrimary: 'URBAN',
-    cityUrbanOptionPrimary: '',
-    addressLine3UrbanOptionPrimary: '',
-    addressLine2UrbanOptionPrimary: '',
-    numberUrbanOptionPrimary: '',
-    postcodePrimary: '',
-    addressLine5Primary: '',
-    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    internationalCityPrimary: '',
-    internationalAddressLine1Primary: '',
-    internationalAddressLine2Primary: '',
-    internationalAddressLine3Primary: '',
-    internationalPostcodePrimary: '',
+    ...appendStringToKeys(primaryAddressData, 'Groom'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Groom'),
     _fhirID: '89113c35-1310-4d8f-9352-0269a04a1c4a'
   },
   bride: {
@@ -939,39 +944,14 @@ export const mockMarriageDeclarationData = {
     firstNamesEng: 'Kaitlin',
     familyNameEng: 'Samo',
     marriedLastNameEng: 'Bride Last Name',
-    countryPrimary: 'FAR',
-    statePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    districtPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrbanPrimary: 'URBAN',
-    cityUrbanOptionPrimary: '',
-    addressLine3UrbanOptionPrimary: '',
-    addressLine2UrbanOptionPrimary: '',
-    numberUrbanOptionPrimary: '',
-    postcodePrimary: '',
-    addressLine5Primary: '',
-    internationalStatePrimary: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    internationalDistrictPrimary: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    internationalCityPrimary: '',
-    internationalAddressLine1Primary: '',
-    internationalAddressLine2Primary: '',
-    internationalAddressLine3Primary: '',
-    internationalPostcodePrimary: '',
+    ...appendStringToKeys(primaryAddressData, 'Bride'),
+    ...appendStringToKeys(primaryInternationalAddressLines, 'Bride'),
     _fhirID: '09a68a88-921f-4eaf-8424-7d9d43e5804c'
   },
   marriageEvent: {
     marriageDate: '2020-12-12',
     typeOfMarriage: 'MONOGAMY',
-    country: 'FAR',
-    state: '5dd96001-7c94-4eeb-b96e-8a987957f7a2',
-    district: 'ab93d5a5-c078-4dfa-b4ca-d54d1e57bca0',
-    ruralOrUrban: 'URBAN',
-    addressLine3UrbanOption: '',
-    addressLine2UrbanOption: '',
-    numberUrbanOption: '',
-    addressLine5: '',
-    internationalAddressLine1: '',
-    internationalAddressLine2: '',
-    internationalAddressLine3: ''
+    ...appendStringToKeys(eventAddressData, 'Placeofmarriage')
   },
   witnessOne: {
     firstNamesEng: 'Sadman',
@@ -999,20 +979,6 @@ export const mockMarriageDeclarationData = {
 }
 
 export const mockBirthRegistrationSectionData = {
-  contactPoint: {
-    nestedFields: {
-      registrationPhone: '01557394989'
-    },
-    value: 'MOTHER'
-  },
-  whoseContactDetails: {
-    value: 'MOTHER',
-    nestedFields: { registrationPhone: '01557394986' }
-  },
-  informantType: {
-    value: 'MOTHER',
-    nestedFields: { otherInformantType: '' }
-  },
   informantsSignature: 'data:image/png;base64,abcd',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
@@ -1044,20 +1010,10 @@ export const mockBirthRegistrationSectionData = {
 }
 
 export const mockDeathRegistrationSectionData = {
-  contactPoint: {
-    nestedFields: {
-      registrationPhone: '01557394982'
-    },
-    value: 'MOTHER'
-  },
-  whoseContactDetails: 'MOTHER',
-  informantType: 'MOTHER',
-  registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
-  contact: 'OTHER',
-  contactPhoneNumber: '+8801671010143',
-  contactRelationship: 'Friend',
+  type: 'death',
+  commentsOrNotes: '',
   regStatus: {
     type: 'REGISTERED',
     officeName: 'MokhtarPur',
@@ -1185,130 +1141,6 @@ export async function createTestComponent(
   return mount(<PropProxy {...node.props} />, options)
 }
 
-export const mockDeathDeclarationDataWithoutFirstNames = {
-  deceased: {
-    iDType: 'NATIONAL_ID',
-    iD: '1230000000000',
-    firstNames: '',
-    familyName: 'ইসলাম',
-    firstNamesEng: '',
-    familyNameEng: 'Islam',
-    nationality: 'BGD',
-    gender: 'male',
-    maritalStatus: 'MARRIED',
-    birthDate: '1987-02-16',
-    primaryAddress: '',
-    countryPrimary: 'BGD',
-    statePrimary: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
-    districtPrimary: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
-    addressLine4Primary: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
-    addressLine3Primary: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Primary: '193 Kalibari Road',
-    addressLine1Primary: '193 Kalibari Road',
-    postCodePrimary: '2200',
-    secondaryAddress: '',
-    country: 'BGD',
-    state: '',
-    district: '',
-    addressLine4: '',
-    addressLine3: '',
-    addressLine2: '',
-    addressLine1: '',
-    postCode: ''
-  },
-  informant: {
-    informantIdType: 'NATIONAL_ID',
-    iDType: 'NATIONAL_ID',
-    informantID: '1230000000000',
-    informantFirstNames: '',
-    informantFamilyName: 'ইসলাম',
-    informantFirstNamesEng: 'Islam',
-    informantFamilyNameEng: 'Islam',
-    nationality: 'BGD',
-    informantBirthDate: '',
-    relationship: 'SPOUSE',
-    secondaryAddress: '',
-    country: 'BGD',
-    state: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
-    district: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
-    addressLine4: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200',
-    primaryAddress: '',
-    informantPrimaryAddressSameAsCurrent: true,
-    countryPrimary: 'BGD',
-    statePrimary: '',
-    districtPrimary: '',
-    addressLine4Primary: '',
-    addressLine3Primary: '',
-    addressLine2Primary: '',
-    addressLine1Primary: '',
-    postCodePrimary: ''
-  },
-  deathEvent: {
-    deathDate: '1987-02-16',
-    manner: 'ACCIDENT',
-    deathPlace: '',
-    placeOfDeath: 'OTHER',
-    deathLocation: '',
-    addressType: '',
-    country: 'BGD',
-    state: 'state',
-    district: 'district',
-    addressLine4: 'upazila',
-    addressLine3: 'union',
-    addressLine2: '',
-    addressLine1: '',
-    postCode: ''
-  },
-  causeOfDeath: {
-    causeOfDeathEstablished: false,
-    methodOfCauseOfDeath: '',
-    causeOfDeathCode: ''
-  },
-  documents: {
-    imageUploader: [
-      {
-        data: 'base64-data',
-        type: 'image/jpeg',
-        optionValues: ["Proof of Deceased's ID", 'National ID (front)'],
-        title: "Proof of Deceased's ID",
-        description: 'National ID (front)'
-      }
-    ]
-  },
-  registration: {
-    contactPoint: {
-      nestedFields: {
-        registrationPhone: '01557394982'
-      },
-      value: 'SPOUSE'
-    },
-    registrationPhone: '01557394986',
-    registrationNumber: '201908122365DDSS0SE1',
-    contact: 'OTHER',
-    contactPhoneNumber: '+8801671010143',
-    contactRelationship: 'Friend',
-    regStatus: {
-      type: 'REGISTERED',
-      officeName: 'MokhtarPur',
-      officeAlias: 'মখতারপুর',
-      officeAddressLevel3: 'Gazipur',
-      officeAddressLevel4: 'Dhaka'
-    },
-    certificates: [
-      {
-        collector: {
-          type: 'MOTHER'
-        },
-        hasShowedVerifiedDocument: true
-      }
-    ]
-  }
-}
-
 export const getFileFromBase64String = (
   base64String: string,
   name: string,
@@ -1349,17 +1181,17 @@ export async function goToEndOfForm(component: ReactWrapper) {
 }
 
 export async function goToDocumentsSection(component: ReactWrapper) {
-  await goToSection(component, 3)
+  await goToSection(component, 4)
   await waitForElement(component, '#form_section_id_documents-view-group')
 }
 
 export async function goToFatherSection(component: ReactWrapper) {
-  await goToSection(component, 2)
+  await goToSection(component, 3)
   await waitForElement(component, '#form_section_id_father-view-group')
 }
 
 export async function goToMotherSection(component: ReactWrapper) {
-  await goToSection(component, 1)
+  await goToSection(component, 2)
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 

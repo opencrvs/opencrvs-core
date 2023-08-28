@@ -11,7 +11,7 @@
  */
 import { Validation } from '@client/utils/validate'
 import { referenceApi } from '@client/utils/referenceApi'
-import { AnyFn } from '@client/forms/mappings/deserializer'
+import { AnyFn } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 
 export type Validator = Validation | AnyFn<Validation>

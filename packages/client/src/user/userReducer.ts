@@ -17,7 +17,7 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
+import { AnyFn, deserializeForm } from '@client/forms/deserializer/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,

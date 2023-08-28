@@ -12,10 +12,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { countries } from '@client/forms/countries'
-import { identityNameMapper } from '@client/forms/identity'
+import { countries } from '@client/utils/countries'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { messages } from '@client/i18n/messages/views/certificate'
+import { identityNameMapper } from '@client/forms/certificate/fieldDefinitions/messages'
 
 const Wrapper = styled.div`
   width: 100%;

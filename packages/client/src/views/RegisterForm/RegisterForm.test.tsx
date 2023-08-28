@@ -16,7 +16,6 @@ import {
   mockDeclarationData,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
-  mockDeathDeclarationDataWithoutFirstNames,
   getRegisterFormFromStore,
   getReviewFormFromStore,
   createTestStore,
@@ -192,34 +191,6 @@ describe('when user is in the register form for death event', () => {
       ).toHaveLength(1)
     })
   })
-  describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
-    })
-  })
 })
 
 describe('when user is in the register form for marriage event', () => {
@@ -276,34 +247,6 @@ describe('when user is in the register form for marriage event', () => {
       expect(
         component.find('#form_section_id_marriage-event-details').hostNodes()
       ).toHaveLength(1)
-    })
-  })
-  describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
     })
   })
 })
@@ -785,7 +728,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathDeclarationDataWithoutFirstNames,
+      mockDeathDeclarationData,
       Event.Death
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
