@@ -73,11 +73,10 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { IForm } from '@client/forms'
 
 type IStateProps = {
   userDetails: UserDetails | null
-  registerForm: { birth: IForm; death: IForm; marriage: IForm }
+  fieldNames: string[]
   language: string
 }
 
@@ -123,10 +122,6 @@ type IFullProps = IntlShapeProps &
 
 interface IState {
   showLogoutModal: boolean
-}
-
-interface Forms {
-  [formName: string]: IForm
 }
 
 enum ACTIVE_MENU_ITEM {
@@ -331,23 +326,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  getFieldNames = (forms: Forms) => {
-    const fieldNames = []
-    for (const form in forms) {
-      for (const section of forms[form].sections) {
-        for (const group of section.groups) {
-          for (const field of group.fields) {
-            fieldNames.push(field.name)
-          }
-        }
-      }
-    }
-    return fieldNames
-  }
-
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
-    const fieldNames = this.getFieldNames(props.registerForm)
-    const { intl, searchText, selectedSearchType, language } = props
+    const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -579,7 +559,11 @@ export const Header = connect(
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store),
-    registerForm: getRegisterForm(store)
+    fieldNames: Object.values(getRegisterForm(store))
+      .flatMap((form) => form.sections)
+      .flatMap((section) => section.groups)
+      .flatMap((group) => group.fields)
+      .map((field) => field.name)
   }),
   {
     redirectToAuthentication,
