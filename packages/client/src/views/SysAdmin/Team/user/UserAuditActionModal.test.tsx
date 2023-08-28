@@ -251,12 +251,13 @@ describe('user audit action modal tests', () => {
       )
     })
 
-    it('clicking on confirm action with empty form shows deactivate button as disabled', async () => {
+    it('clicking on confirm action with empty form shows error text', async () => {
       const confirmButton = await waitForElement(
         component,
         '#deactivate-action'
       )
-      expect(confirmButton.hostNodes().props().disabled).toBeTruthy()
+      confirmButton.hostNodes().simulate('click')
+      await waitForElement(component, '#form-error')
     })
 
     describe('after filling mandatory data', () => {
