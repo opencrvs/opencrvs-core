@@ -213,6 +213,7 @@ export type ApplicationConfiguration = {
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: Maybe<LoginBackground>
@@ -220,6 +221,7 @@ export type ApplicationConfiguration = {
   MARRIAGE_REGISTRATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
+  USER_NOTIFICATION_DELIVERY_METHOD?: Maybe<Scalars['String']>
 }
 
 export type ApplicationConfigurationInput = {
@@ -231,12 +233,14 @@ export type ApplicationConfigurationInput = {
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD?: InputMaybe<Scalars['String']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   MARRIAGE?: InputMaybe<MarriageInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
+  USER_NOTIFICATION_DELIVERY_METHOD?: InputMaybe<Scalars['String']>
 }
 
 export type AssignmentData = {
@@ -276,70 +280,6 @@ export type AttachmentInput = {
   systemFileName?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
   uri?: InputMaybe<Scalars['String']>
-}
-
-export enum AttachmentSubject {
-  Bride = 'BRIDE',
-  Child = 'CHILD',
-  ChildAge = 'CHILD_AGE',
-  DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
-  DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
-  DeceasedIdProof = 'DECEASED_ID_PROOF',
-  HusbandFamilyHeads = 'HUSBAND_FAMILY_HEADS',
-  WifeFamilyHeads = 'WIFE_FAMILY_HEADS',
-  Father = 'FATHER',
-  Groom = 'GROOM',
-  InformantIdProof = 'INFORMANT_ID_PROOF',
-  LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
-  MarriageDetails = 'MARRIAGE_DETAILS',
-  MarriageNoticeProof = 'MARRIAGE_NOTICE_PROOF',
-  Mother = 'MOTHER',
-  Other = 'OTHER',
-  Parent = 'PARENT',
-  HusbandWitness = 'HUSBAND_WITNESS',
-  WifeWitness = 'WIFE_WITNESS',
-  WitnessOne = 'WITNESS_ONE',
-  WitnessTwo = 'WITNESS_TWO'
-}
-
-export enum AttachmentType {
-  AdoptionProof = 'ADOPTION_PROOF',
-  AttestedLetterOfDeath = 'ATTESTED_LETTER_OF_DEATH',
-  BirthCertificate = 'BIRTH_CERTIFICATE',
-  BurialReceipt = 'BURIAL_RECEIPT',
-  CoronersReport = 'CORONERS_REPORT',
-  CourtOrder = 'COURT_ORDER',
-  HospitalCertificateOfDeath = 'HOSPITAL_CERTIFICATE_OF_DEATH',
-  MarriageCertificate = 'MARRIAGE_CERTIFICATE',
-  MarriageNotice = 'MARRIAGE_NOTICE',
-  MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
-  NationalId = 'NATIONAL_ID',
-  NationalPoliceId = 'NATIONAL_POLICE_ID',
-  NotificationOfBirth = 'NOTIFICATION_OF_BIRTH',
-  Other = 'OTHER',
-  Passport = 'PASSPORT',
-  PassportPhoto = 'PASSPORT_PHOTO',
-  PoliceCertificateOfDeath = 'POLICE_CERTIFICATE_OF_DEATH',
-  ProofOfAssignedResponsibility = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
-  ProofOfLegalGuardianship = 'PROOF_OF_LEGAL_GUARDIANSHIP',
-  RecognitionProof = 'RECOGNITION_PROOF',
-  RefugeeCard = 'REFUGEE_CARD',
-  Requisition = 'REQUISITION',
-  ResidentCard = 'RESIDENT_CARD',
-  RetiredPoliceId = 'RETIRED_POLICE_ID',
-  VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
-}
-
-export enum AttendantType {
-  Layperson = 'LAYPERSON',
-  Midwife = 'MIDWIFE',
-  None = 'NONE',
-  Nurse = 'NURSE',
-  NurseMidwife = 'NURSE_MIDWIFE',
-  Other = 'OTHER',
-  OtherParamedicalPersonnel = 'OTHER_PARAMEDICAL_PERSONNEL',
-  Physician = 'PHYSICIAN',
-  TraditionalBirthAttendant = 'TRADITIONAL_BIRTH_ATTENDANT'
 }
 
 export type AuditLogItemBase = {
@@ -995,32 +935,6 @@ export type LoginBackgroundInput = {
   backgroundColor?: InputMaybe<Scalars['String']>
   backgroundImage?: InputMaybe<Scalars['String']>
   imageFit?: InputMaybe<ImageFit>
-}
-
-export enum MannerOfDeath {
-  Accident = 'ACCIDENT',
-  Assault = 'ASSAULT',
-  Homicide = 'HOMICIDE',
-  Illness = 'ILLNESS',
-  MannerUndetermined = 'MANNER_UNDETERMINED',
-  NaturalCauses = 'NATURAL_CAUSES',
-  NaturalDisaster = 'NATURAL_DISASTER',
-  Suicide = 'SUICIDE',
-  War = 'WAR'
-}
-
-export type MappingInput = {
-  mutation: Operation
-  query: Operation
-}
-
-export enum MaritalStatusType {
-  Divorced = 'DIVORCED',
-  Married = 'MARRIED',
-  NotStated = 'NOT_STATED',
-  Separated = 'SEPARATED',
-  Single = 'SINGLE',
-  Widowed = 'WIDOWED'
 }
 
 export type Marriage = {
@@ -1873,40 +1787,6 @@ export type QueryVerifyPasswordByIdArgs = {
   password: Scalars['String']
 }
 
-export type QuestionInput = {
-  conditionals?: InputMaybe<Array<ConditionalInput>>
-  custom?: InputMaybe<Scalars['Boolean']>
-  datasetId?: InputMaybe<Scalars['String']>
-  description?: InputMaybe<Array<MesssageInput>>
-  disabled?: InputMaybe<Scalars['Boolean']>
-  dynamicOptions?: InputMaybe<DynamicOptionInput>
-  enabled?: InputMaybe<Scalars['String']>
-  errorMessage?: InputMaybe<Array<MesssageInput>>
-  extraValue?: InputMaybe<Scalars['String']>
-  fieldId: Scalars['String']
-  fieldName?: InputMaybe<Scalars['String']>
-  fieldType?: InputMaybe<CustomFieldType>
-  helperText?: InputMaybe<Array<MesssageInput>>
-  hideHeader?: InputMaybe<Scalars['Boolean']>
-  hideInPreview?: InputMaybe<Scalars['Boolean']>
-  ignoreBottomMargin?: InputMaybe<Scalars['Boolean']>
-  initialValue?: InputMaybe<Scalars['String']>
-  inputWidth?: InputMaybe<Scalars['Int']>
-  label?: InputMaybe<Array<MesssageInput>>
-  mapping?: InputMaybe<MappingInput>
-  maxLength?: InputMaybe<Scalars['Int']>
-  optionCondition?: InputMaybe<Scalars['String']>
-  options?: InputMaybe<Array<CustomSelectOption>>
-  placeholder?: InputMaybe<Array<MesssageInput>>
-  precedingFieldId: Scalars['String']
-  previewGroup?: InputMaybe<Scalars['String']>
-  required?: InputMaybe<Scalars['Boolean']>
-  tooltip?: InputMaybe<Array<MesssageInput>>
-  unit?: InputMaybe<Array<MesssageInput>>
-  validateEmpty?: InputMaybe<Scalars['Boolean']>
-  validator?: InputMaybe<Array<ValidatorInput>>
-}
-
 export type QuestionnaireQuestion = {
   __typename?: 'QuestionnaireQuestion'
   fieldId?: Maybe<Scalars['String']>
@@ -2020,7 +1900,6 @@ export type RegistrationInput = {
   contact?: InputMaybe<Scalars['String']>
   contactEmail?: InputMaybe<Scalars['String']>
   contactPhoneNumber?: InputMaybe<Scalars['String']>
-  contactRelationship?: InputMaybe<Scalars['String']>
   correction?: InputMaybe<CorrectionInput>
   draftId?: InputMaybe<Scalars['String']>
   groomSignature?: InputMaybe<Scalars['String']>
@@ -2135,7 +2014,7 @@ export type RemoveBookmarkedSeachInput = {
 
 export type Response = {
   __typename?: 'Response'
-  msg: Scalars['String']
+  roleIdMap: Scalars['Map']
 }
 
 export type Role = {
@@ -2418,10 +2297,12 @@ export type UserInput = {
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
+  password?: InputMaybe<Scalars['String']>
   primaryFacilityId?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
+  status?: InputMaybe<Status>
   systemRole: SystemRoleType
   title: Scalars['String']
   username?: InputMaybe<Scalars['String']>
@@ -2613,7 +2494,7 @@ export type UpdateRoleMutationVariables = Exact<{
 
 export type UpdateRoleMutation = {
   __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; msg: string }
+  updateRole: { __typename?: 'Response'; roleIdMap: any }
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -3466,6 +3347,12 @@ export type FetchBirthRegistrationForReviewQuery = {
       id?: string | null
       birthDate?: string | null
       gender?: string | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: string | null
+        otherType?: string | null
+      } | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -5057,6 +4944,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       groomSignature?: string | null
       groomSignatureURI?: string | null
       brideSignature?: string | null
@@ -5393,6 +5281,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      contactEmail?: string | null
       groomSignature?: string | null
       groomSignatureURI?: string | null
       brideSignature?: string | null
@@ -7717,6 +7606,8 @@ export type UpdateApplicationConfigMutation = {
     DATE_OF_BIRTH_UNKNOWN?: boolean | null
     INFORMANT_SIGNATURE?: boolean | null
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
+    USER_NOTIFICATION_DELIVERY_METHOD?: string | null
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string | null
     LOGIN_BACKGROUND?: {
       __typename?: 'LoginBackground'
       backgroundColor?: string | null

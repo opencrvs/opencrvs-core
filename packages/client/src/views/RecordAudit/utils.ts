@@ -142,8 +142,8 @@ const getLocation = (
   resources: IOfflineData,
   intl: IntlShape
 ) => {
-  const locationType: string = EMPTY_STRING
-  const locationId = EMPTY_STRING
+  let locationType: string = EMPTY_STRING
+  let locationId = EMPTY_STRING
   let district = EMPTY_STRING
   let state = EMPTY_STRING
   let internationalDistrict = EMPTY_STRING
