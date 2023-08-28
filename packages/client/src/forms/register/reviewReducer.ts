@@ -13,7 +13,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { deserializeForm } from '@client/forms/deserializer/deserializer'
 import { validators } from '@client/forms/validators'
 
 export type IReviewFormState =

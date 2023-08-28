@@ -44,6 +44,7 @@ import { Table } from '@client/../../components/lib'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -292,6 +293,7 @@ const ActionDetailsModalListTable = ({
       ) as IFormSection
 
       if (section.id === 'documents') {
+        item.valueString = EMPTY_STRING
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )

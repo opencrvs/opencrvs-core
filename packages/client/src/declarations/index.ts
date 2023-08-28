@@ -1898,7 +1898,7 @@ export function getMinioUrlsFromDeclaration(
         'user' in history
       ) {
         const user = history.user as { avatar?: { data?: string } }
-        return user.avatar?.data
+        return user?.avatar?.data
       }
       return null
     })

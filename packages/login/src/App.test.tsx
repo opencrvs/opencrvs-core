@@ -27,7 +27,8 @@ describe('Login app step one', () => {
       COUNTRY_CONFIG_URL: 'http://localhost:3040',
       PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,
       SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
-      LOGROCKET: 'opencrvs-foundation/opencrvs-farajaland'
+      LOGROCKET: 'opencrvs-foundation/opencrvs-farajaland',
+      INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms'
     }
   })
 
