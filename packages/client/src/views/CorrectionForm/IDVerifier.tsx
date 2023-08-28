@@ -191,7 +191,9 @@ class IDVerifierComponent extends React.Component<
         <ResponsiveModal
           id="withoutVerificationPrompt"
           show={showPrompt}
-          title={intl.formatMessage(certificateMessages.idCheckDialogTitle)}
+          title={intl.formatMessage(
+            certificateMessages.idCheckForCorrectionTitle
+          )}
           contentHeight={96}
           handleClose={this.togglePrompt}
           actions={[
