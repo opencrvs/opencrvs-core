@@ -699,7 +699,6 @@ const BodyContent = ({
   ...actionProps
 }: IFullProps) => {
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
-
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -779,7 +778,6 @@ const BodyContent = ({
       draft?.data?.registration?.trackingId?.toString() ||
       workqueueDeclaration?.registration?.trackingId ||
       ''
-
     let declaration =
       draft &&
       (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -793,7 +791,6 @@ const BodyContent = ({
             language,
             trackingId
           )
-
     const wqStatus = workqueueDeclaration?.registration?.status
     const draftStatus =
       draft?.submissionStatus?.toString() ||
