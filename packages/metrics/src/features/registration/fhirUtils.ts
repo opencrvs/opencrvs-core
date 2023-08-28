@@ -15,7 +15,7 @@ import {
   fetchPractitionerRole,
   fetchTaskHistory
 } from '@metrics/api'
-import { Composition, Task } from '@opencrvs/commons'
+
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
@@ -123,7 +123,7 @@ function findPreviousTask(
   if (!task) {
     return null
   }
-  return task as Task
+  return task as fhir.Task
 }
 
 function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
@@ -138,7 +138,7 @@ function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
   if (!task) {
     return null
   }
-  return task as Task[]
+  return task as fhir.Task[]
 }
 
 export function getPaymentReconciliation(bundle: fhir.Bundle) {
@@ -149,7 +149,7 @@ export function getPaymentReconciliation(bundle: fhir.Bundle) {
 }
 
 export function getTask(bundle: fhir.Bundle) {
-  return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+  return getResourceByType<fhir.Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
 export function getDownloadedExtensionStatus(task: fhir.Task) {
   const extension =
@@ -170,7 +170,10 @@ export function findExtension(
 }
 
 export function getComposition(bundle: fhir.Bundle) {
-  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+  return getResourceByType<fhir.Composition>(
+    bundle,
+    FHIR_RESOURCE_TYPE.COMPOSITION
+  )
 }
 
 export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
@@ -192,11 +195,11 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
 }
 
 export async function getPreviousTask(
-  task: Task,
+  task: fhir.Task,
   allowedPreviousStates: DECLARATION_STATUS[],
   authHeader: IAuthHeader
 ) {
-  const taskHistory = await fetchTaskHistory(task.id, authHeader)
+  const taskHistory = await fetchTaskHistory(task.id!, authHeader)
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
@@ -235,7 +238,9 @@ export function getPractionerIdFromTask(task: fhir.Task) {
     ?.valueReference?.reference?.split('/')?.[1]
 }
 
-export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
+export function getDeclarationStatus(
+  task: fhir.Task
+): DECLARATION_STATUS | null {
   if (!task.businessStatus || !task.businessStatus.coding) {
     return null
   }
@@ -249,7 +254,7 @@ export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
   return coding.code as DECLARATION_STATUS
 }
 
-export function getTrackingId(task: Task) {
+export function getTrackingId(task: fhir.Task) {
   const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
@@ -263,7 +268,7 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getDeclarationType(task: Task): DECLARATION_TYPE {
+export function getDeclarationType(task: fhir.Task): DECLARATION_TYPE {
   const coding = task.code?.coding?.find(
     ({ system }) => system === 'http://opencrvs.org/specs/types'
   )
@@ -508,13 +513,13 @@ export async function fetchDeclarationsBeginnerRole(
   const currentTask = getTask(fhirBundle)
 
   if (currentTask) {
-    const bundle = await fetchTaskHistory(currentTask.id, authHeader)
+    const bundle = await fetchTaskHistory(currentTask.id!, authHeader)
     const length = bundle.entry ? bundle.entry.length : 0
     const task =
       bundle.entry &&
       bundle.entry
         .map((entry) => entry.resource)
-        .filter((resource): resource is Task =>
+        .filter((resource): resource is fhir.Task =>
           Boolean(resource && isTaskResource(resource))
         )
 

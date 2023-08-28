@@ -516,6 +516,9 @@ export async function markValidatedHandler(
   return h.response().code(200)
 }
 
+type TaskBundleEntry = Omit<fhir.BundleEntry, 'resource'> & {
+  resource: fhir.Task
+}
 export async function correctionEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -526,13 +529,13 @@ export async function correctionEventHandler(
     return badRequest('No task found in received bundle')
   }
 
-  const history = await fetchTaskHistory(task.id, {
+  const history = await fetchTaskHistory(task.id!, {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
   })
 
-  const latestCorrectionTask = history.entry?.find(
-    (entry) =>
+  const latestCorrectionTask: TaskBundleEntry | undefined = history.entry?.find(
+    (entry: TaskBundleEntry): entry is TaskBundleEntry =>
       entry.resource.businessStatus?.coding?.[0].code === 'CORRECTION_REQUESTED'
   )
 

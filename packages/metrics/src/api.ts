@@ -19,8 +19,6 @@ import {
   DOCUMENTS_URL
 } from '@metrics/constants'
 
-import { Bundle, Task } from '@opencrvs/commons'
-
 export function fetchFHIR<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
@@ -45,7 +43,7 @@ export function fetchFHIR<T = any>(
 }
 
 export function fetchTaskHistory(taskId: string, authHeader: IAuthHeader) {
-  return fetchFHIR<Bundle<Task>>(`Task/${taskId}/_history`, authHeader)
+  return fetchFHIR<fhir.Bundle>(`Task/${taskId}/_history`, authHeader)
 }
 
 export const fetchLocation = async (
