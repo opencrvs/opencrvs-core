@@ -10,12 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import {
-  ACTIVATE_USERS,
-  COUNTRY_CONFIG_URL,
-  GATEWAY_GQL_HOST,
-  GATEWAY_URL
-} from './constants'
+import { ACTIVATE_USERS, COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
 import { z } from 'zod'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -73,7 +68,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUseres() {
-  const url = new URL('users', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('users', COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
@@ -102,7 +97,7 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(GATEWAY_GQL_HOST, {
+  const searchResponse = await fetch(`${GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -123,7 +118,7 @@ async function userAlreadyExists(
 
 async function getOfficeIdFromIdentifier(identifier: string) {
   const response = await fetch(
-    `${GATEWAY_URL}/location?identifier=${identifier}`,
+    `${GATEWAY_HOST}/location?identifier=${identifier}`,
     {
       headers: {
         'Content-Type': 'application/fhir+json'
@@ -181,7 +176,7 @@ export async function seedUsers(
         ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
         primaryOffice
       }
-      const res = await fetch(GATEWAY_GQL_HOST, {
+      const res = await fetch(`${GATEWAY_HOST}/graphql`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
