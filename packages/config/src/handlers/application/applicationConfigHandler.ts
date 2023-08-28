@@ -132,15 +132,21 @@ export async function updateApplicationConfigHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const currentConfig = await getApplicationConfig()
+    let applicationConfig
+    const configFromDB = await ApplicationConfig.findOne({})
     const changeConfig = request.payload as IApplicationConfigurationModel
-    const applicationConfig = merge(currentConfig, changeConfig)
+
+    if (configFromDB !== null) {
+      applicationConfig = merge(configFromDB, changeConfig)
+    }
+    applicationConfig = changeConfig
     await ApplicationConfig.findOneAndUpdate(
       {},
       { $set: applicationConfig },
       { upsert: true }
     )
-    return h.response(applicationConfig).code(201)
+
+    return h.response(await getApplicationConfig()).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo

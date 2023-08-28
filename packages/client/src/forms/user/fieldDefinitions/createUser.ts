@@ -18,8 +18,8 @@ import {
   TEXT,
   UserSection
 } from '@client/forms/index'
-import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { NATIONAL_ID } from '@client/utils/constants'
 
 export function userSectionFormType(): ISerializedFormSection {
   return {
