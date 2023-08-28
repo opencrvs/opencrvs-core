@@ -145,9 +145,8 @@ export async function updateApplicationConfigHandler(
       { $set: applicationConfig },
       { upsert: true }
     )
-    const currentConfig = await getApplicationConfig()
 
-    return h.response(merge(currentConfig, applicationConfig)).code(201)
+    return h.response(await getApplicationConfig()).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
