@@ -10,6 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  createTestComponent,
+  selectOption,
+  mockDeclarationData,
+  mockDeathDeclarationData,
+  mockMarriageDeclarationData,
+  getRegisterFormFromStore,
+  getReviewFormFromStore,
+  createTestStore,
+  flushPromises
+} from '@client/tests/util'
+import {
+  RegisterForm,
+  RegisterForm
+} from '@client/views/RegisterForm/RegisterForm'
+import { ReactWrapper, ReactWrapper } from 'enzyme'
+import {
   SUBMISSION_STATUS,
   createDeclaration,
   createReviewDeclaration,
@@ -29,7 +45,6 @@ import {
   mockMarriageDeclarationData,
   selectOption
 } from '@client/tests/util'
-import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
@@ -38,7 +53,6 @@ import {
   HOME,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
-import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { v4 as uuid } from 'uuid'
 
@@ -191,34 +205,6 @@ describe('when user is in the register form for death event', () => {
       ).toHaveLength(1)
     })
   })
-  describe('when user is in contact point page', () => {
-    it('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
-    })
-  })
 })
 
 describe('when user is in the register form for marriage event', () => {
@@ -275,35 +261,6 @@ describe('when user is in the register form for marriage event', () => {
       expect(
         component.find('#form_section_id_marriage-event-details').hostNodes()
       ).toHaveLength(1)
-    })
-  })
-  describe('when user is in contact point page', () => {
-    /* Marriage form in Cameroon doesn't have the informant type selection */
-    it.skip('shows error if click continue without any value', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          declaration={draft}
-          pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-          match={{
-            params: { declarationId: draft.id, pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      component = testComponent
-      component.find('#next_section').hostNodes().simulate('click')
-      await waitForElement(component, '#informantType_error')
-      expect(component.find('#informantType_error').hostNodes().text()).toBe(
-        'Required for registration'
-      )
     })
   })
 })
@@ -785,7 +742,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathDeclarationDataWithoutFirstNames,
+      mockDeathDeclarationData,
       Event.Death
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]

@@ -43,6 +43,10 @@ import { ISerializedForm } from '@client/forms'
 import { getToken } from '@client/utils/authUtils'
 import { initConditionals } from '@client/forms/conditionals'
 import { initValidators } from '@client/forms/validators'
+import {
+  Action as NotificationAction,
+  configurationErrorNotification
+} from '@client/notification/actions'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -102,6 +106,8 @@ export type IOfflineDataState = {
   userDetails?: UserDetails
 }
 
+type Action = actions.Action | NotificationAction
+
 const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
@@ -157,7 +163,7 @@ async function loadCertificates(
 
 function checkIfDone(
   oldState: IOfflineDataState,
-  loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
+  loopOrState: IOfflineDataState | Loop<IOfflineDataState, Action>
 ) {
   const loopWithState = liftState(loopOrState)
   const newState = getModel(loopWithState)
@@ -281,7 +287,7 @@ function errorIfDataNotLoaded(state: IOfflineDataState) {
 function reducer(
   state: IOfflineDataState,
   action: actions.Action | profileActions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   switch (action.type) {
     // ENTRYPOINT - called from profile reducer
     case profileActions.USER_DETAILS_AVAILABLE: {
@@ -524,6 +530,20 @@ function reducer(
 
     case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(
+            configurationErrorNotification(
+              payload.message + ' to load application configuration properly'
+            )
+          )
+        )
+      }
       return loop(
         {
           ...state,
@@ -593,6 +613,16 @@ function reducer(
       }
     }
     case actions.FORMS_FAILED: {
+      const payload = action.payload
+      if (payload.cause === 'VALIDATION_ERROR') {
+        return loop(
+          {
+            ...state,
+            loadingError: errorIfDataNotLoaded(state)
+          },
+          Cmd.action(configurationErrorNotification(payload.message))
+        )
+      }
       return loop(
         {
           ...state,
@@ -666,7 +696,7 @@ function reducer(
 export function offlineDataReducer(
   state: IOfflineDataState | undefined = initialState,
   action: actions.Action
-): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+): IOfflineDataState | Loop<IOfflineDataState, Action> {
   const newState = reducer(state, action)
   if (action.type !== actions.READY) {
     return checkIfDone(state, newState)

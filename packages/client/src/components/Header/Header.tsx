@@ -337,7 +337,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         isDefault: true
       },
       {
-        label: intl.formatMessage(messages.typeBrnDrn),
+        label: intl.formatMessage(messages.typeRN),
         value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)

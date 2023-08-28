@@ -27,7 +27,6 @@ import {
   hideUserAuditSuccessToast,
   hidePINUpdateSuccessToast,
   hideDownloadDeclarationFailedToast,
-  ShowUnassignedPayload,
   hideUnassignedModal,
   hideCreateUserErrorToast,
   hideCreateUserFormDuplicateEmailErrorToast,
@@ -35,25 +34,9 @@ import {
   hideDuplicateRecordsToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { NotificationState } from '@client/notification/reducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 
-type NotificationProps = {
-  language?: string
-  configurationErrorVisible: boolean
-  saveDraftClicked: boolean
-  submitFormSuccessToast: string | null
-  submitFormErrorToast: string | null
-  userAuditSuccessToast: NotificationState['userAuditSuccessToast']
-  showPINUpdateSuccess: boolean
-  showDuplicateRecordsToast: boolean
-  duplicateCompositionId: string | null
-  duplicateTrackingId: string | null
-  downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
-  unassignedModal: ShowUnassignedPayload | null
-  userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
-  userCreateDuplicateEmailFailedToast: NotificationState['userCreateDuplicateEmailFailedToast']
-  userReconnectedToast: boolean
+type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
 }
 
@@ -113,6 +96,7 @@ class Component extends React.Component<
   render() {
     const {
       children,
+      configurationError,
       configurationErrorVisible,
       intl,
       saveDraftClicked,
@@ -141,6 +125,11 @@ class Component extends React.Component<
             onClose={this.hideUserReconnectedToast}
           >
             {intl.formatMessage(messages.onlineUserStatus)}
+          </Toast>
+        )}
+        {configurationError && (
+          <Toast type="warning" id="formValidationErrorNotification">
+            {configurationError}
           </Toast>
         )}
         {configurationErrorVisible && (
@@ -284,6 +273,7 @@ const mapStateToProps = (store: IStoreState) => {
     language: getLanguage(store),
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
+    configurationError: store.notification.configurationError,
     configurationErrorVisible: store.notification.configurationErrorVisible,
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,

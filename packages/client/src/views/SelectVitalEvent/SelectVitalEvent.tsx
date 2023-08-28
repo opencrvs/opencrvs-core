@@ -109,7 +109,7 @@ class SelectVitalEventView extends React.Component<
               <Button
                 id="goBack"
                 type="secondary"
-                size="medium"
+                size="small"
                 onClick={this.props.goToHome}
               >
                 <Icon name="X" />

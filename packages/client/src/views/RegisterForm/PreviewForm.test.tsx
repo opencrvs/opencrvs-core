@@ -17,14 +17,7 @@ import {
   waitForReady,
   validateScopeToken,
   registerScopeToken,
-  primaryAddressData,
-  primaryInternationalAddressLines,
-  secondaryAddressData,
-  secondaryInternationalAddressLines,
-  eventAddressData,
-  flushPromises,
-  getFileFromBase64String,
-  validImageB64String
+  flushPromises
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -152,7 +145,7 @@ describe('when user is previewing the form data', () => {
         await goToEndOfForm(app)
       })
 
-      it('check whether submit button is enabled or not', async () => {
+      it('check whether submit button is enabled or not', () => {
         expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
           false
         )
@@ -182,70 +175,6 @@ describe('when user is previewing the form data', () => {
 
   describe('when user is in the birth review section', () => {
     let customDraft: IDeclaration
-
-    const childDetails: IPersonDetails = {
-      attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'নাইম',
-      firstNamesEng: 'Naim',
-      gender: 'male',
-      multipleBirth: '2',
-      birthType: 'SINGLE',
-      weightAtBirth: '6',
-      _fhirID: '1'
-    }
-
-    const fatherDetails: IPersonDetails = {
-      detailsExist: true,
-      iD: '432432432',
-      iDType: 'NATIONAL_ID',
-      primaryAddressSameAsOtherPrimary: true,
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      fatherBirthDate: '1999-10-10',
-      dateOfMarriage: '2010-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'আনোয়ার',
-      firstNamesEng: 'Anwar',
-      maritalStatus: 'MARRIED',
-      nationality: 'FAR',
-      _fhirID: '2'
-    }
-
-    const motherDetails: IPersonDetails = {
-      iD: '765987987',
-      iDType: 'NATIONAL_ID',
-      nationality: 'FAR',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'রোকেয়া',
-      firstNamesEng: 'Rokeya',
-      maritalStatus: 'MARRIED',
-      dateOfMarriage: '2010-10-10',
-      motherBirthDate: '1999-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      _fhirID: '3'
-    }
-
-    const registrationDetails = {
-      contactPoint: {
-        value: 'DAUGHTER',
-        nestedFields: { registrationPhone: '0787878787' }
-      },
-      trackingId: 'B123456',
-      registrationNumber: '2019121525B1234568',
-      _fhirID: '4'
-    }
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
@@ -374,13 +303,6 @@ describe('when user is previewing the form data', () => {
           .replace(':pageId', 'review')
       )
       await waitForElement(app, '#readyDeclaration')
-    })
-
-    it('successfully submits the review form', async () => {
-      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
-      app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
-      app.update()
-      app.find('#submit_confirm').hostNodes().simulate('click')
     })
 
     it('rejecting declaration redirects to reject confirmation screen', async () => {

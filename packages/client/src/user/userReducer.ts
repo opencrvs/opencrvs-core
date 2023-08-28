@@ -17,7 +17,7 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { AnyFn, deserializeForm } from '@client/forms/mappings/deserializer'
+import { AnyFn, deserializeForm } from '@client/forms/deserializer/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
@@ -35,7 +35,7 @@ import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
-import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
@@ -449,7 +449,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case ROLES_LOADED:
       const { systemRoles } = action.payload
       const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
-      const form = deserializeForm(createUserForm, validators)
+      const form = deserializeForm(getCreateUserForm(), validators)
       const mutateOptions = optionsGenerator(systemRoles)
 
       generateUserFormWithRoles(form, mutateOptions)

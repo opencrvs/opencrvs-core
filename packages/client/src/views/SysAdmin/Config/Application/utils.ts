@@ -183,6 +183,12 @@ export const isWithinFileLength = (base64data: string) => {
   return decoded.length < 2000000
 }
 
+const isGeneralOrConfigAction = (
+  configProperty: IActionType
+): configProperty is GeneralActionId => {
+  return Object.keys(GeneralActionId).includes(configProperty)
+}
+
 export async function callApplicationConfigMutation(
   configProperty: IActionType,
   appConfig: IApplicationConfig,
@@ -192,7 +198,9 @@ export async function callApplicationConfigMutation(
   try {
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      configProperty in BirthActionId
+      isGeneralOrConfigAction(configProperty)
+        ? { [configProperty]: appConfig[configProperty] }
+        : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
         : configProperty in DeathActionId
         ? { DEATH: appConfig.DEATH }

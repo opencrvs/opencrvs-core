@@ -11,6 +11,7 @@
  */
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
+  DIVIDER,
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
@@ -52,8 +53,7 @@ import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT,
-  LinkButton
+  ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -75,6 +75,7 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
+import { Link } from '@opencrvs/components'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -141,7 +142,7 @@ class UserReviewFormComponent extends React.Component<
       group.fields.forEach((field: IFormField, idx) => {
         if (field.hideValueInPreview) {
           return
-        } else if (field.type === SUBSECTION_HEADER) {
+        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -193,7 +194,7 @@ class UserReviewFormComponent extends React.Component<
                   field.name === 'registrationOffice' &&
                   this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
-                  <LinkButton
+                  <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
                       this.props.userId
@@ -211,7 +212,7 @@ class UserReviewFormComponent extends React.Component<
                     }}
                   >
                     {intl.formatMessage(messages.change)}
-                  </LinkButton>
+                  </Link>
                 ) : (
                   <></>
                 )

@@ -339,6 +339,7 @@ describe('edit user tests', () => {
             ],
             username: 'shakib1',
             mobile: '+8801662132163',
+            email: 'jeff@gmail.com',
             identifier: {
               system: 'NATIONAL_ID',
               value: '101488192',

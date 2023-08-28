@@ -827,6 +827,8 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
   LOGIN_BACKGROUND: LoginBackground
 }
@@ -844,6 +846,8 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   INFORMANT_SIGNATURE: Boolean
   INFORMANT_SIGNATURE_REQUIRED: Boolean
+  USER_NOTIFICATION_DELIVERY_METHOD: String
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
   DATE_OF_BIRTH_UNKNOWN: Boolean
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
@@ -967,7 +971,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
-  system: System
+  system: IntegratedSystem
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1275,7 +1279,6 @@ input RegistrationInput {
   registrationOffice: String
   otherInformantType: String
   contact: String
-  contactRelationship: String
   contactPhoneNumber: String
   contactEmail: String
   status: [RegWorkflowInput]
@@ -1495,6 +1498,12 @@ enum RegAction {
 
 type StatusReason {
   text: String
+}
+
+type IntegratedSystem {
+  name: String
+  username: String
+  type: String
 }
 
 type Comment {

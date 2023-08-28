@@ -129,6 +129,13 @@ function getSystemType(type: string | undefined) {
 
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
+  if (
+    newHistories[index].action ||
+    !['ISSUED', 'CERTIFIED'].includes(newHistories[index].regStatus)
+  ) {
+    return -1
+  }
+
   newHistories.map((item) => {
     item.uuid = uuid()
     return item
@@ -136,7 +143,11 @@ const getIndexByAction = (histories: any, index: number): number => {
 
   const uid = newHistories[index].uuid
   const actionIndex = newHistories
-    .filter((item) => item.action === newHistories[index].action)
+    .filter(
+      (item) =>
+        item.action === newHistories[index].action &&
+        (item.regStatus === 'ISSUED' || item.regStatus === 'CERTIFIED')
+    )
     .reverse()
     .findIndex((item) => item.uuid === uid)
 
@@ -226,7 +237,10 @@ export const GetHistory = ({
       <Link
         font="bold14"
         onClick={() => {
-          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          const actionIndex = getIndexByAction(
+            sortedHistory,
+            index + (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE
+          )
           toggleActionDetails(item, actionIndex)
         }}
       >
@@ -242,11 +256,11 @@ export const GetHistory = ({
     user: (
       <>
         {isFlaggedAsPotentialDuplicate(item) ? (
-          <SystemUser name={item.system?.name} />
+          <SystemUser name={item.system?.name || ''} />
         ) : isVerifiedAction(item) ? (
           <div />
         ) : isSystemInitiated(item) ? (
-          <HealthSystemUser name={item.system?.name} />
+          <HealthSystemUser name={item.system?.name || ''} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
@@ -275,7 +289,7 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) || !item.user?.systemRole ? (
-      intl.formatMessage(getSystemType(item.system?.type))
+      intl.formatMessage(getSystemType(item.system?.type || ''))
     ) : (
       getUserRole(currentLanguage, item.user?.role)
     ),

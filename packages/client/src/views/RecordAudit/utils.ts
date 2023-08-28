@@ -149,42 +149,67 @@ const getLocation = (
   let internationalDistrict = EMPTY_STRING
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
-
   if (declaration.event === Event.Death) {
-    const municipality =
-      resources.locations[
-        `${declaration.data?.deathEvent?.placeOfDeathMunicipality}`
-      ]
+    locationType =
+      declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
 
-    const localityValue =
-      declaration.data?.deathEvent?.placeOfDeathLocality +
-      ', ' +
-      municipality?.name
+    locationId =
+      declaration.data?.deathEvent?.deathLocation?.toString() || EMPTY_STRING
 
-    return localityValue.toString() || EMPTY_STRING
+    district =
+      declaration.data?.deathEvent?.districtPlaceofdeath?.toString() ||
+      EMPTY_STRING
+    state =
+      declaration.data?.deathEvent?.statePlaceofdeath?.toString() ||
+      EMPTY_STRING
+    country =
+      declaration.data?.deathEvent?.countryPlaceofdeath?.toString() ||
+      EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.deathEvent?.internationalDistrictPlaceofdeath?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.deathEvent?.internationalStatePlaceofdeath?.toString() ||
+      EMPTY_STRING
   } else if (declaration.event === Event.Birth) {
     const municipality =
       resources.locations[
         `${declaration.data?.child?.placeOfBirthMunicipality}`
       ]
 
-    const localityValue =
-      declaration.data?.child?.placeOfBirthLocality + ', ' + municipality?.name
-
-    return localityValue.toString() || EMPTY_STRING
-  } else if (declaration.event === Event.Marriage) {
     district =
-      declaration.data?.marriageEvent?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.marriageEvent?.state?.toString() || EMPTY_STRING
+      declaration.data?.child?.districtPlaceofbirth?.toString() || EMPTY_STRING
+    state =
+      declaration.data?.child?.statePlaceofbirth?.toString() || EMPTY_STRING
     country =
-      declaration.data?.marriageEvent?.country?.toString() || EMPTY_STRING
+      declaration.data?.child?.countryPlaceofbirth?.toString() || EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.marriageEvent?.internationalDistrict?.toString() ||
+      declaration.data?.child?.internationalDistrictPlaceofbirth?.toString() ||
       EMPTY_STRING
     internationalState =
-      declaration.data?.marriageEvent?.internationalState?.toString() ||
+      declaration.data?.child?.internationalStatePlaceofbirth?.toString() ||
+      EMPTY_STRING
+  } else if (declaration.event === Event.Marriage) {
+    district =
+      declaration.data?.marriageEvent?.districtPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    state =
+      declaration.data?.marriageEvent?.statePlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    country =
+      declaration.data?.marriageEvent?.countryPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.marriageEvent?.internationalDistrictPlaceofmarriage?.toString() ||
+      EMPTY_STRING
+    internationalState =
+      declaration.data?.marriageEvent?.internationalStatePlaceofmarriage?.toString() ||
       EMPTY_STRING
 
     if (country && country !== window.config.COUNTRY) {
@@ -230,15 +255,16 @@ const getLocation = (
   // when address is default residence address of deceased
   if (locationType === 'DECEASED_USUAL_RESIDENCE') {
     const countryResidence =
-      declaration.data?.deceased?.countryPrimary?.toString() || EMPTY_STRING
+      declaration.data?.deceased?.countryPrimaryDeceased?.toString() ||
+      EMPTY_STRING
 
     if (countryResidence !== window.config.COUNTRY) {
       // residence address is other than default country
       const internationalDistrictResidence =
-        declaration.data?.deceased?.internationalDistrictPrimary?.toString() ||
+        declaration.data?.deceased?.internationalDistrictPrimaryDeceased?.toString() ||
         EMPTY_STRING
       const internationalStateResidence =
-        declaration.data?.deceased?.internationalStatePrimary?.toString() ||
+        declaration.data?.deceased?.internationalStatePrimaryDeceased?.toString() ||
         EMPTY_STRING
 
       let location = EMPTY_STRING
@@ -252,9 +278,11 @@ const getLocation = (
       return location
     } else {
       const districtResidence =
-        declaration.data?.deceased?.districtPrimary?.toString() || EMPTY_STRING
+        declaration.data?.deceased?.districtPrimaryDeceased?.toString() ||
+        EMPTY_STRING
       const stateResidence =
-        declaration.data?.deceased?.statePrimary?.toString() || EMPTY_STRING
+        declaration.data?.deceased?.statePrimaryDeceased?.toString() ||
+        EMPTY_STRING
 
       return generateFullLocation(
         districtResidence,

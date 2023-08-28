@@ -18,6 +18,7 @@ interface Window {
     LANGUAGES: string
     AVAILABLE_LANGUAGES_SELECT: string
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     CLIENT_APP_URL: string
     PHONE_NUMBER_PATTERN: RegExp
     LOGROCKET: string

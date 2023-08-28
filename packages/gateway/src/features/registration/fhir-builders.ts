@@ -776,24 +776,42 @@ function createEducationalAttainmentBuilder(
   })
 }
 
-function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
+function setExtension(
+  extensions: fhir.Extension[],
+  url: string,
+  value: string
+) {
+  const existingExtension = extensions.find((ext) => ext.url === url)
+  if (existingExtension) {
+    existingExtension.valueString = value
+  } else {
+    extensions.push({
+      url,
+      valueString: value
+    })
   }
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
-    valueString: fieldValue
-  })
 }
 
-function createInformantRelationship(resource: fhir.Task, fieldValue: string) {
-  if (!resource.extension) {
-    resource.extension = []
+function createInformantShareContact(task: fhir.Task, fieldValue: string) {
+  if (!task.extension) {
+    task.extension = []
   }
-  resource.extension.push({
-    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
-    valueString: fieldValue
-  })
+  setExtension(
+    task.extension,
+    `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+    fieldValue
+  )
+}
+
+function createInformantRelationship(task: fhir.Task, fieldValue: string) {
+  if (!task.extension) {
+    task.extension = []
+  }
+  setExtension(
+    task.extension,
+    `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
+    fieldValue
+  )
 }
 
 function createInformantsSignature(
@@ -840,7 +858,99 @@ function createInformantShareContactNumber(
     valueString: fieldValue
   })
 }
+async function createInformantType(
+  fhirBundle: ITemplatedBundle,
+  fieldValue: string,
+  context: any
+) {
+  const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+  createInformantShareContact(taskResource, fieldValue)
 
+  const relatedPersonResource = selectOrCreateInformantSection(
+    INFORMANT_CODE,
+    INFORMANT_TITLE,
+    fhirBundle
+  )
+
+  if (fieldValue !== 'OTHER') {
+    relatedPersonResource.relationship = {
+      coding: [
+        {
+          system: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+          code: fieldValue
+        }
+      ]
+    }
+  }
+  if (context.event === EVENT_TYPE.BIRTH) {
+    if (fieldValue === 'MOTHER') {
+      setInformantReference(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'FATHER') {
+      setInformantReference(
+        FATHER_CODE,
+        FATHER_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'BRIDE') {
+      setInformantReference(
+        BRIDE_CODE,
+        BRIDE_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    } else if (fieldValue === 'GROOM') {
+      setInformantReference(
+        GROOM_CODE,
+        GROOM_TITLE,
+        relatedPersonResource,
+        fhirBundle,
+        context
+      )
+    }
+  }
+}
+
+async function createOtherInformantType(
+  fhirBundle: ITemplatedBundle,
+  fieldValue: string,
+  context: any
+) {
+  const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+  createInformantRelationship(taskResource, fieldValue)
+  const relatedPersonResource = selectOrCreateInformantSection(
+    INFORMANT_CODE,
+    INFORMANT_TITLE,
+    fhirBundle
+  )
+  if (
+    fieldValue &&
+    relatedPersonResource.relationship &&
+    relatedPersonResource.relationship.coding &&
+    relatedPersonResource.relationship.coding[0]
+  ) {
+    relatedPersonResource.relationship.coding[0].code = 'OTHER'
+    relatedPersonResource.relationship.text = fieldValue
+  } else if (fieldValue) {
+    relatedPersonResource.relationship = {
+      coding: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}extension/other-informant-value`,
+          code: 'OTHER'
+        }
+      ],
+      text: fieldValue
+    }
+  }
+}
 function createInformantShareEmail(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -2090,7 +2200,17 @@ export const builders: IFieldBuilders = {
     ) => {
       const person = selectOrCreateInformantResource(fhirBundle)
       return createEducationalAttainmentBuilder(person, fieldValue)
-    }
+    },
+    relationship: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => createInformantType(fhirBundle, fieldValue, context),
+    otherRelationship: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => createOtherInformantType(fhirBundle, fieldValue, context)
   },
   bride: {
     _fhirID: (fhirBundle, fieldValue) => {
@@ -2556,96 +2676,12 @@ export const builders: IFieldBuilders = {
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
-    ) => {
-      // contact has seperate field, thus commented
-      // const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      // createInformantShareContact(taskResource, fieldValue)
-
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-
-      if (fieldValue !== 'OTHER') {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: fieldValue
-            }
-          ]
-        }
-      }
-      if (context.event === EVENT_TYPE.BIRTH) {
-        if (fieldValue === 'MOTHER') {
-          setInformantReference(
-            MOTHER_CODE,
-            MOTHER_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        } else if (fieldValue === 'FATHER') {
-          setInformantReference(
-            FATHER_CODE,
-            FATHER_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        } else if (fieldValue === 'BRIDE') {
-          setInformantReference(
-            BRIDE_CODE,
-            BRIDE_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        } else if (fieldValue === 'GROOM') {
-          setInformantReference(
-            GROOM_CODE,
-            GROOM_TITLE,
-            relatedPersonResource,
-            fhirBundle,
-            context
-          )
-        }
-      }
-    },
+    ) => createInformantType(fhirBundle, fieldValue, context),
     otherInformantType: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
-    ) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      createInformantRelationship(taskResource, fieldValue)
-      const relatedPersonResource = selectOrCreateInformantSection(
-        INFORMANT_CODE,
-        INFORMANT_TITLE,
-        fhirBundle
-      )
-      if (
-        fieldValue &&
-        relatedPersonResource.relationship &&
-        relatedPersonResource.relationship.coding &&
-        relatedPersonResource.relationship.coding[0]
-      ) {
-        relatedPersonResource.relationship.coding[0].code = 'OTHER'
-        relatedPersonResource.relationship.text = fieldValue
-      } else if (fieldValue) {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system: `${OPENCRVS_SPECIFICATION_URL}extension/other-informant-value`,
-              code: 'OTHER'
-            }
-          ],
-          text: fieldValue
-        }
-      }
-    },
+    ) => createOtherInformantType(fhirBundle, fieldValue, context),
     draftId: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,

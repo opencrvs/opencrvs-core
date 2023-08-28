@@ -17,6 +17,9 @@ import FormVersions, {
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { logger } from '@config/config/logger'
+import { badData } from '@hapi/boom'
+import { registrationForms } from './validation'
+import { fromZodError } from 'zod-validation-error'
 
 interface IFormsPayload {
   version: string
@@ -42,6 +45,20 @@ export default async function getForm(
   }
 
   const forms: IFormsPayload = await response.json()
+
+  if (process.env.NODE_ENV === 'development') {
+    const result = registrationForms.safeParse(forms)
+
+    if (!result.success) {
+      throw badData(
+        fromZodError(result.error, {
+          prefix: 'Form validation error',
+          maxIssuesInMessage: 5
+        }).message
+      )
+    }
+  }
+
   const formVersion: IFormVersionModel | null = await FormVersions.findOne({
     version: forms.version
   })
@@ -53,7 +70,7 @@ export default async function getForm(
         marriageForm: JSON.stringify(forms.marriage),
         version: forms.version,
         status: Status.ACTIVE
-      } as IFormVersionModel)
+      })
     } catch (err) {
       logger.error(err)
       // return 400 if there is a validation error when saving to mongo

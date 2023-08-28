@@ -108,6 +108,8 @@ export interface IApplicationConfig {
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
   LOGIN_BACKGROUND: ILoginBackground
+  USER_NOTIFICATION_DELIVERY_METHOD: string
+  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
@@ -123,6 +125,14 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+
+  if (res && res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
+
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
@@ -159,6 +169,12 @@ async function loadForms(): Promise<LoadFormsResponse> {
       Authorization: `Bearer ${getToken()}`
     }
   })
+  if (res.status === 422) {
+    const err = new Error((await res.json()).message, {
+      cause: 'VALIDATION_ERROR'
+    })
+    throw err
+  }
 
   if (res && res.status !== 201) {
     throw Error(res.statusText)
