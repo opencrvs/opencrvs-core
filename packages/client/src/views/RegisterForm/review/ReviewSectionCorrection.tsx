@@ -1,6 +1,7 @@
 import {
   IDeclaration,
   SUBMISSION_STATUS,
+  modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
@@ -14,11 +15,13 @@ import { messages } from '@client/i18n/messages/views/register'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { goToHomeTab } from '@client/navigation'
 import styled from 'styled-components'
-import { IFormSectionData } from '@client/forms'
+import { IFormSectionData, SubmissionAction } from '@client/forms'
 import {
   IRejectCorrectionForm,
   rejectCorrection
 } from '@client/review/reject-correction'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { hasFormError } from '@client/forms/utils'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -37,14 +40,18 @@ interface IProps {
 type DispatchProps = {
   writeDeclaration: typeof writeDeclaration
   goToHomeTab: typeof goToHomeTab
+  modifyDeclaration: typeof modifyDeclaration
 }
 
-type FullProps = IProps & IntlShapeProps & { form: IRejectCorrectionForm }
+type FullProps = IProps &
+  IntlShapeProps &
+  DispatchProps & { form: IRejectCorrectionForm }
 
 type State = {
   data: IFormSectionData
   approvePrompt: boolean
   rejectPrompt: boolean
+  enabledForReject: boolean
 }
 
 class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
@@ -53,7 +60,8 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     this.state = {
       data: {},
       approvePrompt: false,
-      rejectPrompt: false
+      rejectPrompt: false,
+      enabledForReject: false
     }
   }
 
@@ -67,6 +75,30 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     this.setState((state) => ({
       approvePrompt: !state.approvePrompt
     }))
+  }
+
+  approveCorrection = () => {
+    const recordWithSubmissionStatus = {
+      ...this.props.declaration,
+      submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+      action: SubmissionAction.APPROVE_CORRECTION
+    }
+    this.props.modifyDeclaration(recordWithSubmissionStatus)
+    this.props.writeDeclaration(recordWithSubmissionStatus)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+  }
+
+  storeData = (rejectionFormData: IFormSectionData) => {
+    this.setState(
+      () => ({ data: rejectionFormData }),
+      () =>
+        this.setState(() => ({
+          enabledForReject: !hasFormError(
+            this.props.form.fields,
+            rejectionFormData
+          )
+        }))
+    )
   }
 
   render() {
@@ -100,6 +132,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
               size="medium"
               id="confirm_save"
               key="confirm_save"
+              onClick={this.approveCorrection}
             >
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
@@ -129,23 +162,19 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
               size="medium"
               key="submit_reject_form"
               id="submit_reject_form"
-              // disabled={!this.state.enableSendForUpdateBtn}
+              disabled={!this.state.enabledForReject}
             >
               {intl.formatMessage(buttonMessages.confirm)}
             </Button>
           ]}
         >
           <Text element="p" variant="reg16">
-            <Instruction>
-              {intl.formatMessage(
-                messages.saveCorrectionRejectModalDescription
-              )}
-            </Instruction>
+            {intl.formatMessage(messages.saveCorrectionRejectModalDescription)}
           </Text>
           <FormFieldGenerator
             id="reject_form"
             fields={fields}
-            onChange={() => {}}
+            onChange={this.storeData}
             setAllFieldsDirty={false}
           />
         </Dialog>
@@ -156,5 +185,6 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSectionCorrection = connect<{}, DispatchProps>(null, {
   writeDeclaration,
-  goToHomeTab
+  goToHomeTab,
+  modifyDeclaration
 })(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))
