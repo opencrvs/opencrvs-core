@@ -13,7 +13,8 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormSectionData
+  IFormSectionData,
+  IFormFieldQueryMapFunction
 } from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
@@ -22,13 +23,20 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import { History, RegStatus } from '@client/utils/gateway'
-import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
-import { get } from 'lodash'
+import {
+  GQLRegStatus,
+  GQLRegWorkflow
+} from '@opencrvs/gateway/src/graphql/schema'
+import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
-import { getAddressName } from '@client/views/SysAdmin/Team/utils'
+import {
+  getAddressMapping,
+  getAddressName
+} from '@client/views/SysAdmin/Team/utils'
 import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { countryAlpha3toAlpha2 } from '@client/utils/locationUtils'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 
 export const roleUserTransformer = (
   transformedData: IFormData,
@@ -290,3 +298,129 @@ export const QRCodeTransformer = async (
       )}`
     )
 }
+
+export function informantTypeTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'informantType'
+  ] = queryData[sectionId].informantType
+    ? (informantMessageDescriptors[
+        queryData[sectionId].informantType
+      ] as MessageDescriptor & Record<string, string>)
+    : ''
+}
+
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        VIEW_VERIFY_CERTIFICATE,
+        {
+          declarationId: queryData.id
+        }
+      )}`
+    )
+}
+
+export const registrationAddressUserTransformer =
+  (valueLocation: 'region' | 'division' | 'subdivision') =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string,
+    offlineData?: IOfflineData
+  ) => {
+    const statusData = queryData.registration.status as GQLRegWorkflow[]
+    const registrationStatus =
+      statusData &&
+      statusData.find((status) => {
+        return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      })
+    if (!registrationStatus?.office || !offlineData) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrationOfficeAddress'
+      ] = ''
+      return
+    }
+
+    const officeAddress = getAddressMapping(
+      offlineData,
+      registrationStatus.office as unknown as ILocation
+    )
+
+    const currentOfficeAddress = officeAddress.find(
+      (r) => r.type === valueLocation
+    )
+
+    if (currentOfficeAddress) {
+      transformedData[targetSectionId || sectionId][
+        targetFieldName || 'registrationOfficeAddress'
+      ] = currentOfficeAddress.name
+      return
+    }
+
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationOfficeAddress'
+    ] = ''
+  }
+
+export const changeHirerchyQueryTransformer =
+  (
+    transformedFieldName?: string,
+    transformerMethod?: IFormFieldQueryMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    queryData: IFormData,
+    sectionId: string,
+    field: IFormField,
+    nestedField: IFormField
+  ) => {
+    if (transformedFieldName) {
+      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
+        get(queryData, transformedFieldName)
+
+      if (transformerMethod) {
+        const clonedTransformedData = cloneDeep(transformedData)
+        transformerMethod(clonedTransformedData, queryData, sectionId, field)
+
+        transformedData[sectionId][field.name]['nestedFields'][
+          nestedField.name
+        ] = clonedTransformedData[sectionId][field.name]
+      }
+    } else {
+      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
+        get(queryData, `${sectionId}.${nestedField.name}`)
+    }
+
+    return transformedData
+  }
+
+export const plainInputTransformerSection =
+  (fieldName: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    if (fieldName && targetFieldName) {
+      transformedData[targetSectionId || sectionId][targetFieldName] =
+        queryData[sectionId][fieldName]
+    }
+  }

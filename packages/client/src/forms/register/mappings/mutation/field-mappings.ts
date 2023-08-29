@@ -774,3 +774,42 @@ export const msisdnTransformer =
 
     return transformedData
   }
+
+export const changeHirerchyMutationTransformer =
+  (
+    transformedFieldName?: string,
+    transformerMethod?: IFormFieldMutationMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField,
+    nestedField: IFormField
+  ) => {
+    const nestedFieldValueObj: IFormSectionData = (
+      draftData[sectionId][field.name] as IFormSectionData
+    ).nestedFields as IFormSectionData
+
+    if (transformedFieldName) {
+      set(
+        transformedData,
+        transformedFieldName,
+        nestedFieldValueObj[nestedField.name] || ''
+      )
+
+      if (transformerMethod) {
+        transformerMethod(
+          transformedData,
+          draftData[sectionId][field.name] as IFormData,
+          'nestedFields',
+          nestedField
+        )
+      }
+    } else {
+      transformedData[nestedField.name] =
+        nestedFieldValueObj[nestedField.name] || ''
+    }
+
+    return transformedData
+  }

@@ -1236,3 +1236,83 @@ export function questionnaireToCustomFieldTransformer(
     }
   }
 }
+
+enum LocationLevel {
+  district,
+  state,
+  country
+}
+
+const transformAddressTemplateArray = (
+  transformedData: IFormData,
+  addressFromQuery: GQLAddress,
+  addressLocationLevel: keyof typeof LocationLevel,
+  sectionId: string,
+  nameKey: string,
+  offlineData?: IOfflineData,
+  addressCases?: AddressCases
+) => {
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+  if (!transformedData[sectionId][nameKey]) {
+    transformedData[sectionId][nameKey] = Array(3).fill('')
+  }
+  const addressName =
+    addressLocationLevel === 'country'
+      ? countries.find(
+          ({ value }) => value === addressFromQuery?.[addressLocationLevel]
+        )?.label || ''
+      : offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
+          addressFromQuery[addressLocationLevel] as string
+        ]?.name ||
+        addressFromQuery[addressLocationLevel] ||
+        ''
+  ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
+    LocationLevel[addressLocationLevel]
+  ] = addressName
+
+  const addressCase =
+    addressCases === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
+  transformedData[sectionId][
+    camelCase(`${nameKey}_${addressCase}_${addressLocationLevel}`)
+  ] = addressName as string | Record<string, string>
+}
+
+export const eventLocationAddressOfflineTransformer =
+  (
+    addressLocationLevel: keyof typeof LocationLevel,
+    transformedFieldName?: string
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation.type !== 'PRIVATE_HOME' &&
+      queryData.eventLocation.type !== 'PRIMARY_ADDRESS' &&
+      queryData.eventLocation.type !== 'DECEASED_USUAL_RESIDENCE' &&
+      queryData.eventLocation.type !== 'OTHER'
+    ) {
+      return
+    }
+
+    const addressFromQuery = queryData.eventLocation?.address
+    const nameKey = transformedFieldName || field.name
+
+    if (addressFromQuery) {
+      transformAddressTemplateArray(
+        transformedData,
+        addressFromQuery,
+        addressLocationLevel,
+        sectionId,
+        nameKey,
+        offlineData
+      )
+    }
+  }
