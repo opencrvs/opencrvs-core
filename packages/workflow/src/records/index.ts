@@ -13,6 +13,16 @@ import { sortBy, uniqBy } from 'lodash'
 
 const client = new MongoClient(HEARTH_MONGO_URL)
 
+function developmentTimeError(...params: Parameters<typeof console.error>) {
+  /* eslint-disable no-console */
+  console.error('-----------------------------')
+  console.error('')
+  console.error(...params)
+  console.error('')
+  console.error('-----------------------------')
+  /* eslint-enable no-console */
+}
+
 export class RecordNotFoundError extends Error {
   constructor(message: string) {
     super(message)
@@ -44,19 +54,14 @@ function checkForUnresolvedReferences(bundle: Bundle) {
           try {
             findFromBundleById(bundle, id)
           } catch (error) {
-            console.log('-----------------------------------')
-            console.log()
-            console.log(
+            developmentTimeError(
               'Unresolved reference found: ' + value,
-              JSON.stringify(rootResource)
+              'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned',
+              'Resource:',
+              JSON.stringify(rootResource),
+              'Bundle',
+              JSON.stringify(bundle)
             )
-            console.log(
-              'Make sure to add a join to getFHIRBundleWithRecordID query so that all resources of the records are returned'
-            )
-            console.log()
-            console.log(JSON.stringify(bundle))
-            console.log()
-            console.log('-----------------------------------')
             throw error
           }
         }
@@ -74,27 +79,6 @@ function checkForUnresolvedReferences(bundle: Bundle) {
 
   for (const entry of bundle.entry!) {
     check(entry.resource, entry.resource.resourceType, entry.resource)
-  }
-}
-function checkForDuplicateIds(bundleEntries: BundleEntry[]) {
-  const knownIDs: Record<string, BundleEntry> = {}
-
-  for (const entry of bundleEntries) {
-    if (knownIDs[entry.resource.id!]) {
-      console.log('-----------------------------------')
-      console.log()
-      console.log(
-        'Duplicate ID found: ' + entry.resource.id,
-        JSON.stringify(entry.resource)
-      )
-      console.log()
-      console.log(JSON.stringify(knownIDs[entry.resource.id!]))
-      console.log()
-      console.log('-----------------------------------')
-      throw new Error('Duplicate identifier in bundle')
-    }
-
-    knownIDs[entry.resource.id!] = entry
   }
 }
 
@@ -485,7 +469,8 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     try {
       checkForUnresolvedReferences(bundle)
     } catch (error) {
-      console.log(error)
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw error
     }
   }
@@ -507,15 +492,6 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     bundle,
     entriesInBackwardsCompatibleOrder
   )
-
-  if (process.env.NODE_ENV !== 'production') {
-    try {
-      checkForDuplicateIds(bundleWithFullURLReferences)
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
 
   const record = {
     resourceType: 'Bundle',

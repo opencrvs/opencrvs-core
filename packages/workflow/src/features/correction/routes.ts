@@ -39,7 +39,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
-import { getLoggedInPractitionerResource } from '../user/utils'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
 
 function validateRequest<T extends z.ZodType>(

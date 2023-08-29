@@ -47,7 +47,7 @@ import {
   Resource,
   Task
 } from '@opencrvs/commons'
-import { MAKE_CORRECTION_EXTENSION_URL } from '../task/fhir/constants'
+import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 interface INotificationPayload {
   recipient: {
