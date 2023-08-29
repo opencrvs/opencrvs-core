@@ -14,12 +14,11 @@ import {
   Bundle,
   CertifiedRecord,
   CorrectionRequestedRecord,
-  getAuthHeader,
   IssuedRecord,
   RegisteredRecord,
   Task,
   withOnlyLatestTask
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { uploadBase64ToMinio } from '@workflow/documents'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import {
@@ -41,6 +40,7 @@ import { z } from 'zod'
 
 import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import { getRecordById } from '@workflow/records'
+import { getAuthHeader } from '@opencrvs/commons'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,

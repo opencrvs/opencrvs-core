@@ -43,7 +43,7 @@ import {
   Patient,
   Resource,
   Task
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {

@@ -13,7 +13,7 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-import { Practitioner } from '@opencrvs/commons'
+import { Practitioner } from '@opencrvs/commons/types'
 
 export async function getUser(
   userId: string,

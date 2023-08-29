@@ -22,7 +22,7 @@ import { testFhirBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'
-import { Bundle, Composition, Task } from '@opencrvs/commons'
+import { Bundle, Composition, Task } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 

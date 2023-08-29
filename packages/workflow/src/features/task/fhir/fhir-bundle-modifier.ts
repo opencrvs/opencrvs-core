@@ -17,7 +17,7 @@ import {
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import { Bundle, Task } from '@opencrvs/commons'
+import { Bundle, Task } from '@opencrvs/commons/types'
 
 export async function modifyTaskBundle(fhirBundle: Bundle, token: string) {
   if (

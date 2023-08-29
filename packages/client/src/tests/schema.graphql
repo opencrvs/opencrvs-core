@@ -169,10 +169,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
-  requestBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
+  requestRegistrationCorrection(id: ID!, details: BirthRegistrationInput!): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsArchived(id: String!): ID!

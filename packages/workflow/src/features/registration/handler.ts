@@ -68,7 +68,7 @@ import {
   Composition,
   Patient,
   Task
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string

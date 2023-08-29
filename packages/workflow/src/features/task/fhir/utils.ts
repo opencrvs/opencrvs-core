@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Task } from '@opencrvs/commons'
+import { Task } from '@opencrvs/commons/types'
 import { RegStatus } from '@workflow/features/registration/fhir/constants'
 
 export function isRejectedTask(taskResource: Task) {

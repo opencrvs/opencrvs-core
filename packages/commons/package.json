@@ -6,7 +6,8 @@
   "main": "./build/dist/index.js",
   "exports": {
     ".": "./build/dist/index.js",
-    "./monitoring": "./build/dist/monitoring.js"
+    "./monitoring": "./build/dist/monitoring.js",
+    "./types": "./build/dist/types.js"
   },
   "scripts": {
     "start": "yarn build:watch",

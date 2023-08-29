@@ -1,7 +1,7 @@
 import { METRICS_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
-import { ValidRecord } from '@opencrvs/commons'
+import { ValidRecord } from '@opencrvs/commons/types'
 
 export async function createNewAuditEvent(
   bundle: ValidRecord,

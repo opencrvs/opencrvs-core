@@ -3,11 +3,10 @@ import {
   BundleEntry,
   BundleEntryWithFullUrl,
   DocumentReference,
-  getUUID,
   PaymentReconciliation,
   Task,
   Unsaved
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
@@ -17,6 +16,7 @@ import {
   CorrectionRequestPaymentInput
 } from './correction-request'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { getUUID } from '@opencrvs/commons'
 
 export function createCorrectionProofOfLegalCorrectionDocument(
   subjectReference: string,

@@ -50,7 +50,7 @@ import {
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
-import { Bundle, Task } from '@opencrvs/commons'
+import { Bundle, Task } from '@opencrvs/commons/types'
 const fetch = fetchAny as any
 
 const mockInput = [

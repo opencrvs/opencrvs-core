@@ -38,7 +38,12 @@ import {
   mosipBirthPatientBundleMock,
   mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
-import { BundleEntry, Composition, Practitioner, Task } from '@opencrvs/commons'
+import {
+  BundleEntry,
+  Composition,
+  Practitioner,
+  Task
+} from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'

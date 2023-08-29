@@ -22,7 +22,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/utils'
-import { Bundle, Task } from '@opencrvs/commons'
+import { Bundle, Task } from '@opencrvs/commons/types'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,

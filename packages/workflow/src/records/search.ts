@@ -1,4 +1,4 @@
-import { ValidRecord } from '@opencrvs/commons'
+import { ValidRecord } from '@opencrvs/commons/types'
 import { SEARCH_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 

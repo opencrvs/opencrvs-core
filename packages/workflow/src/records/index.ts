@@ -4,7 +4,7 @@ import {
   StateIdenfitiers,
   isComposition,
   isRelatedPerson
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { HEARTH_MONGO_URL } from '@workflow/constants'
 import { MongoClient } from 'mongodb'
 

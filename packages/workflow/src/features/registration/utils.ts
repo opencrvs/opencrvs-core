@@ -46,7 +46,7 @@ import {
   Patient,
   Resource,
   Task
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 interface INotificationPayload {

@@ -8,7 +8,7 @@ import {
   Nominal,
   StateIdenfitiers,
   IssuedRecord
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
 export type Certify = Nominal<{}, 'Certify'>

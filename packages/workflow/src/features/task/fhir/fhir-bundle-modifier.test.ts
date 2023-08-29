@@ -22,7 +22,7 @@ import {
   testFhirTaskBundle,
   taskResouceMock
 } from '@workflow/test/utils'
-import { Task } from '@opencrvs/commons'
+import { Task } from '@opencrvs/commons/types'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'

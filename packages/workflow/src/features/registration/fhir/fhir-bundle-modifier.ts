@@ -63,7 +63,7 @@ import {
   Patient,
   Practitioner,
   Task
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 
 export async function modifyRegistrationBundle(
   fhirBundle: Bundle,

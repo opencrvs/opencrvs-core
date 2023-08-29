@@ -25,7 +25,7 @@ import {
   Task,
   TaskWithoutId,
   isTask
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import { CompositionSection } from 'fhir/r3'
 
 export const INFORMANT_CODE = 'informant-details'

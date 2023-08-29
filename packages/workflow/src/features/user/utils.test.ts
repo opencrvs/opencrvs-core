@@ -29,7 +29,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 import * as fetchAny from 'jest-fetch-mock'
-import { Location, Practitioner } from '@opencrvs/commons'
+import { Location, Practitioner } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 

@@ -16,7 +16,7 @@ import {
   Unsaved,
   sortTasksDescending,
   RecordWithPreviousTask
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/types'
 import {
   setupLastRegLocation,
   setupLastRegUser
