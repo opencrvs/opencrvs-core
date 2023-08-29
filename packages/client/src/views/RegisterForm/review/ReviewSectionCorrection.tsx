@@ -4,12 +4,9 @@ import {
   writeDeclaration
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
-import { ResponsiveModal } from '@opencrvs/components'
-import {
-  SuccessButton,
-  TertiaryButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
+import { Text } from '@opencrvs/components/lib/Text'
 import React from 'react'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -75,11 +72,6 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
   render() {
     const { intl, form } = this.props
     const { fields } = form
-    if (
-      this.props.declaration.registrationStatus !==
-      SUBMISSION_STATUS.CORRECTION_REQUESTED
-    )
-      return null
 
     return (
       <>
@@ -88,74 +80,81 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
           toggleApproveModal: this.toggleApproveModal
         })}
 
-        <ResponsiveModal
+        <Dialog
           id="save_correction_confirmation"
           title={intl.formatMessage(messages.saveCorrectionConfirmModalTitle)}
-          show={this.state.approvePrompt}
-          handleClose={this.toggleApproveModal}
-          responsive={false}
-          contentHeight={80}
+          isOpen={this.state.approvePrompt}
+          onClose={this.toggleApproveModal}
           actions={[
-            <TertiaryButton
+            <Button
+              type="tertiary"
+              size="medium"
               id="cancel_save"
               key="cancel_save"
               onClick={this.toggleApproveModal}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <SuccessButton id="confirm_save" key="confirm_save">
+            </Button>,
+            <Button
+              type="positive"
+              size="medium"
+              id="confirm_save"
+              key="confirm_save"
+            >
               {intl.formatMessage(buttonMessages.confirm)}
-            </SuccessButton>
+            </Button>
           ]}
         >
-          {intl.formatMessage(messages.saveCorrectionConfirmModalDescription)}
-        </ResponsiveModal>
-        <ResponsiveModal
+          <Text element="p" variant="reg16">
+            {intl.formatMessage(messages.saveCorrectionConfirmModalDescription)}
+          </Text>
+        </Dialog>
+        <Dialog
           id="reject_correction_confirmation"
           title={intl.formatMessage(messages.saveCorrectionRejectModalTitle)}
-          show={this.state.rejectPrompt}
-          width={718}
-          contentHeight={230}
-          handleClose={this.toggleRejectModal}
-          showHeaderBorder={true}
+          isOpen={this.state.rejectPrompt}
+          onClose={this.toggleRejectModal}
           actions={[
-            <TertiaryButton
+            <Button
+              type="tertiary"
+              size="medium"
               id="cancel_reject"
               key="cancel_reject"
               onClick={this.toggleRejectModal}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <DangerButton
+            </Button>,
+            <Button
+              type="negative"
+              size="medium"
               key="submit_reject_form"
               id="submit_reject_form"
               // disabled={!this.state.enableSendForUpdateBtn}
             >
               {intl.formatMessage(buttonMessages.confirm)}
-            </DangerButton>
+            </Button>
           ]}
         >
-          <Instruction>
-            {intl.formatMessage(messages.saveCorrectionRejectModalDescription)}
-          </Instruction>
+          <Text element="p" variant="reg16">
+            <Instruction>
+              {intl.formatMessage(
+                messages.saveCorrectionRejectModalDescription
+              )}
+            </Instruction>
+          </Text>
           <FormFieldGenerator
             id="reject_form"
             fields={fields}
             onChange={() => {}}
             setAllFieldsDirty={false}
           />
-        </ResponsiveModal>
+        </Dialog>
       </>
     )
   }
 }
 
-export const ReviewSectionCorrection = connect<{}, DispatchProps>(
-  () => ({
-    form: rejectCorrection
-  }),
-  {
-    writeDeclaration,
-    goToHomeTab
-  }
-)(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))
+export const ReviewSectionCorrection = connect<{}, DispatchProps>(null, {
+  writeDeclaration,
+  goToHomeTab
+})(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))

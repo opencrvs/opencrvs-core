@@ -67,6 +67,9 @@ interface ICorrectionMessages
   correctionSummaryTotalPaymentLabel: MessageDescriptor
   correctionRequiredLabel: MessageDescriptor
   correctionForApprovalDialogTitle: MessageDescriptor
+  correctionSummarySubmitter: MessageDescriptor
+  correctionSummaryOffice: MessageDescriptor
+  correctionSummaryRequestedOn: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -390,6 +393,21 @@ const messagesToDefine: ICorrectionMessages = {
     description:
       'The description for the dialog when record correction sent by registration agent for approval',
     id: 'correction.correctionForApprovalDialog.description'
+  },
+  correctionSummarySubmitter: {
+    id: 'correction.summary.submitter',
+    defaultMessage: 'Submitter',
+    description: 'Submitter of certificate correction summary'
+  },
+  correctionSummaryOffice: {
+    id: 'correction.summary.office',
+    defaultMessage: 'Office',
+    description: 'Office where certificate correction summary was submitted'
+  },
+  correctionSummaryRequestedOn: {
+    id: 'correction.summary.requestedOn',
+    defaultMessage: 'Requested on',
+    description: 'Date when certificate correction summary was submitted'
   }
 }
 
