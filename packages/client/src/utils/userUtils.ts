@@ -29,9 +29,11 @@ export function getUserLocation(userDetails: UserDetails) {
 }
 
 export async function storeUserDetails(userDetails: UserDetails) {
+  window.config.USER_SYSTEM_ROLE = userDetails.systemRole
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
 export async function removeUserDetails() {
+  window.config.USER_SYSTEM_ROLE = ''
   storage.removeItem(USER_DETAILS)
 }
 

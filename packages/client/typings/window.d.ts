@@ -12,6 +12,7 @@
 
 interface Window {
   config: {
+    USER_SYSTEM_ROLE: string
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
     BIRTH: {
