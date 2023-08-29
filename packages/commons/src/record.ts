@@ -90,7 +90,7 @@ export function withOnlyLatestTask<
     {
       ...record,
       entry: record.entry.filter(
-        (entry) => !isTask(entry.resource) || entry.resource.id === tasks[0].id
+        (entry) => !isTask(entry.resource) || entry.resource === tasks[0] // match by reference
       )
     },
     getState(record)

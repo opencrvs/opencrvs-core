@@ -138,17 +138,13 @@ export const routes = [
 
       // This is just for backwards compatibility reasons as a lot of existing code assimes there
       // is only one task in the bundle
-      const recordWithOnlyThePreviousTask = withOnlyLatestTask(
+      const recordWithOnlyTheLatestTask = withOnlyLatestTask(
         recordInPreviousStateWithCorrectionRejection
       )
 
-      await createNewAuditEvent(
-        recordWithOnlyThePreviousTask,
-        getToken(request)
-      )
-      await indexBundle(recordWithOnlyThePreviousTask, getToken(request))
-
-      return recordWithOnlyThePreviousTask
+      await createNewAuditEvent(recordWithOnlyTheLatestTask, getToken(request))
+      await indexBundle(recordWithOnlyTheLatestTask, getToken(request))
+      return recordWithOnlyTheLatestTask
     }
   }),
   createRoute({

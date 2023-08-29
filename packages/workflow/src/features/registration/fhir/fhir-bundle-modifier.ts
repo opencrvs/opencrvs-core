@@ -460,7 +460,7 @@ export async function setupRegistrationWorkflow(
 
 export async function setupLastRegLocation(
   taskResource: Task,
-  practitioner: fhir3.Practitioner
+  practitioner: Practitioner
 ): Promise<Task> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')

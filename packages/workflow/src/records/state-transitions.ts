@@ -292,6 +292,9 @@ export async function toCorrectionRejected(
     practitioner
   )
 
+  // This is important as otherwise the when the older task is removed later on this one gets dropped out
+  previousTaskWithPractitionerExtensions.lastModified = new Date().toISOString()
+
   const tasksToBeIncludedInBundle = [
     correctionRejectionWithLocationExtensions,
     previousTaskWithLocationExtensions

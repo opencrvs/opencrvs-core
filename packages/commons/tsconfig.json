@@ -18,7 +18,8 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["jest", "fhir"]
+    "types": ["jest", "fhir"],
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "typings"],
   "exclude": [
@@ -26,7 +27,6 @@
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
+    "src/setupTests.ts"
   ]
 }
