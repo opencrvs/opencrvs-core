@@ -433,14 +433,7 @@ function applyCorrectionToData(record: IDeclaration) {
       ...declarationData,
       registration: {
         ...declarationData.registration,
-        correction: {
-          ...correction,
-          date: correctionRequestTask.date,
-          submitter:
-            correctionRequestTask?.user &&
-            getName(correctionRequestTask.user.name, 'en'),
-          office: correctionRequestTask.office?.name
-        }
+        correction: correction
       }
     }
   }

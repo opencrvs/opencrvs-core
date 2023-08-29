@@ -243,12 +243,12 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   },
   [RegAction.RequestedCorrection]: {
     id: 'recordAudit.regAction.requestedCorrection',
-    defaultMessage: 'Requested correction',
+    defaultMessage: 'Correction requested',
     description: 'Requested Correction action'
   },
   [RegAction.ApprovedCorrection]: {
     id: 'recordAudit.regAction.approvedCorrection',
-    defaultMessage: 'Approved correction',
+    defaultMessage: 'Correction approved',
     description: 'Approved Correction action'
   },
   [RegAction.Corrected]: {
@@ -258,7 +258,7 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   },
   [RegAction.RejectedCorrection]: {
     id: 'recordAudit.regAction.rejectedCorrection',
-    defaultMessage: 'Rejected correction',
+    defaultMessage: 'Correction rejected',
     description: 'Rejected Correction action'
   },
   [RegAction.Viewed]: {
