@@ -17,9 +17,6 @@ import FormVersions, {
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { logger } from '@config/config/logger'
-import { badData } from '@hapi/boom'
-import { registrationForms } from './validation'
-import { fromZodError } from 'zod-validation-error'
 
 interface IFormsPayload {
   version: string
@@ -46,18 +43,19 @@ export default async function getForm(
 
   const forms: IFormsPayload = await response.json()
 
-  if (process.env.NODE_ENV === 'development') {
-    const result = registrationForms.safeParse(forms)
+  // Validates farajaland specific form logic
+  // if (process.env.NODE_ENV === 'development') {
+  //   const result = registrationForms.safeParse(forms)
 
-    if (!result.success) {
-      throw badData(
-        fromZodError(result.error, {
-          prefix: 'Form validation error',
-          maxIssuesInMessage: 5
-        }).message
-      )
-    }
-  }
+  //   if (!result.success) {
+  //     throw badData(
+  //       fromZodError(result.error, {
+  //         prefix: 'Form validation error',
+  //         maxIssuesInMessage: 5
+  //       }).message
+  //     )
+  //   }
+  // }
 
   const formVersion: IFormVersionModel | null = await FormVersions.findOne({
     version: forms.version
