@@ -67,7 +67,7 @@ const initialState: IUserFormState = {
   submitting: false,
   loadingRoles: false,
   submissionError: false,
-  userAuditForm: null,
+  userAuditForm,
   systemRoleMap: {}
 }
 
@@ -261,7 +261,7 @@ export interface IUserFormState {
   submitting: boolean
   loadingRoles: boolean
   submissionError: boolean
-  userAuditForm: IUserAuditForm | null
+  userAuditForm: IUserAuditForm
   systemRoleMap: ISystemRolesMap
 }
 
@@ -328,7 +328,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
-          userAuditForm
+          userAuditForm,
+          loadingRoles: true
         },
         Cmd.run(fetchRoles, {
           successActionCreator: rolesLoaded
