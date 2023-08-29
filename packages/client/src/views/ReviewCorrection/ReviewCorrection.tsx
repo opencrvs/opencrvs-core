@@ -453,8 +453,6 @@ export function ReviewCorrection() {
   const location = useLocation()
   const history = useHistory()
 
-  const dispatch = useDispatch()
-
   const registerForm = useSelector((state: IStoreState) =>
     getEventReviewForm(state, Event.Birth)
   )
@@ -477,19 +475,6 @@ export function ReviewCorrection() {
 
   return (
     <>
-      <button
-        onClick={() => {
-          const recordWithSubmissionStatus = {
-            ...recordWithProposedChanges,
-            submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-            action: SubmissionAction.APPROVE_CORRECTION
-          }
-          dispatch(modifyDeclaration(recordWithSubmissionStatus))
-          dispatch(writeDeclaration(recordWithSubmissionStatus))
-        }}
-      >
-        test
-      </button>
       <RegisterForm
         match={{
           ...match,

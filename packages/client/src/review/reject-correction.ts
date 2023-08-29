@@ -20,11 +20,11 @@ export const rejectCorrection: IRejectCorrectionForm = {
     {
       name: 'rejectionRaisonOfCorrection',
       type: TEXTAREA,
-      label: messages.rejectionCommentForHealthWorkerLabel,
+      label: messages.rejectionReasonLabel,
       initialValue: '',
       required: true,
       hideAsterisk: true,
-      hideHeader: true,
+      hideHeader: false,
       validator: [],
       maxLength: 500,
       ignoreMediaQuery: true,
