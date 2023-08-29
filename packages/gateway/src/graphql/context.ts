@@ -11,7 +11,7 @@
  */
 /* eslint-disable import/no-relative-parent-imports */
 import PatientAPI from '../features/fhir/patientAPI'
-import { IAuthHeader } from '../common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PaymentsAPI from '../features/fhir/paymentsAPI'
 import DocumentsAPI from '../features/fhir/documentsAPI'

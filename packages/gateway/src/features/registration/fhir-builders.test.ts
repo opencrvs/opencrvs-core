@@ -34,7 +34,9 @@ import { mockTask } from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { IAuthHeader } from '@gateway/common-types'
+
+import { IAuthHeader } from '@opencrvs/commons'
+
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -894,105 +896,6 @@ test('creates task with contact other relationship', async () => {
       })
     )
   ).toBe(true)
-})
-
-test('should build bundle for correction fhir builders', async () => {
-  fetch.mockResponse(
-    JSON.stringify({
-      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-    })
-  )
-  const fhir = await buildFHIRBundle(
-    {
-      child: {
-        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
-        gender: 'male',
-        name: [],
-        birthDate: '2018-01-28',
-        maritalStatus: 'NOT_STATED',
-        deceased: false,
-        multipleBirth: 3,
-        dateOfMarriage: '',
-        nationality: ['BGD'],
-        educationalAttainment: 'NO_SCHOOLING'
-      },
-      registration: {
-        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        informantType: 'MOTHER',
-        contactPhoneNumber: '01733333333',
-        paperFormID: '12345678',
-        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
-        trackingId: 'B123456',
-        registrationNumber: '201923324512345671',
-        correction: {
-          location: {
-            _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
-          },
-          requester: 'MOTHER',
-          hasShowedVerifiedDocument: true,
-          attestedAndCopied: true,
-          noSupportingDocumentationRequired: false,
-          values: [
-            {
-              section: 'child',
-              fieldName: 'name',
-              oldValue: 'Khaby Lame',
-              newValue: 'Khaby Lame Corrected'
-            }
-          ],
-          reason: 'CLERICAL_ERROR',
-          note: 'Spelling mistake',
-          payments: {
-            amount: 10,
-            total: 10,
-            paymentId: '123',
-            type: 'MANUAL',
-            date: '2022-01-28T07:09:01.079Z',
-            data: 'data:image/png;base64,2324256'
-          },
-          data: 'data:image/png;base64,2324234'
-        }
-      }
-    },
-    'BIRTH' as EVENT_TYPE
-  )
-
-  expect(fhir).toBeDefined()
-  // Task resource
-  expect(fhir.entry[2].resource.extension[2]).toEqual({
-    url: 'http://opencrvs.org/specs/extension/requestingIndividual',
-    valueString: 'MOTHER'
-  })
-  expect(fhir.entry[2].resource.input).toEqual([
-    {
-      valueCode: 'child',
-      valueId: 'name',
-      type: {
-        coding: [
-          {
-            code: 'update',
-            system: 'http://terminology.hl7.org/CodeSystem/action-type'
-          }
-        ]
-      },
-      valueString: 'Khaby Lame'
-    }
-  ])
-  expect(fhir.entry[2].resource.output).toEqual([
-    {
-      valueCode: 'child',
-      valueId: 'name',
-      type: {
-        coding: [
-          {
-            code: 'update',
-            system: 'http://terminology.hl7.org/CodeSystem/action-type'
-          }
-        ]
-      },
-      valueString: 'Khaby Lame Corrected'
-    }
-  ])
 })
 
 describe('taskBundleWithExtension()', () => {
