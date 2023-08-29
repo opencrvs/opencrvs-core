@@ -212,6 +212,10 @@ class ReadyForReviewComponent extends React.Component<
           reg.operationHistories,
           RegStatus.Validated
         ) ||
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.CorrectionRequested
+        ) ||
         ''
       const NameComponent = reg.name ? (
         <NameContainer

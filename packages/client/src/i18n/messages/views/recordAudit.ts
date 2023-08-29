@@ -253,7 +253,7 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   },
   [RegAction.Corrected]: {
     id: 'recordAudit.regAction.corrected',
-    defaultMessage: 'Corrected',
+    defaultMessage: 'Record corrected',
     description: 'Corrected action'
   },
   [RegAction.RejectedCorrection]: {
