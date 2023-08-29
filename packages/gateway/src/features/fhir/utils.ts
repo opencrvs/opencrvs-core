@@ -1039,6 +1039,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.MARKED_AS_NOT_DUPLICATE
   } else if (findExtension(FLAGGED_AS_POTENTIAL_DUPLICATE, extensions)) {
     return GQLRegAction.FLAGGED_AS_POTENTIAL_DUPLICATE
+  } else if (findExtension(MAKE_CORRECTION_EXTENSION_URL, extensions)) {
+    return GQLRegAction.CORRECTED
   }
   if (
     task.businessStatus?.coding?.find(
@@ -1047,8 +1049,6 @@ export function getActionFromTask(task: fhir.Task) {
   ) {
     if (task.status === 'requested') {
       return GQLRegAction.REQUESTED_CORRECTION
-    } else if (task.status === 'completed') {
-      return GQLRegAction.CORRECTED
     } else if (task.status === 'accepted') {
       return GQLRegAction.APPROVED_CORRECTION
     } else if (task.status === 'rejected') {
@@ -1376,6 +1376,24 @@ export const getEventDurationsFromMetrics = async (
         )
       )
     })
+}
+
+export function getCompositionFromBundle(
+  bundle: fhir.Bundle
+): fhir.Composition {
+  const composition = bundle.entry
+    ?.map(({ resource }) => resource)
+    ?.filter((resource): resource is fhir.Resource => Boolean(resource))
+    .find(
+      (resource): resource is fhir.Composition =>
+        resource.resourceType === 'Composition'
+    )
+
+  if (!composition) {
+    throw new Error('Composition not found in bundle')
+  }
+
+  return composition
 }
 
 export async function getDeclarationIdsFromResponse(

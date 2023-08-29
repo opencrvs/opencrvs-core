@@ -218,6 +218,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
           type
         }
         payment {
+          id
           type
           amount
           outcome

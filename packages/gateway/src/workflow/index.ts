@@ -46,6 +46,32 @@ export function requestRegistrationCorrection(
   )
 }
 
+export function approveRegistrationCorrection(
+  recordId: string,
+  correctionDetails: GQLCorrectionInput,
+  authHeader: IAuthHeader
+) {
+  return createRequest(
+    'POST',
+    `/records/${recordId}/approve-correction`,
+    authHeader,
+    correctionDetails
+  )
+}
+
+export function makeRegistrationCorrection(
+  recordId: string,
+  correctionDetails: GQLCorrectionInput,
+  authHeader: IAuthHeader
+) {
+  return createRequest<fhir.Bundle>(
+    'POST',
+    `/records/${recordId}/make-correction`,
+    authHeader,
+    correctionDetails
+  )
+}
+
 export function rejectRegistrationCorrection(
   recordId: string,
   details: GQLCorrectionRejectionInput,

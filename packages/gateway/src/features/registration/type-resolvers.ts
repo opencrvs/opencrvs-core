@@ -1133,7 +1133,15 @@ export const typeResolvers: GQLResolver = {
         docRef.extension as fhir.Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
     }
   },
   Identifier: {
@@ -1253,6 +1261,7 @@ export const typeResolvers: GQLResolver = {
       )
 
       return {
+        id: paymentId,
         type: paymentReconciliation.detail?.[0].type?.coding?.[0].code,
         amount: paymentReconciliation.detail?.[0].amount?.value,
         outcome: paymentReconciliation.outcome?.coding?.[0].code,
@@ -1272,7 +1281,15 @@ export const typeResolvers: GQLResolver = {
         task.extension as fhir.Extension[]
       )
 
-      return Boolean(hasShowedDocument?.valueString)
+      if (hasShowedDocument?.valueString) {
+        return Boolean(hasShowedDocument?.valueString)
+      }
+
+      if (typeof hasShowedDocument?.valueBoolean === 'boolean') {
+        return hasShowedDocument?.valueBoolean
+      }
+
+      return false
     },
 
     noSupportingDocumentationRequired: (task: fhir.Task) => {

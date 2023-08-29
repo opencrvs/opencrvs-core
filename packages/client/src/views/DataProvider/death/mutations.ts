@@ -11,6 +11,7 @@
  */
 import { gql } from '@apollo/client'
 import {
+  APPROVE_DEATH_REG_CORRECTION,
   CREATE_DEATH_REG_CORRECTION,
   REQUEST_REG_CORRECTION
 } from '@client/forms/correction/mutations'
@@ -129,5 +130,7 @@ export function getDeathMutation(action: SubmissionAction) {
       return CREATE_DEATH_REG_CORRECTION
     case SubmissionAction.REQUEST_CORRECTION:
       return REQUEST_REG_CORRECTION
+    case SubmissionAction.APPROVE_CORRECTION:
+      return APPROVE_DEATH_REG_CORRECTION
   }
 }

@@ -30,7 +30,10 @@ import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
 import {
+  MAKE_CORRECTION_EXTENSION_URL,
+  findExtension,
   getActionFromTask,
+  getPaymentReconciliation,
   getTask
 } from '@metrics/features/registration/fhirUtils'
 import { EventType } from '@metrics/config/routes'
@@ -519,6 +522,7 @@ export async function markValidatedHandler(
 type TaskBundleEntry = Omit<fhir.BundleEntry, 'resource'> & {
   resource: fhir.Task
 }
+
 export async function correctionEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -536,7 +540,11 @@ export async function correctionEventHandler(
 
   const latestCorrectionTask: TaskBundleEntry | undefined = history.entry?.find(
     (entry: TaskBundleEntry): entry is TaskBundleEntry =>
-      entry.resource.businessStatus?.coding?.[0].code === 'CORRECTION_REQUESTED'
+      entry.resource.businessStatus?.coding?.[0].code ===
+        'CORRECTION_REQUESTED' ||
+      Boolean(
+        findExtension(MAKE_CORRECTION_EXTENSION_URL, entry.resource.extension!)
+      )
   )
 
   if (!latestCorrectionTask) {
@@ -565,26 +573,28 @@ async function correctionHandler(
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('CORRECTED', request)
+  const payload = request.payload as fhir.Bundle
+  const payment = getPaymentReconciliation(payload)
   try {
     const points = await Promise.all([
-      generatePaymentPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization
-        },
-        'correction'
-      ),
-      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
+      ...(payment
+        ? [
+            generatePaymentPoint(
+              payload,
+              {
+                Authorization: request.headers.authorization
+              },
+              'correction'
+            )
+          ]
+        : []),
+      generateCorrectionReasonPoint(payload, {
         Authorization: request.headers.authorization
       }),
-      generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['REGISTERED', 'CERTIFIED'],
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+      generateEventDurationPoint(payload, ['REGISTERED', 'CERTIFIED'], {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(payload, {
         Authorization: request.headers.authorization
       })
     ])
@@ -601,26 +611,29 @@ async function approveCorrectionHandler(
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('APPROVED_CORRECTION', request)
+  const payload = request.payload as fhir.Bundle
+  const payment = getPaymentReconciliation(payload)
+
   try {
     const points = await Promise.all([
-      generatePaymentPoint(
-        request.payload as fhir.Bundle,
-        {
-          Authorization: request.headers.authorization
-        },
-        'correction'
-      ),
-      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
+      ...(payment
+        ? [
+            generatePaymentPoint(
+              payload,
+              {
+                Authorization: request.headers.authorization
+              },
+              'correction'
+            )
+          ]
+        : []),
+      generateCorrectionReasonPoint(payload, {
         Authorization: request.headers.authorization
       }),
-      generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['REGISTERED', 'CERTIFIED'],
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+      generateEventDurationPoint(payload, ['CORRECTION_REQUESTED'], {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(payload, {
         Authorization: request.headers.authorization
       })
     ])

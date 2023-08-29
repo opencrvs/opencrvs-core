@@ -186,6 +186,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           type
         }
         payment {
+          id
           type
           amount
           outcome

@@ -12,9 +12,11 @@ import { HEARTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 import {
+  ApproveRequestInput,
   CorrectionRequestInput,
   CorrectionRequestPaymentInput
 } from './correction-request'
+import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 export function createCorrectionProofOfLegalCorrectionDocument(
   subjectReference: string,
@@ -129,6 +131,14 @@ export function createCorrectionPaymentResources(
         subject: {
           reference: `urn:uuid:${temporaryPaymentId}`
         },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/payment',
+            valueReference: {
+              reference: `urn:uuid:${temporaryPaymentId}`
+            }
+          }
+        ],
         type: {
           coding: [
             {
@@ -163,6 +173,101 @@ export function createCorrectionEncounter(): Unsaved<
   }
 }
 
+export function createCorrectedTask(
+  previousTask: Task, // @todo do not require previous task, pass values from outside
+  correctionDetails: CorrectionRequestInput | ApproveRequestInput,
+  correctionEncounter:
+    | Unsaved<BundleEntry<fhir3.Encounter>>
+    | BundleEntry<fhir3.Encounter>,
+  paymentReconciliation?:
+    | Unsaved<BundleEntry<PaymentReconciliation>>
+    | BundleEntry<PaymentReconciliation>
+): Task {
+  return {
+    resourceType: 'Task',
+    status: 'ready',
+    intent: 'order',
+    code: previousTask.code,
+    focus: previousTask.focus,
+    id: previousTask.id,
+    encounter: { reference: correctionEncounter.fullUrl },
+    identifier: previousTask.identifier,
+    extension: [
+      ...previousTask.extension.filter((extension) =>
+        [
+          'http://opencrvs.org/specs/extension/informants-signature',
+          'http://opencrvs.org/specs/extension/contact-person-email'
+        ].includes(extension.url)
+      ),
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      },
+      ...(paymentReconciliation
+        ? [
+            {
+              url: 'http://opencrvs.org/specs/extension/paymentDetails',
+              valueReference: {
+                reference: paymentReconciliation.fullUrl
+              }
+            }
+          ]
+        : []),
+      {
+        url: 'http://opencrvs.org/specs/extension/noSupportingDocumentationRequired',
+        valueBoolean: correctionDetails.noSupportingDocumentationRequired
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+        valueString: correctionDetails.requester
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+        valueBoolean: correctionDetails.hasShowedVerifiedDocument
+      },
+      {
+        url: MAKE_CORRECTION_EXTENSION_URL,
+        valueString: 'REGISTERED'
+      }
+    ],
+    input: correctionDetails.values.map((update) => ({
+      valueCode: update.section,
+      valueId: update.fieldName,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/action-type',
+            code: 'update'
+          }
+        ]
+      },
+      valueString: update.newValue
+    })),
+    reason: {
+      text: correctionDetails.reason,
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/otherReason',
+          valueString: correctionDetails.otherReason
+        }
+      ]
+    },
+    note: [
+      {
+        text: correctionDetails.note
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    businessStatus: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/reg-status',
+          code: 'REGISTERED'
+        }
+      ]
+    }
+  }
+}
 export function createCorrectionRequestTask(
   previousTask: Task, // @todo do not require previous task, pass values from outside
   correctionDetails: CorrectionRequestInput,

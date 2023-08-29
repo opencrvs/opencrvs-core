@@ -11,14 +11,18 @@ import {
 } from '@opencrvs/commons'
 import { getRecordById } from './records'
 
-export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type Certify = Nominal<{}, 'Certify'>
 export type Validate = Nominal<{}, 'Validate'>
 export type Issue = Nominal<{}, 'Issue'>
+export type RequestCorrection = Nominal<{}, 'RequestCorrection'>
 export type RejectCorrection = Nominal<{}, 'RejectCorrection'>
+export type ApproveCorrection = Nominal<{}, 'ApproveCorrection'>
+export type MakeCorrection = Nominal<{}, 'MakeCorrection'>
 
 export type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
+  APPROVE_CORRECTION: ApproveCorrection
+  MAKE_CORRECTION: MakeCorrection
   REJECT_CORRECTION: RejectCorrection
   CERTIFY: Certify
   VALIDATION: Validate
@@ -33,8 +37,14 @@ export type Action = RequestCorrection | Certify | Validate
 export type StateTree =
   | Transition<WaitingForValidationRecord, Validate, ValidatedRecord>
   | Transition<RegisteredRecord, Certify, CertifiedRecord>
-  | Transition<RegisteredRecord, RequestCorrection, CorrectionRequestedRecord>
   | Transition<CertifiedRecord, Issue, IssuedRecord>
+  // Corrections
+  // Request correction
+  | Transition<RegisteredRecord, RequestCorrection, CorrectionRequestedRecord>
+  // Make correction
+  | Transition<RegisteredRecord, MakeCorrection, RegisteredRecord>
+  // Approve correction
+  | Transition<CorrectionRequestedRecord, ApproveCorrection, RegisteredRecord>
   // Reject correction
   | Transition<
       CorrectionRequestedRecord,

@@ -20,7 +20,6 @@ import {
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
-  markEventCorrectedHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   actionEventHandler,
@@ -30,7 +29,7 @@ import {
 import {
   getEventType,
   hasCertificateDataInDocRef,
-  hasCorrectionEncounterSection,
+  hasCorrectionExtension,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
@@ -63,7 +62,7 @@ import {
   setupSystemIdentifier
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { Events } from '@workflow/features/events/utils'
-import { Bundle, Composition } from '@opencrvs/commons'
+import { Bundle, Composition, isTask } from '@opencrvs/commons'
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as Bundle
@@ -92,9 +91,13 @@ function detectEvent(request: Hapi.Request): Events {
               return Events[`${eventType}_WAITING_EXTERNAL_RESOURCE_VALIDATION`]
             }
           } else {
+            const tasks = fhirBundle.entry
+              .map((entry) => entry.resource)
+              .filter(isTask)
+
             if (
               hasRegisterScope(request) &&
-              hasCorrectionEncounterSection(firstEntry as Composition)
+              tasks.some(hasCorrectionExtension)
             ) {
               return Events[`${eventType}_MAKE_CORRECTION`]
             } else if (!hasCertificateDataInDocRef(fhirBundle)) {
@@ -243,8 +246,26 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_MAKE_CORRECTION:
     case Events.DEATH_MAKE_CORRECTION:
     case Events.MARRIAGE_MAKE_CORRECTION:
-      response = await markEventCorrectedHandler(request, h)
-      await triggerEvent(event, response, request.headers)
+      // Invoke event triggers so search and metrics are notified
+      await triggerEvent(event, request.payload, request.headers)
+      // forward as-is to hearth
+
+      /*
+       * Temporary fix for task being saved again after correction. Currently the flow is
+       * 1. Workflow receives the updated task from the gateway, saves it to Heath, Search and Metrics (task saved once)
+       * 2. Bundle returns to gateway, gateway updates the bundle using the inputs from the client, sends it to Hearth
+       * 3. We land here, and forward the bundle to Hearth again (task saved twice)
+       *
+       * Remove the following lines after workflow is refactored to handle the correction approval / creation flows completely
+       */
+
+      const bundle = request.payload as Bundle
+      const bundleWithoutTask = {
+        ...bundle,
+        entry: bundle.entry?.filter((entry) => !isTask(entry.resource))
+      }
+
+      response = await forwardToHearth(request, h, bundleWithoutTask)
       break
     case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
     case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:

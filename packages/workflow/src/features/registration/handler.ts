@@ -20,7 +20,6 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsCorrected,
   validateDeceasedDetails,
   makeTaskAnonymous,
   markBundleAsIssued
@@ -524,17 +523,4 @@ export async function anonymousActionEventHandler(
     logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)
   }
-}
-
-export async function markEventCorrectedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const payload = await markBundleAsCorrected(
-    request.payload as Bundle,
-    getToken(request)
-  )
-
-  await postToHearth(payload)
-  return payload
 }

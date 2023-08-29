@@ -216,6 +216,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           type
         }
         payment {
+          id
           type
           amount
           outcome

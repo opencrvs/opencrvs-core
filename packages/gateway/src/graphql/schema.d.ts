@@ -63,6 +63,9 @@ export interface GQLMutation {
   voidNotification?: GQLNotification
   requestRegistrationCorrection: string
   rejectRegistrationCorrection: string
+  approveBirthRegistrationCorrection: string
+  approveDeathRegistrationCorrection: string
+  approveMarriageRegistrationCorrection: string
   createBirthRegistrationCorrection: string
   createDeathRegistrationCorrection: string
   createMarriageRegistrationCorrection: string
@@ -2681,6 +2684,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   voidNotification?: MutationToVoidNotificationResolver<TParent>
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
+  approveBirthRegistrationCorrection?: MutationToApproveBirthRegistrationCorrectionResolver<TParent>
+  approveDeathRegistrationCorrection?: MutationToApproveDeathRegistrationCorrectionResolver<TParent>
+  approveMarriageRegistrationCorrection?: MutationToApproveMarriageRegistrationCorrectionResolver<TParent>
   createBirthRegistrationCorrection?: MutationToCreateBirthRegistrationCorrectionResolver<TParent>
   createDeathRegistrationCorrection?: MutationToCreateDeathRegistrationCorrectionResolver<TParent>
   createMarriageRegistrationCorrection?: MutationToCreateMarriageRegistrationCorrectionResolver<TParent>
@@ -2790,6 +2796,54 @@ export interface MutationToRejectRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToRejectRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToApproveBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveBirthRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToApproveDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveDeathRegistrationCorrectionArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveMarriageRegistrationCorrectionArgs {
+  id: string
+  details: GQLMarriageRegistrationInput
+}
+export interface MutationToApproveMarriageRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveMarriageRegistrationCorrectionArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

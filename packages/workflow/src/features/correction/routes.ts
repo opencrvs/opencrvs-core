@@ -15,20 +15,23 @@ import {
   CertifiedRecord,
   CorrectionRequestedRecord,
   getAuthHeader,
-  isCorrectionRequestedTask,
   IssuedRecord,
-  isTask,
   RegisteredRecord,
-  Task
+  Task,
+  withOnlyLatestTask
 } from '@opencrvs/commons'
+import { uploadBase64ToMinio } from '@workflow/documents'
 import { createNewAuditEvent } from '@workflow/records/audit'
 import {
+  ApproveRequestInput,
   CorrectionRejectionInput,
   CorrectionRequestInput
 } from '@workflow/records/correction-request'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundle } from '@workflow/records/search'
 import {
+  toCorrected,
+  toCorrectionApproved,
   toCorrectionRejected,
   toCorrectionRequested
 } from '@workflow/records/state-transitions'
@@ -37,7 +40,7 @@ import { getToken } from '@workflow/utils/authUtils'
 import { z } from 'zod'
 
 import { getLoggedInPractitionerResource } from '../user/utils'
-import { uploadBase64ToMinio } from '@workflow/documents'
+import { getRecordById } from '@workflow/records'
 
 function validateRequest<T extends z.ZodType>(
   validator: T,
@@ -131,27 +134,13 @@ export const routes = [
 
       // Mark previous CORRECTION_REQUESTED task as rejected
       // Reinstate previous REGISTERED / CERTIFIED / ISSUED task
-      await sendBundleToHearth({
-        ...recordInPreviousStateWithCorrectionRejection,
-        entry: recordInPreviousStateWithCorrectionRejection.entry
-          .map(({ resource }) => resource)
-          .filter(isTask)
-          .map((resource) => ({ resource }))
-      })
+      await sendBundleToHearth(recordInPreviousStateWithCorrectionRejection)
 
       // This is just for backwards compatibility reasons as a lot of existing code assimes there
       // is only one task in the bundle
-      const recordWithOnlyThePreviousTask = {
-        ...recordInPreviousStateWithCorrectionRejection,
-        entry: recordInPreviousStateWithCorrectionRejection.entry.filter(
-          (entry) => {
-            if (!isTask(entry.resource)) {
-              return true
-            }
-            return !isCorrectionRequestedTask(entry.resource)
-          }
-        )
-      }
+      const recordWithOnlyThePreviousTask = withOnlyLatestTask(
+        recordInPreviousStateWithCorrectionRejection
+      )
 
       await createNewAuditEvent(
         recordWithOnlyThePreviousTask,
@@ -160,6 +149,101 @@ export const routes = [
       await indexBundle(recordWithOnlyThePreviousTask, getToken(request))
 
       return recordWithOnlyThePreviousTask
+    }
+  }),
+  createRoute({
+    method: 'POST',
+    path: '/records/{recordId}/make-correction',
+    allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
+    action: 'MAKE_CORRECTION',
+    handler: async (request, record): Promise<RegisteredRecord> => {
+      const correctionDetails = validateRequest(
+        CorrectionRequestInput,
+        request.payload
+      )
+      const token = getToken(request)
+
+      if (hasActiveCorrectionRequest(record)) {
+        throw conflict(
+          'There is already a pending correction request for this record'
+        )
+      }
+      const practitioner = await getLoggedInPractitionerResource(token)
+
+      const paymentAttachmentUrl =
+        correctionDetails.payment?.attachmentData &&
+        (await uploadBase64ToMinio(
+          correctionDetails.payment.attachmentData,
+          getAuthHeader(request)
+        ))
+
+      const proofOfLegalCorrectionAttachments = await Promise.all(
+        correctionDetails.attachments.map(async (attachment) => ({
+          type: attachment.type,
+          url: await uploadBase64ToMinio(
+            attachment.data,
+            getAuthHeader(request)
+          )
+        }))
+      )
+
+      const recordInCorrectedState = await toCorrected(
+        record,
+        practitioner,
+        correctionDetails,
+        proofOfLegalCorrectionAttachments,
+        paymentAttachmentUrl
+      )
+
+      await sendBundleToHearth(recordInCorrectedState)
+      await createNewAuditEvent(recordInCorrectedState, token)
+      await indexBundle(recordInCorrectedState, token)
+
+      const updatedRecord = await getRecordById(request.params.recordId, [
+        'REGISTERED'
+      ])
+
+      return updatedRecord
+    }
+  }),
+  createRoute({
+    method: 'POST',
+    path: '/records/{recordId}/approve-correction',
+    allowedStartStates: ['CORRECTION_REQUESTED'],
+    action: 'APPROVE_CORRECTION',
+    handler: async (request, record): Promise<RegisteredRecord> => {
+      const correctionDetails = validateRequest(
+        ApproveRequestInput,
+        request.payload
+      )
+      const token = getToken(request)
+
+      if (!hasActiveCorrectionRequest(record)) {
+        throw conflict(
+          'There is no pending correction requests for this record'
+        )
+      }
+      const practitioner = await getLoggedInPractitionerResource(token)
+
+      const recordInCorrectedState = await toCorrectionApproved(
+        record,
+        practitioner,
+        correctionDetails
+      )
+
+      await sendBundleToHearth(recordInCorrectedState)
+
+      const recordWithOnlyThePreviousTask = withOnlyLatestTask(
+        recordInCorrectedState
+      )
+      await createNewAuditEvent(recordWithOnlyThePreviousTask, token)
+      await indexBundle(recordWithOnlyThePreviousTask, token)
+
+      const updatedRecord = await getRecordById(request.params.recordId, [
+        'REGISTERED'
+      ])
+
+      return updatedRecord
     }
   })
 ]

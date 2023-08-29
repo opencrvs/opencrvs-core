@@ -55,10 +55,26 @@ export type BundleEntryWithFullUrl = Omit<fhir3.BundleEntry, 'fullUrl'> & {
   fullUrl: string
 }
 
-export function isCorrectionRequestedTask(task: Task) {
+export type CorrectionRequestedTask = Omit<Task, 'encounter'> & {
+  encounter: {
+    reference: string
+  }
+}
+
+export function isCorrectionRequestedTask(
+  task: Task
+): task is CorrectionRequestedTask {
   return task.businessStatus.coding.some(
     ({ code }) => code === 'CORRECTION_REQUESTED'
   )
+}
+
+export function getBusinessStatus(task: Task) {
+  const code = task.businessStatus.coding.find(({ code }) => code)
+  if (!code) {
+    throw new Error('No business status code found')
+  }
+  return code.code
 }
 
 export function isComposition(resource: Resource): resource is Composition {
@@ -101,4 +117,31 @@ export function getTaskFromBundle(bundle: Bundle): Task {
     throw new Error('No task found in bundle')
   }
   return task
+}
+
+type KnownExtensionType = {
+  'http://opencrvs.org/specs/extension/paymentDetails': {
+    url: 'http://opencrvs.org/specs/extension/paymentDetails'
+    valueReference: {
+      reference: string
+    }
+  }
+}
+
+export function findExtension<T extends keyof KnownExtensionType>(
+  url: T,
+  extensions: fhir3.Extension[]
+): KnownExtensionType[T] | undefined {
+  return extensions.find(
+    (obj: fhir3.Extension): obj is KnownExtensionType[T] => {
+      return obj.url === url
+    }
+  )
+}
+export function sortTasksDescending(tasks: Task[]) {
+  return tasks.slice().sort((a, b) => {
+    return (
+      new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+    )
+  })
 }

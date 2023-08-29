@@ -1406,7 +1406,6 @@ input CertificateInput {
 input CorrectionInput {
   requester: ID
   hasShowedVerifiedDocument: Boolean
-  attestedAndCopied: Boolean
   noSupportingDocumentationRequired: Boolean
   payments: [PaymentInput]
   values: [CorrectionValueInput]

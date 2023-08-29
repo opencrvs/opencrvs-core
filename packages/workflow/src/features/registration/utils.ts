@@ -29,9 +29,6 @@ import {
   EVENT_TYPE,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
-  BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE,
   INFORMANT_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
@@ -50,6 +47,7 @@ import {
   Resource,
   Task
 } from '@opencrvs/commons'
+import { MAKE_CORRECTION_EXTENSION_URL } from '../task/fhir/constants'
 
 interface INotificationPayload {
   recipient: {
@@ -419,19 +417,10 @@ export function taskHasInput(taskResource: Task) {
   return !!(taskResource.input && taskResource.input.length > 0)
 }
 
-export function hasCorrectionEncounterSection(
-  compositionResource: Composition
-) {
-  return compositionResource.section?.some((section) => {
-    if (section.code?.coding?.[0]?.code) {
-      return [
-        BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
-      ].includes(section.code.coding[0].code)
-    }
-    return false
-  })
+export function hasCorrectionExtension(taskResource: Task) {
+  return taskResource.extension.some(
+    (extension) => extension.url === MAKE_CORRECTION_EXTENSION_URL
+  )
 }
 
 export function hasCertificateDataInDocRef(fhirBundle: Bundle) {

@@ -76,6 +76,27 @@ function checkForUnresolvedReferences(bundle: Bundle) {
     check(entry.resource, entry.resource.resourceType, entry.resource)
   }
 }
+function checkForDuplicateIds(bundleEntries: BundleEntry[]) {
+  const knownIDs: Record<string, BundleEntry> = {}
+
+  for (const entry of bundleEntries) {
+    if (knownIDs[entry.resource.id!]) {
+      console.log('-----------------------------------')
+      console.log()
+      console.log(
+        'Duplicate ID found: ' + entry.resource.id,
+        JSON.stringify(entry.resource)
+      )
+      console.log()
+      console.log(JSON.stringify(knownIDs[entry.resource.id!]))
+      console.log()
+      console.log('-----------------------------------')
+      throw new Error('Duplicate identifier in bundle')
+    }
+
+    knownIDs[entry.resource.id!] = entry
+  }
+}
 
 const COLLECTIONS_TO_AUTOMATICALLY_JOIN = [
   'DocumentReference',
@@ -282,6 +303,23 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
           }
         }),
         /*
+         * Creates a list of all encounters inside Task.encounter.reference
+         */
+        taskEncounterIds: {
+          $map: {
+            input: filterByType('Task'),
+            as: 'task',
+            in: {
+              $arrayElemAt: [
+                {
+                  $split: ['$$task.encounter.reference', '/']
+                },
+                1
+              ]
+            }
+          }
+        },
+        /*
          * Creates a list of all authors inside Task.note
          */
         taskNoteAuthorIds: flattenArray({
@@ -348,37 +386,26 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
       }
     },
     // Get Task extension references
-    {
-      $lookup: {
-        from: 'Practitioner',
-        localField: `taskReferenceIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
-    {
-      $lookup: {
-        from: 'Location',
-        localField: `taskReferenceIds`,
-        foreignField: 'id',
-        as: 'joinResult'
-      }
-    },
-    {
-      $addFields: {
-        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
-      }
-    },
+    ...autoJoinAllCollections('taskReferenceIds'),
     // Get Patients by RelatedPersonIds
     {
       $lookup: {
         from: 'Patient',
         localField: `relatedPersonPatientIds`,
+        foreignField: 'id',
+        as: 'joinResult'
+      }
+    },
+    {
+      $addFields: {
+        bundle: { $concatArrays: ['$bundle', '$joinResult'] }
+      }
+    },
+    // Get encounters Tasks are referring to
+    {
+      $lookup: {
+        from: 'Encounter',
+        localField: `taskEncounterIds`,
         foreignField: 'id',
         as: 'joinResult'
       }
@@ -480,6 +507,15 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     bundle,
     entriesInBackwardsCompatibleOrder
   )
+
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      checkForDuplicateIds(bundleWithFullURLReferences)
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
 
   const record = {
     resourceType: 'Bundle',

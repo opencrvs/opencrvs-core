@@ -1055,6 +1055,9 @@ export type MonthWiseEstimationMetric = {
 export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
+  approveBirthRegistrationCorrection: Scalars['ID']
+  approveDeathRegistrationCorrection: Scalars['ID']
+  approveMarriageRegistrationCorrection: Scalars['ID']
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
@@ -1114,6 +1117,21 @@ export type MutationActivateUserArgs = {
   password: Scalars['String']
   securityQNAs: Array<InputMaybe<SecurityQuestionAnswer>>
   userId: Scalars['String']
+}
+
+export type MutationApproveBirthRegistrationCorrectionArgs = {
+  details: BirthRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationApproveDeathRegistrationCorrectionArgs = {
+  details: DeathRegistrationInput
+  id: Scalars['ID']
+}
+
+export type MutationApproveMarriageRegistrationCorrectionArgs = {
+  details: MarriageRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationAuditUserArgs = {
@@ -3594,6 +3612,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       }>
       payment?: {
         __typename?: 'Payment'
+        id: string
         type: PaymentType
         amount: number
         outcome: PaymentOutcomeType
@@ -4330,6 +4349,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       }>
       payment?: {
         __typename?: 'Payment'
+        id: string
         type: PaymentType
         amount: number
         outcome: PaymentOutcomeType
@@ -5084,6 +5104,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       }>
       payment?: {
         __typename?: 'Payment'
+        id: string
         type: PaymentType
         amount: number
         outcome: PaymentOutcomeType

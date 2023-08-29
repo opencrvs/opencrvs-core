@@ -24,9 +24,7 @@ import {
   getFromFhir,
   getRegStatusCode,
   fetchExistingRegStatusCode,
-  updateResourceInHearth,
-  mergePatientIdentifier,
-  generateEmptyBundle
+  updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   fetchTaskByCompositionIdFromHearth,
@@ -58,23 +56,14 @@ import {
   USER_SCOPE
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
-import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { triggerEvent } from '@workflow/features/events/handler'
 import {
   Bundle,
   Composition,
   Patient,
   Practitioner,
-  Task,
-  isCorrectionRequestedTask,
-  isTask
+  Task
 } from '@opencrvs/commons'
-import {
-  getTaskHistory,
-  sendBundleToHearth,
-  sortTasksDescending
-} from '@workflow/records/fhir'
-import { getRecordById } from '@workflow/records'
 
 export async function modifyRegistrationBundle(
   fhirBundle: Bundle,
@@ -140,84 +129,6 @@ export async function markBundleAsValidated(
   setupLastRegUser(taskResource, practitioner)
 
   return bundle
-}
-
-export async function markBundleAsCorrected(
-  bundle: Bundle,
-  token: string
-): Promise<Bundle> {
-  const composition = getComposition(bundle)
-  const proposedTask = getTaskResource(bundle)
-
-  if (!composition) {
-    throw new Error('Cant get composition in bundle')
-  }
-
-  let nextStatus: fhir3.Coding | undefined
-
-  const fullBundle = await getRecordById(composition.id, [
-    'REGISTERED',
-    'CERTIFIED',
-    'ISSUED',
-    'CORRECTION_REQUESTED'
-  ])
-
-  let currentStatusTask = getTaskResource(fullBundle)
-  const historyBundle = await getTaskHistory(currentStatusTask.id)
-
-  if (isCorrectionRequestedTask(currentStatusTask)) {
-    currentStatusTask.status = 'accepted'
-
-    await sendBundleToHearth({
-      ...generateEmptyBundle(),
-      entry: [{ resource: currentStatusTask }]
-    })
-
-    const history = sortTasksDescending(
-      historyBundle.entry.map((e) => e.resource)
-    )
-
-    const previousStatus = history.find(
-      (task) => !isCorrectionRequestedTask(task)
-    )!
-
-    nextStatus = previousStatus.businessStatus.coding[0]
-
-    currentStatusTask = previousStatus
-  } else {
-    currentStatusTask = proposedTask
-    nextStatus = await fetchExistingRegStatusCode(currentStatusTask.id)
-  }
-
-  const practitioner = await getLoggedInPractitionerResource(token)
-  await mergePatientIdentifier(bundle)
-
-  if (!currentStatusTask.extension) {
-    currentStatusTask.extension = []
-  }
-  currentStatusTask.extension.push({
-    url: MAKE_CORRECTION_EXTENSION_URL,
-    valueString: nextStatus?.code
-  })
-
-  await setupLastRegLocation(currentStatusTask, practitioner)
-
-  setupLastRegUser(currentStatusTask, practitioner)
-
-  /* setting registration workflow status here */
-
-  await setupRegistrationWorkflow(
-    currentStatusTask,
-    getTokenPayload(token),
-    nextStatus?.code
-  )
-
-  return {
-    ...bundle,
-    entry: bundle.entry
-      ?.filter((entry) => !isTask(entry.resource))
-      .concat({ resource: currentStatusTask })
-  }
 }
 
 export async function invokeRegistrationValidation(

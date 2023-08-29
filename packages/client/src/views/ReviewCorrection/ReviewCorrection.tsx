@@ -74,13 +74,13 @@ function applyCorrectionToData(record: IDeclaration) {
 
   const correction: CorrectionInput = {
     attachments: correctionRequestTask.documents.map((document) => ({
-      _fhirID: document._fhirID
+      _fhirID: document.id
     })),
     hasShowedVerifiedDocument: correctionRequestTask.hasShowedVerifiedDocument!,
     noSupportingDocumentationRequired:
       correctionRequestTask.noSupportingDocumentationRequired!,
     location: {
-      _fhirID: correctionRequestTask.location!._fhirID
+      _fhirID: correctionRequestTask.location!.id
     },
     note: '', //correctionRequestTask.note!,
     otherReason: correctionRequestTask.otherReason!,
@@ -105,8 +105,6 @@ function applyCorrectionToData(record: IDeclaration) {
 
   return {
     ...record,
-    submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-    action: SubmissionAction.MAKE_CORRECTION,
     data: {
       ...declarationData,
       registration: {
@@ -150,8 +148,13 @@ export function ReviewCorrection() {
     <>
       <button
         onClick={() => {
-          dispatch(modifyDeclaration(recordWithProposedChanges))
-          dispatch(writeDeclaration(recordWithProposedChanges))
+          const recordWithSubmissionStatus = {
+            ...recordWithProposedChanges,
+            submissionStatus: SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+            action: SubmissionAction.APPROVE_CORRECTION
+          }
+          dispatch(modifyDeclaration(recordWithSubmissionStatus))
+          dispatch(writeDeclaration(recordWithSubmissionStatus))
         }}
       >
         test

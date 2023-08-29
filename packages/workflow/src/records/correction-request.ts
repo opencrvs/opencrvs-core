@@ -35,6 +35,27 @@ export const CorrectionRequestInput = z.object({
   otherReason: z.string(),
   note: z.string()
 })
+
+export const MakeCorrectionRequestInput = CorrectionRequestInput
+export const ApproveRequestInput = CorrectionRequestInput.extend({
+  attachments: z
+    .array(
+      z.object({
+        _fhirID: z.string()
+      })
+    )
+    .default([]),
+  payment: z
+    .union([
+      z.object({
+        _fhirID: z.string()
+      }),
+      z.null()
+    ])
+
+    .optional()
+})
+
 export const CorrectionRejectionInput = z.object({
   reason: z.string()
 })
@@ -44,3 +65,7 @@ export type CorrectionRequestPaymentInput = z.infer<
   typeof CorrectionRequestPaymentInput
 >
 export type CorrectionRejectionInput = z.infer<typeof CorrectionRejectionInput>
+export type ApproveRequestInput = z.infer<typeof ApproveRequestInput>
+export type MakeCorrectionRequestInput = z.infer<
+  typeof MakeCorrectionRequestInput
+>

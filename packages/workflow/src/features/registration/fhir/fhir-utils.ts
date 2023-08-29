@@ -262,7 +262,8 @@ export const getFromFhir = (suffix: string) => {
 
 export async function forwardToHearth(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  payloadBundle?: Bundle
 ) {
   logger.info(
     `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
@@ -280,7 +281,7 @@ export async function forwardToHearth(
 
   let path = request.path
   if (request.method === 'post' || request.method === 'put') {
-    requestOpts.body = JSON.stringify(request.payload)
+    requestOpts.body = JSON.stringify(payloadBundle || request.payload)
   } else if (request.method === 'get') {
     path = `${request.path}${request.url.search}`
   }
