@@ -11,9 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Content } from '@opencrvs/components/lib/Content'
 
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   Redirect,
   useHistory,
@@ -39,9 +38,334 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { SubmissionAction } from '@client/forms'
+import { IFormSection, IFormSectionData, SubmissionAction } from '@client/forms'
+import { Button } from '@opencrvs/components/src/Button'
+import { ReviewSectionCorrection } from '@opencrvs/client/src/views/RegisterForm/review/ReviewSectionCorrection'
+import { ReviewHeader } from '@opencrvs/client/src/views/RegisterForm/review/ReviewHeader'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { buttonMessages } from '@client/i18n/messages'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Divider } from '@opencrvs/components/lib/Divider'
+import { rejectCorrection } from '@client/review/reject-correction'
+import { Summary } from '@opencrvs/components/lib/Summary'
+import { CorrectorRelationship } from '@client/forms/correction/corrector'
+import { messages } from '@client/i18n/messages/views/correction'
+import { CorrectionReason } from '@client/forms/correction/reason'
+import { Check, PaperClip } from '@opencrvs/components/lib/icons'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { getViewableSection } from '@opencrvs/client/src/views/CorrectionForm/utils'
+import { getOfflineData } from '@client/offline/selectors'
+import { getLanguage } from '@client/i18n/selectors'
+import { getName } from '@opencrvs/client/src/views/RecordAudit/utils'
+import format from '@client/utils/date-formatting'
 
 type URLParams = { declarationId: string }
+
+const Card = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
+  margin-bottom: 40px;
+  &:last-child {
+    margin-bottom: 200px;
+  }
+`
+
+const Row = styled.div<{
+  position?: 'left' | 'center'
+  background?: 'white' | 'background'
+}>`
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  justify-content: ${({ position }) => position || 'center'};
+  background-color: ${({ theme, background }) =>
+    !background || background === 'background'
+      ? theme.colors.background
+      : theme.colors.white};
+  flex-direction: row;
+  padding: 24px 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px 0;
+  }
+`
+const ReviewContainter = styled.div<{ paddingT?: boolean }>`
+  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0px 24px;
+  }
+`
+
+const SupportingDocument = styled.div`
+  display: flex;
+  margin: 8px 0;
+  & span:last-child {
+    padding-left: 8px;
+  }
+`
+
+interface IPropsReviewSummarySection {
+  declaration: IDeclaration
+}
+
+const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
+  const intl = useIntl()
+
+  const registerForm = useSelector((state: IStoreState) =>
+    getEventReviewForm(state, Event.Birth)
+  )
+
+  const offlineResources = useSelector((state: IStoreState) =>
+    getOfflineData(state)
+  )
+
+  const languages = useSelector((state: IStoreState) => getLanguage(state))
+
+  const formSections = getViewableSection(registerForm, declaration)
+
+  const getName = (person: IFormSectionData) => {
+    return [
+      person.firstNamesEng as string,
+      person.familyNameEng as string
+    ].join(' ')
+  }
+
+  const getRequestedBy = () => {
+    const corrector = declaration.data.registration as IFormSectionData
+
+    const relationship =
+      corrector &&
+      corrector.correction &&
+      ((corrector.correction as IFormSectionData).requester as string)
+    switch (relationship) {
+      case CorrectorRelationship.INFORMANT:
+        return getName(declaration.data.informant)
+      case CorrectorRelationship.MOTHER:
+        return getName(declaration.data.mother)
+      case CorrectorRelationship.FATHER:
+        return getName(declaration.data.father)
+      case CorrectorRelationship.CHILD:
+        return getName(declaration.data.child)
+      case CorrectorRelationship.LEGAL_GUARDIAN:
+        return intl.formatMessage(messages.legalGuardian)
+      case CorrectorRelationship.ANOTHER_AGENT:
+        return intl.formatMessage(messages.anotherRegOrFieldAgent)
+      case CorrectorRelationship.REGISTRAR:
+        return intl.formatMessage(messages.me)
+      case CorrectorRelationship.COURT:
+        return intl.formatMessage(messages.court)
+      // case CorrectorRelationship.OTHER:
+      //   return (
+      //     (corrector.correction as IFormSectionData)
+      //       .nestedFields as IFormSectionData
+      //   ).otherRelationship as string
+
+      default:
+        return '-'
+    }
+  }
+
+  const getReasonForRequest = () => {
+    const reason = declaration.data.registration as IFormSectionData
+    const reasonValue =
+      reason &&
+      reason.correction &&
+      ((reason.correction as IFormSectionData).reason as string)
+    switch (reasonValue) {
+      case CorrectionReason.CLERICAL_ERROR:
+        return intl.formatMessage(messages.clericalError)
+      case CorrectionReason.MATERIAL_ERROR:
+        return intl.formatMessage(messages.materialError)
+      case CorrectionReason.MATERIAL_OMISSION:
+        return intl.formatMessage(messages.materialOmission)
+      case CorrectionReason.JUDICIAL_ORDER:
+        return intl.formatMessage(messages.judicialOrder)
+      // case CorrectionReason.OTHER:
+      //   return (reasonType.nestedFields as IFormSectionData)
+      //     .otherReason as string
+      default:
+        return '-'
+    }
+  }
+
+  const getSupportingDocuments = () => {
+    const supportingDocuments = declaration.data?.registration
+      ?.correction as IFormSectionData
+    const proofOfDoc =
+      supportingDocuments &&
+      (supportingDocuments.attachments as IFormSectionData[])
+
+    return (
+      <div>
+        {proofOfDoc &&
+          proofOfDoc.map((proof, i) => {
+            const doc = proof.optionValues as IFormSectionData[]
+            return (
+              <SupportingDocument key={`proof-${i}`}>
+                <PaperClip />
+                <span>{doc[1] as any}</span>
+              </SupportingDocument>
+            )
+          })}
+      </div>
+    )
+  }
+
+  const getComments = () => {
+    const reason = declaration.data?.registration
+      ?.correction as IFormSectionData
+    const comments = reason && (reason.otherReason as string)
+
+    return (
+      <div>
+        <div>{comments}</div>
+      </div>
+    )
+  }
+
+  const getChanges = (formSections: IFormSection[]) => {
+    const changesValue = declaration.data?.registration
+      ?.correction as IFormSectionData
+    const Values = changesValue && (changesValue.values as any[])
+    let items: any[] = []
+
+    Values?.forEach((value: any) => {
+      const section = formSections.find((r) => r.id === value.section)
+      if (section) {
+        section.groups.forEach((group) => {
+          const field = group.fields.find((r) => r.name === value.fieldName)
+          if (field) {
+            items = items.concat({
+              item: intl.formatMessage(field.label),
+              original: value.oldValue,
+              changed: value.newValue
+            })
+          }
+        })
+      }
+    })
+
+    return items.filter((item) => item)
+  }
+
+  const getSubmitter = () => {
+    const correction = declaration.data?.registration
+      ?.correction as IFormSectionData
+    return correction && (correction.submitter as string)
+  }
+
+  const getOffice = () => {
+    const correction = declaration.data?.registration
+      ?.correction as IFormSectionData
+    return correction && (correction.office as string)
+  }
+
+  const getDate = () => {
+    const correction = declaration.data?.registration
+      ?.correction as IFormSectionData
+    return correction && (correction.date as Date)
+  }
+
+  return (
+    <ReviewSectionCorrection declaration={declaration} form={rejectCorrection}>
+      {({ toggleRejectModal, toggleApproveModal }) => (
+        <Card>
+          <ReviewHeader id="correction_header" subject={'Correction request'} />
+
+          <ReviewContainter paddingT={true}>
+            <Summary>
+              <Summary.Row
+                label={intl.formatMessage(messages.correctionSummarySubmitter)}
+                value={getSubmitter()}
+              />
+              <Summary.Row
+                label={intl.formatMessage(messages.correctionSummaryOffice)}
+                value={getOffice()}
+              />
+              <Summary.Row
+                label={intl.formatMessage(
+                  messages.correctionSummaryRequestedOn
+                )}
+                value={format(new Date(getDate()), 'MMMM dd, yyyy')}
+              />
+              <Summary.Row
+                label={intl.formatMessage(
+                  messages.correctionSummaryRequestedBy
+                )}
+                value={getRequestedBy()}
+              />
+              <Summary.Row
+                label={intl.formatMessage(
+                  messages.correctionSummaryReasonForRequest
+                )}
+                value={getReasonForRequest()}
+              />
+              <Summary.Row
+                label={intl.formatMessage(
+                  messages.correctionSummarySupportingDocuments
+                )}
+                value={getSupportingDocuments()}
+              />
+              <Summary.Row
+                label={intl.formatMessage(messages.correctionSummaryComments)}
+                value={getComments()}
+              />
+            </Summary>
+            <Divider />
+            <Table
+              isLoading={false}
+              noPagination
+              hideTableBottomBorder={false}
+              columns={[
+                {
+                  label: intl.formatMessage(messages.correctionSummaryItem),
+                  alignment: ColumnContentAlignment.LEFT,
+                  width: 34,
+                  key: 'item'
+                },
+                {
+                  label: intl.formatMessage(messages.correctionSummaryOriginal),
+                  width: 33,
+                  alignment: ColumnContentAlignment.LEFT,
+                  key: 'original'
+                },
+                {
+                  label: intl.formatMessage(
+                    messages.correctionSummaryCorrection
+                  ),
+                  width: 33,
+                  alignment: ColumnContentAlignment.LEFT,
+                  key: 'changed'
+                }
+              ]}
+              content={getChanges(formSections)}
+            />
+            <Row position="left" background="white">
+              <Button
+                type="positive"
+                size="large"
+                id="ApproveCorrectionBtn"
+                onClick={toggleApproveModal}
+              >
+                <Icon name="Check" />
+                {intl.formatMessage(buttonMessages.approve)}
+              </Button>
+              <Button
+                type="negative"
+                size="large"
+                id="rejectCorrectionBtn"
+                onClick={toggleRejectModal}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.reject)}
+              </Button>
+            </Row>
+          </ReviewContainter>
+        </Card>
+      )}
+    </ReviewSectionCorrection>
+  )
+}
 
 function applyCorrectionToData(record: IDeclaration) {
   const history = record.data.history as unknown as History[]
@@ -73,7 +397,7 @@ function applyCorrectionToData(record: IDeclaration) {
   )
 
   const correction: CorrectionInput = {
-    attachments: correctionRequestTask.documents.map((document) => ({
+    attachments: correctionRequestTask?.documents?.map((document) => ({
       _fhirID: document._fhirID
     })),
     hasShowedVerifiedDocument: correctionRequestTask.hasShowedVerifiedDocument!,
@@ -111,7 +435,14 @@ function applyCorrectionToData(record: IDeclaration) {
       ...declarationData,
       registration: {
         ...declarationData.registration,
-        correction: correction
+        correction: {
+          ...correction,
+          date: correctionRequestTask.date,
+          submitter:
+            correctionRequestTask?.user &&
+            getName(correctionRequestTask.user.name, 'en'),
+          office: correctionRequestTask.office?.name
+        }
       }
     }
   }
@@ -165,6 +496,9 @@ export function ReviewCorrection() {
             groupId: 'review-view-group'
           }
         }}
+        reviewSummaryHeader={
+          <ReviewSummarySection declaration={recordWithProposedChanges} />
+        }
         pageRoute={''}
         location={location}
         history={history}

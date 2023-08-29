@@ -49,6 +49,7 @@ import {
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   SuccessButton,
   SecondaryButton,
@@ -56,6 +57,7 @@ import {
   ICON_ALIGNMENT,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import styled from 'styled-components'
@@ -386,14 +388,18 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           title={intl.formatMessage(messages.correctionForApprovalDialogTitle)}
           onClose={this.togglePrompt}
           actions={[
-            <TertiaryButton
+            <Button
               id="cancel"
               key="cancel"
+              size="medium"
+              type="tertiary"
               onClick={this.togglePrompt}
             >
               {intl.formatMessage(messages.correctionForApprovalDialogCancel)}
-            </TertiaryButton>,
-            <SuccessButton
+            </Button>,
+            <Button
+              type="positive"
+              size="medium"
               id="send"
               key="continue"
               onClick={() => {
@@ -402,10 +408,16 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               }}
             >
               {intl.formatMessage(messages.correctionForApprovalDialogConfirm)}
-            </SuccessButton>
+            </Button>
           ]}
         >
-          {intl.formatMessage(messages.correctionForApprovalDialogDescription)}
+          <p>
+            <Text element="p" variant="reg16">
+              {intl.formatMessage(
+                messages.correctionForApprovalDialogDescription
+              )}
+            </Text>
+          </p>
         </Dialog>
       </>
     )

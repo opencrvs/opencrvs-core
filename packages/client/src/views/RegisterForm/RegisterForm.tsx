@@ -159,6 +159,7 @@ interface IFormProps {
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
+  reviewSummaryHeader?: React.ReactNode
 }
 
 export type RouteProps = RouteComponentProps<{
@@ -917,7 +918,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       duplicate,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      reviewSummaryHeader
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -984,6 +986,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      reviewSummaryHeader={reviewSummaryHeader}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,
