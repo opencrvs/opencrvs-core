@@ -13,6 +13,7 @@ import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { Practitioner } from '@opencrvs/commons'
 
 export async function getUser(
   userId: string,
@@ -143,7 +144,7 @@ export async function getLoggedInPractitionerLocations(
 
 export async function getLoggedInPractitionerResource(
   token: string
-): Promise<fhir3.Practitioner> {
+): Promise<Practitioner> {
   const tokenPayload = getTokenPayload(token)
   const isNotificationAPIUser =
     tokenPayload.scope.indexOf('notification-api') > -1
@@ -187,7 +188,7 @@ export async function getPractitionerLocations(
   return locList as [fhir3.Location]
 }
 
-export function getPractitionerRef(practitioner: fhir3.Practitioner): string {
+export function getPractitionerRef(practitioner: Practitioner): string {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }

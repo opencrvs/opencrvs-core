@@ -38,6 +38,7 @@ import {
   mosipBirthPatientBundleMock,
   mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
+import { BundleEntry, Composition, Practitioner, Task } from '@opencrvs/commons'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -57,8 +58,8 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[1] &&
         fhirBundle.entry[1].resource
       ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[1].resource as fhir.Task
+        const composition = fhirBundle.entry[0].resource as Composition
+        const task = fhirBundle.entry[1].resource as Task
         if (
           composition &&
           composition.identifier &&
@@ -85,8 +86,8 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[0].resource &&
         fhirBundle.entry[10].resource
       ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[10].resource as fhir.Task
+        const composition = fhirBundle.entry[0].resource as Composition
+        const task = fhirBundle.entry[10].resource as Task
         if (
           composition &&
           composition.identifier &&
@@ -113,8 +114,8 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[0].resource &&
         fhirBundle.entry[1].resource
       ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
-        const task = fhirBundle.entry[1].resource as fhir.Task
+        const composition = fhirBundle.entry[0].resource as Composition
+        const task = fhirBundle.entry[1].resource as Task
         if (
           composition &&
           composition.identifier &&
@@ -154,7 +155,7 @@ describe('Verify fhir bundle modifier functions', () => {
                 ]
               }
             }
-          }
+          } as unknown as BundleEntry<Task>
         ]
       })
 
@@ -164,7 +165,7 @@ describe('Verify fhir bundle modifier functions', () => {
         fhirBundle.entry[0] &&
         fhirBundle.entry[0].resource
       ) {
-        const composition = fhirBundle.entry[0].resource as fhir.Composition
+        const composition = fhirBundle.entry[0].resource as Composition
         if (
           composition &&
           composition.identifier &&
@@ -179,7 +180,7 @@ describe('Verify fhir bundle modifier functions', () => {
   describe('SetupRegistrationType', () => {
     it('Will push the proper event type on fhirDoc', () => {
       const taskResource = setupRegistrationType(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         EVENT_TYPE.BIRTH
       )
       if (
@@ -198,9 +199,9 @@ describe('Verify fhir bundle modifier functions', () => {
 
     it('Will push code section with proper event type on fhirDoc if it is missing', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[1].resource.code = undefined
+      fhirBundle.entry[1].resource.code = undefined as any
       const taskResource = setupRegistrationType(
-        fhirBundle.entry[1].resource as fhir.Task,
+        fhirBundle.entry[1].resource as Task,
         EVENT_TYPE.BIRTH
       )
 
@@ -228,7 +229,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['declare']
       }
       const taskResource = await setupRegistrationWorkflow(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         tokenPayload
       )
 
@@ -272,7 +273,7 @@ describe('Verify fhir bundle modifier functions', () => {
         }
 
         const taskResource = await setupRegistrationWorkflow(
-          fhirBundle.entry[1].resource as fhir.Task,
+          fhirBundle.entry[1].resource as Task,
           tokenPayload
         )
 
@@ -292,13 +293,13 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   describe('SetupLastRegUser', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
       name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
+        { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+        { use: 'bn', family: [''], given: [''] }
       ],
       gender: 'male',
       meta: {
@@ -315,7 +316,7 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource
       ) {
         const taskResource = setupLastRegUser(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
         )
         if (
@@ -345,7 +346,7 @@ describe('Verify fhir bundle modifier functions', () => {
       ) {
         fhirBundle.entry[1].resource.extension = [{ url: '', valueString: '' }]
         const taskResource = setupLastRegUser(
-          fhirBundle.entry[1].resource as fhir.Task,
+          fhirBundle.entry[1].resource as Task,
           practitioner
         )
 
@@ -377,7 +378,7 @@ describe('Verify fhir bundle modifier functions', () => {
         const lengthOfTaskExtensions =
           testFhirBundle.entry[1].resource.extension.length
         const taskResource = setupLastRegUser(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
         )
         if (
@@ -396,13 +397,13 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   it('setupAuthorOnNotes will update the author name on notes', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
       name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
+        { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+        { use: 'bn', family: [''], given: [''] }
       ],
       gender: 'male',
       meta: {
@@ -420,7 +421,7 @@ describe('Verify fhir bundle modifier functions', () => {
       }
     ]
     const taskResource = setupAuthorOnNotes(
-      fhirBundle.entry[1].resource as fhir.Task,
+      fhirBundle.entry[1].resource as Task,
       practitioner
     )
     if (taskResource && taskResource.note && taskResource.note[0]) {
@@ -449,7 +450,7 @@ describe('Verify fhir bundle modifier functions', () => {
     })
     it('set regLastLocation properly', async () => {
       const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
       if (taskResource && taskResource.extension && taskResource.extension[4]) {
@@ -463,7 +464,7 @@ describe('Verify fhir bundle modifier functions', () => {
     })
     it('set regLastOffice properly', async () => {
       const taskResource = await setupLastRegLocation(
-        testFhirBundle.entry[1].resource as fhir.Task,
+        testFhirBundle.entry[1].resource as Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
       if (taskResource && taskResource.extension && taskResource.extension[2]) {
@@ -480,7 +481,7 @@ describe('Verify fhir bundle modifier functions', () => {
       practitioner.id = undefined
       expect(
         setupLastRegLocation(
-          testFhirBundle.entry[1].resource as fhir.Task,
+          testFhirBundle.entry[1].resource as Task,
           practitioner
         )
       ).rejects.toThrowError('Invalid practitioner data found')

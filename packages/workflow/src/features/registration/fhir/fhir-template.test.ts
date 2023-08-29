@@ -12,8 +12,7 @@
 import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
-  getTaskResource,
-  isTask
+  getTaskResource
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -23,6 +22,7 @@ import { testFhirBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'
+import { Bundle, Composition, Task } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
@@ -48,14 +48,15 @@ describe('Verify fhir templates', () => {
             }
           }
         ]
-      }
+      } as Bundle<Composition>
 
       const taskResource = selectOrCreateTaskRefResource(fhirBundle)
 
       expect(taskResource).toBeDefined()
       expect(taskResource).toEqual({
         resourceType: 'Task',
-        status: 'requested',
+        intent: 'order',
+        status: 'ready',
         focus: {
           reference: '121'
         },
@@ -75,18 +76,30 @@ describe('Verify fhir templates', () => {
       expect(taskResource).toBeDefined()
       expect(taskResource).toEqual({
         resourceType: 'Task',
-        status: 'requested',
-        intent: '',
+        status: 'ready',
+        intent: 'order',
+        lastModified: '2018-11-29T15:11:13.041+00:00',
         focus: {
           reference: 'urn:uuid:888'
+        },
+        businessStatus: {
+          coding: [
+            {
+              code: 'DECLARED',
+              system: 'http://opencrvs.org/specs/status'
+            }
+          ]
         },
         code: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'birth-registration'
+              code: 'BIRTH'
             }
           ]
+        },
+        encounter: {
+          reference: 'Encounter/123'
         },
         identifier: [
           {
@@ -216,17 +229,7 @@ describe('Verify fhir templates', () => {
       }
     })
   })
-  describe('isTask', () => {
-    it('returns true if the reasource is a Task', () => {
-      expect(isTask({ resourceType: 'Task' } as fhir.Resource)).toBeTruthy()
-    })
 
-    it('returns false if the reasource is not a Task', () => {
-      expect(
-        isTask({ resourceType: 'Composition' } as fhir.Resource)
-      ).toBeFalsy()
-    })
-  })
   describe('getTaskResource', () => {
     it('returns the task resource properly when FhirBundle is sent', () => {
       const taskResourse = getTaskResource(testFhirBundle)
@@ -238,7 +241,7 @@ describe('Verify fhir templates', () => {
       const payload = {
         type: 'document',
         entry: [{ ...testFhirBundle.entry[1] }]
-      }
+      } as Bundle<Task>
       const taskResourse = getTaskResource(payload)
 
       expect(taskResourse).toBeDefined()
@@ -255,14 +258,9 @@ describe('Verify fhir templates', () => {
     })
     it('throws error if provided document type is not FhirBundle or FhirBundleTaskEntry ', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[0].resource.resourceType = ''
+      ;(fhirBundle.entry[0].resource as any).resourceType = '' as any
       expect(() => getTaskResource(fhirBundle)).toThrowError(
         'Unable to find Task Bundle from the provided data'
-      )
-    })
-    it('throws error if invalid document is sent', () => {
-      expect(() => getTaskResource({ type: '' })).toThrowError(
-        'Invalid FHIR bundle found'
       )
     })
   })

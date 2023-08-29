@@ -2,9 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@workflow/*": [
-        "./*"
-      ]
+      "@workflow/*": ["./*"]
     },
     "target": "es6",
     "module": "commonjs",
@@ -12,33 +10,16 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": [
-      "esnext.asynciterable",
-      "es6",
-      "es2017"
-    ],
+    "lib": ["esnext.asynciterable", "es6", "es2017"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": [
-      "fhir",
-      "jest"
-    ]
+    "types": ["fhir", "jest"],
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*.ts",
-    "typings"
-  ],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
-  ]
+  "include": ["src/**/*.ts", "typings"],
+  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

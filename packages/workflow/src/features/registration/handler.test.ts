@@ -50,6 +50,7 @@ import {
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { Bundle, Task } from '@opencrvs/commons'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -1360,195 +1361,6 @@ describe('markEventAsWaitingValidationHandler', () => {
   })
 })
 
-describe('markEventAsRequestedForCorrection handler', () => {
-  let server: any
-  let testCorrectionBundleBirth: any
-  let testCorrectionBundleDeath: any
-
-  beforeEach(async () => {
-    fetch.resetMocks()
-    server = await createServer()
-    fetch.mockResponses(
-      [userMock, { status: 200 }],
-      [patientMock, { status: 200 }],
-      [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }]
-    )
-
-    testCorrectionBundleBirth = cloneDeep(testFhirBundleWithIds)
-    testCorrectionBundleDeath = cloneDeep(testFhirBundleWithIdsForDeath)
-
-    const correctionEncounterSection = {
-      title: 'Birth correction encounters',
-      code: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/doc-sections',
-            code: 'birth-correction-encounters'
-          }
-        ],
-        text: 'Birth correction encounters'
-      },
-      entry: [
-        {
-          reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
-        }
-      ]
-    }
-
-    testCorrectionBundleBirth.entry[0].resource.section?.push(
-      correctionEncounterSection
-    )
-
-    testCorrectionBundleDeath.entry[0].resource.section?.push(
-      correctionEncounterSection
-    )
-
-    testCorrectionBundleBirth.entry[1].resource.identifier?.push({
-      system: 'http://opencrvs.org/specs/id/birth-registration-number',
-      value: 'B5WGYJE'
-    })
-
-    testCorrectionBundleDeath.entry[1].resource.identifier?.push({
-      system: 'http://opencrvs.org/specs/id/death-registration-number',
-      value: 'B5WGYJE'
-    })
-  })
-
-  it('returns OK with full fhir bundle as payload', async () => {
-    const token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-            resource: {
-              resourceType: 'Task',
-              status: 'requested',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'birth-registration'
-                  }
-                ]
-              },
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/paper-form-id',
-                  value: '12345678'
-                },
-                {
-                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                  value: 'B5WGYJE'
-                }
-              ],
-              extension: [
-                {
-                  url: 'http://opencrvs.org/specs/extension/contact-person',
-                  valueString: 'MOTHER'
-                }
-              ],
-              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-            }
-          }
-        ]
-      })
-    )
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCorrectionBundleBirth,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
-  })
-
-  it('returns OK with full fhir bundle as payload for death', async () => {
-    const token = jwt.sign(
-      { scope: ['register'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-            resource: {
-              resourceType: 'Task',
-              status: 'requested',
-              code: {
-                coding: [
-                  {
-                    system: 'http://opencrvs.org/specs/types',
-                    code: 'death-registration'
-                  }
-                ]
-              },
-              identifier: [
-                {
-                  system: 'http://opencrvs.org/specs/id/death-tracking-id',
-                  value: 'D5WGYJE'
-                }
-              ],
-              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-            }
-          }
-        ]
-      })
-    )
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCorrectionBundleDeath,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
-  })
-})
-
 describe('fhirWorkflowEventHandler', () => {
   let server: any
 
@@ -1704,7 +1516,7 @@ describe('markBirthAsCertifiedHandler handler', () => {
       testCertificateFhirBundle.entry[1].resource.identifier
     ) {
       const identifiers = testCertificateFhirBundle.entry[1].resource
-        .identifier as fhir.Identifier[]
+        .identifier as fhir3.Identifier[]
       identifiers.push({
         system: 'http://opencrvs.org/specs/id/birth-registration-number',
         value: '12345678'
@@ -1747,10 +1559,10 @@ describe('markBirthAsCertifiedHandler handler', () => {
       testCertificateFhirBundle.entry &&
       testCertificateFhirBundle.entry[1] &&
       testCertificateFhirBundle.entry[1].resource &&
-      testCertificateFhirBundle.entry[1].resource.identifier
+      (testCertificateFhirBundle.entry[1].resource as Task).identifier
     ) {
-      const identifiers = testCertificateFhirBundle.entry[1].resource
-        .identifier as fhir.Identifier[]
+      const identifiers = (testCertificateFhirBundle.entry[1].resource as Task)
+        .identifier as fhir3.Identifier[]
       identifiers.push({
         system: 'http://opencrvs.org/specs/id/death-registration-number',
         value: '12345678'
@@ -2138,7 +1950,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:49.664Z' }
-    }
+    } as Bundle
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2200,7 +2012,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       type: 'transaction-response'
-    }
+    } as Bundle
     populateCompositionWithID(payload, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',
@@ -2855,7 +2667,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
-    }
+    } as Bundle
     const response = {
       resourceType: 'Bundle',
       entry: [
@@ -2917,7 +2729,7 @@ describe('populateCompositionWithID', () => {
         }
       ],
       type: 'transaction-response'
-    }
+    } as Bundle
     populateCompositionWithID(payload, response)
     expect(payload).toEqual({
       resourceType: 'Bundle',

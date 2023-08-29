@@ -39,6 +39,7 @@ import {
   BundleEntry,
   Composition,
   Location,
+  OpenCRVSName,
   Patient,
   Resource,
   Task
@@ -64,9 +65,9 @@ export async function getSharedContactEmail(fhirBundle: Bundle) {
   )
 }
 
-export function concatenateName(fhirNames: fhir3.HumanName[]) {
+export function concatenateName(fhirNames: OpenCRVSName[]) {
   const language = getDefaultLanguage()
-  const name = fhirNames.find((humanName: fhir3.HumanName) => {
+  const name = fhirNames.find((humanName: OpenCRVSName) => {
     return humanName.use === language
   })
 
@@ -76,7 +77,7 @@ export function concatenateName(fhirNames: fhir3.HumanName[]) {
   return ''
     .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')
-    .concat(name.family)
+    .concat(name.family.join(' '))
 }
 
 export async function getSubjectName(

@@ -109,8 +109,8 @@ function getSectionFromResponse(
   return (response.entry &&
     response.entry.filter((o) => {
       const res = o.response as fhir3.BundleEntryResponse
-      return Object.keys(res).some((k) =>
-        res[k].toLowerCase().includes(reference.toLowerCase())
+      return Object.keys(res).some((k: keyof fhir3.BundleEntryResponse) =>
+        (res[k] as string).toLowerCase().includes(reference.toLowerCase())
       )
     })) as BundleEntry[]
 }

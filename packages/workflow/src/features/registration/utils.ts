@@ -563,7 +563,7 @@ export async function getMosipUINToken(
       lang: 'eng',
       authdata: {
         vid: submittedNationalIDInForm,
-        name: concatenateName(patient.name as fhir3.HumanName[]),
+        name: concatenateName(patient.name),
         gender: patient.gender,
         dob: patient.birthDate?.replace(/-/g, '/')
         // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently

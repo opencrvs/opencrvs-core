@@ -1,28 +1,59 @@
 import { UUID } from './uuid'
 
+/*
+ * These types should always strictly match the data formats
+ * that OpenCRVS stores in its database.
+ * If we know a field always exists, it should not be optional even if its optional in FHIR spec.
+ */
+
 type Saved<T> = Omit<T, 'id'> & {
   id: string
 }
 
+export type UnsavedResource<T extends Resource> = Omit<T, 'id'>
+
 export type Unsaved<T extends BundleEntry> = Omit<T, 'fullUrl' | 'resource'> & {
   fullUrl: `urn:uuid:${UUID}`
-  resource: Omit<T['resource'], 'id'>
+  resource: UnsavedResource<T['resource']>
+}
+
+export type OpenCRVSName = Omit<fhir3.HumanName, 'use' | 'family'> & {
+  use: string
+  family: string[]
+}
+
+type Address = Omit<fhir3.Address, 'type'> & {
+  type: 'SECONDARY_ADDRESS' | 'PRIMARY_ADDRESS'
 }
 
 export type CompositionWithoutId = Omit<fhir3.Composition, 'id'>
 export type Extension = fhir3.Extension
-export type Practitioner = fhir3.Practitioner
+export type Practitioner = Omit<fhir3.Practitioner, 'name'> & {
+  name: Array<OpenCRVSName>
+}
+
 export type BusinessStatus = Omit<fhir3.CodeableConcept, 'coding'> & {
   coding: fhir3.Coding[]
 }
 
 export type TaskWithoutId = Omit<fhir3.Task, 'id'>
 
-export type Task = Omit<Saved<fhir3.Task>, 'extension' | 'businessStatus'> & {
+export type Task = Omit<
+  Saved<fhir3.Task>,
+  'extension' | 'businessStatus' | 'code'
+> & {
   id: string
   lastModified: string
   extension: Array<Extension>
   businessStatus: BusinessStatus
+  code: Omit<fhir3.CodeableConcept, 'coding'> & {
+    coding: Array<
+      Omit<fhir3.Coding, 'code' | 'system'> & {
+        system: 'http://opencrvs.org/specs/types'
+        code: 'BIRTH' | 'DEATH' | 'MARRIAGE'
+      }
+    >
+  }
   // This field is missing from the fhir3 spec
   encounter: fhir3.Reference
 }
@@ -31,9 +62,17 @@ export type Composition = CompositionWithoutId & { id: string }
 
 export type PaymentReconciliation = Saved<fhir3.PaymentReconciliation>
 export type DocumentReference = Saved<fhir3.DocumentReference>
-export type Patient = Saved<fhir3.Patient>
+export type Patient = Saved<
+  Omit<fhir3.Patient, 'name' | 'address'> & {
+    name: Array<OpenCRVSName>
+    address?: Address[]
+    deceased?: boolean
+  }
+>
 export type RelatedPerson = Saved<fhir3.RelatedPerson>
 export type Location = Saved<fhir3.Location>
+export type Encounter = Saved<fhir3.Encounter>
+export type Observation = Saved<fhir3.Observation>
 
 export type Resource = fhir3.Resource
 
@@ -44,6 +83,9 @@ export type BundleEntry<T extends Resource = Resource> = Omit<
   resource: T
 }
 
+export type StrictBundle<T extends Resource[]> = Omit<fhir3.Bundle, 'entry'> & {
+  entry: { [Property in keyof T]: BundleEntry<T[Property]> }
+}
 export type Bundle<T extends Resource = Resource> = Omit<
   fhir3.Bundle,
   'entry'

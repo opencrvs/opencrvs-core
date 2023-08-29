@@ -29,6 +29,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 import * as fetchAny from 'jest-fetch-mock'
+import { Location, Practitioner } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
@@ -287,7 +288,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       JSON.parse(officeMock)
     ]
     const primaryLocation = getPrimaryLocationFromLocationList(
-      locations as [fhir.Location]
+      locations as [Location]
     )
     expect(primaryLocation).toBeDefined()
     expect(primaryLocation).toEqual(JSON.parse(unionMock))
@@ -324,7 +325,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       }
     ]
     expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
+      getPrimaryLocationFromLocationList(locations as [Location])
     ).toThrowError('No CRVS office found')
   })
   it('throws error if no primary location for crvs office found', () => {
@@ -370,7 +371,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       }
     ]
     expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
+      getPrimaryLocationFromLocationList(locations as [Location])
     ).toThrowError('No primary location found')
   })
   it('throws error if crvs office has a invalid location id', () => {
@@ -405,7 +406,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       }
     ]
     expect(() =>
-      getPrimaryLocationFromLocationList(locations as [fhir.Location])
+      getPrimaryLocationFromLocationList(locations as [Location])
     ).toThrowError(
       'No primary location not found for office: d33e4cb2-670e-4564-a8ed-c72baacdy48y'
     )
@@ -413,13 +414,13 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
 })
 describe('Verify getPractitionerRef', () => {
   it('returns practinioner ref properly', () => {
-    const practitioner = {
+    const practitioner: Practitioner = {
       resourceType: 'Practitioner',
       identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
       telecom: [{ system: 'phone', value: '01711111111' }],
       name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
+        { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+        { use: 'bn', family: [''], given: [''] }
       ],
       gender: 'male',
       meta: {
@@ -440,7 +441,7 @@ describe('Verify getPractitionerRef', () => {
         lastUpdated: '2018-11-25T17:31:08.062+00:00',
         versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
       }
-    }
+    } as Practitioner
     expect(() => getPractitionerRef(practitioner)).toThrowError(
       'Invalid practitioner data found'
     )

@@ -1,3 +1,15 @@
+import {
+  Bundle,
+  Composition,
+  Encounter,
+  Observation,
+  Patient,
+  RelatedPerson,
+  StrictBundle,
+  Task,
+  UnsavedResource
+} from '@opencrvs/commons'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,7 +21,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const testFhirBundle = {
+export const testFhirBundle: StrictBundle<
+  [
+    UnsavedResource<Composition>,
+    UnsavedResource<Task>,
+    UnsavedResource<Patient>,
+    UnsavedResource<Patient>,
+    UnsavedResource<Patient>,
+    UnsavedResource<RelatedPerson>
+  ]
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -121,7 +142,17 @@ export const testFhirBundle = {
       resource: {
         resourceType: 'Task',
         status: 'ready',
-        intent: '',
+        intent: 'order',
+        lastModified: '2018-11-29T15:11:13.041+00:00',
+        encounter: { reference: 'Encounter/123' },
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/status',
+              code: 'DECLARED'
+            }
+          ]
+        },
         focus: {
           reference: 'urn:uuid:888'
         },
@@ -129,7 +160,7 @@ export const testFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'birth-registration'
+              code: 'BIRTH'
             }
           ]
         },
@@ -203,7 +234,8 @@ export const testFhirBundle = {
         name: [
           {
             given: ['Jack'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'male'
@@ -630,9 +662,9 @@ export const testFhirBundleWithIdsForDeath = {
       }
     }
   ]
-}
+} as Bundle
 
-export const testFhirTaskBundle = {
+export const testFhirTaskBundle: Bundle<Task> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -642,8 +674,11 @@ export const testFhirTaskBundle = {
       resource: {
         resourceType: 'Task',
         status: 'ready',
-        intent: '',
+        intent: 'order',
+        lastModified: '2018-11-29T15:11:13.041+00:00',
+        encounter: { reference: 'Encounter/123' },
         code: {
+          system: 'http://opencrvs.org/specs/types',
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
         extension: [
@@ -1304,7 +1339,13 @@ export const motherMock = JSON.stringify({
   id: '0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
 })
 
-export const testDeathFhirBundle = {
+export const testDeathFhirBundle: Bundle<
+  | UnsavedResource<Composition>
+  | UnsavedResource<Patient>
+  | UnsavedResource<RelatedPerson>
+  | UnsavedResource<Encounter>
+  | UnsavedResource<Observation>
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -1390,7 +1431,7 @@ export const testDeathFhirBundle = {
       resource: {
         resourceType: 'Patient',
         active: true,
-        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+
         name: [{ use: 'en', given: ['Jane'], family: ['Doe'] }],
         gender: 'female',
         birthDate: '2000-01-28',
@@ -1452,7 +1493,6 @@ export const testDeathFhirBundle = {
       resource: {
         resourceType: 'Patient',
         active: true,
-        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
         name: [{ use: 'en', given: ['John'], family: ['Doe'] }],
         telecom: [{ system: 'phone', value: '0171111111', use: 'mobile' }],
         gender: 'male',
@@ -1516,12 +1556,16 @@ export const testDeathFhirBundle = {
     },
     {
       fullUrl: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a',
-      resource: { resourceType: 'Encounter', status: 'finished' }
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished'
+      }
     },
     {
       fullUrl: 'urn:uuid:fff280db-e146-40bf-a53d-850bb7972f0e',
       resource: {
         resourceType: 'Observation',
+
         status: 'final',
         context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
         category: [
@@ -1685,7 +1729,11 @@ export const testDeathFhirBundle = {
   meta: { lastUpdated: '2019-02-11' }
 }
 
-export const testMarriageFhirBundle = {
+export const testMarriageFhirBundle: Bundle<
+  | UnsavedResource<Task>
+  | UnsavedResource<Composition>
+  | UnsavedResource<Patient>
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -1763,15 +1811,28 @@ export const testMarriageFhirBundle = {
       resource: {
         resourceType: 'Task',
         status: 'ready',
-        intent: '',
+        intent: 'order',
         focus: {
           reference: 'urn:uuid:888'
+        },
+        extension: [],
+        encounter: {
+          reference: 'urn:uuid:888'
+        },
+        lastModified: '2018-05-23T14:44:58+02:00',
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/status',
+              code: 'IN_PROGRESS'
+            }
+          ]
         },
         code: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'marriage-registration'
+              code: 'MARRIAGE'
             }
           ]
         },
@@ -1795,7 +1856,8 @@ export const testMarriageFhirBundle = {
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'female',
@@ -1815,7 +1877,8 @@ export const testMarriageFhirBundle = {
         name: [
           {
             given: ['Jack'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'male'
@@ -2183,7 +2246,7 @@ const birthPatientIdentifier = {
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
 } as fhir3.CodeableConcept
 
-export const mosipDeceasedPatientMock = {
+export const mosipDeceasedPatientMock: Patient = {
   resourceType: 'Patient',
   active: true,
   id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
@@ -2191,7 +2254,7 @@ export const mosipDeceasedPatientMock = {
     {
       use: 'bn',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',
@@ -2208,7 +2271,7 @@ export const mosipUpdatedDeceasedPatientMock = {
     {
       use: 'bn',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',
@@ -2225,7 +2288,7 @@ export const mosipBirthPatientMock = {
     {
       use: 'bn',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',

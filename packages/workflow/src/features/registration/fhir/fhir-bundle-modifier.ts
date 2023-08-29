@@ -550,7 +550,7 @@ export async function setupSystemIdentifier(request: Hapi.Request) {
 
 export function setupLastRegUser(
   taskResource: Task,
-  practitioner: fhir3.Practitioner
+  practitioner: Practitioner
 ): Task {
   if (!taskResource.extension) {
     taskResource.extension = []
@@ -737,8 +737,7 @@ export async function validateDeceasedDetails(
               birthPatientBundle
             )}`
           )
-          let birthPatient: Partial<fhir3.Patient> &
-            Pick<fhir3.Patient, 'resourceType'> = {
+          let birthPatient: Partial<Patient> & Pick<Patient, 'resourceType'> = {
             resourceType: 'Patient'
           }
           if (
@@ -747,7 +746,7 @@ export async function validateDeceasedDetails(
             birthPatientBundle.entry.length
           ) {
             birthPatientBundle.entry.forEach((entry) => {
-              const bundlePatient = entry.resource as fhir3.Patient
+              const bundlePatient = entry.resource as Patient
               const selectedIdentifier = bundlePatient.identifier?.filter(
                 (identifier) => {
                   return (
