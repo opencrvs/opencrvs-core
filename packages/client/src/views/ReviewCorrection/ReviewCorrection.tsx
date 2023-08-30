@@ -38,7 +38,15 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { IFormSection, IFormSectionData, SubmissionAction } from '@client/forms'
+import {
+  IFormData,
+  IFormField,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IPreviewGroup,
+  SubmissionAction
+} from '@client/forms'
 import { Button } from '@opencrvs/components/src/Button'
 import { ReviewSectionCorrection } from '@opencrvs/client/src/views/RegisterForm/review/ReviewSectionCorrection'
 import { ReviewHeader } from '@opencrvs/client/src/views/RegisterForm/review/ReviewHeader'
@@ -52,12 +60,22 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { messages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
+import { Text } from '@opencrvs/components/lib/Text'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { getViewableSection } from '@opencrvs/client/src/views/CorrectionForm/utils'
+import {
+  getRenderableField,
+  getViewableSection,
+  hasFieldChanged,
+  isViewOnly,
+  isVisibleField,
+  renderValue
+} from '@opencrvs/client/src/views/CorrectionForm/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { getName } from '@opencrvs/client/src/views/RecordAudit/utils'
 import format from '@client/utils/date-formatting'
+import { IOfflineData } from '@client/offline/reducer'
+import { Size } from 'react-easy-crop/types'
 
 type URLParams = { declarationId: string }
 
@@ -99,9 +117,6 @@ const ReviewContainter = styled.div<{ paddingT?: boolean }>`
 const SupportingDocument = styled.div`
   display: flex;
   margin: 8px 0;
-  & span:last-child {
-    padding-left: 8px;
-  }
 `
 
 interface IPropsReviewSummarySection {
@@ -119,11 +134,18 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
     getOfflineData(state)
   )
 
-  const languages = useSelector((state: IStoreState) => getLanguage(state))
+  const language = useSelector((state: IStoreState) => getLanguage(state))
 
   const formSections = getViewableSection(registerForm, declaration)
 
-  const getName = (person: IFormSectionData) => {
+  const getCorrectionRequestTask = () => {
+    const history = declaration.data.history as unknown as History[]
+    return history.find(
+      (task: History) => task.action === 'REQUESTED_CORRECTION'
+    )
+  }
+
+  const getNameRequester = (person: IFormSectionData) => {
     return [
       person.firstNamesEng as string,
       person.familyNameEng as string
@@ -139,13 +161,13 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
       ((corrector.correction as IFormSectionData).requester as string)
     switch (relationship) {
       case CorrectorRelationship.INFORMANT:
-        return getName(declaration.data.informant)
+        return getNameRequester(declaration.data.informant)
       case CorrectorRelationship.MOTHER:
-        return getName(declaration.data.mother)
+        return getNameRequester(declaration.data.mother)
       case CorrectorRelationship.FATHER:
-        return getName(declaration.data.father)
+        return getNameRequester(declaration.data.father)
       case CorrectorRelationship.CHILD:
-        return getName(declaration.data.child)
+        return getNameRequester(declaration.data.child)
       case CorrectorRelationship.LEGAL_GUARDIAN:
         return intl.formatMessage(messages.legalGuardian)
       case CorrectorRelationship.ANOTHER_AGENT:
@@ -154,11 +176,8 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
         return intl.formatMessage(messages.me)
       case CorrectorRelationship.COURT:
         return intl.formatMessage(messages.court)
-      // case CorrectorRelationship.OTHER:
-      //   return (
-      //     (corrector.correction as IFormSectionData)
-      //       .nestedFields as IFormSectionData
-      //   ).otherRelationship as string
+      case CorrectorRelationship.OTHER:
+        return CorrectorRelationship.OTHER
 
       default:
         return '-'
@@ -189,38 +208,241 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getSupportingDocuments = () => {
-    const supportingDocuments = declaration.data?.registration
-      ?.correction as IFormSectionData
-    const proofOfDoc =
-      supportingDocuments &&
-      (supportingDocuments.attachments as IFormSectionData[])
+    const correction = getCorrectionRequestTask()
+    const proofOfDoc = correction?.documents
 
     return (
-      <div>
+      <>
         {proofOfDoc &&
           proofOfDoc.map((proof, i) => {
-            const doc = proof.optionValues as IFormSectionData[]
+            const doc = proof.type
             return (
               <SupportingDocument key={`proof-${i}`}>
-                <PaperClip />
-                <span>{doc[1] as any}</span>
+                <Text element="span" variant="reg16">
+                  {doc}
+                </Text>
               </SupportingDocument>
             )
           })}
-      </div>
+      </>
     )
   }
 
   const getComments = () => {
-    const reason = declaration.data?.registration
-      ?.correction as IFormSectionData
-    const comments = reason && (reason.otherReason as string)
+    const reason = getCorrectionRequestTask()
+    return reason?.comments && (reason.comments[0]?.comment as string)
+  }
 
-    return (
-      <div>
-        <div>{comments}</div>
-      </div>
+  const getFieldValue = (
+    section: IFormSection,
+    data: IFormData,
+    field: IFormField,
+    intl: IntlShape,
+    offlineResources: IOfflineData,
+    language: string,
+    ignoreNestedFieldWrapping?: boolean,
+    replaceEmpty?: boolean
+  ) => {
+    let value = renderValue(
+      data,
+      section.id,
+      field,
+      intl,
+      offlineResources,
+      language
     )
+
+    if (replaceEmpty && !value) {
+      value = '-'
+    }
+
+    return field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
+      ? (
+          (data[section.id] &&
+            data[section.id][field.name] &&
+            (data[section.id][field.name] as IFormSectionData).value &&
+            field.nestedFields[
+              (data[section.id][field.name] as IFormSectionData).value as string
+            ]) ||
+          []
+        ).reduce((groupedValues, nestedField) => {
+          // Value of the parentField resembles with IFormData as a nested form
+          const nestedValue =
+            (data[section.id] &&
+              data[section.id][field.name] &&
+              renderValue(
+                data[section.id][field.name] as IFormData,
+                'nestedFields',
+                nestedField,
+                intl,
+                offlineResources,
+                language
+              )) ||
+            ''
+          return (
+            <>
+              {groupedValues}
+              {nestedValue && <div></div>}
+              {nestedValue}
+            </>
+          )
+        }, <>{value}</>)
+      : value
+  }
+
+  const getPreviewGroupsField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    visitedTags: string[],
+    data: IFormSectionData,
+    originalData?: IFormSectionData
+  ) => {
+    if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
+      visitedTags.push(field.previewGroup)
+
+      const baseTag = field.previewGroup
+      const taggedFields: IFormField[] = []
+      group.fields.forEach((field) => {
+        if (
+          isVisibleField(field, section, declaration, offlineResources) &&
+          !isViewOnly(field)
+        ) {
+          if (field.previewGroup === baseTag) {
+            taggedFields.push(field)
+          }
+          for (const index in field.nestedFields) {
+            field.nestedFields[index].forEach((tempField) => {
+              if (
+                isVisibleField(
+                  tempField,
+                  section,
+                  declaration,
+                  offlineResources
+                ) &&
+                !isViewOnly(tempField) &&
+                tempField.previewGroup === baseTag
+              ) {
+                taggedFields.push(tempField)
+              }
+            })
+          }
+        }
+      })
+
+      const tagDef =
+        (group.previewGroups &&
+          (group.previewGroups.filter(
+            (previewGroup) => previewGroup.id === baseTag
+          ) as IPreviewGroup[])) ||
+        []
+      const values = taggedFields
+        .map((field) =>
+          getFieldValue(
+            section,
+            declaration.data,
+            field,
+            intl,
+            offlineResources,
+            language
+          )
+        )
+        .filter((value) => value)
+
+      let completeValue = values[0]
+      values.shift()
+      values.forEach(
+        (value) =>
+          (completeValue = (
+            <>
+              {completeValue}
+              {tagDef[0].delimiter ? tagDef[0].delimiter : <div></div>}
+              {value}
+            </>
+          ))
+      )
+
+      const hasAnyFieldChanged = taggedFields.reduce(
+        (accum, field) => accum || hasFieldChanged(field, data, originalData),
+        false
+      )
+
+      const declarationOriginalData = declaration.originalData
+      if (declarationOriginalData && hasAnyFieldChanged) {
+        const previousValues = taggedFields
+          .map((field, index) =>
+            getFieldValue(
+              section,
+              declarationOriginalData,
+              field,
+              intl,
+              offlineResources,
+              language,
+              undefined,
+              !!index
+            )
+          )
+          .filter((value) => value)
+        let previousCompleteValue = previousValues[0]
+        previousValues.shift()
+        previousValues.forEach(
+          (previousValue) =>
+            (previousCompleteValue = (
+              <>
+                {previousCompleteValue}
+                {tagDef[0].delimiter ? tagDef[0].delimiter : <div></div>}
+                {previousValue}
+              </>
+            ))
+        )
+
+        return getRenderableField(
+          section,
+          (tagDef[0] && tagDef[0].label) || field.label,
+          previousCompleteValue,
+          completeValue,
+          intl
+        )
+      }
+    }
+  }
+
+  const getSinglePreviewField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    ignoreNestedFieldWrapping?: boolean
+  ) => {
+    if (
+      declaration.originalData &&
+      hasFieldChanged(
+        field,
+        declaration.data[section.id],
+        declaration.originalData[section.id]
+      )
+    ) {
+      const changed = getFieldValue(
+        section,
+        declaration.data,
+        field,
+        intl,
+        offlineResources,
+        language,
+        ignoreNestedFieldWrapping
+      )
+      const original = getFieldValue(
+        section,
+        declaration.originalData,
+        field,
+        intl,
+        offlineResources,
+        language,
+        ignoreNestedFieldWrapping,
+        true
+      )
+
+      return getRenderableField(section, field.label, original, changed, intl)
+    }
   }
 
   const getChanges = (formSections: IFormSection[]) => {
@@ -229,17 +451,29 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
     const Values = changesValue && (changesValue.values as any[])
     let items: any[] = []
 
+    let tempItem: any
+
+    const visitedTags: string[] = []
+
     Values?.forEach((value: any) => {
       const section = formSections.find((r) => r.id === value.section)
       if (section) {
         section.groups.forEach((group) => {
           const field = group.fields.find((r) => r.name === value.fieldName)
           if (field) {
-            items = items.concat({
-              item: intl.formatMessage(field.label),
-              original: value.oldValue,
-              changed: value.newValue
-            })
+            tempItem = field.previewGroup
+              ? getPreviewGroupsField(
+                  section,
+                  group,
+                  field,
+                  visitedTags,
+                  declaration.data[section.id],
+                  declaration.originalData &&
+                    declaration.originalData[section.id]
+                )
+              : getSinglePreviewField(section, group, field)
+
+            items = items.concat(tempItem)
           }
         })
       }
@@ -249,21 +483,18 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   }
 
   const getSubmitter = () => {
-    const correction = declaration.data?.registration
-      ?.correction as IFormSectionData
-    return correction && (correction.submitter as string)
+    const correction = getCorrectionRequestTask()
+    return correction?.user && getName(correction.user.name, 'en')
   }
 
   const getOffice = () => {
-    const correction = declaration.data?.registration
-      ?.correction as IFormSectionData
-    return correction && (correction.office as string)
+    const correction = getCorrectionRequestTask()
+    return correction?.office && (correction.office?.name as string)
   }
 
   const getDate = () => {
-    const correction = declaration.data?.registration
-      ?.correction as IFormSectionData
-    return correction && (correction.date as Date)
+    const correction = getCorrectionRequestTask()
+    return correction?.date && (correction.date as Date)
   }
 
   return (
@@ -300,12 +531,12 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
                 )}
                 value={getReasonForRequest()}
               />
-              {/* <Summary.Row
+              <Summary.Row
                 label={intl.formatMessage(
                   messages.correctionSummarySupportingDocuments
                 )}
                 value={getSupportingDocuments()}
-              /> */}
+              />
               <Summary.Row
                 label={intl.formatMessage(messages.correctionSummaryComments)}
                 value={getComments()}

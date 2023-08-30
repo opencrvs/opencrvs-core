@@ -85,7 +85,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     }
     this.props.modifyDeclaration(recordWithSubmissionStatus)
     this.props.writeDeclaration(recordWithSubmissionStatus)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
   storeData = (rejectionFormData: IFormSectionData) => {
