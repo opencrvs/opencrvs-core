@@ -677,6 +677,34 @@ class RegisterFormView extends React.Component<FullProps, State> {
   componentDidUpdate(prevProps: FullProps) {
     const oldHash = prevProps.location && prevProps.location.hash
     const newHash = this.props.location && this.props.location.hash
+    const { declaration } = this.props
+    const informantTypeChanged =
+      prevProps.declaration?.data?.informant?.informantType !==
+      declaration?.data?.informant?.informantType
+
+    // see https://github.com/opencrvs/opencrvs-core/issues/5820
+    if (informantTypeChanged) {
+      let informant
+
+      if (declaration?.data?.informant?.informantType === 'MOTHER') {
+        informant = 'mother'
+      } else if (declaration?.data?.informant?.informantType === 'FATHER') {
+        informant = 'father'
+      }
+
+      if (informant) {
+        this.props.modifyDeclaration({
+          ...declaration,
+          data: {
+            ...declaration.data,
+            [informant]: {
+              ...declaration.data[informant],
+              detailsExist: true
+            }
+          }
+        })
+      }
+    }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
       this.props.history.replace({
